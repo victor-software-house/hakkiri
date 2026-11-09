@@ -43,8 +43,26 @@ Alternatives, each written as the same four rules and parsed with its own reader
 - Jsonnet, Nickel, Starlark and Dhall. Lost: the file runs as code before it is data.
 - An own syntax. Lost: it needs its own parser, formatter and grammar, and GitHub would show it uncoloured until it is in wide use.
 
+### 2. Vale's field names outside the selector
+
+Every field outside the selector takes Vale's name (operator, 2026-11-09).  
+The selector keeps ast-grep's terms under one key, `rule`, in place of Vale's `scope`.  
+A file holds one rule, and its file name is the rule name, as in Vale: `ProseStyle/rules/Filler.yml` is `ProseStyle.Filler`.
+
+The fields are `extends`, `message`, `level`, `description`, `link`, `tokens`, `exceptions`, `ignorecase`, `swap`, `max` and `condition`.  
+Tests sit in the rule as `tests`, each with `name`, `input`, and `contains`, `absent` or `want`, as Vale's [test suite][vale-suite] reads them.
+
+ProseStyle's 42 rules already use these names, so the importer maps most fields one to one.  
+`extends` names the check type, and Vale's levels have no `off`; turning a rule off belongs in `.ctl/hakkiri.yaml`.
+
+Alternative: ast-grep's names for the envelope (`id`, `severity`, `note`, `url`, `files`, `ignores`) with several rules per file.  
+Lost: ast-grep has no names for prose checks, so the check fields would still come from Vale.  
+Its tests are [`valid` and `invalid` lists][ast-grep-tests] that show only whether a rule fired, with the alerts in a separate snapshot file.
+
 ## Risks / Trade-offs
 
 - [YAML's implicit typing differs between 1.1 and 1.2] → hakkiri reads 1.2 only. Its JSON schema lets an editor flag a list item that a 1.1 tool would read as a boolean.
 
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
+[vale-suite]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/testsuite/suite.go#L28-L64
+[ast-grep-tests]: https://github.com/ast-grep/ast-grep.github.io/blob/fe48cd89b24174a421505adf15604a49e740d3b2/website/guide/test-rule.md
