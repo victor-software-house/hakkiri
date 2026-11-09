@@ -37,5 +37,5 @@ The operator contract will be `hakkiri instructions` and `skills/hakkiri/SKILL.m
 
 - ctl's shared rules apply: always a pull request, never `--no-verify`, ctl-core owns presentation, every flag has a `HAKKIRI_` variable, and nothing local leaks into a tracked file.
 - The pull request's CI verifies. Do not build or test before a push.
-- A behaviour change moves code, tests, `src/instructions.md`, `skills/hakkiri/SKILL.md`, this file and `docs/` together (the ctl bundle contract).
+- A behaviour change moves code, tests, `src/instructions.md`, `skills/hakkiri/SKILL.md`, this file and its OpenSpec change together (the ctl bundle contract).
 - Prose in this repository follows ProseStyle: plain words, short sentences, no dashes as punctuation.

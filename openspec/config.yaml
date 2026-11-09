@@ -7,8 +7,8 @@ context: |
   ProseStyle rule package. Rules pick nodes in a document tree first, and a
   pattern only narrows that pick. Each source language has a profile that maps
   its comments and doc comments into the tree.
-  Contracts: AGENTS.md. Evidence: docs/research.md. Decisions:
-  docs/decisions.md. Work queue: tasks.yaml (HKR-###). One OpenSpec change
+  Contracts: AGENTS.md. The plan, research and decisions:
+  openspec/changes/bootstrap-hakkiri/. Work queue: tasks.yaml (HKR-###). One OpenSpec change
   maps to one queue row.
   Writing style: ProseStyle. Plain words, short sentences, no dashes as
   punctuation, no emojis. This repository is public: no local paths, machine

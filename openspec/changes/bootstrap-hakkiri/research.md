@@ -136,7 +136,7 @@ Versions and licences from the crates.io API on 2026-11-09.
 
 ## 6. What the design has to settle
 
-These follow from the findings and go to the operator.
+These follow from the findings; [design.md](design.md) records how the operator settled each one.
 
 1. Rule format: read Vale `.vale.ini` and rule YAML as they are, or a ctl-style `.ctl/<verb>.yaml` plus a new rule format with a one-time converter.  
    Reading Vale YAML as it is ties us to Vale's scope names and regexp2 syntax; a new format can add the scopes in finding 3.

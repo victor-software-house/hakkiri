@@ -13,7 +13,8 @@ queue:
     acceptance:
       - CI passes on main with the rendered rust-crate template, OpenSpec and lint_prose.
       - tasks.yaml queues every release 1 slice, and qctl check passes.
-      - docs/research.md and docs/decisions.md hold no local path or private name.
+      - The bootstrap-hakkiri OpenSpec change holds the research and design, with no local path or private name.
+    plan: openspec/changes/bootstrap-hakkiri/proposal.md
 
   - id: HKR-002
     title: Design the rule and config format

@@ -23,8 +23,9 @@ An editor server follows in the second release.
 
 ## Documentation
 
-- [Research](docs/research.md): the field, the building blocks, and what ProseStyle needs.
-- [Decisions](docs/decisions.md): what the design settled and why.
+- [Research](openspec/changes/bootstrap-hakkiri/research.md): the field, the building blocks, and what ProseStyle needs.
+- [Design](openspec/changes/bootstrap-hakkiri/design.md): what the design settled, the alternatives, and the release 1 plan.
+- [Work queue](tasks.yaml): one row per slice, each planned as an OpenSpec change.
 
 ## License
 
