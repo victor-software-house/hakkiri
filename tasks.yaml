@@ -13,7 +13,7 @@ queue:
     acceptance:
       - Every enabled ProseStyle rule and every frequency-habit rule is written in the format, none using lookbehind to rebuild structure.
       - The operator approved the format.
-      - The rule-format OpenSpec change specifies rule files and .ctl/hakkiri.yaml, with structure terms from ast-grep and prose checks from Vale plus rates.
+      - The rule-format OpenSpec change specifies rule files and .ctl/hakkiri.yaml, with fields and scopes from Vale and prose checks from Vale plus rates.
     plan: openspec/changes/rule-format/proposal.md
 
   - id: HKR-003
