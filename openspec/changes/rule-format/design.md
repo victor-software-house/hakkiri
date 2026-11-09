@@ -111,6 +111,33 @@ These are `existence`, `substitution`, `occurrence`, `metric`, `capitalization`,
 
 Alternative: only the four types ProseStyle uses today. Lost: a style that uses another type could not be imported.
 
+### 6. The project config uses lowercase keys
+
+`.ctl/hakkiri.yaml` holds the settings `.vale.ini` holds today, in lowercase keys like the other `.ctl/` configs and the rule files (operator, 2026-11-09):
+
+```yaml
+packages:
+  - url: https://github.com/victor-software-house/prose-style/releases/download/v0.0.7/ProseStyle.zip
+    sha256: 3d03b911…
+level: warning
+files:
+  '*.{md,mdx,rs}':
+    styles: [ProseStyle]
+  '*.rs':
+    ProseStyle.BareURL: off
+  'target/**':
+    styles: []
+```
+
+- `packages` is verctl's key; `url` and `sha256` are the key names in prose-style's [`upstream.toml`][upstream-toml]. A package whose download does not match its hash fails the run.
+- `level` is the lowest level reported, Vale's `MinAlertLevel`.
+- `files` maps a glob to its settings, as Vale's glob sections do.
+- `styles` lists the styles a glob runs, Vale's `BasedOnStyles`; an empty list turns linting off for those files.
+- A rule's name sets its level for those files, and `off` turns it off, where Vale writes `NO`.
+
+Alternative: Vale's `.vale.ini` names unchanged in YAML, with each glob as a top-level key.  
+Lost: the keys are PascalCase while the rule files are lowercase.
+
 ## Risks / Trade-offs
 
 - [YAML's implicit typing differs between 1.1 and 1.2] → hakkiri reads 1.2 only. Its JSON schema lets an editor flag a list item that a 1.1 tool would read as a boolean.
@@ -125,4 +152,5 @@ Alternative: only the four types ProseStyle uses today. Lost: a style that uses 
 [vale-comments]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/query.go#L103-L107
 [vale-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L53-L63
 [vale-types]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L119-L132
+[upstream-toml]: https://github.com/victor-software-house/prose-style/blob/ee9f207279864e305d7372aef4a6c5dacc3eb846/upstream.toml
 [habit-research]: https://github.com/victor-software-house/prose-style/blob/ee9f207279864e305d7372aef4a6c5dacc3eb846/openspec/changes/frequency-habit-rules/research.md
