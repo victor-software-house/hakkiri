@@ -32,8 +32,7 @@ queue:
     title: Build the rule engine
     scope: engine
     outcome: >-
-      Rules select nodes first, then run word lists, swaps, counts, metrics and rates
-      over them.
+      Rules select text by scope, then run every Vale check type except script, with rates through metric.
     blocked_by:
       - HKR-002
     acceptance:
@@ -72,8 +71,7 @@ queue:
     title: Import Vale styles
     scope: import
     outcome: >-
-      hakkiri import vale converts the Vale rule types ProseStyle uses into the
-      format.
+      hakkiri import vale converts every Vale rule type except script into the format.
     blocked_by:
       - HKR-005
     acceptance:

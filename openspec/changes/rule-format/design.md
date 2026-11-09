@@ -82,10 +82,40 @@ Alternatives:
 - Vale's `scope` plus ast-grep's `inside`, `has`, `not`, `all` and `any`. Lost: two operator sets for one job, and no ProseStyle rule needs a deeper match than the scope operators give.
 - Node names from mdast and nlcst, or from the tree-sitter grammars. Lost: they mix camelCase, PascalCase and snake_case, and tree-sitter's Markdown grammar has no node for a bare URL in text.
 
+### 4. A rate is a metric that counts tokens
+
+A habit rate is a `metric` rule with `tokens`, whose formula reads `occurrences`, the number of token matches (operator, 2026-11-09).  
+`occurrences` is Vale's own word for a match in its `occurrence` check, and it is the one name this format adds to Vale's.  
+With no scope, a metric measures the whole file, as [Vale's metric][vale-metric] does:
+
+```yaml
+extends: metric
+message: "%s semicolons per 1,000 words, over 3: split the sentences."
+level: warning
+tokens:
+  - ';'
+formula: occurrences / words * 1000
+condition: '> 3'
+```
+
+The [frequency research][habit-research] measured each habit per 1,000 words, so its numbers become thresholds directly.
+
+Alternative: Vale's `occurrence` unchanged, at most N matches per paragraph or sentence.  
+Lost: a 10-word and a 60-word paragraph get the same limit, and each threshold would need measuring again.
+
+### 5. Release 1 implements every Vale check type but script
+
+Release 1 implements the 11 [check types Vale defines][vale-types] other than `script` (operator, 2026-11-09).  
+These are `existence`, `substitution`, `occurrence`, `metric`, `capitalization`, `consistency`, `conditional`, `repetition`, `sequence`, `spelling` and `readability`.  
+`script` runs Tengo code, and a rule file stays data.
+
+Alternative: only the four types ProseStyle uses today. Lost: a style that uses another type could not be imported.
+
 ## Risks / Trade-offs
 
 - [YAML's implicit typing differs between 1.1 and 1.2] → hakkiri reads 1.2 only. Its JSON schema lets an editor flag a list item that a 1.1 tool would read as a boolean.
 - [Front matter, link definitions, raw HTML and MDX have no scope] → the first rule that needs one adds a lowercase dotted name to the spec.
+- [`sequence` needs part-of-speech tags and `spelling` needs dictionaries] → the engine slice names the crate or data for each before it starts.
 
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
 [vale-suite]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/testsuite/suite.go#L28-L64
@@ -93,3 +123,6 @@ Alternatives:
 [prose-style-rules]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846/ProseStyle/styles/ProseStyle
 [vale-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/scope.go#L68-L187
 [vale-comments]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/query.go#L103-L107
+[vale-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L53-L63
+[vale-types]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L119-L132
+[habit-research]: https://github.com/victor-software-house/prose-style/blob/ee9f207279864e305d7372aef4a6c5dacc3eb846/openspec/changes/frequency-habit-rules/research.md
