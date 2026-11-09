@@ -1,0 +1,44 @@
+# Hooks call mise tasks, so a hook runs the same command as CI. mise.dev.toml
+# installs the hooks through its postinstall hook. CI never loads that file,
+# so no runner has them and no hook needs a CI skip.
+#
+# Every command runs with MISE_ENV=dev,hooks, from the hookenv anchor on the
+# first command, except lockfile below. MISE_ENV replaces the .miserc.toml
+# default, so dev is named
+# again; a mise.hooks.toml, where a repository has one, disables auto deps
+# providers inside hooks.
+pre-commit:
+  commands:
+    format:
+      # *.rs matches every depth; **/*.rs misses files at the root.
+      glob: "*.rs"
+      env: &hookenv { MISE_ENV: "dev,hooks" }
+      run: mise run format
+    staged-secrets:
+      env: *hookenv
+      run: mise run hooks:secrets:staged
+
+commit-msg:
+  commands:
+    committed:
+      env: *hookenv
+      run: mise run commit-msg {1}
+
+# Hooks are the cheap local tier: no build, test, typecheck or type-aware
+# lint. The pull request's CI is the gate and runs all of them.
+pre-push:
+  commands:
+    # Fails when a mise lockfile no longer matches its config
+    # (mise-tasks/hooks/lockfile.sh). The task checks each committed
+    # mise.<profile>.toml's lock in turn, except the hooks profile's; the
+    # env here only sets the profiles mise runs the task itself in.
+    lockfile:
+      env: { MISE_ENV: "dev" }
+      run: mise run hooks:lockfile
+    # Lints each pushed commit the remote does not have yet. It also scans
+    # those commits for credentials, instead of the whole history. The task,
+    # mise-tasks/hooks/pushed.sh, reads git's pre-push lines on stdin.
+    commits:
+      env: *hookenv
+      use_stdin: true
+      run: mise run hooks:pushed

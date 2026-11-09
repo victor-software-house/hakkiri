@@ -8,13 +8,15 @@ The operator contract will be `hakkiri instructions` and `skills/hakkiri/SKILL.m
 
 1. **Own format.**
    hakkiri reads its own rule files and `.ctl/hakkiri.yaml`, not `.vale.ini` or Vale rule files.  
-   The format takes its structure terms from one source, ast-grep (`kind`, `inside`, `has`, `not`, `all`, `any`), and its prose checks from Vale's model: word lists, swaps, counts, metrics, plus rates.  
+   The format takes its structure terms from ast-grep: `kind`, `inside`, `has`, `not`, `all`, `any`.  
+   Its prose checks come from Vale's model: word lists, swaps, counts, metrics, plus rates.  
    Vale styles enter only through `hakkiri import vale`, which a package build runs.
 2. **Structure first.**
    A rule selects nodes in the document tree; a pattern only narrows that selection.  
-   A rule that needs a regular expression to find out whether text sits in code, a link or a comment is a missing node kind, not a rule to write.
+   A rule that needs a regular expression to find whether text sits in code, a link or a comment shows a missing node kind.
 3. **Language profiles.**
-   Each source language has a profile that maps its comments and doc comments into the tree: rustdoc as Markdown, TSDoc and JSDoc with their tags, plain comments as text.  
+   Each source language has a profile that maps its comments and doc comments into the tree.  
+   Rustdoc reads as Markdown, TSDoc and JSDoc keep their tags, and plain comments read as text.  
    String literals are never prose.  
    The first release ships Rust, TypeScript, JavaScript, Markdown and MDX.
 4. **Matching.**
@@ -35,7 +37,8 @@ The operator contract will be `hakkiri instructions` and `skills/hakkiri/SKILL.m
 
 ## Rules
 
-- ctl's shared rules apply: always a pull request, never `--no-verify`, ctl-core owns presentation, every flag has a `HAKKIRI_` variable, and nothing local leaks into a tracked file.
+- ctl's shared rules apply. Every change goes through a pull request, and `--no-verify` is never used.  
+  ctl-core owns presentation, every flag has a `HAKKIRI_` variable, and nothing local leaks into a tracked file.
 - The pull request's CI verifies. Do not build or test before a push.
-- A behaviour change moves code, tests, `src/instructions.md`, `skills/hakkiri/SKILL.md`, this file and `docs/` together (the ctl bundle contract).
+- A behaviour change moves code, tests, `src/instructions.md`, `skills/hakkiri/SKILL.md`, this file and its OpenSpec change together (the ctl bundle contract).
 - Prose in this repository follows ProseStyle: plain words, short sentences, no dashes as punctuation.

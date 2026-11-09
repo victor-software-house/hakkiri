@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
+schema_version: 5
+prefix: HKR
+active: HKR-001
+queue:
+  - id: HKR-001
+    title: Scaffold the repository
+    scope: repo
+    outcome: >-
+      The repository holds the template render, the work queue, OpenSpec, and the
+      research and decisions behind the plan.
+    blocked_by: []
+    acceptance:
+      - CI passes on main with the rendered rust-crate template, OpenSpec and lint_prose.
+      - tasks.yaml queues every release 1 slice, and qctl check passes.
+      - The bootstrap-hakkiri OpenSpec change holds the research and design, with no local path or private name.
+    plan: openspec/changes/bootstrap-hakkiri/proposal.md
+
+  - id: HKR-002
+    title: Design the rule and config format
+    scope: format
+    outcome: >-
+      One approved spec defines the rule files and .ctl/hakkiri.yaml before any
+      engine code.
+    blocked_by:
+      - HKR-001
+    acceptance:
+      - docs/format.md specifies rule files and .ctl/hakkiri.yaml, with structure terms from ast-grep and prose checks from Vale plus rates.
+      - Every enabled ProseStyle rule and every frequency-habit rule is written in the format, none using lookbehind to rebuild structure.
+      - The operator approved the format.
+
+  - id: HKR-003
+    title: Build the document tree and language profiles
+    scope: tree
+    outcome: >-
+      Markdown, MDX, and Rust, TypeScript and JavaScript comments parse into one node
+      tree with byte spans.
+    blocked_by:
+      - HKR-002
+    acceptance:
+      - Snapshot tests show trees and spans for block comments, strings holding URLs, nested lists, tables and MDX.
+      - String literals never appear as prose nodes.
+
+  - id: HKR-004
+    title: Build the rule engine
+    scope: engine
+    outcome: >-
+      Rules select nodes first, then run word lists, swaps, counts, metrics and rates
+      over them.
+    blocked_by:
+      - HKR-002
+    acceptance:
+      - Each check type has unit tests.
+      - Flesch-Kincaid matches Vale on the prose-style fixtures within a stated tolerance.
+      - A 50,000-character line and a 60,000-line file finish with no panic.
+
+  - id: HKR-005
+    title: Ship the check and test commands
+    scope: cli
+    outcome: >-
+      hakkiri check lints files in parallel and hakkiri test runs rule cases,
+      released as binaries through verctl.
+    blocked_by:
+      - HKR-003
+      - HKR-004
+    acceptance:
+      - Integration tests cover line and JSON output, exit status by level, and .ctl/hakkiri.yaml globs and levels.
+      - JSON output holds no ESC byte with CLICOLOR_FORCE=1.
+      - A verctl Version PR publishes a release that mise installs.
+
+  - id: HKR-006
+    title: Fetch and cache rule packages
+    scope: packages
+    outcome: >-
+      A project pins rule packages by version and hash, and check fetches them with
+      no sync step.
+    blocked_by:
+      - HKR-005
+    acceptance:
+      - Tests cover the first fetch, a cache hit and a hash mismatch.
+
+  - id: HKR-007
+    title: Import Vale styles
+    scope: import
+    outcome: >-
+      hakkiri import vale converts the Vale rule types ProseStyle uses into the
+      format.
+    blocked_by:
+      - HKR-005
+    acceptance:
+      - Each converted Voices, Std and Readability rule passes the cases from its own Vale file.
+
+  - id: HKR-008
+    title: Run ProseStyle on hakkiri
+    scope: prose-style
+    outcome: >-
+      prose-style publishes a hakkiri package with its own rules, the converted
+      upstream styles and the rate rules.
+    blocked_by:
+      - HKR-006
+      - HKR-007
+    acceptance:
+      - Every rule case and package case passes under hakkiri test.
+      - An alert diff against Vale with ProseStyle 0.0.7 over our public repositories shows only the intended differences.
+
+  - id: HKR-009
+    title: Switch the template to hakkiri
+    scope: template
+    outcome: >-
+      The lint_prose piece runs hakkiri from mise and a pre-commit hook, with no Vale
+      left.
+    blocked_by:
+      - HKR-008
+    acceptance:
+      - The templates Template check passes, and one pilot project passes CI on its update.
+
+  - id: HKR-010
+    title: Release 1
+    scope: release
+    outcome: Projects that used Vale with ProseStyle run hakkiri instead.
+    blocked_by:
+      - HKR-009
+    acceptance:
+      - Every adopted project passes CI on hakkiri.
+archive: []
+horizon:
+  - id: HKR-011
+    title: Serve alerts and fixes in editors
+    scope: lsp
+    outcome: hakkiri lsp shows alerts and offers swap fixes in editors.
+    kind: deferred
+    open: Release 1 has not shipped.
