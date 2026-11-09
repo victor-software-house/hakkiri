@@ -11,9 +11,10 @@ queue:
       engine code.
     blocked_by: []
     acceptance:
-      - docs/format.md specifies rule files and .ctl/hakkiri.yaml, with structure terms from ast-grep and prose checks from Vale plus rates.
       - Every enabled ProseStyle rule and every frequency-habit rule is written in the format, none using lookbehind to rebuild structure.
       - The operator approved the format.
+      - The rule-format OpenSpec change specifies rule files and .ctl/hakkiri.yaml, with structure terms from ast-grep and prose checks from Vale plus rates.
+    plan: openspec/changes/rule-format/proposal.md
 
   - id: HKR-003
     title: Build the document tree and language profiles
