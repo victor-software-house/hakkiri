@@ -39,6 +39,8 @@ queue:
       - Each check type has unit tests.
       - Flesch-Kincaid matches Vale on the prose-style fixtures within a stated tolerance.
       - A 50,000-character line and a 60,000-line file finish with no panic.
+    notes:
+      - '2026-11-09, a sentence-length check counts prose words only: a code span is one word, and a link counts its text, not its target. This differs from Vale on purpose; HKR-002 lists it with the other intended differences.'
 
   - id: HKR-005
     title: Ship the check and test commands
