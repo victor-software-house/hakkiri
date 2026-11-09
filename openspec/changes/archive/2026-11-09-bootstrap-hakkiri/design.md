@@ -140,5 +140,5 @@ Rollback: until the template switch, `HKR-009`, no project depends on hakkiri; a
 
 [proposal]: proposal.md
 [research]: research.md
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
 [ast-grep]: https://ast-grep.github.io/reference/rule.html

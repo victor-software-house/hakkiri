@@ -40,6 +40,6 @@ None.
 
 [ProseStyle]: https://github.com/victor-software-house/prose-style
 [Vale]: https://vale.sh
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
 [research]: research.md
 [design]: design.md
