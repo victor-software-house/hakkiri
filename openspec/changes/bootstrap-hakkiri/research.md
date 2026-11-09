@@ -12,8 +12,8 @@ Each claim links its source.
    The package configuration turns on 42 rules of four types: existence, substitution, occurrence and metric (section 2.1).  
    The Tengo script rule and the conditional rule ship in the zip but no section turns them on.
 3. The slowest and least stable rules exist because Vale gives them no scope for "prose outside code".  
-   `BareURL` rebuilds fenced blocks and code spans out of lookbehinds; that rule caused the 100,000-slot backtracking panics and the 249 s run (section 3).  
-   A linter that walks a real Markdown tree can offer that scope directly, and the rule becomes a token match.
+   `BareURL` rebuilds fenced blocks and code spans out of lookbehinds; that rule caused the backtracking panics and the 249 s run (section 3).  
+   A linter that walks a Markdown tree offers that scope, and the rule becomes a token match.
 4. The Rust building blocks are mature for every part except sentence splitting and syllable counts (section 5).  
    `fancy-regex` now accepts variable-length lookbehind and returns an error, not a panic, when it runs out of backtracking budget.
 5. Whether `fancy-regex` compiles the six ProseStyle patterns that use lookbehind, unchanged, is not verified.  
@@ -51,10 +51,10 @@ The open [frequency-habit-rules][ps-freq] change proposes rules that count a hab
 - Tests: every rule carries `tests:` cases run by `vale test --coverage`, which fails when a rule fires in no case, plus 16 package cases in [`test/package.test.yml`][ps-pkgtest].  
   `vale test` is upstream since [ae6d749][vale-test] (2026-08-11).
 
-### 2.3 How projects run it
+### 2.3 Use in projects
 
-The Copier template's `lint:prose` task lists tracked files with `git ls-files`, passes them to `vale --output=line` through `xargs`, and fails on any printed line when `prose_fail_level` is `warning`.    
-It pins Vale 3.26.0 through mise and ProseStyle v0.0.7 in `includes/pins.jinja`.    
+The Copier template's `lint:prose` task lists tracked files with `git ls-files`, passes them to `vale --output=line` through `xargs`, and fails on any printed line when `prose_fail_level` is `warning`.  
+It pins Vale 3.26.0 through mise and ProseStyle v0.0.7 in `includes/pins.jinja`.  
 Generated paths get an empty `BasedOnStyles` section, so large generated files are skipped rather than linted.
 
 ## 3. Vale today
@@ -69,10 +69,12 @@ Read at source in [vale-cli/vale at 66bbb85][vale-head] unless marked.
 | A fragment format such as Rust is linted as Markdown, then the whole file is restored for `raw` and summary scopes, so `raw` reads string literals | [fragment.go L104-L108][vale-frag] |
 | The Rust query reads `(line_comment)+` only; block comments are skipped | [rs.go][vale-rs] |
 | Regex runs on a fork of regexp2 with a 100,000-slot backtracking stack, and Vale's wrappers panic when a match exceeds it | [regex.go][vale-regex], [regexp2 options.go][regexp2-opts] |
-| The only issue on parallel files is #21, closed in 2017 | [issue 21][vale-21] |
+| The only issue on parallel files, [issue 21][vale-21], was closed in 2017 | GitHub issue search |
 
-The README's "files linted in parallel" holds for a directory argument, not for a list of files.    
-On one large Rust project's prose files, ProseStyle v0.0.6 took 249.5 s in one Vale process and v0.0.7 took 9.0 to 9.4 s, on 8 vCPUs (measured 2026-11-09, not repeated here).
+The README's "files linted in parallel" holds for a directory argument, not for a list of files.
+
+On one large Rust project's prose files, ProseStyle v0.0.6 took 249.5 s in one Vale process on 8 vCPUs.  
+Version 0.0.7 took 9.0 to 9.4 s on the same machine (measured 2026-11-09, not repeated here).
 
 ## 4. The field
 
@@ -82,7 +84,7 @@ Licences and dates from the GitHub API unless a LICENSE link is given.
 |:--|:--|:--|:--|:--|
 | [Vale][vale] | MIT, Go | active, one maintainer | YAML rule types plus Tengo scripts | runs the package today |
 | [vale-ls][vale-ls] | MIT, Rust | v0.6.0, 2026-10-01 | language server that calls Vale | editor front end for Vale only |
-| [Harper][harper] | Apache-2.0, Rust | v3.1.0, 2026-11-06; 1,228 commits in 2026 | built-in Rust linters and the [Weir][weir] phrase DSL; no regex, no scopes, no metrics | grammar; a maintainer says style is not its goal ([discussion 1465][harper-1465]) |
+| [Harper][harper] | Apache-2.0, Rust | v3.1.0, 2026-11-06 | built-in linters and the [Weir][weir] phrase DSL; no regex, scopes or metrics | grammar; style is not its goal ([discussion 1465][harper-1465]) |
 | [vale-cli/Harper][vale-harper] | Apache-2.0 | v0.1.0, 2026-08-05 | Harper rules compiled to Vale YAML | a Vale style, not a linter |
 | [textlint][textlint] | [MIT][textlint-lic], TypeScript | v15.8.0, 2026-08-01 | JavaScript functions over an AST; MDX plugin | rules are code and need Node |
 | [proselint][proselint] | BSD-3-Clause, Python | v0.16.0, 2025-11-14 | fixed checks | no user rules |
@@ -113,7 +115,7 @@ Versions and licences from the crates.io API on 2026-11-09.
 | Crate | Licence | Latest | Notes |
 |:--|:--|:--|:--|
 | [regex][regex] | MIT or Apache-2.0 | 1.13.1 | linear time; no lookaround |
-| [fancy-regex][fancy] | MIT | 0.20.0, 2026-10-24 | delegates easy parts to `regex`; variable-length lookbehind since 0.17 and 0.18 ([CHANGELOG][fancy-cl]); `RegexSet` since 0.19; `backtrack_limit` yields [`RuntimeError::BacktrackLimitExceeded`][fancy-err] |
+| [fancy-regex][fancy] | MIT | 0.20.0, 2026-10-24 | variable-length lookbehind since 0.18 ([CHANGELOG][fancy-cl]); `backtrack_limit` returns [an error][fancy-err], not a panic |
 | [aho-corasick][aho] | Unlicense or MIT | 1.1.5 | word lists |
 | [rayon][rayon], [ignore][ignore] | MIT or Apache-2.0; Unlicense or MIT | 1.12.0; 0.4.34 | parallel files; gitignore-aware walk |
 
@@ -121,7 +123,7 @@ Versions and licences from the crates.io API on 2026-11-09.
 
 | Need | Candidates | State |
 |:--|:--|:--|
-| Sentences | [unicode-segmentation][unicode-seg] (UAX #29) | active; abbreviations need our own list |
+| Sentences | [unicode-segmentation][unicode-seg] (Unicode UAX 29) | active; abbreviations need our own list |
 | Syllables for Flesch-Kincaid | `textstat`, `readsight`, `syllarust`, `hypher` | low use or unproven; write our own and test it against Vale's numbers |
 | Spelling | [spellbook][spellbook] | MPL-2.0, Hunspell dictionaries, alpha; only needed if a spelling rule ships |
 | Script rules | [rhai][rhai] | pure Rust, operation limits; only needed if the Tengo rule stays |
@@ -136,10 +138,11 @@ Versions and licences from the crates.io API on 2026-11-09.
 
 ## 6. What the design has to settle
 
-These follow from the findings; [design.md](design.md) records how the operator settled each one.
+These follow from the findings; [design.md][design] records how the operator settled each one.
 
 1. Rule format: read Vale `.vale.ini` and rule YAML as they are, or a ctl-style `.ctl/<verb>.yaml` plus a new rule format with a one-time converter.  
-   Reading Vale YAML as it is ties us to Vale's scope names and regexp2 syntax; a new format can add the scopes in finding 3.
+   Reading Vale YAML as it is ties us to Vale's scope names and regexp2 syntax.  
+   A new format can add the scopes in finding 3.
 2. First release: Markdown, MDX and Rust comments; existence, substitution, occurrence, metric and `extends`.  
    Tengo, conditional, spelling and the five suggestion rules are not needed to reproduce what projects see today.
 3. Where it runs: the template's `lint:prose` task first; CI follows from it; an editor server and a pre-commit hook later.
@@ -154,6 +157,7 @@ These follow from the findings; [design.md](design.md) records how the operator 
 - Rhai sandbox limits.
 - textlint editor support and parallelism.
 
+[design]: design.md
 [ps]: https://github.com/victor-software-house/prose-style
 [ps-head]: https://github.com/victor-software-house/prose-style/tree/be9ef1746c7b23a10a9388ccce1dc6a4bbdff7e3
 [ps-ini]: https://github.com/victor-software-house/prose-style/blob/be9ef1746c7b23a10a9388ccce1dc6a4bbdff7e3/ProseStyle/.vale.ini

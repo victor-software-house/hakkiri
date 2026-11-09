@@ -12,7 +12,7 @@
 ## 2. Plan
 
 - [x] 2.1 Queue the release 1 slices as HKR rows, and verify `qctl check` passes.
-  - 2026-11-09 (UTC), HKR-001 to HKR-010 are queued and HKR-011 waits on the horizon; `qctl check --no-git` passed.
+  - 2026-11-09 (UTC), `HKR-001` to `HKR-010` are queued in [tasks.yaml][ledger] and `HKR-011` waits on the horizon; `qctl check --no-git` passed.
 - [x] 2.2 Write this change's proposal, design and research, and verify `openspec validate --all --strict` passes.
 
 ## 3. Integration
@@ -22,8 +22,9 @@
 
 ## Workflow follow-up
 
-- Archive this change after the pull request merges, then archive HKR-001 with `qctl close-from-openspec`.
+- Archive this change after the pull request merges, then archive `HKR-001` with `qctl close-from-openspec`.
 
+[ledger]: ../../../tasks.yaml
 [repo]: https://github.com/victor-software-house/hakkiri
 [c-first]: https://github.com/victor-software-house/hakkiri/commit/6f8aef2a4c537a6d2a30bb981f75be321316dd24
 [c-render]: https://github.com/victor-software-house/hakkiri/commit/20e8df5191ddeed6a8c83c66c649e1ae27187fdd

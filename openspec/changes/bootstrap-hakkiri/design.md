@@ -2,7 +2,8 @@
 
 ## Context
 
-The motivation is in [proposal.md][proposal]; the evidence is in [research.md][research].  
+The motivation is in [proposal.md][proposal]; the evidence is in [research.md][research].
+
 ProseStyle turns on 42 rules of four Vale types: existence, substitution, occurrence and metric.  
 Projects see 37 of them, because the template sets `MinAlertLevel = warning` and five rules are suggestions.  
 The Tengo script rule and the conditional rule ship in the package and stay off.  
@@ -29,10 +30,11 @@ The operator settled the decisions below on 2026-11-09.
 
 hakkiri reads its own rule files and `.ctl/hakkiri.yaml`.  
 Structure terms come from [ast-grep's rule object][ast-grep]: `kind`, `inside`, `has`, `not`, `all`, `any`.  
-Prose checks come from Vale's model: word lists, swaps, counts, metrics, plus rates.  
+Prose checks come from Vale's model: word lists, swaps, counts, metrics, plus rates.
+
 File globs and rule levels follow flat lint configs such as ESLint and oxlint.  
 Vale styles enter only through an importer that a package build runs.  
-Field names are settled in HKR-002, with every candidate shown side by side.
+The format slice, [`HKR-002`][ledger], settles the field names, with every candidate shown side by side.
 
 Alternatives:
 
@@ -101,38 +103,42 @@ Only a pattern that needs lookaround uses `fancy-regex`, with a backtrack limit;
 
 Alternative: one backtracking engine for every pattern, as Vale does with regexp2. Lost: its limit panics the whole run.
 
-### 9. Our templates, OpenSpec and qctl
+### 9. Templates, OpenSpec and qctl
 
 The repository is rendered from the shared Copier template.  
-Each slice is an OpenSpec change named by one row in `tasks.yaml`, moved with qctl.  
-verctl releases start with the CLI slice, HKR-005, because prose-style CI and the template install hakkiri through mise.
+Each slice is an OpenSpec change named by one row in [tasks.yaml][ledger], moved with qctl.  
+verctl releases start with the CLI slice, `HKR-005`, because prose-style CI and the template install hakkiri through mise.
 
 Alternative: a free-form plan file. Lost: OpenSpec and qctl already hold the plan, the evidence and the queue, and `qctl check` keeps them in step.
 
 ## Risks / Trade-offs
 
-- [markdown-rs, the only Rust parser with MDX and positions on every node, has had no release since 2025-04] → HKR-003 checks its positions on tables and list items first; comrak is the fallback for `.md`.
-- [Sentence boundaries decide `LongSentence` and `Direct.Length`] → HKR-004 tests the drift against Vale, and HKR-008's alert diff shows the effect.
-- [Converting upstream styles ties each upstream bump to the importer] → HKR-007 covers only the types those styles use.
-- [Whether `fancy-regex` compiles ProseStyle's six lookbehind patterns unchanged is not verified] → structure-first rules should remove most of them in HKR-002.
+- [markdown-rs has had no release since 2025-04] → It is the only Rust parser with MDX and positions on every node.
+  The tree slice, `HKR-003`, tests its positions on tables and list items first, and comrak is the fallback for `.md`.
+- [Sentence boundaries decide `LongSentence` and `Direct.Length`] → The engine slice, `HKR-004`, tests the drift against Vale, and the alert diff in `HKR-008` shows the effect.
+- [Converting upstream styles ties each upstream bump to the importer] → The importer slice, `HKR-007`, covers only the types those styles use.
+- [Whether `fancy-regex` compiles ProseStyle's six lookbehind patterns unchanged is not verified] → The format slice, `HKR-002`, should remove most of them with structure-first rules.
 
 ## Migration Plan
 
+Each slice is a row in [tasks.yaml][ledger].
+
 | Row | Slice | Proof |
 |:--|:--|:--|
-| HKR-001 | This change: repository, queue, research, design | CI passes on the rendered template; `qctl check` and `openspec validate --strict` pass |
-| HKR-002 | Rule and config format | The operator approves the format; every ProseStyle rule is written in it |
-| HKR-003 | Document tree and language profiles | Snapshot tests of trees and spans |
-| HKR-004 | Rule engine | Unit tests per check; no panic on a 50,000-character line |
-| HKR-005 | `check` and `test`, released through verctl | Integration tests; a release mise installs |
-| HKR-006 | Packages pinned by hash | Fetch, cache and mismatch tests |
-| HKR-007 | Vale importer | Converted rules pass their own Vale cases |
-| HKR-008 | ProseStyle on hakkiri, with rate rules | Every case passes; the alert diff shows only intended differences |
-| HKR-009 | Template switch | The Template check and a pilot project pass |
-| HKR-010 | Release 1 | Every adopted project passes CI |
+| `HKR-001` | This change: repository, queue, research, design | CI passes on the rendered template; `qctl check` and `openspec validate --strict` pass |
+| `HKR-002` | Rule and config format | The operator approves the format; every ProseStyle rule is written in it |
+| `HKR-003` | Document tree and language profiles | Snapshot tests of trees and spans |
+| `HKR-004` | Rule engine | Unit tests per check; no panic on a 50,000-character line |
+| `HKR-005` | `check` and `test`, released through verctl | Integration tests; a release mise installs |
+| `HKR-006` | Packages pinned by hash | Fetch, cache and mismatch tests |
+| `HKR-007` | Vale importer | Converted rules pass their own Vale cases |
+| `HKR-008` | ProseStyle on hakkiri, with rate rules | Every case passes; the alert diff shows only intended differences |
+| `HKR-009` | Template switch | The Template check and a pilot project pass |
+| `HKR-010` | Release 1 | Every adopted project passes CI |
 
-Rollback: until HKR-009, no project depends on hakkiri; after it, a project returns to Vale by taking the previous template tag.
+Rollback: until the template switch, `HKR-009`, no project depends on hakkiri; after it, a project returns to Vale by taking the previous template tag.
 
 [proposal]: proposal.md
 [research]: research.md
+[ledger]: ../../../tasks.yaml
 [ast-grep]: https://ast-grep.github.io/reference/rule.html
