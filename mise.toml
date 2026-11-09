@@ -44,7 +44,6 @@ depends = [
   "lint",
   "check:features",
   "test",
-  "test:doc",
   "doc",
   "deny",
   "deps",

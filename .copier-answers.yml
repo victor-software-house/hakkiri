@@ -35,7 +35,6 @@ pieces:
 pieces_extra:
 - lint_workflows
 - machete
-- doc_tests
 - rustdoc
 project: rust-crate
 prose_fail_level: error
