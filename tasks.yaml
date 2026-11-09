@@ -1,29 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-001
+active: HKR-002
 queue:
-  - id: HKR-001
-    title: Scaffold the repository
-    scope: repo
-    outcome: >-
-      The repository holds the template render, the work queue, OpenSpec, and the
-      research and decisions behind the plan.
-    blocked_by: []
-    acceptance:
-      - CI passes on main with the rendered rust-crate template, OpenSpec and lint_prose.
-      - tasks.yaml queues every release 1 slice, and qctl check passes.
-      - The bootstrap-hakkiri OpenSpec change holds the research and design, with no local path or private name.
-    plan: openspec/changes/bootstrap-hakkiri/proposal.md
-
   - id: HKR-002
     title: Design the rule and config format
     scope: format
     outcome: >-
       One approved spec defines the rule files and .ctl/hakkiri.yaml before any
       engine code.
-    blocked_by:
-      - HKR-001
+    blocked_by: []
     acceptance:
       - docs/format.md specifies rule files and .ctl/hakkiri.yaml, with structure terms from ast-grep and prose checks from Vale plus rates.
       - Every enabled ProseStyle rule and every frequency-habit rule is written in the format, none using lookbehind to rebuild structure.
@@ -122,7 +108,18 @@ queue:
       - HKR-009
     acceptance:
       - Every adopted project passes CI on hakkiri.
-archive: []
+archive:
+  - id: HKR-001
+    title: Scaffold the repository
+    scope: repo
+    outcome: >-
+      The repository holds the template render, the work queue, OpenSpec, and the
+      research and decisions behind the plan.
+    plan: openspec/changes/archive/2026-11-09-bootstrap-hakkiri/proposal.md
+    completed: 2026-11-09T17:42:10
+    evidence:
+      - Repository, template render, queue and the bootstrap-hakkiri OpenSpec change merged in PR 1.
+    disposition: completed
 horizon:
   - id: HKR-011
     title: Serve alerts and fixes in editors

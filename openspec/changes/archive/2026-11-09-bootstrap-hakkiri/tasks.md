@@ -17,15 +17,26 @@
 
 ## 3. Integration
 
-- [ ] 3.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
-- [ ] 3.2 Add hakkiri to the ctl mani group and the ctl `AGENTS.md` table, and verify `mani check` lists it.
+- [x] 3.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+  - 2026-11-09 (UTC), the first run failed: doc-tests found no library target, and rumdl flagged 4-space hard breaks.  
+    [ad825d5][c-doc-tests] turned the `doc_tests` piece off, and [2e693a7][c-prose] cleared the Markdown and ProseStyle alerts.  
+    [Run 42666547836][run-ci] then passed Build and test and Static checks, and [run 42666547754][run-template] passed the Template check.  
+    Kody found nothing, and [PR 1][pr-1] merged as [cb248d7][c-merge].
+- [x] 3.2 Add hakkiri to the ctl mani group and the ctl `AGENTS.md` table, and verify `mani check` lists it.
+  - 2026-11-09 (UTC), the workspace manifest and guide changed in the private dotfiles, and `mani list projects --tags prose` lists hakkiri.
 
 ## Workflow follow-up
 
 - Archive this change after the pull request merges, then archive `HKR-001` with `qctl close-from-openspec`.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
 [repo]: https://github.com/victor-software-house/hakkiri
 [c-first]: https://github.com/victor-software-house/hakkiri/commit/6f8aef2a4c537a6d2a30bb981f75be321316dd24
 [c-render]: https://github.com/victor-software-house/hakkiri/commit/20e8df5191ddeed6a8c83c66c649e1ae27187fdd
 [c-ci-lock]: https://github.com/victor-software-house/hakkiri/commit/efe389ae0099eebe5da77aceaa64ee2960b07ae6
+[c-doc-tests]: https://github.com/victor-software-house/hakkiri/commit/ad825d5cc53782a1005fd6ac440124b13f3a42e4
+[c-prose]: https://github.com/victor-software-house/hakkiri/commit/2e693a74bec8314c948ed72154b7b203cddbaf56
+[c-merge]: https://github.com/victor-software-house/hakkiri/commit/cb248d78b44bc276afdb56df4d07859bddbc2406
+[run-ci]: https://github.com/victor-software-house/hakkiri/actions/runs/42666547836
+[run-template]: https://github.com/victor-software-house/hakkiri/actions/runs/42666547754
+[pr-1]: https://github.com/victor-software-house/hakkiri/pull/1
