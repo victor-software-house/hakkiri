@@ -1,0 +1,31 @@
+# OpenSpec reads the project context and the per-artifact rules from here.
+schema: spec-driven
+
+context: |
+  hakkiri is a prose linter in Rust for Markdown, MDX, and the comments of
+  Rust, TypeScript and JavaScript. It replaces Vale in projects that use the
+  ProseStyle rule package. Rules pick nodes in a document tree first, and a
+  pattern only narrows that pick. Each source language has a profile that maps
+  its comments and doc comments into the tree.
+  Contracts: AGENTS.md. Evidence: docs/research.md. Decisions:
+  docs/decisions.md. Work queue: tasks.yaml (HKR-###). One OpenSpec change
+  maps to one queue row.
+  Writing style: ProseStyle. Plain words, short sentences, no dashes as
+  punctuation, no emojis. This repository is public: no local paths, machine
+  names, or private repository names in any artifact. Every reference is a
+  clickable reference-style link, pinned to a commit for code and files.
+
+rules:
+  proposal:
+    # ProseStyle.ChattyHeadings rejects a question heading, and OpenSpec
+    # accepts any heading in a proposal.
+    - Use the headings `## Motivation` and `## Changes` in place of the template's `## Why` and `## What Changes`.
+    - Name the HKR row the change belongs to.
+  specs:
+    - Every requirement uses SHALL and has at least one WHEN/THEN scenario.
+    - A scenario about a rule quotes the input text and the alerts it expects.
+  design:
+    - Each decision names the alternative considered and why it lost.
+  tasks:
+    - Each task names the command or observation that proves it is done.
+    - Compile, lint and test tasks run in the pull request's CI, not on the authoring machine.
