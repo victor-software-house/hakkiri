@@ -44,20 +44,12 @@ It joins adjacent line comments of the same type into one block, as rustdoc does
 
 It keeps, for each byte of the stripped text, the byte it came from in the file.  
 The stripped text parses as Markdown (rule-format decision 8).  
-Each Markdown node maps back through that table to its segments, one byte range for each line of its text.  
-A segment leaves out the markers and the stripped indentation.
-
-In a Markdown file the same holds for a paragraph inside a block quote or a list item.
-
-Each line is one segment, without its line ending.  
-The indentation and the `>` markers of the containers stay out of it.
-
-A block quote or list node keeps its own markers, because it is the container.
+Each Markdown node maps back through that table to ranges of the file, which the [node-segments design][segments] turns into its segments.
 
 A source file has one `raw` root for each comment group: one comment, or adjacent line comments that share a marker.
 
-The span of the node covers its segments from the first byte to the last.  
-An alert takes its position from the span, and the text comes from the segments.
+The span of a node covers its segments from the first byte to the last.  
+An alert takes its position from the span.
 
 ### 4. Scopes from mdast nodes
 
@@ -75,11 +67,9 @@ An alert takes its position from the span, and the text comes from the segments.
 | `image` alt text | `alt` |
 
 These carry no prose scope: fenced code, raw HTML, link definitions, front matter, MDX expressions, MDX imports, and the tags of JSX elements.  
-Where one sits inside a prose node, it is a gap between the segments of that node, so one paragraph stays one node.
+The node-segments design makes them gaps in the text of the node around them.
 
 Text inside a JSX element is prose.  
-A block quote or list item with no prose inside it gives no node.  
-A table row has the segments of its cells, and reads them one space apart.  
 `raw` holds the whole file for Markdown and MDX, and the comment text for a source file.
 
 The builder walks the mdast with its own stack of frames.  
@@ -108,6 +98,7 @@ A change to the tree shows as a snapshot diff in review.
   CI proves the build.
 
 [rule-format]: ../archive/2026-11-10-rule-format/design.md
+[segments]: ../node-segments/design.md
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
 [research]: ../archive/2026-11-09-bootstrap-hakkiri/research.md
 [markdown-rs]: https://crates.io/crates/markdown/1.0.0

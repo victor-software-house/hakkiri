@@ -95,6 +95,15 @@ queue:
       - HKR-009
     acceptance:
       - Every adopted project passes CI on hakkiri.
+
+  - id: HKR-012
+    title: Give tree nodes their text segments
+    scope: tree
+    outcome: Every tree node reads its text from file ranges that hold no markup.
+    blocked_by: []
+    acceptance:
+      - Every node from Markdown, MDX and comments holds segments that cover its text and leave out markers, indentation and line endings.
+    plan: openspec/changes/node-segments/proposal.md
 archive:
   - id: HKR-002
     title: Design the rule and config format

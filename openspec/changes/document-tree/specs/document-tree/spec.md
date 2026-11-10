@@ -9,32 +9,13 @@ Rules select text from this tree, and alerts point back into the file through th
 
 ### Requirement: Every node holds a scope and a span
 
-Each node in the tree SHALL hold its scope name, the byte span of its text in the file, its segments and its child nodes.  
-The segments are the byte ranges of the node's text.  
-The span runs from the start of the first segment to the end of the last.  
+Each node in the tree SHALL hold its scope name, the byte span of its text in the file, and its child nodes.  
+The node-segments spec states which ranges make the text of a node and how the span covers them.
 
 #### Scenario: A paragraph in a Markdown file
 
 - **WHEN** a Markdown file holds `# Title`, a blank line, and `One line.`
-- **THEN** the tree holds a `heading.h1` node spanning bytes 0 to 7 and a `paragraph` node spanning bytes 9 to 18
-
-### Requirement: A Markdown line is one segment
-
-A Markdown paragraph, heading or inline node SHALL hold one segment for each line of its text.
-
-A segment leaves out the line ending.  
-It also leaves out the indentation and the block quote markers in front of the line.
-
-#### Scenario: A paragraph in a block quote
-
-- **WHEN** a Markdown file holds the lines `> First line` and `> second line.`
-- **THEN** the tree holds one `paragraph` node with two segments, the bytes of `First line` and of `second line.`, with no `>` marker in either
-- **AND** its text is those two lines joined by a line feed
-
-#### Scenario: A list item that continues on an indented line
-
-- **WHEN** a Markdown file holds the line `- Item first` and a line `item second` that is indented by two spaces
-- **THEN** the `paragraph` node has two segments, the second without its two-space indent
+- **THEN** the tree holds a `heading.h1` node spanning bytes 2 to 7 and a `paragraph` node spanning bytes 9 to 18
 
 ### Requirement: Markdown nodes carry Vale scope names
 
@@ -50,39 +31,26 @@ The table covers paragraphs, headings, block quotes, list items, table rows and 
 
 - **WHEN** a Markdown file holds a table with header `| Name | Note |` and one body row `| a | b |`
 - **THEN** the tree holds two `table.row` nodes, the first with two `table.header` cells and the second with two `table.cell` cells, each span covering its cell text
-- **AND** each row reads as its cells without the pipes, one space apart
 
 ### Requirement: Code and markup are not prose
 
 Fenced code, raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.  
-A block quote or list item that holds nothing else SHALL give no node.  
-Where such syntax sits inside a prose node, it SHALL be a gap between the segments of that node.
+Inside a prose node, the node-segments spec makes such syntax a gap in the text.
 
 #### Scenario: A URL in a fenced block
 
 - **WHEN** a Markdown file holds a fenced block with `curl https://example.com`
 - **THEN** no prose node holds `https://example.com`, and the `raw` node of the file does
 
-#### Scenario: HTML inside a paragraph
-
-- **WHEN** a Markdown file holds `Click <a href="https://h.example">here</a>.`
-- **THEN** the `paragraph` node has three segments, and its text is `Click here.`
-
 ### Requirement: MDX keeps prose and leaves code out
 
 In an MDX file, text inside a JSX element SHALL be prose.  
-Imports, exports, expressions, and the tags and attributes of JSX elements SHALL carry no prose scope.  
-A paragraph that holds an expression or a tag SHALL stay one node, with the expression and the tags as gaps between its segments.
+Imports, exports, expressions, and the tags and attributes of JSX elements SHALL carry no prose scope.
 
 #### Scenario: A JSX element with text
 
 - **WHEN** an MDX file holds `import X from './x'` and `<Note title="t">Read this.</Note>`
 - **THEN** the tree holds a `paragraph` node for `Read this.` and no prose node for the import or for `title="t"`
-
-#### Scenario: An expression in a paragraph
-
-- **WHEN** an MDX file holds `Text with {expression} inside.`
-- **THEN** the tree holds one `paragraph` node whose text is `Text with  inside.`
 
 ### Requirement: Export blocks end at the end of their code
 
@@ -134,22 +102,12 @@ Adjacent line comments of the same type SHALL join into one comment node, read a
 
 ### Requirement: Spans inside comments point into the file
 
-A node inside a comment SHALL span the bytes of its text in the file, not in the text with markers stripped.  
-A node SHALL hold one segment for each line of its text.  
-A segment leaves out the comment marker and the indentation that hakkiri strips.
-
-The text of the node is its segments in order, with a line feed between two segments on different lines.
+A node inside a comment SHALL span the bytes of its text in the file, not in the text with markers stripped.
 
 #### Scenario: A link in a doc comment
 
 - **WHEN** a Rust file holds the line `/// See [the guide](https://g.example).` indented by four spaces
 - **THEN** the `link` node spans the bytes of `[the guide](https://g.example)` in that line of the file
-
-#### Scenario: A paragraph over two line comments
-
-- **WHEN** a Rust file holds the lines `// Read the guide` and `// before you start.`
-- **THEN** the tree holds one `paragraph` node with two segments, the bytes of `Read the guide` and of `before you start.`, with no `//` marker in either
-- **AND** its text is those two lines joined by a line feed
 
 ### Requirement: JSDoc tags are not prose
 
