@@ -97,8 +97,16 @@ Training and measurement run in an ephemeral build box.
 
 ## 4. Accuracy and speed
 
-- [ ] 4.1 Add the evaluation test.  
+- [x] 4.1 Add the evaluation test.  
   Verify it passes in CI, and record hakkiri's and Vale's F1 per set under this task.
+  - 2026-11-10 (UTC), the three tests of [`tests/splitter_eval.rs`][eval-test] passed in [Verify][run-eval] on [PR 15][pr15] at `d13d27d`.
+  - The F1 test fails when hakkiri's F1 on a set, rounded to four decimals, is below the `f1` column of [`vale-f1.tsv`][vale-f1].  
+    The two fixture tests fail when a record holds two identical consecutive sentences, and when a `masc` record does not hold exactly four sentences.
+  - hakkiri's F1 on `docs` is 0.9909 against Vale's 0.9849.
+  - On `hard` it is 0.9268 against 0.9157, on `golden-rules` 0.6301 against 0.5797, and on `masc` 0.9883 against 0.9883.
+  - The numbers come from a build box run of the test, which prints them.  
+    The `masc` tie holds: 212 of 213 gold boundaries are right out of 216 predicted, for both splitters.
+  - The 300,000-token penalty was swept on these same sets, so the scores show no independent evidence for that value.
 - [x] 4.2 Split a 50,000-character paragraph and a 60,000-line file.  
   Verify both finish in CI with no panic, and record the time per paragraph.
   - 2026-11-10 (UTC), `a_50000_character_paragraph_splits`, `a_50000_character_run_with_no_space_is_one_sentence` and `a_60000_line_input_splits` passed in [Verify][run-splitter] on [PR 14][pr14] at `cac88f4`.
@@ -109,6 +117,9 @@ Training and measurement run in an ephemeral build box.
 [spec]: specs/sentence-splitting/spec.md
 [run-splitter]: https://github.com/victor-software-house/hakkiri/actions/runs/42817055813
 [pr14]: https://github.com/victor-software-house/hakkiri/pull/14
+[pr15]: https://github.com/victor-software-house/hakkiri/pull/15
+[run-eval]: https://github.com/victor-software-house/hakkiri/actions/runs/42819618424
+[eval-test]: ../../../tests/splitter_eval.rs
 [docs-set]: ../../../tests/fixtures/splitter/docs.fixture
 [hard-set]: ../../../tests/fixtures/splitter/hard.fixture
 [golden-set]: ../../../tests/fixtures/splitter/golden-rules.fixture
