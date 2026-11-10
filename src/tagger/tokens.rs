@@ -155,15 +155,26 @@ fn split(text: &str, span: Range<usize>, found: &mut Vec<Range<usize>>) {
         .collect();
     // Suffixes come off the end, so they are collected and appended in order.
     let mut suffixes: Vec<Range<usize>> = Vec::new();
+    // The earliest contraction ending found for the current `from`. It stays
+    // right while `to` shrinks, unless `to` cuts into the ending.
+    let mut contraction: Option<(usize, Option<Contraction>)> = None;
     while from < to {
         let rest = text.get(from..to).unwrap_or_default();
         if is_special(rest) {
             found.push(from..to);
             break;
         }
-        if let Some(length) =
-            prefix_length(rest).or_else(|| contraction_start(text, &apostrophes, from, to))
-        {
+        if let Some(length) = prefix_length(rest).or_else(|| {
+            let known = match contraction {
+                Some((at, ending)) if at == from && ending.is_none_or(|e| e.end <= to) => ending,
+                _ => {
+                    let ending = find_contraction(text, &apostrophes, from, to);
+                    contraction = Some((from, ending));
+                    ending
+                }
+            };
+            known.map(|ending| ending.start - from)
+        }) {
             found.push(from..from + length);
             from += length;
             continue;
@@ -186,7 +197,8 @@ pub(super) fn is_emoticon(span: &str) -> bool {
 
 /// Whether `span` must stay whole.
 fn is_special(span: &str) -> bool {
-    is_emoticon(span) || SPECIAL.is_match(span)
+    // Both patterns of `SPECIAL` end with a period, so the others need no scan.
+    is_emoticon(span) || (span.ends_with('.') && SPECIAL.is_match(span))
 }
 
 /// The length of the prefix of `span`, when it has one and holds more.
@@ -205,15 +217,27 @@ fn suffix_length(span: &str) -> Option<usize> {
         .map(|suffix| suffix.len())
 }
 
-/// Where the earliest contraction ending starts in `text[from..to]`, counted
-/// from `from`, when it is not the first byte.
+/// Where a contraction ending lies in `text`.
+#[derive(Clone, Copy)]
+struct Contraction {
+    start: usize,
+    end: usize,
+}
+
+/// The earliest contraction ending in `text[from..to]` that does not start at
+/// `from`.
 ///
 /// Case is ignored for ASCII letters only. Each ending is searched for on its
 /// own and only its first match counts, as in prose.
 /// An ending holds an apostrophe, at its start or one byte after it, so the
 /// search starts just before the first apostrophe of `apostrophes` in the
 /// window.
-fn contraction_start(text: &str, apostrophes: &[usize], from: usize, to: usize) -> Option<usize> {
+fn find_contraction(
+    text: &str,
+    apostrophes: &[usize],
+    from: usize,
+    to: usize,
+) -> Option<Contraction> {
     let first = *apostrophes
         .get(apostrophes.partition_point(|at| *at < from))
         .filter(|at| **at < to)?;
@@ -221,11 +245,13 @@ fn contraction_start(text: &str, apostrophes: &[usize], from: usize, to: usize) 
     let window = text.get(scan..to)?;
     CONTRACTIONS
         .iter()
-        .filter_map(|ending| find_ignoring_ascii_case(window, ending))
-        .map(|at| scan + at)
-        .filter(|at| *at > from)
+        .filter_map(|ending| {
+            let start = scan + find_ignoring_ascii_case(window, ending)?;
+            Some((start, start + ending.len()))
+        })
+        .filter(|(start, _)| *start > from)
         .min()
-        .map(|at| at - from)
+        .map(|(start, end)| Contraction { start, end })
 }
 
 /// The byte offset of the first place `needle` occurs in `haystack`, ignoring

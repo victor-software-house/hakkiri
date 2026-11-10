@@ -181,31 +181,50 @@ fn a_contraction_after_a_long_run_still_splits() -> TestResult {
     Ok(())
 }
 
-#[test]
-fn a_long_run_of_one_mark_tags_in_linear_time() -> TestResult {
+/// Fails when tagging the sentence that `make` builds from 20,000 repeats
+/// takes over 30 times as long as from 2,000.
+fn assert_linear(what: &str, make: impl Fn(usize) -> String) -> TestResult {
     let tagger = english()?;
     // The best of three runs of each, so a pause on a shared machine does not
     // fail correct code.
-    let best = |sentence: &str| {
+    let best = |repeats: usize| {
+        let sentence = make(repeats);
         let mut best = Duration::MAX;
         for _ in 0..3 {
             let start = Instant::now();
-            let found = tagger.tag(sentence);
+            let found = tagger.tag(&sentence);
             best = best.min(start.elapsed());
             assert!(found.len() > 1, "{} tokens", found.len());
         }
         best
     };
+    let (small, large) = (best(2_000), best(20_000));
+    eprintln!("{what}: 2,000 took {small:?}, 20,000 took {large:?}");
+    // Ten times the input costs ten times as much; 30 leaves room for noise,
+    // and a quadratic loop costs 100.
+    assert!(
+        large < small.max(Duration::from_micros(500)) * 30,
+        "{what}: 20,000 took {large:?}, 2,000 took {small:?}"
+    );
+    Ok(())
+}
+
+#[test]
+fn a_long_run_of_one_mark_tags_in_linear_time() -> TestResult {
     for mark in [")", "."] {
-        let small = best(&format!("word{}", mark.repeat(2_000)));
-        let large = best(&format!("word{}", mark.repeat(20_000)));
-        eprintln!("{mark} run: 2,000 took {small:?}, 20,000 took {large:?}");
-        // Ten times the marks cost ten times as much; 30 leaves room for
-        // noise, and a quadratic loop costs 100.
-        assert!(
-            large < small.max(Duration::from_micros(500)) * 30,
-            "20,000 marks took {large:?}, 2,000 took {small:?}"
-        );
+        assert_linear(mark, |n| format!("word{}", mark.repeat(n)))?;
     }
     Ok(())
+}
+
+#[test]
+fn a_long_run_of_apostrophes_tags_in_linear_time() -> TestResult {
+    assert_linear("apostrophes", |n| format!("a{}", "'".repeat(n)))
+}
+
+#[test]
+fn initials_followed_by_a_long_run_of_marks_tag_in_linear_time() -> TestResult {
+    assert_linear("initials and marks", |n| {
+        format!("{}{}", "a.".repeat(n / 2), ")".repeat(n / 2))
+    })
 }
