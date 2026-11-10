@@ -50,6 +50,7 @@ jobs:
         .github/workflows/ci.yml
         .github/workflows/secrets.yml
         .github/workflows/template.yml
+        .lefthook/**
         .miserc.toml
         .oxfmtrc.json
         .rumdl.toml
