@@ -75,15 +75,12 @@ Training and measurement run in an ephemeral build box.
   - 2026-11-10 (UTC), two runs of `mise run splitter:train` in a 4x8 build box wrote byte-identical `en.tsv` and `SOURCES.md`, and the fetched corpus files were identical too.  
     The SHA-256 of `en.tsv` is `09927086…` and of `SOURCES.md` is `3684c458…` in both runs.
   - Each run took about 2 minutes: the fetch about 75 seconds, reading the corpus about 22 seconds, training 6.6 to 7.2 seconds.
-  - The corpus holds 26,144,179 tokens, counted as whitespace-separated words, after the Markdown sources are cut to the text of their paragraphs:
-
-    | Source | Documents | Tokens |
-    |:--|--:|--:|
-    | Owner's public repositories, 48 | 1,037 | 574,192 |
-    | `stackv2` Markdown, first 512 MiB of shard 129 | 46,146 | 10,782,267 |
-    | Python Enhancement Proposals | 818 | 1,625,676 |
-    | `project_gutenberg`, first 32 MiB of shard 0 | 186 | 13,162,044 |
-
+  - The corpus holds 26,144,179 tokens.  
+    A token is a whitespace-separated word, counted after the Markdown sources are cut to the text of their paragraphs.
+  - The owner's 48 public repositories give 1,037 documents and 574,192 tokens.
+  - The first 512 MiB of `stackv2` shard 129 gives 46,146 Markdown documents and 10,782,267 tokens.
+  - The Python Enhancement Proposals give 818 documents and 1,625,676 tokens.
+  - The first 32 MiB of `project_gutenberg` shard 0 gives 186 documents and 13,162,044 tokens.
   - The model is 571,359 bytes in 24,632 lines: 2,655 abbreviations, 1,183 collocations, 793 sentence starters and 20,000 capitalization entries cut from 817,997.  
     The data comes from 1,262,092 word types, 1,225,698 tokens that end in a period.
   - `stackv2` spreads its Markdown over many of its 764 shards, mixed with code.  
