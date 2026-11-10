@@ -27,6 +27,7 @@ queue:
     acceptance:
       - Snapshot tests show trees and spans for block comments, strings holding URLs, nested lists, tables and MDX.
       - String literals never appear as prose nodes.
+    plan: openspec/changes/document-tree/proposal.md
 
   - id: HKR-004
     title: Build the rule engine
