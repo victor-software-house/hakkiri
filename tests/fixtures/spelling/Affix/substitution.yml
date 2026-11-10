@@ -1,0 +1,6 @@
+extends: substitution
+message: "Use '%s' instead of '%s'."
+affix: en_US-web
+swap:
+  utilize/DSG: use
+  approve/D: okay

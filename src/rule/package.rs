@@ -8,13 +8,16 @@ use std::path::{Component, Path, PathBuf};
 use super::LoadError;
 use super::build::Source;
 use super::schema::SpellingFields;
-use crate::dictionary::{Book, Dictionary, Speller};
+use crate::dictionary::{AffixFile, Book, Dictionary, DictionaryError, Speller, read_affixes};
 
 /// Where a package keeps its dictionaries.
 const DICTIONARIES: &str = "config/dictionaries";
 
 /// Where a package keeps its word lists.
 const IGNORE: &str = "config/ignore";
+
+/// The name of the built-in dictionary's affix file.
+const BUILTIN_AFFIX: &str = "en_US-web";
 
 /// The built-in dictionary.
 fn builtin(source: &Source<'_>) -> Result<Book, LoadError> {
@@ -234,4 +237,57 @@ pub(super) fn speller(source: &Source<'_>, fields: &SpellingFields) -> Result<Sp
         books.push(read_dictionary(source, "aff", aff, &affix, &words)?);
     }
     Ok(Speller::new(books, lists(source, package, ignore)?))
+}
+
+/// An affix file that names the forms of a word.
+pub(super) enum Forms {
+    /// The built-in dictionary's.
+    Builtin(&'static Dictionary),
+    /// One read from the package.
+    File(Box<AffixFile>),
+}
+
+impl Forms {
+    /// The forms that `word` makes with the flags `flags`.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DictionaryError`] when a flag names no affix class, or
+    /// flags have no word.
+    pub(super) fn of(&self, word: &str, flags: &str) -> Result<Vec<String>, DictionaryError> {
+        match self {
+            Self::Builtin(dictionary) => dictionary.expand(word, flags),
+            Self::File(file) => file.expand(word, flags),
+        }
+    }
+}
+
+/// The affix file `name` of an `affix` field: `name.aff` in the package's
+/// dictionaries folder, or else the built-in one when `name` is `en_US-web`.
+pub(super) fn forms(source: &Source<'_>, name: &str) -> Result<Forms, LoadError> {
+    let refuse = |message: String| {
+        source.problem(
+            "affix",
+            format!("rule `{}`: affix `{name}`: {message}", source.name),
+        )
+    };
+    if let Some(package) = source.package
+        && let Some(path) = find(package, &format!("{DICTIONARIES}/{name}.aff")).map_err(refuse)?
+    {
+        let bytes = fs::read(&path).map_err(|error| refuse(error.to_string()))?;
+        return read_affixes(&bytes)
+            .map(|file| Forms::File(Box::new(file)))
+            .map_err(|error| refuse(error.to_string()));
+    }
+    if name == BUILTIN_AFFIX {
+        return Dictionary::english()
+            .map(Forms::Builtin)
+            .map_err(|error| refuse(format!("the built-in dictionary: {error}")));
+    }
+    if source.package.is_none() {
+        return Err(refuse(format!(
+            "`{name}.aff` is a file, which only a rule in a package can read"
+        )));
+    }
+    Err(refuse(format!("`{name}.aff` is not in `{DICTIONARIES}`")))
 }

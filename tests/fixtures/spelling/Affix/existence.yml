@@ -1,0 +1,8 @@
+extends: existence
+message: "'%s'"
+affix: en_US-web
+tokens:
+  - utilize/DSG
+  - approve/D respect
+  - '\bcolor/S\b'
+  - 'and\/or'

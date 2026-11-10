@@ -1,0 +1,39 @@
+Affix.existence	affix.md	1	26	33	utilizes	'utilizes'
+Affix.existence	affix.md	1	39	46	utilized	'utilized'
+Affix.existence	affix.md	1	4	10	utilize	'utilize'
+Affix.existence	affix.md	1	58	66	utilizing	'utilizing'
+Affix.existence	affix.md	3	84	98	approve respect	'approve respect'
+Affix.existence	affix.md	5	19	23	color	'color'
+Affix.existence	affix.md	5	5	10	colors	'colors'
+Affix.existence	affix.md	5	59	64	and/or	'and/or'
+Affix.existence	affix.md	9	50	56	utilize	'utilize'
+Affix.existence	affix.md	9	62	69	utilizes	'utilizes'
+Affix.file	affix.md	7	15	19	walks	'walks'
+Affix.file	affix.md	7	22	27	unwalk	'unwalk'
+Affix.file	affix.md	7	33	39	unwalks	'unwalks'
+Affix.file	affix.md	7	42	46	carry	'carry'
+Affix.file	affix.md	7	52	58	carries	'carries'
+Affix.file	affix.md	7	6	9	walk	'walk'
+Affix.file	affix.md	7	73	76	bake	'bake'
+Affix.file	affix.md	7	82	86	baked	'baked'
+Affix.filesubstitution	affix.md	7	22	27	unwalk	Use 'go' instead of 'unwalk'.
+Affix.filesubstitution	affix.md	7	42	46	carry	Use 'bring' instead of 'carry'.
+Affix.filesubstitution	affix.md	7	52	58	carries	Use 'bring' instead of 'carries'.
+Affix.filesubstitution	affix.md	7	6	9	walk	Use 'go' instead of 'walk'.
+Affix.ignorecase	affix.md	3	1	7	Approve	'Approve'
+Affix.ignorecase	affix.md	3	16	23	approved	'approved'
+Affix.ignorecase	affix.md	3	29	36	approves	'approves'
+Affix.ignorecase	affix.md	3	49	57	approving	'approving'
+Affix.ignorecase	affix.md	3	63	70	Approved	'Approved'
+Affix.ignorecase	affix.md	3	84	90	approve	'approve'
+Affix.slash	affix.md	1	4	10	utilize	'utilize'
+Affix.slash	affix.md	9	20	22	x/D	'x/D'
+Affix.slash	affix.md	9	50	56	utilize	'utilize'
+Affix.substitution	affix.md	1	26	33	utilizes	Use 'use' instead of 'utilizes'.
+Affix.substitution	affix.md	1	39	46	utilized	Use 'use' instead of 'utilized'.
+Affix.substitution	affix.md	1	4	10	utilize	Use 'use' instead of 'utilize'.
+Affix.substitution	affix.md	1	58	66	utilizing	Use 'use' instead of 'utilizing'.
+Affix.substitution	affix.md	3	16	23	approved	Use 'okay' instead of 'approved'.
+Affix.substitution	affix.md	3	84	90	approve	Use 'okay' instead of 'approve'.
+Affix.substitution	affix.md	9	50	56	utilize	Use 'use' instead of 'utilize'.
+Affix.substitution	affix.md	9	62	69	utilizes	Use 'use' instead of 'utilizes'.

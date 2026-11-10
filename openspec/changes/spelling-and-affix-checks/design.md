@@ -76,6 +76,17 @@ A `word/FLAGS` part of an `existence` token or a `substitution` key becomes an a
 The alternation holds the word and the forms its flags name.  
 The expansion uses the dictionary reader's affix rules, which `main` holds, and the rule-engine change's refusal ends here.
 
+Each space-separated part of a token is read alone.  
+A part with no unescaped slash, or a slash written `\/`, is text, and a `\b` at either end of a part stays outside the alternation.  
+The word before the slash must be plain text, and each form is escaped as Go's `regexp.QuoteMeta` escapes it.  
+A rule with no `affix` keeps every slash.  
+The file is `name.aff` in the package's dictionaries folder, which wins over the built-in file of the same name `en_US-web`, as in Vale ([vocab.go][v-find-affix]).
+
+A probe of Vale 66bbb85 and a parity test cover the built-in and a package file, `\b`, an escaped slash, a part with no flags, `ignorecase`, and the swap keys of `substitution`.  
+The same probe refused each of these as a rule error, as hakkiri does: a flag that names no class, a word that is not plain text, flags with no word, and a file that is missing.  
+One difference is read from Vale's source and not probed: two keys of a `swap` that expand to the same text.  
+Vale keeps the replacement of the key its map visits last, which can change from run to run, and hakkiri keeps both in the order written, so the first gives the replacement.
+
 [case-design]: ../archive/2026-11-10-case-and-sequence-checks/design.md
 [case-reader]: ../archive/2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
 [project-config]: ../../specs/project-config/spec.md

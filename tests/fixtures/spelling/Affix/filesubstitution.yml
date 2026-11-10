@@ -1,0 +1,6 @@
+extends: substitution
+message: "Use '%s' instead of '%s'."
+affix: forms
+swap:
+  walk/UD: go
+  carry/S: bring

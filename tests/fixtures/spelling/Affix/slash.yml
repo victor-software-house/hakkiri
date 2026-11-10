@@ -1,0 +1,6 @@
+extends: existence
+message: "'%s'"
+affix: en_US-web
+tokens:
+  - 'x\/D'
+  - utilize/

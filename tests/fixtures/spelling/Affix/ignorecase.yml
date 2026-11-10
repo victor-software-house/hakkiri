@@ -1,0 +1,6 @@
+extends: existence
+message: "'%s'"
+affix: en_US-web
+ignorecase: true
+tokens:
+  - approve/DSG

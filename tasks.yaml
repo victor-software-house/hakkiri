@@ -15,6 +15,15 @@ queue:
       - A 50,000-character line and a 60,000-line file finish with no panic for spelling and affix.
     plan: openspec/changes/spelling-and-affix-checks/proposal.md
 
+  - id: HKR-022
+    title: List every difference from Vale in one place
+    scope: docs
+    outcome: One current list in openspec/specs names every intended difference from Vale.
+    blocked_by: []
+    acceptance:
+      - The list names each difference recorded in the archived designs (rule-format decision 7, rule-engine, pattern-and-readability, case-and-sequence) and the spelling refusal of exceptions and threshold, each with a link to its decision.
+      - Every later change that adds a difference updates the list in the same pull request.
+
   - id: HKR-005
     title: Ship the check and test commands
     scope: cli

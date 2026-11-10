@@ -92,21 +92,6 @@ fn scope_ok(value: &Texts, ctx: &()) -> garde::Result {
     }
 }
 
-#[expect(
-    clippy::trivially_copy_pass_by_ref,
-    reason = "garde calls a custom rule with a reference to its context."
-)]
-fn affix_ok(value: &Text, ctx: &()) -> garde::Result {
-    valid(value, ctx)?;
-    if value.value().is_empty() {
-        Ok(())
-    } else {
-        Err(garde::Error::new(
-            "`affix` is not supported yet: no affix files load",
-        ))
-    }
-}
-
 /// Whether `tokens` and `raw` hold a pattern to match: a pattern of nothing
 /// matches at every position.
 fn has_pattern(tokens: &Texts, raw: &Texts) -> bool {
@@ -262,7 +247,7 @@ rule_fields! {
         #[garde(custom(valid))]
         tokens: Texts,
         #[serde(default)]
-        #[garde(custom(affix_ok))]
+        #[garde(custom(valid))]
         affix: Text,
         #[serde(default)]
         #[garde(custom(valid))]
@@ -291,7 +276,7 @@ rule_fields! {
         #[garde(custom(valid))]
         exceptions: Texts,
         #[serde(default)]
-        #[garde(custom(affix_ok))]
+        #[garde(custom(valid))]
         affix: Text,
         #[serde(default)]
         #[garde(custom(valid))]
