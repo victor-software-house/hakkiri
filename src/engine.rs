@@ -2,6 +2,7 @@
 
 use crate::alert::{Alert, Locator, settle};
 use crate::check::{run, run_summary};
+use crate::metric::{Variables, variables};
 use crate::rule::{Check, Rule};
 use crate::select::{SelectError, select};
 use crate::summary::{Summary, summarize};
@@ -16,6 +17,8 @@ use crate::tree::Tree;
 /// A `metric` rule with no `scope`, or `scope: text`, measures the prose of the
 /// whole file, the comments of a code file included, and reports at its start;
 /// any other scope measures each block it selects.
+/// The counts and scores of that prose are worked out once, and each rule adds
+/// only its `occurrences`.
 ///
 /// # Errors
 ///
@@ -28,17 +31,20 @@ pub fn lint(
 ) -> Result<Vec<Alert>, SelectError> {
     let mut locator = Locator::new(source);
     let mut alerts = Vec::new();
-    let mut summary: Option<Summary> = None;
+    let mut measured: Option<(Summary, Option<Variables>)> = None;
     for rule in rules {
         if let Check::Metric(metric) = &rule.check
             && rule.scope.measures_file()
         {
-            if summary.is_none() {
-                summary = Some(summarize(tree, source)?);
+            if measured.is_none() {
+                let summary = summarize(tree, source)?;
+                let base = variables(&summary.content, summary.elements);
+                measured = Some((summary, base));
             }
-            let hit = summary
-                .as_ref()
-                .map_or(Ok(None), |summary| run_summary(metric, summary));
+            let hit = measured.as_ref().map_or(Ok(None), |(summary, base)| {
+                base.as_ref()
+                    .map_or(Ok(None), |base| run_summary(metric, summary, base))
+            });
             match hit {
                 Ok(hit) => {
                     alerts.extend(hit.map(|hit| locator.alert_at(rule, 0, hit.messages(rule))));

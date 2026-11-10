@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::ops::Range;
 
 use crate::alert::fill;
-use crate::metric::measure;
+use crate::metric::{Variables, measure, variables};
 use crate::pattern::{Pattern, SearchError};
 use crate::rule::{Check, Exceptions, Existence, Metric, Occurrence, Rule, Substitution, Swap};
 use crate::summary::{Elements, Summary};
@@ -260,7 +260,10 @@ fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
         .as_ref()
         .map(|tokens| count_tokens(tokens, content))
         .transpose()?;
-    Ok(measure(metric, content, Elements::default(), occurrences)
+    let Some(base) = variables(content, Elements::default()) else {
+        return Ok(Vec::new());
+    };
+    Ok(measure(metric, &base, occurrences)
         .map(|result| Hit {
             range: 0..0,
             values: vec![format!("{result:.2}")],
@@ -270,18 +273,21 @@ fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
         .collect())
 }
 
-/// What the metric reports for the prose of the whole file.
-pub(crate) fn run_summary(metric: &Metric, summary: &Summary) -> Result<Option<Hit>, SearchError> {
+/// What the metric reports for the prose of the whole file, whose variables
+/// are `base`.
+pub(crate) fn run_summary(
+    metric: &Metric,
+    summary: &Summary,
+    base: &Variables,
+) -> Result<Option<Hit>, SearchError> {
     let occurrences = metric
         .tokens
         .as_ref()
         .map(|tokens| count_tokens(tokens, &summary.content))
         .transpose()?;
-    Ok(
-        measure(metric, &summary.content, summary.elements, occurrences).map(|result| Hit {
-            range: 0..0,
-            values: vec![format!("{result:.2}")],
-            numbered: false,
-        }),
-    )
+    Ok(measure(metric, base, occurrences).map(|result| Hit {
+        range: 0..0,
+        values: vec![format!("{result:.2}")],
+        numbered: false,
+    }))
 }

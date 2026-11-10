@@ -65,13 +65,15 @@ fn float(count: usize) -> f64 {
     f64::from(u32::try_from(count).unwrap_or(u32::MAX))
 }
 
-/// The variables of the text `content`.
-fn variables(
-    content: &str,
-    elements: Elements,
-    occurrences: Option<usize>,
-    model: &Model,
-) -> HashMap<&'static str, f64> {
+/// The variables of a text, by name.
+pub(crate) type Variables = HashMap<&'static str, f64>;
+
+/// The variables of the text `content` that do not depend on the rule: the
+/// counts, the scores and the element counts.
+///
+/// Returns `None` when the sentence model does not load.
+pub(crate) fn variables(content: &str, elements: Elements) -> Option<Variables> {
+    let model = Model::english().ok()?;
     let counts = Counts::of(content, model);
     let mut found = HashMap::new();
     for (name, value) in [
@@ -91,26 +93,23 @@ fn variables(
     for name in ELEMENTS {
         found.insert(name, elements.count(name).map_or(0.0, float));
     }
-    if let Some(count) = occurrences {
-        found.insert("occurrences", float(count));
-    }
-    found
+    Some(found)
 }
 
-/// The result of the formula over `content`, when the condition holds for it.
+/// The result of the formula over a text with the variables `base`, when the
+/// condition holds for it.
 ///
 /// A text with no words, a formula that gives no number, and a condition that
 /// does not give a truth value hold nothing.
 pub(crate) fn measure(
     metric: &Metric,
-    content: &str,
-    elements: Elements,
+    base: &Variables,
     occurrences: Option<usize>,
 ) -> Option<f64> {
-    let Ok(model) = Model::english() else {
-        return None;
-    };
-    let mut found = variables(content, elements, occurrences, model);
+    let mut found = base.clone();
+    if let Some(count) = occurrences {
+        found.insert("occurrences", float(count));
+    }
     if found.get("words").is_none_or(|words| *words == 0.0) {
         return None;
     }
