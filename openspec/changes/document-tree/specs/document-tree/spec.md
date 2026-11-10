@@ -84,6 +84,17 @@ A paragraph that holds an expression or a tag SHALL stay one node, with the expr
 - **WHEN** an MDX file holds `Text with {expression} inside.`
 - **THEN** the tree holds one `paragraph` node whose text is `Text with  inside.`
 
+### Requirement: Export blocks end at the end of their code
+
+An export block SHALL end where its brackets, strings, template literals, regular expressions and comments close, also across a blank line.
+
+An export block that runs to the end of the file with something still open SHALL NOT fail the file.
+
+#### Scenario: A quote or a regular expression in an export block
+
+- **WHEN** an MDX file holds `export const re = /'/`, a blank line and a paragraph
+- **THEN** the tree holds a `paragraph` node for that paragraph and none for the export
+
 ### Requirement: Deep nesting does not crash hakkiri
 
 hakkiri SHALL build the tree of a document with 1,000 levels of block quotes without exhausting the stack.  

@@ -157,6 +157,7 @@ snapshots! {
     snapshot_cuts_md: "cuts.md",
     snapshot_cuts_rs: "cuts.rs",
     snapshot_esm: "esm.mdx",
+    snapshot_esm_literals: "esm-literals.mdx",
     snapshot_table_no_pipes: "table-no-pipes.md",
     snapshot_jsdoc_more: "jsdoc-more.ts",
     snapshot_banner: "banner.rs",
@@ -634,6 +635,29 @@ fn deeply_nested_quotes_and_lists() -> TestResult {
     let tree = parse(Language::Markdown, &lists)?;
     assert_eq!(tree.roots.len(), 1);
     assert!(depth(&tree) > 1000);
+    Ok(())
+}
+
+#[test]
+fn literals_in_an_export_block() -> TestResult {
+    let fixture = load("esm-literals.mdx")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        [
+            "Prose after a template.",
+            "Prose after a template with a blank line.",
+            "Prose after a regular expression.",
+            "Prose after a regular expression with a quote.",
+            "Prose after an apostrophe.",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn an_unclosed_export_block_does_not_fail_the_file() -> TestResult {
+    let tree = parse(Language::Mdx, "export const a = {\n\nProse.\n")?;
+    assert_eq!(tree.roots.len(), 1);
     Ok(())
 }
 

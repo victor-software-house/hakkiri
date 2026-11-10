@@ -1,0 +1,24 @@
+export const a = `x ${ { b: `}` }.b } y`
+
+Prose after a template.
+
+export const b = `line
+${
+  1 + 1
+}
+
+tail`
+
+Prose after a template with a blank line.
+
+export const re = /{/
+
+Prose after a regular expression.
+
+export const q = /'/.test("it's")
+
+Prose after a regular expression with a quote.
+
+export const A = () => <p>Don't</p>
+
+Prose after an apostrophe.

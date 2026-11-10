@@ -20,7 +20,8 @@ pub(crate) enum Flavor {
 }
 
 impl Flavor {
-    fn options(self) -> ParseOptions {
+    /// `source` is the file the options parse.
+    fn options(self, source: &str) -> ParseOptions {
         match self {
             Self::Markdown => ParseOptions {
                 constructs: Constructs {
@@ -30,20 +31,23 @@ impl Flavor {
                 ..ParseOptions::default()
             },
             Self::Comment => ParseOptions::gfm(),
-            Self::Mdx => ParseOptions {
-                constructs: Constructs {
-                    frontmatter: true,
-                    gfm_autolink_literal: true,
-                    gfm_footnote_definition: true,
-                    gfm_label_start_footnote: true,
-                    gfm_strikethrough: true,
-                    gfm_table: true,
-                    gfm_task_list_item: true,
-                    ..Constructs::mdx()
-                },
-                mdx_esm_parse: Some(Box::new(esm)),
-                ..ParseOptions::default()
-            },
+            Self::Mdx => {
+                let tail = source.trim_end().to_owned();
+                ParseOptions {
+                    constructs: Constructs {
+                        frontmatter: true,
+                        gfm_autolink_literal: true,
+                        gfm_footnote_definition: true,
+                        gfm_label_start_footnote: true,
+                        gfm_strikethrough: true,
+                        gfm_table: true,
+                        gfm_task_list_item: true,
+                        ..Constructs::mdx()
+                    },
+                    mdx_esm_parse: Some(Box::new(move |block: &str| esm(block, &tail))),
+                    ..ParseOptions::default()
+                }
+            }
         }
     }
 }
@@ -52,45 +56,93 @@ impl Flavor {
 #[derive(Clone, Copy, PartialEq)]
 enum Lex {
     Code,
+    /// A string in single or double quotes. It ends at a line feed.
     Quote(char),
+    /// A template literal. Its `${` opens code again.
+    Template,
+    /// A regular expression literal. It ends at a line feed.
+    Regex {
+        class: bool,
+    },
     LineComment,
     BlockComment,
 }
+
+/// The characters after which a `/` starts a regular expression and not a
+/// division.
+const BEFORE_REGEX: &str = "(,=:[!&|?{};+-*%<>~^";
 
 /// Tells markdown-rs whether an import or export block is complete.
 ///
 /// markdown-rs reads such a block only when it has a parser for it.
 /// It ends the block at the first blank line the parser accepts.
-/// hakkiri needs the extent of the block, not its syntax, so the block is
-/// complete when no bracket, string, template literal or comment is open.
-fn esm(block: &str) -> MdxSignal {
+/// hakkiri needs the extent of the block, not its syntax.
+/// The block is complete when no bracket, string, template literal, regular
+/// expression or comment is open.
+///
+/// `source` is the whole file without its trailing whitespace.
+/// A block that ends the file is complete whatever the lexer saw.
+/// It cannot grow, and an error would fail the whole file over a misread
+/// literal.
+fn esm(block: &str, source: &str) -> MdxSignal {
     let mut state = Lex::Code;
     let mut depth = 0_usize;
+    // The bracket depth of each `${` that is still open.
+    let mut templates: Vec<usize> = Vec::new();
+    let mut previous = None;
     let mut chars = block.chars().peekable();
     while let Some(c) = chars.next() {
         state = match (state, c) {
-            (Lex::Code, '\'' | '"' | '`') => Lex::Quote(c),
+            (Lex::Code, '\'' | '"') => Lex::Quote(c),
+            (Lex::Code, '`') => Lex::Template,
+            (Lex::Template, '`')
+            | (Lex::Quote(_) | Lex::Regex { .. } | Lex::LineComment, '\n')
+            | (Lex::Regex { class: false }, '/') => Lex::Code,
+            (Lex::Template, '$') if chars.next_if_eq(&'{').is_some() => {
+                depth += 1;
+                templates.push(depth);
+                Lex::Code
+            }
             (Lex::Code, '/') if chars.next_if_eq(&'/').is_some() => Lex::LineComment,
             (Lex::Code, '/') if chars.next_if_eq(&'*').is_some() => Lex::BlockComment,
+            (Lex::Code, '/') if previous.is_none_or(|p| BEFORE_REGEX.contains(p)) => {
+                Lex::Regex { class: false }
+            }
             (Lex::Code, '(' | '[' | '{') => {
                 depth += 1;
                 Lex::Code
+            }
+            (Lex::Code, '}') if templates.last() == Some(&depth) => {
+                templates.pop();
+                depth = depth.saturating_sub(1);
+                Lex::Template
             }
             (Lex::Code, ')' | ']' | '}') => {
                 depth = depth.saturating_sub(1);
                 Lex::Code
             }
-            (Lex::Quote(_), '\\') => {
+            (Lex::Quote(_) | Lex::Template | Lex::Regex { .. }, '\\') => {
                 chars.next();
                 state
             }
             (Lex::Quote(quote), _) if quote == c => Lex::Code,
-            (Lex::LineComment, '\n') => Lex::Code,
+            (Lex::Regex { .. }, '[') => Lex::Regex { class: true },
+            (Lex::Regex { .. }, ']') => Lex::Regex { class: false },
             (Lex::BlockComment, '*') if chars.next_if_eq(&'/').is_some() => Lex::Code,
             _ => state,
         };
+        if state == Lex::Code && !c.is_whitespace() {
+            previous = Some(c);
+        }
     }
-    if depth == 0 && matches!(state, Lex::Code | Lex::LineComment) {
+    // A block ends at a line end, which closes a string or a regular
+    // expression.
+    let complete = depth == 0
+        && matches!(
+            state,
+            Lex::Code | Lex::LineComment | Lex::Quote(_) | Lex::Regex { .. }
+        );
+    if complete || source.ends_with(block.trim_end()) {
         MdxSignal::Ok
     } else {
         MdxSignal::Eof(
@@ -110,7 +162,7 @@ pub(crate) fn document(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error>
 
 /// The prose nodes of `source`, with spans in `source`.
 pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
-    let root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
+    let root = markdown::to_mdast(source, &flavor.options(source)).map_err(Error::Mdx)?;
     Ok(Builder { source }.visit(&root, Scope::TableCell).nodes)
 }
 

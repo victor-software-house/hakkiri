@@ -1,0 +1,10 @@
+---
+source: tests/tree.rs
+expression: "load(\"esm-literals.mdx\")? .render()"
+---
+raw 0..359 [0..359] "export const a = `x ${ { b: `}` }.b } y`\n\nProse after a template.\n\nexport const b = `line\n${\n  1 + 1\n}\n\ntail`\n\nProse after a template with a blank line.\n\nexport const re = /{/\n\nProse after a regular expression.\n\nexport const q = /'/.test(\"it's\")\n\nProse after a regular expression with a quote.\n\nexport const A = () => <p>Don't</p>\n\nProse after an apostrophe.\n"
+  paragraph 42..65 [42..65] "Prose after a template."
+  paragraph 111..152 [111..152] "Prose after a template with a blank line."
+  paragraph 177..210 [177..210] "Prose after a regular expression."
+  paragraph 247..293 [247..293] "Prose after a regular expression with a quote."
+  paragraph 332..358 [332..358] "Prose after an apostrophe."
