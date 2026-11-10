@@ -252,8 +252,17 @@ impl Alternative {
                 if !sentence {
                     return false;
                 }
-            } else if !names.iter().any(|name| named(&part.name, name)) {
-                return false;
+            } else {
+                // A sentence keeps the nodes around its node, so `list` also
+                // selects the sentences inside a list item.
+                let in_node = names.iter().any(|name| named(&part.name, name));
+                let around = sentence
+                    && ancestors
+                        .iter()
+                        .any(|scope| named(&part.name, scope.name()));
+                if !(in_node || around) {
+                    return false;
+                }
             }
             if !part.applies_to(extension) {
                 return false;

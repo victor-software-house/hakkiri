@@ -128,6 +128,13 @@ fn sentence_selects_each_sentence() -> TestResult {
 }
 
 #[test]
+fn a_part_selects_the_sentences_inside_it() -> TestResult {
+    let found = blocks(&["sentence & list"], "a.md", "One two.\n\n- Three four.\n")?;
+    assert_eq!(texts(&found), ["Three four."]);
+    Ok(())
+}
+
+#[test]
 fn a_heading_rule_reads_the_whole_heading() -> TestResult {
     let found = blocks(&["heading"], "a.md", "# One two. Three four.\n")?;
     assert_eq!(texts(&found), ["One two. Three four."]);
