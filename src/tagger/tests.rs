@@ -131,3 +131,27 @@ fn a_file_cut_short_is_refused() -> TestResult {
     ));
     Ok(())
 }
+
+#[test]
+fn a_long_run_of_marks_splits_one_token_each() -> TestResult {
+    let sentence = format!("word{}", ")".repeat(20_000));
+    assert_eq!(english()?.tag(&sentence).len(), 20_001);
+    Ok(())
+}
+
+#[test]
+fn a_contraction_after_a_long_run_still_splits() -> TestResult {
+    let sentence = format!("{}don't", "(".repeat(5_000));
+    let found = pairs(&sentence)?;
+    let tail = found
+        .get(found.len().saturating_sub(2)..)
+        .unwrap_or_default();
+    assert_eq!(tail.len(), 2);
+    assert!(
+        tail.iter()
+            .zip(["do/", "n't/"])
+            .all(|(token, start)| token.starts_with(start)),
+        "{tail:?}"
+    );
+    Ok(())
+}

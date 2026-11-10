@@ -144,6 +144,15 @@ fn split(text: &str, span: Range<usize>, found: &mut Vec<Range<usize>>) {
         return;
     }
     let (mut from, mut to) = (span.start, span.end);
+    // Every contraction ending holds an apostrophe, so the places to look are
+    // found once.
+    let apostrophes: Vec<usize> = text
+        .get(span.clone())
+        .unwrap_or_default()
+        .char_indices()
+        .filter(|(_, c)| *c == '\'' || *c == '\u{2019}')
+        .map(|(at, _)| span.start + at)
+        .collect();
     // Suffixes come off the end, so they are collected and appended in order.
     let mut suffixes: Vec<Range<usize>> = Vec::new();
     while from < to {
@@ -152,7 +161,9 @@ fn split(text: &str, span: Range<usize>, found: &mut Vec<Range<usize>>) {
             found.push(from..to);
             break;
         }
-        if let Some(length) = prefix_length(rest).or_else(|| contraction_start(rest)) {
+        if let Some(length) =
+            prefix_length(rest).or_else(|| contraction_start(text, &apostrophes, from, to))
+        {
             found.push(from..from + length);
             from += length;
             continue;
@@ -194,17 +205,27 @@ fn suffix_length(span: &str) -> Option<usize> {
         .map(|suffix| suffix.len())
 }
 
-/// Where the earliest contraction ending starts in `span`, when it is not the
-/// first byte.
+/// Where the earliest contraction ending starts in `text[from..to]`, counted
+/// from `from`, when it is not the first byte.
 ///
 /// Case is ignored for ASCII letters only. Each ending is searched for on its
 /// own and only its first match counts, as in prose.
-fn contraction_start(span: &str) -> Option<usize> {
+/// An ending holds an apostrophe, at its start or one byte after it, so the
+/// search starts just before the first apostrophe of `apostrophes` in the
+/// window.
+fn contraction_start(text: &str, apostrophes: &[usize], from: usize, to: usize) -> Option<usize> {
+    let first = *apostrophes
+        .get(apostrophes.partition_point(|at| *at < from))
+        .filter(|at| **at < to)?;
+    let scan = text.floor_char_boundary(first.saturating_sub(1)).max(from);
+    let window = text.get(scan..to)?;
     CONTRACTIONS
         .iter()
-        .filter_map(|ending| find_ignoring_ascii_case(span, ending))
-        .filter(|at| *at > 0)
+        .filter_map(|ending| find_ignoring_ascii_case(window, ending))
+        .map(|at| scan + at)
+        .filter(|at| *at > from)
         .min()
+        .map(|at| at - from)
 }
 
 /// The byte offset of the first place `needle` occurs in `haystack`, ignoring
