@@ -194,9 +194,7 @@ fn sanitize(run: &str, base: usize) -> (String, Option<Vec<usize>>) {
 
 /// Whether `token` holds no letter.
 fn no_letter(token: &str) -> bool {
-    !token
-        .chars()
-        .any(|c| LETTER.is_match(c.encode_utf8(&mut [0; 4])))
+    !token.chars().any(|c| is(Category::Letter, c))
 }
 
 /// Cuts the run `run` of a text, which starts at byte `base`, into words:
@@ -312,8 +310,32 @@ fn camel(word: &str) -> bool {
     false
 }
 
-/// Whether `c` is in the category `pattern` names.
-fn is(pattern: &Regex, c: char) -> bool {
+/// A category of one character: a letter, a capital or a small letter, as the
+/// classes `\p{L}`, `\p{Lu}` and `\p{Ll}` name them.
+#[derive(Clone, Copy)]
+enum Category {
+    Letter,
+    Upper,
+    Lower,
+}
+
+/// Whether `c` is in `category`.
+///
+/// An ASCII character is tested by its byte, which gives the answer of the
+/// class, and any other goes through the class.
+fn is(category: Category, c: char) -> bool {
+    if c.is_ascii() {
+        return match category {
+            Category::Letter => c.is_ascii_alphabetic(),
+            Category::Upper => c.is_ascii_uppercase(),
+            Category::Lower => c.is_ascii_lowercase(),
+        };
+    }
+    let pattern = match category {
+        Category::Letter => &LETTER,
+        Category::Upper => &UPPER,
+        Category::Lower => &LOWER,
+    };
     pattern.is_match(c.encode_utf8(&mut [0; 4]))
 }
 
@@ -345,13 +367,14 @@ fn split_identifier(word: &str) -> Vec<Part<'_>> {
     for (index, (at, c)) in chars.iter().enumerate() {
         let before = index.checked_sub(1).and_then(|i| chars.get(i)).map(|p| p.1);
         let after = chars.get(index + 1).map(|p| p.1);
-        if !is(&LETTER, *c) {
+        if !is(Category::Letter, *c) {
             flush(word, &mut start, *at, &mut parts);
         } else if start.is_none() {
             start = Some(*at);
-        } else if is(&UPPER, *c)
-            && (before.is_some_and(|b| is(&LOWER, b))
-                || (after.is_some_and(|a| is(&LOWER, a)) && before.is_some_and(|b| is(&UPPER, b))))
+        } else if is(Category::Upper, *c)
+            && (before.is_some_and(|b| is(Category::Lower, b))
+                || (after.is_some_and(|a| is(Category::Lower, a))
+                    && before.is_some_and(|b| is(Category::Upper, b))))
         {
             flush(word, &mut start, *at, &mut parts);
             start = Some(*at);
@@ -364,7 +387,7 @@ fn split_identifier(word: &str) -> Vec<Part<'_>> {
 /// Whether one part of an identifier passes: a short one or one in capitals
 /// is not checked.
 fn part_passes(spelling: &Spelling, part: &str) -> bool {
-    let letters = part.chars().filter(|c| is(&LETTER, *c)).count();
+    let letters = part.chars().filter(|c| is(Category::Letter, *c)).count();
     letters < MIN_PART_LETTERS
         || crate::case::upper_str(part) == part
         || spelling.speller.spell(&spelling.speller.convert(part))
@@ -372,7 +395,7 @@ fn part_passes(spelling: &Spelling, part: &str) -> bool {
 
 /// The number of capitals in `text`.
 fn capitals(text: &str) -> usize {
-    text.chars().filter(|c| is(&UPPER, *c)).count()
+    text.chars().filter(|c| is(Category::Upper, *c)).count()
 }
 
 /// Whether the dictionary's other-case spelling of `word` is a fix to offer:
@@ -382,7 +405,7 @@ fn capitals(text: &str) -> usize {
 /// A name with a capital only at its start, `Kubernetes`, cannot be told from
 /// a word in another language, and a word with more capitals chose them.
 fn certain_recase(word: &str, cased: &str) -> bool {
-    let inner = cased.chars().skip(1).any(|c| is(&UPPER, c));
+    let inner = cased.chars().skip(1).any(|c| is(Category::Upper, c));
     word.chars().count() >= MIN_PART_LETTERS
         && capitals(word) <= 1
         && capitals(cased) > capitals(word)
