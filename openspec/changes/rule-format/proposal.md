@@ -17,7 +17,7 @@ Each is one decision, with every candidate shown side by side.
 
 - A spec for rule files: the file format, every field, the scopes, the check types and the test cases.
 - A spec for `.ctl/hakkiri.yaml`: which files a project lints, which packages it pins, and the level of each rule.
-- Every enabled ProseStyle rule and every frequency-habit rule written in the format, as the proof that it covers the package.
+- Every enabled ProseStyle rule and every frequency-habit rule written in the format, as the proof that it covers the package: [prose-style-rules.md][rules].
 - The intended differences from Vale, such as counting only prose words in a sentence.
 
 ## Capabilities
@@ -37,3 +37,4 @@ None.
 
 [ledger]: ../../../tasks.yaml
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
+[rules]: prose-style-rules.md
