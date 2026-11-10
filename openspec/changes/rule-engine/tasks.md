@@ -57,13 +57,31 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 7. Flesch-Kincaid parity
 
-- [ ] 7.1 Measure Vale 3.26.0's `flesch_kincaid`, `words`, `sentences` and `syllables` for each prose-style case input with no code span.  
+- [x] 7.1 Measure Vale 3.26.0's `flesch_kincaid`, `words`, `sentences` and `syllables` for each prose-style case input with no code span.  
   Run it once in a throwaway Linux box, with a `metric` rule whose message prints each value.  
   Verify the measurement covers every such input.
-- [ ] 7.2 Store the values in a fixture file under `tests/fixtures/` that names the Vale version and the prose-style commit.  
+- [x] 7.2 Store the values in a fixture file under `tests/fixtures/` that names the Vale version and the prose-style commit.  
   Verify the fixture holds one entry per input.
 - [ ] 7.3 Compare hakkiri's values with the fixture at the tolerance the design states.  
   Verify the parity test passes in CI and prints each input whose counts differ from Vale's.
+
+### Evidence for 7.1
+
+- 2026-11-10 UTC: Vale 3.26.0, the official Linux release, ran once in a throwaway Linux box with four `metric` rules, one per value.
+- The inputs are the 87 cases of [prose-style at `ee9f207`][ps-commit].
+  21 hold a code span or fence and are left out, which leaves 66.
+- Vale printed values for 51 of the 66.
+  It printed none for 15: 10 Rust inputs, 4 Markdown tables and 1 line that holds only a URL.
+  The fixture marks them `no-words`.
+- The rule messages print `%.2f`, so the score was multiplied by 1,000,000 in the formula to keep six decimals.
+- Not verified: Vale's scores for Rust inputs, which its summary leaves empty.
+
+### Evidence for 7.2
+
+- 2026-11-10 UTC: [`vale-fk.tsv`][fk-tsv] holds one row per input, 66 rows, each with the Vale version and the prose-style commit.
+- The 15 `no-words` rows stay in the fixture with that mark, so task 7.3 compares the other 51.
+- The inputs are copied under [`inputs/`][fk-inputs], from a repository the same owner holds.
+- How to rerun the measurement, the format and the license note are in [`SOURCES.md`][fk-sources].
 
 ## 8. Integration
 
@@ -82,3 +100,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [match]: specs/match-checks/spec.md
 [metric]: specs/metric-check/spec.md
 [rule-files]: ../../specs/rule-files/spec.md
+[ps-commit]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846
+[fk-tsv]: ../../../tests/fixtures/fk-parity/vale-fk.tsv
+[fk-inputs]: ../../../tests/fixtures/fk-parity/inputs
+[fk-sources]: ../../../tests/fixtures/fk-parity/SOURCES.md

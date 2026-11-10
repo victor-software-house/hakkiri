@@ -1,0 +1,11 @@
+//! Started in EVO-9673.
+
+/// Fixed in PR #123.
+fn f() {
+    // See !294 first.
+    let d = 1; // trailing QCTL-006
+    /* Block comment ABC-12 */
+    /*
+     * Spans lines #456
+     */
+}

@@ -1,0 +1,15 @@
+//! Crate docs at https://crate.example here.
+//! An autolink <https://auto.example>.
+
+/// Doc comment https://doc.example here.
+fn f() {
+    // Line comment https://line.example
+    let d = 1; // trailing https://trailing.example
+    /* Block comment https://block.example */
+    /*
+     * Spans lines https://lines.example
+     */
+}
+
+/** Block doc https://blockdoc.example */
+fn g() {}

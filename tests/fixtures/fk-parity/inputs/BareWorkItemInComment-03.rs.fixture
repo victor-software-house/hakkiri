@@ -1,0 +1,18 @@
+fn expected() -> String {
+    formatdoc! {"
+        Closed #123 and ABC-12.
+    "}
+}
+
+const SAMPLE: &str = indoc! {"
+    error: ticket EVO-9673 is closed
+"};
+
+const FIXTURE: &str = indoc! {r#"
+    ledger:
+      - id: QCTL-006
+        merge: !294
+"#};
+
+const PLAIN: &str = "see #456";
+const RAW: &str = r#"see ABC-34"#;

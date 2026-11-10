@@ -1,0 +1,16 @@
+fn expected() -> String {
+    formatdoc! {"
+        Published to the registry.
+          base: https://example.test/v1
+    "}
+}
+
+const SAMPLE: &str = indoc! {"
+    error: the registry at https://crates.io refused the upload
+"};
+
+const FIXTURE: &str = indoc! {r#"
+    registries:
+      internal:
+        index: sparse+https://registry.example.com/index/
+"#};
