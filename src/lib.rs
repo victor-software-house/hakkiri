@@ -10,6 +10,7 @@ mod error;
 mod jsdoc;
 mod language;
 mod markdown;
+pub mod splitter;
 mod tree;
 
 pub use error::Error;
