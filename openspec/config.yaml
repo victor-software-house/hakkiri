@@ -24,6 +24,7 @@ rules:
   specs:
     - Every requirement uses SHALL and has at least one WHEN/THEN scenario.
     - A scenario about a rule quotes the input text and the alerts it expects.
+    - A change that makes hakkiri differ from Vale, or removes a difference, adds, changes or removes its scenario in the `vale-differences` spec in the same pull request, with a link to the decision that records it.
   design:
     - Each decision names the alternative considered and why it lost.
   tasks:
