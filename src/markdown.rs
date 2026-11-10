@@ -196,46 +196,45 @@ fn build(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
     Ok((nodes, builder.code_blocks.get()))
 }
 
-/// The HTML tags Vale never counts as opening an element: the void tags,
-/// which hold no content, and the inline tags.
-const NO_ELEMENT_TAGS: [&str; 34] = [
-    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track",
-    "wbr", "b", "big", "i", "small", "abbr", "acronym", "cite", "dfn", "em", "kbd", "strong", "a",
-    "span", "sub", "sup", "code", "tt", "del", "q", "samp", "var",
-];
-
-/// Whether a block opens no element: a thematic break, a link definition, or
-/// an HTML block whose tags are all void or inline.
-///
-/// A comment, a declaration and a processing instruction hold no tag.
-/// A tag after the end of a comment on its line is in the same block.
-fn opens_no_element(node: &Mdast) -> bool {
-    if matches!(node, Mdast::ThematicBreak(_) | Mdast::Definition(_)) {
-        return true;
+/// Whether a block leaves the first place free: a thematic break, a link
+/// definition, or an HTML block that resets nothing ([`crate::html`] explains
+/// which).
+fn leaves_first_place(node: &Mdast) -> bool {
+    match node {
+        Mdast::ThematicBreak(_) | Mdast::Definition(_) => true,
+        Mdast::Html(html) => !crate::html::resets_scope(&html.value),
+        Mdast::Root(_)
+        | Mdast::Blockquote(_)
+        | Mdast::FootnoteDefinition(_)
+        | Mdast::MdxJsxFlowElement(_)
+        | Mdast::List(_)
+        | Mdast::MdxjsEsm(_)
+        | Mdast::Toml(_)
+        | Mdast::Yaml(_)
+        | Mdast::Break(_)
+        | Mdast::InlineCode(_)
+        | Mdast::InlineMath(_)
+        | Mdast::Delete(_)
+        | Mdast::Emphasis(_)
+        | Mdast::MdxTextExpression(_)
+        | Mdast::FootnoteReference(_)
+        | Mdast::Image(_)
+        | Mdast::ImageReference(_)
+        | Mdast::MdxJsxTextElement(_)
+        | Mdast::Link(_)
+        | Mdast::LinkReference(_)
+        | Mdast::Strong(_)
+        | Mdast::Text(_)
+        | Mdast::Code(_)
+        | Mdast::Math(_)
+        | Mdast::MdxFlowExpression(_)
+        | Mdast::Heading(_)
+        | Mdast::Table(_)
+        | Mdast::TableRow(_)
+        | Mdast::TableCell(_)
+        | Mdast::ListItem(_)
+        | Mdast::Paragraph(_) => false,
     }
-    let Mdast::Html(html) = node else {
-        return false;
-    };
-    let mut rest = html.value.as_str();
-    while let Some(at) = rest.find('<') {
-        rest = rest.get(at + 1..).unwrap_or_default();
-        if let Some(comment) = rest.strip_prefix("!--") {
-            rest = comment.split_once("-->").map_or("", |(_, after)| after);
-            continue;
-        }
-        let tag = rest.strip_prefix('/').unwrap_or(rest);
-        let name: String = tag
-            .chars()
-            .take_while(|c| c.is_ascii_alphanumeric() || *c == '-')
-            .collect::<String>()
-            .to_ascii_lowercase();
-        if tag.starts_with(|c: char| c.is_ascii_alphabetic())
-            && !NO_ELEMENT_TAGS.contains(&name.as_str())
-        {
-            return false;
-        }
-    }
-    true
 }
 
 /// What a visit of one mdast node gives its parent.
@@ -335,9 +334,9 @@ impl<'n> Frame<'n> {
     ///
     /// The parser lists every child, a fenced block, a table, an empty list
     /// item and an HTML block included, and each takes the first place.
-    /// A thematic break, a link definition, and an HTML block of comments, void
-    /// tags and inline tags open no element, so Vale reads past them: it takes
-    /// a block's scope from the elements opened since the last one closed.
+    /// A thematic break, a link definition, and an HTML block that ends no
+    /// run of tags leave the place free: Vale takes a block's scope from the
+    /// tags opened since the last reset.
     /// A node with no place of its own passes the place of its first child up.
     fn next_child(&mut self) -> Option<(&'n Mdast, Scope, bool)> {
         let child = self.children.next()?;
@@ -351,7 +350,7 @@ impl<'n> Frame<'n> {
                 Kind::Scoped(_) | Kind::Cell => true,
                 Kind::Jsx | Kind::Transparent => self.first,
             };
-        self.taken |= !opens_no_element(child);
+        self.taken |= !leaves_first_place(child);
         self.index += 1;
         Some((child, cell, first))
     }

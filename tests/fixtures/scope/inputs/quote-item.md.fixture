@@ -193,3 +193,168 @@ lazy line marker aa.
 > <!DOCTYPE html>
 >
 > After declaration marker tt.
+
+***
+
+> <?php echo "<div>"; ?>
+>
+> After probe marker a1.
+
+***
+
+> <![CDATA[<div>]]>
+>
+> After probe marker a2.
+
+***
+
+> <!DOCTYPE html><div>
+>
+> After probe marker a3.
+
+***
+
+> <?x?><div>
+>
+> After probe marker a4.
+
+***
+
+> <!-- a -- b --> <div>
+>
+> After probe marker a5.
+
+***
+
+> <!--> <div>
+>
+> After probe marker a6.
+
+***
+
+> <DIV>x</DIV>
+>
+> After probe marker a7.
+
+***
+
+> <HR>
+>
+> After probe marker a8.
+
+***
+
+> <SPAN>
+>
+> After probe marker a9.
+
+***
+
+> <div title="a>b">
+>
+> After probe marker b1.
+
+***
+
+> <hr title="a><div>">
+>
+> After probe marker b2.
+
+***
+
+> <div/>
+>
+> After probe marker b3.
+
+***
+
+> <div />
+>
+> After probe marker b4.
+
+***
+
+> <div a=/>
+>
+> After probe marker b5.
+
+***
+
+> <![CDATA[x]]> <div>
+>
+> After probe marker b6.
+
+***
+
+> <!---> <div>
+>
+> After probe marker b7.
+
+
+***
+
+> <hr title='x>' ><span>
+>
+> After probe marker b9.
+
+***
+
+> <!-- a --!- b --> <div>
+>
+> After probe marker c1.
+
+***
+
+> <b:x>
+>
+> After probe marker c2.
+
+***
+
+> </hr>
+>
+> After probe marker d1.
+
+***
+
+> </br>
+>
+> After probe marker d2.
+
+***
+
+> </span>
+>
+> After probe marker d3.
+
+
+
+***
+
+> <textarea>x</textarea>
+>
+> After probe marker d6.
+
+***
+
+> <style></style>
+>
+> After probe marker d7.
+
+***
+
+> <div>x
+>
+> After probe marker d8.
+
+***
+
+> <hr>x
+>
+> After probe marker d9.
+
+***
+
+> <
+>
+> After probe marker e1.

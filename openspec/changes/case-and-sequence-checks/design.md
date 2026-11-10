@@ -202,10 +202,10 @@ So `~list` and `~blockquote` keep what Vale keeps, which replaces the any-depth 
 Two cases differ, where Vale's behaviour is a defect:
 
 - `sentence & paragraph` selects the sentences of paragraphs, and Vale selects none, since no sentence block has `paragraph` in its scope. Vale works around this for `sequence` ([sequence.go][v-seq-scope]).
-- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block holds `paragraph`. hakkiri gives 84 alerts fewer.
+- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block holds `paragraph`. hakkiri gives 104 alerts fewer.
 
 A test runs 57 `existence` and `sequence` rules for 29 scopes over nine Markdown files that nest sentences in items, quotes, tables and headings.  
-It matches all of Vale's 3,946 alerts but those 84, and `departures.tsv` lists them and the 126 that only hakkiri gives.
+It matches all of Vale's 4,513 alerts but those 104, and `departures.tsv` lists them and the 156 that only hakkiri gives.
 
 Alternative: keep the container text and filter blocks by depth.  
 Lost: it needs a depth rule for each scope, and Vale's rule is the chain of first children.

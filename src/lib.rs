@@ -14,6 +14,7 @@ pub mod dictionary;
 pub mod engine;
 mod error;
 pub mod formula;
+mod html;
 mod jsdoc;
 mod language;
 mod markdown;
