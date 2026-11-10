@@ -11,9 +11,10 @@ queue:
       engine code.
     blocked_by: []
     acceptance:
-      - docs/format.md specifies rule files and .ctl/hakkiri.yaml, with structure terms from ast-grep and prose checks from Vale plus rates.
       - Every enabled ProseStyle rule and every frequency-habit rule is written in the format, none using lookbehind to rebuild structure.
       - The operator approved the format.
+      - The rule-format OpenSpec change specifies rule files and .ctl/hakkiri.yaml, with fields and scopes from Vale and prose checks from Vale plus rates.
+    plan: openspec/changes/rule-format/proposal.md
 
   - id: HKR-003
     title: Build the document tree and language profiles
@@ -26,19 +27,21 @@ queue:
     acceptance:
       - Snapshot tests show trees and spans for block comments, strings holding URLs, nested lists, tables and MDX.
       - String literals never appear as prose nodes.
+    plan: openspec/changes/document-tree/proposal.md
 
   - id: HKR-004
     title: Build the rule engine
     scope: engine
     outcome: >-
-      Rules select nodes first, then run word lists, swaps, counts, metrics and rates
-      over them.
+      Rules select text by scope, then run every Vale check type except script, with rates through metric.
     blocked_by:
       - HKR-002
     acceptance:
       - Each check type has unit tests.
       - Flesch-Kincaid matches Vale on the prose-style fixtures within a stated tolerance.
       - A 50,000-character line and a 60,000-line file finish with no panic.
+    notes:
+      - 2026-11-09, a word count reads a code span as one word, where Vale 3.26.0 reads none; link text counts and its target does not, as in Vale. HKR-002 lists the intended differences.
 
   - id: HKR-005
     title: Ship the check and test commands
@@ -69,8 +72,7 @@ queue:
     title: Import Vale styles
     scope: import
     outcome: >-
-      hakkiri import vale converts the Vale rule types ProseStyle uses into the
-      format.
+      hakkiri import vale converts every Vale rule type except script into the format.
     blocked_by:
       - HKR-005
     acceptance:

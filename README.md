@@ -17,7 +17,7 @@ An editor server follows in the second release.
 
 - A rule picks nodes in the document tree first, such as a heading, a sentence, prose outside code, or a doc comment.  
   A pattern then narrows that pick, so a rule never rebuilds code fences or code spans out of regular expressions.
-- Each source language has a profile that knows where its prose lives and in what syntax: rustdoc Markdown, TSDoc and JSDoc tags, plain comments.  
+- Each source language has a profile that knows where its prose lives and in what syntax: Markdown in every comment, plus TSDoc and JSDoc tags.  
   String literals are never read as prose.
 - A project pins rule packages by version and hash in `.ctl/hakkiri.yaml`; hakkiri fetches and caches them.
 - Files are checked in parallel.

@@ -8,15 +8,15 @@ The operator contract will be `hakkiri instructions` and `skills/hakkiri/SKILL.m
 
 1. **Own format.**
    hakkiri reads its own rule files and `.ctl/hakkiri.yaml`, not `.vale.ini` or Vale rule files.  
-   The format takes its structure terms from ast-grep: `kind`, `inside`, `has`, `not`, `all`, `any`.  
-   Its prose checks come from Vale's model: word lists, swaps, counts, metrics, plus rates.  
+   A rule selects text with Vale's `scope`: its lowercase dotted names, such as `sentence` and `text.comment.doc`, and its operators `~`, `&` and lists.  
+   Its checks are Vale's check types except `script`; a rate is a `metric` whose formula reads `occurrences`.  
    Vale styles enter only through `hakkiri import vale`, which a package build runs.
 2. **Structure first.**
-   A rule selects nodes in the document tree; a pattern only narrows that selection.  
-   A rule that needs a regular expression to find whether text sits in code, a link or a comment shows a missing node kind.
+   A rule selects text by its scope in the document tree; a pattern only narrows that selection.  
+   A rule that needs a regular expression to find whether text sits in code, a link or a comment shows a missing scope.
 3. **Language profiles.**
    Each source language has a profile that maps its comments and doc comments into the tree.  
-   Rustdoc reads as Markdown, TSDoc and JSDoc keep their tags, and plain comments read as text.  
+   Every comment reads as Markdown, plain `//` comments included; TSDoc and JSDoc keep their tags.  
    String literals are never prose.  
    The first release ships Rust, TypeScript, JavaScript, Markdown and MDX.
 4. **Matching.**
