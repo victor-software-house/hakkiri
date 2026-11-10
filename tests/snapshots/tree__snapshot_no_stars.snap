@@ -1,0 +1,7 @@
+---
+source: tests/tree.rs
+expression: "load(\"no-stars.ts\")? .render()"
+---
+raw 0..43 [0..43] "/**\n   Plain text line one.\n   Line two.\n*/"
+  text.comment.doc.block 0..43 [0..43] "/**\n   Plain text line one.\n   Line two.\n*/"
+    paragraph 7..40 [7..27, 31..40] "Plain text line one.\nLine two."

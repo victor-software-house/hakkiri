@@ -1,0 +1,9 @@
+export const meta = {
+  title: 'A page',
+
+  source: 'https://esm.example',
+}
+
+# Heading
+
+Text.

@@ -1,0 +1,17 @@
+---
+source: tests/tree.rs
+expression: "load(\"nested-list.md\")? .render()"
+---
+raw 0..53 [0..53] "- One\n  - Two\n    - Three\n- Four\n\n1. First\n2. Second\n"
+  list 2..25 [2..5, 10..13, 20..25] "One\nTwo\nThree"
+    paragraph 2..5 [2..5] "One"
+    list 10..25 [10..13, 20..25] "Two\nThree"
+      paragraph 10..13 [10..13] "Two"
+      list 20..25 [20..25] "Three"
+        paragraph 20..25 [20..25] "Three"
+  list 28..32 [28..32] "Four"
+    paragraph 28..32 [28..32] "Four"
+  list 37..42 [37..42] "First"
+    paragraph 37..42 [37..42] "First"
+  list 46..52 [46..52] "Second"
+    paragraph 46..52 [46..52] "Second"

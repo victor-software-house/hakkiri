@@ -1,0 +1,77 @@
+export const a = `x ${ { b: `}` }.b } y`
+
+Prose after a template.
+
+export const b = `line
+${
+  1 + 1
+}
+
+tail`
+
+Prose after a template with a blank line.
+
+export const re = /{/
+
+Prose after a regular expression.
+
+export const q = /'/.test("it's")
+
+Prose after a regular expression with a quote.
+
+export const A = () => <p>Don't</p>
+
+Prose after an apostrophe.
+
+export const k = () => { return /{/ }
+
+Prose after a keyword and a regular expression.
+
+export const t = (x) => typeof /'/.test(x)
+
+Prose after typeof and a quote in a regular expression.
+
+export const cls = /[/]{/
+
+Prose after a character class.
+
+export const esc = /a\/{/
+
+Prose after an escaped slash.
+
+export const J = () => <p>press ` to open</p>
+
+Prose after a backtick in JSX text.
+
+export const P = () => (<p>hi</p>)
+
+Prose after a closing tag in parentheses.
+
+export const T = () => <p>{`a
+
+b`}</p>
+
+Prose after a template with a blank line in JSX.
+
+export default function X() { return <p>It's</p> }
+
+Prose after an apostrophe in a function.
+
+export const O = {
+
+b: 1,
+}
+
+Prose after an object split by a blank line.
+
+export default f(1,
+
+2)
+
+Prose after an argument list split by a blank line.
+
+export const D = () => (<div>
+
+<p>x</p></div>)
+
+Prose after a JSX element split by a blank line.

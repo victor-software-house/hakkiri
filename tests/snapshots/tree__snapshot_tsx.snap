@@ -1,0 +1,10 @@
+---
+source: tests/tree.rs
+expression: "load(\"view.tsx\")? .render()"
+---
+raw 32..59 [32..59] "// A comment in a function."
+  text.comment.line 32..59 [32..59] "// A comment in a function."
+    paragraph 35..59 [35..59] "A comment in a function."
+raw 98..118 [98..118] "/* A JSX comment. */"
+  text.comment.block 98..118 [98..118] "/* A JSX comment. */"
+    paragraph 101..115 [101..115] "A JSX comment."

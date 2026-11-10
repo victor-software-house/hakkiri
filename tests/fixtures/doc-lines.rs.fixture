@@ -1,0 +1,13 @@
+/// First line
+///
+/// Second paragraph.
+fn first() {}
+
+//! Inner doc.
+
+// A plain comment
+// over two lines.
+fn second() {}
+
+//// Four slashes are plain.
+fn third() {}

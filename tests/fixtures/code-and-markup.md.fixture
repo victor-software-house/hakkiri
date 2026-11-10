@@ -1,0 +1,15 @@
+---
+title: A title
+---
+
+Run this:
+
+```sh
+curl https://example.com
+```
+
+<div class="raw">https://html.example</div>
+
+[ref]: https://definition.example
+
+After the markup.

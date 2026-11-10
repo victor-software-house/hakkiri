@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; edit with `copier update --data`.
-_commit: v0.0.84
+_commit: v0.0.88
 _src_path: https://github.com/victor-software-house/templates.git
 ci_runner: github-hosted
 clippy_disallowed_methods: []
@@ -7,7 +7,9 @@ clippy_disallowed_types: []
 default_branch: main
 deny_bans: []
 deny_ignore: []
-deny_licenses: []
+deny_licenses:
+-   license: Zlib
+    reason: foldhash, through serde_json in tree-sitter's build
 deny_skip: []
 feature_sets: []
 generated_paths: []
@@ -36,6 +38,9 @@ pieces_extra:
 - lint_workflows
 - machete
 - rustdoc
+platforms:
+- linux-x64
+- macos-arm64
 project: rust-crate
 prose_fail_level: error
 published: false

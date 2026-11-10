@@ -38,12 +38,18 @@ Alternative: a lexer per language, such as `ra_ap_rustc_lexer`. Lost: one per la
 
 ### 3. Comment text keeps a map to the file
 
-hakkiri strips the comment markers: `//`, `///`, `//!`, `/*`, `/**`, `/*!`, `*/`, and a leading `*` on each line.  
+hakkiri strips the comment markers: `//`, `///`, `//!`, `/*`, `/**`, `/*!`, `*/`, and the run of `/` or `*` after the opener of a plain comment.  
+It strips a leading `*` on each line only when every line has one, which is rustdoc's rule.  
 It joins adjacent line comments of the same type into one block, as rustdoc does.  
 
 It keeps, for each byte of the stripped text, the byte it came from in the file.  
 The stripped text parses as Markdown (rule-format decision 8).  
-Each Markdown node's span maps back through that table.
+Each Markdown node maps back through that table to ranges of the file, which the [node-segments design][segments] turns into its segments.
+
+A source file has one `raw` root for each comment group: one comment, or adjacent line comments that share a marker.
+
+The span of a node covers its segments from the first byte to the last.  
+An alert takes its position from the span.
 
 ### 4. Scopes from mdast nodes
 
@@ -61,17 +67,27 @@ Each Markdown node's span maps back through that table.
 | `image` alt text | `alt` |
 
 These carry no prose scope: fenced code, raw HTML, link definitions, front matter, MDX expressions, MDX imports, and the tags of JSX elements.  
+The node-segments design makes them gaps in the text of the node around them.
+
 Text inside a JSX element is prose.  
 `raw` holds the whole file for Markdown and MDX, and the comment text for a source file.
+
+The builder walks the mdast with its own stack of frames.  
+So does the map from the stripped text back to the file.  
+The depth of a document then costs no call stack.  
+markdown-rs reads 1,000 levels of block quotes or lists, and so does hakkiri.
 
 ### 5. JSDoc and TSDoc tags
 
 In a `/** */` comment of TypeScript or JavaScript, a line that starts with `@` begins a tag.  
-The tag name, and the parameter name after `@param` or `@typedef`, are not prose; the description after them is.
+The tag name, and a type in braces after it, are not prose.  
+Neither is the name after `@param` and the tags that name something.  
+The description after them is prose.  
+The body of `@example` is code, and a line inside a fenced block begins no tag.
 
 ### 6. insta snapshots
 
-Each test file under `tests/fixtures/` has an [insta][insta] snapshot of its tree: scope, span and the text the span covers, one node per line.  
+Each test file under `tests/fixtures/` has an [insta][insta] snapshot of its tree: scope, span, segments and the text of the node, one node per line.  
 A change to the tree shows as a snapshot diff in review.
 
 ## Risks / Trade-offs
@@ -82,6 +98,7 @@ A change to the tree shows as a snapshot diff in review.
   CI proves the build.
 
 [rule-format]: ../archive/2026-11-10-rule-format/design.md
+[segments]: ../node-segments/design.md
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
 [research]: ../archive/2026-11-09-bootstrap-hakkiri/research.md
 [markdown-rs]: https://crates.io/crates/markdown/1.0.0

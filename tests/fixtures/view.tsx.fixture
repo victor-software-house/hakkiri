@@ -1,0 +1,4 @@
+export const View = () => (
+    // A comment in a function.
+    <div title="https://jsx.example">{/* A JSX comment. */}Text</div>
+);

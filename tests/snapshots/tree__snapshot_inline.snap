@@ -1,0 +1,17 @@
+---
+source: tests/tree.rs
+expression: "load(\"inline.md\")? .render()"
+---
+raw 0..310 [0..310] "A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,\n`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png \"title\").\n\nCafé [naïve link](https://b.example) with non-ASCII letters.\n\nAn image reference ![logo][img] here.\n\n[ref]: https://c.example\n[img]: logo.png\n"
+  paragraph 0..164 [0..85, 86..164] "A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,\n`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png \"title\")."
+    link 2..27 [2..27] "[link](https://a.example)"
+    link 32..50 [32..50] "[a reference][ref]"
+    link 59..79 [59..79] "https://bare.example"
+    code 86..92 [86..92] "`code`"
+    strong 94..104 [94..104] "**strong**"
+    emphasis 106..116 [106..116] "*emphasis*"
+    alt 133..143 [133..143] "alt *text*"
+  paragraph 166..228 [166..228] "Café [naïve link](https://b.example) with non-ASCII letters."
+    link 172..204 [172..204] "[naïve link](https://b.example)"
+  paragraph 230..267 [230..267] "An image reference ![logo][img] here."
+    alt 251..255 [251..255] "logo"

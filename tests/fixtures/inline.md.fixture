@@ -1,0 +1,9 @@
+A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,
+`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png "title").
+
+Café [naïve link](https://b.example) with non-ASCII letters.
+
+An image reference ![logo][img] here.
+
+[ref]: https://c.example
+[img]: logo.png

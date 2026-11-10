@@ -1,0 +1,10 @@
+---
+source: tests/tree.rs
+expression: "load(\"tabs.rs\")? .render()"
+---
+raw 1..41 [1..20, 22..41] "/// Tabbed line one\n/// tabbed line two"
+  text.comment.doc.line 1..41 [1..20, 22..41] "/// Tabbed line one\n/// tabbed line two"
+    paragraph 5..41 [5..20, 26..41] "Tabbed line one\ntabbed line two"
+raw 43..85 [43..85] "/*\n\t * Starred with tabs.\n\t * Second.\n\t */"
+  text.comment.block 43..85 [43..85] "/*\n\t * Starred with tabs.\n\t * Second.\n\t */"
+    paragraph 50..80 [50..68, 73..80] "Starred with tabs.\nSecond."

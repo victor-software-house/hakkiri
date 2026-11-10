@@ -1,0 +1,16 @@
+---
+source: tests/tree.rs
+expression: "load(\"table.md\")? .render()"
+---
+raw 0..82 [0..82] "| Name | Note |\n|:-----|-----:|\n| a | b |\n| longer cell | `code` and **strong** |\n"
+  table.row 2..13 [2..6, 9..13] "Name Note"
+    table.header 2..6 [2..6] "Name"
+    table.header 9..13 [9..13] "Note"
+  table.row 34..39 [34..35, 38..39] "a b"
+    table.cell 34..35 [34..35] "a"
+    table.cell 38..39 [38..39] "b"
+  table.row 44..79 [44..55, 58..79] "longer cell `code` and **strong**"
+    table.cell 44..55 [44..55] "longer cell"
+    table.cell 58..79 [58..79] "`code` and **strong**"
+      code 58..64 [58..64] "`code`"
+      strong 69..79 [69..79] "**strong**"

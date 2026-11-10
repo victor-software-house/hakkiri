@@ -1,0 +1,7 @@
+---
+source: tests/tree.rs
+expression: "load(\"jsx-text.tsx\")? .render()"
+---
+raw 70..85 [70..85] "// real comment"
+  text.comment.line 70..85 [70..85] "// real comment"
+    paragraph 73..85 [73..85] "real comment"

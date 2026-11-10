@@ -1,0 +1,18 @@
+/**
+ * Decorated doc.
+ *
+ * - item one
+ * - item two
+ */
+fn decorated() {}
+
+/*!
+Inner block doc.
+*/
+
+/* Plain
+   block over lines. */
+fn plain() {}
+
+/**/
+/*** not a doc comment */

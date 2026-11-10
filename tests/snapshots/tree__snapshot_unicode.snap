@@ -1,0 +1,15 @@
+---
+source: tests/tree.rs
+expression: "load(\"unicode.rs\")? .render()"
+---
+raw 0..52 [0..52] "// Café naïve [lien](https://é.example) — ünï"
+  text.comment.line 0..52 [0..52] "// Café naïve [lien](https://é.example) — ünï"
+    paragraph 3..52 [3..52] "Café naïve [lien](https://é.example) — ünï"
+      link 16..42 [16..42] "[lien](https://é.example)"
+raw 53..89 [53..89] "/// Ünï [lien](https://é.example)"
+  text.comment.doc.line 53..89 [53..89] "/// Ünï [lien](https://é.example)"
+    paragraph 57..89 [57..89] "Ünï [lien](https://é.example)"
+      link 63..89 [63..89] "[lien](https://é.example)"
+raw 90..112 [90..112] "/** Ünïcode block */"
+  text.comment.doc.block 90..112 [90..112] "/** Ünïcode block */"
+    paragraph 94..109 [94..109] "Ünïcode block"

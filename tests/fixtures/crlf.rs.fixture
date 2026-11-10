@@ -1,0 +1,8 @@
+/// First line
+/// second line.
+
+/*
+ * Block
+ * text.
+ */
+fn f() {}

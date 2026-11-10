@@ -1,0 +1,2 @@
+/// Use Vec<String> here, and `Vec<u8>` there.
+fn f() {}

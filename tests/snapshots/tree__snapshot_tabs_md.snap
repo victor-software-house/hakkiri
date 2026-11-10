@@ -1,0 +1,8 @@
+---
+source: tests/tree.rs
+expression: "load(\"tabs.md\")? .render()"
+---
+raw 0..26 [0..26] "-\titem\n\n\tsecond paragraph\n"
+  list 2..25 [2..6, 9..25] "item\nsecond paragraph"
+    paragraph 2..6 [2..6] "item"
+    paragraph 9..25 [9..25] "second paragraph"

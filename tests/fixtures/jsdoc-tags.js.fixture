@@ -1,0 +1,14 @@
+/**
+ * A typedef.
+ *
+ * @typedef {Object} Options
+ * @returns The result.
+ * @param {string} [name=default value] Optional name.
+ * @see https://see.example
+ */
+
+/** @param a The first number. */
+function f(a) {}
+
+/* Block */
+// Line
