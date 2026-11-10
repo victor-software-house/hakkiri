@@ -112,6 +112,42 @@ fn affix_ok(value: &Text, ctx: &()) -> garde::Result {
     }
 }
 
+/// Whether `tokens` and `raw` hold a pattern to match: a pattern of nothing
+/// matches at every position.
+fn has_pattern(tokens: &Texts, raw: &Texts) -> bool {
+    raw.values().iter().any(|part| !part.is_empty())
+        || tokens.values().iter().any(|token| !token.trim().is_empty())
+}
+
+const NO_PATTERN: &str = "`tokens` and `raw` hold nothing to match, so the pattern would \
+     match at every position: list a token or a raw pattern";
+
+#[expect(
+    clippy::trivially_copy_pass_by_ref,
+    reason = "garde calls a custom rule with a reference to its context."
+)]
+fn existence_ok(fields: &ExistenceFields, _: &()) -> garde::Result {
+    if has_pattern(&fields.tokens, &fields.raw) {
+        Ok(())
+    } else {
+        Err(garde::Error::new(NO_PATTERN))
+    }
+}
+
+/// A metric without `tokens` or `raw` counts words only. One that lists
+/// `tokens` holding nothing counts nothing, which is a mistake.
+#[expect(
+    clippy::trivially_copy_pass_by_ref,
+    reason = "garde calls a custom rule with a reference to its context."
+)]
+fn metric_ok(fields: &MetricFields, _: &()) -> garde::Result {
+    if fields.tokens.values().is_empty() || has_pattern(&fields.tokens, &fields.raw) {
+        Ok(())
+    } else {
+        Err(garde::Error::new(NO_PATTERN))
+    }
+}
+
 /// The action of a rule: what a fix would do. It loads and changes nothing.
 #[derive(Debug, Deserialize, Validate)]
 #[serde(deny_unknown_fields)]
@@ -126,11 +162,12 @@ pub(super) struct ActionFields {
 }
 
 /// Defines the fields of one rule file type: the fields every check takes,
-/// then the ones of its own.
+/// then the ones of its own. `check(f)` adds the rule `f`, which reads the
+/// whole type.
 macro_rules! rule_fields {
     (
         $(#[$meta:meta])*
-        $name:ident {
+        $name:ident $(check($check:ident))? {
             $(
                 $(#[$field_meta:meta])*
                 $field:ident: $ty:ty,
@@ -141,6 +178,7 @@ macro_rules! rule_fields {
         #[derive(Debug, Deserialize, Validate)]
         #[serde(deny_unknown_fields)]
         #[garde(allow_unvalidated)]
+        $(#[garde(custom($check))])?
         pub(super) struct $name {
             #[garde(custom(valid))]
             pub(super) extends: Text,
@@ -177,7 +215,7 @@ macro_rules! rule_fields {
 
 rule_fields! {
     /// An `existence` rule.
-    ExistenceFields {
+    ExistenceFields check(existence_ok) {
         #[serde(default)]
         #[garde(custom(valid))]
         raw: Texts,
@@ -250,7 +288,7 @@ rule_fields! {
 
 rule_fields! {
     /// A `metric` rule.
-    MetricFields {
+    MetricFields check(metric_ok) {
         #[garde(custom(valid))]
         formula: Text,
         #[garde(custom(valid))]

@@ -327,6 +327,54 @@ fn affix_is_refused() -> TestResult {
 }
 
 #[test]
+fn a_rule_with_no_tokens_or_raw_is_refused() -> TestResult {
+    let (field, line, message) = refused(indoc! {"
+        extends: existence
+        message: m
+    "})?;
+    assert_eq!(field, "");
+    assert_eq!(line, Some(1));
+    assert!(message.contains("`tokens` and `raw`"), "{message}");
+    Ok(())
+}
+
+#[test]
+fn a_rule_with_only_blank_tokens_is_refused() -> TestResult {
+    let (_, line, message) = refused(indoc! {"
+        extends: existence
+        message: m
+        tokens: ['', '  ']
+    "})?;
+    assert_eq!(line, Some(1));
+    assert!(message.contains("`tokens` and `raw`"), "{message}");
+    Ok(())
+}
+
+#[test]
+fn a_metric_with_only_blank_tokens_is_refused() -> TestResult {
+    let (_, line, message) = refused(indoc! {"
+        extends: metric
+        message: m
+        tokens: ['  ']
+        formula: occurrences
+        condition: '> 3'
+    "})?;
+    assert_eq!(line, Some(1));
+    assert!(message.contains("`tokens` and `raw`"), "{message}");
+    Ok(())
+}
+
+#[test]
+fn a_rule_with_only_raw_loads() -> TestResult {
+    load(indoc! {r"
+        extends: existence
+        message: m
+        raw: ['\bvery\b']
+    "})?;
+    Ok(())
+}
+
+#[test]
 fn a_doc_scope_is_refused() -> TestResult {
     let (field, _, message) = refused(indoc! {"
         extends: existence
