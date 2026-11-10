@@ -451,10 +451,111 @@ fn a_file_outside_the_root_draws_a_warning() -> TestResult {
     )?;
     assert_eq!(result.code, 0, "{}", result.err);
     assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
-    assert_eq!(
-        result.err,
-        "warning ../outside.md: outside the project root, so no glob matches it and it is not linted\n"
+    assert_eq!(result.err, OUTSIDE_WARNING);
+    Ok(())
+}
+
+const OUTSIDE_WARNING: &str =
+    "warning ../outside.md: outside the project root, so no glob matches it and it is not linted\n";
+
+#[test]
+fn a_mixed_run_exits_by_the_alert_level() -> TestResult {
+    let suite = Suite::new("check-mixed");
+    let root = nested(&suite, "mixed");
+    let result = run(
+        &root.path().join("project"),
+        &["check", "--fail-level", "warning", "in.md", "../outside.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 1);
+    assert_eq!(result.err, OUTSIDE_WARNING);
+    assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
+    Ok(())
+}
+
+#[test]
+fn json_keeps_the_warning_on_standard_error() -> TestResult {
+    let suite = Suite::new("check-outside-json");
+    let root = nested(&suite, "outside-json");
+    let project = root.path().join("project");
+    let mixed = run(
+        &project,
+        &["check", "--format", "json", "in.md", "../outside.md"],
+        &[],
+    )?;
+    assert_eq!(mixed.code, 0, "{}", mixed.err);
+    assert_eq!(mixed.err, OUTSIDE_WARNING);
+    let json: Value = serde_json::from_str(&mixed.out)?;
+    assert_eq!(json["files"], 1);
+    assert_eq!(json["alerts"].as_array().map(Vec::len), Some(1));
+    assert_eq!(json["failures"].as_array().map(Vec::len), Some(0));
+    let none = run(
+        &project,
+        &["check", "--format", "json", "../outside.md"],
+        &[],
+    )?;
+    assert_eq!(none.code, 2);
+    assert_eq!(none.err, OUTSIDE_WARNING);
+    let json: Value = serde_json::from_str(&none.out)?;
+    assert_eq!(json["failures"][0]["config"], ".ctl/hakkiri.yaml");
+    assert!(
+        json["failures"][0]["message"]
+            .as_str()
+            .is_some_and(|message| message.contains("project root")),
+        "{}",
+        none.out
     );
+    Ok(())
+}
+
+#[test]
+fn quiet_keeps_the_warning() -> TestResult {
+    let suite = Suite::new("check-outside-quiet");
+    let root = nested(&suite, "outside-quiet");
+    let result = run(
+        &root.path().join("project"),
+        &["check", "--quiet", "in.md", "../outside.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(result.out, "");
+    assert_eq!(result.err, OUTSIDE_WARNING);
+    Ok(())
+}
+
+#[test]
+fn a_missing_package_folder_is_a_config_error() -> TestResult {
+    let suite = Suite::new("check-no-package");
+    let root = suite.scenario("no-package");
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Team]}\n",
+    );
+    root.file("a.md", "Fine.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2);
+    assert!(
+        result.err.contains("line 2: path: `styles`"),
+        "{}",
+        result.err
+    );
+    Ok(())
+}
+
+#[cfg(unix)]
+#[test]
+fn a_walk_does_not_enter_a_symlink_to_a_package_folder() -> TestResult {
+    let suite = Suite::new("check-link-package");
+    let root = project(&suite, "link-package", CONFIG);
+    root.file("docs/a.md", "This is very good.\n");
+    root.file("styles/Team/notes.md", "This is very good.\n");
+    std::os::unix::fs::symlink("../styles", root.path().join("docs/styles"))?;
+    let walked = run(root.path(), &["check", "docs"], &[])?;
+    assert_eq!(walked.code, 0, "{}", walked.err);
+    assert_eq!(walked.lines().last(), Some(&"1 alert in 1 file"));
+    let named = run(root.path(), &["check", "styles"], &[])?;
+    assert_eq!(named.code, 0, "{}", named.err);
+    assert_eq!(named.lines().last(), Some(&"1 alert in 1 file"));
     Ok(())
 }
 

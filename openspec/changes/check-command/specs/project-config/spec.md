@@ -5,6 +5,13 @@
 The project root SHALL be the folder that holds the `.ctl` folder of the config file, or the folder of the config file when it is not in a `.ctl` folder, with symlinks resolved.  
 hakkiri SHALL read every `path` in the config relative to that root, and a walk SHALL compare each folder's resolved path with those resolved package paths when it skips package folders.
 
+A `packages` `path` that does not exist SHALL be an error that names its line, and hakkiri SHALL NOT fall back to a path as written.
+
+#### Scenario: A package folder that is missing
+
+- **WHEN** `packages` holds `{path: styles}` and `styles/` does not exist
+- **THEN** hakkiri reports an error naming the line of that `path` and exits 2
+
 #### Scenario: A config named from another folder
 
 - **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml` is set in `other/` and `packages` holds `{path: styles}`

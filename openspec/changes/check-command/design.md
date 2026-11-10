@@ -58,6 +58,11 @@ A `files` glob matches the path relative to the root, with `/` separators.
 A path outside the root matches no glob, so it is not linted, and the run says so.
 Each path given that is outside the root, and does not hold it, draws a warning on standard error.
 When no path given lies under the root or holds it, the run reports a failure and exits 2, so a wrong `--config` is not a clean run.
+A `packages` `path` that does not exist is a config error, so a package not yet fetched (`HKR-006`) is not skipped or matched by its written path.
+The walk compares resolved paths, and `realpath` returns the stored case on a case-insensitive filesystem: on APFS, `STYLES/team` resolves to `styles/Team`.
+CI runs on a case-sensitive filesystem, so no test covers that.
+A walk never enters a symlink to a folder, so one into a package folder is skipped, and a folder inside a package that links out is skipped with its package.
+A directory named as an argument is walked even when it is a package folder, as Vale lints its styles path only when named.
 A directory that holds the root is walked only along the way to the root and then under it, so `check ..` from a workspace never enters a sibling project.
 A path that does not exist is a failure of its own, and the run does not also say that no path lies under the root.
 Vale walks every folder under the one it is given and lints each file whose section glob matches, so `vale ..` lints the files of a sibling project, probed on Vale 3.26.0 with a `[*.md]` section.

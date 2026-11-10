@@ -29,6 +29,8 @@ Only the binary size measurement in task 1.2 runs on a box, because CI cannot.
   - A walk from another folder that skips the package folders.
   - A file named two ways, which is linted once.
   - A walk from a folder that holds the root, and a path that does not exist.
+  - The warning in JSON and quiet runs, and a mixed run.
+  - A missing package folder, and a walk past a symlink to a package folder.
 
 ## 3. Finding and linting files
 

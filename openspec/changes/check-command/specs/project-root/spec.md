@@ -51,6 +51,27 @@ When no path lies under the root or holds it, hakkiri SHALL report a failure tha
 - **WHEN** `HAKKIRI_CONFIG=../other/hakkiri.yaml hakkiri check` runs in `project/`, so the root is `other/`
 - **THEN** hakkiri prints a warning that names `.`, reports a failure naming the root, and exits 2
 
+### Requirement: The warning is a diagnostic
+
+hakkiri SHALL write the warning to standard error in every output format, and `--quiet` SHALL not hide it, because `--quiet` hides only a successful result.  
+A run with some paths under the root and some outside SHALL lint those under it, warn for each one outside, and exit by the alert level.  
+The failure that names the root SHALL be one of the `failures` of the JSON object.
+
+#### Scenario: A mixed run
+
+- **WHEN** `hakkiri check --fail-level warning in.md ../outside.md` runs in `project/` and `in.md` draws a warning
+- **THEN** hakkiri warns for `../outside.md`, lints `in.md`, and exits 1
+
+#### Scenario: JSON output
+
+- **WHEN** `hakkiri check --format json ../outside.md` runs in `project/`
+- **THEN** standard error holds the warning, standard output is one JSON object whose `failures` names the root, and hakkiri exits 2
+
+#### Scenario: Quiet output
+
+- **WHEN** `hakkiri check --quiet in.md ../outside.md` runs in `project/`
+- **THEN** standard output is empty, standard error holds the warning, and hakkiri exits 0
+
 ### Requirement: A walk enters only the way to the project root
 
 A walk of a directory that holds the root SHALL enter only the folders on the way to the root and the folders under it.
@@ -59,6 +80,22 @@ A walk of a directory that holds the root SHALL enter only the folders on the wa
 
 - **WHEN** `hakkiri check ..` runs in `project/` and a sibling folder `sibling/locked` cannot be read
 - **THEN** hakkiri does not enter `sibling`, lints the files under the root, and exits 0
+
+### Requirement: A walk compares resolved paths
+
+When it skips package folders, a walk SHALL compare the resolved path of each folder with the resolved package paths, so a folder written in another case, or below a symlinked folder, is skipped alike.  
+A walk SHALL NOT enter a symlink to a folder.  
+A directory named as an argument SHALL be walked even when it is a package folder, as Vale lints its styles path only when named.
+
+#### Scenario: A symlink to a package folder
+
+- **WHEN** `docs/styles` is a symlink to the package folder `styles/`, and `hakkiri check docs` runs
+- **THEN** hakkiri does not enter `docs/styles`
+
+#### Scenario: A package folder named as an argument
+
+- **WHEN** `hakkiri check styles` runs and `styles/Team/notes.md` is prose a glob matches
+- **THEN** hakkiri lints `notes.md`
 
 ### Requirement: A missing path is reported once
 
