@@ -398,3 +398,13 @@ fn a_paragraph_after_a_fenced_block_in_an_item_is_a_paragraph() -> TestResult {
     assert_eq!(texts(&found), Vec::<&str>::new());
     Ok(())
 }
+
+#[test]
+fn a_paragraph_after_a_fenced_block_in_a_quote_is_a_paragraph() -> TestResult {
+    let source = "> ```text\n> code\n> ```\n>\n> After the fence.\n";
+    let found = blocks(&["paragraph"], "a.md", source)?;
+    assert_eq!(texts(&found), ["After the fence."]);
+    let found = blocks(&["blockquote"], "a.md", source)?;
+    assert_eq!(texts(&found), Vec::<&str>::new());
+    Ok(())
+}

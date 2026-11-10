@@ -194,21 +194,21 @@ So the first paragraph of an item is `list`, and the next is a `paragraph`.
 A negated part reads the block's scope the same way ([scope.go][v-scope-match]), and `sentence.list` is `sentence & list`.
 
 hakkiri's tree gives a list item or a quote the text of everything inside it ([node-segments spec][node-segments]), and the metric summaries read that text.  
-Selection no longer does.  
-It reads each paragraph, heading and cell under the scope Vale gives it, found from whether the node is the first child of its parent and starts on a line with the parent's marker.  
+Selection reads each paragraph, heading and cell under the scope Vale gives it, found from whether the node is the first child of its parent.  
+A first child starts on a line with the parent's marker, and in a quote nothing but blank quote lines lies above it.  
 So `~list` and `~blockquote` keep what Vale keeps, which replaces the any-depth exclusion of the [format design][format-7].  
-`table` selects cells and not rows, since Vale has no row scope.
+`table` selects cells, not rows, since Vale has no row scope.
 
 Two cases differ, where Vale's behaviour is a defect:
 
 - `sentence & paragraph` selects the sentences of paragraphs, and Vale selects none, since no sentence block has `paragraph` in its scope. Vale works around this for `sequence` ([sequence.go][v-seq-scope]).
-- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block holds `paragraph`. hakkiri gives 44 alerts fewer.
+- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block holds `paragraph`. hakkiri gives 52 alerts fewer.
 
-A test runs 57 `existence` and `sequence` rules for 29 scopes over seven Markdown files that nest sentences in items, quotes, tables and headings.  
-It matches all of Vale's 2,751 alerts but those 44, and `departures.tsv` lists them and the 66 that only hakkiri gives.
+A test runs 57 `existence` and `sequence` rules for 29 scopes over eight Markdown files that nest sentences in items, quotes, tables and headings.  
+It matches all of Vale's 2,923 alerts but those 52, and `departures.tsv` lists them and the 78 that only hakkiri gives.
 
 Alternative: keep the container text and filter blocks by depth.  
-Lost: it needs a depth rule for each scope name, and Vale's rule is the chain of first children.
+Lost: it needs a depth rule for each scope, and Vale's rule is the chain of first children.
 
 ### Crates read
 

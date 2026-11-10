@@ -5,6 +5,10 @@ vale	Scope.existence-not-paragraph	edge.md	12	34	39	marker
 vale	Scope.existence-not-paragraph	edge.md	16	12	17	marker
 vale	Scope.existence-not-paragraph	edge.md	18	12	17	marker
 vale	Scope.existence-not-paragraph	edge.md	24	18	23	marker
+vale	Scope.existence-not-paragraph	fence.md	5	15	20	marker
+vale	Scope.existence-not-paragraph	fence.md	13	21	26	marker
+vale	Scope.existence-not-paragraph	fence.md	21	32	37	marker
+vale	Scope.existence-not-paragraph	fence.md	27	23	28	marker
 vale	Scope.existence-not-paragraph	fresh.md	20	23	28	marker
 vale	Scope.existence-not-paragraph	fresh.md	24	12	17	marker
 vale	Scope.existence-not-paragraph	fresh.md	33	21	26	marker
@@ -27,6 +31,10 @@ vale	Scope.sequence-not-paragraph	edge.md	12	34	39	marker
 vale	Scope.sequence-not-paragraph	edge.md	16	12	17	marker
 vale	Scope.sequence-not-paragraph	edge.md	18	12	17	marker
 vale	Scope.sequence-not-paragraph	edge.md	24	18	23	marker
+vale	Scope.sequence-not-paragraph	fence.md	5	15	20	marker
+vale	Scope.sequence-not-paragraph	fence.md	13	21	26	marker
+vale	Scope.sequence-not-paragraph	fence.md	21	32	37	marker
+vale	Scope.sequence-not-paragraph	fence.md	27	23	28	marker
 vale	Scope.sequence-not-paragraph	fresh.md	20	23	28	marker
 vale	Scope.sequence-not-paragraph	fresh.md	24	12	17	marker
 vale	Scope.sequence-not-paragraph	fresh.md	33	21	26	marker
@@ -49,6 +57,10 @@ hakkiri	Scope.existence-sentence-paragraph	edge.md	12	34	39	marker
 hakkiri	Scope.existence-sentence-paragraph	edge.md	16	12	17	marker
 hakkiri	Scope.existence-sentence-paragraph	edge.md	18	12	17	marker
 hakkiri	Scope.existence-sentence-paragraph	edge.md	24	18	23	marker
+hakkiri	Scope.existence-sentence-paragraph	fence.md	5	15	20	marker
+hakkiri	Scope.existence-sentence-paragraph	fence.md	13	21	26	marker
+hakkiri	Scope.existence-sentence-paragraph	fence.md	21	32	37	marker
+hakkiri	Scope.existence-sentence-paragraph	fence.md	27	23	28	marker
 hakkiri	Scope.existence-sentence-paragraph	fresh.md	20	23	28	marker
 hakkiri	Scope.existence-sentence-paragraph	fresh.md	24	12	17	marker
 hakkiri	Scope.existence-sentence-paragraph	fresh.md	33	21	26	marker
@@ -71,6 +83,10 @@ hakkiri	Scope.sequence-paragraph-not-list	edge.md	12	34	39	marker
 hakkiri	Scope.sequence-paragraph-not-list	edge.md	16	12	17	marker
 hakkiri	Scope.sequence-paragraph-not-list	edge.md	18	12	17	marker
 hakkiri	Scope.sequence-paragraph-not-list	edge.md	24	18	23	marker
+hakkiri	Scope.sequence-paragraph-not-list	fence.md	5	15	20	marker
+hakkiri	Scope.sequence-paragraph-not-list	fence.md	13	21	26	marker
+hakkiri	Scope.sequence-paragraph-not-list	fence.md	21	32	37	marker
+hakkiri	Scope.sequence-paragraph-not-list	fence.md	27	23	28	marker
 hakkiri	Scope.sequence-paragraph-not-list	fresh.md	20	23	28	marker
 hakkiri	Scope.sequence-paragraph-not-list	fresh.md	24	12	17	marker
 hakkiri	Scope.sequence-paragraph-not-list	fresh.md	33	21	26	marker
@@ -93,6 +109,10 @@ hakkiri	Scope.sequence-sentence-paragraph	edge.md	12	34	39	marker
 hakkiri	Scope.sequence-sentence-paragraph	edge.md	16	12	17	marker
 hakkiri	Scope.sequence-sentence-paragraph	edge.md	18	12	17	marker
 hakkiri	Scope.sequence-sentence-paragraph	edge.md	24	18	23	marker
+hakkiri	Scope.sequence-sentence-paragraph	fence.md	5	15	20	marker
+hakkiri	Scope.sequence-sentence-paragraph	fence.md	13	21	26	marker
+hakkiri	Scope.sequence-sentence-paragraph	fence.md	21	32	37	marker
+hakkiri	Scope.sequence-sentence-paragraph	fence.md	27	23	28	marker
 hakkiri	Scope.sequence-sentence-paragraph	fresh.md	20	23	28	marker
 hakkiri	Scope.sequence-sentence-paragraph	fresh.md	24	12	17	marker
 hakkiri	Scope.sequence-sentence-paragraph	fresh.md	33	21	26	marker

@@ -71,12 +71,49 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
     }
 }
 
+/// The text of `line` after `depth` quote markers, or `None` when it holds
+/// fewer than that.
+fn after_markers(line: &str, depth: usize) -> Option<&str> {
+    let mut rest = line;
+    for _ in 0..depth {
+        rest = rest.trim_start().strip_prefix('>')?;
+    }
+    Some(rest)
+}
+
+/// Whether nothing but blank quote lines lies between the start of the quote
+/// that holds the node at byte `start`, and the line of that node.
+///
+/// A quote repeats its marker on every line, so the line of the node holds a
+/// marker whether or not something came before it.
+/// What came before is on the lines above that carry as many markers as the
+/// node's line does, and a line with fewer is outside the quote.
+fn first_in_quote(source: &str, line_start: usize, depth: usize) -> bool {
+    let mut end = line_start;
+    while end > 0 {
+        let above = source.get(..end - 1).unwrap_or_default();
+        let start = above.rfind('\n').map_or(0, |at| at + 1);
+        match source
+            .get(start..end - 1)
+            .and_then(|line| after_markers(line, depth))
+        {
+            None => return true,
+            Some(rest) if !rest.trim().is_empty() => return false,
+            Some(_) => end = start,
+        }
+    }
+    true
+}
+
 /// Whether `child` is the first thing inside `parent`.
 ///
 /// The tree keeps only the prose of a document, so a fenced block or another
 /// element with none can sit before the first child.
-/// The line a first child starts on then holds no marker of its parent, such
-/// as the bullet of a list item, a `>` of a quote or the pipe of a table row.
+/// The line a first child starts on then holds no marker of its parent: the
+/// bullet of a list item, or the pipe of a table row.
+/// A quote repeats its marker on every line, so its first child is the one
+/// with nothing but blank quote lines above it.
+/// A table row holds no block, so a fence cannot come before its first cell.
 fn opens(source: &str, parent: &Node, child: &Node) -> bool {
     let markers = match parent.scope {
         Scope::List => "-*+.)",
@@ -106,12 +143,17 @@ fn opens(source: &str, parent: &Node, child: &Node) -> bool {
     let line = source
         .get(..start)
         .map_or(0, |before| before.rfind('\n').map_or(0, |at| at + 1));
-    source.get(line..start).is_some_and(|prefix| {
+    let marked = source.get(line..start).is_some_and(|prefix| {
         prefix.contains(|c| markers.contains(c))
             && prefix
                 .chars()
                 .all(|c| c.is_whitespace() || c.is_ascii_digit() || "-*+>|.)#[]xX".contains(c))
-    })
+    });
+    marked
+        && (parent.scope != Scope::Blockquote
+            || source
+                .get(line..start)
+                .is_some_and(|prefix| first_in_quote(source, line, prefix.matches('>').count())))
 }
 
 /// The scope names a node holds.
