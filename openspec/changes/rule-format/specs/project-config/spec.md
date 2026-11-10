@@ -78,7 +78,10 @@ An empty list SHALL turn off linting for those files.
 
 Under a glob, a key that names a rule SHALL set that rule's level for the matched files.  
 The value SHALL be `suggestion`, `warning` or `error`, or `off` to turn the rule off.
-A key that names no rule in any loaded style SHALL be refused, with an error that names the key and its line.
+
+hakkiri SHALL refuse a key other than `styles` that names no rule in any style the config loads.  
+Its error SHALL name the key and its line.  
+A rule name SHALL match case-sensitively.
 
 #### Scenario: A rule turned down
 
@@ -87,5 +90,10 @@ A key that names no rule in any loaded style SHALL be refused, with an error tha
 
 #### Scenario: A misspelled rule name
 
-- **WHEN** a glob holds `ProseStyle.BareUrl: off` on line 7, and no loaded style has a rule of that name
+- **WHEN** a glob holds `ProseStyle.BareUrl: off` on line 7, and the loaded ProseStyle has a rule `BareURL` and none named `BareUrl`
 - **THEN** hakkiri reports an error naming `ProseStyle.BareUrl` and line 7, and exits with a failure status
+
+#### Scenario: A rule from a style another glob lists
+
+- **WHEN** `files` holds `'*.{md,rs}': {styles: [ProseStyle]}` and then `'*.rs': {ProseStyle.BareURL: off}`, and ProseStyle has a rule `BareURL`
+- **THEN** hakkiri accepts the config, though the `'*.rs'` glob lists no `styles` of its own
