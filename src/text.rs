@@ -133,9 +133,10 @@ impl Text {
     /// Whether the bytes `range` of the text overlap a code span.
     #[must_use]
     pub fn overlaps_code(&self, range: &Range<usize>) -> bool {
+        let first = self.code.partition_point(|code| code.end <= range.start);
         self.code
-            .iter()
-            .any(|code| code.start < range.end.max(range.start + 1) && range.start < code.end)
+            .get(first)
+            .is_some_and(|code| code.start < range.end.max(range.start + 1))
     }
 
     /// The part of this text in the bytes `range`, or `None` when `range` is

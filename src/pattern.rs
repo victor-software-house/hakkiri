@@ -1,6 +1,7 @@
 //! Patterns: the `regex` crate, and `fancy-regex` for a pattern that needs
 //! lookaround or a backreference.
 
+use std::ops::Range;
 use std::{error, fmt};
 
 /// How many steps `fancy-regex` takes on one search before it gives up.
@@ -43,6 +44,51 @@ impl fmt::Display for PatternError {
 }
 
 impl error::Error for PatternError {}
+
+/// Why a search of a text did not finish.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum SearchError {
+    /// `fancy-regex` took [`BACKTRACK_LIMIT`] steps on one search.
+    BacktrackLimit {
+        /// The pattern as compiled.
+        pattern: String,
+    },
+    /// `fancy-regex` ran out of stack on the text.
+    Stack {
+        /// The pattern as compiled.
+        pattern: String,
+    },
+}
+
+impl fmt::Display for SearchError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::BacktrackLimit { pattern } => write!(
+                f,
+                "the pattern `{pattern}` reached the backtrack limit of {BACKTRACK_LIMIT} steps"
+            ),
+            Self::Stack { pattern } => {
+                write!(f, "the pattern `{pattern}` ran out of stack on the text")
+            }
+        }
+    }
+}
+
+impl error::Error for SearchError {}
+
+impl SearchError {
+    fn new(pattern: &str, error: &fancy_regex::Error) -> Self {
+        let pattern = pattern.to_owned();
+        if matches!(
+            error,
+            fancy_regex::Error::RuntimeError(fancy_regex::RuntimeError::StackOverflow)
+        ) {
+            Self::Stack { pattern }
+        } else {
+            Self::BacktrackLimit { pattern }
+        }
+    }
+}
 
 impl Pattern {
     /// Compiles `source` with `regex`, and with `fancy-regex` when `regex`
@@ -89,15 +135,29 @@ impl Pattern {
     ///
     /// # Errors
     ///
-    /// Returns a [`PatternError`] when `fancy-regex` gives up on `text` at its
-    /// backtrack limit.
-    pub fn is_match(&self, text: &str) -> Result<bool, PatternError> {
+    /// Returns a [`SearchError`] when `fancy-regex` gives up on `text`.
+    pub fn is_match(&self, text: &str) -> Result<bool, SearchError> {
         match &self.engine {
             Engine::Regex(regex) => Ok(regex.is_match(text)),
-            Engine::Fancy(regex) => regex.is_match(text).map_err(|error| PatternError {
-                pattern: self.source.clone(),
-                message: error.to_string(),
-            }),
+            Engine::Fancy(regex) => regex
+                .is_match(text)
+                .map_err(|error| SearchError::new(&self.source, &error)),
+        }
+    }
+
+    /// The byte range of each match in `text`, in order.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`SearchError`] when `fancy-regex` gives up on `text`.
+    pub fn find_all(&self, text: &str) -> Result<Vec<Range<usize>>, SearchError> {
+        match &self.engine {
+            Engine::Regex(regex) => Ok(regex.find_iter(text).map(|found| found.range()).collect()),
+            Engine::Fancy(regex) => regex
+                .find_iter(text)
+                .map(|found| found.map(|found| found.range()))
+                .collect::<Result<_, _>>()
+                .map_err(|error| SearchError::new(&self.source, &error)),
         }
     }
 

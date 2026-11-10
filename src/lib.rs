@@ -5,7 +5,10 @@
 //! its children. Rules select text by scope, and alerts point back into the
 //! file through the spans.
 
+pub mod alert;
+mod check;
 mod comments;
+pub mod engine;
 mod error;
 mod jsdoc;
 mod language;

@@ -42,7 +42,7 @@ A line break inside a value SHALL read as one space.
 
 #### Scenario: A percent sign
 
-- **WHEN** a rule has `message: "'%s' is 100%% filler."` and `tokens: [basically]`, and the input is `Basically, yes.`
+- **WHEN** a rule has `message: "'%s' is 100%% filler."`, `ignorecase: true` and `tokens: [basically]`, and the input is `Basically, yes.`
 - **THEN** the alert message is `'Basically' is 100% filler.`
 
 #### Scenario: A match across a line break
@@ -86,7 +86,7 @@ It SHALL NOT panic.
 
 #### Scenario: Nested repeats with a lookahead
 
-- **WHEN** rule `Team.Slow` has `nonword: true` and `tokens: ['(a+)+(?=b)']`, and the input is one line of 50,000 `a` characters
+- **WHEN** rule `Team.Slow` has `nonword: true` and `tokens: ['(a+)+(?=b)c']`, and the input is one line of 50,000 `a` characters
 - **THEN** hakkiri reports one `error` alert for `Team.Slow` that names the backtrack limit, and the other rules report as usual
 
 ### Requirement: Long input finishes
