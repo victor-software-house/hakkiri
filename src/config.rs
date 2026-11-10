@@ -271,13 +271,16 @@ impl Project {
 }
 
 /// The 1-based line of the first line at or after line `from` that is the key
-/// `key`, written bare or quoted, or `None` when there is none.
+/// `key`, written bare or quoted and perhaps after a list dash, or `None` when
+/// there is none.
 fn key_line(text: &str, key: &str, from: usize) -> Option<usize> {
     text.lines()
         .enumerate()
         .skip(from.saturating_sub(1))
         .find_map(|(index, line)| {
-            let rest = line.trim_start().trim_start_matches(['\'', '"']);
+            let item = line.trim_start();
+            let item = item.strip_prefix("- ").map_or(item, str::trim_start);
+            let rest = item.trim_start_matches(['\'', '"']);
             let after = rest.strip_prefix(key)?;
             after
                 .trim_start_matches(['\'', '"'])
