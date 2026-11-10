@@ -311,6 +311,16 @@ fn a_negated_part_with_another_extension_leaves_nothing_out() -> TestResult {
 }
 
 #[test]
+fn an_item_of_parts_for_another_language_selects_nothing() -> TestResult {
+    let source = "# Head\n\nBody.\n";
+    let found = blocks(&["~heading.rs"], "a.md", source)?;
+    assert_eq!(texts(&found), Vec::<&str>::new());
+    let found = blocks(&["~heading.md"], "a.md", source)?;
+    assert_eq!(texts(&found), ["Body."]);
+    Ok(())
+}
+
+#[test]
 fn an_exclusion_belongs_to_its_item() -> TestResult {
     let source = "# See [the guide](u.md) now\n\nSee [the guide](u.md) now.\n";
     let found = blocks(&["heading", "paragraph & ~link"], "a.md", source)?;

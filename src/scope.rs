@@ -237,6 +237,11 @@ impl Alternative {
         if sentence && !self.wants_sentences() {
             return false;
         }
+        // An item whose every part names another language selects nothing,
+        // whether its parts are negated or not.
+        if self.parts.iter().all(|part| !part.applies_to(extension)) {
+            return false;
+        }
         let mut has_positive = false;
         for part in &self.parts {
             if part.negated {

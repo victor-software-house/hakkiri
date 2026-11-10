@@ -62,7 +62,8 @@ A sentence SHALL keep the nodes around its node, so an exclusion such as `~block
 ### Requirement: A file extension narrows a scope
 
 A last scope part that names a file extension, such as `rs` in `raw.rs`, SHALL limit the scope to files with that extension.
-A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes only in files with that extension.
+A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes only in files with that extension.  
+A scope item whose every part names another extension SHALL select nothing.
 
 #### Scenario: raw.rs in two files
 
@@ -73,6 +74,11 @@ A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes o
 
 - **WHEN** a rule has `scope: text & ~heading.rs` and `tokens: [marker]`, and a Markdown file holds `# A marker`
 - **THEN** hakkiri reports one alert, on the heading
+
+#### Scenario: An item that names only another language
+
+- **WHEN** a rule has `scope: [~heading.rs]` and `tokens: [marker]`, and a Markdown file holds `# A marker` and `A marker.`
+- **THEN** hakkiri reports no alert
 
 ### Requirement: An inline exclusion blanks the element
 
