@@ -179,6 +179,29 @@ hakkiri does better than Vale where Vale's behaviour is a defect.
 
 Alternative: read it as AP. Lost: a misspelt `chicago` would apply AP with no sign.
 
+### 9. A part reads an element and everything inside it
+
+Vale gives each block of text the scope of its own element ([ast.go][v-tag-scope], measured at `66bbb85`).  
+The text of a list item in a quote reads as `list`, a heading or table cell in a quote as `heading` or `table.cell`, and a quote in a list item as `blockquote`.  
+Only the first paragraph of an item or quote reads as the item or quote.  
+The paragraphs after it read as `paragraph`.
+
+hakkiri's tree gives a list item or a quote the text of everything inside it, as the [node-segments spec][node-segments] fixes.  
+So a part reads an element and everything inside it, as `~` does at any depth ([format design 7][format-7]).  
+Four cases follow, and the `scope-selection` spec records them:
+
+- `list` and `blockquote`, alone or joined to `sentence`, also read what Vale gives to the element inside.
+- `paragraph` leaves out the later paragraphs of an item or a quote.
+- `~list` and `~blockquote` leave out text that Vale keeps.
+- `sentence.list` is refused as an unknown scope, where Vale reads it as `sentence & list`.
+
+A test runs an `existence` and a `sequence` rule for 24 scopes over five Markdown files that nest sentences in items, quotes, tables and headings.  
+Of the 1,735 alerts Vale gave to the rules hakkiri loads, 1,610 are hakkiri's too, and `departures.tsv` lists the other 125 and the 156 that only hakkiri gives.  
+`heading`, `heading.h2`, `table`, `table.cell`, `text`, `sentence`, and `sentence` joined to `heading`, `table`, `~heading` or `~table`, equal Vale's alerts.
+
+Alternative: Vale's own element only.  
+Lost: it changes the text every `list` and `blockquote` rule reads, and the node-segments change fixed that text.
+
 ### Crates read
 
 Each crate was read on crates.io on 2026-11-10.
@@ -207,6 +230,9 @@ Each crate was read on crates.io on 2026-11-10.
 [pattern-design]: ../archive/2026-11-10-pattern-and-readability-checks/design.md
 [spelling-design]: ../spelling-and-affix-checks/design.md
 [deny]: ../../../deny.toml
+[v-tag-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L51-L58
+[node-segments]: ../../specs/node-segments/spec.md
+[format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [v-seq-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L123-L236
 [v-seq-tokens]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L289-L330
 [v-seq-match]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L387-L497
