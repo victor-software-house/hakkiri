@@ -15,6 +15,7 @@
 )]
 
 use std::error::Error;
+use std::time::{Duration, Instant};
 
 use super::{FormatError, Tagger};
 
@@ -153,5 +154,34 @@ fn a_contraction_after_a_long_run_still_splits() -> TestResult {
             .all(|(token, start)| token.starts_with(start)),
         "{tail:?}"
     );
+    Ok(())
+}
+
+#[test]
+fn a_long_run_of_one_mark_tags_in_linear_time() -> TestResult {
+    let tagger = english()?;
+    // The best of three runs of each, so a pause on a shared machine does not
+    // fail correct code.
+    let best = |sentence: &str| {
+        let mut best = Duration::MAX;
+        for _ in 0..3 {
+            let start = Instant::now();
+            let found = tagger.tag(sentence);
+            best = best.min(start.elapsed());
+            assert!(found.len() > 1, "{} tokens", found.len());
+        }
+        best
+    };
+    for mark in [")", "."] {
+        let small = best(&format!("word{}", mark.repeat(2_000)));
+        let large = best(&format!("word{}", mark.repeat(20_000)));
+        eprintln!("{mark} run: 2,000 took {small:?}, 20,000 took {large:?}");
+        // Ten times the marks cost ten times as much; 30 leaves room for
+        // noise, and a quadratic loop costs 100.
+        assert!(
+            large < small.max(Duration::from_micros(500)) * 30,
+            "20,000 marks took {large:?}, 2,000 took {small:?}"
+        );
+    }
     Ok(())
 }
