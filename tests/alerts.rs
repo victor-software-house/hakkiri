@@ -302,6 +302,16 @@ fn a_word_inside_an_accepted_phrase() -> TestResult {
 }
 
 #[test]
+fn a_word_inside_overlapping_phrases() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: [c]\nexceptions: ['a b', 'b c']\n",
+        "a b c",
+    )?;
+    assert_eq!(found, Vec::<Alert>::new());
+    Ok(())
+}
+
+#[test]
 fn a_code_span_is_no_match() -> TestResult {
     let found = markdown(
         "extends: existence\nmessage: m\nnonword: true\ntokens: ['x']\n",

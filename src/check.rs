@@ -33,7 +33,7 @@ fn run_existence(existence: &Existence, text: &Text) -> Result<Vec<Hit>, SearchE
     let content = text.as_str();
     let found = existence.pattern.find_all(content)?;
     let phrases = match &existence.exceptions.phrases {
-        Some(phrases) if !found.is_empty() => phrases.find_all(content)?,
+        Some(phrases) if !found.is_empty() => phrases.find_overlapping(content)?,
         _ => Vec::new(),
     };
     let mut hits = Vec::new();

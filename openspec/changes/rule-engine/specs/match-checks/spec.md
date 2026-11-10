@@ -47,6 +47,11 @@ A match inside a multi-word exception SHALL give no alert.
 - **WHEN** a rule has `tokens: [culpa]` and `exceptions: ['mea culpa']`, and the input is `A mea culpa and a culpa.`
 - **THEN** hakkiri reports one alert, at the second `culpa`
 
+#### Scenario: Two phrases that overlap
+
+- **WHEN** a rule has `tokens: [c]` and `exceptions: ['a b', 'b c']`, and the input is `a b c`
+- **THEN** hakkiri reports no alert
+
 ### Requirement: substitution tries longer keys first
 
 A `substitution` rule SHALL match its `swap` keys as `existence` matches tokens, trying longer keys first.  

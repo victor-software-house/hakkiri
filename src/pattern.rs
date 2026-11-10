@@ -161,6 +161,37 @@ impl Pattern {
         }
     }
 
+    /// The byte range of each match in `text`, including a match that starts
+    /// inside an earlier one.
+    ///
+    /// After each match, the search starts again one character past the
+    /// match's start.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`SearchError`] when `fancy-regex` gives up on `text`.
+    pub fn find_overlapping(&self, text: &str) -> Result<Vec<Range<usize>>, SearchError> {
+        let mut found = Vec::new();
+        let mut at = 0;
+        while at <= text.len() {
+            let next = match &self.engine {
+                Engine::Regex(regex) => regex.find_at(text, at).map(|found| found.range()),
+                Engine::Fancy(regex) => regex
+                    .find_from_pos(text, at)
+                    .map_err(|error| SearchError::new(&self.source, &error))?
+                    .map(|found| found.range()),
+            };
+            let Some(range) = next else { break };
+            at = range.start
+                + text
+                    .get(range.start..)
+                    .and_then(|rest| rest.chars().next())
+                    .map_or(1, char::len_utf8);
+            found.push(range);
+        }
+        Ok(found)
+    }
+
     /// The pattern as it was compiled.
     #[must_use]
     pub fn source(&self) -> &str {
