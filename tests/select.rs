@@ -334,3 +334,20 @@ fn an_exclusion_belongs_to_its_item() -> TestResult {
     assert_eq!(texts(&found), ["See the guide now", "See           now."]);
     Ok(())
 }
+
+#[test]
+fn a_quote_selects_the_heading_inside_it() -> TestResult {
+    let found = blocks(&["blockquote"], "a.md", "> # A marker heading\n")?;
+    assert_eq!(texts(&found), ["A marker heading"]);
+    Ok(())
+}
+
+#[test]
+fn a_list_item_selects_its_later_paragraph() -> TestResult {
+    let source = "- First.\n\n  A marker here.\n";
+    let found = blocks(&["list"], "a.md", source)?;
+    assert_eq!(texts(&found), ["First.\nA marker here."]);
+    let found = blocks(&["paragraph"], "a.md", source)?;
+    assert_eq!(texts(&found), Vec::<&str>::new());
+    Ok(())
+}
