@@ -110,7 +110,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     All 4,383 words of prose's syllable data match.  
     Two of its three score cases match to 0.01, and the third has two sentences here, where prose finds one.  
   - 2026-11-10 (UTC), the Rust comment test and the heading condition test pass in a box run of [4fabe24][c-condition].  
-    A whole-file metric now measures the comments of a code file, from [f312d38][c-comments].  
+    A whole-file metric now measures the comments of a code file, from [f312d38][c-comments], which Vale's default does not do ([decision 16][design-16]).  
     Eight such rules over a 50,000-character line take 42 ms, from 327 ms, in [7950466][c-once].  
   - 2026-11-10 (UTC), after one warm-up run, the median of five runs on a 4x8 box is 42 ms for one rule and 42 ms for eight.  
     Before [7950466][c-once] it was 43 ms and 341 ms.  
@@ -126,6 +126,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 7.3 Compare hakkiri's values with the fixture at the tolerance the design states.  
   Verify the parity test passes in CI and prints each input whose counts differ from Vale's.
   - 2026-11-10 (UTC), the parity test passes in the same box run: 51 inputs, counts equal Vale's on all 51, scores within 0.01, in [d324f02][c-metric].
+  - 2026-11-10 (UTC), the test also covers the 10 Rust inputs where Vale prints no value, in [ff43618][c-rust-parity].  
+    Six hold a comment, and hakkiri counts 18, 21, 9, 3, 2 and 4 words in them.  
+    The other four hold only strings, and hakkiri gives nothing, as Vale does.
 
 ### Evidence for 7.1
 
@@ -154,6 +157,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - Archive this change after the pull request merges, then archive `HKR-004` with `qctl close-from-openspec`.
 
 [design]: design.md
+[design-16]: design.md#16-better-than-vale-where-vale-is-wrong
 [c-deny]: https://github.com/victor-software-house/hakkiri/commit/f23a9c9776a9e45e2acac151b825c0fdeedb2fb8
 [c-tree]: https://github.com/victor-software-house/hakkiri/commit/462eaa9e82ec229444a658904a23fbcd5be274ac
 [c-select]: https://github.com/victor-software-house/hakkiri/commit/3fdac6d3dcd3d3929577c34ff37f3e48a222e050
@@ -170,6 +174,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-once]: https://github.com/victor-software-house/hakkiri/commit/7950466010eebccf5c05016a6a2d784e76c8671f
 [c-condition]: https://github.com/victor-software-house/hakkiri/commit/4fabe241fbc5a9b973a0cc12e699f92dac9e321d
 [c-linear]: https://github.com/victor-software-house/hakkiri/commit/7cbdcc598fd42e2940db9746f9ebaee574b25722
+[c-rust-parity]: https://github.com/victor-software-house/hakkiri/commit/ff436183465279d09d9621cf8883bd2401fbbce9
 [c-zero]: https://github.com/victor-software-house/hakkiri/commit/28e2bd40b28d871c0e5802e7ac14a29f21c84c9d
 [c-blank]: https://github.com/victor-software-house/hakkiri/commit/eb734afda9d33ab272ab83d0bde22e0fbf8dab6b
 [c-load]: https://github.com/victor-software-house/hakkiri/commit/389d5b4791be8248e954e303fd78f9314d1111ca

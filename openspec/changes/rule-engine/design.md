@@ -80,7 +80,7 @@ A sentence is a piece of one paragraph, heading or table cell, cut by hakkiri's 
 Vale segments the same blocks ([provider.go][v-segment]).
 
 A whole-file metric reads the paragraphs, list items and quotes joined by blank lines, as Vale's summary does ([ast.go][v-summary]).  
-In a code file it reads the paragraphs of the comments, as Vale's summary of a code file does ([code_ts.go][v-code-summary]).  
+In a code file it reads the paragraphs of the comments, which Vale's default does not (decision 16).  
 It then cuts at blank lines and sentences ([summarize.go][p-init]).  
 A word is a match of `(?:[A-Z]\.){2,}|[\p{N}\p{L}']+`, prose's word pattern ([regexp.go][p-words]).
 
@@ -191,10 +191,17 @@ These rows join the intended differences of [rule-format decision 7][format-7]:
 | `$1` in a swap value, for a key with a space | The key as written misses a line wrap, so the alert is lost ([substitution.go][v-expand]) | The key as matched, its spaces matching a line wrap |
 | `occurrence` with matches of blank text only | Counts them, points at none, and gives no alert ([occurrence.go][v-occ-count]) | Points at the first word of the node |
 | `occurrence` over a match in code | Counts every match, then points at the first one that is not code ([occurrence.go][v-occ-count]) | A match that overlaps a code span is not counted |
+| A whole-file metric in a code file | Prints no value (operator, 2026-11-10). A comment joins the summary only when a `tree-sitter` View gives its query a markup format ([code_ts.go][v-code-summary]). The default Rust query has none ([rs.go][v-rust-query], [query.go][v-query-format]), so `lintLines` writes no summary ([code_ts.go][v-comment-lint], [ast.go][v-summarize]) | Measures the prose of the comments, built in |
 
 Alternative: Vale's behaviour in each case.  
 Lost: a word with an accent would read as two words, an alert would point at a bullet, and `1st` would swap to `First`.  
 A `$1` key would lose its alert across a line wrap, and a count would include code.
+
+The comments row is a choice, not a repair of a Vale defect (operator, 2026-11-10).  
+The same holds at Vale 3.26.0 ([e2d4374][v-3-26-0]).  
+Alternative: match Vale's empty summary for a code file.  
+Lost: hakkiri measures comment prose by default, and the list of languages it reads will grow.  
+The [parity test][parity] asserts it on the 10 Rust inputs.
 
 ### 17. An inline exclusion belongs to its scope item
 
@@ -275,6 +282,12 @@ Each crate was read on crates.io on 2026-11-10.
 [v-expand]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/substitution.go#L516-L522
 [v-occ-count]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/occurrence.go#L63-L109
 [v-code-summary]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code_ts.go#L112-L114
+[v-comment-lint]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code_ts.go#L199-L215
+[v-rust-query]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/rs.go#L11-L16
+[v-query-format]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/query.go#L166
+[v-summarize]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L464-L481
+[v-3-26-0]: https://github.com/vale-cli/vale/tree/e2d4374b1c66c8a1dd6d912bebc135040d8833fa
+[parity]: ../../../tests/parity.rs
 [v-measure]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L701-L729
 [v-metrics]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L362-L405
 [v-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L19-L121
