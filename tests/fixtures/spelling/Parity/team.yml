@@ -1,0 +1,4 @@
+extends: spelling
+message: "'%s'"
+dictionaries: [team]
+append: true

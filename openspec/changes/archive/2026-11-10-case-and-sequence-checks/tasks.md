@@ -40,12 +40,17 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
 
 ## 4. Long inputs
 
-- [ ] 4.1 Run `capitalization` and `sequence` over the rule-engine change's 50,000-character line and 60,000-line file.  
-  Verify both tests pass in CI with no panic, and record their run time in the evidence note.
+- [x] 4.1 Run `capitalization` and `sequence` over the rule-engine change's 50,000-character line and 60,000-line file.  
+  Verify both tests pass in CI with no panic, and record their run time in the evidence note.  
+  - 2026-11-10 (UTC), `case_and_sequence_over_a_line_of_fifty_thousand_characters`, `case_and_sequence_over_a_file_of_sixty_thousand_lines` and `a_sentence_of_fifty_thousand_characters` pass in the [CI run on PR 39][pr39-ci].  
+    The five tests of `tests/long_inputs.rs` ran together in a debug build and finished in 68.51 s.  
+    They ran in parallel, so each time is measured from the start of the binary: the two line tests finished at 0.8 s and 1.2 s, and the file test at 68.5 s.
 
 ## 5. Integration
 
-- [ ] 5.1 Verify the pull request's CI passes: build, lint, tests, docs, deny, prose lint, OpenSpec and the Template check.
+- [x] 5.1 Verify the pull request's CI passes: build, lint, tests, docs, deny, prose lint, OpenSpec and the Template check.  
+  - 2026-11-10 (UTC), CI passes on [6757a8d][c-pr39] of [PR 39][hakkiri#39], the top of the stack: Build and test, Static checks, Verify, CodeQL, both Analyze jobs, secrets and the Kody review.  
+    The Template check and Publish checks skip on this branch, and I did not run them.
 
 ## Workflow follow-up
 
@@ -55,10 +60,13 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
 [hakkiri#35]: https://github.com/victor-software-house/hakkiri/pull/35
 [hakkiri#36]: https://github.com/victor-software-house/hakkiri/pull/36
 [hakkiri#37]: https://github.com/victor-software-house/hakkiri/pull/37
+[hakkiri#39]: https://github.com/victor-software-house/hakkiri/pull/39
 [pr36-ci]: https://github.com/victor-software-house/hakkiri/actions/runs/42868740193
 [pr37-ci]: https://github.com/victor-software-house/hakkiri/actions/runs/42874900849
+[pr39-ci]: https://github.com/victor-software-house/hakkiri/actions/runs/42898183022
+[c-pr39]: https://github.com/victor-software-house/hakkiri/commit/6757a8d87ba80d1aedfdbacc9c1d490533fd0346
 [main-ci]: https://github.com/victor-software-house/hakkiri/actions/runs/42865681901
-[pattern]: ../archive/2026-11-10-pattern-and-readability-checks/proposal.md
+[pattern]: ../2026-11-10-pattern-and-readability-checks/proposal.md
 [design]: design.md
 [capitalization]: specs/capitalization-check/spec.md
 [sequence]: specs/sequence-check/spec.md

@@ -31,4 +31,4 @@ None.
 - One new module for the `spelling` check, with unit tests.
 
 [ledger]: ../../../tasks.yaml
-[case]: ../case-and-sequence-checks/proposal.md
+[case]: ../archive/2026-11-10-case-and-sequence-checks/proposal.md

@@ -250,7 +250,7 @@ Each crate was read on crates.io on 2026-11-10.
 [segments-delta]: specs/node-segments/spec.md
 [tree-delta]: specs/document-tree/spec.md
 [rule-files-delta]: specs/rule-files/spec.md
-[last]: ../../case-and-sequence-checks/proposal.md
+[last]: ../2026-11-10-case-and-sequence-checks/proposal.md
 [splitter]: ../2026-11-10-sentence-splitter/design.md
 [tree-spec]: ../../../specs/document-tree/spec.md
 [segments-spec]: ../../../specs/node-segments/spec.md

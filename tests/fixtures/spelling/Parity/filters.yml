@@ -1,0 +1,3 @@
+extends: spelling
+message: "'%s'"
+filters: ['^hak', '^[a-z]{2}$']

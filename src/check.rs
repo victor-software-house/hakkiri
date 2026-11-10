@@ -12,6 +12,7 @@ use crate::rule::{
     Readability, Repetition, Rule, Sequence, Substitution, Swap,
 };
 use crate::sequence::find;
+use crate::spelling::run as run_spelling;
 use crate::splitter::Model;
 use crate::summary::{Elements, Summary};
 use crate::text::Text;
@@ -25,6 +26,9 @@ pub(crate) struct Hit {
     pub(crate) values: Vec<String>,
     /// Whether the message reads `%d` as `%s`.
     pub(crate) numbered: bool,
+    /// The message to use in place of the rule's, when the check knows more
+    /// than the rule's message does.
+    pub(crate) message: Option<String>,
 }
 
 impl Hit {
@@ -38,7 +42,8 @@ impl Hit {
                 fill(template, &values)
             }
         };
-        (read(&rule.message), read(&rule.description))
+        let message = self.message.clone().unwrap_or_else(|| read(&rule.message));
+        (message, read(&rule.description))
     }
 }
 
@@ -56,7 +61,7 @@ pub(crate) struct Memory {
 }
 
 /// The matches `check` finds in `text`, the next block of a file whose earlier
-/// blocks `memory` holds.
+/// blocks `memory` holds and whose extension, without the dot, is `extension`.
 ///
 /// # Errors
 ///
@@ -65,6 +70,7 @@ pub(crate) fn run(
     check: &Check,
     text: &Text,
     memory: &mut Memory,
+    extension: &str,
 ) -> Result<Vec<Hit>, SearchError> {
     match check {
         Check::Existence(existence) => run_existence(existence, text),
@@ -77,6 +83,7 @@ pub(crate) fn run(
         Check::Readability(readability) => Ok(run_readability(readability, text)),
         Check::Capitalization(capitalization) => Ok(run_capitalization(capitalization, text)),
         Check::Sequence(sequence) => run_sequence(sequence, text),
+        Check::Spelling(spelling) => Ok(run_spelling(spelling, text, extension)),
     }
 }
 
@@ -170,6 +177,7 @@ fn run_existence(existence: &Existence, text: &Text) -> Result<Vec<Hit>, SearchE
             continue;
         }
         hits.push(Hit {
+            message: None,
             values: vec![matched.to_owned()],
             numbered: false,
             range,
@@ -207,6 +215,7 @@ fn run_substitution(substitution: &Substitution, text: &Text) -> Result<Vec<Hit>
             continue;
         }
         hits.push(Hit {
+            message: None,
             values: vec![expected, observed.to_owned()],
             numbered: false,
             range,
@@ -281,6 +290,7 @@ fn run_occurrence(occurrence: &Occurrence, text: &Text) -> Result<Vec<Hit>, Sear
     let range = placed.or_else(|| first_word(content));
     Ok(range
         .map(|range| Hit {
+            message: None,
             values: vec![count.to_string()],
             numbered: true,
             range,
@@ -330,6 +340,7 @@ fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
     };
     Ok(measure(metric, &base, occurrences)
         .map(|result| Hit {
+            message: None,
             range: 0..0,
             values: vec![format!("{result:.2}")],
             numbered: false,
@@ -391,6 +402,7 @@ fn run_conditional(
             continue;
         }
         hits.push(Hit {
+            message: None,
             values: vec![observed.to_owned()],
             numbered: false,
             range,
@@ -426,6 +438,7 @@ fn run_consistency(
             && let Some(matched) = content.get(range.clone())
         {
             hits.push(Hit {
+                message: None,
                 values: vec![matched.to_owned()],
                 numbered: false,
                 range,
@@ -497,6 +510,7 @@ fn run_repetition(repetition: &Repetition, text: &Text) -> Result<Vec<Hit>, Sear
                 };
                 if !excepted(&repetition.exceptions, held, &span, spanned)? {
                     hits.push(Hit {
+                        message: None,
                         range: span,
                         values: vec![current.to_owned()],
                         numbered: false,
@@ -521,6 +535,7 @@ fn run_capitalization(capitalization: &Capitalization, text: &Text) -> Vec<Hit> 
         return Vec::new();
     }
     vec![Hit {
+        message: None,
         range: 0..content.len(),
         values: vec![content.to_owned(), expected],
         numbered: false,
@@ -533,6 +548,7 @@ fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchErro
     Ok(find(sequence, text.as_str())?
         .into_iter()
         .map(|matched| Hit {
+            message: None,
             range: matched.range,
             values: matched.words,
             numbered: false,
@@ -555,6 +571,7 @@ fn run_readability(readability: &Readability, text: &Text) -> Vec<Hit> {
 /// The hit of an average grade, at the start of the text.
 fn grade_hit(average: f64) -> Hit {
     Hit {
+        message: None,
         range: 0..0,
         values: vec![format!("{average:.2}")],
         numbered: false,
@@ -576,6 +593,7 @@ pub(crate) fn run_summary(
                 .map(|tokens| count_tokens(tokens, &summary.content))
                 .transpose()?;
             Ok(measure(metric, base, occurrences).map(|result| Hit {
+                message: None,
                 range: 0..0,
                 values: vec![format!("{result:.2}")],
                 numbered: false,
@@ -589,6 +607,7 @@ pub(crate) fn run_summary(
         | Check::Conditional(_)
         | Check::Repetition(_)
         | Check::Capitalization(_)
-        | Check::Sequence(_) => Ok(None),
+        | Check::Sequence(_)
+        | Check::Spelling(_) => Ok(None),
     }
 }

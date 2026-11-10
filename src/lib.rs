@@ -25,6 +25,7 @@ pub mod rule;
 pub mod scope;
 pub mod select;
 mod sequence;
+mod spelling;
 pub mod splitter;
 pub mod strcase;
 pub mod summary;

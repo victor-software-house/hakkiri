@@ -61,7 +61,7 @@ pub fn lint(
         let mut failure = None;
         let mut memory = Memory::default();
         'blocks: for block in select(&rule.scope, tree, source, extension)? {
-            match run(&rule.check, &block.text, &mut memory) {
+            match run(&rule.check, &block.text, &mut memory, extension) {
                 Ok(hits) => {
                     for hit in hits {
                         let messages = hit.messages(rule);

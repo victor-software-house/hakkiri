@@ -10,7 +10,7 @@ use serde::Deserialize;
 use super::field::{Count, Flag, Number, Pairs, Text, Texts, valid};
 
 /// The check types of Vale 3.26.0 that hakkiri runs.
-pub(super) const RUNNABLE: [&str; 10] = [
+pub(super) const RUNNABLE: [&str; 11] = [
     "existence",
     "substitution",
     "occurrence",
@@ -21,10 +21,8 @@ pub(super) const RUNNABLE: [&str; 10] = [
     "readability",
     "capitalization",
     "sequence",
+    "spelling",
 ];
-
-/// The check types of Vale 3.26.0 that a later change adds.
-pub(super) const PLANNED: [&str; 1] = ["spelling"];
 
 /// The levels of an alert.
 pub(super) const LEVELS: [&str; 3] = ["suggestion", "warning", "error"];
@@ -51,16 +49,10 @@ fn extends_ok(value: &Text, ctx: &()) -> garde::Result {
         Err(garde::Error::new(
             "`script` rules are not supported: hakkiri runs no scripts",
         ))
-    } else if PLANNED.contains(&name) {
-        Err(garde::Error::new(format!(
-            "`{name}` is a check type hakkiri does not run yet"
-        )))
     } else {
         Err(garde::Error::new(format!(
             "`{name}` is not a check type: use one of {}",
-            [RUNNABLE.as_slice(), PLANNED.as_slice()]
-                .concat()
-                .join(", ")
+            RUNNABLE.join(", ")
         )))
     }
 }
@@ -503,5 +495,44 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         model: Text,
+    }
+}
+
+rule_fields! {
+    /// A `spelling` rule.
+    SpellingFields {
+        #[serde(default)]
+        #[garde(custom(valid))]
+        filters: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        ignore: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        exceptions: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        dictionaries: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        aff: Text,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        dic: Text,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        dicpath: Text,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        threshold: Number,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        custom: Flag,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        append: Flag,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        split: Flag,
     }
 }

@@ -5,16 +5,17 @@
 //! `raw` text before or after it, and one flag for case.
 
 use std::cmp::Reverse;
+use std::path::Path;
 
 use super::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
-    OccurrenceFields, ReadabilityFields, RepetitionFields, SequenceFields, SubstitutionFields,
-    TokenFields,
+    OccurrenceFields, ReadabilityFields, RepetitionFields, SequenceFields, SpellingFields,
+    SubstitutionFields, TokenFields,
 };
 use super::{
     Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence,
     LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Sequence,
-    Substitution, Swap, Token, level_of,
+    Spelling, Substitution, Swap, Token, level_of, package,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -30,10 +31,12 @@ pub(super) struct Source<'a> {
     pub(super) name: &'a str,
     /// The rule's file.
     pub(super) file: &'a str,
+    /// The package that holds the rule, when it was read in one.
+    pub(super) package: Option<&'a Path>,
 }
 
 impl Source<'_> {
-    fn problem(&self, field: &str, message: String) -> LoadError {
+    pub(super) fn problem(&self, field: &str, message: String) -> LoadError {
         LoadError {
             problems: vec![LoadProblem {
                 file: self.file.to_owned(),
@@ -940,5 +943,51 @@ pub(super) fn sequence_rule(
         fields,
         Check::Sequence(sequence(source, fields)?),
         &sentence_scope(fields.scope.values())
+    ))
+}
+
+/// The check of a `spelling` rule: its dictionaries, word lists and filters.
+///
+/// Vale reads `exceptions` and `threshold` in a `spelling` rule and uses
+/// neither, so each is refused here rather than accepted and ignored. A
+/// `threshold` of 0 reads as unset, as it does in a `capitalization` rule.
+fn spelling(source: &Source<'_>, fields: &SpellingFields) -> Result<Spelling, LoadError> {
+    let name = source.name;
+    if !fields.exceptions.values().is_empty() {
+        return Err(source.problem(
+            "exceptions",
+            format!(
+                "rule `{name}`: `exceptions` has no effect on a spelling rule; to accept a word, list it in a dictionary, or match it with `filters`"
+            ),
+        ));
+    }
+    if fields.threshold.value() != 0.0 {
+        return Err(source.problem(
+            "threshold",
+            format!("rule `{name}`: `threshold` has no effect on a spelling rule; remove it"),
+        ));
+    }
+    let filters = fields
+        .filters
+        .values()
+        .iter()
+        .map(|filter| source.compile("filters", filter, &[]))
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(Spelling {
+        speller: package::speller(source, fields)?,
+        filters,
+        standard: !fields.custom.value(),
+        split: fields.split.value(),
+    })
+}
+
+pub(super) fn spelling_rule(
+    source: &Source<'_>,
+    fields: &SpellingFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Spelling(spelling(source, fields)?)
     ))
 }
