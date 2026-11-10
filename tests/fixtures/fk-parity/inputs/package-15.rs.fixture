@@ -1,0 +1,2 @@
+/// Fixed in EVO-9673.
+fn fix() {}

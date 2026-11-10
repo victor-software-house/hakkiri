@@ -1,0 +1,2 @@
+/// The blocker is load-bearing, e.g. a day.
+fn wait() {}

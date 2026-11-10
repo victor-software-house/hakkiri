@@ -1,0 +1,67 @@
+id	vale	prose_style	format	status	flesch_kincaid	words	sentences	syllables
+BareURL-01	3.26.0	ee9f207	md	measured	-2.620000	3	1	3
+BareURLInComment-01	3.26.0	ee9f207	rs	no-words				
+BareURLInComment-07	3.26.0	ee9f207	rs	no-words				
+BareURLInComment-08	3.26.0	ee9f207	md	no-words				
+BareWorkItem-01	3.26.0	ee9f207	md	measured	2.342222	9	1	11
+BareWorkItemInComment-01	3.26.0	ee9f207	rs	no-words				
+BareWorkItemInComment-03	3.26.0	ee9f207	rs	no-words				
+BareWorkItemInComment-04	3.26.0	ee9f207	md	measured	1.313333	3	1	4
+ChattyHeadings-01	3.26.0	ee9f207	md	measured	-3.400000	3	3	3
+ChattyHeadings-02	3.26.0	ee9f207	md	measured	-3.400000	2	2	2
+Dashes-01	3.26.0	ee9f207	md	measured	-0.266667	15	3	17
+Dashes-02	3.26.0	ee9f207	md	measured	0.520000	5	1	6
+Emoji-01	3.26.0	ee9f207	md	measured	2.890000	2	1	3
+Emoji-02	3.26.0	ee9f207	md	measured	0.516667	6	1	7
+Exclamation-01	3.26.0	ee9f207	md	measured	-2.815000	5	2	5
+Filler-01	3.26.0	ee9f207	md	measured	4.317857	7	2	11
+Filler-02	3.26.0	ee9f207	md	measured	-2.815000	5	2	5
+FormalWords-01	3.26.0	ee9f207	md	measured	2.375769	13	2	17
+FormalWords-02	3.26.0	ee9f207	md	measured	1.573182	11	2	14
+GenericHeaders-01	3.26.0	ee9f207	md	no-words				
+GenericHeaders-02	3.26.0	ee9f207	md	no-words				
+Jargon-01	3.26.0	ee9f207	md	measured	0.558571	14	3	17
+Jargon-02	3.26.0	ee9f207	md	measured	0.516667	6	1	7
+LeakedChat-01	3.26.0	ee9f207	md	measured	-0.660000	10	2	11
+LeakedChat-02	3.26.0	ee9f207	md	measured	0.625714	7	1	8
+Lingo-01	3.26.0	ee9f207	md	measured	2.280000	16	2	20
+Lingo-02	3.26.0	ee9f207	md	measured	2.280000	8	1	10
+Lingo-03	3.26.0	ee9f207	md	measured	3.755000	8	1	11
+ListItem-01	3.26.0	ee9f207	md	measured	0.806221	62	7	68
+ListItem-02	3.26.0	ee9f207	md	measured	2.890000	4	2	6
+LongSentence-01	3.26.0	ee9f207	md	measured	21.067660	47	1	73
+LongSentence-02	3.26.0	ee9f207	md	measured	4.450000	6	1	9
+MadeUpWords-01	3.26.0	ee9f207	md	measured	7.773333	12	1	19
+MadeUpWords-02	3.26.0	ee9f207	md	measured	2.483333	6	1	8
+MadeUpWords-03	3.26.0	ee9f207	md	measured	7.190000	10	1	16
+MadeUpWords-04	3.26.0	ee9f207	md	measured	1.290000	10	1	11
+Paragraph-01	3.26.0	ee9f207	md	measured	0.806221	62	7	68
+Paragraph-02	3.26.0	ee9f207	md	measured	5.246667	3	1	5
+Profanity-01	3.26.0	ee9f207	md	measured	0.520000	5	1	6
+Profanity-02	3.26.0	ee9f207	md	measured	4.450000	6	1	9
+StaleWords-01	3.26.0	ee9f207	md	measured	2.280000	16	2	20
+StaleWords-02	3.26.0	ee9f207	md	measured	-0.466667	12	2	13
+StockPhrases-01	3.26.0	ee9f207	md	measured	3.718636	11	2	16
+StockPhrases-02	3.26.0	ee9f207	md	measured	2.311429	7	1	9
+StockPhrases-03	3.26.0	ee9f207	md	measured	1.031111	9	1	10
+StrawMan-01	3.26.0	ee9f207	md	measured	3.653333	18	2	24
+StrawMan-02	3.26.0	ee9f207	md	measured	5.240000	5	1	8
+TableRow-01	3.26.0	ee9f207	md	no-words				
+TableRow-02	3.26.0	ee9f207	md	no-words				
+ThingsSpeak-01	3.26.0	ee9f207	md	measured	0.500455	22	4	26
+ThingsSpeak-02	3.26.0	ee9f207	md	measured	1.607353	17	2	20
+package-01	3.26.0	ee9f207	md	measured	8.161569	51	3	74
+package-02	3.26.0	ee9f207	md	measured	3.997143	7	1	10
+package-03	3.26.0	ee9f207	md	measured	1.573182	11	2	14
+package-04	3.26.0	ee9f207	md	measured	2.483333	6	1	8
+package-05	3.26.0	ee9f207	rs	no-words				
+package-06	3.26.0	ee9f207	rs	no-words				
+package-07	3.26.0	ee9f207	txt	measured	2.280000	8	1	10
+package-09	3.26.0	ee9f207	md	measured	4.520556	9	2	14
+package-10	3.26.0	ee9f207	md	measured	2.195000	8	2	11
+package-11	3.26.0	ee9f207	rs	no-words				
+package-12	3.26.0	ee9f207	rs	no-words				
+package-13	3.26.0	ee9f207	md	measured	-3.010000	2	1	2
+package-14	3.26.0	ee9f207	rs	no-words				
+package-15	3.26.0	ee9f207	rs	no-words				
+package-16	3.26.0	ee9f207	md	measured	3.670000	4	1	6

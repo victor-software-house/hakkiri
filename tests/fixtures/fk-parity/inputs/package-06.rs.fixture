@@ -1,0 +1,2 @@
+/// Closes the socket.
+fn close() {}
