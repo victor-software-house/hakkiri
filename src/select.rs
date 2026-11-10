@@ -71,14 +71,44 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
     }
 }
 
-/// The text of `line` after `depth` quote markers, or `None` when it holds
-/// fewer than that.
-fn after_markers(line: &str, depth: usize) -> Option<&str> {
-    let mut rest = line;
-    for _ in 0..depth {
-        rest = rest.trim_start().strip_prefix('>')?;
+/// The text after a list marker, a task box, if any, and its blanks.
+///
+/// A marker is a bullet or a number with `.` or `)`, followed by a blank.
+fn after_list_marker(text: &str) -> Option<&str> {
+    let digits = text.trim_start_matches(|c: char| c.is_ascii_digit());
+    let after = if digits.len() < text.len() {
+        digits.strip_prefix(['.', ')'])?
+    } else {
+        text.strip_prefix(['-', '*', '+'])?
+    };
+    if !after.is_empty() && !after.starts_with(char::is_whitespace) {
+        return None;
     }
-    Some(rest)
+    let item = after.trim_start();
+    let boxed = ["[ ]", "[x]", "[X]"]
+        .iter()
+        .find_map(|task| item.strip_prefix(task))
+        .filter(|rest| rest.starts_with(char::is_whitespace));
+    Some(boxed.unwrap_or(item))
+}
+
+/// The quote markers that open `line`, and the text after them.
+///
+/// A list marker may come before or between the markers, as in `- > text` and
+/// `> - text`, and the lines of the quote that follow indent past it.
+fn quote_prefix(line: &str) -> (usize, &str) {
+    let mut depth = 0;
+    let mut rest = line.trim_start();
+    loop {
+        if let Some(after) = rest.strip_prefix('>') {
+            depth += 1;
+            rest = after.trim_start();
+        } else if let Some(after) = after_list_marker(rest) {
+            rest = after;
+        } else {
+            return (depth, rest);
+        }
+    }
 }
 
 /// Whether nothing but blank quote lines lies between the start of the quote
@@ -93,14 +123,14 @@ fn first_in_quote(source: &str, line_start: usize, depth: usize) -> bool {
     while end > 0 {
         let above = source.get(..end - 1).unwrap_or_default();
         let start = above.rfind('\n').map_or(0, |at| at + 1);
-        match source
-            .get(start..end - 1)
-            .and_then(|line| after_markers(line, depth))
-        {
-            None => return true,
-            Some(rest) if !rest.trim().is_empty() => return false,
-            Some(_) => end = start,
+        let (markers, rest) = quote_prefix(source.get(start..end - 1).unwrap_or_default());
+        if markers < depth {
+            return true;
         }
+        if !rest.trim_end().is_empty() {
+            return false;
+        }
+        end = start;
     }
     true
 }

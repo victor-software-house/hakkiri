@@ -65,6 +65,11 @@ A list item and a block quote SHALL be read through the blocks inside them.
 - **WHEN** a rule has `scope: paragraph`, and the input is a quote that starts with a fenced block and holds the paragraph `> After the fence.`
 - **THEN** hakkiri selects one block, `After the fence.`
 
+#### Scenario: A paragraph after the first in a quote inside an item
+
+- **WHEN** a rule has `scope: paragraph`, and the input is a list item that holds a quote of the paragraphs `Para one.` and `Para two.`
+- **THEN** hakkiri selects one block, `Para two.`, and a rule with `scope: blockquote` selects `Para one.`
+
 ### Requirement: A dotted sentence is a sentence in a scope
 
 A scope part written `sentence.` and a name SHALL read as that name joined to `sentence` with `&`, as in Vale 3.26.0.
