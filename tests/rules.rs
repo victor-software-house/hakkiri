@@ -365,6 +365,20 @@ fn a_metric_with_only_blank_tokens_is_refused() -> TestResult {
 }
 
 #[test]
+fn a_metric_with_an_empty_raw_is_refused() -> TestResult {
+    let (_, line, message) = refused(indoc! {"
+        extends: metric
+        message: m
+        raw: ['']
+        formula: occurrences
+        condition: '> 3'
+    "})?;
+    assert_eq!(line, Some(1));
+    assert!(message.contains("`tokens` and `raw`"), "{message}");
+    Ok(())
+}
+
+#[test]
 fn a_rule_with_only_raw_loads() -> TestResult {
     load(indoc! {r"
         extends: existence

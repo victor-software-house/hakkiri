@@ -135,13 +135,14 @@ fn existence_ok(fields: &ExistenceFields, _: &()) -> garde::Result {
 }
 
 /// A metric without `tokens` or `raw` counts words only. One that lists
-/// `tokens` holding nothing counts nothing, which is a mistake.
+/// either, holding nothing, counts nothing, which is a mistake.
 #[expect(
     clippy::trivially_copy_pass_by_ref,
     reason = "garde calls a custom rule with a reference to its context."
 )]
 fn metric_ok(fields: &MetricFields, _: &()) -> garde::Result {
-    if fields.tokens.values().is_empty() || has_pattern(&fields.tokens, &fields.raw) {
+    let listed = !fields.tokens.values().is_empty() || !fields.raw.values().is_empty();
+    if !listed || has_pattern(&fields.tokens, &fields.raw) {
         Ok(())
     } else {
         Err(garde::Error::new(NO_PATTERN))

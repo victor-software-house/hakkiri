@@ -85,7 +85,7 @@ hakkiri SHALL refuse a rule with a pattern that neither regex engine compiles, a
 
 ### Requirement: A pattern with nothing to match is refused
 
-hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` hold nothing to match, and a `metric` rule that lists `tokens` holding nothing, because such a pattern matches at every position.  
+hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` hold nothing to match, and a `metric` rule that lists `tokens` or `raw` holding nothing, because such a pattern matches at every position.  
 The error SHALL name the file, the line, `tokens` and `raw`.
 
 #### Scenario: An existence rule with no tokens
@@ -96,6 +96,11 @@ The error SHALL name the file, the line, `tokens` and `raw`.
 #### Scenario: Tokens of blanks only
 
 - **WHEN** an `existence` rule holds `tokens: ['', '  ']` and no `raw`
+- **THEN** hakkiri reports the same error
+
+#### Scenario: A metric with an empty raw
+
+- **WHEN** a `metric` rule holds `raw: ['']` and no `tokens`
 - **THEN** hakkiri reports the same error
 
 ### Requirement: A YAML error names the line
