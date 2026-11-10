@@ -79,6 +79,21 @@ queue:
       - Every rule case and package case passes under hakkiri test.
       - An alert diff against Vale with ProseStyle 0.0.7 over our public repositories shows only the intended differences.
 
+  - id: HKR-021
+    title: Read the text inside HTML blocks as prose
+    scope: tree
+    outcome: Text inside an HTML block is linted as prose, with the scope Vale gives it.
+    notes:
+      - 2026-11-10, Vale lints the text of an HTML block with the scope of its block. hakkiri reads an HTML block as markup and lints none of it, so Vale gives alerts there that hakkiri does not.
+      - '2026-11-10, reading it needs three behaviours of Vale checked first, and none is checked yet: unescaping HTML entities, masking the text of code, tt, kbd and samp, and handling pre.'
+      - '2026-11-10, Vale lints the text after a closed raw-text tag on the same line, such as `<style></style > x` and `<style></style/> x`, and after `--!>` in a comment block. hakkiri keeps that text as HTML, from the CommonMark end condition of the block.'
+      - 2026-11-10, the operator decided hakkiri reads HTML-block text as prose as Vale does; it is a gap to close (operator, 2026-11-10).
+    blocked_by: []
+    acceptance:
+      - Text inside an HTML block gets the alerts Vale 66bbb85 gives it, with the scope Vale gives it, on a fixture probed against Vale.
+      - Entity unescaping, the masking of code, tt, kbd and samp text, and the handling of pre match Vale on probes.
+      - The text after a closed raw-text tag on the same line and after --!> in a comment block gets the alerts Vale gives it, or a departure records why not.
+
   - id: HKR-009
     title: Switch the template to hakkiri
     scope: template
@@ -233,14 +248,3 @@ horizon:
       - '2026-11-10, Ronacher (2026) ranks agent-session words by inflation against wordfreq: https://lucumr.pocoo.org/2026/5/4/content-for-contents-sake/.'
       - '2026-11-10, prior rule sets: https://github.com/tbhb/vale-ai-tells and https://github.com/Syntaf/vale-llm-slop (comments in source files).'
       - 2026-11-10, Wikipedia Signs of AI writing warns that word tells change across model generations, so a list needs dated evidence and review.
-
-  - id: HKR-021
-    title: Read the text inside HTML blocks as prose
-    scope: tree
-    outcome: Text inside an HTML block is linted as prose, with the scope Vale gives it.
-    kind: deferred
-    open: A decision on whether hakkiri reads text inside HTML blocks as prose.
-    notes:
-      - 2026-11-10, Vale lints the text of an HTML block with the scope of its block. hakkiri reads an HTML block as markup and lints none of it, so Vale gives alerts there that hakkiri does not.
-      - '2026-11-10, a decision to read it also needs three behaviours of Vale checked first, and none is checked yet: unescaping HTML entities, masking the text of code, tt, kbd and samp, and handling pre.'
-      - '2026-11-10, Vale lints the text after a closed raw-text tag on the same line, such as `<style></style > x` and `<style></style/> x`, and after `--!>` in a comment block. hakkiri keeps that text as HTML, from the CommonMark end condition of the block.'
