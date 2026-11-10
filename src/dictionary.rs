@@ -247,6 +247,18 @@ fn find_from(word: &str, pattern: &str, from: usize) -> Option<usize> {
         .map(|at| at + from)
 }
 
+/// Reads an affix file from its bytes, to expand a word's forms.
+///
+/// # Errors
+///
+/// Returns a [`DictionaryError`] when the file is in a character set this
+/// reader does not read, a directive lacks its argument, or a condition does
+/// not read.
+pub(crate) fn read_affixes(aff: &[u8]) -> Result<AffixFile, DictionaryError> {
+    let (text, _) = charset::decode(aff, b"")?;
+    AffixFile::parse(&text)
+}
+
 impl Dictionary {
     /// The English dictionary that ships in the binary, Vale's `en_US-web`.
     ///

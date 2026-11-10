@@ -15,7 +15,7 @@ use super::schema::{
 use super::{
     Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence,
     LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Sequence,
-    Spelling, Substitution, Swap, Token, level_of, package,
+    Spelling, Substitution, Swap, Token, affix, level_of, package,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -245,11 +245,17 @@ fn tokens_pattern(
 
 fn existence(source: &Source<'_>, fields: &ExistenceFields) -> Result<Existence, LoadError> {
     let nonword = fields.nonword.value();
+    let tokens = affix::expand(
+        source,
+        "tokens",
+        fields.affix.value(),
+        fields.tokens.values(),
+    )?;
     Ok(Existence {
         pattern: tokens_pattern(
             source,
             fields.raw.values(),
-            fields.tokens.values(),
+            &tokens,
             fields.append.value(),
             nonword,
             fields.ignorecase.value(),
@@ -272,12 +278,20 @@ fn substitution(
     source: &Source<'_>,
     fields: &SubstitutionFields,
 ) -> Result<Substitution, LoadError> {
+    let written: Vec<String> = fields
+        .swap
+        .entries()
+        .iter()
+        .map(|(key, _)| key.clone())
+        .collect();
+    let keys = affix::expand(source, "swap", fields.affix.value(), &written)?;
     let mut swaps: Vec<Swap> = fields
         .swap
         .entries()
         .iter()
-        .map(|(key, value)| Swap {
-            key: key.clone(),
+        .zip(keys)
+        .map(|((_, value), key)| Swap {
+            key,
             value: value.clone(),
         })
         .collect();

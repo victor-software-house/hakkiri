@@ -303,20 +303,6 @@ fn a_vocab_flag_loads() -> TestResult {
 }
 
 #[test]
-fn affix_is_refused() -> TestResult {
-    let (field, line, message) = refused(indoc! {"
-        extends: existence
-        message: m
-        affix: en
-        tokens: [a]
-    "})?;
-    assert_eq!(field, "affix");
-    assert_eq!(line, Some(3));
-    assert!(message.contains("affix"), "{message}");
-    Ok(())
-}
-
-#[test]
 fn a_rule_with_no_tokens_or_raw_is_refused() -> TestResult {
     let (field, line, message) = refused(indoc! {"
         extends: existence

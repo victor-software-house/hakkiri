@@ -1,0 +1,7 @@
+extends: existence
+message: "'%s'"
+affix: forms
+tokens:
+  - walk/US
+  - carry/S
+  - bake/D

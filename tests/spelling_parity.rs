@@ -1,11 +1,12 @@
-//! The `spelling` check against Vale: the alerts of one style of `spelling`
-//! rules over Markdown inputs.
+//! The `spelling` check and the `affix` field against Vale: the alerts of one
+//! style of rules over Markdown inputs.
 //!
-//! `tests/fixtures/spelling/Parity` holds the rules, in the package under
-//! `tests/fixtures/spelling`.
-//! `tests/fixtures/spelling-parity/inputs` holds the Markdown files, with
-//! `.fixture` after `.md`.
-//! `vale.tsv` there holds one row for each alert Vale gave: the rule, the
+//! `tests/fixtures/spelling/Parity` holds the `spelling` rules and
+//! `tests/fixtures/spelling/Affix` the `existence` and `substitution` rules
+//! with `affix`, in the package under `tests/fixtures/spelling`.
+//! `tests/fixtures/spelling-parity/inputs` and `affix-parity/inputs` hold the
+//! Markdown files of each, with `.fixture` after `.md`.
+//! `vale.tsv` beside each holds one row for each alert Vale gave: the rule, the
 //! file, the line, the first and last column, the matched text and the
 //! message.
 //! The rows come from Vale at `66bbb85` run on the inputs with the package as
@@ -67,15 +68,15 @@ fn files_in(dir: &Path) -> Result<Vec<PathBuf>, Box<dyn Error>> {
     Ok(files)
 }
 
-#[test]
-fn spelling_reports_as_vale_does_but_where_decided() -> TestResult {
+/// Holds the alerts of the style `style` over the inputs of `root` to Vale's.
+fn compare(style: &str, root: &str) -> TestResult {
     let fixtures = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
-    let root = fixtures.join("spelling-parity");
+    let root = fixtures.join(root);
     let mut vale: BTreeSet<Row> = BTreeSet::new();
     for line in fs::read_to_string(root.join("vale.tsv"))?.lines() {
         vale.insert(row(&line.split('\t').collect::<Vec<&str>>())?);
     }
-    let rules = load_style(&fixtures.join("spelling/Parity"))?;
+    let rules = load_style(&fixtures.join("spelling").join(style))?;
     let mut hakkiri: BTreeSet<Row> = BTreeSet::new();
     for input in files_in(&root.join("inputs"))? {
         let source = fs::read_to_string(&input)?;
@@ -116,4 +117,14 @@ fn spelling_reports_as_vale_does_but_where_decided() -> TestResult {
         found.join("\n")
     );
     Ok(())
+}
+
+#[test]
+fn spelling_reports_as_vale_does_but_where_decided() -> TestResult {
+    compare("Parity", "spelling-parity")
+}
+
+#[test]
+fn affix_expands_as_vale_does_but_where_decided() -> TestResult {
+    compare("Affix", "affix-parity")
 }

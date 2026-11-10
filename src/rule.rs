@@ -7,6 +7,7 @@
 //! feature hakkiri does not run.
 //! Every error names the file, and the field and line when it has them.
 
+mod affix;
 mod build;
 mod field;
 mod package;
