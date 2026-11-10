@@ -1,7 +1,7 @@
 //! The engine: one file's rules run over its tree, and the alerts they give.
 
 use crate::alert::{Alert, Locator, settle};
-use crate::check::{run, run_summary};
+use crate::check::{Memory, run, run_summary};
 use crate::metric::{Variables, variables};
 use crate::rule::{Check, Rule};
 use crate::select::{SelectError, select};
@@ -59,8 +59,9 @@ pub fn lint(
         }
         let mut found = Vec::new();
         let mut failure = None;
+        let mut memory = Memory::default();
         'blocks: for block in select(&rule.scope, tree, source, extension)? {
-            match run(&rule.check, &block.text) {
+            match run(&rule.check, &block.text, &mut memory) {
                 Ok(hits) => {
                     for hit in hits {
                         let messages = hit.messages(rule);

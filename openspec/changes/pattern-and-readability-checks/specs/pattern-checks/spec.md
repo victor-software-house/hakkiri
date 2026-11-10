@@ -32,6 +32,24 @@ Each pair of `either` SHALL be checked on its own, and an alert SHALL carry the 
 - **WHEN** rule `Team.Spelling` has `either: {advisor: adviser, color: colour}`, and the input is `The advisor likes color. The adviser likes color.`
 - **THEN** hakkiri reports one alert from `Team.Spelling`, with the matched text `adviser`
 
+### Requirement: consistency ignores code
+
+A match of a `consistency` rule that overlaps a code span SHALL NOT count as a form seen, and SHALL NOT give an alert.
+
+#### Scenario: A form in code
+
+- **WHEN** the rule above reads the paragraph `An advisor came.` and then ``The `adviser` left.``
+- **THEN** hakkiri reports no alert
+
+### Requirement: consistency needs a pair
+
+hakkiri SHALL refuse a `consistency` rule whose `either` holds no pair, or a pair with a form that holds no text, with an error that names the field.
+
+#### Scenario: No pair
+
+- **WHEN** a rule has `extends: consistency` and no `either`
+- **THEN** hakkiri reports an error naming `either`, and exits with a failure status
+
 ### Requirement: conditional without a group needs second in the node
 
 When `second` has no capture group, a `conditional` rule SHALL report each match of `first` in a selected node where `second` does not match.

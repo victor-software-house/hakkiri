@@ -10,23 +10,18 @@ use serde::Deserialize;
 use super::field::{Count, Flag, Number, Pairs, Text, Texts, valid};
 
 /// The check types of Vale 3.26.0 that hakkiri runs.
-pub(super) const RUNNABLE: [&str; 6] = [
+pub(super) const RUNNABLE: [&str; 7] = [
     "existence",
     "substitution",
     "occurrence",
     "metric",
+    "consistency",
     "repetition",
     "readability",
 ];
 
 /// The check types of Vale 3.26.0 that a later change adds.
-pub(super) const PLANNED: [&str; 5] = [
-    "capitalization",
-    "consistency",
-    "conditional",
-    "sequence",
-    "spelling",
-];
+pub(super) const PLANNED: [&str; 4] = ["capitalization", "conditional", "sequence", "spelling"];
 
 /// The levels of an alert.
 pub(super) const LEVELS: [&str; 3] = ["suggestion", "warning", "error"];
@@ -153,6 +148,28 @@ fn metric_ok(fields: &MetricFields, _: &()) -> garde::Result {
     } else {
         Err(garde::Error::new(NO_PATTERN))
     }
+}
+
+#[expect(
+    clippy::trivially_copy_pass_by_ref,
+    reason = "garde calls a custom rule with a reference to its context."
+)]
+fn consistency_ok(fields: &ConsistencyFields, _: &()) -> garde::Result {
+    let entries = fields.either.entries();
+    if entries.is_empty() {
+        return Err(garde::Error::new(
+            "`either` holds no pair: list at least one `form: other form`",
+        ));
+    }
+    if entries
+        .iter()
+        .any(|(first, second)| first.trim().is_empty() || second.trim().is_empty())
+    {
+        return Err(garde::Error::new(
+            "`either` has a form with no text, which would match at every position",
+        ));
+    }
+    Ok(())
 }
 
 /// Whether `tokens` holds a pattern to match.
@@ -374,5 +391,20 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         exceptions: Texts,
+    }
+}
+
+rule_fields! {
+    /// A `consistency` rule.
+    ConsistencyFields check(consistency_ok) {
+        #[serde(default)]
+        #[garde(custom(valid))]
+        either: Pairs,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        nonword: Flag,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        ignorecase: Flag,
     }
 }

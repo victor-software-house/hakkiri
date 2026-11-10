@@ -1,14 +1,14 @@
 //! Checks: what each check type finds in one block of text.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ops::Range;
 
 use crate::alert::fill;
 use crate::metric::{Variables, graded, measure, variables};
 use crate::pattern::{Pattern, SearchError};
 use crate::rule::{
-    Check, Exceptions, Existence, Metric, Occurrence, Readability, Repetition, Rule, Substitution,
-    Swap,
+    Check, Consistency, Exceptions, Existence, Metric, Occurrence, Readability, Repetition, Rule,
+    Substitution, Swap,
 };
 use crate::splitter::Model;
 use crate::summary::{Elements, Summary};
@@ -40,17 +40,33 @@ impl Hit {
     }
 }
 
-/// The matches `check` finds in `text`.
+/// What one rule remembers from the blocks of one file it has read.
+///
+/// A rule starts each file with none, so two rules never share it.
+#[derive(Debug, Default)]
+pub(crate) struct Memory {
+    /// The pairs of a `consistency` rule, by position, and for each the forms
+    /// seen so far, as 0 or 1.
+    seen: HashSet<(usize, usize)>,
+}
+
+/// The matches `check` finds in `text`, the next block of a file whose earlier
+/// blocks `memory` holds.
 ///
 /// # Errors
 ///
 /// Returns a [`SearchError`] when a pattern gives up on the text.
-pub(crate) fn run(check: &Check, text: &Text) -> Result<Vec<Hit>, SearchError> {
+pub(crate) fn run(
+    check: &Check,
+    text: &Text,
+    memory: &mut Memory,
+) -> Result<Vec<Hit>, SearchError> {
     match check {
         Check::Existence(existence) => run_existence(existence, text),
         Check::Substitution(substitution) => run_substitution(substitution, text),
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
         Check::Metric(metric) => run_metric(metric, text),
+        Check::Consistency(consistency) => run_consistency(consistency, text, memory),
         Check::Repetition(repetition) => run_repetition(repetition, text),
         Check::Readability(readability) => Ok(run_readability(readability, text)),
     }
@@ -314,6 +330,42 @@ fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
         .collect())
 }
 
+/// One hit for each pair that matched in `text` once both of its forms have
+/// matched in the file so far, `text` included.
+///
+/// The hit is at the last match of the pair in `text`, and holds its text. A
+/// match that overlaps a code span is no match.
+fn run_consistency(
+    consistency: &Consistency,
+    text: &Text,
+    memory: &mut Memory,
+) -> Result<Vec<Hit>, SearchError> {
+    let content = text.as_str();
+    let mut hits = Vec::new();
+    for (pair, pattern) in consistency.pairs.iter().enumerate() {
+        let mut last = None;
+        for (form, range) in pattern.find_groups(content, Consistency::FORM)? {
+            if text.overlaps_code(&range) {
+                continue;
+            }
+            memory.seen.insert((pair, form));
+            last = Some(range);
+        }
+        if let Some(range) = last
+            && memory.seen.contains(&(pair, 0))
+            && memory.seen.contains(&(pair, 1))
+            && let Some(matched) = content.get(range.clone())
+        {
+            hits.push(Hit {
+                values: vec![matched.to_owned()],
+                numbered: false,
+                range,
+            });
+        }
+    }
+    Ok(hits)
+}
+
 /// Whether the matches `before` and `current` are the same word.
 fn same(repetition: &Repetition, before: &str, current: &str) -> bool {
     if repetition.ignorecase {
@@ -434,6 +486,7 @@ pub(crate) fn run_summary(
         Check::Existence(_)
         | Check::Substitution(_)
         | Check::Occurrence(_)
+        | Check::Consistency(_)
         | Check::Repetition(_) => Ok(None),
     }
 }

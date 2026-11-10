@@ -19,8 +19,8 @@ use serde::de::DeserializeOwned;
 
 use self::build::Source;
 use self::schema::{
-    ExistenceFields, MetricFields, OccurrenceFields, Probe, ReadabilityFields, RepetitionFields,
-    SubstitutionFields,
+    ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields, Probe, ReadabilityFields,
+    RepetitionFields, SubstitutionFields,
 };
 use crate::formula::Formula;
 use crate::pattern::Pattern;
@@ -109,6 +109,8 @@ pub enum Check {
     Occurrence(Occurrence),
     /// Computes a formula over counts of the text, and tests the result.
     Metric(Metric),
+    /// Reports a file that uses both forms of a pair.
+    Consistency(Consistency),
     /// Reports a match that repeats the one before it.
     Repetition(Repetition),
     /// Averages grade-level scores of the text, and tests the average.
@@ -192,6 +194,20 @@ pub struct Metric {
     /// What the formula's `occurrences` counts, when the rule has `tokens` or
     /// `raw`.
     pub tokens: Option<Existence>,
+}
+
+/// A `consistency` rule.
+#[derive(Debug)]
+pub struct Consistency {
+    /// One pattern for each pair of `either`, by key: the pair's two forms are
+    /// the groups [`Consistency::FORM`] and 0, and [`Consistency::FORM`] and 1.
+    pub pairs: Vec<Pattern>,
+}
+
+impl Consistency {
+    /// The name of the group that holds a pair's form number `n` is this,
+    /// then the number.
+    pub const FORM: &'static str = "form_";
 }
 
 /// A `repetition` rule.
@@ -360,6 +376,7 @@ impl Rule {
                 build::substitution_rule(&source, &read::<SubstitutionFields>(&input)?)
             }
             "occurrence" => build::occurrence_rule(&source, &read::<OccurrenceFields>(&input)?),
+            "consistency" => build::consistency_rule(&source, &read::<ConsistencyFields>(&input)?),
             "repetition" => build::repetition_rule(&source, &read::<RepetitionFields>(&input)?),
             "readability" => build::readability_rule(&source, &read::<ReadabilityFields>(&input)?),
             _ => build::metric_rule(&source, &read::<MetricFields>(&input)?),

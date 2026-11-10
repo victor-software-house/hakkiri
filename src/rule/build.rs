@@ -7,12 +7,12 @@
 use std::cmp::Reverse;
 
 use super::schema::{
-    ExistenceFields, MetricFields, OccurrenceFields, ReadabilityFields, RepetitionFields,
-    SubstitutionFields,
+    ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields, ReadabilityFields,
+    RepetitionFields, SubstitutionFields,
 };
 use super::{
-    Action, Check, Exceptions, Existence, LoadError, LoadProblem, Metric, Occurrence, Readability,
-    Repetition, Rule, Score, Substitution, Swap, level_of,
+    Action, Check, Consistency, Exceptions, Existence, LoadError, LoadProblem, Metric, Occurrence,
+    Readability, Repetition, Rule, Score, Substitution, Swap, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -394,6 +394,26 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
     })
 }
 
+/// One pattern for each pair of a `consistency` rule, by key.
+///
+/// A pair matches as `existence` tokens do, its two forms as groups.
+fn consistency(source: &Source<'_>, fields: &ConsistencyFields) -> Result<Consistency, LoadError> {
+    let mut entries: Vec<&(String, String)> = fields.either.entries().iter().collect();
+    entries.sort_by(|left, right| left.0.cmp(&right.0));
+    let pairs = entries
+        .into_iter()
+        .map(|(first, second)| {
+            let body = format!(
+                "(?P<{form}0>{first})|(?P<{form}1>{second})",
+                form = Consistency::FORM
+            );
+            let pattern = template(!fields.nonword.value(), fields.ignorecase.value(), &body);
+            source.compile("either", &pattern, &[first, second])
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(Consistency { pairs })
+}
+
 /// The pattern of a `repetition` rule: its tokens in one group, with no word
 /// template.
 fn repetition(source: &Source<'_>, fields: &RepetitionFields) -> Result<Repetition, LoadError> {
@@ -548,5 +568,16 @@ pub(super) fn repetition_rule(
         source,
         fields,
         Check::Repetition(repetition(source, fields)?)
+    ))
+}
+
+pub(super) fn consistency_rule(
+    source: &Source<'_>,
+    fields: &ConsistencyFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Consistency(consistency(source, fields)?)
     ))
 }
