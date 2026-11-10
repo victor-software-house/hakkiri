@@ -650,6 +650,11 @@ fn literals_in_an_export_block() -> TestResult {
             "Prose after a regular expression.",
             "Prose after a regular expression with a quote.",
             "Prose after an apostrophe.",
+            "Prose after a keyword and a regular expression.",
+            "Prose after typeof and a quote in a regular expression.",
+            "Prose after a character class.",
+            "Prose after an escaped slash.",
+            "Prose after a backtick in JSX text.",
         ]
     );
     Ok(())

@@ -22,3 +22,23 @@ Prose after a regular expression with a quote.
 export const A = () => <p>Don't</p>
 
 Prose after an apostrophe.
+
+export const k = () => { return /{/ }
+
+Prose after a keyword and a regular expression.
+
+export const t = (x) => typeof /'/.test(x)
+
+Prose after typeof and a quote in a regular expression.
+
+export const cls = /[/]{/
+
+Prose after a character class.
+
+export const esc = /a\/{/
+
+Prose after an escaped slash.
+
+export const J = () => <p>press ` to open</p>
+
+Prose after a backtick in JSX text.
