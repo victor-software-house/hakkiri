@@ -80,10 +80,10 @@ The scope `table.row` SHALL hold the text of one table row, header row included,
 
 hakkiri SHALL refuse a rule whose `scope` names no scope it defines, and report an error that names the rule and the scope.
 
-#### Scenario: A misspelled scope
+#### Scenario: A scope hakkiri does not define
 
-- **WHEN** a rule `Team.Short` has `scope: paragrap`
-- **THEN** hakkiri reports an error naming `Team.Short` and `paragrap`, and exits with a failure status
+- **WHEN** a rule `Team.Short` has `scope: chapter`
+- **THEN** hakkiri reports an error naming `Team.Short` and `chapter`, and exits with a failure status
 
 ### Requirement: Scopes combine with Vale's operators
 
