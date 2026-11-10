@@ -177,3 +177,12 @@ horizon:
     outcome: hakkiri lsp shows alerts and offers swap fixes in editors.
     kind: deferred
     open: Release 1 has not shipped.
+
+  - id: HKR-016
+    title: Parse long Markdown files in linear time
+    scope: tree
+    outcome: >-
+      A Markdown file of 60,000 lines parses in time that grows linearly with its
+      size.
+    kind: research
+    open: "Measured: markdown-rs 1.0.0 alone takes 2.5 s at 60,000 lines in a release build, and 0.17 s at 15,000, so its time grows with the square of the line count, for one paragraph and for 60,000 separate paragraphs. Missing: whether upstream knows of it, and a fix, in markdown-rs or by splitting the source before it parses."
