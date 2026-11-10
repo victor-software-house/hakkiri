@@ -18,7 +18,9 @@ use ctl_core::input::{Input, InputError};
 use serde::de::DeserializeOwned;
 
 use self::build::Source;
-use self::schema::{ExistenceFields, MetricFields, OccurrenceFields, Probe, SubstitutionFields};
+use self::schema::{
+    ExistenceFields, MetricFields, OccurrenceFields, Probe, ReadabilityFields, SubstitutionFields,
+};
 use crate::formula::Formula;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
@@ -106,6 +108,8 @@ pub enum Check {
     Occurrence(Occurrence),
     /// Computes a formula over counts of the text, and tests the result.
     Metric(Metric),
+    /// Averages grade-level scores of the text, and tests the average.
+    Readability(Readability),
 }
 
 /// The patterns that hold a match back.
@@ -185,6 +189,70 @@ pub struct Metric {
     /// What the formula's `occurrences` counts, when the rule has `tokens` or
     /// `raw`.
     pub tokens: Option<Existence>,
+}
+
+/// A grade-level score a `readability` rule may average.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Score {
+    /// `Automated Readability`.
+    AutomatedReadability,
+    /// `Coleman-Liau`.
+    ColemanLiau,
+    /// `Flesch-Kincaid`.
+    FleschKincaid,
+    /// `Gunning Fog`.
+    GunningFog,
+    /// `SMOG`.
+    Smog,
+}
+
+impl Score {
+    /// Every score, in the order the error for an unknown one lists them.
+    pub const ALL: [Self; 5] = [
+        Self::AutomatedReadability,
+        Self::ColemanLiau,
+        Self::FleschKincaid,
+        Self::GunningFog,
+        Self::Smog,
+    ];
+
+    /// The name a rule's `metrics` list uses.
+    #[must_use]
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::AutomatedReadability => "Automated Readability",
+            Self::ColemanLiau => "Coleman-Liau",
+            Self::FleschKincaid => "Flesch-Kincaid",
+            Self::GunningFog => "Gunning Fog",
+            Self::Smog => "SMOG",
+        }
+    }
+
+    /// The score named `name`, written as a rule's `metrics` list writes it.
+    #[must_use]
+    pub fn named(name: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|score| score.name() == name)
+    }
+
+    /// The metric variable that holds the score.
+    pub(crate) const fn variable(self) -> &'static str {
+        match self {
+            Self::AutomatedReadability => "automated_readability",
+            Self::ColemanLiau => "coleman_liau",
+            Self::FleschKincaid => "flesch_kincaid",
+            Self::GunningFog => "gunning_fog",
+            Self::Smog => "smog",
+        }
+    }
+}
+
+/// A `readability` rule.
+#[derive(Debug)]
+pub struct Readability {
+    /// The scores to average, at least one.
+    pub scores: Vec<Score>,
+    /// The highest average a text may have.
+    pub grade: f64,
 }
 
 /// One thing wrong with a rule file.
@@ -274,6 +342,7 @@ impl Rule {
                 build::substitution_rule(&source, &read::<SubstitutionFields>(&input)?)
             }
             "occurrence" => build::occurrence_rule(&source, &read::<OccurrenceFields>(&input)?),
+            "readability" => build::readability_rule(&source, &read::<ReadabilityFields>(&input)?),
             _ => build::metric_rule(&source, &read::<MetricFields>(&input)?),
         }
     }

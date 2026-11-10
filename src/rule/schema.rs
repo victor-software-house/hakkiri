@@ -7,20 +7,25 @@
 use garde::Validate;
 use serde::Deserialize;
 
-use super::field::{Count, Flag, Pairs, Text, Texts, valid};
+use super::field::{Count, Flag, Number, Pairs, Text, Texts, valid};
 
 /// The check types of Vale 3.26.0 that hakkiri runs.
-pub(super) const RUNNABLE: [&str; 4] = ["existence", "substitution", "occurrence", "metric"];
+pub(super) const RUNNABLE: [&str; 5] = [
+    "existence",
+    "substitution",
+    "occurrence",
+    "metric",
+    "readability",
+];
 
 /// The check types of Vale 3.26.0 that a later change adds.
-pub(super) const PLANNED: [&str; 7] = [
+pub(super) const PLANNED: [&str; 6] = [
     "capitalization",
     "consistency",
     "conditional",
     "repetition",
     "sequence",
     "spelling",
-    "readability",
 ];
 
 /// The levels of an alert.
@@ -313,5 +318,17 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         nonword: Flag,
+    }
+}
+
+rule_fields! {
+    /// A `readability` rule.
+    ReadabilityFields {
+        #[serde(default)]
+        #[garde(custom(valid))]
+        metrics: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        grade: Number,
     }
 }

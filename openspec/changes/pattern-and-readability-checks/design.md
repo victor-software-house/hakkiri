@@ -112,6 +112,14 @@ Alternatives:
 - Load it with no effect, as Vale does. Lost: an author who sets the field gets no sign that it does nothing.
 - Refuse the field. Lost: a style written for Vale that sets it would stop loading.
 
+### 8. A score listed twice counts once
+
+Vale adds a listed score once however often it is listed, and divides by the length of the list ([readability.go][v-read-run]).  
+hakkiri averages the distinct scores, so a repeated name changes nothing: it gives a better result than Vale where Vale's is a defect, as in decision 6.
+
+Alternative: Vale's division.  
+Lost: `[SMOG, SMOG]` would report half of SMOG's grade.
+
 ## Risks / Trade-offs
 
 - [hakkiri's splitter cuts some text apart from Vale's] → `repetition` reads sentences only through the engine.  

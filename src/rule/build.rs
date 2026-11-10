@@ -6,10 +6,12 @@
 
 use std::cmp::Reverse;
 
-use super::schema::{ExistenceFields, MetricFields, OccurrenceFields, SubstitutionFields};
+use super::schema::{
+    ExistenceFields, MetricFields, OccurrenceFields, ReadabilityFields, SubstitutionFields,
+};
 use super::{
-    Action, Check, Exceptions, Existence, LoadError, LoadProblem, Metric, Occurrence, Rule,
-    Substitution, Swap, level_of,
+    Action, Check, Exceptions, Existence, LoadError, LoadProblem, Metric, Occurrence, Readability,
+    Rule, Score, Substitution, Swap, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -391,6 +393,45 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
     })
 }
 
+fn readability(source: &Source<'_>, fields: &ReadabilityFields) -> Result<Readability, LoadError> {
+    let names = fields.metrics.values();
+    if names.is_empty() {
+        return Err(source.problem(
+            "metrics",
+            format!(
+                "rule `{}`: `metrics` lists no score: use one or more of {}",
+                source.name,
+                score_names()
+            ),
+        ));
+    }
+    let mut scores = Vec::new();
+    for name in names {
+        let score = Score::named(name).ok_or_else(|| {
+            source.problem(
+                "metrics",
+                format!(
+                    "rule `{}`: `{name}` is not a score hakkiri knows: use one of {}",
+                    source.name,
+                    score_names()
+                ),
+            )
+        })?;
+        if !scores.contains(&score) {
+            scores.push(score);
+        }
+    }
+    Ok(Readability {
+        scores,
+        grade: fields.grade.value(),
+    })
+}
+
+/// The names a `metrics` list accepts, as a list for an error.
+fn score_names() -> String {
+    Score::ALL.map(Score::name).join(", ")
+}
+
 /// `formula` with `heading.h2` written as the variable `heading_h2`.
 fn read_headings(formula: &str) -> String {
     (1..=6).fold(formula.to_owned(), |text, depth| {
@@ -460,5 +501,16 @@ pub(super) fn metric_rule(source: &Source<'_>, fields: &MetricFields) -> Result<
         source,
         fields,
         Check::Metric(metric(source, fields)?)
+    ))
+}
+
+pub(super) fn readability_rule(
+    source: &Source<'_>,
+    fields: &ReadabilityFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Readability(readability(source, fields)?)
     ))
 }

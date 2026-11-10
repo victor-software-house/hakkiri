@@ -4,9 +4,11 @@ use std::collections::HashMap;
 use std::ops::Range;
 
 use crate::alert::fill;
-use crate::metric::{Variables, measure, variables};
+use crate::metric::{Variables, graded, measure, variables};
 use crate::pattern::{Pattern, SearchError};
-use crate::rule::{Check, Exceptions, Existence, Metric, Occurrence, Rule, Substitution, Swap};
+use crate::rule::{
+    Check, Exceptions, Existence, Metric, Occurrence, Readability, Rule, Substitution, Swap,
+};
 use crate::summary::{Elements, Summary};
 use crate::text::Text;
 
@@ -47,6 +49,7 @@ pub(crate) fn run(check: &Check, text: &Text) -> Result<Vec<Hit>, SearchError> {
         Check::Substitution(substitution) => run_substitution(substitution, text),
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
         Check::Metric(metric) => run_metric(metric, text),
+        Check::Readability(readability) => Ok(run_readability(readability, text)),
     }
 }
 
@@ -308,21 +311,48 @@ fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
         .collect())
 }
 
-/// What the metric reports for the prose of the whole file, whose variables
-/// are `base`.
+/// One hit at the start of `text` when the average grade of the text is over
+/// the rule's grade, measured apart from the rest of the file.
+fn run_readability(readability: &Readability, text: &Text) -> Vec<Hit> {
+    let Some(base) = variables(text.as_str(), Elements::default()) else {
+        return Vec::new();
+    };
+    graded(readability, &base)
+        .map(grade_hit)
+        .into_iter()
+        .collect()
+}
+
+/// The hit of an average grade, at the start of the text.
+fn grade_hit(average: f64) -> Hit {
+    Hit {
+        range: 0..0,
+        values: vec![format!("{average:.2}")],
+        numbered: false,
+    }
+}
+
+/// What the check reports for the prose of the whole file, whose variables
+/// are `base`: a `metric` or a `readability` rule that measures the file.
 pub(crate) fn run_summary(
-    metric: &Metric,
+    check: &Check,
     summary: &Summary,
     base: &Variables,
 ) -> Result<Option<Hit>, SearchError> {
-    let occurrences = metric
-        .tokens
-        .as_ref()
-        .map(|tokens| count_tokens(tokens, &summary.content))
-        .transpose()?;
-    Ok(measure(metric, base, occurrences).map(|result| Hit {
-        range: 0..0,
-        values: vec![format!("{result:.2}")],
-        numbered: false,
-    }))
+    match check {
+        Check::Metric(metric) => {
+            let occurrences = metric
+                .tokens
+                .as_ref()
+                .map(|tokens| count_tokens(tokens, &summary.content))
+                .transpose()?;
+            Ok(measure(metric, base, occurrences).map(|result| Hit {
+                range: 0..0,
+                values: vec![format!("{result:.2}")],
+                numbered: false,
+            }))
+        }
+        Check::Readability(readability) => Ok(graded(readability, base).map(grade_hit)),
+        Check::Existence(_) | Check::Substitution(_) | Check::Occurrence(_) => Ok(None),
+    }
 }

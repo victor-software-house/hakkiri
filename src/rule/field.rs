@@ -309,6 +309,108 @@ impl<'de> Deserialize<'de> for Count {
     }
 }
 
+/// A number, whole or with decimals, and negative when it starts with a minus.
+/// A number in quotes reads as the number.
+#[derive(Debug, Default)]
+pub(super) struct Number {
+    value: f64,
+    problem: Option<String>,
+}
+
+impl Number {
+    /// The number, 0 when the field read with a problem.
+    pub(super) const fn value(&self) -> f64 {
+        self.value
+    }
+
+    fn found(found: &str) -> Self {
+        Self {
+            value: 0.0,
+            problem: Some(format!("must be a number, found {found}")),
+        }
+    }
+
+    fn of(value: f64) -> Self {
+        if value.is_finite() {
+            Self {
+                value,
+                problem: None,
+            }
+        } else {
+            Self::found(&format!("`{value}`"))
+        }
+    }
+}
+
+impl Checked for Number {
+    fn problem(&self) -> Option<&str> {
+        self.problem.as_deref()
+    }
+}
+
+impl<'de> Deserialize<'de> for Number {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct NumberVisitor;
+
+        impl<'de> Visitor<'de> for NumberVisitor {
+            type Value = Number;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                formatter.write_str("a number")
+            }
+
+            fn visit_f64<E: de::Error>(self, value: f64) -> Result<Number, E> {
+                Ok(Number::of(value))
+            }
+
+            fn visit_i64<E: de::Error>(self, value: i64) -> Result<Number, E> {
+                Ok(i32::try_from(value).map_or_else(
+                    |_| Number::found(&format!("`{value}`")),
+                    |value| Number::of(f64::from(value)),
+                ))
+            }
+
+            fn visit_u64<E: de::Error>(self, value: u64) -> Result<Number, E> {
+                Ok(u32::try_from(value).map_or_else(
+                    |_| Number::found(&format!("`{value}`")),
+                    |value| Number::of(f64::from(value)),
+                ))
+            }
+
+            fn visit_bool<E: de::Error>(self, value: bool) -> Result<Number, E> {
+                Ok(Number::found(&format!("`{value}`")))
+            }
+
+            fn visit_str<E: de::Error>(self, value: &str) -> Result<Number, E> {
+                Ok(value
+                    .trim()
+                    .parse::<f64>()
+                    .map_or_else(|_| Number::found(&format!("`{value}`")), Number::of))
+            }
+
+            fn visit_unit<E: de::Error>(self) -> Result<Number, E> {
+                Ok(Number::default())
+            }
+
+            fn visit_none<E: de::Error>(self) -> Result<Number, E> {
+                Ok(Number::default())
+            }
+
+            fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<Number, A::Error> {
+                while seq.next_element::<IgnoredAny>()?.is_some() {}
+                Ok(Number::found("a list"))
+            }
+
+            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Number, A::Error> {
+                while map.next_entry::<IgnoredAny, IgnoredAny>()?.is_some() {}
+                Ok(Number::found("a mapping"))
+            }
+        }
+
+        deserializer.deserialize_any(NumberVisitor)
+    }
+}
+
 /// `true` or `false`. The words in quotes read the same.
 #[derive(Debug, Default)]
 pub(super) struct Flag {
