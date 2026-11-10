@@ -227,6 +227,8 @@ fn capitalized(text: &str) -> String {
 ///
 /// A match that overlaps a code span is no match: it is neither counted nor
 /// pointed at.
+/// The alert points at the first counted match that is not blank, and at the
+/// first word when there is none.
 fn run_occurrence(occurrence: &Occurrence, text: &Text) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
     let found: Vec<Range<usize>> = occurrence
@@ -241,15 +243,12 @@ fn run_occurrence(occurrence: &Occurrence, text: &Text) -> Result<Vec<Hit>, Sear
     if !over && !under {
         return Ok(Vec::new());
     }
-    let range = if count == 0 {
-        first_word(content)
-    } else {
-        found.into_iter().find(|range| {
-            content
-                .get(range.clone())
-                .is_some_and(|matched| !matched.trim().is_empty())
-        })
-    };
+    let placed = found.into_iter().find(|range| {
+        content
+            .get(range.clone())
+            .is_some_and(|matched| !matched.trim().is_empty())
+    });
+    let range = placed.or_else(|| first_word(content));
     Ok(range
         .map(|range| Hit {
             values: vec![count.to_string()],

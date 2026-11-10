@@ -574,6 +574,19 @@ fn a_match_outside_code_is_counted_and_pointed_at() -> TestResult {
 }
 
 #[test]
+fn matches_of_blanks_point_at_the_first_word() -> TestResult {
+    let found = markdown(&occurrence("'[ ]'", "min: 3"), "One two three.")?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(
+        (alert.message.as_str(), alert.matched.as_str()),
+        ("2 found", "One")
+    );
+    Ok(())
+}
+
+#[test]
 fn a_match_in_code_does_not_meet_a_minimum() -> TestResult {
     let found = markdown(&occurrence("x", "min: 1"), "Run `cargo` now.")?;
     let [alert] = found.as_slice() else {

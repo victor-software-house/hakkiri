@@ -189,6 +189,7 @@ These rows join the intended differences of [rule-format decision 7][format-7]:
 | A long word | Over six bytes ([summarize.go][p-complex]) | Over six characters |
 | `capitalize` on a match that starts with a digit or a symbol | Capitalizes the value, since changing the first character leaves the match unchanged ([substitution.go][v-capitalize]) | Capitalizes only when the match starts with a capital letter |
 | `$1` in a swap value, for a key with a space | The key as written misses a line wrap, so the alert is lost ([substitution.go][v-expand]) | The key as matched, its spaces matching a line wrap |
+| `occurrence` with matches of blank text only | Counts them, points at none, and gives no alert ([occurrence.go][v-occ-count]) | Points at the first word of the node |
 | `occurrence` over a match in code | Counts every match, then points at the first one that is not code ([occurrence.go][v-occ-count]) | A match that overlaps a code span is not counted |
 
 Alternative: Vale's behaviour in each case.  

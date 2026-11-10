@@ -118,13 +118,18 @@ Its message and description SHALL read `%d` as `%s`, so the count fills either o
 
 ### Requirement: An occurrence alert points at a match
 
-An alert over `max` SHALL point at the first match that is not a code span.  
-An alert under `min` with no match SHALL point at the first word of the node.
+An alert SHALL point at the first counted match that is not blank.  
+When there is none, it SHALL point at the first word of the node.
 
 #### Scenario: A match inside code
 
 - **WHEN** a rule has `extends: occurrence`, `max: 1` and `token: x`, and the input is ``A box, `cargo` and `make`.``
 - **THEN** hakkiri reports no alert
+
+#### Scenario: Matches of blanks only
+
+- **WHEN** a rule has `extends: occurrence`, `message: "%d found"`, `min: 3` and `token: '[ ]'`, and the input is `One two three.`
+- **THEN** hakkiri reports one alert, with the message `2 found` and the matched text `One`
 
 #### Scenario: Too few matches
 
