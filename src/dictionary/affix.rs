@@ -169,7 +169,9 @@ impl Form {
 #[derive(Clone, Debug)]
 pub(crate) struct AffixFile {
     flag_type: FlagType,
-    /// A UTF-8 file's flags are bytes unless `FLAG` says otherwise.
+    /// A file that declares `SET UTF-8` has flags of one byte unless `FLAG`
+    /// says otherwise. In any other file a flag is one character, so `é` and
+    /// `è` are two flags in a Latin-1 file.
     byte_flags: bool,
     /// The flag sets that an entry names by number, from `AF`.
     aliases: Vec<String>,
@@ -247,7 +249,7 @@ impl AffixFile {
     pub(crate) fn parse(text: &str) -> Result<Self, DictionaryError> {
         let mut file = Self {
             flag_type: FlagType::Default,
-            byte_flags: true,
+            byte_flags: false,
             aliases: Vec::new(),
             classes: HashMap::new(),
             conversions: Vec::new(),

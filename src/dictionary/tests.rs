@@ -132,3 +132,19 @@ fn a_rule_whose_strip_text_is_not_on_the_word_makes_nothing() -> TestResult {
     assert!(!dictionary.spell("caties", &HashSet::new()));
     Ok(())
 }
+
+#[test]
+fn flags_of_a_latin1_file_are_single_characters() -> TestResult {
+    // No `SET`, and bytes that are not UTF-8, so the files read as Latin-1:
+    // `\xe9` is `é` and `\xe8` is `è`. Read as UTF-8 bytes, both start with the
+    // byte `0xC3` and one rule would replace the other.
+    let aff = b"SFX \xe9 Y 1\nSFX \xe9 0 s .\nSFX \xe8 Y 1\nSFX \xe8 0 x .\n";
+    let dic = b"2\ncat/\xe9\ndog/\xe8\n";
+    let dictionary = Dictionary::parse(aff, dic)?;
+    let none = HashSet::new();
+    assert!(dictionary.spell("cats", &none));
+    assert!(dictionary.spell("dogx", &none));
+    assert!(!dictionary.spell("catx", &none));
+    assert!(!dictionary.spell("dogs", &none));
+    Ok(())
+}
