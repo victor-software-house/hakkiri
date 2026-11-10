@@ -41,13 +41,63 @@ impl Flavor {
                     gfm_task_list_item: true,
                     ..Constructs::mdx()
                 },
-                // markdown-rs reads an import or export block only when it has
-                // a parser for it. hakkiri needs the block's extent, not its
-                // syntax, so every block passes.
-                mdx_esm_parse: Some(Box::new(|_| MdxSignal::Ok)),
+                mdx_esm_parse: Some(Box::new(esm)),
                 ..ParseOptions::default()
             },
         }
+    }
+}
+
+/// Where the lexer of an import or export block stands.
+#[derive(Clone, Copy, PartialEq)]
+enum Lex {
+    Code,
+    Quote(char),
+    LineComment,
+    BlockComment,
+}
+
+/// Tells markdown-rs whether an import or export block is complete.
+///
+/// markdown-rs reads such a block only when it has a parser for it.
+/// It ends the block at the first blank line the parser accepts.
+/// hakkiri needs the extent of the block, not its syntax, so the block is
+/// complete when no bracket, string, template literal or comment is open.
+fn esm(block: &str) -> MdxSignal {
+    let mut state = Lex::Code;
+    let mut depth = 0_usize;
+    let mut chars = block.chars().peekable();
+    while let Some(c) = chars.next() {
+        state = match (state, c) {
+            (Lex::Code, '\'' | '"' | '`') => Lex::Quote(c),
+            (Lex::Code, '/') if chars.next_if_eq(&'/').is_some() => Lex::LineComment,
+            (Lex::Code, '/') if chars.next_if_eq(&'*').is_some() => Lex::BlockComment,
+            (Lex::Code, '(' | '[' | '{') => {
+                depth += 1;
+                Lex::Code
+            }
+            (Lex::Code, ')' | ']' | '}') => {
+                depth = depth.saturating_sub(1);
+                Lex::Code
+            }
+            (Lex::Quote(_), '\\') => {
+                chars.next();
+                state
+            }
+            (Lex::Quote(quote), _) if quote == c => Lex::Code,
+            (Lex::LineComment, '\n') => Lex::Code,
+            (Lex::BlockComment, '*') if chars.next_if_eq(&'/').is_some() => Lex::Code,
+            _ => state,
+        };
+    }
+    if depth == 0 && matches!(state, Lex::Code | Lex::LineComment) {
+        MdxSignal::Ok
+    } else {
+        MdxSignal::Eof(
+            "Unexpected end of file in an import or export".to_owned(),
+            Box::new("hakkiri".to_owned()),
+            Box::new("esm".to_owned()),
+        )
     }
 }
 
@@ -110,7 +160,7 @@ impl Builder<'_> {
             Mdast::InlineCode(_) => self.scoped(node, Scope::Code, cell),
             Mdast::Strong(_) => self.scoped(node, Scope::Strong, cell),
             Mdast::Emphasis(_) => self.scoped(node, Scope::Emphasis, cell),
-            Mdast::Image(_) => self.alt(node),
+            Mdast::Image(_) | Mdast::ImageReference(_) => self.alt(node),
             Mdast::Table(table) => table.children.iter().enumerate().fold(
                 Visited::default(),
                 |visited, (row, node)| {
@@ -123,24 +173,24 @@ impl Builder<'_> {
                 },
             ),
             Mdast::MdxJsxFlowElement(_) | Mdast::MdxJsxTextElement(_) => self.jsx(node, cell),
-            Mdast::MdxjsEsm(_) | Mdast::MdxFlowExpression(_) | Mdast::MdxTextExpression(_) => {
-                Visited::cut(span_of(node))
-            }
+            // Syntax that is not prose is a gap in the text around it.
+            Mdast::MdxjsEsm(_)
+            | Mdast::MdxFlowExpression(_)
+            | Mdast::MdxTextExpression(_)
+            | Mdast::Toml(_)
+            | Mdast::Yaml(_)
+            | Mdast::InlineMath(_)
+            | Mdast::Html(_)
+            | Mdast::Code(_)
+            | Mdast::Math(_)
+            | Mdast::Definition(_) => Visited::cut(span_of(node)),
             Mdast::Root(_) | Mdast::FootnoteDefinition(_) | Mdast::List(_) | Mdast::Delete(_) => {
                 self.children(node, cell)
             }
-            Mdast::Toml(_)
-            | Mdast::Yaml(_)
-            | Mdast::Break(_)
-            | Mdast::InlineMath(_)
+            Mdast::Break(_)
             | Mdast::FootnoteReference(_)
-            | Mdast::Html(_)
-            | Mdast::ImageReference(_)
             | Mdast::Text(_)
-            | Mdast::Code(_)
-            | Mdast::Math(_)
-            | Mdast::ThematicBreak(_)
-            | Mdast::Definition(_) => Visited::default(),
+            | Mdast::ThematicBreak(_) => Visited::default(),
         }
     }
 
@@ -155,8 +205,9 @@ impl Builder<'_> {
 
     /// A node of `scope` over `node`, holding the nodes below it.
     ///
-    /// Where MDX syntax cuts into the node's span, the span splits around it.
-    /// One node of the scope stands for each piece that holds text.
+    /// Syntax that is not prose and sits inside the node is a gap between its
+    /// segments.
+    /// A table row has the segments of its cells.
     fn scoped(&self, node: &Mdast, scope: Scope, cell: Scope) -> Visited {
         let inner = self.children(node, cell);
         let Some(span) = span_of(node).map(|span| self.trimmed(scope, span)) else {
@@ -166,21 +217,18 @@ impl Builder<'_> {
             nodes: children,
             cuts,
         } = inner;
-        let mut pieces: Vec<Node> = self
-            .pieces(&span, &cuts)
-            .into_iter()
-            .map(|span| Node::new(scope, span, Vec::new()))
-            .collect();
-        for child in children {
-            if let Some(piece) = pieces
-                .iter_mut()
-                .find(|piece| piece.span.contains(&child.span.start))
-            {
-                piece.children.push(child);
-            }
-        }
+        let segments = if scope == Scope::TableRow {
+            children
+                .iter()
+                .flat_map(|child| child.segments.clone())
+                .collect()
+        } else {
+            self.segments(&span, &cuts)
+        };
         Visited {
-            nodes: pieces,
+            nodes: Node::from_segments(scope, segments, children)
+                .into_iter()
+                .collect(),
             cuts,
         }
     }
@@ -188,7 +236,7 @@ impl Builder<'_> {
     /// `span` without the line ending and padding that markdown-rs leaves at
     /// its end.
     ///
-    /// A table row or cell also loses its pipes and padding.
+    /// A table cell also loses its pipes and padding.
     /// markdown-rs starts a cell at its leading pipe and ends it after the
     /// padding or the closing pipe.
     fn trimmed(&self, scope: Scope, span: Range<usize>) -> Range<usize> {
@@ -196,10 +244,7 @@ impl Builder<'_> {
             return span;
         };
         let text = text.trim_end();
-        if !matches!(
-            scope,
-            Scope::TableRow | Scope::TableHeader | Scope::TableCell
-        ) {
+        if !matches!(scope, Scope::TableHeader | Scope::TableCell) {
             return span.start..span.start + text.len();
         }
         let unpadded = text.trim_start();
@@ -219,9 +264,11 @@ impl Builder<'_> {
         start..start + body.len()
     }
 
-    /// The parts of `span` that no cut covers and that hold more than
-    /// whitespace, without the whitespace around them.
-    fn pieces(&self, span: &Range<usize>, cuts: &[Range<usize>]) -> Vec<Range<usize>> {
+    /// The parts of `span` that no cut covers, without the whitespace at
+    /// either end of the text.
+    ///
+    /// Returns no part when only whitespace is left.
+    fn segments(&self, span: &Range<usize>, cuts: &[Range<usize>]) -> Vec<Range<usize>> {
         let mut inside: Vec<&Range<usize>> = cuts
             .iter()
             .filter(|cut| cut.start < span.end && span.start < cut.end)
@@ -238,18 +285,21 @@ impl Builder<'_> {
         if at < span.end {
             parts.push(at..span.end);
         }
+        let text_of = |part: &Range<usize>| self.source.get(part.clone()).unwrap_or_default();
+        if parts.iter().all(|part| text_of(part).trim().is_empty()) {
+            return Vec::new();
+        }
+        if let Some(first) = parts.first_mut() {
+            first.start += text_of(first).len() - text_of(first).trim_start().len();
+        }
+        if let Some(last) = parts.last_mut() {
+            last.end = last.start + text_of(last).trim_end().len();
+        }
+        parts.retain(|part| !part.is_empty());
         parts
-            .into_iter()
-            .filter_map(|part| {
-                let text = self.source.get(part.clone())?;
-                let start = part.start + (text.len() - text.trim_start().len());
-                let trimmed = text.trim();
-                (!trimmed.is_empty()).then(|| start..start + trimmed.len())
-            })
-            .collect()
     }
 
-    /// A JSX element: its children stay prose and its tags are cut out.
+    /// A JSX element: its children stay prose and its tags are gaps.
     fn jsx(&self, node: &Mdast, cell: Scope) -> Visited {
         let mut visited = self.children(node, cell);
         if let Some(span) = span_of(node) {
@@ -267,8 +317,8 @@ impl Builder<'_> {
         visited
     }
 
-    /// The `alt` node of an image: the label between `![` and its closing
-    /// bracket.
+    /// The `alt` node of an image or an image reference: the label between
+    /// `![` and its closing bracket.
     fn alt(&self, node: &Mdast) -> Visited {
         let span = span_of(node).and_then(|span| {
             let label = self.source.get(span.clone())?.strip_prefix("![")?;

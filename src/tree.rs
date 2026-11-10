@@ -111,15 +111,17 @@ pub struct Node {
     /// It runs from the first byte of its first segment to the end of its
     /// last.
     ///
-    /// In a comment, the span of a node over several lines also covers the
-    /// markers between them.
+    /// The span also covers what lies between the segments: the markers
+    /// between the lines of a comment, and syntax that is not prose.
     /// Use it for a position, and read the text through `segments`.
     pub span: Range<usize>,
-    /// The byte ranges of the node's text in the original file, one for each
-    /// line, in file order.
+    /// The byte ranges of the node's text in the original file, in file order.
     ///
-    /// The comment markers and the indentation that a comment strips are in no
-    /// segment. A line with no text gives an empty range.
+    /// A gap between two segments holds what is not part of the text.
+    /// It is a comment marker, or the indentation that a comment strips.
+    /// It can also be syntax that is not prose, such as a code block, an HTML
+    /// tag or an MDX expression.
+    /// A line of a comment with no text gives an empty range.
     pub segments: Vec<Range<usize>>,
     /// The nodes inside this one, in file order.
     pub children: Vec<Node>,
@@ -136,23 +138,50 @@ impl Node {
         }
     }
 
-    /// The text of this node in `source`, its segments joined by a line feed.
+    /// A node with `segments`, or `None` when there is no segment.
+    pub(crate) fn from_segments(
+        scope: Scope,
+        segments: Vec<Range<usize>>,
+        children: Vec<Self>,
+    ) -> Option<Self> {
+        let span = segments.first()?.start..segments.last()?.end;
+        Some(Self {
+            scope,
+            span,
+            segments,
+            children,
+        })
+    }
+
+    /// The text of this node in `source`: its segments in order.
     ///
+    /// A line feed separates two segments with a line break between them,
+    /// and one space separates two cells of a table row.
+    /// Any other gap reads as nothing.
     /// Returns `None` when a segment is not a slice of `source`.
     #[must_use]
     pub fn text(&self, source: &str) -> Option<String> {
-        let lines: Option<Vec<&str>> = self
-            .segments
-            .iter()
-            .map(|segment| source.get(segment.clone()))
-            .collect();
-        lines.map(|lines| lines.join("\n"))
+        let mut text = String::new();
+        let mut previous_end = None;
+        for segment in &self.segments {
+            if let Some(end) = previous_end {
+                let gap = source.get(end..segment.start)?;
+                if gap.contains('\n') {
+                    text.push('\n');
+                } else if gap.contains('|') && gap.chars().all(|c| c == '|' || c.is_whitespace()) {
+                    text.push(' ');
+                }
+            }
+            text.push_str(source.get(segment.clone())?);
+            previous_end = Some(segment.end);
+        }
+        Some(text)
     }
 
     /// Replaces the segments and the span of this node and of every node below
-    /// it. `map` gives the segments of a node from its current span.
+    /// it. `map` gives the segments of a range from its current place.
     pub(crate) fn map_segments(&mut self, map: &impl Fn(Range<usize>) -> Vec<Range<usize>>) {
-        self.segments = map(self.span.clone());
+        self.segments = self.segments.iter().cloned().flat_map(map).collect();
         if let (Some(first), Some(last)) = (self.segments.first(), self.segments.last()) {
             self.span = first.start..last.end;
         }
@@ -165,7 +194,7 @@ impl Node {
 /// The tree of one file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Tree {
-    /// The `raw` roots: one for a Markdown or MDX file, one per comment for a
-    /// source file.
+    /// The `raw` roots: one for a Markdown or MDX file, one per comment group
+    /// for a source file.
     pub roots: Vec<Node>,
 }

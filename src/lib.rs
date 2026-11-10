@@ -19,8 +19,9 @@ pub use tree::{Node, Scope, Tree};
 /// Parses `source`, the text of a file in `language`, into its document tree.
 ///
 /// A Markdown or MDX file gives one `raw` root that spans the whole file.
-/// A source file gives one `raw` root per comment, so no string literal reaches
-/// the tree.
+/// A source file gives one `raw` root per comment group, so no string literal
+/// reaches the tree.
+/// A group is one comment, or adjacent line comments that share a marker.
 ///
 /// # Errors
 ///
