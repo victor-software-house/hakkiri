@@ -30,5 +30,5 @@ None.
 - New dependencies: markdown-rs for Markdown and MDX, tree-sitter with the Rust, TypeScript and JavaScript grammars for comments, and insta for snapshot tests.
 - Sentences and words are not in this slice; the engine slice adds them with word counting.
 
-[ledger]: ../../../tasks.yaml
-[rule-format]: ../archive/2026-11-10-rule-format/design.md
+[ledger]: ../../../../tasks.yaml
+[rule-format]: ../2026-11-10-rule-format/design.md

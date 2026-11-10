@@ -33,5 +33,5 @@ The tree, its scopes and its spans stay in [document-tree][document-tree].
 - The `Node` type gains `segments` and a `text` method, and the tree builders produce them.
 - A rule engine slice (`HKR-004`) reads text through the segments, so it never sees syntax.
 
-[ledger]: ../../../tasks.yaml
-[document-tree]: ../document-tree/proposal.md
+[ledger]: ../../../../tasks.yaml
+[document-tree]: ../2026-11-10-document-tree/proposal.md

@@ -23,8 +23,14 @@
 
 ## 3. Integration
 
-- [ ] 3.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+- [x] 3.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+  - 2026-11-10 (UTC), [Verify][run-pr7] passed on [PR 7][pr7] at `ab0f0b7`.  
+    The Template check passed at v0.0.88.  
+    Every Kody thread was answered and resolved, and the pull request merged at `94ae55e`.
 
 ## Workflow follow-up
 
 - Archive this change after the pull request merges, then archive `HKR-003` with `qctl close-from-openspec`.
+
+[pr7]: https://github.com/victor-software-house/hakkiri/pull/7
+[run-pr7]: https://github.com/victor-software-house/hakkiri/actions/runs/42782271493
