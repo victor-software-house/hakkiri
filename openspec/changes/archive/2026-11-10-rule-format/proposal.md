@@ -35,6 +35,6 @@ None.
 
 - No code yet. The tree slice `HKR-003`, the engine slice `HKR-004` and the importer slice `HKR-007` build against these specs.
 
-[ledger]: ../../../tasks.yaml
-[bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
+[ledger]: ../../../../tasks.yaml
+[bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
 [rules]: prose-style-rules.md

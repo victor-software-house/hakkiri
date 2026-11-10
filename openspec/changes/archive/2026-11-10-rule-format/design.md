@@ -200,7 +200,7 @@ Alternative: `TableRow` keeps `scope: raw` and its regex. Lost: the rule would s
 - [Front matter, link definitions, raw HTML and MDX have no scope] → the first rule that needs one adds a lowercase dotted name to the spec.
 - [`sequence` needs part-of-speech tags and `spelling` needs dictionaries] → the engine slice names the crate or data for each before it starts.
 
-[bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
+[bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
 [vale-suite]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/testsuite/suite.go#L28-L64
 [ast-grep-tests]: https://github.com/ast-grep/ast-grep.github.io/blob/fe48cd89b24174a421505adf15604a49e740d3b2/website/guide/test-rule.md
 [prose-style-rules]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846/ProseStyle/styles/ProseStyle
