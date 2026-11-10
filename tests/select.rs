@@ -281,6 +281,15 @@ fn words_follow_the_prose_pattern() {
 }
 
 #[test]
+fn a_combining_mark_ends_a_word() {
+    // U+0345 has the Alphabetic property but is a mark, not a letter, so
+    // prose's `\p{L}` stops at it.
+    let text = "a\u{0345}b";
+    let found: Vec<&str> = words(text).into_iter().map(|range| &text[range]).collect();
+    assert_eq!(found, ["a", "b"]);
+}
+
+#[test]
 fn a_pipe_in_a_link_destination_outside_a_table_reads_as_nothing() -> TestResult {
     let found = blocks(
         &["paragraph"],
