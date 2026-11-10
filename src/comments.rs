@@ -215,25 +215,41 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
 
 /// The file bytes of each line of comment text, with the markers and the `*` of
 /// each line removed.
+///
+/// A plain comment also loses the run of `/` or `*` that follows its opener, so
+/// a banner such as `//////` or `/*****` leaves no punctuation in the text.
 fn lines(source: &str, group: &Group) -> Vec<Range<usize>> {
     if group.marker.is_line() {
         return group
             .comments
             .iter()
-            .map(|comment| comment.start + group.marker.opener()..comment.end)
+            .map(|comment| {
+                let start = comment.start + group.marker.opener();
+                let banner = if group.marker == Marker::Line {
+                    leading_run(source.get(start..comment.end).unwrap_or_default(), '/')
+                } else {
+                    0
+                };
+                start + banner..comment.end
+            })
             .map(|line| trim_carriage_return(source, line))
             .collect();
     }
     let Some(comment) = group.comments.first() else {
         return Vec::new();
     };
-    let start = comment.start + group.marker.opener();
+    let mut start = comment.start + group.marker.opener();
     let text = source.get(comment.clone()).unwrap_or_default();
-    let end = if text.len() >= group.marker.opener() + 2 && text.ends_with("*/") {
+    let mut end = if text.len() >= group.marker.opener() + 2 && text.ends_with("*/") {
         comment.end - 2
     } else {
         comment.end
     };
+    if group.marker == Marker::Block {
+        start += leading_run(source.get(start..end).unwrap_or_default(), '*');
+        let body = source.get(start..end).unwrap_or_default();
+        end -= body.len() - body.trim_end_matches('*').len();
+    }
     let mut lines = Vec::new();
     let mut at = start;
     for line in source.get(start..end).unwrap_or_default().split('\n') {
@@ -255,6 +271,11 @@ fn lines(source: &str, group: &Group) -> Vec<Range<usize>> {
         }
     }
     lines
+}
+
+/// The bytes of the run of `c` that starts `text`.
+fn leading_run(text: &str, c: char) -> usize {
+    text.len() - text.trim_start_matches(c).len()
 }
 
 fn trim_carriage_return(source: &str, line: Range<usize>) -> Range<usize> {
