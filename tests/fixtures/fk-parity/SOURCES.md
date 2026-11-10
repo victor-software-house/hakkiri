@@ -20,7 +20,9 @@ Vale returns no metrics for a document with no counted words, and it printed non
 
 ## Inputs
 
-- Source: [prose-style at `ee9f207`][prose-style-commit], public, with no license file; the owner is the same as hakkiri's.
+- Source: [prose-style at `ee9f207`][prose-style-commit], public, and owned by victor-software-house, as hakkiri is.  
+  The inputs are copied with that owner's consent.  
+  The repository has no license file, and none is claimed.
 - A case is each entry of `tests:` in a rule file under `ProseStyle/styles/ProseStyle/`, and each entry of `test/package.test.yml`.
 - That is 87 cases.
   21 hold a code span or fence and are left out, since a code span counts one word on purpose.

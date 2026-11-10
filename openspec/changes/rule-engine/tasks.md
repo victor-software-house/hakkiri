@@ -79,7 +79,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 ### Evidence for 7.2
 
 - 2026-11-10 UTC: [`vale-fk.tsv`][fk-tsv] holds one row per input, 66 rows, each with the Vale version and the prose-style commit.
-- The inputs are copied under [`inputs/`][fk-inputs].
+- The 15 `no-words` rows stay in the fixture with that mark, so task 7.3 compares the other 51.
+- The inputs are copied under [`inputs/`][fk-inputs], from a repository the same owner holds.
 - How to rerun the measurement, the format and the license note are in [`SOURCES.md`][fk-sources].
 
 ## 8. Integration
