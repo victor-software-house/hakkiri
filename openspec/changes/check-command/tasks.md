@@ -28,6 +28,7 @@ Only the binary size measurement in task 1.2 runs on a box, because CI cannot.
   - A path outside the root with its warning, no path under the root, and a config elsewhere.
   - A walk from another folder that skips the package folders.
   - A file named two ways, which is linted once.
+  - A walk from a folder that holds the root, and a path that does not exist.
 
 ## 3. Finding and linting files
 

@@ -594,6 +594,37 @@ fn a_file_named_two_ways_is_linted_once() -> TestResult {
     Ok(())
 }
 
+#[cfg(unix)]
+#[test]
+fn a_walk_from_a_folder_that_holds_the_root_leaves_the_siblings_alone() -> TestResult {
+    use std::fs::Permissions;
+    use std::os::unix::fs::PermissionsExt;
+
+    let suite = Suite::new("check-prune");
+    let root = nested(&suite, "prune");
+    let locked = root.path().join("sibling/locked");
+    std::fs::create_dir_all(&locked)?;
+    std::fs::set_permissions(&locked, Permissions::from_mode(0o000))?;
+    let result = run(&root.path().join("project"), &["check", ".."], &[]);
+    std::fs::set_permissions(&locked, Permissions::from_mode(0o755))?;
+    let result = result?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
+    Ok(())
+}
+
+#[test]
+fn a_missing_path_is_one_failure() -> TestResult {
+    let suite = Suite::new("check-missing-path");
+    let root = project(&suite, "missing-path", CONFIG);
+    root.file("a.md", "Fine.\n");
+    let result = run(root.path(), &["check", "typo.md"], &[])?;
+    assert_eq!(result.code, 2);
+    assert!(result.out.contains("failed typo.md:"), "{}", result.out);
+    assert!(!result.out.contains("project root"), "{}", result.out);
+    Ok(())
+}
+
 #[test]
 fn a_package_path_is_read_from_the_root() -> TestResult {
     let suite = Suite::new("check-root-package");

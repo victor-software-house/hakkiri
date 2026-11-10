@@ -58,7 +58,10 @@ A `files` glob matches the path relative to the root, with `/` separators.
 A path outside the root matches no glob, so it is not linted, and the run says so.
 Each path given that is outside the root, and does not hold it, draws a warning on standard error.
 When no path given lies under the root or holds it, the run reports a failure and exits 2, so a wrong `--config` is not a clean run.
-A directory that holds the root is walked, and the files outside the root are skipped with no warning.
+A directory that holds the root is walked only along the way to the root and then under it, so `check ..` from a workspace never enters a sibling project.
+A path that does not exist is a failure of its own, and the run does not also say that no path lies under the root.
+Vale walks every folder under the one it is given and lints each file whose section glob matches, so `vale ..` lints the files of a sibling project, probed on Vale 3.26.0 with a `[*.md]` section.
+Pruning changes no result, since a file outside the root matches no glob, and it spares the walk the sibling folders and their build output.
 `*` crosses `/`, so `'*.rs'` matches `src/a.rs`, as in Vale, and `**` and `{a,b}` work.
 A `packages` `path` is relative to the root too.
 The config is still read from `.ctl/hakkiri.yaml` in the current directory unless `--config` or `HAKKIRI_CONFIG` names another.

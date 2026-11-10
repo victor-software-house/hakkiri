@@ -34,7 +34,7 @@ It SHALL resolve the root and the folders of the file through symlinks, and keep
 
 hakkiri SHALL print a warning on standard error for each path it is given that is outside the project root and does not hold it, and SHALL lint none of its files.  
 When it is given no path, the current directory is the path given.  
-When no path lies under the root or holds it, hakkiri SHALL report a failure that names the root and exit 2.
+When no path lies under the root or holds it, hakkiri SHALL report a failure that names the root and exit 2.  
 
 #### Scenario: One file outside the root
 
@@ -50,3 +50,21 @@ When no path lies under the root or holds it, hakkiri SHALL report a failure tha
 
 - **WHEN** `HAKKIRI_CONFIG=../other/hakkiri.yaml hakkiri check` runs in `project/`, so the root is `other/`
 - **THEN** hakkiri prints a warning that names `.`, reports a failure naming the root, and exits 2
+
+### Requirement: A walk enters only the way to the project root
+
+A walk of a directory that holds the root SHALL enter only the folders on the way to the root and the folders under it.
+
+#### Scenario: A walk from a folder that holds the root
+
+- **WHEN** `hakkiri check ..` runs in `project/` and a sibling folder `sibling/locked` cannot be read
+- **THEN** hakkiri does not enter `sibling`, lints the files under the root, and exits 0
+
+### Requirement: A missing path is reported once
+
+A path that does not exist SHALL be a failure of its own, with no failure about the root.
+
+#### Scenario: A path that does not exist
+
+- **WHEN** `hakkiri check typo.md` runs and `typo.md` does not exist
+- **THEN** hakkiri reports a failure naming `typo.md` and no failure about the root, and exits 2

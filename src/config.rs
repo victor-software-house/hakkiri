@@ -194,12 +194,17 @@ impl Project {
         &self.root
     }
 
+    /// Whether the resolved directory `real` is under the project root or
+    /// holds it, so a walk of it can reach a file under the root.
+    pub(crate) fn leads_to_root(&self, real: &Path) -> bool {
+        real.starts_with(&self.root) || self.root.starts_with(real)
+    }
+
     /// Whether `argument` can lead to a file under the project root: a file
     /// that is under it, or a directory that is under it or holds it.
     pub(crate) fn reaches(&self, argument: &Path, directory: bool) -> bool {
         if directory {
-            fs::canonicalize(argument)
-                .is_ok_and(|real| real.starts_with(&self.root) || self.root.starts_with(&real))
+            fs::canonicalize(argument).is_ok_and(|real| self.leads_to_root(&real))
         } else {
             self.relative(argument).is_some()
         }

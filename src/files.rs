@@ -126,11 +126,14 @@ impl Finder<'_> {
     }
 
     /// Whether a walk leaves the directory `path` alone: `node_modules`,
-    /// `.git`, or a folder of a package.
+    /// `.git`, a folder of a package, or a folder that is neither under the
+    /// project root nor on the way to it.
     fn skips(&self, path: &Path) -> bool {
         path.file_name()
             .is_some_and(|name| SKIPPED.iter().any(|skipped| name == *skipped))
-            || fs::canonicalize(path).is_ok_and(|real| self.project.packages.contains(&real))
+            || fs::canonicalize(path).is_ok_and(|real| {
+                self.project.packages.contains(&real) || !self.project.leads_to_root(&real)
+            })
     }
 }
 
@@ -178,6 +181,7 @@ pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf]) -> Found<'a> {
                 finder.file(&root, true);
             }
             Err(error) => {
+                reached = true;
                 let path = display(&root, finder.current.as_deref());
                 finder
                     .failures
