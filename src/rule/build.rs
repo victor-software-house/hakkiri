@@ -14,7 +14,7 @@ use super::schema::{
 use super::{
     Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence,
     LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Sequence,
-    Step, Substitution, Swap, Token, level_of,
+    Substitution, Swap, Token, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -782,7 +782,7 @@ fn sequence_token(
     number: usize,
     written: &TokenFields,
     flag: &str,
-) -> Result<(Token, bool), LoadError> {
+) -> Result<Token, LoadError> {
     let name = source.name;
     let at = |part: &str| format!("tokens[{number}].{part}");
     let pattern = written.pattern.value();
@@ -829,17 +829,16 @@ fn sequence_token(
         Some(source.compile(&at("tag"), &tag, &[])?)
     };
     let required = word.is_some() || tag.is_some();
-    Ok((
-        Token {
-            word,
-            tag,
-            words,
-            negate: written.negate.value(),
-            target: written.target.value(),
-            skip: written.skip.value(),
-        },
+    Ok(Token {
+        word,
+        tag,
+        words,
+        negate: written.negate.value(),
+        target: written.target.value(),
+        skip: written.skip.value(),
+        copies: written.min.value().max(1),
         required,
-    ))
+    })
 }
 
 /// The tokens of a `sequence` rule as steps, and the patterns they match with.
@@ -860,42 +859,41 @@ fn sequence(source: &Source<'_>, fields: &SequenceFields) -> Result<Sequence, Lo
     };
     let mut tokens = Vec::new();
     let mut patterns: Vec<&str> = Vec::new();
-    let mut steps = Vec::new();
-    let mut group = 0;
+    let mut ends: Vec<usize> = Vec::new();
     for (number, written) in fields.tokens.iter().enumerate() {
-        let (token, required) = sequence_token(source, number, written, flag)?;
-        for _ in 0..written.min.value().max(1) {
-            group += 1;
-            for left in (1..=token.skip).rev() {
-                steps.push(Step {
-                    token: tokens.len(),
-                    optional: true,
-                    start: left == token.skip,
-                    end: false,
-                    group,
-                });
-            }
-            if required {
-                steps.push(Step {
-                    token: tokens.len(),
-                    optional: false,
-                    start: false,
-                    end: true,
-                    group,
-                });
-            }
-        }
+        let token = sequence_token(source, number, written, flag)?;
+        // The steps are counted, never stored, so a large `skip` or `min` is
+        // cheap. Only a count that does not fit a number is refused.
+        let end = token
+            .skip
+            .checked_add(usize::from(token.required))
+            .and_then(|width| width.checked_mul(token.copies))
+            .and_then(|made| made.checked_add(ends.last().copied().unwrap_or(0)))
+            .ok_or_else(|| {
+                source.problem(
+                    &format!("tokens[{number}].skip"),
+                    format!("rule `{name}`: `skip` and `min` make more steps than a count holds"),
+                )
+            })?;
+        ends.push(end);
         patterns.push(written.pattern.value());
         tokens.push(token);
     }
-    let anchor = steps
-        .iter()
-        .position(|step| !tokens[step.token].negate && tokens[step.token].word.is_some())
-        .or_else(|| {
-            steps
-                .iter()
-                .position(|step| !tokens[step.token].negate && tokens[step.token].tag.is_some())
+    let mut sequence = Sequence {
+        tokens,
+        ends,
+        anchor: 0,
+        candidates: None,
+        exceptions: Vec::new(),
+    };
+    let first = |has: fn(&Token) -> bool| {
+        (0..sequence.tokens.len()).find(|index| {
+            let token = &sequence.tokens[*index];
+            !token.negate && has(token) && !sequence.block(*index).is_empty()
         })
+    };
+    let anchor_token = first(|token| token.word.is_some())
+        .or_else(|| first(|token| token.tag.is_some()))
         .ok_or_else(|| {
             source.problem(
                 "tokens",
@@ -905,7 +903,8 @@ fn sequence(source: &Source<'_>, fields: &SequenceFields) -> Result<Sequence, Lo
                 ),
             )
         })?;
-    let anchor_token = steps[anchor].token;
+    let anchor = sequence.block(anchor_token).start;
+    let tokens = &sequence.tokens;
     let candidates = if tokens[anchor_token].word.is_some() {
         let pattern = patterns[anchor_token];
         Some(source.compile(
@@ -922,13 +921,10 @@ fn sequence(source: &Source<'_>, fields: &SequenceFields) -> Result<Sequence, Lo
         .iter()
         .map(|exception| source.compile("exceptions", exception, &[]))
         .collect::<Result<Vec<_>, _>>()?;
-    Ok(Sequence {
-        tokens,
-        steps,
-        anchor,
-        candidates,
-        exceptions,
-    })
+    sequence.anchor = anchor;
+    sequence.candidates = candidates;
+    sequence.exceptions = exceptions;
+    Ok(sequence)
 }
 
 pub(super) fn sequence_rule(

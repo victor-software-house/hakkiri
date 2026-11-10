@@ -9,6 +9,7 @@
 )]
 
 use std::error::Error;
+use std::time::{Duration, Instant};
 
 use hakkiri::alert::Alert;
 use hakkiri::engine::lint;
@@ -242,5 +243,29 @@ fn a_token_field_it_does_not_define_is_refused() -> TestResult {
         &rule("m", "tokens: [{pattern: a, tags: NN}]\n"),
     )?;
     assert!(message.contains("tags"), "{message}");
+    Ok(())
+}
+
+#[test]
+fn a_huge_skip_and_min_cost_nothing() -> TestResult {
+    let started = Instant::now();
+    let huge = rule(
+        "Found.",
+        "tokens: [{pattern: go, skip: 100000000, min: 1000}]\n",
+    );
+    assert_eq!(found(&huge, "Go go go.\n")?, none());
+    let twenty = rule(
+        "Found.",
+        "tokens: [{pattern: go, skip: 100000000, min: 20}]\n",
+    );
+    assert_eq!(
+        found(&twenty, &format!("{}.\n", ["go"; 20].join(" ")))?,
+        [pair(&["go"; 20].join(" "), "Found.")]
+    );
+    assert_eq!(
+        found(&twenty, &format!("{}.\n", ["go"; 19].join(" ")))?,
+        none()
+    );
+    assert!(started.elapsed() < Duration::from_secs(10));
     Ok(())
 }

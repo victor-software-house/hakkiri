@@ -362,12 +362,27 @@ pub struct Token {
     pub target: bool,
     /// The `skip`: how many words may come before the word.
     pub skip: usize,
+    /// How many times the token repeats: its `min`, or 1.
+    pub copies: usize,
+    /// Whether the token has a step of its own after its optional ones: it
+    /// has a `pattern`, a tag or a `upos`.
+    pub required: bool,
+}
+
+impl Token {
+    /// How many steps one copy of the token makes: its `skip` optional steps
+    /// and the required one.
+    fn width(&self) -> usize {
+        self.skip + usize::from(self.required)
+    }
 }
 
 /// One position a `sequence` walk checks: a token, or one copy of it.
 ///
-/// A token with `skip: N` becomes N optional steps and the required one, and a
+/// A token with `skip: N` has N optional steps and the required one, and a
 /// token with `min: N` repeats that N times.
+/// The steps are counted, not stored, so that a large `skip` or `min` costs
+/// nothing until a walk reaches them.
 #[derive(Clone, Copy, Debug)]
 pub struct Step {
     /// The index of the token in [`Sequence::tokens`].
@@ -378,8 +393,10 @@ pub struct Step {
     pub start: bool,
     /// Whether it is the required step that the optional ones pad.
     pub end: bool,
-    /// The steps that one occurrence of a token made share a group.
-    pub group: usize,
+    /// The first step that one occurrence of a token made.
+    pub first: usize,
+    /// The step after the last one that the occurrence made.
+    pub after: usize,
 }
 
 /// A `sequence` rule.
@@ -387,8 +404,8 @@ pub struct Step {
 pub struct Sequence {
     /// The tokens as written.
     pub tokens: Vec<Token>,
-    /// The tokens as the walk reads them.
-    pub steps: Vec<Step>,
+    /// The number of steps up to the end of each token.
+    pub ends: Vec<usize>,
     /// The step the walk starts from: the first with a `pattern`, or else the
     /// first with a tag, that is not negated.
     pub anchor: usize,
@@ -397,6 +414,51 @@ pub struct Sequence {
     pub candidates: Option<Pattern>,
     /// The `exceptions`: a match that begins inside a match of one is dropped.
     pub exceptions: Vec<Pattern>,
+}
+
+impl Sequence {
+    /// How many steps the tokens make.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.ends.last().copied().unwrap_or(0)
+    }
+
+    /// Whether the tokens make no step.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    /// The steps of token `token`.
+    #[must_use]
+    pub fn block(&self, token: usize) -> std::ops::Range<usize> {
+        let begin = token.checked_sub(1).map_or(0, |before| self.ends[before]);
+        begin..self.ends[token]
+    }
+
+    /// The token that made step `index`.
+    #[must_use]
+    pub fn token_of(&self, index: usize) -> usize {
+        self.ends.partition_point(|end| *end <= index)
+    }
+
+    /// Step `index`, which must be below [`Sequence::len`].
+    #[must_use]
+    pub fn step(&self, index: usize) -> Step {
+        let token = self.token_of(index);
+        let width = self.tokens[token].width();
+        let offset = index - self.block(token).start;
+        let within = offset % width;
+        let first = index - within;
+        Step {
+            token,
+            optional: within < self.tokens[token].skip,
+            start: within == 0 && self.tokens[token].skip > 0,
+            end: within == self.tokens[token].skip,
+            first,
+            after: first + width,
+        }
+    }
 }
 
 /// One thing wrong with a rule file.

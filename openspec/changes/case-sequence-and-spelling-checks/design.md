@@ -97,7 +97,12 @@ Vale's walk has two quirks that hakkiri keeps ([sequence.go][v-seq-run]):
 Vale also cuts each block again with prose's segmenter and tags each part apart ([prose.go][v-tag-text]), and skips the tagger when a literal that a token needs is missing.
 hakkiri tags the sentence its own splitter gave, whole, so a text the two cut differently can get other tags.
 
-hakkiri refuses what Vale loads and never matches: tokens with nothing to start from (a `pattern`, `tag` or `upos` without `negate`), a token field it does not define, and a `skip` or `min` below 0.
+Vale makes one step for each copy of a `skip` and `min` before it walks ([sequence.go][v-seq-tokens]).  
+With a 6 GB limit, `skip: 1000` and `min: 1000` ran out of memory after 13 seconds on a three-word text.  
+hakkiri counts the steps and stores none, so `skip: 100000000` loads and reads a short text at once.
+
+hakkiri refuses what Vale loads and never matches: tokens with nothing to start from (a `pattern`, `tag` or `upos` without `negate`), a token field it does not define, and a `skip` or `min` below 0.  
+It refuses a `skip` and `min` whose steps overflow a count too.
 
 Alternative: compile the tokens into one pattern over a string of `word/TAG` pairs.  
 Lost: `negate` at a sentence edge and `target` spans have no direct form there, and results would drift from Vale's walk.

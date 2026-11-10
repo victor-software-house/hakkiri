@@ -67,14 +67,16 @@ fn accepts(token: &Token, word: &Word<'_>) -> Result<bool, SearchError> {
 /// Whether every one of `steps` is negated. A negated step holds where there
 /// is no word at all, so it holds at the edge of the sentence.
 fn negated(sequence: &Sequence, steps: Range<usize>) -> bool {
-    sequence.steps[steps]
-        .iter()
-        .all(|step| sequence.tokens[step.token].negate)
+    if steps.is_empty() {
+        return true;
+    }
+    (sequence.token_of(steps.start)..=sequence.token_of(steps.end - 1))
+        .filter(|token| !sequence.block(*token).is_empty())
+        .all(|token| sequence.tokens[token].negate)
 }
 
 /// Walks the steps from the anchor step, which reads the word `at`.
 fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Found>, SearchError> {
-    let steps = &sequence.steps;
     let anchor = sequence.anchor;
     let mut first: Option<usize> = None;
     let mut last: Option<usize> = None;
@@ -91,7 +93,7 @@ fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Fou
             }
             return Ok(None);
         };
-        let current = &steps[step - 1];
+        let current = sequence.step(step - 1);
         let token = &sequence.tokens[current.token];
         first = Some(before);
         read.insert(step - 1, before);
@@ -106,9 +108,7 @@ fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Fou
             (true, true) => {
                 // The word sat inside its window: the spare steps of the
                 // window are done with, and the steps past them still hold.
-                while step > 0 && steps[step - 1].group == current.group {
-                    step -= 1;
-                }
+                step = current.first;
                 word = before;
             }
             _ => {
@@ -118,14 +118,14 @@ fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Fou
         }
     }
     let (mut step, mut word) = (anchor, at);
-    while step < steps.len() {
+    while step < sequence.len() {
         if word >= words.len() {
-            if negated(sequence, step..steps.len()) {
+            if negated(sequence, step..sequence.len()) {
                 break;
             }
             return Ok(None);
         }
-        let current = &steps[step];
+        let current = sequence.step(step);
         first = Some(first.map_or(word, |first| first.min(word)));
         last = Some(word);
         read.insert(step, word);
@@ -133,9 +133,7 @@ fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Fou
         match (hit, current.optional) {
             (false, false) => return Ok(None),
             (true, true) => {
-                while step < steps.len() && steps[step].group == current.group {
-                    step += 1;
-                }
+                step = current.after;
                 word += 1;
             }
             _ => {
@@ -164,7 +162,7 @@ fn start(
     words: &[Word<'_>],
     visited: &[usize],
 ) -> Result<(usize, Option<Found>), SearchError> {
-    let anchor = &sequence.tokens[sequence.steps[sequence.anchor].token];
+    let anchor = &sequence.tokens[sequence.token_of(sequence.anchor)];
     for (index, word) in words.iter().enumerate() {
         if accepts(anchor, word)? && !visited.contains(&index) {
             return Ok((index, walk(sequence, words, index)?));
@@ -177,14 +175,25 @@ fn start(
 /// step of such a token read a word.
 fn targeted(sequence: &Sequence, found: &Found) -> Option<(usize, usize)> {
     let mut range: Option<(usize, usize)> = None;
-    for (index, step) in sequence.steps.iter().enumerate() {
-        if !sequence.tokens[step.token].target {
+    for (token, written) in sequence.tokens.iter().enumerate() {
+        if !written.target {
             continue;
         }
         // A targeted step that read no word was passed over. The span cannot
         // be narrowed to it, so the match keeps its whole span.
-        let word = *found.at.get(&index)?;
-        range = Some(range.map_or((word, word), |(lo, hi)| (lo.min(word), hi.max(word))));
+        let block = sequence.block(token);
+        let read: Vec<usize> = found
+            .at
+            .iter()
+            .filter(|(step, _)| block.contains(step))
+            .map(|(_, word)| *word)
+            .collect();
+        if read.len() != block.len() {
+            return None;
+        }
+        for word in read {
+            range = Some(range.map_or((word, word), |(lo, hi)| (lo.min(word), hi.max(word))));
+        }
     }
     range
 }
