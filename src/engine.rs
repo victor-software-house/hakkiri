@@ -37,6 +37,9 @@ pub fn lint(
             && rule.scope.measures_file()
         {
             if measured.is_none() {
+                // Vale takes the whole file as the summary of a plain-text file
+                // (`lint.go` L539-544 at 66bbb85). That applies once hakkiri
+                // reads a plain-text language, which it does not yet.
                 let summary = summarize(tree, source)?;
                 let base = variables(&summary.content, summary.elements);
                 measured = Some((summary, base));

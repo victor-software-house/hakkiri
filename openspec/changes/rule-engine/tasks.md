@@ -111,7 +111,10 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     Two of its three score cases match to 0.01, and the third has two sentences here, where prose finds one.  
   - 2026-11-10 (UTC), the Rust comment test and the heading condition test pass in a box run of [4fabe24][c-condition].  
     A whole-file metric now measures the comments of a code file, from [f312d38][c-comments].  
-    Eight such rules over a 50,000-character line take 42 ms, from 327 ms, in [7950466][c-once].
+    Eight such rules over a 50,000-character line take 42 ms, from 327 ms, in [7950466][c-once].  
+  - 2026-11-10 (UTC), after one warm-up run, the median of five runs on a 4x8 box is 42 ms for one rule and 42 ms for eight.  
+    Before [7950466][c-once] it was 43 ms and 341 ms.  
+    The earlier 66 ms for one rule was a single run with no warm-up.
 
 ## 7. Flesch-Kincaid parity
 
