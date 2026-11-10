@@ -17,8 +17,10 @@ This change starts after the [rule-engine change][engine] merges.
   Verify every consistency scenario in the [pattern-checks spec][pattern] passes as a unit test in CI.
 - [ ] 2.2 Build `conditional`: group detection, the plain presence check, the terms captured per file in document order, `exceptions`, and the refusal of `in`.  
   Verify every conditional scenario passes as a unit test in CI.
-- [ ] 2.3 Build `repetition`: the joined pattern, the trimmed comparison, `alpha`, `max` with Vale's count, the one-sentence check and `exceptions`.  
+- [x] 2.3 Build `repetition`: the joined pattern, the trimmed comparison, `alpha`, `max` with Vale's count, the one-sentence check and `exceptions`.  
   Verify every repetition scenario passes as a unit test in CI.
+  - 2026-11-10 (UTC), 11 tests in `tests/repetition.rs` cover every repetition scenario, in a Linux box run of [ec04711][c-repetition].  
+    They add the count's reset, a repeat over two sentences that still counts, case, `alpha`, a line wrap, and code.
 
 ## 3. Readability
 
@@ -46,3 +48,4 @@ This change starts after the [rule-engine change][engine] merges.
 [pattern]: specs/pattern-checks/spec.md
 [readability]: specs/readability-check/spec.md
 [c-readability]: https://github.com/victor-software-house/hakkiri/commit/cfb983962d9399c5d3c0865afc81eb93390c82cd
+[c-repetition]: https://github.com/victor-software-house/hakkiri/commit/ec047118bdfc7d89163072067848beaf6704a874
