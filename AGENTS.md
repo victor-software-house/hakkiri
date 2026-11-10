@@ -40,6 +40,6 @@ The operator contract will be `hakkiri instructions` and `skills/hakkiri/SKILL.m
 - ctl's shared rules apply. Every change goes through a pull request, and `--no-verify` is never used.  
   ctl-core owns presentation, every flag has a `HAKKIRI_` variable, and nothing local leaks into a tracked file.
 - The pull request's CI verifies. Do not build or test before a push.
-- A change that makes hakkiri differ from Vale, or removes a difference, updates `openspec/specs/vale-differences/spec.md` in the same pull request.
+- A change that makes hakkiri differ from Vale, or removes a difference, updates [`openspec/specs/vale-differences/spec.md`](openspec/specs/vale-differences/spec.md) in the same pull request.
 - A behaviour change moves code, tests, `src/instructions.md`, `skills/hakkiri/SKILL.md`, this file and its OpenSpec change together (the ctl bundle contract).
 - Prose in this repository follows ProseStyle: plain words, short sentences, no dashes as punctuation.

@@ -29,7 +29,7 @@ Alternative: put each refusal beside the check it belongs to. Lost: a reader wou
 
 - [A refusal is read as covering a case its decision left open] → each scenario names the field and quotes the design's case.
 
-[first-design]: ../vale-differences/design.md
-[pattern]: ../archive/2026-11-10-pattern-and-readability-checks/design.md
-[case]: ../archive/2026-11-10-case-and-sequence-checks/design.md
-[spelling]: ../archive/2026-11-10-spelling-and-affix-checks/design.md
+[first-design]: ../2026-11-10-vale-differences/design.md
+[pattern]: ../2026-11-10-pattern-and-readability-checks/design.md
+[case]: ../2026-11-10-case-and-sequence-checks/design.md
+[spelling]: ../2026-11-10-spelling-and-affix-checks/design.md

@@ -32,9 +32,9 @@ None.
 - No code changes.
 - The spec joins `openspec/specs/` when this change is archived, and the three later changes then add their requirements to it.
 
-[ledger]: ../../../tasks.yaml
-[checks]: ../vale-differences-checks/proposal.md
-[readers]: ../vale-differences-readers/proposal.md
-[format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[case-9]: ../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
-[format]: ../vale-differences-format/proposal.md
+[ledger]: ../../../../tasks.yaml
+[checks]: ../2026-11-10-vale-differences-checks/proposal.md
+[readers]: ../2026-11-10-vale-differences-readers/proposal.md
+[format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[case-9]: ../2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[format]: ../2026-11-10-vale-differences-format/proposal.md

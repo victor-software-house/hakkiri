@@ -31,7 +31,7 @@ None.
 - No code changes.
 - This change adds to the spec that [`vale-differences`][first] creates, so it is archived after that change and [`vale-differences-checks`][checks].
 
-[ledger]: ../../../tasks.yaml
-[first]: ../vale-differences/proposal.md
-[checks]: ../vale-differences-checks/proposal.md
-[format]: ../vale-differences-format/proposal.md
+[ledger]: ../../../../tasks.yaml
+[first]: ../2026-11-10-vale-differences/proposal.md
+[checks]: ../2026-11-10-vale-differences-checks/proposal.md
+[format]: ../2026-11-10-vale-differences-format/proposal.md

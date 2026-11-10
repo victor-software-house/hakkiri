@@ -100,15 +100,15 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 - **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
 
-[bootstrap-8]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
-[case-3]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
-[case-5]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#5-tags-come-from-a-port-of-proses-tagger-and-model
-[case-6]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
-[engine-8]: ../../../archive/2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
-[spelling-1]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#1-spelling-reads-words-as-vales-tokenizer-cuts-them
-[spelling-4]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
-[case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
-[case-9]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
-[spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
-[tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
-[ledger]: ../../../../../tasks.yaml
+[bootstrap-8]: ../../../2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
+[case-3]: ../../../2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
+[case-5]: ../../../2026-11-10-case-and-sequence-checks/design.md#5-tags-come-from-a-port-of-proses-tagger-and-model
+[case-6]: ../../../2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
+[engine-8]: ../../../2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
+[spelling-1]: ../../../2026-11-10-spelling-and-affix-checks/design.md#1-spelling-reads-words-as-vales-tokenizer-cuts-them
+[spelling-4]: ../../../2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
+[case-1]: ../../../2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[case-9]: ../../../2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+[tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[ledger]: ../../../../../../tasks.yaml

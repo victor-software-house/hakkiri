@@ -1,52 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-022
+active: HKR-005
 queue:
-  - id: HKR-022
-    title: List every difference from Vale in one place
-    scope: docs
-    outcome: One current list in openspec/specs names every intended difference from Vale.
-    blocked_by: []
-    acceptance:
-      - The list names each difference recorded in the archived designs (rule-format decision 7, rule-engine, pattern-and-readability, case-and-sequence) and the spelling refusal of exceptions and threshold, each with a link to its decision.
-      - Every later change that adds a difference updates the list in the same pull request.
-    plan: openspec/changes/vale-differences/proposal.md
-
-  - id: HKR-023
-    title: List the check and refusal differences from Vale
-    scope: docs
-    outcome: >-
-      The vale-differences spec lists how the pattern checks differ from Vale and
-      each rule that hakkiri refuses where Vale loads it.
-    blocked_by: []
-    acceptance:
-      - Each difference in the pattern-and-readability, case-and-sequence and spelling-and-affix designs that is a pattern-check difference or a refusal is a scenario with a link to its decision.
-    plan: openspec/changes/vale-differences-checks/proposal.md
-
-  - id: HKR-024
-    title: List the reader and resource-use differences from Vale
-    scope: docs
-    outcome: >-
-      The vale-differences spec lists how the ported readers differ from Vale and
-      each input on which a run finishes in hakkiri and fails or stalls in Vale.
-    blocked_by: []
-    acceptance:
-      - Each reader difference and each resource-use difference in the case-and-sequence and spelling-and-affix designs, and the regex limit of the rule-engine and bootstrap designs, is a scenario with a link to its decision.
-      - The spec lists each known gap apart from the differences, with its queue row, and a language other than English as an intended difference.
-    plan: openspec/changes/vale-differences-readers/proposal.md
-
-  - id: HKR-025
-    title: List the format and configuration differences from Vale
-    scope: docs
-    outcome: >-
-      The vale-differences spec lists how comments, rule files, configuration and
-      packages differ from Vale.
-    blocked_by: []
-    acceptance:
-      - Each decision of the rule-format, rule-engine and bootstrap designs that differs from Vale in behaviour, checked against Vale by source and probe, is a scenario with a link to its decision.
-    plan: openspec/changes/vale-differences-format/proposal.md
-
   - id: HKR-005
     title: Ship the check and test commands
     scope: cli
@@ -166,6 +122,56 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-025
+    title: List the format and configuration differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how comments, rule files, configuration and
+      packages differ from Vale.
+    plan: openspec/changes/archive/2026-11-10-vale-differences-format/proposal.md
+    completed: 2026-11-10T22:40:25
+    evidence:
+      - openspec/changes/archive/2026-11-10-vale-differences-format/
+      - PR 48 merged the comment, rule-file and configuration requirements at 991fe19; the vale-differences-format change is archived.
+    disposition: completed
+
+  - id: HKR-024
+    title: List the reader and resource-use differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how the ported readers differ from Vale and
+      each input on which a run finishes in hakkiri and fails or stalls in Vale.
+    plan: openspec/changes/archive/2026-11-10-vale-differences-readers/proposal.md
+    completed: 2026-11-10T22:40:25
+    evidence:
+      - openspec/changes/archive/2026-11-10-vale-differences-readers/
+      - PR 48 merged the reader, resource-use and known-gap requirements at 991fe19; the vale-differences-readers change is archived.
+    disposition: completed
+
+  - id: HKR-023
+    title: List the check and refusal differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how the pattern checks differ from Vale and
+      each rule that hakkiri refuses where Vale loads it.
+    plan: openspec/changes/archive/2026-11-10-vale-differences-checks/proposal.md
+    completed: 2026-11-10T22:40:25
+    evidence:
+      - openspec/changes/archive/2026-11-10-vale-differences-checks/
+      - PR 48 merged the pattern-check and refusal requirements at 991fe19; the vale-differences-checks change is archived.
+    disposition: completed
+
+  - id: HKR-022
+    title: List every difference from Vale in one place
+    scope: docs
+    outcome: One current list in openspec/specs names every intended difference from Vale.
+    plan: openspec/changes/archive/2026-11-10-vale-differences/proposal.md
+    completed: 2026-11-10T22:40:25
+    evidence:
+      - openspec/changes/archive/2026-11-10-vale-differences/
+      - PR 48 merged the rule and the first four requirements of the vale-differences spec at 991fe19 (CI on 9a09b1c green); the vale-differences change is archived and the spec has 12 requirements and 62 scenarios.
+    disposition: completed
+
   - id: HKR-020
     title: Run the spelling check and affix
     scope: engine

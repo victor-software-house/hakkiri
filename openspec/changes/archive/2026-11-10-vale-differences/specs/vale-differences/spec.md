@@ -131,13 +131,13 @@ hakkiri SHALL measure as each scenario below says, where Vale 3.26.0 measures ot
 - **WHEN** a `readability` rule has `metrics: [SMOG, SMOG]`
 - **THEN** hakkiri averages the distinct scores and reports SMOG's grade, and Vale divides by the length of the list and reports half of it ([pattern 8][pattern-8])
 
-[case-9]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
-[engine-12]: ../../../archive/2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
-[engine-16]: ../../../archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
-[engine-17]: ../../../archive/2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-its-scope-item
-[engine-18]: ../../../archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
-[engine-3]: ../../../archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
-[engine-7]: ../../../archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
-[format-7]: ../../../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[pattern-8]: ../../../archive/2026-11-10-pattern-and-readability-checks/design.md#8-a-score-listed-twice-counts-once
-[splitter-5]: ../../../archive/2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-not-against-vale
+[case-9]: ../../../2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[engine-12]: ../../../2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
+[engine-16]: ../../../2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
+[engine-17]: ../../../2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-its-scope-item
+[engine-18]: ../../../2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
+[engine-3]: ../../../2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
+[engine-7]: ../../../2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
+[format-7]: ../../../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[pattern-8]: ../../../2026-11-10-pattern-and-readability-checks/design.md#8-a-score-listed-twice-counts-once
+[splitter-5]: ../../../2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-not-against-vale

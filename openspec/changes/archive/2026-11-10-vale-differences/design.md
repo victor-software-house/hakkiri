@@ -55,14 +55,14 @@ Alternative: the spec alone. Lost: an author who writes a delta for another capa
 - [A design's wording is read as a difference it did not intend] → each scenario quotes the design's own cases, and a reviewer checks each against its decision.
 - [A decision adds a difference and no one updates the list] → the rule is in three places, and a reviewer checks it.
 
-[checks]: ../vale-differences-checks/proposal.md
-[readers]: ../vale-differences-readers/proposal.md
-[format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[engine]: ../archive/2026-11-10-rule-engine/design.md
-[pattern]: ../archive/2026-11-10-pattern-and-readability-checks/design.md
-[case]: ../archive/2026-11-10-case-and-sequence-checks/design.md
-[spelling]: ../archive/2026-11-10-spelling-and-affix-checks/design.md
-[bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
-[splitter]: ../archive/2026-11-10-sentence-splitter/design.md
-[case-9]: ../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
-[format]: ../vale-differences-format/proposal.md
+[checks]: ../2026-11-10-vale-differences-checks/proposal.md
+[readers]: ../2026-11-10-vale-differences-readers/proposal.md
+[format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[engine]: ../2026-11-10-rule-engine/design.md
+[pattern]: ../2026-11-10-pattern-and-readability-checks/design.md
+[case]: ../2026-11-10-case-and-sequence-checks/design.md
+[spelling]: ../2026-11-10-spelling-and-affix-checks/design.md
+[bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
+[splitter]: ../2026-11-10-sentence-splitter/design.md
+[case-9]: ../2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[format]: ../2026-11-10-vale-differences-format/proposal.md
