@@ -1,3 +1,9 @@
 # Spelling, checked by `mise run lint:typos`.
 [files]
-extend-exclude = ["*.lock"]
+extend-exclude = ["*.lock", "tests/fixtures/readability/syllables.tsv"]
+
+# Word endings in the syllable rules of `src/readability.rs`.
+[default.extend-words]
+ful = "ful"
+ment = "ment"
+thm = "thm"
