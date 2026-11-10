@@ -8,11 +8,11 @@
 //! matched text. The rows come from Vale at `66bbb85` run on the inputs with
 //! the rules as one style.
 //!
-//! hakkiri gives Vale's alerts except in the cases of design decision 9 of the
-//! `case-sequence-and-spelling-checks` change. `departures.tsv` holds one row
-//! for each alert that only one side gave, led by `vale` or `hakkiri`. The
-//! test fails on any difference that file does not list, and on any row of it
-//! that no longer differs.
+//! hakkiri gives Vale's alerts except in the two cases of design decision 9 of
+//! the `case-and-sequence-checks` change. `departures.tsv` holds one row for
+//! each alert that only one side gave, led by `vale` or `hakkiri`. The test
+//! fails on any difference that file does not list, and on any row of it that
+//! no longer differs.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -32,9 +32,6 @@ type TestResult = Result<(), Box<dyn Error>>;
 
 /// A rule, a file, a line, the first and last column, and the matched text.
 type Row = (String, String, usize, usize, usize, String);
-
-/// The rules hakkiri refuses: Vale reads `sentence.list` as `sentence & list`.
-const REFUSED: [&str; 2] = ["existence-sentence-dot-list", "sequence-sentence-dot-list"];
 
 fn row(cells: &[&str]) -> Result<Row, Box<dyn Error>> {
     let [rule, file, line, first, last, matched] = cells else {
@@ -75,7 +72,6 @@ fn scopes_select_as_vale_does_but_where_decided() -> TestResult {
     }
     let inputs = files_in(&root.join("inputs"))?;
     let mut hakkiri: BTreeSet<Row> = BTreeSet::new();
-    let mut refused = Vec::new();
     for file in files_in(&root.join("rules"))? {
         let stem = file
             .file_stem()
@@ -83,10 +79,7 @@ fn scopes_select_as_vale_does_but_where_decided() -> TestResult {
             .ok_or("a rule file has no name")?;
         let name = format!("Scope.{stem}");
         let text = fs::read_to_string(&file)?;
-        let Ok(rule) = Rule::from_text(&name, name_of(&file)?, &text) else {
-            refused.push(stem.to_owned());
-            continue;
-        };
+        let rule = Rule::from_text(&name, name_of(&file)?, &text)?;
         for input in &inputs {
             let source = fs::read_to_string(input)?;
             let tree = parse(Language::Markdown, &source)?;
@@ -102,18 +95,11 @@ fn scopes_select_as_vale_does_but_where_decided() -> TestResult {
             }
         }
     }
-    assert_eq!(refused, REFUSED);
-    let loaded = |rows: &BTreeSet<Row>| -> BTreeSet<Row> {
-        rows.iter()
-            .filter(|row| !REFUSED.iter().any(|stem| row.0 == format!("Scope.{stem}")))
-            .cloned()
-            .collect()
-    };
     let mut found = Vec::new();
-    for only in loaded(&vale).difference(&hakkiri) {
+    for only in vale.difference(&hakkiri) {
         found.push(format!("vale\t{}", tsv(only)));
     }
-    for only in hakkiri.difference(&loaded(&vale)) {
+    for only in hakkiri.difference(&vale) {
         found.push(format!("hakkiri\t{}", tsv(only)));
     }
     let listed: Vec<String> = fs::read_to_string(root.join("departures.tsv"))?

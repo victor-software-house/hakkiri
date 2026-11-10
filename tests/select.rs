@@ -219,13 +219,19 @@ fn a_list_of_scopes() -> TestResult {
 }
 
 #[test]
-fn an_exclusion_reaches_any_depth() -> TestResult {
+fn an_exclusion_leaves_out_blocks_of_that_scope() -> TestResult {
     let found = blocks(
         &["sentence & ~blockquote"],
         "a.md",
         "A marker here.\n\n> - A marker in a list.\n",
     )?;
     assert_eq!(texts(&found), ["A marker here."]);
+    let found = blocks(
+        &["sentence & ~blockquote"],
+        "a.md",
+        "A marker here.\n\n> Quote text.\n>\n> - A marker in a list.\n",
+    )?;
+    assert_eq!(texts(&found), ["A marker here.", "A marker in a list."]);
     Ok(())
 }
 
@@ -336,18 +342,59 @@ fn an_exclusion_belongs_to_its_item() -> TestResult {
 }
 
 #[test]
-fn a_quote_selects_the_heading_inside_it() -> TestResult {
-    let found = blocks(&["blockquote"], "a.md", "> # A marker heading\n")?;
-    assert_eq!(texts(&found), ["A marker heading"]);
+fn a_later_paragraph_of_an_item_is_a_paragraph() -> TestResult {
+    let source = "- First.\n\n  A marker here.\n";
+    let found = blocks(&["list"], "a.md", source)?;
+    assert_eq!(texts(&found), ["First."]);
+    let found = blocks(&["paragraph"], "a.md", source)?;
+    assert_eq!(texts(&found), ["A marker here."]);
     Ok(())
 }
 
 #[test]
-fn a_list_item_selects_its_later_paragraph() -> TestResult {
-    let source = "- First.\n\n  A marker here.\n";
+fn a_heading_inside_a_quote_is_a_heading() -> TestResult {
+    let source = "> A quote.\n>\n> # A heading\n";
+    let found = blocks(&["blockquote"], "a.md", source)?;
+    assert_eq!(texts(&found), ["A quote."]);
+    let found = blocks(&["heading"], "a.md", source)?;
+    assert_eq!(texts(&found), ["A heading"]);
+    Ok(())
+}
+
+#[test]
+fn a_quote_that_opens_an_item_is_the_item() -> TestResult {
+    let source = "- > Opens the item.\n\n- First.\n\n  > Second quote.\n";
     let found = blocks(&["list"], "a.md", source)?;
-    assert_eq!(texts(&found), ["First.\nA marker here."]);
+    assert_eq!(texts(&found), ["Opens the item.", "First."]);
+    let found = blocks(&["blockquote"], "a.md", source)?;
+    assert_eq!(texts(&found), ["Second quote."]);
+    Ok(())
+}
+
+#[test]
+fn a_dotted_sentence_is_a_sentence_in_the_scope() -> TestResult {
+    let source = "A paragraph.\n\n- An item.\n";
+    let found = blocks(&["sentence.list"], "a.md", source)?;
+    assert_eq!(texts(&found), ["An item."]);
+    Ok(())
+}
+
+#[test]
+fn table_selects_cells_and_not_rows() -> TestResult {
+    let source = "| H1 | H2 |\n|:--|:--|\n| B1 | B2 |\n";
+    let found = blocks(&["table"], "a.md", source)?;
+    assert_eq!(texts(&found), ["H1", "H2", "B1", "B2"]);
+    let found = blocks(&["table.row"], "a.md", source)?;
+    assert_eq!(found.len(), 2);
+    Ok(())
+}
+
+#[test]
+fn a_paragraph_after_a_fenced_block_in_an_item_is_a_paragraph() -> TestResult {
+    let source = "- ```text\n  code\n  ```\n\n  After the fence.\n";
     let found = blocks(&["paragraph"], "a.md", source)?;
+    assert_eq!(texts(&found), ["After the fence."]);
+    let found = blocks(&["list"], "a.md", source)?;
     assert_eq!(texts(&found), Vec::<&str>::new());
     Ok(())
 }
