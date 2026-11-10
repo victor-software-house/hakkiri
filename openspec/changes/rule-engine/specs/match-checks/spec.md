@@ -52,6 +52,11 @@ A match inside a multi-word exception SHALL give no alert.
 - **WHEN** a rule has `tokens: [c]` and `exceptions: ['a b', 'b c']`, and the input is `a b c`
 - **THEN** hakkiri reports no alert
 
+#### Scenario: A phrase inside a longer phrase
+
+- **WHEN** a rule has `tokens: [c]` and `exceptions: ['a b', 'a b c']`, and the input is `a b c`
+- **THEN** hakkiri reports no alert
+
 ### Requirement: substitution tries longer keys first
 
 A `substitution` rule SHALL match its `swap` keys as `existence` matches tokens, trying longer keys first.  

@@ -195,16 +195,14 @@ fn exceptions(source: &Source<'_>, terms: &[String]) -> Result<Exceptions, LoadE
         &template(true, false, &alternatives.join("|")),
         &parts,
     )?;
-    let phrases: Vec<String> = terms
+    let phrases = terms
         .iter()
         .filter(|term| term.contains([' ', '\t']) || term.contains(r"\s"))
-        .map(|term| term_pattern(term))
-        .collect();
-    let phrases = if phrases.is_empty() {
-        None
-    } else {
-        Pattern::new(&format!(r"(?i)\b(?:{})\b", phrases.join("|"))).ok()
-    };
+        .map(|term| {
+            let pattern = format!(r"(?i)\b(?:{})\b", term_pattern(term));
+            source.compile("exceptions", &pattern, &[term.as_str()])
+        })
+        .collect::<Result<Vec<_>, _>>()?;
     Ok(Exceptions {
         words: Some(words),
         phrases,

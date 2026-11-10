@@ -52,15 +52,21 @@ pub(crate) fn run(check: &Check, text: &Text) -> Result<Vec<Hit>, SearchError> {
 
 /// The spans of the multi-word exceptions in `content`, when `found` holds a
 /// match to check them against.
+///
+/// Each exception is searched on its own, so two that overlap or nest both
+/// give their spans.
 fn phrase_spans(
     exceptions: &Exceptions,
     content: &str,
     found: bool,
 ) -> Result<Vec<Range<usize>>, SearchError> {
-    match &exceptions.phrases {
-        Some(phrases) if found => phrases.find_overlapping(content),
-        _ => Ok(Vec::new()),
+    let mut spans = Vec::new();
+    if found {
+        for phrase in &exceptions.phrases {
+            spans.extend(phrase.find_overlapping(content)?);
+        }
     }
+    Ok(spans)
 }
 
 /// Whether an exception holds back the match `range`, which reads `observed`.

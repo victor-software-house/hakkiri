@@ -312,6 +312,16 @@ fn a_word_inside_overlapping_phrases() -> TestResult {
 }
 
 #[test]
+fn a_word_inside_nested_phrases() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: [c]\nexceptions: ['a b', 'a b c']\n",
+        "a b c",
+    )?;
+    assert_eq!(found, Vec::<Alert>::new());
+    Ok(())
+}
+
+#[test]
 fn a_phrase_that_holds_a_shorter_key() -> TestResult {
     let found = markdown(
         indoc! {"
@@ -441,7 +451,7 @@ fn a_code_span_is_no_match() -> TestResult {
 const MARKER_RULES: [(&str, &str); 4] = [
     (
         "Team.Existence",
-        "extends: existence\nmessage: m\ntokens: [marker]\n",
+        "extends: existence\nmessage: m\ntokens: [marker]\nexceptions: ['a a']\n",
     ),
     (
         "Team.Substitution",

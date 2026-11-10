@@ -114,9 +114,9 @@ pub struct Exceptions {
     /// The `exceptions` words: a match that holds one as a whole word is held
     /// back.
     pub words: Option<Pattern>,
-    /// The `exceptions` of more than one word: a match inside one is held
-    /// back.
-    pub phrases: Option<Pattern>,
+    /// The `exceptions` of more than one word, each as a pattern of its own: a
+    /// match inside a match of one is held back.
+    pub phrases: Vec<Pattern>,
 }
 
 /// An `existence` rule.
