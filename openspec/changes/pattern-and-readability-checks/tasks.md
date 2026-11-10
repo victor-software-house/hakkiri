@@ -36,8 +36,11 @@ This change starts after the [rule-engine change][engine] merges.
 
 ## 4. Long inputs
 
-- [ ] 4.1 Run the four check types over the rule-engine change's 50,000-character line and 60,000-line file.  
+- [x] 4.1 Run the four check types over the rule-engine change's 50,000-character line and 60,000-line file.  
   Verify both tests pass in CI with no panic, and record their run time in the evidence note.
+  - 2026-11-10 (UTC), both tests in `tests/long_inputs.rs` pass in a Linux box run of [9c98c9c][c-long], with the four rules together and every alert counted.  
+    The line of 50,000 characters gives 2,945 alerts in 76 to 126 ms, in two debug runs.  
+    The file of 60,000 lines gives 90,002 alerts in 2.2 to 2.6 s, and parsing it takes about 25 s more ([HKR-016][hkr-016]).
 
 ## 5. Integration
 
@@ -55,3 +58,5 @@ This change starts after the [rule-engine change][engine] merges.
 [c-repetition]: https://github.com/victor-software-house/hakkiri/commit/ec047118bdfc7d89163072067848beaf6704a874
 [c-consistency]: https://github.com/victor-software-house/hakkiri/commit/94c564949d03f8da42fdf3a2e50eee6216954a0e
 [c-conditional]: https://github.com/victor-software-house/hakkiri/commit/b4ae3a23b012a68da4157af139f6aefa63d19e4a
+[c-long]: https://github.com/victor-software-house/hakkiri/commit/9c98c9c570946359f0a94831b83ec702cf3238b1
+[hkr-016]: ../../../tasks.yaml
