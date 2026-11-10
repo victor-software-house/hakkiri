@@ -4,7 +4,8 @@
 
 This spec lists every intended difference between hakkiri and Vale 3.26.0.  
 Each scenario names the case, what Vale does, what hakkiri does, and links the decision that records it.  
-A gap, where hakkiri lacks something Vale has and means to close it, is not a difference and is not listed.
+A known gap, where hakkiri lacks something Vale does and means to close it, is not a difference.  
+It is listed apart, with its queue row, under Known gaps.
 
 ## ADDED Requirements
 

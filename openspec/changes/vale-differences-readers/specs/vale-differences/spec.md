@@ -39,6 +39,11 @@ hakkiri SHALL read tags, dictionaries and spelling as each scenario below says, 
 - **WHEN** an `affix` rule's `swap` has two keys whose forms expand to the same text
 - **THEN** hakkiri keeps both in the order written, so the first gives the replacement, and Vale keeps the key its map visits last, which can change from run to run ([spelling 4][spelling-4])
 
+#### Scenario: A language other than English
+
+- **WHEN** a project checks text in a language other than English
+- **THEN** hakkiri does not support it, which the spelling change states as a non-goal, and Vale reads a dictionary for the language ([spelling goals][spelling-goals])
+
 ### Requirement: No input makes a run fail where Vale's would
 
 hakkiri SHALL finish a run on each input below without a panic and without exhausting memory, where Vale 3.26.0 does not.
@@ -68,6 +73,33 @@ hakkiri SHALL finish a run on each input below without a panic and without exhau
 - **WHEN** a text holds a token of 20,000 marks
 - **THEN** hakkiri splits its prefixes, suffixes and contractions in one pass, and prose searches what is left again after each one it takes off, which takes quadratic time ([case 5][case-5])
 
+### Requirement: Known gaps are listed apart
+
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
+
+#### Scenario: Text inside an HTML block
+
+- **WHEN** a Markdown file holds prose inside an HTML block
+- **THEN** hakkiri reads none of it, and Vale lints it with the scope of its block
+- **AND** Vale also lints the text after a closed raw-text tag or a `--!>`
+- **AND** Vale's entity unescaping, masking of `code`, `tt`, `kbd` and `samp`, and handling of `pre` are not yet probed (row [HKR-021][ledger], [case 9][case-9])
+
+#### Scenario: The built-in spelling rule
+
+- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
+- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+
+#### Scenario: Vocabularies
+
+- **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
+- **THEN** hakkiri loads the field and reads no vocabulary, and Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
+
+#### Scenario: The Markdown parser
+
+- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
+
 [bootstrap-8]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
 [case-3]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
 [case-5]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#5-tags-come-from-a-port-of-proses-tagger-and-model
@@ -75,3 +107,8 @@ hakkiri SHALL finish a run on each input below without a panic and without exhau
 [engine-8]: ../../../archive/2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
 [spelling-1]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#1-spelling-reads-words-as-vales-tokenizer-cuts-them
 [spelling-4]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
+[case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[case-9]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+[tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[ledger]: ../../../../../tasks.yaml

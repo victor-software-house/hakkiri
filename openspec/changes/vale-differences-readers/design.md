@@ -11,6 +11,7 @@ This change adds the part that comes from the [case-and-sequence][case] and [spe
 
 - Every difference in the tagger, the dictionary reader and the spelling check, each as a scenario.
 - Every input where Vale panics, stalls or runs out of memory and hakkiri does not.
+- Every known gap, apart from the differences, with its queue row.
 
 **Non-Goals:**
 
@@ -32,6 +33,16 @@ Alternative: list only differences in what a rule reports. Lost: a long line tha
 A scenario gives a time or a size only where the design gives it: 31 ms for 16,667 words, 18 seconds for 8,000 words, and 13 seconds at a 6 GB limit.
 
 Alternative: restate each case as a complexity class alone. Lost: the measured numbers are the evidence that the case matters.
+
+### 3. Gaps are listed apart, with their rows
+
+A gap closes, and a difference stays.  
+The spec lists `HKR-021`, `HKR-026`, `HKR-019` and `HKR-027` under Known gaps, so a project that moves from Vale reads what is missing and where the work is queued.
+
+Alternatives:
+
+- Gaps among the differences. Lost: a reader would take a gap for a choice that stays.
+- Gaps in the queue only. Lost: the list a project reads would show no missing feature.
 
 ## Risks / Trade-offs
 

@@ -33,6 +33,7 @@ queue:
     blocked_by: []
     acceptance:
       - Each reader difference and each resource-use difference in the case-and-sequence and spelling-and-affix designs, and the regex limit of the rule-engine and bootstrap designs, is a scenario with a link to its decision.
+      - The spec lists each known gap apart from the differences, with its queue row, and a language other than English as an intended difference.
     plan: openspec/changes/vale-differences-readers/proposal.md
 
   - id: HKR-025
@@ -123,6 +124,27 @@ queue:
       - Text inside an HTML block gets the alerts Vale 66bbb85 gives it, with the scope Vale gives it, on a fixture probed against Vale.
       - Entity unescaping, the masking of code, tt, kbd and samp text, and the handling of pre match Vale on probes.
       - The text after a closed raw-text tag on the same line and after --!> in a comment block gets the alerts Vale gives it, or a departure records why not.
+
+  - id: HKR-026
+    title: Run Vale's built-in spelling rule
+    scope: engine
+    outcome: >-
+      A project that enables Vale.Spelling gets its alerts from hakkiri, with Vale's default ignore list.
+    blocked_by: []
+    acceptance:
+      - A rule named Vale.Spelling runs with the built-in dictionary and the default ignore list, and gives the alerts Vale 66bbb85 gives on the spelling parity inputs.
+      - Any alert that differs is fixed or recorded as an intended difference in the vale-differences spec.
+
+  - id: HKR-027
+    title: Probe the Markdown parser against Vale's converter
+    scope: tree
+    outcome: >-
+      The differences between hakkiri's Markdown parser and Vale's converter are
+      measured on one corpus.
+    blocked_by: []
+    acceptance:
+      - A corpus of Markdown inputs runs through hakkiri and Vale 66bbb85, and each text or scope that differs is listed.
+      - Each difference found is fixed, or recorded as an intended difference in the vale-differences spec.
 
   - id: HKR-009
     title: Switch the template to hakkiri

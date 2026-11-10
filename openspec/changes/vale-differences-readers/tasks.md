@@ -5,7 +5,8 @@ This change adds to the spec that [`vale-differences`][first] creates.
 
 ## 1. The list
 
-- [ ] 1.1 Add the two requirements for the ported readers and for the inputs on which a run finishes in hakkiri and fails or stalls in Vale, each scenario with a link to its decision.  
+- [ ] 1.1 Add three requirements: the ported readers, the inputs on which a run finishes in hakkiri and fails or stalls in Vale, and the known gaps.  
+  Each scenario links its decision or row.  
   Verify `openspec validate --all --strict` and the link check pass in CI, and that each scenario's link resolves to its decision.
 
 ## 2. Integration

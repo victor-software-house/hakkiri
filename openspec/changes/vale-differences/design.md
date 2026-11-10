@@ -16,7 +16,7 @@ The [bootstrap design][bootstrap] and the [sentence-splitter design][splitter] h
 **Non-Goals:**
 
 - New decisions: the spec records what the designs decided and changes none of it.
-- Gaps, where hakkiri lacks something Vale has and means to close it, such as the text inside HTML blocks ([HKR-021][ledger]) and the `vocab` field.
+- Mixing gaps into the differences: a gap, where hakkiri lacks something Vale does and means to close it, closes, and a difference stays. Gaps are listed apart, under Known gaps, by [`vale-differences-readers`][readers].
 - Differences that were never intended: a defect in hakkiri is fixed, not listed.
 
 ## Decisions
@@ -55,7 +55,6 @@ Alternative: the spec alone. Lost: an author who writes a delta for another capa
 - [A design's wording is read as a difference it did not intend] → each scenario quotes the design's own cases, and a reviewer checks each against its decision.
 - [A decision adds a difference and no one updates the list] → the rule is in three places, and a reviewer checks it.
 
-[ledger]: ../../../tasks.yaml
 [checks]: ../vale-differences-checks/proposal.md
 [readers]: ../vale-differences-readers/proposal.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
