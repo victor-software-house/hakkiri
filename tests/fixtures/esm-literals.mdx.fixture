@@ -56,3 +56,22 @@ Prose after a template with a blank line in JSX.
 export default function X() { return <p>It's</p> }
 
 Prose after an apostrophe in a function.
+
+export const O = {
+
+b: 1,
+}
+
+Prose after an object split by a blank line.
+
+export default f(1,
+
+2)
+
+Prose after an argument list split by a blank line.
+
+export const D = () => (<div>
+
+<p>x</p></div>)
+
+Prose after a JSX element split by a blank line.

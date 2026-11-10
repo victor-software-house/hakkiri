@@ -1,10 +1,11 @@
 //! Markdown and MDX text into nodes, through markdown-rs.
 
+use std::cell::RefCell;
 use std::ops::Range;
 
 use markdown::mdast::Node as Mdast;
 use markdown::{Constructs, MdxSignal, ParseOptions};
-use tree_sitter::{Node as SyntaxNode, Parser};
+use tree_sitter::{InputEdit, Node as SyntaxNode, Parser, Point, Tree};
 
 use crate::error::Error;
 use crate::tree::{Node, Scope};
@@ -93,13 +94,65 @@ fn esm(block: &str) -> MdxSignal {
     }
 }
 
+thread_local! {
+    /// The TSX parser of this thread, with the last block it parsed.
+    /// `None` when the grammar did not load.
+    static TSX: RefCell<Option<Tsx>> = RefCell::new(Tsx::new());
+}
+
+/// A TSX parser that reparses a block that grew.
+///
+/// markdown-rs hands over the same block again with more lines appended, so
+/// the tree of the last parse is edited and reused.
+/// A block that does not extend the last one is parsed from scratch.
+struct Tsx {
+    parser: Parser,
+    /// The last block parsed and its tree.
+    last: Option<(String, Tree)>,
+}
+
+impl Tsx {
+    fn new() -> Option<Self> {
+        let mut parser = Parser::new();
+        parser
+            .set_language(&tree_sitter_typescript::LANGUAGE_TSX.into())
+            .ok()?;
+        Some(Self { parser, last: None })
+    }
+
+    fn parse(&mut self, block: &str) -> Option<Tree> {
+        let old = match self.last.take() {
+            Some((text, mut tree)) if block.starts_with(&text) => {
+                let end = point(&text);
+                tree.edit(&InputEdit {
+                    start_byte: text.len(),
+                    old_end_byte: text.len(),
+                    new_end_byte: block.len(),
+                    start_position: end,
+                    old_end_position: end,
+                    new_end_position: point(block),
+                });
+                Some(tree)
+            }
+            _ => None,
+        };
+        let tree = self.parser.parse(block, old.as_ref())?;
+        self.last = Some((block.to_owned(), tree.clone()));
+        Some(tree)
+    }
+}
+
+/// The row and column, in bytes, where `text` ends.
+fn point(text: &str) -> Point {
+    Point {
+        row: text.matches('\n').count(),
+        column: text.len() - text.rfind('\n').map_or(0, |line_feed| line_feed + 1),
+    }
+}
+
 /// The syntax tree of `block` in the TSX grammar.
-fn parse_tsx(block: &str) -> Option<tree_sitter::Tree> {
-    let mut parser = Parser::new();
-    parser
-        .set_language(&tree_sitter_typescript::LANGUAGE_TSX.into())
-        .ok()?;
-    parser.parse(block, None)
+fn parse_tsx(block: &str) -> Option<Tree> {
+    TSX.with_borrow_mut(|tsx| tsx.as_mut()?.parse(block))
 }
 
 /// The first `ERROR` or `MISSING` node of a tree that has one, in file order.

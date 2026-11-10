@@ -658,6 +658,9 @@ fn literals_in_an_export_block() -> TestResult {
             "Prose after a closing tag in parentheses.",
             "Prose after a template with a blank line in JSX.",
             "Prose after an apostrophe in a function.",
+            "Prose after an object split by a blank line.",
+            "Prose after an argument list split by a blank line.",
+            "Prose after a JSX element split by a blank line.",
         ]
     );
     Ok(())
@@ -667,6 +670,17 @@ fn literals_in_an_export_block() -> TestResult {
 fn an_unclosed_export_block_fails_the_file() {
     let result = parse(Language::Mdx, "export const a = {\n\nProse.\n");
     assert!(matches!(result, Err(ParseError::Mdx(_))), "{result:?}");
+}
+
+#[test]
+fn a_missing_bracket_at_the_end_reads_on() -> TestResult {
+    let fixture = {
+        let source = "export const a = f(1\n\n)\n\nProse.\n".to_owned();
+        let tree = parse(Language::Mdx, &source)?;
+        Fixture { source, tree }
+    };
+    assert_eq!(fixture.texts(Scope::Paragraph), ["Prose."]);
+    Ok(())
 }
 
 #[test]
