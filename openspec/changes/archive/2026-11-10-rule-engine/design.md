@@ -22,7 +22,7 @@ Vale's counts come from the [prose][prose] module it pins, read at `b33e60d`.
 - Vocabularies. hakkiri has no vocabulary file, so `vocab` loads and has no effect.
 - Fixes. `action` loads and rides on the alert; nothing applies it until `HKR-011`.
 - Vale's `doc(...)` selectors and Views. They are not Vale scope names in the format, so they are refused as unknown scopes.
-- `affix`, which needs the spelling change's dictionaries: until [`case-sequence-and-spelling-checks`][last], a rule that sets it is refused.
+- `affix`, which needs the spelling change's dictionaries: until [`case-and-sequence-checks`][last], a rule that sets it is refused.
 
 ## Decisions
 
@@ -250,7 +250,7 @@ Each crate was read on crates.io on 2026-11-10.
 [segments-delta]: specs/node-segments/spec.md
 [tree-delta]: specs/document-tree/spec.md
 [rule-files-delta]: specs/rule-files/spec.md
-[last]: ../../case-sequence-and-spelling-checks/proposal.md
+[last]: ../../case-and-sequence-checks/proposal.md
 [splitter]: ../2026-11-10-sentence-splitter/design.md
 [tree-spec]: ../../../specs/document-tree/spec.md
 [segments-spec]: ../../../specs/node-segments/spec.md

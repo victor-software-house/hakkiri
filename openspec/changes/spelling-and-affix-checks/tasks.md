@@ -1,7 +1,7 @@
 # Tasks
 
 Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
-This change builds on the dictionary reader and the built-in dictionary that the [`case-sequence-and-spelling-checks` change][case] merged.
+This change builds on the dictionary reader and the built-in dictionary that the [`case-and-sequence-checks` change][case] merged.
 
 ## 1. Checks
 
@@ -23,5 +23,5 @@ This change builds on the dictionary reader and the built-in dictionary that the
 
 - Archive this change after the pull request merges, then archive `HKR-020` with `qctl close-from-openspec`.
 
-[case]: ../case-sequence-and-spelling-checks/proposal.md
+[case]: ../case-and-sequence-checks/proposal.md
 [spelling]: specs/spelling-check/spec.md

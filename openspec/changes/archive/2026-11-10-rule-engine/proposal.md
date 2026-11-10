@@ -10,7 +10,7 @@ The CLI slice, `HKR-005`, needs an engine that loads rules, selects text by scop
 
 Vale's eleven check types are too much for one change under the spec budget.  
 This change builds the engine and the four check types ProseStyle uses today: `existence`, `substitution`, `occurrence` and `metric`.  
-Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`case-sequence-and-spelling-checks`][last].
+Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`case-and-sequence-checks`][last].
 
 ## Changes
 
@@ -51,7 +51,7 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 [document-tree]: ../../../specs/document-tree/spec.md
 [node-segments]: ../../../specs/node-segments/spec.md
 [next]: ../2026-11-10-pattern-and-readability-checks/proposal.md
-[last]: ../../case-sequence-and-spelling-checks/proposal.md
+[last]: ../../case-and-sequence-checks/proposal.md
 [bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
 [design]: design.md
 [splitter]: ../2026-11-10-sentence-splitter/proposal.md

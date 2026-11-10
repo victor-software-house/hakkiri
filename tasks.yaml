@@ -12,7 +12,7 @@ queue:
     acceptance:
       - Each of capitalization and sequence has unit tests.
       - A 50,000-character line and a 60,000-line file finish with no panic for these two checks.
-    plan: openspec/changes/case-sequence-and-spelling-checks/proposal.md
+    plan: openspec/changes/case-and-sequence-checks/proposal.md
 
   - id: HKR-020
     title: Run the spelling check and affix
@@ -65,7 +65,7 @@ queue:
       - Accepted and rejected terms give the alerts that Vale's generated Vale.Terms and Vale.Avoid rules give.
     notes:
       - "2026-11-10, Vale adds the accepted terms to a capitalization rule's exceptions when its vocab is true, which is the default: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L52-L70."
-      - 2026-11-10, the case-sequence-and-spelling-checks change leaves capitalization's vocab with no effect, and its spelling check (task 3.3) reads accepted words from this row.
+      - 2026-11-10, the case-and-sequence-checks change leaves capitalization's vocab with no effect, and the spelling check of the spelling-and-affix-checks change (task 1.1) reads accepted words from this row.
 
   - id: HKR-007
     title: Import Vale styles

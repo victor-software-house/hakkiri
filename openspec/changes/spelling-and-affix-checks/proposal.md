@@ -4,7 +4,7 @@ Queue row: `HKR-020` in [tasks.yaml][ledger], a new row after `HKR-014`.
 
 ## Motivation
 
-The [`case-sequence-and-spelling-checks` change][case] runs `capitalization` and `sequence`, and builds the dictionary reader and the built-in dictionary.  
+The [`case-and-sequence-checks` change][case] runs `capitalization` and `sequence`, and builds the dictionary reader and the built-in dictionary.  
 The Vale importer, `HKR-007`, also meets `spelling` in the upstream styles it converts, and Vale's `affix` field on `existence` and `substitution`.  
 Both need that dictionary and its affix rules.
 
@@ -31,4 +31,4 @@ None.
 - One new module for the `spelling` check, with unit tests.
 
 [ledger]: ../../../tasks.yaml
-[case]: ../case-sequence-and-spelling-checks/proposal.md
+[case]: ../case-and-sequence-checks/proposal.md
