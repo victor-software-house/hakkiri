@@ -24,7 +24,7 @@ const SUFFIXES: &[&str] = &[
 ];
 
 /// Endings that start a token of their own, such as the `n't` of `don't`.
-const CONTRACTIONS: &[&str] = &[
+pub(super) const CONTRACTIONS: &[&str] = &[
     "'ll",
     "'s",
     "'re",
@@ -132,20 +132,9 @@ fn split(text: &str, span: Range<usize>, found: &mut Vec<Range<usize>>) {
         return;
     }
     let (mut from, mut to) = (span.start, span.end);
-    // Every contraction ending holds an apostrophe, so the places to look are
-    // found once.
-    let apostrophes: Vec<usize> = text
-        .get(span.clone())
-        .unwrap_or_default()
-        .char_indices()
-        .filter(|(_, c)| *c == '\'' || *c == '\u{2019}')
-        .map(|(at, _)| span.start + at)
-        .collect();
+    let mut contractions = Contractions::new(text, span.clone());
     // Suffixes come off the end, so they are collected and appended in order.
     let mut suffixes: Vec<Range<usize>> = Vec::new();
-    // The earliest contraction ending found for the current `from`. It stays
-    // right while `to` shrinks, unless `to` cuts into the ending.
-    let mut contraction: Option<(usize, Option<Contraction>)> = None;
     // Where the run of initials at the current `from` ends.
     let mut initials: Option<(usize, usize)> = None;
     while from < to {
@@ -154,17 +143,7 @@ fn split(text: &str, span: Range<usize>, found: &mut Vec<Range<usize>>) {
             found.push(from..to);
             break;
         }
-        if let Some(length) = prefix_length(rest).or_else(|| {
-            let known = match contraction {
-                Some((at, ending)) if at == from && ending.is_none_or(|e| e.end <= to) => ending,
-                _ => {
-                    let ending = find_contraction(text, &apostrophes, from, to);
-                    contraction = Some((from, ending));
-                    ending
-                }
-            };
-            known.map(|ending| ending.start - from)
-        }) {
+        if let Some(length) = prefix_length(rest).or_else(|| contractions.earliest(from, to)) {
             found.push(from..from + length);
             from += length;
             continue;
@@ -254,55 +233,77 @@ fn suffix_length(span: &str) -> Option<usize> {
         .map(|suffix| suffix.len())
 }
 
-/// Where a contraction ending lies in `text`.
-#[derive(Clone, Copy)]
-struct Contraction {
-    start: usize,
-    end: usize,
-}
-
-/// The earliest contraction ending in `text[from..to]` that does not start at
-/// `from`.
+/// Where each ending of [`CONTRACTIONS`] occurs in one span.
 ///
-/// Case is ignored for ASCII letters only. Each ending is searched for on its
-/// own and only its first match counts, as in prose.
-/// An ending holds an apostrophe, at its start or one byte after it, so the
-/// search starts just before the first apostrophe of `apostrophes` in the
-/// window.
-fn find_contraction(
-    text: &str,
-    apostrophes: &[usize],
-    from: usize,
-    to: usize,
-) -> Option<Contraction> {
-    let first = *apostrophes
-        .get(apostrophes.partition_point(|at| *at < from))
-        .filter(|at| **at < to)?;
-    let scan = text.floor_char_boundary(first.saturating_sub(1)).max(from);
-    let window = text.get(scan..to)?;
-    CONTRACTIONS
-        .iter()
-        .filter_map(|ending| {
-            let start = scan + find_ignoring_ascii_case(window, ending)?;
-            Some((start, start + ending.len()))
-        })
-        .filter(|(start, _)| *start > from)
-        .min()
-        .map(|(start, end)| Contraction { start, end })
+/// Every ending holds an apostrophe, at its start or one byte after it, so
+/// each ending is checked at the apostrophes of the span, once.
+/// A span with no apostrophe holds nothing.
+pub(super) struct Contractions {
+    /// For each ending, the byte offset of each place it occurs, in order.
+    starts: Vec<Vec<usize>>,
+    /// For each ending, the first place in `starts` at or after the last
+    /// `from` asked about. `from` only grows, so it only moves forward.
+    cursors: Vec<usize>,
 }
 
-/// The byte offset of the first place `needle` occurs in `haystack`, ignoring
-/// the case of ASCII letters.
-fn find_ignoring_ascii_case(haystack: &str, needle: &str) -> Option<usize> {
-    let length = needle.len();
-    let last = haystack.len().checked_sub(length)?;
-    if length == 0 {
-        return None;
+impl Contractions {
+    /// The endings in `text[span]`. Case is ignored for ASCII letters only.
+    pub(super) fn new(text: &str, span: Range<usize>) -> Self {
+        let apostrophes: Vec<usize> = text
+            .get(span.clone())
+            .unwrap_or_default()
+            .char_indices()
+            .filter(|(_, c)| *c == '\'' || *c == '\u{2019}')
+            .map(|(at, _)| span.start + at)
+            .collect();
+        if apostrophes.is_empty() {
+            return Self {
+                starts: Vec::new(),
+                cursors: Vec::new(),
+            };
+        }
+        let starts: Vec<Vec<usize>> = CONTRACTIONS
+            .iter()
+            .map(|ending| {
+                let offset = ending.find(['\'', '\u{2019}']).unwrap_or(0);
+                apostrophes
+                    .iter()
+                    .filter_map(|at| at.checked_sub(offset))
+                    .filter(|start| {
+                        *start >= span.start
+                            && text
+                                .as_bytes()
+                                .get(*start..*start + ending.len())
+                                .is_some_and(|found| {
+                                    *start + ending.len() <= span.end
+                                        && found.eq_ignore_ascii_case(ending.as_bytes())
+                                })
+                    })
+                    .collect()
+            })
+            .collect();
+        let cursors = vec![0; starts.len()];
+        Self { starts, cursors }
     }
-    (0..=last).find(|at| {
-        haystack
-            .as_bytes()
-            .get(*at..*at + length)
-            .is_some_and(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
-    })
+
+    /// Where the earliest ending in `text[from..to]` starts, counted from
+    /// `from`, when that is not the first byte.
+    ///
+    /// Each ending counts only at its first place from `from` on, as in
+    /// prose, so an ending that starts at `from` counts for nothing.
+    /// `from` must not be smaller than in an earlier call.
+    pub(super) fn earliest(&mut self, from: usize, to: usize) -> Option<usize> {
+        self.starts
+            .iter()
+            .zip(&mut self.cursors)
+            .zip(CONTRACTIONS)
+            .filter_map(|((starts, cursor), ending)| {
+                while starts.get(*cursor).is_some_and(|start| *start < from) {
+                    *cursor += 1;
+                }
+                let start = *starts.get(*cursor)?;
+                (start > from && start + ending.len() <= to).then_some(start - from)
+            })
+            .min()
+    }
 }

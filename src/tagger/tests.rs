@@ -17,7 +17,7 @@
 use std::error::Error;
 use std::time::{Duration, Instant};
 
-use super::tokens::{is_emoticon, is_special};
+use super::tokens::{CONTRACTIONS, Contractions, is_emoticon, is_special};
 use super::{FormatError, Tagger};
 
 type TestResult = Result<(), Box<dyn Error>>;
@@ -224,6 +224,14 @@ fn a_long_run_of_apostrophes_tags_in_linear_time() -> TestResult {
 }
 
 #[test]
+fn many_contractions_in_one_token_tag_in_linear_time() -> TestResult {
+    // Each ending splits off, and then the other one does: after a split the
+    // ending it made is the first one at `from`, so the same ending cannot
+    // split twice in a row.
+    assert_linear("contractions", |n| format!("a{}", "'s'm".repeat(n / 4)))
+}
+
+#[test]
 fn initials_followed_by_a_long_run_of_marks_tag_in_linear_time() -> TestResult {
     assert_linear("initials and marks", |n| {
         format!("{}{}", "a.".repeat(n / 2), ")".repeat(n / 2))
@@ -266,4 +274,51 @@ fn the_special_check_equals_the_pattern_it_replaces() -> TestResult {
     }
     assert!(checked > 100_000, "{checked} windows");
     Ok(())
+}
+
+/// The earliest ending in `text[from..to]` as a search of that window finds
+/// it: each ending's first place in the window, when it is not at `from`.
+fn earliest_in_window(text: &str, from: usize, to: usize) -> Option<usize> {
+    let window = text.get(from..to)?;
+    CONTRACTIONS
+        .iter()
+        .filter_map(|ending| {
+            let last = window.len().checked_sub(ending.len())?;
+            (0..=last).find(|at| {
+                window
+                    .as_bytes()
+                    .get(*at..*at + ending.len())
+                    .is_some_and(|found| found.eq_ignore_ascii_case(ending.as_bytes()))
+            })
+        })
+        .filter(|at| *at > 0)
+        .min()
+}
+
+#[test]
+fn the_contractions_found_once_equal_a_search_of_each_window() {
+    let alphabet = ['n', 'N', '\'', '\u{2019}', 't', 's', 'l'];
+    let mut texts = vec![String::new()];
+    let mut checked = 0;
+    for _ in 0..5 {
+        let longer: Vec<String> = texts
+            .iter()
+            .flat_map(|text| alphabet.iter().map(move |c| format!("{text}{c}")))
+            .collect();
+        for text in &longer {
+            let mut contractions = Contractions::new(text, 0..text.len());
+            for from in (0..=text.len()).filter(|at| text.is_char_boundary(*at)) {
+                for to in (from..=text.len()).filter(|at| text.is_char_boundary(*at)) {
+                    assert_eq!(
+                        contractions.earliest(from, to),
+                        earliest_in_window(text, from, to),
+                        "{from}..{to} of {text:?}"
+                    );
+                    checked += 1;
+                }
+            }
+        }
+        texts = longer;
+    }
+    assert!(checked > 100_000, "{checked} windows");
 }
