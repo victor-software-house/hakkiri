@@ -502,8 +502,8 @@ fn consistency(source: &Source<'_>, fields: &ConsistencyFields) -> Result<Consis
 /// The pattern of a `repetition` rule: its tokens in one group, with no word
 /// template.
 fn repetition(source: &Source<'_>, fields: &RepetitionFields) -> Result<Repetition, LoadError> {
-    // A blank token would match the empty string at every position, as an
-    // `existence` rule leaves it out.
+    // A blank token is left out, as an `existence` rule leaves it out, since
+    // it would match the empty string at every position.
     let tokens: Vec<&str> = fields
         .tokens
         .values()
