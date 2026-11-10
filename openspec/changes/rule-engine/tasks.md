@@ -150,7 +150,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 8. Integration
 
-- [ ] 8.1 Verify the pull request's CI passes: build, lint, tests, docs, deny, prose lint, OpenSpec and the Template check.
+- [x] 8.1 Verify the pull request's CI passes: build, lint, tests, docs, deny, prose lint, OpenSpec and the Template check.
+  - 2026-11-10 (UTC), CI passes on [08a2d35][c-horizon] of [PR 23][pr-23]: Build and test, Static checks, Verify, CodeQL, both Analyze jobs, secrets and the Kody review.  
+    The Template check and Publish checks skip on this branch, and I did not run them.
 
 ## Workflow follow-up
 
@@ -174,6 +176,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-once]: https://github.com/victor-software-house/hakkiri/commit/7950466010eebccf5c05016a6a2d784e76c8671f
 [c-condition]: https://github.com/victor-software-house/hakkiri/commit/4fabe241fbc5a9b973a0cc12e699f92dac9e321d
 [c-linear]: https://github.com/victor-software-house/hakkiri/commit/7cbdcc598fd42e2940db9746f9ebaee574b25722
+[c-horizon]: https://github.com/victor-software-house/hakkiri/commit/08a2d35e74598223592a5f4547f38b64f7952157
+[pr-23]: https://github.com/victor-software-house/hakkiri/pull/23
 [c-rust-parity]: https://github.com/victor-software-house/hakkiri/commit/ff436183465279d09d9621cf8883bd2401fbbce9
 [c-zero]: https://github.com/victor-software-house/hakkiri/commit/28e2bd40b28d871c0e5802e7ac14a29f21c84c9d
 [c-blank]: https://github.com/victor-software-house/hakkiri/commit/eb734afda9d33ab272ab83d0bde22e0fbf8dab6b
