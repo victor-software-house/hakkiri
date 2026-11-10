@@ -33,6 +33,7 @@ An editor server follows in the second release.
 Copyright (c) 2026 Victor Software House.  
 [AGPL-3.0-or-later](LICENSE): GNU Affero General Public License, version 3 or any later version.
 The embedded part-of-speech model is [CC BY-SA 4.0](data/tagger/NOTICE.md), trained on UD English EWT, and stays a separate data file.
+The embedded English dictionary is under the [terms of the English Speller Database](data/dictionary/NOTICE.md), which allow any use if its copyright notice ships with every copy.
 
 [ProseStyle]: https://github.com/victor-software-house/prose-style
 [Vale]: https://vale.sh

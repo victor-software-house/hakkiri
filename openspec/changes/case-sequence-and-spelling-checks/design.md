@@ -144,6 +144,14 @@ hakkiri ports Vale's `spell` package, about 2,900 lines of Go under MIT ([LICENS
 It needs no C++ build, and it reads `ICONV` and the affix flags as Vale does.  
 The `affix` field reuses it.
 
+The port is smaller than Vale's package in three ways, none of which changes what an English dictionary accepts:
+
+- It makes every form of every entry when it loads, where Vale makes the forms of an entry when it looks a word up.
+- It leaves out the directives for compounds made by flag (`COMPOUNDFLAG`, `COMPOUNDBEGIN`, `COMPOUNDMIDDLE`, `COMPOUNDEND`), for suggestions, for Turkic casing and for `ß`. A dictionary that uses them loads, and a German or Dutch compound is not accepted.
+- It reads UTF-8 and ISO 8859-1 and refuses any other `SET` with an error that names it (operator, 2026-11-10). Vale reads every character set that `golang.org/x/text` knows, and reading them here would add `encoding_rs` as a dependency.
+
+A test compares the words accepted with Vale's on about 7,000 words, run in Go.
+
 Alternatives:
 
 - `spellbook`: MPL-2.0, which [deny.toml][deny] does not allow.

@@ -14,21 +14,6 @@ pub(super) const END: &str = "-END-";
 /// The context word two after the last word of a sentence.
 pub(super) const END2: &str = "-END2-";
 
-/// The lower case of `c`, as a single character.
-///
-/// Go maps a character to one character. Rust maps `İ` to two, so that one is
-/// mapped to `i` as Go does.
-fn lower(c: char) -> char {
-    if c == '\u{130}' {
-        return 'i';
-    }
-    let mut lowered = c.to_lowercase();
-    match (lowered.next(), lowered.next()) {
-        (Some(only), None) => only,
-        _ => c,
-    }
-}
-
 /// The form of `word` the perceptron reads around the word it tags.
 ///
 /// A word with a hyphen inside is `!HYPHEN`, a number of four digits is
@@ -47,7 +32,7 @@ pub(super) fn normalize(word: &str) -> String {
     if first.is_ascii_digit() {
         return "!DIGITS".to_owned();
     }
-    word.chars().map(lower).collect()
+    crate::case::lower_str(word)
 }
 
 /// Whether `word` is an optional sign and then digits.

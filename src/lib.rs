@@ -6,8 +6,10 @@
 //! file through the spans.
 
 pub mod alert;
+mod case;
 mod check;
 mod comments;
+pub mod dictionary;
 pub mod engine;
 mod error;
 pub mod formula;
