@@ -73,8 +73,7 @@ scope: sentence & ~blockquote
 
 Vale has no scope names for front matter, link definitions, raw HTML or MDX.  
 No ProseStyle rule needs one, so the spec adds none until a rule does.  
-Vale's code applies an exclusion to the element and its direct parent only.  
-Whether hakkiri applies it at any depth is settled with the other intended differences.
+Vale's code applies an exclusion to the element and its direct parent only; hakkiri applies it at any depth, as decision 7 lists.
 
 Alternatives:
 
@@ -138,6 +137,25 @@ files:
 Alternative: Vale's `.vale.ini` names unchanged in YAML, with each glob as a top-level key.  
 Lost: the keys are PascalCase while the rule files are lowercase.
 
+### 7. Intended differences from Vale
+
+hakkiri differs from Vale 3.26.0 in these cases on purpose (operator, 2026-11-09).  
+Each Vale behaviour below was measured with that release, or read in its source at `66bbb85`, which is 3.26.0 plus 16 commits.
+
+| Case | Vale 3.26.0 | hakkiri |
+|:--|:--|:--|
+| A code span in a word count | Counts 0 words | Counts 1 word |
+| `~` before a scope | Excludes the element and its direct parent | Excludes the element at any depth |
+| Rust `/* */`, `/** */`, `/*! */` | Not read: [the Rust query][vale-rust] takes line comments only | Read as `text.comment.block` and `text.comment.doc.block` |
+| String literals in code | Read by the `raw` scope with the rest of the file | Never prose |
+
+Two measured cases need no difference.  
+Link text counts as words and its target does not, in both.  
+A bare URL or an autolink counts 0 words in Vale; ProseStyle's `BareURL` rule rejects either one anyway.
+
+The string-literal case comes from the [bootstrap design][bootstrap].  
+A sentence of two words, a four-word code span and one more word counts 3 words in Vale and 4 in hakkiri.
+
 ## Risks / Trade-offs
 
 - [YAML's implicit typing differs between 1.1 and 1.2] → hakkiri reads 1.2 only. Its JSON schema lets an editor flag a list item that a 1.1 tool would read as a boolean.
@@ -150,6 +168,7 @@ Lost: the keys are PascalCase while the rule files are lowercase.
 [prose-style-rules]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846/ProseStyle/styles/ProseStyle
 [vale-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/scope.go#L68-L187
 [vale-comments]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/query.go#L103-L107
+[vale-rust]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/rs.go#L10-L16
 [vale-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L53-L63
 [vale-types]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L119-L132
 [upstream-toml]: https://github.com/victor-software-house/prose-style/blob/ee9f207279864e305d7372aef4a6c5dacc3eb846/upstream.toml
