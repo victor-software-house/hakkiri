@@ -156,6 +156,42 @@ A bare URL or an autolink counts 0 words in Vale; ProseStyle's `BareURL` rule re
 The string-literal case comes from the [bootstrap design][bootstrap].  
 A sentence of two words, a four-word code span and one more word counts 3 words in Vale and 4 in hakkiri.
 
+### 8. Every comment reads as Markdown
+
+hakkiri reads every comment as Markdown, plain `//` and `/* */` comments included (operator, 2026-11-10).  
+A code span, a link and a bare URL then mean the same in a comment as in a `.md` file.  
+ProseStyle's [`BareURLInComment`][bare-url-in-comment] test already expects a code span in a plain `//` comment to pass.
+
+So four rules that rebuild code spans, fences and comments with `raw` and lookbehind become two scope rules:
+
+| ProseStyle today | In hakkiri |
+|:--|:--|
+| `BareURL`, `BareURLInComment` | `BareURL`: `scope: link`, a token for a URL at the start of the link text |
+| `BareWorkItem`, `BareWorkItemInComment` | `BareWorkItem`: `scope: text & ~link` |
+
+GFM reads a bare URL as a link whose text is the URL, so `scope: link` finds bare URLs and autolinks and skips `[the page](…)`.
+
+Alternative: plain comments stay text, and the comment rules stay separate.  
+Lost: a backticked URL in a `//` comment would be flagged, which breaks ProseStyle's own test.
+
+### 9. A table row is a scope
+
+`table.row` holds the text of one table row, next to Vale's `table.header` and `table.cell` (operator, 2026-11-10).  
+`TableRow` becomes a metric on Vale's `characters` variable:
+
+```yaml
+extends: metric
+message: "This table row is over 250 characters: make it a list or a section."
+level: warning
+scope: table.row
+formula: characters
+condition: '> 250'
+```
+
+A row's text leaves out the pipes and padding, so the limit counts cell text only.
+
+Alternative: `TableRow` keeps `scope: raw` and its regex. Lost: the rule would still find a row by parsing raw text.
+
 ## Risks / Trade-offs
 
 - [YAML's implicit typing differs between 1.1 and 1.2] → hakkiri reads 1.2 only. Its JSON schema lets an editor flag a list item that a 1.1 tool would read as a boolean.
@@ -168,6 +204,7 @@ A sentence of two words, a four-word code span and one more word counts 3 words 
 [prose-style-rules]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846/ProseStyle/styles/ProseStyle
 [vale-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/scope.go#L68-L187
 [vale-comments]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/query.go#L103-L107
+[bare-url-in-comment]: https://github.com/victor-software-house/prose-style/blob/ee9f207279864e305d7372aef4a6c5dacc3eb846/ProseStyle/styles/ProseStyle/BareURLInComment.yml
 [vale-rust]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/rs.go#L10-L16
 [vale-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L53-L63
 [vale-types]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L119-L132

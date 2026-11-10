@@ -16,7 +16,7 @@ The operator contract will be `hakkiri instructions` and `skills/hakkiri/SKILL.m
    A rule that needs a regular expression to find whether text sits in code, a link or a comment shows a missing scope.
 3. **Language profiles.**
    Each source language has a profile that maps its comments and doc comments into the tree.  
-   Rustdoc reads as Markdown, TSDoc and JSDoc keep their tags, and plain comments read as text.  
+   Every comment reads as Markdown, plain `//` comments included; TSDoc and JSDoc keep their tags.  
    String literals are never prose.  
    The first release ships Rust, TypeScript, JavaScript, Markdown and MDX.
 4. **Matching.**

@@ -67,6 +67,15 @@ The rule SHALL read only the text those scopes hold.
 - **WHEN** a rule has `extends: existence`, `message: "'%s'"`, `scope: paragraph` and `tokens: [marker]`, and the input is `# A marker` followed by a paragraph `Another marker.`
 - **THEN** hakkiri reports one alert, on line 3, with the message `'marker'`
 
+### Requirement: A table row is a scope
+
+The scope `table.row` SHALL hold the text of one table row, header row included, without its pipes and padding.
+
+#### Scenario: A long table row
+
+- **WHEN** a rule has `extends: metric`, `message: "This table row is over 250 characters."`, `scope: table.row`, `formula: characters` and `condition: '> 250'`, and a table has one row of 260 characters of cell text and one row of 10
+- **THEN** hakkiri reports one alert, on the line of the long row
+
 ### Requirement: An unknown scope is refused
 
 hakkiri SHALL refuse a rule whose `scope` names no scope it defines, and report an error that names the rule and the scope.
@@ -107,6 +116,16 @@ In Rust, TypeScript and JavaScript, hakkiri SHALL read `//` comments as `text.co
 
 - **WHEN** a rule has `scope: text.comment.doc` and `tokens: [marker]`, and a Rust file holds `// A marker here.` and `/// A marker there.`
 - **THEN** hakkiri reports one alert, on the `///` line
+
+### Requirement: Every comment reads as Markdown
+
+hakkiri SHALL read the text of every comment as Markdown, plain comments included.  
+A code span, a link and a bare URL in a comment SHALL read as they do in a Markdown file.
+
+#### Scenario: A URL in a plain comment
+
+- **WHEN** a rule has `scope: link`, `nonword: true` and `tokens: ['^https?://\S+']`, and a Rust file holds two comment lines, `// Read https://bare.example first.` and ``// Run `https://span.example` too.``
+- **THEN** hakkiri reports one alert, with the matched text `https://bare.example`
 
 ### Requirement: String literals are never prose
 
