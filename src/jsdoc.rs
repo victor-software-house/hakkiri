@@ -53,7 +53,10 @@ fn description_start(line: &str) -> Option<usize> {
 /// `@typedef` at `at`.
 fn after_parameter(line: &str, at: usize) -> usize {
     let mut at = skip_blanks(line, at);
-    if let Some(closed) = line.get(at..).and_then(|rest| closing(rest, '{', '}')) {
+    let rest = line.get(at..).unwrap_or_default();
+    if rest.starts_with('{')
+        && let Some(closed) = closing(rest, '{', '}')
+    {
         at = skip_blanks(line, at + closed + 1);
     }
     let rest = line.get(at..).unwrap_or_default();
@@ -90,7 +93,7 @@ fn closing(text: &str, open: char, close: char) -> Option<usize> {
         if c == open {
             depth += 1;
         } else if c == close {
-            depth -= 1;
+            depth = depth.checked_sub(1)?;
             if depth == 0 {
                 return Some(index);
             }
