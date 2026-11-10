@@ -55,6 +55,7 @@ The table covers paragraphs, headings, block quotes, list items, table rows and 
 ### Requirement: Code and markup are not prose
 
 Fenced code, raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.  
+A block quote or list item that holds nothing else SHALL give no node.  
 Where such syntax sits inside a prose node, it SHALL be a gap between the segments of that node.
 
 #### Scenario: A URL in a fenced block
@@ -71,8 +72,6 @@ Where such syntax sits inside a prose node, it SHALL be a gap between the segmen
 
 In an MDX file, text inside a JSX element SHALL be prose.  
 Imports, exports, expressions, and the tags and attributes of JSX elements SHALL carry no prose scope.  
-An export block SHALL end where its brackets close, also across a blank line.
-
 A paragraph that holds an expression or a tag SHALL stay one node, with the expression and the tags as gaps between its segments.
 
 #### Scenario: A JSX element with text
@@ -84,6 +83,16 @@ A paragraph that holds an expression or a tag SHALL stay one node, with the expr
 
 - **WHEN** an MDX file holds `Text with {expression} inside.`
 - **THEN** the tree holds one `paragraph` node whose text is `Text with  inside.`
+
+### Requirement: Deep nesting does not crash hakkiri
+
+hakkiri SHALL build the tree of a document with 1,000 levels of block quotes without exhausting the stack.  
+It SHALL do the same for 1,000 levels of lists.
+
+#### Scenario: A thousand block quotes
+
+- **WHEN** a Markdown file holds a line of 1,000 `>` markers and a word
+- **THEN** the tree holds a `blockquote` node 1,000 levels deep, with the `paragraph` node at the bottom
 
 ### Requirement: Source files give the tree their comments only
 

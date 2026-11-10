@@ -143,36 +143,115 @@ struct Builder<'a> {
     source: &'a str,
 }
 
+/// How a node of the mdast takes part in the tree.
+enum Kind {
+    /// A node of this scope over the nodes below it.
+    Scoped(Scope),
+    /// A table cell, of the scope the table gives its row.
+    Cell,
+    /// A JSX element: its tags are gaps in the text around it.
+    Jsx,
+    /// No node of its own: the nodes below it go to its parent.
+    Transparent,
+}
+
+/// What the builder does with a node before it looks below it.
+enum Step {
+    /// The node has no prose below it. This is what it gives its parent.
+    Done(Visited),
+    /// The nodes below the node come first.
+    Open(Kind),
+}
+
+/// A node whose children the builder is still visiting.
+struct Frame<'n> {
+    node: &'n Mdast,
+    kind: Kind,
+    /// The scope of a table cell found below the node.
+    cell: Scope,
+    children: std::slice::Iter<'n, Mdast>,
+    index: usize,
+    inner: Visited,
+}
+
+impl<'n> Frame<'n> {
+    fn new(node: &'n Mdast, kind: Kind, cell: Scope) -> Self {
+        Self {
+            node,
+            kind,
+            cell,
+            children: node.children().map_or(&[][..], Vec::as_slice).iter(),
+            index: 0,
+            inner: Visited::default(),
+        }
+    }
+
+    /// The next child and the scope of a table cell below it.
+    fn next_child(&mut self) -> Option<(&'n Mdast, Scope)> {
+        let child = self.children.next()?;
+        let cell = match (self.node, self.index) {
+            (Mdast::Table(_), 0) => Scope::TableHeader,
+            (Mdast::Table(_), _) => Scope::TableCell,
+            _ => self.cell,
+        };
+        self.index += 1;
+        Some((child, cell))
+    }
+}
+
 impl Builder<'_> {
-    /// Visits `node`; `cell` is the scope of a table cell found below it.
-    fn visit(&self, node: &Mdast, cell: Scope) -> Visited {
+    /// Visits `root` and everything below it.
+    ///
+    /// The visit keeps its own stack of frames, so the depth of the document
+    /// costs no call stack.
+    fn visit(&self, root: &Mdast, cell: Scope) -> Visited {
+        let mut stack = Vec::new();
+        match self.step(root) {
+            Step::Done(visited) => return visited,
+            Step::Open(kind) => stack.push(Frame::new(root, kind, cell)),
+        }
+        loop {
+            let Some(top) = stack.last_mut() else {
+                return Visited::default();
+            };
+            if let Some((child, cell)) = top.next_child() {
+                match self.step(child) {
+                    Step::Done(visited) => {
+                        top.inner = std::mem::take(&mut top.inner).append(visited);
+                    }
+                    Step::Open(kind) => stack.push(Frame::new(child, kind, cell)),
+                }
+                continue;
+            }
+            let Some(frame) = stack.pop() else {
+                return Visited::default();
+            };
+            let visited = self.finish(frame);
+            match stack.last_mut() {
+                Some(parent) => {
+                    parent.inner = std::mem::take(&mut parent.inner).append(visited);
+                }
+                None => return visited,
+            }
+        }
+    }
+
+    fn step(&self, node: &Mdast) -> Step {
         match node {
-            Mdast::Paragraph(_) => self.scoped(node, Scope::Paragraph, cell),
-            Mdast::Heading(heading) => match Scope::heading(heading.depth) {
-                Some(scope) => self.scoped(node, scope, cell),
-                None => self.children(node, cell),
-            },
-            Mdast::Blockquote(_) => self.scoped(node, Scope::Blockquote, cell),
-            Mdast::ListItem(_) => self.scoped(node, Scope::List, cell),
-            Mdast::TableRow(_) => self.scoped(node, Scope::TableRow, cell),
-            Mdast::TableCell(_) => self.scoped(node, cell, cell),
-            Mdast::Link(_) | Mdast::LinkReference(_) => self.scoped(node, Scope::Link, cell),
-            Mdast::InlineCode(_) => self.scoped(node, Scope::Code, cell),
-            Mdast::Strong(_) => self.scoped(node, Scope::Strong, cell),
-            Mdast::Emphasis(_) => self.scoped(node, Scope::Emphasis, cell),
-            Mdast::Image(_) | Mdast::ImageReference(_) => self.alt(node),
-            Mdast::Table(table) => table.children.iter().enumerate().fold(
-                Visited::default(),
-                |visited, (row, node)| {
-                    let cell = if row == 0 {
-                        Scope::TableHeader
-                    } else {
-                        Scope::TableCell
-                    };
-                    visited.append(self.visit(node, cell))
-                },
-            ),
-            Mdast::MdxJsxFlowElement(_) | Mdast::MdxJsxTextElement(_) => self.jsx(node, cell),
+            Mdast::Paragraph(_) => Step::Open(Kind::Scoped(Scope::Paragraph)),
+            Mdast::Heading(heading) => {
+                Step::Open(Scope::heading(heading.depth).map_or(Kind::Transparent, Kind::Scoped))
+            }
+            Mdast::Blockquote(_) => Step::Open(Kind::Scoped(Scope::Blockquote)),
+            Mdast::ListItem(_) => Step::Open(Kind::Scoped(Scope::List)),
+            Mdast::TableRow(_) => Step::Open(Kind::Scoped(Scope::TableRow)),
+            Mdast::TableCell(_) => Step::Open(Kind::Cell),
+            Mdast::Link(_) | Mdast::LinkReference(_) => Step::Open(Kind::Scoped(Scope::Link)),
+            Mdast::InlineCode(_) => Step::Open(Kind::Scoped(Scope::Code)),
+            Mdast::Strong(_) => Step::Open(Kind::Scoped(Scope::Strong)),
+            Mdast::Emphasis(_) => Step::Open(Kind::Scoped(Scope::Emphasis)),
+            Mdast::Image(_) | Mdast::ImageReference(_) => Step::Done(self.alt(node)),
+            Mdast::MdxJsxFlowElement(_) | Mdast::MdxJsxTextElement(_) => Step::Open(Kind::Jsx),
             // Syntax that is not prose is a gap in the text around it.
             Mdast::MdxjsEsm(_)
             | Mdast::MdxFlowExpression(_)
@@ -183,33 +262,36 @@ impl Builder<'_> {
             | Mdast::Html(_)
             | Mdast::Code(_)
             | Mdast::Math(_)
-            | Mdast::Definition(_) => Visited::cut(span_of(node)),
-            Mdast::Root(_) | Mdast::FootnoteDefinition(_) | Mdast::List(_) | Mdast::Delete(_) => {
-                self.children(node, cell)
-            }
+            | Mdast::Definition(_) => Step::Done(Visited::cut(span_of(node))),
+            Mdast::Root(_)
+            | Mdast::FootnoteDefinition(_)
+            | Mdast::List(_)
+            | Mdast::Delete(_)
+            | Mdast::Table(_) => Step::Open(Kind::Transparent),
             Mdast::Break(_)
             | Mdast::FootnoteReference(_)
             | Mdast::Text(_)
-            | Mdast::ThematicBreak(_) => Visited::default(),
+            | Mdast::ThematicBreak(_) => Step::Done(Visited::default()),
         }
     }
 
-    fn children(&self, node: &Mdast, cell: Scope) -> Visited {
-        node.children()
-            .into_iter()
-            .flatten()
-            .fold(Visited::default(), |visited, child| {
-                visited.append(self.visit(child, cell))
-            })
+    /// What a node gives its parent once the nodes below it are visited.
+    fn finish(&self, frame: Frame<'_>) -> Visited {
+        match frame.kind {
+            Kind::Scoped(scope) => self.scoped(frame.node, scope, frame.inner),
+            Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner),
+            Kind::Jsx => Self::jsx(frame.node, frame.inner),
+            Kind::Transparent => frame.inner,
+        }
     }
 
-    /// A node of `scope` over `node`, holding the nodes below it.
+    /// A node of `scope` over `node`, holding the nodes in `inner`.
     ///
     /// Syntax that is not prose and sits inside the node is a gap between its
     /// segments.
     /// A table row has the segments of its cells.
-    fn scoped(&self, node: &Mdast, scope: Scope, cell: Scope) -> Visited {
-        let inner = self.children(node, cell);
+    /// A block quote or list item with no prose below it gives no node.
+    fn scoped(&self, node: &Mdast, scope: Scope, inner: Visited) -> Visited {
         let Some(span) = span_of(node).map(|span| self.trimmed(scope, span)) else {
             return inner;
         };
@@ -223,19 +305,26 @@ impl Builder<'_> {
                 .flat_map(|child| child.segments.clone())
                 .collect()
         } else if matches!(scope, Scope::Blockquote | Scope::List) {
-            self.segments(&span, &cuts)
+            if children.is_empty() {
+                Vec::new()
+            } else {
+                self.segments(&span, &cuts)
+            }
         } else {
             self.segments(&span, &cuts)
                 .into_iter()
                 .flat_map(|part| self.lines(part))
                 .collect()
         };
-        Visited {
-            nodes: Node::from_segments(scope, segments, children)
+        // A node with no text gives way to the nodes below it.
+        let nodes = if segments.is_empty() {
+            children
+        } else {
+            Node::from_segments(scope, segments, children)
                 .into_iter()
-                .collect(),
-            cuts,
-        }
+                .collect()
+        };
+        Visited { nodes, cuts }
     }
 
     /// `span` without the line ending and padding that markdown-rs leaves at
@@ -332,8 +421,7 @@ impl Builder<'_> {
     }
 
     /// A JSX element: its children stay prose and its tags are gaps.
-    fn jsx(&self, node: &Mdast, cell: Scope) -> Visited {
-        let mut visited = self.children(node, cell);
+    fn jsx(node: &Mdast, mut visited: Visited) -> Visited {
         if let Some(span) = span_of(node) {
             let children = node.children().map_or(&[][..], Vec::as_slice);
             let first = children.first().and_then(span_of);

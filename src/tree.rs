@@ -180,13 +180,17 @@ impl Node {
 
     /// Replaces the segments and the span of this node and of every node below
     /// it. `map` gives the segments of a range from its current place.
+    ///
+    /// The walk keeps its own stack, so the depth of the tree costs no call
+    /// stack.
     pub(crate) fn map_segments(&mut self, map: &impl Fn(Range<usize>) -> Vec<Range<usize>>) {
-        self.segments = self.segments.iter().cloned().flat_map(map).collect();
-        if let (Some(first), Some(last)) = (self.segments.first(), self.segments.last()) {
-            self.span = first.start..last.end;
-        }
-        for child in &mut self.children {
-            child.map_segments(map);
+        let mut pending = vec![self];
+        while let Some(node) = pending.pop() {
+            node.segments = node.segments.iter().cloned().flat_map(map).collect();
+            if let (Some(first), Some(last)) = (node.segments.first(), node.segments.last()) {
+                node.span = first.start..last.end;
+            }
+            pending.extend(node.children.iter_mut());
         }
     }
 }

@@ -605,25 +605,42 @@ fn slashes_in_jsx_text_are_not_a_comment() -> TestResult {
     Ok(())
 }
 
-/// The tree builder recurses once for each level of nesting.
-///
-/// Measured in a debug build on a test thread, which has a 2 MiB stack.
-/// Block quotes overflow between 500 and 750 levels, and nested lists between
-/// 250 and 500.
-/// markdown-rs itself parses 1,000 levels of either.
-/// The depths below stay well inside what works.
+/// The number of levels in the deepest branch of `tree`, counted without
+/// recursion.
+fn depth(tree: &Tree) -> usize {
+    let mut deepest = 0;
+    let mut pending: Vec<(&Node, usize)> = tree.roots.iter().map(|root| (root, 1)).collect();
+    while let Some((node, level)) = pending.pop() {
+        deepest = deepest.max(level);
+        pending.extend(node.children.iter().map(|child| (child, level + 1)));
+    }
+    deepest
+}
+
+/// The tree builder keeps its own stack.
+/// A document nests as deep as markdown-rs reads it: 1,000 levels of block
+/// quotes or lists.
 #[test]
 fn deeply_nested_quotes_and_lists() -> TestResult {
-    let quotes = format!("{} deep\n", ">".repeat(400));
+    let quotes = format!("{} deep\n", ">".repeat(1000));
     let tree = parse(Language::Markdown, &quotes)?;
     assert_eq!(tree.roots.len(), 1);
+    assert!(depth(&tree) > 1000);
     let mut lists = String::new();
-    for level in 0..200 {
+    for level in 0..1000 {
         lists.push_str(&"  ".repeat(level));
         lists.push_str("- item\n");
     }
     let tree = parse(Language::Markdown, &lists)?;
     assert_eq!(tree.roots.len(), 1);
+    assert!(depth(&tree) > 1000);
+    Ok(())
+}
+
+#[test]
+fn a_quote_with_only_a_definition_has_no_node() -> TestResult {
+    let tree = parse(Language::Markdown, "> [a]: https://a.example\n")?;
+    assert!(tree.roots.iter().all(|root| root.children.is_empty()));
     Ok(())
 }
 

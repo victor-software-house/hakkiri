@@ -78,8 +78,14 @@ These carry no prose scope: fenced code, raw HTML, link definitions, front matte
 Where one sits inside a prose node, it is a gap between the segments of that node, so one paragraph stays one node.
 
 Text inside a JSX element is prose.  
+A block quote or list item with no prose inside it gives no node.  
 A table row has the segments of its cells, and reads them one space apart.  
 `raw` holds the whole file for Markdown and MDX, and the comment text for a source file.
+
+The builder walks the mdast with its own stack of frames.  
+So does the map from the stripped text back to the file.  
+The depth of a document then costs no call stack.  
+markdown-rs reads 1,000 levels of block quotes or lists, and so does hakkiri.
 
 ### 5. JSDoc and TSDoc tags
 
