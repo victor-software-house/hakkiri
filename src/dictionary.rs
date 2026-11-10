@@ -16,6 +16,7 @@
 
 mod affix;
 mod charset;
+mod speller;
 mod words;
 
 #[cfg(test)]
@@ -28,6 +29,7 @@ use std::{error, fmt};
 pub(crate) use affix::AffixFile;
 use affix::{CompoundToken, Flag, has_flag};
 use regex::Regex;
+pub use speller::{Book, Speller};
 
 use crate::case::{lower_str, upper_str};
 

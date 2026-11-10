@@ -9,6 +9,7 @@
 
 mod build;
 mod field;
+mod package;
 mod schema;
 
 use std::path::Path;
@@ -20,9 +21,10 @@ use serde::de::DeserializeOwned;
 use self::build::Source;
 use self::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
-    OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, SequenceFields,
+    OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, SequenceFields, SpellingFields,
     SubstitutionFields,
 };
+use crate::dictionary::Speller;
 use crate::formula::Formula;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
@@ -124,6 +126,8 @@ pub enum Check {
     Capitalization(Capitalization),
     /// Reports a run of words that its tokens match in order.
     Sequence(Sequence),
+    /// Reports each word that no dictionary holds.
+    Spelling(Spelling),
 }
 
 /// The patterns that hold a match back.
@@ -461,6 +465,21 @@ impl Sequence {
     }
 }
 
+/// A `spelling` rule.
+#[derive(Debug)]
+pub struct Spelling {
+    /// The dictionaries, and the words the rule's lists accept besides.
+    pub speller: Speller,
+    /// The `filters`: a word that one matches is skipped.
+    pub filters: Vec<Pattern>,
+    /// Whether the built-in filters skip names and codes: the rule does not set
+    /// `custom`.
+    pub standard: bool,
+    /// Whether an identifier is checked part by part, and each misspelt part
+    /// is reported at its own place.
+    pub split: bool,
+}
+
 /// One thing wrong with a rule file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LoadProblem {
@@ -531,6 +550,8 @@ impl Rule {
     ///
     /// `name` is the rule's name, such as `Team.Filler`, and `file` names the
     /// file in the errors.
+    /// A rule read this way holds no package, so a `spelling` rule that names
+    /// a dictionary or a word list is refused.
     ///
     /// # Errors
     ///
@@ -539,9 +560,37 @@ impl Rule {
     /// the wrong kind, and a feature hakkiri does not run. A pattern that does
     /// not compile is refused, and so is a pattern with nothing to match.
     pub fn from_text(name: &str, file: &str, text: &str) -> Result<Self, LoadError> {
+        Self::read(name, file, text, None)
+    }
+
+    /// Reads one rule from the text of its file, in the package `package`.
+    ///
+    /// The package is the folder that holds the rule's style folder.
+    /// A `spelling` rule reads its dictionaries and word lists from it, and
+    /// from no other place.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`LoadError`] for each fault [`Rule::from_text`] refuses.
+    /// A dictionary or word list that is missing or unreadable is refused,
+    /// and so is a path that leaves the package.
+    pub fn from_text_in(
+        name: &str,
+        file: &str,
+        text: &str,
+        package: &Path,
+    ) -> Result<Self, LoadError> {
+        Self::read(name, file, text, Some(package))
+    }
+
+    fn read(name: &str, file: &str, text: &str, package: Option<&Path>) -> Result<Self, LoadError> {
         let input = Input::new(file, text);
         let probe: Probe = input.load().map_err(|error| at_tab(error, text))?;
-        let source = Source { name, file };
+        let source = Source {
+            name,
+            file,
+            package,
+        };
         match probe.extends.value() {
             "existence" => build::existence_rule(&source, &read::<ExistenceFields>(&input)?),
             "substitution" => {
@@ -556,6 +605,7 @@ impl Rule {
                 build::capitalization_rule(&source, &read::<CapitalizationFields>(&input)?)
             }
             "sequence" => build::sequence_rule(&source, &read::<SequenceFields>(&input)?),
+            "spelling" => build::spelling_rule(&source, &read::<SpellingFields>(&input)?),
             _ => build::metric_rule(&source, &read::<MetricFields>(&input)?),
         }
     }
@@ -602,6 +652,7 @@ fn at_tab(mut error: InputError, text: &str) -> LoadError {
 ///
 /// A rule is named by the folder, a dot, and its file name without the
 /// extension. Every other file in the folder is ignored.
+/// The folder's parent is the rule's package.
 /// The rules come in file name order.
 ///
 /// # Errors
@@ -622,6 +673,10 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
         .file_name()
         .and_then(|name| name.to_str())
         .ok_or_else(|| unread("the style folder has no name".to_owned()))?;
+    let package = folder
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
     let entries = fs::read_dir(folder).map_err(|error| unread(error.to_string()))?;
     let mut files = Vec::new();
     for entry in entries {
@@ -649,7 +704,7 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
                     message: error.to_string(),
                 }],
             })
-            .and_then(|text| Rule::from_text(&format!("{style}.{stem}"), &file, &text));
+            .and_then(|text| Rule::from_text_in(&format!("{style}.{stem}"), &file, &text, package));
         match rule {
             Ok(rule) => rules.push(rule),
             Err(error) => problems.extend(error.problems),

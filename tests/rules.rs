@@ -125,16 +125,6 @@ fn a_script_rule_is_refused() -> TestResult {
 }
 
 #[test]
-fn a_check_type_for_a_later_change_is_refused() -> TestResult {
-    let (_, _, message) = refused(indoc! {"
-        extends: spelling
-        message: m
-    "})?;
-    assert!(message.contains("spelling"), "{message}");
-    Ok(())
-}
-
-#[test]
 fn token_in_an_existence_rule() -> TestResult {
     let (_, _, message) = refused(indoc! {"
         extends: existence
