@@ -35,8 +35,8 @@ None.
 - New modules for the splitter, the model reader and the trainer, and a mise task that trains the model in a build box.
 - `HKR-004` cuts sentences with this splitter, so it waits for this row.
 
-[ledger]: ../../../tasks.yaml
-[engine]: ../rule-engine/proposal.md
+[ledger]: ../../../../tasks.yaml
+[engine]: ../../rule-engine/proposal.md
 [nltk-188]: https://github.com/nltk/nltk_data/issues/188
 [pysbd]: https://aclanthology.org/2020.nlposs-1.15.pdf
 [gillick]: https://aclanthology.org/N09-2061.pdf

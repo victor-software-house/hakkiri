@@ -54,4 +54,4 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 [last]: ../case-sequence-and-spelling-checks/proposal.md
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
 [design]: design.md
-[splitter]: ../sentence-splitter/proposal.md
+[splitter]: ../archive/2026-11-10-sentence-splitter/proposal.md

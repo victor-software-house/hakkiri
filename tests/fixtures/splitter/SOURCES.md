@@ -78,11 +78,11 @@ Links keep their text, and emphasis marks are gone.
 
 UD English-EWT and GUM are measured only for the design evidence, and nothing from them is stored here.
 
-[change]: ../../../openspec/changes/sentence-splitter/proposal.md
+[change]: ../../../openspec/changes/archive/2026-11-10-sentence-splitter/proposal.md
 [pragmatic]: https://github.com/diasks2/pragmatic_segmenter
 [pysbd]: https://github.com/nipunsadvilkar/pySBD
 [masc]: https://anc.org/data/masc/about/
 [vale-gomod]: https://github.com/errata-ai/vale/blob/v3.26.0/go.mod
 [vale-prose]: https://github.com/errata-ai/vale/blob/v3.26.0/internal/nlp/prose.go
 [vale-main]: https://github.com/errata-ai/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/go.mod
-[tasks]: ../../../openspec/changes/sentence-splitter/tasks.md
+[tasks]: ../../../openspec/changes/archive/2026-11-10-sentence-splitter/tasks.md

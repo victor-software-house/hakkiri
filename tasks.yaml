@@ -1,26 +1,14 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-015
+active: HKR-004
 queue:
-  - id: HKR-015
-    title: Split sentences
-    scope: engine
-    outcome: >-
-      Sentences come from hakkiri's own Punkt splitter and model, at least as
-      accurate as Vale's on every evaluation set.
-    blocked_by: []
-    acceptance:
-      - On the committed documentation, Golden Rules and MASC sets, hakkiri's boundary F1 is at least Vale 3.26.0's.
-      - Two training runs on the committed sources write byte-identical model files.
-    plan: openspec/changes/sentence-splitter/proposal.md
-
   - id: HKR-004
     title: Build the rule engine
     scope: engine
     outcome: >-
       Rules select text by scope, then run existence, substitution, occurrence and metric, with rates through metric.
-    blocked_by: [HKR-015]
+    blocked_by: []
     acceptance:
       - Flesch-Kincaid matches Vale on the prose-style fixtures within a stated tolerance.
       - A 50,000-character line and a 60,000-line file finish with no panic.
@@ -125,6 +113,18 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-015
+    title: Split sentences
+    scope: engine
+    outcome: >-
+      Sentences come from hakkiri's own Punkt splitter and model, at least as
+      accurate as Vale's on every evaluation set.
+    plan: openspec/changes/archive/2026-11-10-sentence-splitter/proposal.md
+    completed: 2026-11-10T13:01:41
+    evidence:
+      - PR 14 merged the splitter and its model at e3b7d77; PR 15 adds the evaluation test, and the sentence-splitter OpenSpec change is archived.
+    disposition: completed
+
   - id: HKR-012
     title: Give tree nodes their text segments
     scope: tree
