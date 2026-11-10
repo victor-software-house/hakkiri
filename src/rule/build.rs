@@ -434,6 +434,18 @@ fn conditional(source: &Source<'_>, fields: &ConditionalFields) -> Result<Condit
             ),
         ));
     }
+    for (field, pattern) in [("first", &fields.first), ("second", &fields.second)] {
+        if pattern.value().trim().is_empty() {
+            return Err(source.problem(
+                field,
+                format!(
+                    "rule `{}`: `{field}` holds nothing to match, so the pattern would match at \
+                     every position",
+                    source.name
+                ),
+            ));
+        }
+    }
     let ignorecase = fields.ignorecase.value();
     let compile = |field: &str, pattern: &str| {
         let written = if ignorecase {

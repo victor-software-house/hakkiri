@@ -130,9 +130,9 @@ It SHALL be no form seen, give no alert, define nothing, and leave the next matc
 - **WHEN** the acronym rule reads ``Run `(CDC)` first.`` and then `The CDC said no.`
 - **THEN** hakkiri reports one alert, with the matched text `CDC`
 
-### Requirement: consistency and repetition need something to match
+### Requirement: the pattern checks need something to match
 
-hakkiri SHALL refuse a `consistency` rule whose `either` holds no pair or a form with no text, and a `repetition` rule whose `tokens` hold no text.  
+hakkiri SHALL refuse a `consistency` rule whose `either` holds no pair or a form with no text, a `repetition` rule whose `tokens` hold no text, and a `conditional` rule whose `first` or `second` holds no text.  
 The error SHALL name the field.
 
 #### Scenario: No pair
