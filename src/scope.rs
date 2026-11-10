@@ -65,6 +65,16 @@ struct Part {
     extension: Option<String>,
 }
 
+impl Part {
+    /// Whether the part holds in a file with `extension`: it names no
+    /// extension, or the file's.
+    fn applies_to(&self, extension: &str) -> bool {
+        self.extension
+            .as_deref()
+            .is_none_or(|wanted| wanted == extension)
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct Alternative {
     parts: Vec<Part>,
@@ -217,11 +227,7 @@ impl Alternative {
             } else if !names.iter().any(|name| named(&part.name, name)) {
                 return false;
             }
-            if part
-                .extension
-                .as_deref()
-                .is_some_and(|wanted| wanted != extension)
-            {
+            if !part.applies_to(extension) {
                 return false;
             }
         }
@@ -230,7 +236,9 @@ impl Alternative {
         }
         self.parts
             .iter()
-            .filter(|part| part.negated && !INLINE.contains(&part.name.as_str()))
+            .filter(|part| {
+                part.negated && !INLINE.contains(&part.name.as_str()) && part.applies_to(extension)
+            })
             .all(|part| {
                 !names.iter().any(|name| named(&part.name, name))
                     && !ancestors

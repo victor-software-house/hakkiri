@@ -62,11 +62,17 @@ A sentence SHALL keep the nodes around its node, so an exclusion such as `~block
 ### Requirement: A file extension narrows a scope
 
 A last scope part that names a file extension, such as `rs` in `raw.rs`, SHALL limit the scope to files with that extension.
+A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes only in files with that extension.
 
 #### Scenario: raw.rs in two files
 
 - **WHEN** a rule has `scope: raw.rs` and `tokens: [marker]`, and a Markdown file holds `A marker.` and a Rust file holds `// A marker.`
 - **THEN** hakkiri reports one alert, in the Rust file
+
+#### Scenario: A negated part for another language
+
+- **WHEN** a rule has `scope: text & ~heading.rs` and `tokens: [marker]`, and a Markdown file holds `# A marker`
+- **THEN** hakkiri reports one alert, on the heading
 
 ### Requirement: An inline exclusion blanks the element
 

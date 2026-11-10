@@ -299,3 +299,13 @@ fn a_pipe_in_a_link_destination_outside_a_table_reads_as_nothing() -> TestResult
     assert_eq!(texts(&found), ["Open the page now."]);
     Ok(())
 }
+
+#[test]
+fn a_negated_part_with_another_extension_leaves_nothing_out() -> TestResult {
+    let source = "# Head\n\nBody.\n";
+    let found = blocks(&["text & ~heading.rs"], "a.md", source)?;
+    assert_eq!(texts(&found), ["Head", "Body."]);
+    let found = blocks(&["text & ~heading.md"], "a.md", source)?;
+    assert_eq!(texts(&found), ["Body."]);
+    Ok(())
+}
