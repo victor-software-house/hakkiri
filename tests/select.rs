@@ -10,6 +10,7 @@
 )]
 
 use std::error::Error;
+use std::fs;
 use std::path::Path;
 
 use hakkiri::scope::Selector;
@@ -236,11 +237,10 @@ fn a_block_comment_and_a_doc_comment() -> TestResult {
 
 #[test]
 fn a_url_in_a_comment_is_a_link() -> TestResult {
-    let found = blocks(
-        &["link"],
-        "a.rs",
-        "// Read https://bare.example first.\n// Run `https://span.example` too.\n",
+    let source = fs::read_to_string(
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/url-comments.rs.fixture"),
     )?;
+    let found = blocks(&["link"], "a.rs", &source)?;
     assert_eq!(texts(&found), ["https://bare.example"]);
     Ok(())
 }
@@ -278,4 +278,15 @@ fn words_follow_the_prose_pattern() {
     assert_eq!(counted("naïve café"), ["naïve", "café"]);
     assert_eq!(counted("U.S.A"), ["U.S.", "A"]);
     assert_eq!(counted("-- ;;"), Vec::<String>::new());
+}
+
+#[test]
+fn a_pipe_in_a_link_destination_outside_a_table_reads_as_nothing() -> TestResult {
+    let found = blocks(
+        &["paragraph"],
+        "a.md",
+        "Open [the page](https://x.example/a|b) now.\n",
+    )?;
+    assert_eq!(texts(&found), ["Open the page now."]);
+    Ok(())
 }
