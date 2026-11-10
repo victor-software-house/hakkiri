@@ -79,12 +79,23 @@ Adjacent line comments of the same type SHALL join into one comment node, read a
 
 ### Requirement: Spans inside comments point into the file
 
-A node inside a comment SHALL span the bytes of its text in the file, not in the text with markers stripped.
+A node inside a comment SHALL span the bytes of its text in the file, not in the text with markers stripped.  
+The span runs from the start of the node's first segment to the end of its last.
+
+A node SHALL hold its segments: one byte range for each line of its text.  
+A segment leaves out the comment marker and the indentation that hakkiri strips.  
+The text of the node is its segments joined by a line feed.
 
 #### Scenario: A link in a doc comment
 
 - **WHEN** a Rust file holds the line `/// See [the guide](https://g.example).` indented by four spaces
 - **THEN** the `link` node spans the bytes of `[the guide](https://g.example)` in that line of the file
+
+#### Scenario: A paragraph over two line comments
+
+- **WHEN** a Rust file holds the lines `// Read the guide` and `// before you start.`
+- **THEN** the tree holds one `paragraph` node with two segments, the bytes of `Read the guide` and of `before you start.`, with no `//` marker in either
+- **AND** its text is those two lines joined by a line feed
 
 ### Requirement: JSDoc tags are not prose
 

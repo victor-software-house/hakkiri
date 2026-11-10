@@ -1,0 +1,5 @@
+mod m {
+    /// First line of the summary,
+    /// second line.
+    fn f() {}
+}

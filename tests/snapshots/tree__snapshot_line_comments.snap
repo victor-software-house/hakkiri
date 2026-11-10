@@ -1,0 +1,7 @@
+---
+source: tests/tree.rs
+expression: "load(\"line-comments.rs\")? .render()"
+---
+raw 0..38 [0..17, 18..38] "// Read the guide\n// before you start."
+  text.comment.line 0..38 [0..17, 18..38] "// Read the guide\n// before you start."
+    paragraph 3..38 [3..17, 21..38] "Read the guide\nbefore you start."

@@ -48,12 +48,18 @@ impl Fixture {
     }
 
     fn render_node(&self, node: &Node, depth: usize, lines: &mut Vec<String>) {
+        let segments: Vec<String> = node
+            .segments
+            .iter()
+            .map(|segment| format!("{}..{}", segment.start, segment.end))
+            .collect();
         lines.push(format!(
-            "{}{} {}..{} {:?}",
+            "{}{} {}..{} [{}] {:?}",
             "  ".repeat(depth),
             node.scope,
             node.span.start,
             node.span.end,
+            segments.join(", "),
             self.text(node),
         ));
         for child in &node.children {
@@ -61,10 +67,10 @@ impl Fixture {
         }
     }
 
-    fn text(&self, node: &Node) -> &str {
-        self.source
-            .get(node.span.clone())
-            .unwrap_or("<span outside the file>")
+    /// The text of `node`: its segments joined by a line feed.
+    fn text(&self, node: &Node) -> String {
+        node.text(&self.source)
+            .unwrap_or_else(|| "<segment outside the file>".to_owned())
     }
 
     /// Every node of `scope`, parents before children.
@@ -86,8 +92,8 @@ impl Fixture {
 
     /// The text of every node below `raw` and its comment node: the Markdown
     /// nodes.
-    fn prose(&self) -> Vec<&str> {
-        fn collect<'a>(fixture: &'a Fixture, node: &'a Node, found: &mut Vec<&'a str>) {
+    fn prose(&self) -> Vec<String> {
+        fn collect(fixture: &Fixture, node: &Node, found: &mut Vec<String>) {
             let wrapper = matches!(
                 node.scope,
                 Scope::Raw
@@ -110,7 +116,7 @@ impl Fixture {
         found
     }
 
-    fn texts(&self, scope: Scope) -> Vec<&str> {
+    fn texts(&self, scope: Scope) -> Vec<String> {
         self.nodes(scope)
             .into_iter()
             .map(|node| self.text(node))
@@ -146,6 +152,9 @@ snapshots! {
     snapshot_bare_url: "bare-url.rs",
     snapshot_jsdoc: "jsdoc.ts",
     snapshot_jsdoc_tags: "jsdoc-tags.js",
+    snapshot_jsdoc_braces: "jsdoc-braces.ts",
+    snapshot_line_comments: "line-comments.rs",
+    snapshot_doc_indented_lines: "doc-indented-lines.rs",
     snapshot_tsx: "view.tsx",
     snapshot_mjs: "module.mjs",
 }
@@ -250,7 +259,7 @@ fn spans_are_bytes_not_characters() -> TestResult {
 fn a_jsx_element_with_text() -> TestResult {
     let fixture = load("mdx.mdx")?;
     let paragraphs = fixture.texts(Scope::Paragraph);
-    assert!(paragraphs.contains(&"Read this."));
+    assert!(paragraphs.iter().any(|text| text == "Read this."));
     for text in fixture.prose() {
         for markup in [
             "import",
@@ -268,7 +277,7 @@ fn a_jsx_element_with_text() -> TestResult {
             );
         }
     }
-    assert!(paragraphs.contains(&"A paragraph inside."));
+    assert!(paragraphs.iter().any(|text| text == "A paragraph inside."));
     assert_eq!(fixture.texts(Scope::List), ["- A list item"]);
     Ok(())
 }
@@ -301,18 +310,18 @@ fn a_doc_comment_over_three_lines() -> TestResult {
     let comments = fixture.nodes(Scope::CommentDocLine);
     // The `///` group, and the `//!` line.
     assert_eq!(comments.len(), 2);
+    assert!(
+        comments[0]
+            .children
+            .iter()
+            .all(|child| child.scope == Scope::Paragraph)
+    );
     let paragraphs: Vec<_> = comments[0]
         .children
         .iter()
-        .map(|child| (child.scope, fixture.text(child)))
+        .map(|child| fixture.text(child))
         .collect();
-    assert_eq!(
-        paragraphs,
-        [
-            (Scope::Paragraph, "First line"),
-            (Scope::Paragraph, "Second paragraph.")
-        ]
-    );
+    assert_eq!(paragraphs, ["First line", "Second paragraph."]);
     let plain = fixture.nodes(Scope::CommentLine);
     assert_eq!(plain.len(), 2);
     assert_eq!(
@@ -362,6 +371,54 @@ fn a_parameter_tag() -> TestResult {
     );
     for text in fixture.prose() {
         assert!(!text.contains("@param"), "{text:?}");
+    }
+    Ok(())
+}
+
+#[test]
+fn braces_in_a_parameter_tag() -> TestResult {
+    let fixture = load("jsdoc-braces.ts")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        [
+            "A stray brace in the name.",
+            "See {@link Other} for the description.",
+            "A nested type."
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_paragraph_over_two_line_comments() -> TestResult {
+    let fixture = load("line-comments.rs")?;
+    let paragraphs = fixture.nodes(Scope::Paragraph);
+    assert_eq!(paragraphs.len(), 1);
+    // `// Read the guide` starts at byte 0 and `// before you start.` at 18.
+    assert_eq!(paragraphs[0].segments, [3..17, 21..38]);
+    assert_eq!(paragraphs[0].span, 3..38);
+    assert_eq!(
+        fixture.text(paragraphs[0]),
+        "Read the guide\nbefore you start."
+    );
+    Ok(())
+}
+
+#[test]
+fn a_paragraph_over_indented_doc_lines() -> TestResult {
+    let fixture = load("doc-indented-lines.rs")?;
+    let paragraphs = fixture.nodes(Scope::Paragraph);
+    assert_eq!(paragraphs.len(), 1);
+    assert_eq!(paragraphs[0].segments.len(), 2);
+    assert_eq!(
+        fixture.text(paragraphs[0]),
+        "First line of the summary,\nsecond line."
+    );
+    for segment in &paragraphs[0].segments {
+        let line_start = fixture.source[..segment.start]
+            .rfind('\n')
+            .map_or(0, |i| i + 1);
+        assert_eq!(&fixture.source[line_start..segment.start], "    /// ");
     }
     Ok(())
 }

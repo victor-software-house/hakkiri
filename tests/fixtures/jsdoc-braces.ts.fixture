@@ -1,0 +1,6 @@
+/**
+ * @param a} A stray brace in the name.
+ * @param b See {@link Other} for the description.
+ * @param {Array<{ id: number }>} c A nested type.
+ */
+export function f(a: string, b: string, c: unknown[]): void {}

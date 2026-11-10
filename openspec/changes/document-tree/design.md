@@ -43,7 +43,11 @@ It joins adjacent line comments of the same type into one block, as rustdoc does
 
 It keeps, for each byte of the stripped text, the byte it came from in the file.  
 The stripped text parses as Markdown (rule-format decision 8).  
-Each Markdown node's span maps back through that table.
+Each Markdown node maps back through that table to its segments, one byte range for each line of its text.  
+A segment leaves out the markers and the stripped indentation.
+
+The span of the node covers its segments from the first byte to the last.  
+An alert takes its position from the span.
 
 ### 4. Scopes from mdast nodes
 

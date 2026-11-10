@@ -1,0 +1,7 @@
+---
+source: tests/tree.rs
+expression: "load(\"doc-indented-lines.rs\")? .render()"
+---
+raw 12..63 [12..42, 47..63] "/// First line of the summary,\n/// second line."
+  text.comment.doc.line 12..63 [12..42, 47..63] "/// First line of the summary,\n/// second line."
+    paragraph 16..63 [16..42, 51..63] "First line of the summary,\nsecond line."

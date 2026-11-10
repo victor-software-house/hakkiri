@@ -191,8 +191,8 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
         let text = stripped.text.get(segment.clone()).unwrap_or_default();
         let mut nodes = markdown::blocks(text, Flavor::Comment)?;
         for node in &mut nodes {
-            node.map_spans(&|span| {
-                stripped.span(span.start + segment.start..span.end + segment.start)
+            node.map_segments(&|span| {
+                stripped.segments(span.start + segment.start..span.end + segment.start)
             });
         }
         children.extend(nodes);
@@ -202,11 +202,13 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
     let comment = Node {
         scope: group.marker.scope(),
         span: start..end,
+        segments: group.comments.clone(),
         children,
     };
     Ok(Node {
         scope: Scope::Raw,
         span: start..end,
+        segments: group.comments.clone(),
         children: vec![comment],
     })
 }
@@ -270,13 +272,29 @@ struct Stripped {
 }
 
 impl Stripped {
-    /// The file span of a span of `text`.
-    fn span(&self, span: Range<usize>) -> Range<usize> {
+    /// The file ranges of a span of `text`, one for each line of it.
+    ///
+    /// A line with no text gives an empty range, so the ranges joined by a line
+    /// feed read as the span.
+    fn segments(&self, span: Range<usize>) -> Vec<Range<usize>> {
         let at = |index: usize| self.map.get(index).copied().unwrap_or_default();
-        if span.is_empty() {
-            return at(span.start)..at(span.start);
-        }
-        at(span.start)..at(span.end - 1) + 1
+        let mut start = span.start;
+        self.text
+            .get(span)
+            .unwrap_or_default()
+            .split('\n')
+            .map(|line| {
+                let end = start + line.len();
+                let first = at(start);
+                let last = if line.is_empty() {
+                    first
+                } else {
+                    at(end - 1) + 1
+                };
+                start = end + 1;
+                first..last
+            })
+            .collect()
     }
 }
 

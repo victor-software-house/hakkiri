@@ -2,6 +2,6 @@
 source: tests/tree.rs
 expression: "load(\"block-comment.rs\")? .render()"
 ---
-raw 0..13 "/* A note. */"
-  text.comment.block 0..13 "/* A note. */"
-    paragraph 3..10 "A note."
+raw 0..13 [0..13] "/* A note. */"
+  text.comment.block 0..13 [0..13] "/* A note. */"
+    paragraph 3..10 [3..10] "A note."

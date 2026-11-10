@@ -108,17 +108,56 @@ pub struct Node {
     /// The scope of the node.
     pub scope: Scope,
     /// The byte span of the node's text in the original file.
+    /// It runs from the first byte of its first segment to the end of its
+    /// last.
+    ///
+    /// In a comment, the span of a node over several lines also covers the
+    /// markers between them.
+    /// Use it for a position, and read the text through `segments`.
     pub span: Range<usize>,
+    /// The byte ranges of the node's text in the original file, one for each
+    /// line, in file order.
+    ///
+    /// The comment markers and the indentation that a comment strips are in no
+    /// segment. A line with no text gives an empty range.
+    pub segments: Vec<Range<usize>>,
     /// The nodes inside this one, in file order.
     pub children: Vec<Node>,
 }
 
 impl Node {
-    /// Replaces the span of this node and of every node below it.
-    pub(crate) fn map_spans(&mut self, map: &impl Fn(Range<usize>) -> Range<usize>) {
-        self.span = map(self.span.clone());
+    /// A node whose text is the one range `span`.
+    pub(crate) fn new(scope: Scope, span: Range<usize>, children: Vec<Self>) -> Self {
+        Self {
+            scope,
+            segments: vec![span.clone()],
+            span,
+            children,
+        }
+    }
+
+    /// The text of this node in `source`, its segments joined by a line feed.
+    ///
+    /// Returns `None` when a segment is not a slice of `source`.
+    #[must_use]
+    pub fn text(&self, source: &str) -> Option<String> {
+        let lines: Option<Vec<&str>> = self
+            .segments
+            .iter()
+            .map(|segment| source.get(segment.clone()))
+            .collect();
+        lines.map(|lines| lines.join("\n"))
+    }
+
+    /// Replaces the segments and the span of this node and of every node below
+    /// it. `map` gives the segments of a node from its current span.
+    pub(crate) fn map_segments(&mut self, map: &impl Fn(Range<usize>) -> Vec<Range<usize>>) {
+        self.segments = map(self.span.clone());
+        if let (Some(first), Some(last)) = (self.segments.first(), self.segments.last()) {
+            self.span = first.start..last.end;
+        }
         for child in &mut self.children {
-            child.map_spans(map);
+            child.map_segments(map);
         }
     }
 }

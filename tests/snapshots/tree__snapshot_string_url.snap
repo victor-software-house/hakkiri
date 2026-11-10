@@ -2,6 +2,6 @@
 source: tests/tree.rs
 expression: "load(\"string-url.rs\")? .render()"
 ---
-raw 149..164 "// see the docs"
-  text.comment.line 149..164 "// see the docs"
-    paragraph 152..164 "see the docs"
+raw 149..164 [149..164] "// see the docs"
+  text.comment.line 149..164 [149..164] "// see the docs"
+    paragraph 152..164 [152..164] "see the docs"

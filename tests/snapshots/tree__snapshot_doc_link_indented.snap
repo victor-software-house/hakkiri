@@ -2,7 +2,7 @@
 source: tests/tree.rs
 expression: "load(\"doc-link-indented.rs\")? .render()"
 ---
-raw 12..51 "/// See [the guide](https://g.example)."
-  text.comment.doc.line 12..51 "/// See [the guide](https://g.example)."
-    paragraph 16..51 "See [the guide](https://g.example)."
-      link 20..50 "[the guide](https://g.example)"
+raw 12..51 [12..51] "/// See [the guide](https://g.example)."
+  text.comment.doc.line 12..51 [12..51] "/// See [the guide](https://g.example)."
+    paragraph 16..51 [16..51] "See [the guide](https://g.example)."
+      link 20..50 [20..50] "[the guide](https://g.example)"

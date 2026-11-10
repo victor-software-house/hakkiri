@@ -2,6 +2,6 @@
 source: tests/tree.rs
 expression: "load(\"heading-paragraph.md\")? .render()"
 ---
-raw 0..19 "# Title\n\nOne line.\n"
-  heading.h1 0..7 "# Title"
-  paragraph 9..18 "One line."
+raw 0..19 [0..19] "# Title\n\nOne line.\n"
+  heading.h1 0..7 [0..7] "# Title"
+  paragraph 9..18 [9..18] "One line."

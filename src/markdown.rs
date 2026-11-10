@@ -55,11 +55,7 @@ impl Flavor {
 /// nodes.
 pub(crate) fn document(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
     let children = blocks(source, flavor)?;
-    Ok(vec![Node {
-        scope: Scope::Raw,
-        span: 0..source.len(),
-        children,
-    }])
+    Ok(vec![Node::new(Scope::Raw, 0..source.len(), children)])
 }
 
 /// The prose nodes of `source`, with spans in `source`.
@@ -173,11 +169,7 @@ impl Builder<'_> {
         let mut pieces: Vec<Node> = self
             .pieces(&span, &cuts)
             .into_iter()
-            .map(|span| Node {
-                scope,
-                span,
-                children: Vec::new(),
-            })
+            .map(|span| Node::new(scope, span, Vec::new()))
             .collect();
         for child in children {
             if let Some(piece) = pieces
@@ -286,11 +278,7 @@ impl Builder<'_> {
         });
         Visited {
             nodes: span
-                .map(|span| Node {
-                    scope: Scope::Alt,
-                    span,
-                    children: Vec::new(),
-                })
+                .map(|span| Node::new(Scope::Alt, span, Vec::new()))
                 .into_iter()
                 .collect(),
             cuts: Vec::new(),

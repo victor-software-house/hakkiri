@@ -2,6 +2,6 @@
 source: tests/tree.rs
 expression: "load(\"module.mjs\")? .render()"
 ---
-raw 0..18 "// Module comment."
-  text.comment.line 0..18 "// Module comment."
-    paragraph 3..18 "Module comment."
+raw 0..18 [0..18] "// Module comment."
+  text.comment.line 0..18 [0..18] "// Module comment."
+    paragraph 3..18 [3..18] "Module comment."
