@@ -7,18 +7,6 @@
 //! [prose]: https://github.com/jdkato/prose/blob/b33e60dbff0492289b227f3681120ac057d8131b/tokenize/tokenize.go
 
 use std::ops::Range;
-use std::sync::LazyLock;
-
-use regex::Regex;
-
-/// Spans kept whole: initials such as `U.S.`, and titles such as `Dr.`.
-#[expect(
-    clippy::expect_used,
-    reason = "The pattern is a constant that compiles."
-)]
-static SPECIAL: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"^(?:[A-Za-z]\.){2,}$|^[A-Z][a-z]{1,2}\.$").expect("the special pattern compiles")
-});
 
 /// Characters split off the front of a span, in the order they are tried.
 const PREFIXES: &[&str] = &[
@@ -158,9 +146,11 @@ fn split(text: &str, span: Range<usize>, found: &mut Vec<Range<usize>>) {
     // The earliest contraction ending found for the current `from`. It stays
     // right while `to` shrinks, unless `to` cuts into the ending.
     let mut contraction: Option<(usize, Option<Contraction>)> = None;
+    // Where the run of initials at the current `from` ends.
+    let mut initials: Option<(usize, usize)> = None;
     while from < to {
         let rest = text.get(from..to).unwrap_or_default();
-        if is_special(rest) {
+        if is_special(text, from, to, &mut initials) {
             found.push(from..to);
             break;
         }
@@ -195,10 +185,57 @@ pub(super) fn is_emoticon(span: &str) -> bool {
     EMOTICONS.contains(&span)
 }
 
-/// Whether `span` must stay whole.
-fn is_special(span: &str) -> bool {
-    // Both patterns of `SPECIAL` end with a period, so the others need no scan.
-    is_emoticon(span) || (span.ends_with('.') && SPECIAL.is_match(span))
+/// Whether `text[from..to]` must stay whole: an emoticon, initials such as
+/// `U.S.`, or a title such as `Dr.`.
+///
+/// `initials` holds where the run of initials from `from` ends, once it is
+/// found, and stays right for every `to` while `from` stays the same. A run is
+/// scanned once for each `from`, so a token of many marks costs a pass over
+/// the token and not a pass for each mark.
+pub(super) fn is_special(
+    text: &str,
+    from: usize,
+    to: usize,
+    initials: &mut Option<(usize, usize)>,
+) -> bool {
+    let Some(span) = text.get(from..to) else {
+        return false;
+    };
+    is_emoticon(span) || is_initials(text, from, to, initials) || is_title(span)
+}
+
+/// Whether `text[from..to]` is two or more of a letter and a period.
+fn is_initials(text: &str, from: usize, to: usize, known: &mut Option<(usize, usize)>) -> bool {
+    let length = to.saturating_sub(from);
+    if length < 4 || !length.is_multiple_of(2) || text.as_bytes().get(to - 1) != Some(&b'.') {
+        return false;
+    }
+    let end = match *known {
+        Some((at, end)) if at == from => end,
+        _ => {
+            let bytes = text.as_bytes();
+            let mut end = from;
+            while bytes.get(end).is_some_and(u8::is_ascii_alphabetic)
+                && bytes.get(end + 1) == Some(&b'.')
+            {
+                end += 2;
+            }
+            *known = Some((from, end));
+            end
+        }
+    };
+    to <= end
+}
+
+/// Whether `span` is a capital, one or two lower-case letters and a period.
+fn is_title(span: &str) -> bool {
+    matches!(
+        span.as_bytes(),
+        [first, middle @ .., b'.']
+            if first.is_ascii_uppercase()
+                && (1..=2).contains(&middle.len())
+                && middle.iter().all(u8::is_ascii_lowercase)
+    )
 }
 
 /// The length of the prefix of `span`, when it has one and holds more.

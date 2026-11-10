@@ -17,6 +17,7 @@
 use std::error::Error;
 use std::time::{Duration, Instant};
 
+use super::tokens::{is_emoticon, is_special};
 use super::{FormatError, Tagger};
 
 type TestResult = Result<(), Box<dyn Error>>;
@@ -227,4 +228,42 @@ fn initials_followed_by_a_long_run_of_marks_tag_in_linear_time() -> TestResult {
     assert_linear("initials and marks", |n| {
         format!("{}{}", "a.".repeat(n / 2), ")".repeat(n / 2))
     })
+}
+
+#[test]
+fn initials_and_titles_with_marks_in_between_tag_in_linear_time() -> TestResult {
+    assert_linear("initials, periods and marks", |n| {
+        format!("{}{}", "a.".repeat(n / 2), ".)".repeat(n / 4))
+    })
+}
+
+#[test]
+fn the_special_check_equals_the_pattern_it_replaces() -> TestResult {
+    let pattern = regex::Regex::new(r"^(?:[A-Za-z]\.){2,}$|^[A-Z][a-z]{1,2}\.$")?;
+    let alphabet = ['a', 'Z', '.', ')', '\u{e9}'];
+    let mut texts = vec![String::new()];
+    let mut checked = 0;
+    for _ in 0..6 {
+        let longer: Vec<String> = texts
+            .iter()
+            .flat_map(|text| alphabet.iter().map(move |c| format!("{text}{c}")))
+            .collect();
+        for text in &longer {
+            for from in (0..=text.len()).filter(|at| text.is_char_boundary(*at)) {
+                let mut initials = None;
+                for to in (from..=text.len()).filter(|at| text.is_char_boundary(*at)) {
+                    let window = text.get(from..to).unwrap_or_default();
+                    assert_eq!(
+                        is_special(text, from, to, &mut initials),
+                        is_emoticon(window) || pattern.is_match(window),
+                        "{window:?} at {from}..{to} of {text:?}"
+                    );
+                    checked += 1;
+                }
+            }
+        }
+        texts = longer;
+    }
+    assert!(checked > 100_000, "{checked} windows");
+    Ok(())
 }
