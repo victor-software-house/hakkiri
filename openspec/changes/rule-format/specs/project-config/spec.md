@@ -78,8 +78,14 @@ An empty list SHALL turn off linting for those files.
 
 Under a glob, a key that names a rule SHALL set that rule's level for the matched files.  
 The value SHALL be `suggestion`, `warning` or `error`, or `off` to turn the rule off.
+A key that names no rule in any loaded style SHALL be refused, with an error that names the key and its line.
 
 #### Scenario: A rule turned down
 
 - **WHEN** a glob holds `Direct.Length: warning` and the rule's own level is `error`
 - **THEN** hakkiri reports that rule's alerts on those files as warnings
+
+#### Scenario: A misspelled rule name
+
+- **WHEN** a glob holds `ProseStyle.BareUrl: off` on line 7, and no loaded style has a rule of that name
+- **THEN** hakkiri reports an error naming `ProseStyle.BareUrl` and line 7, and exits with a failure status
