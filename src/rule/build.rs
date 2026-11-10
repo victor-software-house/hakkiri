@@ -368,7 +368,11 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
     }
     let condition = source.formula(
         "condition",
-        &format!("{} {}", metric::LEFT, fields.condition.value()),
+        &format!(
+            "{} {}",
+            metric::LEFT,
+            read_headings(fields.condition.value())
+        ),
         |name| metric::is_condition_variable(name, counted),
     )?;
     if condition.is_number() {

@@ -85,6 +85,20 @@ fn second_level_headings() -> TestResult {
 }
 
 #[test]
+fn a_heading_count_in_a_condition() -> TestResult {
+    let source = "## One\n\nA.\n\n## Two\n\nB.\n";
+    let rule = |condition: &str| {
+        format!("extends: metric\nmessage: \"%s\"\nformula: paragraphs\ncondition: '{condition}'\n")
+    };
+    assert_eq!(messages(&rule(">= heading.h2"), source)?, ["2.00"]);
+    assert_eq!(
+        messages(&rule("> heading.h2"), source)?,
+        Vec::<String>::new()
+    );
+    Ok(())
+}
+
+#[test]
 fn the_comments_of_a_code_file_are_measured() -> TestResult {
     let rule = Rule::from_text(
         "Team.Rule",

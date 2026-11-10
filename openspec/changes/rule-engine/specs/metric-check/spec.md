@@ -81,12 +81,17 @@ A `metric` rule with another `scope` SHALL measure each block that scope selects
 ### Requirement: Formulas use Tengo's expression syntax
 
 A formula and a condition SHALL accept numbers, variables, parentheses, `+`, `-`, `*`, `/`, `%`, comparisons, `&&`, `||`, `!`, the functions of Tengo's `math` module written `math.sqrt(x)`, and `round(x)` or `round(x, places)`.  
-A condition MAY read `result`.
+A condition MAY read `result`, and the element counts as a formula does.
 
 #### Scenario: A two-sided condition
 
 - **WHEN** a rule has `message: "%s"`, `formula: round(words / 3, 1)` and `condition: '> 0.5 && result < 1'`, and the input is `One two.`
 - **THEN** hakkiri reports one alert, with the message `0.70`
+
+#### Scenario: A heading count in a condition
+
+- **WHEN** a rule has `message: "%s"`, `formula: paragraphs` and `condition: '>= heading.h2'`, and the input holds two `##` headings, each followed by a paragraph
+- **THEN** hakkiri reports one alert, with the message `2.00`
 
 ### Requirement: A formula that cannot run is refused
 
