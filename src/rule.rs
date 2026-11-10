@@ -19,12 +19,13 @@ use serde::de::DeserializeOwned;
 
 use self::build::Source;
 use self::schema::{
-    ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields, Probe,
-    ReadabilityFields, RepetitionFields, SubstitutionFields,
+    CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
+    OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, SubstitutionFields,
 };
 use crate::formula::Formula;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
+use crate::strcase::{Sentence, Title};
 
 /// How serious an alert is.
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -118,6 +119,8 @@ pub enum Check {
     Repetition(Repetition),
     /// Averages grade-level scores of the text, and tests the average.
     Readability(Readability),
+    /// Reports a text that is not in the case it names.
+    Capitalization(Capitalization),
 }
 
 /// The patterns that hold a match back.
@@ -309,6 +312,36 @@ pub struct Readability {
     pub grade: f64,
 }
 
+/// The case a `capitalization` rule asks for.
+#[derive(Debug)]
+pub enum Case {
+    /// `$title`, in one style.
+    Title(Title),
+    /// `$sentence`.
+    Sentence(Sentence),
+    /// `$lower`.
+    Lower,
+    /// `$upper`.
+    Upper,
+    /// Any other `match`: a pattern the text must match.
+    Pattern(Pattern),
+}
+
+/// A `capitalization` rule.
+#[derive(Debug)]
+pub struct Capitalization {
+    /// The `match`.
+    pub case: Case,
+    /// The share of words that must agree, 0.8 when the rule sets none.
+    pub threshold: f64,
+    /// The `exceptions` as one pattern: a text, or a word of one, that it
+    /// matches passes.
+    pub exceptions: Option<Pattern>,
+    /// The pattern that cuts a text into the words the share counts, the
+    /// exceptions first.
+    pub words: Pattern,
+}
+
 /// One thing wrong with a rule file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LoadProblem {
@@ -400,6 +433,9 @@ impl Rule {
             "consistency" => build::consistency_rule(&source, &read::<ConsistencyFields>(&input)?),
             "repetition" => build::repetition_rule(&source, &read::<RepetitionFields>(&input)?),
             "readability" => build::readability_rule(&source, &read::<ReadabilityFields>(&input)?),
+            "capitalization" => {
+                build::capitalization_rule(&source, &read::<CapitalizationFields>(&input)?)
+            }
             _ => build::metric_rule(&source, &read::<MetricFields>(&input)?),
         }
     }

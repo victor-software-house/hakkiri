@@ -10,7 +10,7 @@ use serde::Deserialize;
 use super::field::{Count, Flag, Number, Pairs, Text, Texts, valid};
 
 /// The check types of Vale 3.26.0 that hakkiri runs.
-pub(super) const RUNNABLE: [&str; 8] = [
+pub(super) const RUNNABLE: [&str; 9] = [
     "existence",
     "substitution",
     "occurrence",
@@ -19,10 +19,11 @@ pub(super) const RUNNABLE: [&str; 8] = [
     "conditional",
     "repetition",
     "readability",
+    "capitalization",
 ];
 
 /// The check types of Vale 3.26.0 that a later change adds.
-pub(super) const PLANNED: [&str; 3] = ["capitalization", "sequence", "spelling"];
+pub(super) const PLANNED: [&str; 2] = ["sequence", "spelling"];
 
 /// The levels of an alert.
 pub(super) const LEVELS: [&str; 3] = ["suggestion", "warning", "error"];
@@ -429,5 +430,32 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         vocab: Flag,
+    }
+}
+
+rule_fields! {
+    /// A `capitalization` rule.
+    CapitalizationFields {
+        #[serde(rename = "match")]
+        #[garde(custom(valid))]
+        pattern: Text,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        style: Text,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        exceptions: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        indicators: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        threshold: Number,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        vocab: Flag,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        prefix: Text,
     }
 }

@@ -7,17 +7,19 @@
 use std::cmp::Reverse;
 
 use super::schema::{
-    ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields,
-    ReadabilityFields, RepetitionFields, SubstitutionFields,
+    CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
+    OccurrenceFields, ReadabilityFields, RepetitionFields, SubstitutionFields,
 };
 use super::{
-    Action, Check, Conditional, Consistency, Exceptions, Existence, LoadError, LoadProblem, Metric,
-    Occurrence, Readability, Repetition, Rule, Score, Substitution, Swap, level_of,
+    Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence,
+    LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Substitution,
+    Swap, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
+use crate::strcase::{Sentence, Style, Title, WORD};
 
 /// Where a rule came from, for the errors that name it.
 #[derive(Clone, Copy, Debug)]
@@ -179,19 +181,7 @@ fn exceptions(source: &Source<'_>, terms: &[String]) -> Result<Exceptions, LoadE
     if terms.is_empty() {
         return Ok(Exceptions::default());
     }
-    let mut longest_first: Vec<&String> = terms.iter().collect();
-    longest_first.sort_by_key(|term| Reverse(term.len()));
-    let alternatives: Vec<String> = longest_first
-        .into_iter()
-        .map(|term| {
-            let pattern = term_pattern(term);
-            if pattern.starts_with("(?i)") {
-                pattern
-            } else {
-                format!("(?-i){pattern}")
-            }
-        })
-        .collect();
+    let alternatives = kept_words(terms);
     let parts: Vec<&str> = terms.iter().map(String::as_str).collect();
     let words = source.compile(
         "exceptions",
@@ -576,6 +566,90 @@ fn read_headings(formula: &str) -> String {
     })
 }
 
+/// The `exceptions` of a `capitalization` rule as the words its converters
+/// keep as written: each as an `exceptions` pattern reads it, longest first.
+fn kept_words(terms: &[String]) -> Vec<String> {
+    let mut longest_first: Vec<&String> = terms.iter().collect();
+    longest_first.sort_by_key(|term| Reverse(term.len()));
+    longest_first
+        .into_iter()
+        .map(|term| {
+            let pattern = term_pattern(term);
+            if pattern.starts_with("(?i)") {
+                pattern
+            } else {
+                format!("(?-i){pattern}")
+            }
+        })
+        .collect()
+}
+
+/// The error of a pattern that a converter refused, for the field it reads.
+fn refused(source: &Source<'_>, field: &str, error: &crate::pattern::PatternError) -> LoadError {
+    source.problem(field, format!("rule `{}`: {error}", source.name))
+}
+
+fn capitalization(
+    source: &Source<'_>,
+    fields: &CapitalizationFields,
+) -> Result<Capitalization, LoadError> {
+    let style = match fields.style.value() {
+        "" | "AP" => Style::Ap,
+        "Chicago" => Style::Chicago,
+        other => {
+            return Err(source.problem(
+                "style",
+                format!(
+                    "rule `{}`: `{other}` is not a style: use AP or Chicago",
+                    source.name
+                ),
+            ));
+        }
+    };
+    let matching = fields.pattern.value();
+    if matching.is_empty() {
+        return Err(source.problem(
+            "match",
+            format!(
+                "rule `{}`: `match` is empty, so every text would pass: use $title, $sentence, \
+                 $lower, $upper or a pattern",
+                source.name
+            ),
+        ));
+    }
+    let terms = fields.exceptions.values();
+    let exceptions = exceptions(source, terms)?;
+    let kept = kept_words(terms);
+    let prefix = fields.prefix.value();
+    if !prefix.is_empty() {
+        source.compile("prefix", prefix, &[prefix])?;
+    }
+    let case = match matching {
+        "$title" => Case::Title(
+            Title::new(style, &kept, prefix).map_err(|error| refused(source, "prefix", &error))?,
+        ),
+        "$sentence" => Case::Sentence(
+            Sentence::new(&kept, prefix, fields.indicators.values())
+                .map_err(|error| refused(source, "exceptions", &error))?,
+        ),
+        "$lower" => Case::Lower,
+        "$upper" => Case::Upper,
+        other => Case::Pattern(source.compile("match", other, &[other])?),
+    };
+    let threshold = fields.threshold.value();
+    let words = match &exceptions.words {
+        Some(words) => source.compile("exceptions", &format!("{}|{WORD}", words.source()), &[])?,
+        None => source.compile("exceptions", WORD, &[])?,
+    };
+    Ok(Capitalization {
+        case,
+        // A threshold of 0 would disable the rule, so it reads as unset.
+        threshold: if threshold == 0.0 { 0.8 } else { threshold },
+        exceptions: exceptions.words,
+        words,
+    })
+}
+
 /// The fields every check type has, and the check built from the rest.
 macro_rules! rule_of {
     ($source:expr, $fields:expr, $check:expr) => {{
@@ -682,5 +756,16 @@ pub(super) fn conditional_rule(
         source,
         fields,
         Check::Conditional(conditional(source, fields)?)
+    ))
+}
+
+pub(super) fn capitalization_rule(
+    source: &Source<'_>,
+    fields: &CapitalizationFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Capitalization(capitalization(source, fields)?)
     ))
 }
