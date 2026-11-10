@@ -204,12 +204,14 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
         span: start..end,
         segments: group.comments.clone(),
         children,
+        first: false,
     };
     Ok(Node {
         scope: Scope::Raw,
         span: start..end,
         segments: group.comments.clone(),
         children: vec![comment],
+        first: false,
     })
 }
 

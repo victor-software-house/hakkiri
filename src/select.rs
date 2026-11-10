@@ -71,84 +71,14 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
     }
 }
 
-/// The text after a list marker, a task box, if any, and its blanks.
-///
-/// A marker is a bullet or a number with `.` or `)`, followed by a blank.
-fn after_list_marker(text: &str) -> Option<&str> {
-    let digits = text.trim_start_matches(|c: char| c.is_ascii_digit());
-    let after = if digits.len() < text.len() {
-        digits.strip_prefix(['.', ')'])?
-    } else {
-        text.strip_prefix(['-', '*', '+'])?
-    };
-    if !after.is_empty() && !after.starts_with(char::is_whitespace) {
-        return None;
-    }
-    let item = after.trim_start();
-    let boxed = ["[ ]", "[x]", "[X]"]
-        .iter()
-        .find_map(|task| item.strip_prefix(task))
-        .filter(|rest| rest.starts_with(char::is_whitespace));
-    Some(boxed.unwrap_or(item))
-}
-
-/// The quote markers that open `line`, and the text after them.
-///
-/// A list marker may come before or between the markers, as in `- > text` and
-/// `> - text`, and the lines of the quote that follow indent past it.
-fn quote_prefix(line: &str) -> (usize, &str) {
-    let mut depth = 0;
-    let mut rest = line.trim_start();
-    loop {
-        if let Some(after) = rest.strip_prefix('>') {
-            depth += 1;
-            rest = after.trim_start();
-        } else if let Some(after) = after_list_marker(rest) {
-            rest = after;
-        } else {
-            return (depth, rest);
-        }
-    }
-}
-
-/// Whether nothing but blank quote lines lies between the start of the quote
-/// that holds the node at byte `start`, and the line of that node.
-///
-/// A quote repeats its marker on every line, so the line of the node holds a
-/// marker whether or not something came before it.
-/// What came before is on the lines above that carry as many markers as the
-/// node's line does, and a line with fewer is outside the quote.
-fn first_in_quote(source: &str, line_start: usize, depth: usize) -> bool {
-    let mut end = line_start;
-    while end > 0 {
-        let above = source.get(..end - 1).unwrap_or_default();
-        let start = above.rfind('\n').map_or(0, |at| at + 1);
-        let (markers, rest) = quote_prefix(source.get(start..end - 1).unwrap_or_default());
-        if markers < depth {
-            return true;
-        }
-        if !rest.trim_end().is_empty() {
-            return false;
-        }
-        end = start;
-    }
-    true
-}
-
 /// Whether `child` is the first thing inside `parent`.
 ///
-/// The tree keeps only the prose of a document, so a fenced block or another
-/// element with none can sit before the first child.
-/// The line a first child starts on then holds no marker of its parent: the
-/// bullet of a list item, or the pipe of a table row.
-/// A quote repeats its marker on every line, so its first child is the one
-/// with nothing but blank quote lines above it.
-/// A table row holds no block, so a fence cannot come before its first cell.
-fn opens(source: &str, parent: &Node, child: &Node) -> bool {
-    let markers = match parent.scope {
-        Scope::List => "-*+.)",
-        Scope::Blockquote => ">",
-        Scope::TableRow => "|",
+/// The tree keeps only the prose of a document, so a fenced block, a thematic
+/// break or another element with none can sit before the first child.
+/// The parser knows each node's place, and the tree records it in `first`.
+fn opens(parent: &Node, child: &Node) -> bool {
+    match parent.scope {
+        Scope::List | Scope::Blockquote | Scope::TableRow => child.first,
         Scope::Paragraph
         | Scope::Heading1
         | Scope::Heading2
@@ -167,23 +97,8 @@ fn opens(source: &str, parent: &Node, child: &Node) -> bool {
         | Scope::CommentLine
         | Scope::CommentBlock
         | Scope::CommentDocLine
-        | Scope::CommentDocBlock => return true,
-    };
-    let start = child.span.start;
-    let line = source
-        .get(..start)
-        .map_or(0, |before| before.rfind('\n').map_or(0, |at| at + 1));
-    let marked = source.get(line..start).is_some_and(|prefix| {
-        prefix.contains(|c| markers.contains(c))
-            && prefix
-                .chars()
-                .all(|c| c.is_whitespace() || c.is_ascii_digit() || "-*+>|.)#[]xX".contains(c))
-    });
-    marked
-        && (parent.scope != Scope::Blockquote
-            || source
-                .get(line..start)
-                .is_some_and(|prefix| first_in_quote(source, line, prefix.matches('>').count())))
+        | Scope::CommentDocBlock => true,
+    }
 }
 
 /// The scope names a node holds.
@@ -377,7 +292,7 @@ pub fn select(
                 .rev()
                 .map(|(index, child)| Step {
                     node: child,
-                    chain: if index == 0 && opens(source, node, child) {
+                    chain: if index == 0 && opens(node, child) {
                         chain
                     } else {
                         None

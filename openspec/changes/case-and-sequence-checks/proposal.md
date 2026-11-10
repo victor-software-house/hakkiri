@@ -25,7 +25,7 @@ ProseStyle uses none of them, so no project that hakkiri lints today waits on th
 
 ### Modified Capabilities
 
-None.
+- `document-tree`: a node records whether it is the first child of its container.
 
 ## Impact
 

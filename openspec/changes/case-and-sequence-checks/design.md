@@ -195,17 +195,17 @@ A negated part reads the block's scope the same way ([scope.go][v-scope-match]),
 
 hakkiri's tree gives a list item or a quote the text of everything inside it ([node-segments spec][node-segments]), and the metric summaries read that text.  
 Selection reads each paragraph, heading and cell under the scope Vale gives it, found from whether the node is the first child of its parent.  
-A first child starts on a line with the parent's marker, and in a quote nothing but blank quote lines lies above it.  
+The tree records, for each node, whether it is the first child of its container, read from the parser's list of every child.  
 So `~list` and `~blockquote` keep what Vale keeps, which replaces the any-depth exclusion of the [format design][format-7].  
 `table` selects cells, not rows, since Vale has no row scope.
 
 Two cases differ, where Vale's behaviour is a defect:
 
 - `sentence & paragraph` selects the sentences of paragraphs, and Vale selects none, since no sentence block has `paragraph` in its scope. Vale works around this for `sequence` ([sequence.go][v-seq-scope]).
-- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block holds `paragraph`. hakkiri gives 68 alerts fewer.
+- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block holds `paragraph`. hakkiri gives 78 alerts fewer.
 
 A test runs 57 `existence` and `sequence` rules for 29 scopes over nine Markdown files that nest sentences in items, quotes, tables and headings.  
-It matches all of Vale's 3,418 alerts but those 68, and `departures.tsv` lists them and the 102 that only hakkiri gives.
+It matches all of Vale's 3,736 alerts but those 78, and `departures.tsv` lists them and the 117 that only hakkiri gives.
 
 Alternative: keep the container text and filter blocks by depth.  
 Lost: it needs a depth rule for each scope, and Vale's rule is the chain of first children.

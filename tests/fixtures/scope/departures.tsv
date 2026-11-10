@@ -32,6 +32,11 @@ vale	Scope.existence-not-paragraph	quote-item.md	36	16	21	marker
 vale	Scope.existence-not-paragraph	quote-item.md	44	14	19	marker
 vale	Scope.existence-not-paragraph	quote-item.md	52	17	22	marker
 vale	Scope.existence-not-paragraph	quote-item.md	59	12	17	marker
+vale	Scope.existence-not-paragraph	quote-item.md	77	20	25	marker
+vale	Scope.existence-not-paragraph	quote-item.md	84	14	19	marker
+vale	Scope.existence-not-paragraph	quote-item.md	90	14	19	marker
+vale	Scope.existence-not-paragraph	quote-item.md	114	22	27	marker
+vale	Scope.existence-not-paragraph	quote-item.md	122	15	20	marker
 vale	Scope.sequence-not-paragraph	deep.md	18	18	23	marker
 vale	Scope.sequence-not-paragraph	deep.md	18	47	52	marker
 vale	Scope.sequence-not-paragraph	edge.md	8	25	30	marker
@@ -66,6 +71,11 @@ vale	Scope.sequence-not-paragraph	quote-item.md	36	16	21	marker
 vale	Scope.sequence-not-paragraph	quote-item.md	44	14	19	marker
 vale	Scope.sequence-not-paragraph	quote-item.md	52	17	22	marker
 vale	Scope.sequence-not-paragraph	quote-item.md	59	12	17	marker
+vale	Scope.sequence-not-paragraph	quote-item.md	77	20	25	marker
+vale	Scope.sequence-not-paragraph	quote-item.md	84	14	19	marker
+vale	Scope.sequence-not-paragraph	quote-item.md	90	14	19	marker
+vale	Scope.sequence-not-paragraph	quote-item.md	114	22	27	marker
+vale	Scope.sequence-not-paragraph	quote-item.md	122	15	20	marker
 hakkiri	Scope.existence-sentence-paragraph	deep.md	18	18	23	marker
 hakkiri	Scope.existence-sentence-paragraph	deep.md	18	47	52	marker
 hakkiri	Scope.existence-sentence-paragraph	edge.md	8	25	30	marker
@@ -100,6 +110,11 @@ hakkiri	Scope.existence-sentence-paragraph	quote-item.md	36	16	21	marker
 hakkiri	Scope.existence-sentence-paragraph	quote-item.md	44	14	19	marker
 hakkiri	Scope.existence-sentence-paragraph	quote-item.md	52	17	22	marker
 hakkiri	Scope.existence-sentence-paragraph	quote-item.md	59	12	17	marker
+hakkiri	Scope.existence-sentence-paragraph	quote-item.md	77	20	25	marker
+hakkiri	Scope.existence-sentence-paragraph	quote-item.md	84	14	19	marker
+hakkiri	Scope.existence-sentence-paragraph	quote-item.md	90	14	19	marker
+hakkiri	Scope.existence-sentence-paragraph	quote-item.md	114	22	27	marker
+hakkiri	Scope.existence-sentence-paragraph	quote-item.md	122	15	20	marker
 hakkiri	Scope.sequence-paragraph-not-list	deep.md	18	18	23	marker
 hakkiri	Scope.sequence-paragraph-not-list	deep.md	18	47	52	marker
 hakkiri	Scope.sequence-paragraph-not-list	edge.md	8	25	30	marker
@@ -134,6 +149,11 @@ hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	36	16	21	marker
 hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	44	14	19	marker
 hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	52	17	22	marker
 hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	59	12	17	marker
+hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	77	20	25	marker
+hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	84	14	19	marker
+hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	90	14	19	marker
+hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	114	22	27	marker
+hakkiri	Scope.sequence-paragraph-not-list	quote-item.md	122	15	20	marker
 hakkiri	Scope.sequence-sentence-paragraph	deep.md	18	18	23	marker
 hakkiri	Scope.sequence-sentence-paragraph	deep.md	18	47	52	marker
 hakkiri	Scope.sequence-sentence-paragraph	edge.md	8	25	30	marker
@@ -168,3 +188,8 @@ hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	36	16	21	marker
 hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	44	14	19	marker
 hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	52	17	22	marker
 hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	59	12	17	marker
+hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	77	20	25	marker
+hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	84	14	19	marker
+hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	90	14	19	marker
+hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	114	22	27	marker
+hakkiri	Scope.sequence-sentence-paragraph	quote-item.md	122	15	20	marker

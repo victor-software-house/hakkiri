@@ -65,10 +65,15 @@ A list item and a block quote SHALL be read through the blocks inside them.
 - **WHEN** a rule has `scope: paragraph`, and the input is a quote that starts with a fenced block and holds the paragraph `> After the fence.`
 - **THEN** hakkiri selects one block, `After the fence.`
 
-#### Scenario: A paragraph after the first in a quote inside an item
+#### Scenario: A quote inside an item
 
 - **WHEN** a rule has `scope: paragraph`, and the input is a list item that holds a quote of the paragraphs `Para one.` and `Para two.`
-- **THEN** hakkiri selects one block, `Para two.`, and a rule with `scope: blockquote` selects `Para one.`
+- **THEN** hakkiri selects one block, `Para two.`, and a rule with `scope: list` selects `Para one.`
+
+#### Scenario: A paragraph after a thematic break in a quote
+
+- **WHEN** a rule has `scope: blockquote`, and the input is a quote that holds a thematic break and then the paragraph `After the rule.`
+- **THEN** hakkiri selects one block, `After the rule.`
 
 ### Requirement: A dotted sentence is a sentence in a scope
 

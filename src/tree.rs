@@ -151,6 +151,10 @@ pub struct Node {
     pub segments: Vec<Range<usize>>,
     /// The nodes inside this one, in file order.
     pub children: Vec<Node>,
+    /// Whether the node is the first thing inside the list item, quote or
+    /// table row around it, ahead of any fenced block, thematic break or other
+    /// element that holds no prose.
+    pub first: bool,
 }
 
 impl Node {
@@ -161,6 +165,7 @@ impl Node {
             segments: vec![span.clone()],
             span,
             children,
+            first: false,
         }
     }
 
@@ -176,6 +181,7 @@ impl Node {
             span,
             segments,
             children,
+            first: false,
         })
     }
 

@@ -410,11 +410,13 @@ fn a_paragraph_after_a_fenced_block_in_a_quote_is_a_paragraph() -> TestResult {
 }
 
 #[test]
-fn a_quote_in_a_list_item_has_its_first_paragraph_as_the_quote() -> TestResult {
+fn a_quote_in_a_list_item_gives_its_first_paragraph_to_the_item() -> TestResult {
     let source = "- > Para one.\n  >\n  > Para two.\n";
-    let found = blocks(&["blockquote"], "a.md", source)?;
+    let found = blocks(&["list"], "a.md", source)?;
     assert_eq!(texts(&found), ["Para one."]);
     let found = blocks(&["paragraph"], "a.md", source)?;
     assert_eq!(texts(&found), ["Para two."]);
+    let found = blocks(&["blockquote"], "a.md", source)?;
+    assert_eq!(texts(&found), Vec::<&str>::new());
     Ok(())
 }
