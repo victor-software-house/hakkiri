@@ -1,11 +1,11 @@
-# Spec Delta
+# scope-selection Specification
 
 ## Purpose
 
 Selection decides which nodes of the document tree a rule reads, and what text, sentences and words a check sees in each of them.  
 The [rule-files spec][rule-files] names the scopes; this spec fixes how they match.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: A scope name matches by dotted prefix
 
@@ -113,4 +113,4 @@ A match that overlaps a code span SHALL give no alert from `existence` or `subst
 - **WHEN** a rule has `tokens: ['run \w+']`, and the input is ``Then run `cargo test` now.``
 - **THEN** hakkiri reports no alert
 
-[rule-files]: ../../../../specs/rule-files/spec.md
+[rule-files]: ../rule-files/spec.md

@@ -39,7 +39,7 @@ This change starts after the [rule-engine change][engine] merges.
 
 - Archive this change after the pull request merges, then archive `HKR-013` with `qctl close-from-openspec`.
 
-[engine]: ../rule-engine/proposal.md
+[engine]: ../archive/2026-11-10-rule-engine/proposal.md
 [design]: design.md
 [pattern]: specs/pattern-checks/spec.md
 [readability]: specs/readability-check/spec.md

@@ -47,12 +47,12 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 - New modules for rules, selection, text, patterns, alerts and the four checks; the tree builders and their snapshots change for inline gaps.
 - `HKR-005` builds the `check` and `test` commands on this engine.
 
-[ledger]: ../../../tasks.yaml
-[document-tree]: ../../specs/document-tree/spec.md
-[node-segments]: ../../specs/node-segments/spec.md
-[next]: ../pattern-and-readability-checks/proposal.md
-[last]: ../case-sequence-and-spelling-checks/proposal.md
-[bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
+[ledger]: ../../../../tasks.yaml
+[document-tree]: ../../../specs/document-tree/spec.md
+[node-segments]: ../../../specs/node-segments/spec.md
+[next]: ../../pattern-and-readability-checks/proposal.md
+[last]: ../../case-sequence-and-spelling-checks/proposal.md
+[bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
 [design]: design.md
-[splitter]: ../archive/2026-11-10-sentence-splitter/proposal.md
-[sentence-splitting]: ../../specs/sentence-splitting/spec.md
+[splitter]: ../2026-11-10-sentence-splitter/proposal.md
+[sentence-splitting]: ../../../specs/sentence-splitting/spec.md

@@ -97,4 +97,4 @@ The same sources SHALL give the same file.
 - **WHEN** the training task runs twice on the same sources
 - **THEN** both runs write byte-identical model files
 
-[scope]: ../../changes/rule-engine/specs/scope-selection/spec.md
+[scope]: ../scope-selection/spec.md

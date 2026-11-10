@@ -193,8 +193,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [alerts]: specs/alerts/spec.md
 [match]: specs/match-checks/spec.md
 [metric]: specs/metric-check/spec.md
-[rule-files]: ../../specs/rule-files/spec.md
+[rule-files]: ../../../specs/rule-files/spec.md
 [ps-commit]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846
-[fk-tsv]: ../../../tests/fixtures/fk-parity/vale-fk.tsv
-[fk-inputs]: ../../../tests/fixtures/fk-parity/inputs
-[fk-sources]: ../../../tests/fixtures/fk-parity/SOURCES.md
+[fk-tsv]: ../../../../tests/fixtures/fk-parity/vale-fk.tsv
+[fk-inputs]: ../../../../tests/fixtures/fk-parity/inputs
+[fk-sources]: ../../../../tests/fixtures/fk-parity/SOURCES.md

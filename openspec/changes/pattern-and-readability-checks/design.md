@@ -120,8 +120,8 @@ Alternatives:
 - [A `consistency` alert at its own match can differ from Vale's column] → this happens only when the matched text appears earlier in the node.  
   The rule, level, message and matched text still agree.
 
-[engine-design]: ../rule-engine/design.md
-[loading]: ../rule-engine/specs/rule-loading/spec.md
+[engine-design]: ../archive/2026-11-10-rule-engine/design.md
+[loading]: ../../specs/rule-loading/spec.md
 [readability]: specs/readability-check/spec.md
 [pattern]: specs/pattern-checks/spec.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale

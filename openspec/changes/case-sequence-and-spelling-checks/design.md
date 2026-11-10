@@ -185,7 +185,7 @@ Each crate was read on crates.io on 2026-11-10.
 - [Porting about 5,600 lines of Go is the largest task in the engine work] → the tasks split the tagger, the converters and the reader.  
   Each has its own tests.
 
-[engine-design]: ../rule-engine/design.md
+[engine-design]: ../archive/2026-11-10-rule-engine/design.md
 [pattern-design]: ../pattern-and-readability-checks/design.md
 [project-config]: ../../specs/project-config/spec.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
