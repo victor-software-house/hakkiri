@@ -22,7 +22,10 @@
 
 ## 2. Integration
 
-- [ ] 2.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+- [x] 2.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+  - 2026-11-10 (UTC), [Verify][run-pr7] passed on [PR 7][pr7] at `ab0f0b7`.  
+    The Template check passed at v0.0.88.  
+    Every Kody thread was answered and resolved, and the pull request merged at `94ae55e`.
 
 ## Workflow follow-up
 
@@ -32,3 +35,5 @@
 [c-gaps]: https://github.com/victor-software-house/hakkiri/commit/ae31a1ac38d6a4657c5fdc8999b760824d4184d7
 [c-lines]: https://github.com/victor-software-house/hakkiri/commit/02f167627237fe417271074a75b41ae7313eb0cd
 [c-syntax]: https://github.com/victor-software-house/hakkiri/commit/eb6115b9886b3bb509c6a17e3457a9548fd10584
+[pr7]: https://github.com/victor-software-house/hakkiri/pull/7
+[run-pr7]: https://github.com/victor-software-house/hakkiri/actions/runs/42782271493

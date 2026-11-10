@@ -97,10 +97,10 @@ A change to the tree shows as a snapshot diff in review.
 - [TypeScript 0.23.2 is older than the other grammars] → each grammar crate exposes a language function that tree-sitter 0.27 loads.  
   CI proves the build.
 
-[rule-format]: ../archive/2026-11-10-rule-format/design.md
-[segments]: ../node-segments/design.md
-[bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
-[research]: ../archive/2026-11-09-bootstrap-hakkiri/research.md
+[rule-format]: ../2026-11-10-rule-format/design.md
+[segments]: ../2026-11-10-node-segments/design.md
+[bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
+[research]: ../2026-11-09-bootstrap-hakkiri/research.md
 [markdown-rs]: https://crates.io/crates/markdown/1.0.0
 [ts-rust]: https://crates.io/crates/tree-sitter-rust/0.24.2
 [ts-ts]: https://crates.io/crates/tree-sitter-typescript/0.23.2

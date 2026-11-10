@@ -1,20 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-003
+active: HKR-004
 queue:
-  - id: HKR-003
-    title: Build the document tree and language profiles
-    scope: tree
-    outcome: >-
-      Markdown, MDX, and Rust, TypeScript and JavaScript comments parse into one node
-      tree with byte spans.
-    blocked_by: []
-    acceptance:
-      - Snapshot tests show trees and spans for block comments, strings holding URLs, nested lists, tables and MDX.
-      - String literals never appear as prose nodes.
-    plan: openspec/changes/document-tree/proposal.md
-
   - id: HKR-004
     title: Build the rule engine
     scope: engine
@@ -35,7 +23,6 @@ queue:
       hakkiri check lints files in parallel and hakkiri test runs rule cases,
       released as binaries through verctl.
     blocked_by:
-      - HKR-003
       - HKR-004
     acceptance:
       - Integration tests cover line and JSON output, exit status by level, and .ctl/hakkiri.yaml globs and levels.
@@ -95,16 +82,29 @@ queue:
       - HKR-009
     acceptance:
       - Every adopted project passes CI on hakkiri.
-
+archive:
   - id: HKR-012
     title: Give tree nodes their text segments
     scope: tree
     outcome: Every tree node reads its text from file ranges that hold no markup.
-    blocked_by: []
-    acceptance:
-      - Every node from Markdown, MDX and comments holds segments that cover its text and leave out markers, indentation and line endings.
-    plan: openspec/changes/node-segments/proposal.md
-archive:
+    plan: openspec/changes/archive/2026-11-10-node-segments/proposal.md
+    completed: 2026-11-10T08:28:34
+    evidence:
+      - PR 7 merged the document tree and its segments at 94ae55e; both OpenSpec changes are archived.
+    disposition: completed
+
+  - id: HKR-003
+    title: Build the document tree and language profiles
+    scope: tree
+    outcome: >-
+      Markdown, MDX, and Rust, TypeScript and JavaScript comments parse into one node
+      tree with byte spans.
+    plan: openspec/changes/archive/2026-11-10-document-tree/proposal.md
+    completed: 2026-11-10T08:28:34
+    evidence:
+      - PR 7 merged the document tree and its segments at 94ae55e; both OpenSpec changes are archived.
+    disposition: completed
+
   - id: HKR-002
     title: Design the rule and config format
     scope: format

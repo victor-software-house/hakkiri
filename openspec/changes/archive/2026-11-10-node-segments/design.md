@@ -71,4 +71,4 @@ Alternative: map only the start and end of a node. Lost: the markers between lin
   The common indent counts spaces and tabs.
 - [A heading loses its `#`, so its span starts later] → the span is the covering range of the segments, as decision 1 says.
 
-[tree]: ../document-tree/design.md
+[tree]: ../2026-11-10-document-tree/design.md
