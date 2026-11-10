@@ -39,6 +39,23 @@ queue:
     acceptance:
       - Tests cover the first fetch, a cache hit and a hash mismatch.
 
+  - id: HKR-019
+    title: Read vocabularies
+    scope: config
+    outcome: >-
+      A project selects vocabularies whose accepted and rejected terms reach every
+      check that reads them.
+    blocked_by:
+      - HKR-005
+      - HKR-006
+    acceptance:
+      - A project's config names vocabularies, and each is read from a package's accept.txt and reject.txt.
+      - Accepted terms reach capitalization's vocab exceptions, added before the (?-i) rewrite, and the spelling check's accepted words.
+      - Accepted and rejected terms give the alerts that Vale's generated Vale.Terms and Vale.Avoid rules give.
+    notes:
+      - "2026-11-10, Vale adds the accepted terms to a capitalization rule's exceptions when its vocab is true, which is the default: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L52-L70."
+      - 2026-11-10, the case-sequence-and-spelling-checks change leaves capitalization's vocab with no effect, and its spelling check (task 3.3) reads accepted words from this row.
+
   - id: HKR-007
     title: Import Vale styles
     scope: import
