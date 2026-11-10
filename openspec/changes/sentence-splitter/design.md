@@ -62,14 +62,17 @@ Alternative: Punkt alone. Lost: the Golden Rules score stays near Vale's.
 
 ### 3. Training text
 
-The model is trained on three sources (operator, 2026-11-10):
+The model is trained on four sources (operator, 2026-11-10):
 
-- The Markdown of the owner's public repositories.
-- The `.md` files of Common Pile's `github_archive`, kept only where the file's license is on the Blue Oak list ([Common Pile][common-pile]).
-- Public-domain books from Common Pile's `project_gutenberg`.
+- The Markdown of the owner's public repositories: public, not a fork, not archived, at most 10 MB, each pinned by commit.
+- The Markdown files of Common Pile's `stackv2`, kept where the record's `path` ends in `.md` or `.markdown` and every license in its `metadata.license` is on the Blue Oak list ([dataset card][stackv2], [Common Pile][common-pile]).  
+  Markdown spreads over many of its 764 shards, mixed with code; the task reads a pinned prefix of one shard that is dense with it.
+- The Python Enhancement Proposals of Common Pile's `python_enhancement_proposals`, in the public domain ([dataset card][peps]).
+- Public-domain books from Common Pile's `project_gutenberg`: a pinned prefix of one shard.
 
 The documentation sources teach terms such as `e.g.` and `etc.` as hakkiri's input uses them; the books give volume.  
-A source list with each source's license is committed beside the model.
+A source list with each source's license is committed beside the model, in `data/splitter/SOURCES.md`.  
+Every dataset is pinned by revision, so a rerun reads the same input.
 
 Alternatives:
 
@@ -79,8 +82,12 @@ Alternatives:
 
 ### 4. Training runs in a build box, the model is a file
 
-The trainer is one CPU pass that counts tokens and runs Punkt's likelihood tests.  
-A mise task fetches the sources, trains and writes `data/splitter/en.tsv` in an ephemeral build box.  
+The trainer is three CPU passes over the text, in the library module `splitter::train`: it counts tokens, marks candidate sentence ends, and runs Punkt's likelihood tests.  
+The example `examples/train_splitter.rs` reads the corpus files and writes the model and `data/splitter/SOURCES.md`.  
+`mise run splitter:train` runs it after `mise run splitter:fetch`, which reads the pins in `data/splitter/` and writes the corpus to `target/splitter-corpus/`.  
+`mise run splitter:pin` refreshes the repository pins.  
+The tasks run in an ephemeral build box.  
+The capitalization table keeps the 20,000 most frequent words; a word outside it reads as unknown.  
 The model is a tab-separated text file, so a review reads its changes as lines.  
 The binary embeds it with `include_str!` and parses it once per process.
 
@@ -105,7 +112,7 @@ Alternative: agreement with Vale as the score. Lost: Vale's own mistakes would c
 ## Risks / Trade-offs
 
 - [hakkiri splits some text apart from Vale] → `LongSentence` and Flesch-Kincaid move on those inputs. The rule-engine change states its tolerance, and `HKR-008` reviews the alert diff.
-- [A file in `github_archive` carries a wrong license field] → the model holds counts, not text, and the source list names the filter.
+- [A file in `stackv2` carries a wrong license field] → the model holds counts, not text, and the source list names the filter.
 - [Hand labels carry mistakes] → each label change is a reviewed diff, and the Golden Rules and MASC sets are labelled by others.
 
 [proposal]: proposal.md
@@ -118,5 +125,7 @@ Alternative: agreement with Vale as the score. Lost: Vale's own mistakes would c
 [pysbd]: https://aclanthology.org/2020.nlposs-1.15.pdf
 [pysbd-repo]: https://github.com/nipunsadvilkar/pySBD
 [common-pile]: https://arxiv.org/abs/2506.05209
+[stackv2]: https://huggingface.co/datasets/common-pile/stackv2
+[peps]: https://huggingface.co/datasets/common-pile/python_enhancement_proposals
 [nupunkt-guide]: https://github.com/alea-institute/nupunkt/blob/main/docs/training-guide.md
 [masc]: https://anc.org/data/masc/about/
