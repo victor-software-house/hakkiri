@@ -158,6 +158,16 @@ fn a_match_that_ends_in_a_wide_character() -> TestResult {
 }
 
 #[test]
+fn a_zero_width_match_ends_where_it_starts() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\nnonword: true\ntokens: ['(?=b)']\n",
+        "abc",
+    )?;
+    assert_eq!(found.iter().map(place).collect::<Vec<_>>(), [(1, 2, 2)]);
+    Ok(())
+}
+
+#[test]
 fn a_match_across_a_line_break() -> TestResult {
     let found = markdown(
         "extends: existence\nmessage: \"'%s'\"\ntokens: ['very good']\n",
