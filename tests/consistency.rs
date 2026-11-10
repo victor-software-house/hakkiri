@@ -162,6 +162,23 @@ fn a_form_in_code_is_not_a_match() -> TestResult {
 }
 
 #[test]
+fn a_form_with_a_space_matches_across_a_line_wrap() -> TestResult {
+    let found = alerts(
+        &rule("e-mail address: email address", ""),
+        "An e-mail\naddress came.\n\nThe email address left.\n",
+    )?;
+    assert_eq!(found.len(), 1);
+    assert_eq!(found[0].matched, "email address");
+    let found = alerts(
+        &rule("e-mail address: email address", ""),
+        "An e-mail address came.\n\nThe email\naddress left.\n",
+    )?;
+    assert_eq!(found.len(), 1);
+    assert_eq!(found[0].matched, "email\naddress");
+    Ok(())
+}
+
+#[test]
 fn a_rule_starts_each_file_with_nothing_seen() -> TestResult {
     let text = rule("advisor: adviser", "");
     let first = messages(&text, "An advisor came.\n")?;

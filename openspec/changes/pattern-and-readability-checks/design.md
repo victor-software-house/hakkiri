@@ -37,7 +37,7 @@ A captured word that equals a `consistency` group name, such as `Spelling2`, wou
 ### 2. consistency matches as existence does, one pattern per pair
 
 For each `either` pair, hakkiri builds one pattern with the key and the value as two alternatives inside Vale's word template.  
-So `ignorecase` and `nonword` mean what they mean for `existence` ([consistency.go][v-cons-new]).
+So `ignorecase` and `nonword` mean what they mean for `existence`, and a space in a form matches a line wrap, as in an `existence` token ([consistency.go][v-cons-new]).
 
 A node gives one alert for a pair when the pair matched in it and both forms have matched in the file so far.  
 The alert sits at the last match of the pair in that node, through the byte table.

@@ -149,6 +149,13 @@ fn a_repeat_across_a_line_wrap() -> TestResult {
 }
 
 #[test]
+fn a_blank_token_is_left_out() -> TestResult {
+    let text = "extends: repetition\nmessage: m\nignorecase: true\ntokens: ['[^\\s.!?]+', '']\n";
+    assert_eq!(matched(text, "This is is a test.\n")?, ["is is"]);
+    Ok(())
+}
+
+#[test]
 fn a_rule_with_no_token_is_refused() {
     let error = Rule::from_text(
         "Team.Repeat",

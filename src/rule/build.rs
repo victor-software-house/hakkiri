@@ -455,7 +455,8 @@ fn conditional(source: &Source<'_>, fields: &ConditionalFields) -> Result<Condit
 
 /// One pattern for each pair of a `consistency` rule, by key.
 ///
-/// A pair matches as `existence` tokens do, its two forms as groups.
+/// A pair matches as `existence` tokens do, its two forms as groups, and a
+/// space in a form matches a line wrap too.
 fn consistency(source: &Source<'_>, fields: &ConsistencyFields) -> Result<Consistency, LoadError> {
     let mut entries: Vec<&(String, String)> = fields.either.entries().iter().collect();
     entries.sort_by(|left, right| left.0.cmp(&right.0));
@@ -463,7 +464,9 @@ fn consistency(source: &Source<'_>, fields: &ConsistencyFields) -> Result<Consis
         .into_iter()
         .map(|(first, second)| {
             let body = format!(
-                "(?P<{form}0>{first})|(?P<{form}1>{second})",
+                "(?P<{form}0>{})|(?P<{form}1>{})",
+                wrap_spaces(first),
+                wrap_spaces(second),
                 form = Consistency::FORM
             );
             let pattern = template(!fields.nonword.value(), fields.ignorecase.value(), &body);
@@ -476,16 +479,23 @@ fn consistency(source: &Source<'_>, fields: &ConsistencyFields) -> Result<Consis
 /// The pattern of a `repetition` rule: its tokens in one group, with no word
 /// template.
 fn repetition(source: &Source<'_>, fields: &RepetitionFields) -> Result<Repetition, LoadError> {
-    let tokens = fields.tokens.values();
+    // A blank token would match the empty string at every position, as an
+    // `existence` rule leaves it out.
+    let tokens: Vec<&str> = fields
+        .tokens
+        .values()
+        .iter()
+        .map(String::as_str)
+        .filter(|token| !token.trim().is_empty())
+        .collect();
     let group = format!("({})", tokens.join("|"));
     let pattern = if fields.ignorecase.value() {
         format!("(?i){group}")
     } else {
         group
     };
-    let parts: Vec<&str> = tokens.iter().map(String::as_str).collect();
     Ok(Repetition {
-        pattern: source.compile("tokens", &pattern, &parts)?,
+        pattern: source.compile("tokens", &pattern, &tokens)?,
         max: fields.max.value(),
         ignorecase: fields.ignorecase.value(),
         letters: if fields.alpha.value() {
