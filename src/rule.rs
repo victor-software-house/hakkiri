@@ -19,6 +19,7 @@ use serde::de::DeserializeOwned;
 
 use self::build::Source;
 use self::schema::{ExistenceFields, MetricFields, OccurrenceFields, Probe, SubstitutionFields};
+use crate::formula::Formula;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
 
@@ -176,10 +177,11 @@ pub struct Occurrence {
 /// A `metric` rule.
 #[derive(Debug)]
 pub struct Metric {
-    /// The `formula`, as written.
-    pub formula: String,
-    /// The `condition`, as written.
-    pub condition: String,
+    /// The `formula`.
+    pub formula: Formula,
+    /// The `condition`, which reads as a comparison of the formula's result,
+    /// such as `> 4`.
+    pub condition: Formula,
     /// What the formula's `occurrences` counts, when the rule has `tokens` or
     /// `raw`.
     pub tokens: Option<Existence>,

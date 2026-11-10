@@ -11,6 +11,8 @@ use super::{
     Action, Check, Exceptions, Existence, LoadError, LoadProblem, Metric, Occurrence, Rule,
     Substitution, Swap, level_of,
 };
+use crate::formula::Formula;
+use crate::metric;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
 
@@ -34,6 +36,18 @@ impl Source<'_> {
                 message,
             }],
         }
+    }
+
+    /// Parses the formula `text` of `field`, whose variables are those that
+    /// `known` accepts.
+    fn formula(
+        &self,
+        field: &str,
+        text: &str,
+        known: impl Fn(&str) -> bool,
+    ) -> Result<Formula, LoadError> {
+        Formula::parse(text, &known)
+            .map_err(|error| self.problem(field, format!("rule `{}`: {error}", self.name)))
     }
 
     /// Compiles `pattern`, assembled from the `parts` of `field`.
@@ -322,8 +336,8 @@ fn occurrence(source: &Source<'_>, fields: &OccurrenceFields) -> Result<Occurren
 }
 
 fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadError> {
-    let counts = !fields.tokens.values().is_empty() || !fields.raw.values().is_empty();
-    let tokens = if counts {
+    let counted = !fields.tokens.values().is_empty() || !fields.raw.values().is_empty();
+    let tokens = if counted {
         Some(Existence {
             pattern: tokens_pattern(
                 source,
@@ -338,10 +352,44 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
     } else {
         None
     };
+    let formula = source.formula("formula", &read_headings(fields.formula.value()), |name| {
+        metric::is_variable(name, counted)
+    })?;
+    if formula.is_truth() {
+        return Err(source.problem(
+            "formula",
+            format!(
+                "rule `{}`: the formula gives {}, and a metric needs a number",
+                source.name,
+                metric::describe(&formula)
+            ),
+        ));
+    }
+    let condition = source.formula(
+        "condition",
+        &format!("{} {}", metric::LEFT, fields.condition.value()),
+        |name| metric::is_condition_variable(name, counted),
+    )?;
+    if condition.is_number() {
+        return Err(source.problem(
+            "condition",
+            format!(
+                "rule `{}`: the condition must compare the result, such as `> 4`",
+                source.name
+            ),
+        ));
+    }
     Ok(Metric {
-        formula: fields.formula.value().to_owned(),
-        condition: fields.condition.value().to_owned(),
+        formula,
+        condition,
         tokens,
+    })
+}
+
+/// `formula` with `heading.h2` written as the variable `heading_h2`.
+fn read_headings(formula: &str) -> String {
+    (1..=6).fold(formula.to_owned(), |text, depth| {
+        text.replace(&format!("heading.h{depth}"), &format!("heading_h{depth}"))
     })
 }
 

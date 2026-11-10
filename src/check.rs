@@ -4,8 +4,10 @@ use std::collections::HashMap;
 use std::ops::Range;
 
 use crate::alert::fill;
+use crate::metric::measure;
 use crate::pattern::{Pattern, SearchError};
-use crate::rule::{Check, Exceptions, Existence, Occurrence, Rule, Substitution, Swap};
+use crate::rule::{Check, Exceptions, Existence, Metric, Occurrence, Rule, Substitution, Swap};
+use crate::summary::{Elements, Summary};
 use crate::text::Text;
 
 /// One match a check found in a block of text.
@@ -44,7 +46,7 @@ pub(crate) fn run(check: &Check, text: &Text) -> Result<Vec<Hit>, SearchError> {
         Check::Existence(existence) => run_existence(existence, text),
         Check::Substitution(substitution) => run_substitution(substitution, text),
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
-        Check::Metric(_) => Ok(Vec::new()),
+        Check::Metric(metric) => run_metric(metric, text),
     }
 }
 
@@ -217,4 +219,56 @@ fn first_word(content: &str) -> Option<Range<usize>> {
         .find(char::is_whitespace)
         .unwrap_or(content.len() - start);
     Some(start..start + length)
+}
+
+/// How many matches of the tokens `existence` holds in `content`, not
+/// counting the ones an exception holds back. A match in a code span counts.
+fn count_tokens(existence: &Existence, content: &str) -> Result<usize, SearchError> {
+    let found = existence.pattern.find_all(content)?;
+    let phrases = phrase_spans(&existence.exceptions, content, !found.is_empty())?;
+    let mut count = 0;
+    for range in found {
+        let Some(matched) = content.get(range.clone()) else {
+            continue;
+        };
+        if !excepted(&existence.exceptions, &phrases, &range, matched.trim())? {
+            count += 1;
+        }
+    }
+    Ok(count)
+}
+
+/// One hit at the start of `text` when the metric holds for it, measured
+/// apart from the rest of the file.
+fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
+    let content = text.as_str();
+    let occurrences = metric
+        .tokens
+        .as_ref()
+        .map(|tokens| count_tokens(tokens, content))
+        .transpose()?;
+    Ok(measure(metric, content, Elements::default(), occurrences)
+        .map(|result| Hit {
+            range: 0..0,
+            values: vec![format!("{result:.2}")],
+            numbered: false,
+        })
+        .into_iter()
+        .collect())
+}
+
+/// What the metric reports for the prose of the whole file.
+pub(crate) fn run_summary(metric: &Metric, summary: &Summary) -> Result<Option<Hit>, SearchError> {
+    let occurrences = metric
+        .tokens
+        .as_ref()
+        .map(|tokens| count_tokens(tokens, &summary.content))
+        .transpose()?;
+    Ok(
+        measure(metric, &summary.content, summary.elements, occurrences).map(|result| Hit {
+            range: 0..0,
+            values: vec![format!("{result:.2}")],
+            numbered: false,
+        }),
+    )
 }

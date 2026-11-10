@@ -55,7 +55,8 @@ In a metric with a scope, each element count SHALL be 0.
 
 A `metric` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.  
 It SHALL leave out headings and table cells.  
-Text with no words SHALL give no alert.
+Text with no words SHALL give no alert.  
+A `metric` rule with another `scope` SHALL measure each block that scope selects, and report at the start of that block.
 
 #### Scenario: A heading is not measured
 
@@ -66,6 +67,11 @@ Text with no words SHALL give no alert.
 
 - **WHEN** the same rule reads a file that holds only `# One two three`
 - **THEN** hakkiri reports no alert
+
+#### Scenario: A scope measures each block
+
+- **WHEN** a rule has `message: "%s"`, `scope: paragraph`, `formula: words` and `condition: '> 1'`, and the input is the paragraphs `One two three.`, `Four.` and `Five six.`
+- **THEN** hakkiri reports two alerts, with the messages `3.00` and `2.00`
 
 ### Requirement: Formulas use Tengo's expression syntax
 

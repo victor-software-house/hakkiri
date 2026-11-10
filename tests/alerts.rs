@@ -437,8 +437,8 @@ fn a_code_span_is_no_match() -> TestResult {
     Ok(())
 }
 
-/// The rules the long-input tests run together: one of each match check.
-const MARKER_RULES: [(&str, &str); 3] = [
+/// The rules the long-input tests run together: one of each check type.
+const MARKER_RULES: [(&str, &str); 4] = [
     (
         "Team.Existence",
         "extends: existence\nmessage: m\ntokens: [marker]\n",
@@ -446,6 +446,10 @@ const MARKER_RULES: [(&str, &str); 3] = [
     (
         "Team.Substitution",
         "extends: substitution\nmessage: \"Use '%s' instead of '%s'.\"\nswap: {marker: signpost}\n",
+    ),
+    (
+        "Team.Metric",
+        "extends: metric\nmessage: \"%s words\"\nformula: words\ncondition: '> 1'\n",
     ),
     (
         "Team.Occurrence",
@@ -477,14 +481,18 @@ fn a_match_at_the_end_of_a_long_line() -> TestResult {
         [
             ("Team.Existence", 1),
             ("Team.Substitution", 1),
+            ("Team.Metric", 1),
             ("Team.Occurrence", 1)
         ]
     );
-    assert!(
-        found
-            .iter()
-            .all(|alert| place(alert) == (1, 49_995, 50_000))
-    );
+    assert!(found.iter().all(|alert| {
+        place(alert)
+            == if alert.rule == "Team.Metric" {
+                (1, 1, 1)
+            } else {
+                (1, 49_995, 50_000)
+            }
+    }));
     Ok(())
 }
 
@@ -499,6 +507,7 @@ fn sixty_thousand_lines() -> TestResult {
         [
             ("Team.Existence", 60_000),
             ("Team.Substitution", 60_000),
+            ("Team.Metric", 1),
             ("Team.Occurrence", 1)
         ]
     );

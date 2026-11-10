@@ -145,8 +145,24 @@ impl<'a> Locator<'a> {
     ) -> Option<Alert> {
         let matched = text.as_str().get(range.clone())?;
         let offset = text.file_range(range)?.start;
+        Some(self.report(rule, offset, matched, (message, description)))
+    }
+
+    /// The alert of `rule` for a text with no match to point at, at the file
+    /// byte `offset`.
+    pub fn alert_at(&mut self, rule: &Rule, offset: usize, messages: (String, String)) -> Alert {
+        self.report(rule, offset, "", messages)
+    }
+
+    fn report(
+        &mut self,
+        rule: &Rule,
+        offset: usize,
+        matched: &str,
+        (message, description): (String, String),
+    ) -> Alert {
         let (line, first_column) = self.place(offset);
-        Some(Alert {
+        Alert {
             rule: rule.name.clone(),
             level: rule.level,
             message,
@@ -157,13 +173,19 @@ impl<'a> Locator<'a> {
             last_column: first_column + extent(matched),
             matched: matched.to_owned(),
             action: rule.action.clone(),
-        })
+        }
     }
 
     /// An alert that points at the start of `text`, for a fault of the rule
     /// itself.
     pub fn failure(&mut self, rule: &Rule, text: &Text, message: String) -> Alert {
-        let (line, first_column) = self.place(text.file_offset(0).unwrap_or_default());
+        self.failure_at(rule, text.file_offset(0).unwrap_or_default(), message)
+    }
+
+    /// An alert that points at the file byte `offset`, for a fault of the
+    /// rule itself.
+    pub fn failure_at(&mut self, rule: &Rule, offset: usize, message: String) -> Alert {
+        let (line, first_column) = self.place(offset);
         Alert {
             rule: rule.name.clone(),
             level: Level::Error,

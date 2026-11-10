@@ -163,6 +163,18 @@ impl Selector {
         self.declared
     }
 
+    /// Whether the scope is none, or `text` alone: a `metric` rule then
+    /// measures the prose of the whole file instead of the blocks it selects.
+    pub(crate) fn measures_file(&self) -> bool {
+        match self.alternatives.as_slice() {
+            [item] => matches!(
+                item.parts.as_slice(),
+                [part] if part.name == "text" && !part.negated && part.extension.is_none()
+            ),
+            _ => false,
+        }
+    }
+
     /// Whether any item selects sentences.
     pub(crate) fn wants_sentences(&self) -> bool {
         self.alternatives.iter().any(Alternative::wants_sentences)

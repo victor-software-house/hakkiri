@@ -436,7 +436,6 @@ fn a_metric_counts_tokens() -> TestResult {
         return Err("not a metric rule".into());
     };
     assert!(metric.tokens.is_some());
-    assert_eq!(metric.formula, "occurrences / words");
     Ok(())
 }
 

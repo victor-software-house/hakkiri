@@ -112,7 +112,7 @@ fn segments(node: &Node) -> Vec<Range<usize>> {
 
 /// The spans below `node` that read otherwise: a code span reads as `x`, and
 /// an inline element the scope excludes reads as spaces.
-fn replacements(node: &Node, blank: &[Inline]) -> Vec<(Range<usize>, Replace)> {
+pub(crate) fn replacements(node: &Node, blank: &[Inline]) -> Vec<(Range<usize>, Replace)> {
     let mut found: Vec<(Range<usize>, Replace)> = Vec::new();
     let mut pending: Vec<&Node> = node.children.iter().collect();
     while let Some(child) = pending.pop() {
