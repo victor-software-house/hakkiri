@@ -12,9 +12,11 @@ This change starts after the [rule-engine change][engine] merges.
 
 ## 2. Pattern checks
 
-- [ ] 2.1 Build `consistency`: one pattern per `either` pair in Vale's word template, and the forms seen per file in the rule.  
+- [x] 2.1 Build `consistency`: one pattern per `either` pair in Vale's word template, and the forms seen per file in the rule.  
   Give one alert per node, at the last match of the pair.  
   Verify every consistency scenario in the [pattern-checks spec][pattern] passes as a unit test in CI.
+  - 2026-11-10 (UTC), 13 tests in `tests/consistency.rs` cover every consistency scenario, in a Linux box run of [94c5649][c-consistency].  
+    They add a mixed paragraph, the last match, the other form first, case, `nonword`, code, a fresh file, and two refusals.
 - [ ] 2.2 Build `conditional`: group detection, the plain presence check, the terms captured per file in document order, `exceptions`, and the refusal of `in`.  
   Verify every conditional scenario passes as a unit test in CI.
 - [x] 2.3 Build `repetition`: the joined pattern, the trimmed comparison, `alpha`, `max` with Vale's count, the one-sentence check and `exceptions`.  
@@ -49,3 +51,4 @@ This change starts after the [rule-engine change][engine] merges.
 [readability]: specs/readability-check/spec.md
 [c-readability]: https://github.com/victor-software-house/hakkiri/commit/cfb983962d9399c5d3c0865afc81eb93390c82cd
 [c-repetition]: https://github.com/victor-software-house/hakkiri/commit/ec047118bdfc7d89163072067848beaf6704a874
+[c-consistency]: https://github.com/victor-software-house/hakkiri/commit/94c564949d03f8da42fdf3a2e50eee6216954a0e
