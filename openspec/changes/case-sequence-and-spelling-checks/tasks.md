@@ -9,15 +9,23 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
   Add a `style` scenario to the [capitalization spec][capitalization] for the fourth answer.  
   Verify the Open decisions section is empty and `mise run specs:budget` passes.  
   2026-11-10, the operator's answers are recorded as decisions, and the Open decisions section is gone.
-- [ ] 1.2 Add the crates, ported code and data files the answers chose, with each license notice the data needs.  
-  Verify the `deny` and `deps` steps pass in CI, and that each notice file is in the published crate.
+- [x] 1.2 Add the crates, ported code and data files the answers chose, with each license notice the data needs.  
+  Verify the `deny` and `deps` steps pass in CI, and that each notice file is in the published crate.  
+  2026-11-10, the tagger model and the dictionary are in `main` with their notices in `data/tagger/` and `data/dictionary/`.  
+  The `deny` and `deps` tasks ran and passed in the [CI run on the merge commit][main-ci].  
+  `Cargo.toml` sets no `include` or `exclude`, so the notice files ship with the crate.  
+  Not verified: `cargo package --list`, which CI does not run.
 
 ## 2. Shared data
 
-- [ ] 2.1 Build the tagger and its word tokenizer as the first answer chose.  
-  Verify a unit test in CI tags `The file can be read.` with `MD` on `can`, and `Open the file.` with `NN` on `file`.
-- [ ] 2.2 Build the Hunspell reader and the built-in dictionary as the second and third answers chose, with `ICONV`, affix flags and affix expansion.  
-  Verify a unit test in CI accepts `receive` and `GitHub`, refuses `blorft`, and expands `utilize/DSG` to four forms.
+- [x] 2.1 Build the tagger and its word tokenizer as the first answer chose.  
+  Verify a unit test in CI tags `The file can be read.` with `MD` on `can`, and `Open the file.` with `NN` on `file`.  
+  2026-11-10, `can_is_a_modal_in_a_passive` and `file_is_a_noun_after_an_imperative` pass in CI on [PR 33][hakkiri#33], merged with [PR 35][hakkiri#35] in the [run on `main`][main-ci].  
+  A 188-sentence comparison against prose's tags passes as well.
+- [x] 2.2 Build the Hunspell reader and the built-in dictionary as the second and third answers chose, with `ICONV`, affix flags and affix expansion.  
+  Verify a unit test in CI accepts `receive` and `GitHub`, refuses `blorft`, and expands `utilize/DSG` to four forms.  
+  2026-11-10, `words_of_the_dictionary_and_names`, `a_word_it_lacks_is_refused` and `an_affix_flag_makes_four_forms` pass in CI on [PR 35][hakkiri#35], and again in the [run on `main`][main-ci].  
+  A 9,159-word comparison against Vale's checker passes as well.
 
 ## 3. Checks
 
@@ -43,6 +51,9 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
 
 - Archive this change after the pull request merges, then archive `HKR-014` with `qctl close-from-openspec`.
 
+[hakkiri#33]: https://github.com/victor-software-house/hakkiri/pull/33
+[hakkiri#35]: https://github.com/victor-software-house/hakkiri/pull/35
+[main-ci]: https://github.com/victor-software-house/hakkiri/actions/runs/42865681901
 [pattern]: ../archive/2026-11-10-pattern-and-readability-checks/proposal.md
 [design]: design.md
 [capitalization]: specs/capitalization-check/spec.md
