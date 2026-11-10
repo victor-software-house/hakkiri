@@ -46,7 +46,7 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 
 ### Requirement: A run finishes where Vale panics, stalls or runs out of memory
 
-hakkiri SHALL finish a run on each input below in bounded time and memory, where Vale 3.26.0 panics, runs out of memory, or takes cubic or exponential time.
+hakkiri SHALL finish a run on each input below in bounded time and memory, where Vale 3.26.0 panics, runs out of memory, or takes quadratic, cubic or exponential time.
 
 #### Scenario: A pattern reaches its limit
 

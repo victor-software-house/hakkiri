@@ -22,7 +22,7 @@ This change adds the part that comes from the [case-and-sequence][case] and [spe
 
 ### 1. Resource use is listed
 
-Case-and-sequence decisions 3, 5 and 6 and the bootstrap design record cases where Vale runs out of memory, takes cubic or exponential time, or panics, and hakkiri does not.  
+Case-and-sequence decisions 3, 5 and 6 and the bootstrap design record cases where Vale runs out of memory, takes quadratic, cubic or exponential time, or panics, and hakkiri does not.  
 Output stays the same, but the behaviour differs, and a project that moves from Vale meets it.  
 The last requirement of the spec holds them.
 
