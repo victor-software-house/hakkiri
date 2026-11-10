@@ -820,3 +820,63 @@ fn a_quote_or_a_list_item_reads_as_its_content() -> TestResult {
     }
     Ok(())
 }
+
+/// The text of each paragraph in `source`, with whether it is first in its
+/// container.
+fn firsts(source: &str) -> Result<Vec<(String, bool)>, Box<dyn Error>> {
+    let tree = parse(Language::Markdown, source)?;
+    let mut found = Vec::new();
+    let mut pending: Vec<&Node> = tree.roots.iter().rev().collect();
+    while let Some(node) = pending.pop() {
+        if node.scope == Scope::Paragraph {
+            let text = node.text(source).ok_or("a segment outside the source")?;
+            found.push((text, node.first));
+        }
+        pending.extend(node.children.iter().rev());
+    }
+    Ok(found)
+}
+
+#[test]
+fn a_node_records_whether_it_is_first_in_its_container() -> TestResult {
+    let cases: [(&str, &[(&str, bool)]); 21] = [
+        ("- One.\n\n  Two.\n", &[("One.", true), ("Two.", false)]),
+        ("- ```\n  x\n  ```\n\n  Two.\n", &[("Two.", false)]),
+        ("> * * *\n>\n> Two.\n", &[("Two.", true)]),
+        ("> -\n>\n> Two.\n", &[("Two.", false)]),
+        ("> [r]: /u\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <!-- c -->\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <div>x</div>\n>\n> Two.\n", &[("Two.", false)]),
+        ("> <hr>\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <div>\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <!-- c --> <div>x</div>\n>\n> Two.\n", &[("Two.", false)]),
+        ("> <span>\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <hr>\n> <hr>\n>\n> Two.\n", &[("Two.", true)]),
+        ("> </div>\n>\n> Two.\n", &[("Two.", false)]),
+        ("> <?x y ?>\n>\n> Two.\n", &[("Two.", true)]),
+        (
+            "> <?php echo \"<div>\"; ?>\n>\n> Two.\n",
+            &[("Two.", false)],
+        ),
+        ("> <![CDATA[<div>]]>\n>\n> Two.\n", &[("Two.", false)]),
+        ("> <!DOCTYPE html><div>\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <div title=\"a>b\">\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <hr title=\"a><div>\">\n>\n> Two.\n", &[("Two.", true)]),
+        (
+            "> One\nlazy\n>\n> Two.\n",
+            &[("One\nlazy", true), ("Two.", false)],
+        ),
+        (
+            "- > One.\n  >\n  > Two.\n",
+            &[("One.", true), ("Two.", false)],
+        ),
+    ];
+    for (source, expected) in cases {
+        let wanted: Vec<(String, bool)> = expected
+            .iter()
+            .map(|(text, first)| ((*text).to_owned(), *first))
+            .collect();
+        assert_eq!(firsts(source)?, wanted, "{source:?}");
+    }
+    Ok(())
+}

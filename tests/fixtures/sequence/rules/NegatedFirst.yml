@@ -1,0 +1,6 @@
+extends: sequence
+message: "Bare '%s'."
+tokens:
+  - tag: DT
+    negate: true
+  - pattern: of

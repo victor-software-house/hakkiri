@@ -1,0 +1,7 @@
+extends: sequence
+message: "Drop 'then' in '%s'."
+ignorecase: true
+tokens:
+  - pattern: if
+  - pattern: then
+    skip: 2

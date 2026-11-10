@@ -14,6 +14,7 @@
 mod features;
 mod model;
 mod tokens;
+mod treebank;
 
 #[cfg(test)]
 mod tests;
@@ -109,20 +110,43 @@ impl Tagger {
             .iter()
             .map(|range| sentence.get(range.clone()).unwrap_or_default())
             .collect();
+        let tags = self.tag_words(&words);
+        ranges
+            .into_iter()
+            .zip(tags)
+            .map(|(range, tag)| Tagged { range, tag })
+            .collect()
+    }
+
+    /// The words of `sentence` as prose's Treebank tokenizer cuts them, the
+    /// way a title is tagged, each with its tag.
+    #[must_use]
+    pub fn tag_treebank(&self, sentence: &str) -> Vec<String> {
+        let words = treebank::tokenize(sentence);
+        let refs: Vec<&str> = words.iter().map(String::as_str).collect();
+        self.tag_words(&refs)
+            .into_iter()
+            .map(str::to_owned)
+            .collect()
+    }
+
+    /// The tag of each of `words`, which are already cut.
+    #[must_use]
+    pub fn tag_words<'a>(&'a self, words: &[&'a str]) -> Vec<&'a str> {
         let mut context = vec![features::START.to_owned(), features::START2.to_owned()];
         context.extend(words.iter().map(|word| features::normalize(word)));
         context.push(features::END.to_owned());
         context.push(features::END2.to_owned());
         let mut previous = features::START;
         let mut before = features::START2;
-        let mut tagged = Vec::with_capacity(ranges.len());
-        for (index, (range, word)) in ranges.into_iter().zip(words).enumerate() {
+        let mut tags = Vec::with_capacity(words.len());
+        for (index, word) in words.iter().enumerate() {
             let tag = self.tag_one(&context, index + 2, word, previous, before);
-            tagged.push(Tagged { range, tag });
+            tags.push(tag);
             before = previous;
             previous = tag;
         }
-        tagged
+        tags
     }
 
     /// The tag of one word.

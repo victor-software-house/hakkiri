@@ -19,12 +19,14 @@ use serde::de::DeserializeOwned;
 
 use self::build::Source;
 use self::schema::{
-    ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields, Probe,
-    ReadabilityFields, RepetitionFields, SubstitutionFields,
+    CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
+    OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, SequenceFields,
+    SubstitutionFields,
 };
 use crate::formula::Formula;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
+use crate::strcase::{Sentence, Title};
 
 /// How serious an alert is.
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -118,6 +120,10 @@ pub enum Check {
     Repetition(Repetition),
     /// Averages grade-level scores of the text, and tests the average.
     Readability(Readability),
+    /// Reports a text that is not in the case it names.
+    Capitalization(Capitalization),
+    /// Reports a run of words that its tokens match in order.
+    Sequence(Sequence),
 }
 
 /// The patterns that hold a match back.
@@ -309,6 +315,152 @@ pub struct Readability {
     pub grade: f64,
 }
 
+/// The case a `capitalization` rule asks for.
+#[derive(Debug)]
+pub enum Case {
+    /// `$title`, in one style.
+    Title(Title),
+    /// `$sentence`.
+    Sentence(Sentence),
+    /// `$lower`.
+    Lower,
+    /// `$upper`.
+    Upper,
+    /// Any other `match`: a pattern the text must match.
+    Pattern(Pattern),
+}
+
+/// A `capitalization` rule.
+#[derive(Debug)]
+pub struct Capitalization {
+    /// The `match`.
+    pub case: Case,
+    /// The share of words that must agree, 0.8 when the rule sets none.
+    pub threshold: f64,
+    /// The `exceptions` as one pattern: a text, or a word of one, that it
+    /// matches passes.
+    pub exceptions: Option<Pattern>,
+    /// The pattern that cuts a text into the words the share counts, the
+    /// exceptions first.
+    pub words: Pattern,
+}
+
+/// One token of a `sequence` rule.
+#[derive(Debug)]
+pub struct Token {
+    /// The `pattern`, matched against a whole word.
+    pub word: Option<Pattern>,
+    /// The `tag`, or the Penn tags a `upos` stands for, matched anywhere in
+    /// the word's tag.
+    pub tag: Option<Pattern>,
+    /// The words a `upos` that Penn cannot tell apart is limited to, matched
+    /// against a whole word.
+    pub words: Option<Pattern>,
+    /// Whether the token matches a word its pattern and tag do not match.
+    pub negate: bool,
+    /// Whether the alert spans this token's word alone.
+    pub target: bool,
+    /// The `skip`: how many words may come before the word.
+    pub skip: usize,
+    /// How many times the token repeats: its `min`, or 1.
+    pub copies: usize,
+    /// Whether the token has a step of its own after its optional ones: it
+    /// has a `pattern`, a tag or a `upos`.
+    pub required: bool,
+}
+
+impl Token {
+    /// How many steps one copy of the token makes: its `skip` optional steps
+    /// and the required one.
+    fn width(&self) -> usize {
+        self.skip + usize::from(self.required)
+    }
+}
+
+/// One position a `sequence` walk checks: a token, or one copy of it.
+///
+/// A token with `skip: N` has N optional steps and the required one, and a
+/// token with `min: N` repeats that N times.
+/// The steps are counted, not stored, so that a large `skip` or `min` costs
+/// nothing until a walk reaches them.
+#[derive(Clone, Copy, Debug)]
+pub struct Step {
+    /// The index of the token in [`Sequence::tokens`].
+    pub token: usize,
+    /// Whether a word that does not match is passed over.
+    pub optional: bool,
+    /// Whether it is the first of the optional steps of a `skip`.
+    pub start: bool,
+    /// Whether it is the required step that the optional ones pad.
+    pub end: bool,
+    /// The first step that one occurrence of a token made.
+    pub first: usize,
+    /// The step after the last one that the occurrence made.
+    pub after: usize,
+}
+
+/// A `sequence` rule.
+#[derive(Debug)]
+pub struct Sequence {
+    /// The tokens as written.
+    pub tokens: Vec<Token>,
+    /// The number of steps up to the end of each token.
+    pub ends: Vec<usize>,
+    /// The step the walk starts from: the first with a `pattern`, or else the
+    /// first with a tag, that is not negated.
+    pub anchor: usize,
+    /// Where the anchor's pattern occurs in a sentence, which bounds how many
+    /// times the walk starts. A tag has no text to search for.
+    pub candidates: Option<Pattern>,
+    /// The `exceptions`: a match that begins inside a match of one is dropped.
+    pub exceptions: Vec<Pattern>,
+}
+
+impl Sequence {
+    /// How many steps the tokens make.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.ends.last().copied().unwrap_or(0)
+    }
+
+    /// Whether the tokens make no step.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    /// The steps of token `token`.
+    #[must_use]
+    pub fn block(&self, token: usize) -> std::ops::Range<usize> {
+        let begin = token.checked_sub(1).map_or(0, |before| self.ends[before]);
+        begin..self.ends[token]
+    }
+
+    /// The token that made step `index`.
+    #[must_use]
+    pub fn token_of(&self, index: usize) -> usize {
+        self.ends.partition_point(|end| *end <= index)
+    }
+
+    /// Step `index`, which must be below [`Sequence::len`].
+    #[must_use]
+    pub fn step(&self, index: usize) -> Step {
+        let token = self.token_of(index);
+        let width = self.tokens[token].width();
+        let offset = index - self.block(token).start;
+        let within = offset % width;
+        let first = index - within;
+        Step {
+            token,
+            optional: within < self.tokens[token].skip,
+            start: within == 0 && self.tokens[token].skip > 0,
+            end: within == self.tokens[token].skip,
+            first,
+            after: first + width,
+        }
+    }
+}
+
 /// One thing wrong with a rule file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LoadProblem {
@@ -400,6 +552,10 @@ impl Rule {
             "consistency" => build::consistency_rule(&source, &read::<ConsistencyFields>(&input)?),
             "repetition" => build::repetition_rule(&source, &read::<RepetitionFields>(&input)?),
             "readability" => build::readability_rule(&source, &read::<ReadabilityFields>(&input)?),
+            "capitalization" => {
+                build::capitalization_rule(&source, &read::<CapitalizationFields>(&input)?)
+            }
+            "sequence" => build::sequence_rule(&source, &read::<SequenceFields>(&input)?),
             _ => build::metric_rule(&source, &read::<MetricFields>(&input)?),
         }
     }

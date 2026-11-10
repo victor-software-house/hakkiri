@@ -1,0 +1,5 @@
+extends: sequence
+message: "Passive: '%s %s'."
+tokens:
+  - tag: MD
+  - pattern: be

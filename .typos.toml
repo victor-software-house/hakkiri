@@ -6,6 +6,8 @@ extend-exclude = [
   "data/dictionary/en_US-web.aff",
   "data/dictionary/en_US-web.dic",
   "tests/fixtures/dictionary/vale.tsv",
+  "tests/fixtures/capitalization/vale.tsv",
+  "tests/fixtures/tagger/treebank.tsv",
 ]
 
 # Word endings in the syllable rules of `src/readability.rs`.
@@ -13,3 +15,5 @@ extend-exclude = [
 ful = "ful"
 ment = "ment"
 thm = "thm"
+# The `mor` of `mor'n`, a contraction in the Treebank tokenizer of `src/tagger/treebank.rs`.
+mor = "mor"

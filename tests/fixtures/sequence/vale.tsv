@@ -1,0 +1,446 @@
+Seq.AndThe	Getting Started with Hakkiri and the API	and the	Join 'and'.
+Seq.AndThe	The dog and the cat saw the man.	and the	Join 'and'.
+Seq.AndThe	The tall man and the old woman saw the small dog.	and the	Join 'and'.
+Seq.AndThe	and the, and the and the	and the	Join 'and'.
+Seq.AndThe	and the, and the and the	and the	Join 'and'.
+Seq.AndThe	and the, and the and the	and the	Join 'and'.
+Seq.Animal	the the the cat	the cat	Pet 'the cat'.
+Seq.Animal	The dog and the cat saw the man.	The dog	Pet 'The dog'.
+Seq.Animal	The dog and the cat saw the man.	the cat	Pet 'the cat'.
+Seq.Animal	the cat the dog the man the cat	the cat	Pet 'the cat'.
+Seq.Animal	the cat the dog the man the cat	the dog	Pet 'the dog'.
+Seq.Animal	the cat the dog the man the cat	the cat	Pet 'the cat'.
+Seq.Genitive	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Adventures of Sherlock	Of 'Adventures of Sherlock'.
+Seq.Genitive	"Well, some hundreds of times."	hundreds of times	Of 'hundreds of times'.
+Seq.Genitive	Would you mind reading me the advertised description of Mr.	description of Mr.	Of 'description of Mr.'.
+Seq.Genitive	We had no feeling of security unless our doors were locked."	feeling of security	Of 'feeling of security'.
+Seq.Genitive	"Yes, sir, that be the house of Dr.	house of Dr.	Of 'house of Dr.'.
+Seq.Genitive	She said the man of the house saw the picture of London.	picture of London	Of 'picture of London'.
+Seq.IfThen	If it rains then stay.	If it rains then	Drop 'then' in 'If'.
+Seq.IfThen	if it rains, then it pours, and if not then not.	if not then	Drop 'then' in 'if'.
+Seq.ModalBe	The file can be read.	can be	Modal 'can be'.
+Seq.ModalBe	It will be done and you can be sure.	will be	Modal 'will be'.
+Seq.ModalBe	It will be done and you can be sure.	can be	Modal 'can be'.
+Seq.NegatedFirst	Café Society of the World	Society of	Bare 'Society'.
+Seq.NegatedFirst	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Adventures of	Bare 'Adventures'.
+Seq.NegatedFirst	"Well, some hundreds of times."	hundreds of	Bare 'hundreds'.
+Seq.NegatedFirst	"And you are a benefactor of the race," said I.	benefactor of	Bare 'benefactor'.
+Seq.NegatedFirst	Would you mind reading me the advertised description of Mr.	description of	Bare 'description'.
+Seq.NegatedFirst	Some friend of yours, perhaps?"	friend of	Bare 'friend'.
+Seq.NegatedFirst	Well, that is a list of my town suppliers.	list of	Bare 'list'.
+Seq.NegatedFirst	We had no feeling of security unless our doors were locked."	feeling of	Bare 'feeling'.
+Seq.NegatedFirst	"Yes, sir, that be the house of Dr.	house of	Bare 'house'.
+Seq.NegatedFirst	"You speak of danger.	speak of	Bare 'speak'.
+Seq.NegatedFirst	"It is very good of Lord St.	good of	Bare 'good'.
+Seq.NegatedFirst	One sorrow comes close upon the heels of another.	heels of	Bare 'heels'.
+Seq.NegatedFirst	Café your self café, naïve the résumé of the café.	résumé of	Bare 'résumé'.
+Seq.NegatedFirst	I think that the results of the tests of the code are good.	results of	Bare 'results'.
+Seq.NegatedFirst	I think that the results of the tests of the code are good.	tests of	Bare 'tests'.
+Seq.NegatedFirst	She said the man of the house saw the picture of London.	man of	Bare 'man'.
+Seq.NegatedFirst	She said the man of the house saw the picture of London.	picture of	Bare 'picture'.
+Seq.NegatedFirst	It is, in fact, an apple (or two) of the best kind.	) of	Bare ')'.
+Seq.NoNoun	Run the The Web Tool	the The	No noun after 'the The'.
+Seq.NoNoun	Would you mind reading me the advertised description of Mr.	the advertised	No noun after 'the advertised'.
+Seq.NoNoun	"No, no; the real name," said Holmes sweetly.	the real	No noun after 'the real'.
+Seq.NoNoun	"Before the what?" asked Holmes with a start.	the what	No noun after 'the what'.
+Seq.NoNoun	Pick the red one.	the red	No noun after 'the red'.
+Seq.NoNoun	Open the	the	No noun after 'the '.
+Seq.NoNoun	the the the cat	the the	No noun after 'the the'.
+Seq.NoNoun	the the the cat	the the	No noun after 'the the'.
+Seq.NoNoun	The tall man and the old woman saw the small dog.	the old	No noun after 'the old'.
+Seq.NoNoun	The tall man and the old woman saw the small dog.	the small	No noun after 'the small'.
+Seq.NoNoun	The quick brown fox jumps over the lazy dog.	the lazy	No noun after 'the lazy'.
+Seq.NoNoun	It is, in fact, an apple (or two) of the best kind.	the best	No noun after 'the best'.
+Seq.NoNoun	and the, and the and the	the,	No noun after 'the ,'.
+Seq.NoNoun	and the, and the and the	the and	No noun after 'the and'.
+Seq.NoNoun	and the, and the and the	the	No noun after 'the '.
+Seq.NotGood	"'That would suit me very well,' said I.	very well	Not good 'very well'.
+Seq.NotGood	This is very very good.	very very	Not good 'very very'.
+Seq.NotGood	This is very very very good.	very very	Not good 'very very'.
+Seq.NotGood	This is very very very good.	very very	Not good 'very very'.
+Seq.NotGood	Very good, very very good, very bad.	very very	Not good 'very very'.
+Seq.NotGood	Very good, very very good, very bad.	very bad	Not good 'very bad'.
+Seq.NotGood	very very very very good	very very	Not good 'very very'.
+Seq.NotGood	very very very very good	very very	Not good 'very very'.
+Seq.NotGood	very very very very good	very very	Not good 'very very'.
+Seq.Passive	The file can be read.	can be	Passive: 'can be'.
+Seq.Passive	It will be done and you can be sure.	will be	Passive: 'will be'.
+Seq.Passive	It will be done and you can be sure.	can be	Passive: 'can be'.
+Seq.Punctuation	!!!	!!	Marks '!!'.
+Seq.Punctuation	!!!	!!	Marks '!!'.
+Seq.Punctuation	...	..	Marks '..'.
+Seq.Punctuation	...	..	Marks '..'.
+Seq.Punctuation	"Well, some hundreds of times."	."	Marks '."'.
+Seq.Punctuation	"I was mad--insane."	."	Marks '."'.
+Seq.Punctuation	"'Come, man, come, only three minutes, or it won't be legal.'	.'	Marks '.''.
+Seq.Punctuation	"I know where it is."	."	Marks '."'.
+Seq.Punctuation	"But she could not love him."	."	Marks '."'.
+Seq.Punctuation	"'That would suit me very well,' said I.	,'	Marks ',''.
+Seq.Punctuation	"'Where could I find him?'	?'	Marks '?''.
+Seq.Punctuation	Jones, it is all right," said the stranger with deference.	,"	Marks ',"'.
+Seq.Punctuation	"It's all clear," he whispered.	,"	Marks ',"'.
+Seq.Punctuation	"And you are a benefactor of the race," said I.	,"	Marks ',"'.
+Seq.Punctuation	"I met him first at the gasfitters' ball," she said.	,"	Marks ',"'.
+Seq.Punctuation	"It is a murder, then?"	?"	Marks '?"'.
+Seq.Punctuation	Do you not yourself think that he is innocent?"	?"	Marks '?"'.
+Seq.Punctuation	I know all about McCarthy."	."	Marks '."'.
+Seq.Punctuation	Some friend of yours, perhaps?"	?"	Marks '?"'.
+Seq.Punctuation	"Has he come with you to-night?"	?"	Marks '?"'.
+Seq.Punctuation	K., and why does he pursue this unhappy family?"	.,	Marks '.,'.
+Seq.Punctuation	K., and why does he pursue this unhappy family?"	?"	Marks '?"'.
+Seq.Punctuation	"Holmes," I cried, "you are too late."	,"	Marks ',"'.
+Seq.Punctuation	"Holmes," I cried, "you are too late."	, "	Marks ',"'.
+Seq.Punctuation	"Holmes," I cried, "you are too late."	."	Marks '."'.
+Seq.Punctuation	"Yes, I have one waiting."	."	Marks '."'.
+Seq.Punctuation	"In the cells."	."	Marks '."'.
+Seq.Punctuation	"My dear Holmes!"	!"	Marks '!"'.
+Seq.Punctuation	"What will you say?"	?"	Marks '?"'.
+Seq.Punctuation	"No, no; the real name," said Holmes sweetly.	,"	Marks ',"'.
+Seq.Punctuation	We had no feeling of security unless our doors were locked."	."	Marks '."'.
+Seq.Punctuation	"My stepfather's business papers."	."	Marks '."'.
+Seq.Punctuation	"'I shall come down in a carriage to meet you.'	.'	Marks '.''.
+Seq.Punctuation	I fear that you have felt the draught.'	.'	Marks '.''.
+Seq.Punctuation	"Before the what?" asked Holmes with a start.	?"	Marks '?"'.
+Seq.Punctuation	"But you were on a friendly footing?"	?"	Marks '?"'.
+Seq.Punctuation	"It was a slight, sir, a public slight," said Lord St.	,"	Marks ',"'.
+Seq.Punctuation	Oh, what shall I do!"	!"	Marks '!"'.
+Seq.Punctuation	"It is a noiseless lock," said he.	,"	Marks ',"'.
+Seq.Punctuation	Yours faithfully, JEPHRO RUCASTLE.'	.'	Marks '.''.
+Seq.Punctuation	She has her freedom."	."	Marks '."'.
+Seq.Punctuation	Toller knows more about this matter than anyone else."	."	Marks '."'.
+Seq.Quoted	Do it your self.	your self	Write 'yourself' as one word.
+Seq.Quoted	Do it your self and then your self again.	your self	Write 'yourself' as one word.
+Seq.Quoted	Do it your self and then your self again.	your self	Write 'yourself' as one word.
+Seq.Quoted	Café your self café, naïve the résumé of the café.	your self	Write 'yourself' as one word.
+Seq.SkipTag	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	The Adventures of	Window 'The'.
+Seq.SkipTag	Would you mind reading me the advertised description of Mr.	the advertised description of	Window 'the'.
+Seq.SkipTag	"Yes, sir, that be the house of Dr.	the house of	Window 'the'.
+Seq.SkipTag	One sorrow comes close upon the heels of another.	the heels of	Window 'the'.
+Seq.SkipTag	Café your self café, naïve the résumé of the café.	the résumé of	Window 'the'.
+Seq.SkipTag	I think that the results of the tests of the code are good.	the results of	Window 'the'.
+Seq.SkipTag	I think that the results of the tests of the code are good.	the tests of	Window 'the'.
+Seq.SkipTag	She said the man of the house saw the picture of London.	the man of	Window 'the'.
+Seq.SkipTag	She said the man of the house saw the picture of London.	the picture of	Window 'the'.
+Seq.Subordinate	"I know where it is."	where it	Clause 'where it'.
+Seq.Subordinate	I thought that he was delirious.	that he	Clause 'that he'.
+Seq.Subordinate	Do you not yourself think that he is innocent?"	that he	Clause 'that he'.
+Seq.Subordinate	My dear wife knew that I had business in the City.	that I	Clause 'that I'.
+Seq.Subordinate	We had no feeling of security unless our doors were locked."	unless our	Clause 'unless our'.
+Seq.Subordinate	I fear that you have felt the draught.'	that you	Clause 'that you'.
+Seq.Subordinate	"There is the gravel-drive, and there are the rose-bushes where I lay.	where I	Clause 'where I'.
+Seq.Subordinate	Oh, do, do take my word for it that he is innocent.	that he	Clause 'that he'.
+Seq.Subordinate	if it rains, then it pours, and if not then not.	if it	Clause 'if it'.
+Seq.Subordinate	After we ate, they left because it rained.	because it	Clause 'because it'.
+Seq.TagOnly	It is not a common experience among employers in this age.	a common experience	Noun phrase 'a common experience'.
+Seq.TagOnly	Would you mind reading me the advertised description of Mr.	the advertised description	Noun phrase 'the advertised description'.
+Seq.TagOnly	K., and why does he pursue this unhappy family?"	this unhappy family	Noun phrase 'this unhappy family'.
+Seq.TagOnly	"No, no; the real name," said Holmes sweetly.	the real name	Noun phrase 'the real name'.
+Seq.TagOnly	Jeremiah Hayling, aged twenty-six, a hydraulic engineer.	a hydraulic engineer	Noun phrase 'a hydraulic engineer'.
+Seq.TagOnly	"But you were on a friendly footing?"	a friendly footing	Noun phrase 'a friendly footing'.
+Seq.TagOnly	"Oh, a few minutes.	a few minutes	Noun phrase 'a few minutes'.
+Seq.TagOnly	"It was a slight, sir, a public slight," said Lord St.	a public slight	Noun phrase 'a public slight'.
+Seq.TagOnly	"It is a noiseless lock," said he.	a noiseless lock	Noun phrase 'a noiseless lock'.
+Seq.TagOnly	Pick the red one.	the red one	Noun phrase 'the red one'.
+Seq.TagOnly	The tall man and the old woman saw the small dog.	The tall man	Noun phrase 'The tall man'.
+Seq.TagOnly	The tall man and the old woman saw the small dog.	the old woman	Noun phrase 'the old woman'.
+Seq.TagOnly	The tall man and the old woman saw the small dog.	the small dog	Noun phrase 'the small dog'.
+Seq.TagOnly	The quick brown fox jumps over the lazy dog.	the lazy dog	Noun phrase 'the lazy dog'.
+Seq.TagOnly	A black cat is an animal that can run.	A black cat	Noun phrase 'A black cat'.
+Seq.TagOnly	It is, in fact, an apple (or two) of the best kind.	the best kind	Noun phrase 'the best kind'.
+Seq.Target	Do it your self.	self	Join 'your'.
+Seq.Target	Do it your self and then your self again.	self	Join 'your'.
+Seq.Target	Do it your self and then your self again.	self	Join 'your'.
+Seq.Target	He wrote "your self" twice.	self	Join 'your'.
+Seq.Target	Café your self café, naïve the résumé of the café.	self	Join 'your'.
+Seq.TargetRange	Would you mind reading me the advertised description of Mr.	the advertised description	Range 'the'.
+Seq.TargetRange	"No, no; the real name," said Holmes sweetly.	the real name	Range 'the'.
+Seq.TargetRange	Pick the red one.	the red one	Range 'the'.
+Seq.TargetRange	The tall man and the old woman saw the small dog.	the old woman	Range 'the'.
+Seq.TargetRange	The tall man and the old woman saw the small dog.	the small dog	Range 'the'.
+Seq.TargetRange	The quick brown fox jumps over the lazy dog.	the lazy dog	Range 'the'.
+Seq.TargetRange	It is, in fact, an apple (or two) of the best kind.	the best kind	Range 'the'.
+Seq.TargetSkip	The dog and the cat saw the man.	the man	Man 'the'.
+Seq.TargetSkip	She said the man of the house saw the picture of London.	the man	Man 'the'.
+Seq.TargetSkip	the cat the dog the man the cat	dog the man	Man 'the'.
+Seq.TargetSkip	the cat the dog the man the cat	the man	Man 'the'.
+Seq.TwoNouns	Note: Run the tests	Note: Run the tests	Two nouns 'Note'.
+Seq.TwoNouns	Notes From the Field	Notes From the Field	Two nouns 'Notes'.
+Seq.TwoNouns	A Trip to Paris	Trip to Paris	Two nouns 'Trip'.
+Seq.TwoNouns	Release Notes	Release Notes	Two nouns 'Release'.
+Seq.TwoNouns	How to Use the API in Your Project	API in Your Project	Two nouns 'API'.
+Seq.TwoNouns	What's New in v1.2	New in v1.2	Two nouns 'New'.
+Seq.TwoNouns	Well-Known Facts and Figures	Facts and Figures	Two nouns 'Facts'.
+Seq.TwoNouns	Input/Output Basics	Input/Output Basics	Two nouns 'Input/Output'.
+Seq.TwoNouns	“Quoted” Words in Titles	Words in Titles	Two nouns 'Words'.
+Seq.TwoNouns	Café Society of the World	Café Society	Two nouns 'Café'.
+Seq.TwoNouns	Café Society of the World	Society of the World	Two nouns 'Society'.
+Seq.TwoNouns	NASA's Mission to Mars	NASA's Mission	Two nouns 'NASA'.
+Seq.TwoNouns	NASA's Mission to Mars	Mission to Mars	Two nouns 'Mission'.
+Seq.TwoNouns	THE END IS NEAR	END IS NEAR	Two nouns 'END'.
+Seq.TwoNouns	The End Is Near	End Is Near	Two nouns 'End'.
+Seq.TwoNouns	Using the Tools From Start to Finish	Tools From Start	Two nouns 'Tools'.
+Seq.TwoNouns	Using the Tools From Start to Finish	Start to Finish	Two nouns 'Start'.
+Seq.TwoNouns	Install, Configure, and Run	Configure, and Run	Two nouns 'Configure'.
+Seq.TwoNouns	Over the Hills and Far Away	Hills and Far	Two nouns 'Hills'.
+Seq.TwoNouns	Over the Hills and Far Away	Far Away	Two nouns 'Far'.
+Seq.TwoNouns	Up and Down	Up and Down	Two nouns 'Up'.
+Seq.TwoNouns	Self-Hosted Installation Guide	Installation Guide	Two nouns 'Installation'.
+Seq.TwoNouns	Release Notes for 2.0.1	Release Notes	Two nouns 'Release'.
+Seq.TwoNouns	Getting Started with Hakkiri and the API	Hakkiri and the API	Two nouns 'Hakkiri'.
+Seq.TwoNouns	Using Hakkiri's Rules	Hakkiri's	Two nouns 'Hakkiri'.
+Seq.TwoNouns	Using Hakkiri's Rules	's Rules	Two nouns ''s'.
+Seq.TwoNouns	The hakkiri CLI	hakkiri CLI	Two nouns 'hakkiri'.
+Seq.TwoNouns	Python and PyPI: Basics	Python and PyPI	Two nouns 'Python'.
+Seq.TwoNouns	Python and PyPI: Basics	PyPI: Basics	Two nouns 'PyPI'.
+Seq.TwoNouns	Pyspark Basics	Pyspark Basics	Two nouns 'Pyspark'.
+Seq.TwoNouns	an Apple a day	Apple a day	Two nouns 'Apple'.
+Seq.TwoNouns	FAQs and Answers	FAQs and Answers	Two nouns 'FAQs'.
+Seq.TwoNouns	Chapter 1: The Beginning	Chapter 1: The Beginning	Two nouns 'Chapter'.
+Seq.TwoNouns	Part II - The Journey	Part II - The Journey	Two nouns 'Part'.
+Seq.TwoNouns	Ünïcödé Wörds Here	Ünïcödé Wörds	Two nouns 'Ünïcödé'.
+Seq.TwoNouns	ǆ test	ǆ test	Two nouns 'ǆ'.
+Seq.TwoNouns	İstanbul Guide	İstanbul Guide	Two nouns 'İstanbul'.
+Seq.TwoNouns	Use the web and Hakkiri	web and Hakkiri	Two nouns 'web'.
+Seq.TwoNouns	Run the The Web Tool	Web Tool	Two nouns 'Web'.
+Seq.TwoNouns	API: Overview	API: Overview	Two nouns 'API'.
+Seq.TwoNouns	note: the API: a guide	note: the API	Two nouns 'note'.
+Seq.TwoNouns	note: the API: a guide	API: a guide	Two nouns 'API'.
+Seq.TwoNouns	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Project Gutenberg	Two nouns 'Project'.
+Seq.TwoNouns	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Gutenberg's The Adventures	Two nouns 'Gutenberg'.
+Seq.TwoNouns	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Adventures of Sherlock	Two nouns 'Adventures'.
+Seq.TwoNouns	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Sherlock Holmes	Two nouns 'Sherlock'.
+Seq.TwoNouns	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Holmes, by Arthur	Two nouns 'Holmes'.
+Seq.TwoNouns	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Arthur Conan	Two nouns 'Arthur'.
+Seq.TwoNouns	Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle	Conan Doyle	Two nouns 'Conan'.
+Seq.TwoNouns	"Well, some hundreds of times."	hundreds of times	Two nouns 'hundreds'.
+Seq.TwoNouns	"'Come, man, come, only three minutes, or it won't be legal.'	man, come, only three minutes	Two nouns 'man'.
+Seq.TwoNouns	It is cabinet size.	cabinet size	Two nouns 'cabinet'.
+Seq.TwoNouns	Sherlock Holmes were beaten by a woman's wit.	Sherlock Holmes	Two nouns 'Sherlock'.
+Seq.TwoNouns	Sherlock Holmes were beaten by a woman's wit.	Holmes were beaten by a woman	Two nouns 'Holmes'.
+Seq.TwoNouns	Sherlock Holmes were beaten by a woman's wit.	woman's	Two nouns 'woman'.
+Seq.TwoNouns	Sherlock Holmes were beaten by a woman's wit.	's wit	Two nouns ''s'.
+Seq.TwoNouns	It is not a common experience among employers in this age.	experience among employers	Two nouns 'experience'.
+Seq.TwoNouns	It is not a common experience among employers in this age.	employers in this age	Two nouns 'employers'.
+Seq.TwoNouns	"Sarasate plays at the St.	plays at the St.	Two nouns 'plays'.
+Seq.TwoNouns	Jones, it is all right," said the stranger with deference.	stranger with deference	Two nouns 'stranger'.
+Seq.TwoNouns	"And you are a benefactor of the race," said I.	benefactor of the race	Two nouns 'benefactor'.
+Seq.TwoNouns	"I met him first at the gasfitters' ball," she said.	gasfitters' ball	Two nouns 'gasfitters'.
+Seq.TwoNouns	Would you mind reading me the advertised description of Mr.	description of Mr.	Two nouns 'description'.
+Seq.TwoNouns	Clearly such a blow must have been struck from behind.	blow must have been struck from behind	Two nouns 'blow'.
+Seq.TwoNouns	The other was his singular dying reference to a rat.	dying reference	Two nouns 'dying'.
+Seq.TwoNouns	The other was his singular dying reference to a rat.	reference to a rat	Two nouns 'reference'.
+Seq.TwoNouns	repeated upon it, and 'Letters, memoranda, receipts, and a register' written beneath.	'Letters, memoranda	Two nouns ''Letters'.
+Seq.TwoNouns	repeated upon it, and 'Letters, memoranda, receipts, and a register' written beneath.	memoranda, receipts	Two nouns 'memoranda'.
+Seq.TwoNouns	repeated upon it, and 'Letters, memoranda, receipts, and a register' written beneath.	receipts, and a register	Two nouns 'receipts'.
+Seq.TwoNouns	repeated upon it, and 'Letters, memoranda, receipts, and a register' written beneath.	register' written beneath	Two nouns 'register'.
+Seq.TwoNouns	THE MAN WITH THE TWISTED LIP	MAN WITH THE TWISTED	Two nouns 'MAN'.
+Seq.TwoNouns	THE MAN WITH THE TWISTED LIP	TWISTED LIP	Two nouns 'TWISTED'.
+Seq.TwoNouns	"Last Monday Mr.	Monday Mr.	Two nouns 'Monday'.
+Seq.TwoNouns	"This is my friend, Dr.	friend, Dr.	Two nouns 'friend'.
+Seq.TwoNouns	My dear wife knew that I had business in the City.	wife knew that I had business	Two nouns 'wife'.
+Seq.TwoNouns	My dear wife knew that I had business in the City.	business in the City	Two nouns 'business'.
+Seq.TwoNouns	Well, that is a list of my town suppliers.	list of my town	Two nouns 'list'.
+Seq.TwoNouns	Well, that is a list of my town suppliers.	town suppliers	Two nouns 'town'.
+Seq.TwoNouns	"No, no; the real name," said Holmes sweetly.	name," said Holmes	Two nouns 'name'.
+Seq.TwoNouns	This is my intimate friend and associate, Dr.	friend and associate	Two nouns 'friend'.
+Seq.TwoNouns	This is my intimate friend and associate, Dr.	associate, Dr.	Two nouns 'associate'.
+Seq.TwoNouns	We had no feeling of security unless our doors were locked."	feeling of security	Two nouns 'feeling'.
+Seq.TwoNouns	We had no feeling of security unless our doors were locked."	security unless our doors	Two nouns 'security'.
+Seq.TwoNouns	"Yes, sir, that be the house of Dr.	sir, that be the house	Two nouns 'sir'.
+Seq.TwoNouns	"Yes, sir, that be the house of Dr.	house of Dr.	Two nouns 'house'.
+Seq.TwoNouns	"My stepfather's business papers."	stepfather's	Two nouns 'stepfather'.
+Seq.TwoNouns	"My stepfather's business papers."	's business	Two nouns ''s'.
+Seq.TwoNouns	"My stepfather's business papers."	business papers	Two nouns 'business'.
+Seq.TwoNouns	Jeremiah Hayling, aged twenty-six, a hydraulic engineer.	Jeremiah Hayling	Two nouns 'Jeremiah'.
+Seq.TwoNouns	Jeremiah Hayling, aged twenty-six, a hydraulic engineer.	Hayling, aged twenty-six, a hydraulic engineer	Two nouns 'Hayling'.
+Seq.TwoNouns	"There is the gravel-drive, and there are the rose-bushes where I lay.	gravel-drive, and there are the rose-bushes	Two nouns 'gravel-drive'.
+Seq.TwoNouns	"Before the what?" asked Holmes with a start.	Holmes with a start	Two nouns 'Holmes'.
+Seq.TwoNouns	"It is very good of Lord St.	Lord St.	Two nouns 'Lord'.
+Seq.TwoNouns	"It was a slight, sir, a public slight," said Lord St.	sir, a public slight	Two nouns 'sir'.
+Seq.TwoNouns	"It was a slight, sir, a public slight," said Lord St.	slight," said Lord	Two nouns 'slight'.
+Seq.TwoNouns	"It was a slight, sir, a public slight," said Lord St.	Lord St.	Two nouns 'Lord'.
+Seq.TwoNouns	One sorrow comes close upon the heels of another.	sorrow comes close upon the heels	Two nouns 'sorrow'.
+Seq.TwoNouns	Yours faithfully, JEPHRO RUCASTLE.'	JEPHRO RUCASTLE	Two nouns 'JEPHRO'.
+Seq.TwoNouns	Toller knows more about this matter than anyone else."	matter than anyone	Two nouns 'matter'.
+Seq.TwoNouns	The dog and the cat saw the man.	dog and the cat	Two nouns 'dog'.
+Seq.TwoNouns	The dog and the cat saw the man.	cat saw the man	Two nouns 'cat'.
+Seq.TwoNouns	The tall man and the old woman saw the small dog.	man and the old woman	Two nouns 'man'.
+Seq.TwoNouns	The tall man and the old woman saw the small dog.	woman saw the small dog	Two nouns 'woman'.
+Seq.TwoNouns	The quick brown fox jumps over the lazy dog.	fox jumps over the lazy dog	Two nouns 'fox'.
+Seq.TwoNouns	A black cat is an animal that can run.	cat is an animal	Two nouns 'cat'.
+Seq.TwoNouns	Café your self café, naïve the résumé of the café.	self café	Two nouns 'self'.
+Seq.TwoNouns	Café your self café, naïve the résumé of the café.	café, naïve the résumé	Two nouns 'café'.
+Seq.TwoNouns	Café your self café, naïve the résumé of the café.	résumé of the café	Two nouns 'résumé'.
+Seq.TwoNouns	I think that the results of the tests of the code are good.	results of the tests	Two nouns 'results'.
+Seq.TwoNouns	I think that the results of the tests of the code are good.	tests of the code	Two nouns 'tests'.
+Seq.TwoNouns	There are many cats, dogs, and birds; some of them are big.	cats, dogs	Two nouns 'cats'.
+Seq.TwoNouns	There are many cats, dogs, and birds; some of them are big.	dogs, and birds	Two nouns 'dogs'.
+Seq.TwoNouns	She said the man of the house saw the picture of London.	man of the house	Two nouns 'man'.
+Seq.TwoNouns	She said the man of the house saw the picture of London.	house saw the picture	Two nouns 'house'.
+Seq.TwoNouns	She said the man of the house saw the picture of London.	picture of London	Two nouns 'picture'.
+Seq.TwoNouns	It is, in fact, an apple (or two) of the best kind.	fact, an apple	Two nouns 'fact'.
+Seq.TwoNouns	It is, in fact, an apple (or two) of the best kind.	apple (or two) of the best kind	Two nouns 'apple'.
+Seq.TwoNouns	the cat the dog the man the cat	cat the dog	Two nouns 'cat'.
+Seq.TwoNouns	the cat the dog the man the cat	dog the man	Two nouns 'dog'.
+Seq.TwoNouns	the cat the dog the man the cat	man the cat	Two nouns 'man'.
+Seq.TwoNouns	a b a b a	b a b	Two nouns 'b'.
+Seq.UposAux	Sherlock Holmes were beaten by a woman's wit.	were beaten	Aux 'were beaten'.
+Seq.UposAux	"'That would suit me very well,' said I.	would suit	Aux 'would suit'.
+Seq.UposAux	Clearly such a blow must have been struck from behind.	must have	Aux 'must have'.
+Seq.UposAux	Clearly such a blow must have been struck from behind.	have been	Aux 'have been'.
+Seq.UposAux	Clearly such a blow must have been struck from behind.	been struck	Aux 'been struck'.
+Seq.UposAux	A mole could trace it, and there it vanishes among the reeds.	could trace	Aux 'could trace'.
+Seq.UposAux	We will talk about that.	will talk	Aux 'will talk'.
+Seq.UposAux	We had no feeling of security unless our doors were locked."	were locked	Aux 'were locked'.
+Seq.UposAux	"No, I must go.	must go	Aux 'must go'.
+Seq.UposAux	"'I shall come down in a carriage to meet you.'	shall come	Aux 'shall come'.
+Seq.UposAux	I fear that you have felt the draught.'	have felt	Aux 'have felt'.
+Seq.UposAux	I do not know what I could do without her.	could do	Aux 'could do'.
+Seq.UposAux	Oh, do, do take my word for it that he is innocent.	do take	Aux 'do take'.
+Seq.UposAux	"'No, no, we should have him loitering here always.	should have	Aux 'should have'.
+Seq.UposAux	The file can be read.	can be	Aux 'can be'.
+Seq.UposAux	The file can be read.	be read	Aux 'be read'.
+Seq.UposAux	It will be done and you can be sure.	will be	Aux 'will be'.
+Seq.UposAux	It will be done and you can be sure.	be done	Aux 'be done'.
+Seq.UposAux	It will be done and you can be sure.	can be	Aux 'can be'.
+Seq.UposAux	A black cat is an animal that can run.	can run	Aux 'can run'.
+Seq.UposMulti	Note: Run the tests	the tests	Phrase 'the tests'.
+Seq.UposMulti	Welcome to the Team	the Team	Phrase 'the Team'.
+Seq.UposMulti	A Trip to Paris	A Trip	Phrase 'A Trip'.
+Seq.UposMulti	How to Use the API in Your Project	the API	Phrase 'the API'.
+Seq.UposMulti	Well-Known Facts and Figures	Well-Known Facts	Phrase 'Well-Known Facts'.
+Seq.UposMulti	THE END IS NEAR	THE END	Phrase 'THE END'.
+Seq.UposMulti	The End Is Near	The End	Phrase 'The End'.
+Seq.UposMulti	Going to the Store	the Store	Phrase 'the Store'.
+Seq.UposMulti	Using the Tools From Start to Finish	the Tools	Phrase 'the Tools'.
+Seq.UposMulti	This is the end	the end	Phrase 'the end'.
+Seq.UposMulti	Over the Hills and Far Away	the Hills	Phrase 'the Hills'.
+Seq.UposMulti	Getting Started with Hakkiri and the API	the API	Phrase 'the API'.
+Seq.UposMulti	The hakkiri CLI	The hakkiri	Phrase 'The hakkiri'.
+Seq.UposMulti	an Apple a day	a day	Phrase 'a day'.
+Seq.UposMulti	Who Is the Author?	the Author	Phrase 'the Author'.
+Seq.UposMulti	Use the web and Hakkiri	the web	Phrase 'the web'.
+Seq.UposMulti	Run the The Web Tool	The Web	Phrase 'The Web'.
+Seq.UposMulti	note: the API: a guide	the API	Phrase 'the API'.
+Seq.UposMulti	note: the API: a guide	a guide	Phrase 'a guide'.
+Seq.UposMulti	"Well, some hundreds of times."	some hundreds	Phrase 'some hundreds'.
+Seq.UposMulti	Sherlock Holmes were beaten by a woman's wit.	a woman	Phrase 'a woman'.
+Seq.UposMulti	It is not a common experience among employers in this age.	common experience	Phrase 'common experience'.
+Seq.UposMulti	It is not a common experience among employers in this age.	this age	Phrase 'this age'.
+Seq.UposMulti	"Sarasate plays at the St.	Sarasate plays	Phrase 'Sarasate plays'.
+Seq.UposMulti	Jones, it is all right," said the stranger with deference.	the stranger	Phrase 'the stranger'.
+Seq.UposMulti	"And you are a benefactor of the race," said I.	a benefactor	Phrase 'a benefactor'.
+Seq.UposMulti	"And you are a benefactor of the race," said I.	the race	Phrase 'the race'.
+Seq.UposMulti	"I met him first at the gasfitters' ball," she said.	the gasfitters	Phrase 'the gasfitters'.
+Seq.UposMulti	Would you mind reading me the advertised description of Mr.	advertised description	Phrase 'advertised description'.
+Seq.UposMulti	What does her clever stepfather do then?	clever stepfather	Phrase 'clever stepfather'.
+Seq.UposMulti	"It is a murder, then?"	a murder	Phrase 'a murder'.
+Seq.UposMulti	Clearly such a blow must have been struck from behind.	a blow	Phrase 'a blow'.
+Seq.UposMulti	A mole could trace it, and there it vanishes among the reeds.	A mole	Phrase 'A mole'.
+Seq.UposMulti	A mole could trace it, and there it vanishes among the reeds.	the reeds	Phrase 'the reeds'.
+Seq.UposMulti	The other was his singular dying reference to a rat.	singular dying	Phrase 'singular dying'.
+Seq.UposMulti	The other was his singular dying reference to a rat.	a rat	Phrase 'a rat'.
+Seq.UposMulti	Some friend of yours, perhaps?"	Some friend	Phrase 'Some friend'.
+Seq.UposMulti	repeated upon it, and 'Letters, memoranda, receipts, and a register' written beneath.	a register	Phrase 'a register'.
+Seq.UposMulti	K., and why does he pursue this unhappy family?"	unhappy family	Phrase 'unhappy family'.
+Seq.UposMulti	THE MAN WITH THE TWISTED LIP	THE MAN	Phrase 'THE MAN'.
+Seq.UposMulti	"In the cells."	the cells	Phrase 'the cells'.
+Seq.UposMulti	My dear wife knew that I had business in the City.	dear wife	Phrase 'dear wife'.
+Seq.UposMulti	Well, that is a list of my town suppliers.	a list	Phrase 'a list'.
+Seq.UposMulti	"No, no; the real name," said Holmes sweetly.	real name	Phrase 'real name'.
+Seq.UposMulti	This is my intimate friend and associate, Dr.	intimate friend	Phrase 'intimate friend'.
+Seq.UposMulti	We had no feeling of security unless our doors were locked."	no feeling	Phrase 'no feeling'.
+Seq.UposMulti	"Yes, sir, that be the house of Dr.	the house	Phrase 'the house'.
+Seq.UposMulti	"'I shall come down in a carriage to meet you.'	a carriage	Phrase 'a carriage'.
+Seq.UposMulti	I fear that you have felt the draught.'	the draught	Phrase 'the draught'.
+Seq.UposMulti	Jeremiah Hayling, aged twenty-six, a hydraulic engineer.	hydraulic engineer	Phrase 'hydraulic engineer'.
+Seq.UposMulti	"There is the gravel-drive, and there are the rose-bushes where I lay.	the gravel-drive	Phrase 'the gravel-drive'.
+Seq.UposMulti	"There is the gravel-drive, and there are the rose-bushes where I lay.	the rose-bushes	Phrase 'the rose-bushes'.
+Seq.UposMulti	"Before the what?" asked Holmes with a start.	a start	Phrase 'a start'.
+Seq.UposMulti	"But you were on a friendly footing?"	friendly footing	Phrase 'friendly footing'.
+Seq.UposMulti	"Oh, a few minutes.	few minutes	Phrase 'few minutes'.
+Seq.UposMulti	"It was a slight, sir, a public slight," said Lord St.	public slight	Phrase 'public slight'.
+Seq.UposMulti	"It is a noiseless lock," said he.	noiseless lock	Phrase 'noiseless lock'.
+Seq.UposMulti	One sorrow comes close upon the heels of another.	the heels	Phrase 'the heels'.
+Seq.UposMulti	Toller knows more about this matter than anyone else."	this matter	Phrase 'this matter'.
+Seq.UposMulti	If it rains all day then stay.	all day	Phrase 'all day'.
+Seq.UposMulti	The file can be read.	The file	Phrase 'The file'.
+Seq.UposMulti	Open the file.	the file	Phrase 'the file'.
+Seq.UposMulti	Pick the red one.	red one	Phrase 'red one'.
+Seq.UposMulti	the the the cat	the cat	Phrase 'the cat'.
+Seq.UposMulti	The dog and the cat saw the man.	The dog	Phrase 'The dog'.
+Seq.UposMulti	The dog and the cat saw the man.	the cat	Phrase 'the cat'.
+Seq.UposMulti	The dog and the cat saw the man.	the man	Phrase 'the man'.
+Seq.UposMulti	The tall man and the old woman saw the small dog.	tall man	Phrase 'tall man'.
+Seq.UposMulti	The tall man and the old woman saw the small dog.	old woman	Phrase 'old woman'.
+Seq.UposMulti	The tall man and the old woman saw the small dog.	small dog	Phrase 'small dog'.
+Seq.UposMulti	The quick brown fox jumps over the lazy dog.	brown fox	Phrase 'brown fox'.
+Seq.UposMulti	The quick brown fox jumps over the lazy dog.	lazy dog	Phrase 'lazy dog'.
+Seq.UposMulti	A black cat is an animal that can run.	black cat	Phrase 'black cat'.
+Seq.UposMulti	A black cat is an animal that can run.	an animal	Phrase 'an animal'.
+Seq.UposMulti	Café your self café, naïve the résumé of the café.	the résumé	Phrase 'the résumé'.
+Seq.UposMulti	Café your self café, naïve the résumé of the café.	the café	Phrase 'the café'.
+Seq.UposMulti	I think that the results of the tests of the code are good.	the results	Phrase 'the results'.
+Seq.UposMulti	I think that the results of the tests of the code are good.	the tests	Phrase 'the tests'.
+Seq.UposMulti	I think that the results of the tests of the code are good.	the code	Phrase 'the code'.
+Seq.UposMulti	There are many cats, dogs, and birds; some of them are big.	many cats	Phrase 'many cats'.
+Seq.UposMulti	She said the man of the house saw the picture of London.	the man	Phrase 'the man'.
+Seq.UposMulti	She said the man of the house saw the picture of London.	the house	Phrase 'the house'.
+Seq.UposMulti	She said the man of the house saw the picture of London.	the picture	Phrase 'the picture'.
+Seq.UposMulti	It is, in fact, an apple (or two) of the best kind.	an apple	Phrase 'an apple'.
+Seq.UposMulti	It is, in fact, an apple (or two) of the best kind.	best kind	Phrase 'best kind'.
+Seq.UposMulti	the cat the dog the man the cat	the cat	Phrase 'the cat'.
+Seq.UposMulti	the cat the dog the man the cat	the dog	Phrase 'the dog'.
+Seq.UposMulti	the cat the dog the man the cat	the man	Phrase 'the man'.
+Seq.UposMulti	the cat the dog the man the cat	the cat	Phrase 'the cat'.
+Seq.UposMulti	a b a b a	a b	Phrase 'a b'.
+Seq.UposMulti	a b a b a	a b	Phrase 'a b'.
+Seq.UposNoun	Note: Run the tests	the tests	Found 'the tests'.
+Seq.UposNoun	Welcome to the Team	the Team	Found 'the Team'.
+Seq.UposNoun	How to Use the API in Your Project	the API	Found 'the API'.
+Seq.UposNoun	Going to the Store	the Store	Found 'the Store'.
+Seq.UposNoun	Using the Tools From Start to Finish	the Tools	Found 'the Tools'.
+Seq.UposNoun	This is the end	the end	Found 'the end'.
+Seq.UposNoun	Over the Hills and Far Away	the Hills	Found 'the Hills'.
+Seq.UposNoun	Getting Started with Hakkiri and the API	the API	Found 'the API'.
+Seq.UposNoun	Who Is the Author?	the Author	Found 'the Author'.
+Seq.UposNoun	Use the web and Hakkiri	the web	Found 'the web'.
+Seq.UposNoun	note: the API: a guide	the API	Found 'the API'.
+Seq.UposNoun	Jones, it is all right," said the stranger with deference.	the stranger	Found 'the stranger'.
+Seq.UposNoun	"And you are a benefactor of the race," said I.	the race	Found 'the race'.
+Seq.UposNoun	"I met him first at the gasfitters' ball," she said.	the gasfitters	Found 'the gasfitters'.
+Seq.UposNoun	A mole could trace it, and there it vanishes among the reeds.	the reeds	Found 'the reeds'.
+Seq.UposNoun	"In the cells."	the cells	Found 'the cells'.
+Seq.UposNoun	"Yes, sir, that be the house of Dr.	the house	Found 'the house'.
+Seq.UposNoun	I fear that you have felt the draught.'	the draught	Found 'the draught'.
+Seq.UposNoun	"There is the gravel-drive, and there are the rose-bushes where I lay.	the gravel-drive	Found 'the gravel-drive'.
+Seq.UposNoun	"There is the gravel-drive, and there are the rose-bushes where I lay.	the rose-bushes	Found 'the rose-bushes'.
+Seq.UposNoun	One sorrow comes close upon the heels of another.	the heels	Found 'the heels'.
+Seq.UposNoun	Open the file.	the file	Found 'the file'.
+Seq.UposNoun	the the the cat	the cat	Found 'the cat'.
+Seq.UposNoun	The dog and the cat saw the man.	the cat	Found 'the cat'.
+Seq.UposNoun	The dog and the cat saw the man.	the man	Found 'the man'.
+Seq.UposNoun	Café your self café, naïve the résumé of the café.	the résumé	Found 'the résumé'.
+Seq.UposNoun	Café your self café, naïve the résumé of the café.	the café	Found 'the café'.
+Seq.UposNoun	I think that the results of the tests of the code are good.	the results	Found 'the results'.
+Seq.UposNoun	I think that the results of the tests of the code are good.	the tests	Found 'the tests'.
+Seq.UposNoun	I think that the results of the tests of the code are good.	the code	Found 'the code'.
+Seq.UposNoun	She said the man of the house saw the picture of London.	the man	Found 'the man'.
+Seq.UposNoun	She said the man of the house saw the picture of London.	the house	Found 'the house'.
+Seq.UposNoun	She said the man of the house saw the picture of London.	the picture	Found 'the picture'.
+Seq.UposNoun	the cat the dog the man the cat	the cat	Found 'the cat'.
+Seq.UposNoun	the cat the dog the man the cat	the dog	Found 'the dog'.
+Seq.UposNoun	the cat the dog the man the cat	the man	Found 'the man'.
+Seq.UposNoun	the cat the dog the man the cat	the cat	Found 'the cat'.
+Seq.Very	This is very very good.	very very	Repeated: 'very very'.
+Seq.Very	This is very very very good.	very very	Repeated: 'very very'.
+Seq.Very	This is very very very good.	very very	Repeated: 'very very'.
+Seq.Very	Very good, very very good, very bad.	very very	Repeated: 'very very'.
+Seq.Very	very very very very good	very very	Repeated: 'very very'.
+Seq.Very	very very very very good	very very	Repeated: 'very very'.
+Seq.Very	very very very very good	very very	Repeated: 'very very'.
+Seq.YourSelf	Do it your self.	your self	Write 'yourself' as one word.
+Seq.YourSelf	Do it your self and then your self again.	your self	Write 'yourself' as one word.
+Seq.YourSelf	Do it your self and then your self again.	your self	Write 'yourself' as one word.
+Seq.YourSelf	He wrote "your self" twice.	your self	Write 'yourself' as one word.
+Seq.YourSelf	Café your self café, naïve the résumé of the café.	your self	Write 'yourself' as one word.

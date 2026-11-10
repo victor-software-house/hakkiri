@@ -42,16 +42,76 @@ impl fmt::Display for SelectError {
 
 impl error::Error for SelectError {}
 
+/// The scope a node has when it is the one element a block of text is read
+/// under: a list item, a quote, a heading or a table cell.
+const fn named_scope(scope: Scope) -> Option<&'static str> {
+    match scope {
+        Scope::List
+        | Scope::Blockquote
+        | Scope::Heading1
+        | Scope::Heading2
+        | Scope::Heading3
+        | Scope::Heading4
+        | Scope::Heading5
+        | Scope::Heading6
+        | Scope::TableHeader
+        | Scope::TableCell => Some(scope.name()),
+        Scope::Paragraph
+        | Scope::TableRow
+        | Scope::Link
+        | Scope::Code
+        | Scope::Strong
+        | Scope::Emphasis
+        | Scope::Alt
+        | Scope::Raw
+        | Scope::CommentLine
+        | Scope::CommentBlock
+        | Scope::CommentDocLine
+        | Scope::CommentDocBlock => None,
+    }
+}
+
+/// Whether `child` is the first thing inside `parent`.
+///
+/// The tree keeps only the prose of a document, so a fenced block, a thematic
+/// break or another element with none can sit before the first child.
+/// The parser knows each node's place, and the tree records it in `first`.
+fn opens(parent: &Node, child: &Node) -> bool {
+    match parent.scope {
+        Scope::List | Scope::Blockquote | Scope::TableRow => child.first,
+        Scope::Paragraph
+        | Scope::Heading1
+        | Scope::Heading2
+        | Scope::Heading3
+        | Scope::Heading4
+        | Scope::Heading5
+        | Scope::Heading6
+        | Scope::TableHeader
+        | Scope::TableCell
+        | Scope::Link
+        | Scope::Code
+        | Scope::Strong
+        | Scope::Emphasis
+        | Scope::Alt
+        | Scope::Raw
+        | Scope::CommentLine
+        | Scope::CommentBlock
+        | Scope::CommentDocLine
+        | Scope::CommentDocBlock => true,
+    }
+}
+
 /// The scope names a node holds.
 ///
 /// `text` marks the prose leaves, which a list item or a block quote is read
-/// through.
-/// A paragraph inside a list item or a block quote is not a `paragraph`, as in
-/// Vale.
-fn names(scope: Scope, enclosed: bool) -> Vec<&'static str> {
+/// through: the two hold no scope of their own.
+/// A block of text has one scope, as in Vale ([`select`] explains which).
+/// `chain` is that scope when an element around the node gives it, and a
+/// paragraph with none is a `paragraph`.
+fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
     match scope {
-        Scope::Paragraph if enclosed => vec!["text"],
-        Scope::Paragraph => vec!["paragraph", "text"],
+        Scope::Paragraph => vec![chain.unwrap_or("paragraph"), "text"],
+        Scope::Blockquote | Scope::List => Vec::new(),
         Scope::Heading1
         | Scope::Heading2
         | Scope::Heading3
@@ -59,10 +119,8 @@ fn names(scope: Scope, enclosed: bool) -> Vec<&'static str> {
         | Scope::Heading5
         | Scope::Heading6
         | Scope::TableHeader
-        | Scope::TableCell => vec![scope.name(), "text"],
-        Scope::Blockquote
-        | Scope::List
-        | Scope::TableRow
+        | Scope::TableCell => vec![chain.unwrap_or_else(|| scope.name()), "text"],
+        Scope::TableRow
         | Scope::Link
         | Scope::Code
         | Scope::Strong
@@ -134,14 +192,25 @@ pub(crate) fn replacements(node: &Node, blank: &[Inline]) -> Vec<(Range<usize>, 
     kept
 }
 
-/// What the walk does next.
-enum Step<'t> {
-    Enter(&'t Node),
-    Exit,
+/// A node the walk still has to enter, with the scope its parent gives it.
+struct Step<'t> {
+    node: &'t Node,
+    chain: Option<&'static str>,
 }
 
 /// The blocks of `tree`, a file of `source` with `extension`, that `selector`
 /// reads, in file order: a node before the nodes inside it.
+///
+/// A block of text has the scope of one element, as in Vale, and not of every
+/// element around it.
+/// Vale reads that element off the tags opened since the last element closed,
+/// and takes the outermost of a list item, a quote, a heading and a table
+/// cell.
+/// So a node that is the first child of an element gets that element's scope
+/// when the element had one, and a later child gets its own.
+/// The first paragraph of an item is `list` and the second is a `paragraph`.
+/// A heading in the middle of a quote is a `heading`.
+/// A quote that opens an item is `list`.
 ///
 /// # Errors
 ///
@@ -159,28 +228,21 @@ pub fn select(
         None
     };
     let mut blocks = Vec::new();
-    let mut path: Vec<Scope> = Vec::new();
-    let mut enclosing = 0_usize;
-    let mut steps: Vec<Step<'_>> = tree.roots.iter().rev().map(Step::Enter).collect();
-    while let Some(step) = steps.pop() {
-        let node = match step {
-            Step::Enter(node) => node,
-            Step::Exit => {
-                if let Some(scope) = path.pop()
-                    && matches!(scope, Scope::List | Scope::Blockquote)
-                {
-                    enclosing -= 1;
-                }
-                continue;
-            }
-        };
-        let held = names(node.scope, enclosing > 0);
-        let own = selector.reads(&held, &path, extension, false);
+    let mut steps: Vec<Step<'_>> = tree
+        .roots
+        .iter()
+        .rev()
+        .map(|node| Step { node, chain: None })
+        .collect();
+    while let Some(Step { node, chain }) = steps.pop() {
+        let chain = chain.or_else(|| named_scope(node.scope));
+        let held = names(node.scope, chain);
+        let own = selector.reads(&held, extension, false);
         let prose = held.contains(&"text");
         let sentences = if prose && model.is_some() {
             let mut with_sentence = vec!["sentence"];
             with_sentence.extend(&held);
-            selector.reads(&with_sentence, &path, extension, true)
+            selector.reads(&with_sentence, extension, true)
         } else {
             None
         };
@@ -223,12 +285,20 @@ pub fn select(
                 }
             }
         }
-        if matches!(node.scope, Scope::List | Scope::Blockquote) {
-            enclosing += 1;
-        }
-        path.push(node.scope);
-        steps.push(Step::Exit);
-        steps.extend(node.children.iter().rev().map(Step::Enter));
+        steps.extend(
+            node.children
+                .iter()
+                .enumerate()
+                .rev()
+                .map(|(index, child)| Step {
+                    node: child,
+                    chain: if index == 0 && opens(node, child) {
+                        chain
+                    } else {
+                        None
+                    },
+                }),
+        );
     }
     Ok(blocks)
 }

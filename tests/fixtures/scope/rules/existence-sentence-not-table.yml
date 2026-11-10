@@ -1,0 +1,5 @@
+extends: existence
+message: "found '%s'"
+scope: 'sentence & ~table'
+tokens:
+  - marker

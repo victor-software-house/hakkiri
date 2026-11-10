@@ -7,17 +7,21 @@
 use std::cmp::Reverse;
 
 use super::schema::{
-    ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields,
-    ReadabilityFields, RepetitionFields, SubstitutionFields,
+    CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
+    OccurrenceFields, ReadabilityFields, RepetitionFields, SequenceFields, SubstitutionFields,
+    TokenFields,
 };
 use super::{
-    Action, Check, Conditional, Consistency, Exceptions, Existence, LoadError, LoadProblem, Metric,
-    Occurrence, Readability, Repetition, Rule, Score, Substitution, Swap, level_of,
+    Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence,
+    LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Sequence,
+    Substitution, Swap, Token, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
+use crate::sequence::{sentence_scope, upos};
+use crate::strcase::{Sentence, Style, Title, WORD};
 
 /// Where a rule came from, for the errors that name it.
 #[derive(Clone, Copy, Debug)]
@@ -179,19 +183,7 @@ fn exceptions(source: &Source<'_>, terms: &[String]) -> Result<Exceptions, LoadE
     if terms.is_empty() {
         return Ok(Exceptions::default());
     }
-    let mut longest_first: Vec<&String> = terms.iter().collect();
-    longest_first.sort_by_key(|term| Reverse(term.len()));
-    let alternatives: Vec<String> = longest_first
-        .into_iter()
-        .map(|term| {
-            let pattern = term_pattern(term);
-            if pattern.starts_with("(?i)") {
-                pattern
-            } else {
-                format!("(?-i){pattern}")
-            }
-        })
-        .collect();
+    let alternatives = kept_words(terms);
     let parts: Vec<&str> = terms.iter().map(String::as_str).collect();
     let words = source.compile(
         "exceptions",
@@ -576,11 +568,98 @@ fn read_headings(formula: &str) -> String {
     })
 }
 
+/// The `exceptions` of a `capitalization` rule as the words its converters
+/// keep as written: each as an `exceptions` pattern reads it, longest first.
+fn kept_words(terms: &[String]) -> Vec<String> {
+    let mut longest_first: Vec<&String> = terms.iter().collect();
+    longest_first.sort_by_key(|term| Reverse(term.len()));
+    longest_first
+        .into_iter()
+        .map(|term| {
+            let pattern = term_pattern(term);
+            if pattern.starts_with("(?i)") {
+                pattern
+            } else {
+                format!("(?-i){pattern}")
+            }
+        })
+        .collect()
+}
+
+/// The error of a pattern that a converter refused, for the field it reads.
+fn refused(source: &Source<'_>, field: &str, error: &crate::pattern::PatternError) -> LoadError {
+    source.problem(field, format!("rule `{}`: {error}", source.name))
+}
+
+fn capitalization(
+    source: &Source<'_>,
+    fields: &CapitalizationFields,
+) -> Result<Capitalization, LoadError> {
+    let style = match fields.style.value() {
+        "" | "AP" => Style::Ap,
+        "Chicago" => Style::Chicago,
+        other => {
+            return Err(source.problem(
+                "style",
+                format!(
+                    "rule `{}`: `{other}` is not a style: use AP or Chicago",
+                    source.name
+                ),
+            ));
+        }
+    };
+    let matching = fields.pattern.value();
+    if matching.is_empty() {
+        return Err(source.problem(
+            "match",
+            format!(
+                "rule `{}`: `match` is empty, so every text would pass: use $title, $sentence, \
+                 $lower, $upper or a pattern",
+                source.name
+            ),
+        ));
+    }
+    let terms = fields.exceptions.values();
+    let exceptions = exceptions(source, terms)?;
+    let kept = kept_words(terms);
+    let prefix = fields.prefix.value();
+    if !prefix.is_empty() {
+        source.compile("prefix", prefix, &[prefix])?;
+    }
+    let case = match matching {
+        "$title" => Case::Title(
+            Title::new(style, &kept, prefix).map_err(|error| refused(source, "prefix", &error))?,
+        ),
+        "$sentence" => Case::Sentence(
+            Sentence::new(&kept, prefix, fields.indicators.values())
+                .map_err(|error| refused(source, "exceptions", &error))?,
+        ),
+        "$lower" => Case::Lower,
+        "$upper" => Case::Upper,
+        other => Case::Pattern(source.compile("match", other, &[other])?),
+    };
+    let threshold = fields.threshold.value();
+    let words = match &exceptions.words {
+        Some(words) => source.compile("exceptions", &format!("{}|{WORD}", words.source()), &[])?,
+        None => source.compile("exceptions", WORD, &[])?,
+    };
+    Ok(Capitalization {
+        case,
+        // A threshold of 0 would disable the rule, so it reads as unset.
+        threshold: if threshold == 0.0 { 0.8 } else { threshold },
+        exceptions: exceptions.words,
+        words,
+    })
+}
+
 /// The fields every check type has, and the check built from the rest.
 macro_rules! rule_of {
-    ($source:expr, $fields:expr, $check:expr) => {{
+    ($source:expr, $fields:expr, $check:expr) => {
+        rule_of!($source, $fields, $check, $fields.scope.values())
+    };
+    ($source:expr, $fields:expr, $check:expr, $scope:expr) => {{
         let fields = $fields;
-        let scope = Selector::parse(fields.scope.values()).map_err(|refused| {
+        let scope = Selector::parse($scope).map_err(|refused| {
             $source.problem("scope", format!("rule `{}`: {refused}", $source.name))
         })?;
         Rule {
@@ -682,5 +761,184 @@ pub(super) fn conditional_rule(
         source,
         fields,
         Check::Conditional(conditional(source, fields)?)
+    ))
+}
+
+pub(super) fn capitalization_rule(
+    source: &Source<'_>,
+    fields: &CapitalizationFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Capitalization(capitalization(source, fields)?)
+    ))
+}
+
+/// One token of a `sequence` rule with its patterns compiled, and whether it
+/// names a word, a tag or a universal tag, which makes a step that must match.
+fn sequence_token(
+    source: &Source<'_>,
+    number: usize,
+    written: &TokenFields,
+    flag: &str,
+) -> Result<Token, LoadError> {
+    let name = source.name;
+    let at = |part: &str| format!("tokens[{number}].{part}");
+    let pattern = written.pattern.value();
+    let universal = written.upos.value();
+    let mut tag = written.tag.value().to_owned();
+    let mut words = None;
+    if !universal.is_empty() {
+        if !tag.is_empty() {
+            return Err(source.problem(
+                &at("upos"),
+                format!("rule `{name}`: a token cannot set both `tag` and `upos`"),
+            ));
+        }
+        tag = upos::tag_pattern(universal).map_err(|unknown| {
+            source.problem(
+                &at("upos"),
+                format!(
+                    "rule `{name}`: `{unknown}` is not a universal part-of-speech tag: \
+                     use one of {}",
+                    upos::names()
+                ),
+            )
+        })?;
+        // A tag Penn cannot tell apart also limits the words, unless the rule
+        // asked for a pattern, which is the more specific request.
+        if pattern.is_empty()
+            && let Some(listed) = upos::word_pattern(universal)
+        {
+            words = Some(source.compile(&at("upos"), &listed, &[])?);
+        }
+    }
+    let word = if pattern.is_empty() {
+        None
+    } else {
+        Some(source.compile(
+            &at("pattern"),
+            &format!("{flag}^(?:{pattern})$"),
+            &[pattern],
+        )?)
+    };
+    let tag = if tag.is_empty() {
+        None
+    } else {
+        Some(source.compile(&at("tag"), &tag, &[])?)
+    };
+    let required = word.is_some() || tag.is_some();
+    Ok(Token {
+        word,
+        tag,
+        words,
+        negate: written.negate.value(),
+        target: written.target.value(),
+        skip: written.skip.value(),
+        copies: written.min.value().max(1),
+        required,
+    })
+}
+
+/// The tokens of a `sequence` rule as steps, and the patterns they match with.
+fn sequence(source: &Source<'_>, fields: &SequenceFields) -> Result<Sequence, LoadError> {
+    let name = source.name;
+    if !fields.model.value().is_empty() {
+        return Err(source.problem(
+            "model",
+            format!(
+                "rule `{name}`: `model` is not supported: hakkiri reads no other tagger's model"
+            ),
+        ));
+    }
+    let flag = if fields.ignorecase.value() {
+        "(?i)"
+    } else {
+        ""
+    };
+    let mut tokens = Vec::new();
+    let mut patterns: Vec<&str> = Vec::new();
+    let mut ends: Vec<usize> = Vec::new();
+    for (number, written) in fields.tokens.iter().enumerate() {
+        let token = sequence_token(source, number, written, flag)?;
+        // The steps are counted, never stored, so a large `skip` or `min` is
+        // cheap. Only a count that does not fit a number is refused.
+        let end = token
+            .skip
+            .checked_add(usize::from(token.required))
+            .and_then(|width| width.checked_mul(token.copies))
+            .and_then(|made| made.checked_add(ends.last().copied().unwrap_or(0)))
+            .ok_or_else(|| {
+                source.problem(
+                    &format!("tokens[{number}].skip"),
+                    format!("rule `{name}`: `skip` and `min` make more steps than a count holds"),
+                )
+            })?;
+        ends.push(end);
+        patterns.push(written.pattern.value());
+        tokens.push(token);
+    }
+    let mut sequence = Sequence {
+        tokens,
+        ends,
+        anchor: 0,
+        candidates: None,
+        exceptions: Vec::new(),
+    };
+    let first = |has: fn(&Token) -> bool| {
+        (0..sequence.tokens.len()).find(|index| {
+            let token = &sequence.tokens[*index];
+            !token.negate && has(token) && !sequence.block(*index).is_empty()
+        })
+    };
+    let anchor_token = first(|token| token.word.is_some())
+        .or_else(|| first(|token| token.tag.is_some()))
+        .ok_or_else(|| {
+            source.problem(
+                "tokens",
+                format!(
+                    "rule `{name}`: no token has a `pattern`, `tag` or `upos` without `negate`, \
+                     so the rule would never match: add one"
+                ),
+            )
+        })?;
+    let anchor = sequence.block(anchor_token).start;
+    let tokens = &sequence.tokens;
+    let candidates = if tokens[anchor_token].word.is_some() {
+        let pattern = patterns[anchor_token];
+        Some(source.compile(
+            &format!("tokens[{anchor_token}].pattern"),
+            &format!("{flag}(?m)(?:{pattern})"),
+            &[pattern],
+        )?)
+    } else {
+        None
+    };
+    let exceptions = fields
+        .exceptions
+        .values()
+        .iter()
+        .map(|exception| source.compile("exceptions", exception, &[]))
+        .collect::<Result<Vec<_>, _>>()?;
+    sequence.anchor = anchor;
+    sequence.candidates = candidates;
+    sequence.exceptions = exceptions;
+    Ok(sequence)
+}
+
+pub(super) fn sequence_rule(
+    source: &Source<'_>,
+    fields: &SequenceFields,
+) -> Result<Rule, LoadError> {
+    // A scope that names no scope is refused under the name it was written
+    // with, before it is joined to `sentence`.
+    Selector::parse(fields.scope.values())
+        .map_err(|refused| source.problem("scope", format!("rule `{}`: {refused}", source.name)))?;
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Sequence(sequence(source, fields)?),
+        &sentence_scope(fields.scope.values())
     ))
 }

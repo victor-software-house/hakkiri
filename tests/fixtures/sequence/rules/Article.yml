@@ -1,0 +1,5 @@
+extends: sequence
+message: "Article '%s %s'."
+tokens:
+  - pattern: a|an
+  - tag: VB.*

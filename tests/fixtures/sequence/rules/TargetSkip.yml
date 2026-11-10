@@ -1,0 +1,7 @@
+extends: sequence
+message: "Man '%s'."
+tokens:
+  - pattern: the
+  - pattern: man
+    skip: 2
+    target: true

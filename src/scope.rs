@@ -104,6 +104,10 @@ fn named(part: &str, name: &str) -> bool {
     if part == "text" {
         return name == "text";
     }
+    // Vale's `table` is the cells, and has no scope for a row.
+    if part == "table" && name == "table.row" {
+        return false;
+    }
     name.strip_prefix(part)
         .is_some_and(|rest| rest.is_empty() || rest.starts_with('.'))
 }
@@ -138,16 +142,25 @@ impl Selector {
                     }
                     _ => (written, None),
                 };
-                let known = matches!(name, "text" | "sentence")
-                    || NodeScope::ALL.iter().any(|scope| named(name, scope.name()));
-                if !known {
-                    return Err(refuse("is not a scope hakkiri defines"));
+                // Vale reads `sentence.list` as `sentence & list`.
+                let named_parts: Vec<&str> = match name.strip_prefix("sentence.") {
+                    Some(rest) if !negated => vec!["sentence", rest],
+                    _ => vec![name],
+                };
+                for (index, name) in named_parts.iter().enumerate() {
+                    let known = matches!(*name, "text" | "sentence")
+                        || NodeScope::ALL.iter().any(|scope| named(name, scope.name()));
+                    if !known {
+                        return Err(refuse("is not a scope hakkiri defines"));
+                    }
+                    parts.push(Part {
+                        name: (*name).to_owned(),
+                        negated,
+                        extension: (index + 1 == named_parts.len())
+                            .then(|| extension.clone())
+                            .flatten(),
+                    });
                 }
-                parts.push(Part {
-                    name: name.to_owned(),
-                    negated,
-                    extension,
-                });
             }
             alternatives.push(Alternative { parts });
         }
@@ -182,22 +195,21 @@ impl Selector {
 
     /// What a block reads, or `None` when no item selects it.
     ///
-    /// `names` are the scope names the block holds, `ancestors` the scopes
-    /// above its node, and `extension` the file's extension.
+    /// `names` are the scope names the block holds, and `extension` the file's
+    /// extension.
     /// The block reads as spaces the inline elements that the selecting items
     /// leave out, such as `~link`; an item that does not select the block
     /// leaves out nothing.
     pub(crate) fn reads(
         &self,
         names: &[&str],
-        ancestors: &[NodeScope],
         extension: &str,
         sentence: bool,
     ) -> Option<Vec<Inline>> {
         let mut blank = Vec::new();
         let mut selected = false;
         for item in &self.alternatives {
-            if item.selects(names, ancestors, extension, sentence) {
+            if item.selects(names, extension, sentence) {
                 selected = true;
                 for inline in item.blank(extension) {
                     if !blank.contains(&inline) {
@@ -225,13 +237,7 @@ impl Alternative {
             .any(|part| !part.negated && part.name == "sentence")
     }
 
-    fn selects(
-        &self,
-        names: &[&str],
-        ancestors: &[NodeScope],
-        extension: &str,
-        sentence: bool,
-    ) -> bool {
+    fn selects(&self, names: &[&str], extension: &str, sentence: bool) -> bool {
         // A sentence is read for an item that names sentences, and only that
         // one: an item such as `heading` reads the whole heading.
         if sentence && !self.wants_sentences() {
@@ -267,11 +273,6 @@ impl Alternative {
             .filter(|part| {
                 part.negated && Inline::of(&part.name).is_none() && part.applies_to(extension)
             })
-            .all(|part| {
-                !names.iter().any(|name| named(&part.name, name))
-                    && !ancestors
-                        .iter()
-                        .any(|scope| named(&part.name, scope.name()))
-            })
+            .all(|part| !names.iter().any(|name| named(&part.name, name)))
     }
 }

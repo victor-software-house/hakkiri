@@ -1,0 +1,6 @@
+extends: sequence
+message: "No noun after '%s %s'."
+tokens:
+  - pattern: the
+  - tag: NN
+    negate: true

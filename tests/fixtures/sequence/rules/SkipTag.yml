@@ -1,0 +1,8 @@
+extends: sequence
+message: "Window '%s'."
+ignorecase: true
+tokens:
+  - pattern: the
+  - tag: NN
+    skip: 3
+  - pattern: of

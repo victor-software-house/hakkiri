@@ -1,0 +1,6 @@
+extends: sequence
+message: "Not good '%s %s'."
+tokens:
+  - pattern: very
+  - pattern: good
+    negate: true

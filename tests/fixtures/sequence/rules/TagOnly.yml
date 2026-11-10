@@ -1,0 +1,6 @@
+extends: sequence
+message: "Noun phrase '%s %s %s'."
+tokens:
+  - tag: DT
+  - tag: JJ
+  - tag: NN

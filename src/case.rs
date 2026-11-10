@@ -20,6 +20,18 @@ pub(crate) fn upper(c: char) -> char {
     single(c.to_uppercase(), c)
 }
 
+/// The title case of `c`, as one character: the upper case, except for the
+/// digraphs `Ǆ`, `Ǉ`, `Ǌ` and `Ǳ`, whose title case has a small second letter.
+pub(crate) fn title(c: char) -> char {
+    match c {
+        '\u{1c4}'..='\u{1c6}' => '\u{1c5}',
+        '\u{1c7}'..='\u{1c9}' => '\u{1c8}',
+        '\u{1ca}'..='\u{1cc}' => '\u{1cb}',
+        '\u{1f1}'..='\u{1f3}' => '\u{1f2}',
+        _ => upper(c),
+    }
+}
+
 /// The only character of `mapped`, or `fallback` when it holds more or none.
 fn single(mut mapped: impl Iterator<Item = char>, fallback: char) -> char {
     match (mapped.next(), mapped.next()) {

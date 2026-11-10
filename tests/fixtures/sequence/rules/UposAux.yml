@@ -1,0 +1,5 @@
+extends: sequence
+message: "Aux '%s %s'."
+tokens:
+  - upos: AUX
+  - upos: VERB

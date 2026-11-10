@@ -196,6 +196,47 @@ fn build(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
     Ok((nodes, builder.code_blocks.get()))
 }
 
+/// Whether a block leaves the first place free: a thematic break, a link
+/// definition, or an HTML block that resets nothing ([`crate::html`] explains
+/// which).
+fn leaves_first_place(node: &Mdast) -> bool {
+    match node {
+        Mdast::ThematicBreak(_) | Mdast::Definition(_) => true,
+        Mdast::Html(html) => !crate::html::resets_scope(&html.value),
+        Mdast::Root(_)
+        | Mdast::Blockquote(_)
+        | Mdast::FootnoteDefinition(_)
+        | Mdast::MdxJsxFlowElement(_)
+        | Mdast::List(_)
+        | Mdast::MdxjsEsm(_)
+        | Mdast::Toml(_)
+        | Mdast::Yaml(_)
+        | Mdast::Break(_)
+        | Mdast::InlineCode(_)
+        | Mdast::InlineMath(_)
+        | Mdast::Delete(_)
+        | Mdast::Emphasis(_)
+        | Mdast::MdxTextExpression(_)
+        | Mdast::FootnoteReference(_)
+        | Mdast::Image(_)
+        | Mdast::ImageReference(_)
+        | Mdast::MdxJsxTextElement(_)
+        | Mdast::Link(_)
+        | Mdast::LinkReference(_)
+        | Mdast::Strong(_)
+        | Mdast::Text(_)
+        | Mdast::Code(_)
+        | Mdast::Math(_)
+        | Mdast::MdxFlowExpression(_)
+        | Mdast::Heading(_)
+        | Mdast::Table(_)
+        | Mdast::TableRow(_)
+        | Mdast::TableCell(_)
+        | Mdast::ListItem(_)
+        | Mdast::Paragraph(_) => false,
+    }
+}
+
 /// What a visit of one mdast node gives its parent.
 #[derive(Debug, Default)]
 struct Visited {
@@ -266,10 +307,16 @@ struct Frame<'n> {
     children: std::slice::Iter<'n, Mdast>,
     index: usize,
     inner: Visited,
+    /// Whether the node is the first thing inside the node that gives it a
+    /// place in the tree, and each node between the two is first in its own
+    /// parent.
+    first: bool,
+    /// Whether a child that takes the first place has been visited.
+    taken: bool,
 }
 
 impl<'n> Frame<'n> {
-    fn new(node: &'n Mdast, kind: Kind, cell: Scope) -> Self {
+    fn new(node: &'n Mdast, kind: Kind, cell: Scope, first: bool) -> Self {
         Self {
             node,
             kind,
@@ -277,19 +324,35 @@ impl<'n> Frame<'n> {
             children: node.children().map_or(&[][..], Vec::as_slice).iter(),
             index: 0,
             inner: Visited::default(),
+            first,
+            taken: false,
         }
     }
 
-    /// The next child and the scope of a table cell below it.
-    fn next_child(&mut self) -> Option<(&'n Mdast, Scope)> {
+    /// The next child, the scope of a table cell below it, and whether it is
+    /// the first thing inside the node that holds it in the tree.
+    ///
+    /// The parser lists every child, a fenced block, a table, an empty list
+    /// item and an HTML block included, and each takes the first place.
+    /// A thematic break, a link definition, and an HTML block that ends no
+    /// run of tags leave the place free: Vale takes a block's scope from the
+    /// tags opened since the last reset.
+    /// A node with no place of its own passes the place of its first child up.
+    fn next_child(&mut self) -> Option<(&'n Mdast, Scope, bool)> {
         let child = self.children.next()?;
         let cell = match (self.node, self.index) {
             (Mdast::Table(_), 0) => Scope::TableHeader,
             (Mdast::Table(_), _) => Scope::TableCell,
             _ => self.cell,
         };
+        let first = !self.taken
+            && match self.kind {
+                Kind::Scoped(_) | Kind::Cell => true,
+                Kind::Jsx | Kind::Transparent => self.first,
+            };
+        self.taken |= !leaves_first_place(child);
         self.index += 1;
-        Some((child, cell))
+        Some((child, cell, first))
     }
 }
 
@@ -302,18 +365,18 @@ impl Builder<'_> {
         let mut stack = Vec::new();
         match self.step(root) {
             Step::Done(visited) => return visited,
-            Step::Open(kind) => stack.push(Frame::new(root, kind, cell)),
+            Step::Open(kind) => stack.push(Frame::new(root, kind, cell, true)),
         }
         loop {
             let Some(top) = stack.last_mut() else {
                 return Visited::default();
             };
-            if let Some((child, cell)) = top.next_child() {
+            if let Some((child, cell, first)) = top.next_child() {
                 match self.step(child) {
                     Step::Done(visited) => {
                         top.inner = std::mem::take(&mut top.inner).append(visited);
                     }
-                    Step::Open(kind) => stack.push(Frame::new(child, kind, cell)),
+                    Step::Open(kind) => stack.push(Frame::new(child, kind, cell, first)),
                 }
                 continue;
             }
@@ -375,8 +438,8 @@ impl Builder<'_> {
     /// What a node gives its parent once the nodes below it are visited.
     fn finish(&self, frame: Frame<'_>) -> Visited {
         match frame.kind {
-            Kind::Scoped(scope) => self.scoped(frame.node, scope, frame.inner),
-            Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner),
+            Kind::Scoped(scope) => self.scoped(frame.node, scope, frame.inner, frame.first),
+            Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner, frame.first),
             Kind::Jsx => Self::jsx(frame.node, frame.inner),
             Kind::Transparent => Self::strikethrough(frame.node, frame.inner),
         }
@@ -390,7 +453,7 @@ impl Builder<'_> {
     /// nodes inside them.
     /// No marker, bullet or indentation is in their text.
     /// A container with no prose inside it gives no node.
-    fn scoped(&self, node: &Mdast, scope: Scope, inner: Visited) -> Visited {
+    fn scoped(&self, node: &Mdast, scope: Scope, inner: Visited, first: bool) -> Visited {
         let Some(span) = span_of(node).map(|span| self.trimmed(scope, span)) else {
             return inner;
         };
@@ -437,6 +500,7 @@ impl Builder<'_> {
             children
         } else {
             Node::from_segments(scope, segments, children)
+                .map(|node| Node { first, ..node })
                 .into_iter()
                 .collect()
         };

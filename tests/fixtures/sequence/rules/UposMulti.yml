@@ -1,0 +1,5 @@
+extends: sequence
+message: "Phrase '%s %s'."
+tokens:
+  - upos: DET|ADJ
+  - upos: NOUN

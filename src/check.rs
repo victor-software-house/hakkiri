@@ -4,12 +4,14 @@ use std::collections::{HashMap, HashSet};
 use std::ops::Range;
 
 use crate::alert::fill;
+use crate::capitalization::evaluate;
 use crate::metric::{Variables, graded, measure, variables};
 use crate::pattern::{Captured, Pattern, SearchError};
 use crate::rule::{
-    Check, Conditional, Consistency, Exceptions, Existence, Metric, Occurrence, Readability,
-    Repetition, Rule, Substitution, Swap,
+    Capitalization, Check, Conditional, Consistency, Exceptions, Existence, Metric, Occurrence,
+    Readability, Repetition, Rule, Sequence, Substitution, Swap,
 };
+use crate::sequence::find;
 use crate::splitter::Model;
 use crate::summary::{Elements, Summary};
 use crate::text::Text;
@@ -73,6 +75,8 @@ pub(crate) fn run(
         Check::Conditional(conditional) => run_conditional(conditional, text, memory),
         Check::Repetition(repetition) => run_repetition(repetition, text),
         Check::Readability(readability) => Ok(run_readability(readability, text)),
+        Check::Capitalization(capitalization) => Ok(run_capitalization(capitalization, text)),
+        Check::Sequence(sequence) => run_sequence(sequence, text),
     }
 }
 
@@ -506,6 +510,36 @@ fn run_repetition(repetition: &Repetition, text: &Text) -> Result<Vec<Hit>, Sear
     Ok(hits)
 }
 
+/// One hit that spans `text` when it is not in the case the rule names.
+///
+/// The message reads the text, and then the text in the case the rule asks
+/// for.
+fn run_capitalization(capitalization: &Capitalization, text: &Text) -> Vec<Hit> {
+    let content = text.as_str();
+    let (expected, matched) = evaluate(capitalization, content);
+    if matched {
+        return Vec::new();
+    }
+    vec![Hit {
+        range: 0..content.len(),
+        values: vec![content.to_owned(), expected],
+        numbered: false,
+    }]
+}
+
+/// One hit for each run of words in `text`, a sentence, that the rule's tokens
+/// match. The message's `%s` read the words of the run.
+fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchError> {
+    Ok(find(sequence, text.as_str())?
+        .into_iter()
+        .map(|matched| Hit {
+            range: matched.range,
+            values: matched.words,
+            numbered: false,
+        })
+        .collect())
+}
+
 /// One hit at the start of `text` when the average grade of the text is over
 /// the rule's grade, measured apart from the rest of the file.
 fn run_readability(readability: &Readability, text: &Text) -> Vec<Hit> {
@@ -553,6 +587,8 @@ pub(crate) fn run_summary(
         | Check::Occurrence(_)
         | Check::Consistency(_)
         | Check::Conditional(_)
-        | Check::Repetition(_) => Ok(None),
+        | Check::Repetition(_)
+        | Check::Capitalization(_)
+        | Check::Sequence(_) => Ok(None),
     }
 }

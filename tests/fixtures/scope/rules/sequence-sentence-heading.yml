@@ -1,0 +1,5 @@
+extends: sequence
+message: "found '%s'"
+scope: 'sentence & heading'
+tokens:
+  - pattern: marker

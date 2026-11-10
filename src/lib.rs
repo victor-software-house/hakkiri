@@ -6,6 +6,7 @@
 //! file through the spans.
 
 pub mod alert;
+mod capitalization;
 mod case;
 mod check;
 mod comments;
@@ -13,6 +14,7 @@ pub mod dictionary;
 pub mod engine;
 mod error;
 pub mod formula;
+mod html;
 mod jsdoc;
 mod language;
 mod markdown;
@@ -22,7 +24,9 @@ pub mod readability;
 pub mod rule;
 pub mod scope;
 pub mod select;
+mod sequence;
 pub mod splitter;
+pub mod strcase;
 pub mod summary;
 pub mod tagger;
 pub mod text;
