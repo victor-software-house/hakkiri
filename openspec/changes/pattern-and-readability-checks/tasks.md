@@ -22,9 +22,11 @@ This change starts after the [rule-engine change][engine] merges.
 
 ## 3. Readability
 
-- [ ] 3.1 Build `readability` on the engine's scores: the average, the strict comparison and the default scope at line 1.  
+- [x] 3.1 Build `readability` on the engine's scores: the average, the strict comparison and the default scope at line 1.  
   Add the per-node scope and the refusal the open decision chose.  
   Verify every [readability scenario][readability] passes as a unit test in CI.
+  - 2026-11-10 (UTC), 14 tests in `tests/readability_check.rs` cover every readability scenario, in a Linux box run of [cfb9839][c-readability].  
+    They add a repeated score, a missing list, a grade that is not a number, and a list item.
 
 ## 4. Long inputs
 
@@ -43,3 +45,4 @@ This change starts after the [rule-engine change][engine] merges.
 [design]: design.md
 [pattern]: specs/pattern-checks/spec.md
 [readability]: specs/readability-check/spec.md
+[c-readability]: https://github.com/victor-software-house/hakkiri/commit/cfb983962d9399c5d3c0865afc81eb93390c82cd
