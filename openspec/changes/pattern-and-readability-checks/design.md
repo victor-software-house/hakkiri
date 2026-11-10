@@ -120,6 +120,14 @@ hakkiri averages the distinct scores, so a repeated name changes nothing: it giv
 Alternative: Vale's division.  
 Lost: `[SMOG, SMOG]` would report half of SMOG's grade.
 
+### 9. Code breaks a repetition chain
+
+Vale masks code in the text a rule reads, so two adjacent code spans can read as one repeated word.  
+hakkiri treats a match that overlaps a code span as no match, as `existence` does, and the match after it has none before it to repeat.
+
+Alternative: Vale's masked text.  
+Lost: ``Use `a` `b` `c` `` would report a repeat of nothing the reader sees.
+
 ## Risks / Trade-offs
 
 - [hakkiri's splitter cuts some text apart from Vale's] → `repetition` reads sentences only through the engine.  

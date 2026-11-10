@@ -7,11 +7,12 @@
 use std::cmp::Reverse;
 
 use super::schema::{
-    ExistenceFields, MetricFields, OccurrenceFields, ReadabilityFields, SubstitutionFields,
+    ExistenceFields, MetricFields, OccurrenceFields, ReadabilityFields, RepetitionFields,
+    SubstitutionFields,
 };
 use super::{
     Action, Check, Exceptions, Existence, LoadError, LoadProblem, Metric, Occurrence, Readability,
-    Rule, Score, Substitution, Swap, level_of,
+    Repetition, Rule, Score, Substitution, Swap, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -393,6 +394,30 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
     })
 }
 
+/// The pattern of a `repetition` rule: its tokens in one group, with no word
+/// template.
+fn repetition(source: &Source<'_>, fields: &RepetitionFields) -> Result<Repetition, LoadError> {
+    let tokens = fields.tokens.values();
+    let group = format!("({})", tokens.join("|"));
+    let pattern = if fields.ignorecase.value() {
+        format!("(?i){group}")
+    } else {
+        group
+    };
+    let parts: Vec<&str> = tokens.iter().map(String::as_str).collect();
+    Ok(Repetition {
+        pattern: source.compile("tokens", &pattern, &parts)?,
+        max: fields.max.value(),
+        ignorecase: fields.ignorecase.value(),
+        letters: if fields.alpha.value() {
+            Some(source.compile("alpha", r"\A\p{L}+\z", &[])?)
+        } else {
+            None
+        },
+        exceptions: exceptions(source, fields.exceptions.values())?,
+    })
+}
+
 fn readability(source: &Source<'_>, fields: &ReadabilityFields) -> Result<Readability, LoadError> {
     let names = fields.metrics.values();
     if names.is_empty() {
@@ -512,5 +537,16 @@ pub(super) fn readability_rule(
         source,
         fields,
         Check::Readability(readability(source, fields)?)
+    ))
+}
+
+pub(super) fn repetition_rule(
+    source: &Source<'_>,
+    fields: &RepetitionFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Repetition(repetition(source, fields)?)
     ))
 }

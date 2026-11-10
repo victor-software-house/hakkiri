@@ -7,8 +7,10 @@ use crate::alert::fill;
 use crate::metric::{Variables, graded, measure, variables};
 use crate::pattern::{Pattern, SearchError};
 use crate::rule::{
-    Check, Exceptions, Existence, Metric, Occurrence, Readability, Rule, Substitution, Swap,
+    Check, Exceptions, Existence, Metric, Occurrence, Readability, Repetition, Rule, Substitution,
+    Swap,
 };
+use crate::splitter::Model;
 use crate::summary::{Elements, Summary};
 use crate::text::Text;
 
@@ -49,6 +51,7 @@ pub(crate) fn run(check: &Check, text: &Text) -> Result<Vec<Hit>, SearchError> {
         Check::Substitution(substitution) => run_substitution(substitution, text),
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
         Check::Metric(metric) => run_metric(metric, text),
+        Check::Repetition(repetition) => run_repetition(repetition, text),
         Check::Readability(readability) => Ok(run_readability(readability, text)),
     }
 }
@@ -311,6 +314,81 @@ fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
         .collect())
 }
 
+/// Whether the matches `before` and `current` are the same word.
+fn same(repetition: &Repetition, before: &str, current: &str) -> bool {
+    if repetition.ignorecase {
+        before.to_lowercase() == current.to_lowercase()
+    } else {
+        before == current
+    }
+}
+
+/// Each match of the tokens that repeats the one before it, once the repeats
+/// of the text are over `max`.
+///
+/// A match is compared, trimmed of spaces, with the match before it. The
+/// count of repeats goes back to 0 only after a hit, as Vale counts it. A
+/// repeat that spans more than one sentence, or that an exception holds back,
+/// is no hit. A match that overlaps a code span is no match, and it breaks the
+/// chain: the match after it has nothing before it to repeat.
+fn run_repetition(repetition: &Repetition, text: &Text) -> Result<Vec<Hit>, SearchError> {
+    let content = text.as_str();
+    let found = repetition.pattern.find_all(content)?;
+    // The sentence model is embedded and loads; without it no span could be
+    // told from two sentences, and a repeat is not reported.
+    let Ok(model) = Model::english() else {
+        return Ok(Vec::new());
+    };
+    let mut phrases: Option<PhraseSpans> = None;
+    let mut hits = Vec::new();
+    let mut before: Option<(usize, &str)> = None;
+    let mut count = 0_usize;
+    for range in found {
+        let Some(matched) = content.get(range.clone()) else {
+            continue;
+        };
+        if text.overlaps_code(&range) {
+            before = None;
+            continue;
+        }
+        let current = matched.trim();
+        let repeated = match before {
+            Some((_, earlier)) => !current.is_empty() && same(repetition, earlier, current),
+            None => false,
+        };
+        let spelled = match &repetition.letters {
+            Some(letters) => letters.is_match(current)?,
+            None => true,
+        };
+        if let Some((start, _)) = before
+            && repeated
+            && spelled
+        {
+            count += 1;
+            let span = start..range.end;
+            if count > repetition.max
+                && let Some(spanned) = content.get(span.clone())
+                && model.split(spanned).len() == 1
+            {
+                let held = match &phrases {
+                    Some(held) => held,
+                    None => phrases.insert(phrase_spans(&repetition.exceptions, content, true)?),
+                };
+                if !excepted(&repetition.exceptions, held, &span, spanned)? {
+                    hits.push(Hit {
+                        range: span,
+                        values: vec![current.to_owned()],
+                        numbered: false,
+                    });
+                    count = 0;
+                }
+            }
+        }
+        before = Some((range.start, current));
+    }
+    Ok(hits)
+}
+
 /// One hit at the start of `text` when the average grade of the text is over
 /// the rule's grade, measured apart from the rest of the file.
 fn run_readability(readability: &Readability, text: &Text) -> Vec<Hit> {
@@ -353,6 +431,9 @@ pub(crate) fn run_summary(
             }))
         }
         Check::Readability(readability) => Ok(graded(readability, base).map(grade_hit)),
-        Check::Existence(_) | Check::Substitution(_) | Check::Occurrence(_) => Ok(None),
+        Check::Existence(_)
+        | Check::Substitution(_)
+        | Check::Occurrence(_)
+        | Check::Repetition(_) => Ok(None),
     }
 }

@@ -10,20 +10,20 @@ use serde::Deserialize;
 use super::field::{Count, Flag, Number, Pairs, Text, Texts, valid};
 
 /// The check types of Vale 3.26.0 that hakkiri runs.
-pub(super) const RUNNABLE: [&str; 5] = [
+pub(super) const RUNNABLE: [&str; 6] = [
     "existence",
     "substitution",
     "occurrence",
     "metric",
+    "repetition",
     "readability",
 ];
 
 /// The check types of Vale 3.26.0 that a later change adds.
-pub(super) const PLANNED: [&str; 6] = [
+pub(super) const PLANNED: [&str; 5] = [
     "capitalization",
     "consistency",
     "conditional",
-    "repetition",
     "sequence",
     "spelling",
 ];
@@ -152,6 +152,26 @@ fn metric_ok(fields: &MetricFields, _: &()) -> garde::Result {
         Ok(())
     } else {
         Err(garde::Error::new(NO_PATTERN))
+    }
+}
+
+/// Whether `tokens` holds a pattern to match.
+fn has_tokens(tokens: &Texts) -> bool {
+    tokens.values().iter().any(|token| !token.trim().is_empty())
+}
+
+#[expect(
+    clippy::trivially_copy_pass_by_ref,
+    reason = "garde calls a custom rule with a reference to its context."
+)]
+fn repetition_ok(fields: &RepetitionFields, _: &()) -> garde::Result {
+    if has_tokens(&fields.tokens) {
+        Ok(())
+    } else {
+        Err(garde::Error::new(
+            "`tokens` holds nothing to match, so the pattern would match at every position: \
+             list a token",
+        ))
     }
 }
 
@@ -330,5 +350,29 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         grade: Number,
+    }
+}
+
+rule_fields! {
+    /// A `repetition` rule.
+    RepetitionFields check(repetition_ok) {
+        #[serde(default)]
+        #[garde(custom(valid))]
+        tokens: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        max: Count,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        ignorecase: Flag,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        alpha: Flag,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        vocab: Flag,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        exceptions: Texts,
     }
 }

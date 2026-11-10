@@ -83,6 +83,33 @@ A match that does not repeat SHALL leave the count as it is.
 - **WHEN** the rule above has `max: 1` and reads `The the cat saw a a dog.`
 - **THEN** hakkiri reports one alert, with the matched text `a a`
 
+### Requirement: repetition holds back an exception
+
+A `repetition` rule SHALL NOT report a repeat when the text it spans matches an `exceptions` entry.
+
+#### Scenario: A repeat that is a phrase
+
+- **WHEN** the rule above has `exceptions: ['had had']` and reads `She had had enough.`
+- **THEN** hakkiri reports no alert
+
+### Requirement: repetition ignores code
+
+A match of a `repetition` rule that overlaps a code span SHALL NOT be a match, and the match after it SHALL have none before it to repeat.
+
+#### Scenario: A word and a code span
+
+- **WHEN** the rule above reads ``This `is` is a test.``
+- **THEN** hakkiri reports no alert
+
+### Requirement: repetition needs a token
+
+hakkiri SHALL refuse a `repetition` rule whose `tokens` hold nothing to match, with an error that names the field.
+
+#### Scenario: No token
+
+- **WHEN** a rule has `extends: repetition` and no `tokens`
+- **THEN** hakkiri reports an error naming `tokens`, and exits with a failure status
+
 ### Requirement: conditional honours ignorecase
 
 When `ignorecase` is `true`, a `conditional` rule SHALL match `first` and `second` without regard to case.
