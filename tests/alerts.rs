@@ -676,3 +676,46 @@ fn sixty_thousand_lines() -> TestResult {
     assert_eq!(found.last().map(|alert| alert.line), Some(60_000));
     Ok(())
 }
+
+/// Eight whole-file metric rules cost about what one costs: the summary and
+/// its scores are worked out once per file, not once per rule.
+#[test]
+fn eight_whole_file_metrics_over_sixty_thousand_lines() -> TestResult {
+    let formulas = [
+        "words",
+        "sentences",
+        "syllables",
+        "flesch_kincaid",
+        "gunning_fog",
+        "smog",
+        "lix",
+        "coleman_liau",
+    ];
+    let rules = formulas
+        .iter()
+        .map(|formula| {
+            Rule::from_text(
+                &format!("Team.{formula}"),
+                "Team/Rule.yml",
+                &format!(
+                    "extends: metric\nmessage: \"%s\"\nformula: {formula}\ncondition: '> -1000000'\n"
+                ),
+            )
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    let source = "A marker.\n".repeat(60_000);
+    let tree = parse(Language::Markdown, &source)?;
+    let start = Instant::now();
+    let one = lint(&rules[..1], &tree, &source, "md")?;
+    let one_time = start.elapsed();
+    let start = Instant::now();
+    let eight = lint(&rules, &tree, &source, "md")?;
+    let eight_time = start.elapsed();
+    eprintln!("one rule: {one_time:?}, eight rules: {eight_time:?}");
+    assert_eq!((one.len(), eight.len()), (1, 8));
+    assert!(
+        eight_time < one_time * 4,
+        "eight rules took {eight_time:?}, one took {one_time:?}"
+    );
+    Ok(())
+}
