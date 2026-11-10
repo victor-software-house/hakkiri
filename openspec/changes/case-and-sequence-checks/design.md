@@ -185,28 +185,30 @@ hakkiri does better than Vale where Vale's behaviour is a defect.
 
 Alternative: read it as AP. Lost: a misspelt `chicago` would apply AP with no sign.
 
-### 9. A part reads an element and everything inside it
+### 9. A block of text has the scope of one element
 
-Vale gives each block of text the scope of its own element ([ast.go][v-tag-scope], measured at `66bbb85`).  
-The text of a list item in a quote reads as `list`, a heading or table cell in a quote as `heading` or `table.cell`, and a quote in a list item as `blockquote`.  
-Only the first paragraph of an item or quote reads as the item or quote.  
-The paragraphs after it read as `paragraph`.
+Vale gives a block of text one scope.  
+It is the outermost list item, quote, heading or table cell among the tags opened since the last element closed ([ast.go][v-tag-reset], [ast.go][v-tag-scope]).  
+A block with none is a paragraph.  
+So the first paragraph of an item is `list`, and the next is a `paragraph`.  
+A negated part reads the block's scope the same way ([scope.go][v-scope-match]), and `sentence.list` is `sentence & list`.
 
-hakkiri's tree gives a list item or a quote the text of everything inside it, as the [node-segments spec][node-segments] fixes.  
-So a part reads an element and everything inside it, as `~` does at any depth ([format design 7][format-7]).  
-Four cases follow, and the `scope-selection` spec records them:
+hakkiri's tree gives a list item or a quote the text of everything inside it ([node-segments spec][node-segments]), and the metric summaries read that text.  
+Selection no longer does.  
+It reads each paragraph, heading and cell under the scope Vale gives it, found from whether the node is the first child of its parent and starts on a line with the parent's marker.  
+So `~list` and `~blockquote` keep what Vale keeps, which replaces the any-depth exclusion of the [format design][format-7].  
+`table` selects cells and not rows, since Vale has no row scope.
 
-- `list` and `blockquote`, alone or joined to `sentence`, also read what Vale gives to the element inside.
-- `paragraph` leaves out the later paragraphs of an item or a quote.
-- `~list` and `~blockquote` leave out text that Vale keeps.
-- `sentence.list` is refused as an unknown scope, where Vale reads it as `sentence & list`.
+Two cases differ, where Vale's behaviour is a defect:
 
-A test runs an `existence` and a `sequence` rule for 24 scopes over five Markdown files that nest sentences in items, quotes, tables and headings.  
-Of the 1,735 alerts Vale gave to the rules hakkiri loads, 1,610 are hakkiri's too, and `departures.tsv` lists the other 125 and the 156 that only hakkiri gives.  
-The other scopes tested give Vale's alerts, `heading`, `table`, `text` and `sentence` among them.
+- `sentence & paragraph` selects the sentences of paragraphs, and Vale selects none, since no sentence block has `paragraph` in its scope. Vale works around this for `sequence` ([sequence.go][v-seq-scope]).
+- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block holds `paragraph`. hakkiri gives 44 alerts fewer.
 
-Alternative: Vale's own element only.  
-Lost: it changes the text every `list` and `blockquote` rule reads, and the node-segments change fixed that text.
+A test runs 57 `existence` and `sequence` rules for 29 scopes over seven Markdown files that nest sentences in items, quotes, tables and headings.  
+It matches all of Vale's 2,751 alerts but those 44, and `departures.tsv` lists them and the 66 that only hakkiri gives.
+
+Alternative: keep the container text and filter blocks by depth.  
+Lost: it needs a depth rule for each scope name, and Vale's rule is the chain of first children.
 
 ### Crates read
 
@@ -236,7 +238,10 @@ Each crate was read on crates.io on 2026-11-10.
 [pattern-design]: ../archive/2026-11-10-pattern-and-readability-checks/design.md
 [spelling-design]: ../spelling-and-affix-checks/design.md
 [deny]: ../../../deny.toml
-[v-tag-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L51-L58
+[v-tag-reset]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L335-L346
+[v-tag-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L396-L405
+[v-scope-match]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/scope.go#L122-L178
+[v-seq-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L593-L641
 [node-segments]: ../../specs/node-segments/spec.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [v-seq-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L123-L236
