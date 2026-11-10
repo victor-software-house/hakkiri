@@ -37,7 +37,7 @@ A captured word that equals a `consistency` group name, such as `Spelling2`, wou
 ### 2. consistency matches as existence does, one pattern per pair
 
 For each `either` pair, hakkiri builds one pattern with the key and the value as two alternatives inside Vale's word template.  
-So `ignorecase` and `nonword` mean what they mean for `existence` ([consistency.go][v-cons-new]).
+So `ignorecase` and `nonword` mean what they mean for `existence`, and a space in a form matches a line wrap, as in an `existence` token ([consistency.go][v-cons-new]).
 
 A node gives one alert for a pair when the pair matched in it and both forms have matched in the file so far.  
 The alert sits at the last match of the pair in that node, through the byte table.
@@ -54,6 +54,11 @@ Alternatives:
 
 `first` and `second` compile as written, with no word template, as Vale compiles them ([conditional.go][v-cond-new]).  
 Group detection follows Vale's: a `(` that is not escaped, not inside a class and not `(?`, or a named group ([conditional.go][v-cond-group]).
+
+A `first` or `second` that is empty or matches the empty string is refused, which departs from Vale: it compiles both as written.  
+An empty `first` would alert at every position, and an empty `second` would stop every alert.  
+A space is a pattern.  
+A zero-width match such as `\b` still gives an alert, as it does for `existence`.
 
 When `second` has no capture group, a node passes if `second` matches anywhere in it.  
 Otherwise each match of `first` in the node is an alert ([conditional.go][v-cond-plain]).
@@ -103,7 +108,7 @@ Lost: a misspelt score name lowers the grade with no sign of why, measured on ot
 
 ### 7. ignorecase on a conditional applies to both patterns
 
-When `ignorecase` is `true`, a `conditional` rule matches `first` and `second` without regard to case.  
+When `ignorecase` is `true`, a `conditional` rule matches `first` and `second` without regard to case, and compares a match of `first` with a captured term the same way.  
 Vale decodes the field and nothing reads it, so both patterns stay case-sensitive ([conditional.go][v-cond-fields]).  
 The [pattern-checks spec][pattern] states the behaviour, by the same rule as decision 6 (operator, 2026-11-10).
 
@@ -111,6 +116,25 @@ Alternatives:
 
 - Load it with no effect, as Vale does. Lost: an author who sets the field gets no sign that it does nothing.
 - Refuse the field. Lost: a style written for Vale that sets it would stop loading.
+
+### 8. A score listed twice counts once
+
+Vale adds a listed score once however often it is listed, and divides by the length of the list ([readability.go][v-read-run]).  
+hakkiri averages the distinct scores, so a repeated name changes nothing: it gives a better result than Vale where Vale's is a defect, as in decision 6.
+
+Alternative: Vale's division.  
+Lost: `[SMOG, SMOG]` would report half of SMOG's grade.
+
+### 9. Code is no match in the pattern checks
+
+Vale masks code in the text a rule reads, so two adjacent code spans can read as one repeated word, and a form in code counts as seen.  
+hakkiri treats a match that overlaps a code span as no match, as `existence` does.  
+For `repetition`, the match after it has none before it to repeat.  
+For `consistency`, it is not a form seen.  
+For `conditional`, a match of `first` gives no alert and a match of `second` defines nothing.
+
+Alternative: Vale's masked text.  
+Lost: ``Use `a` `b` `c` `` would report a repeat of nothing the reader sees, and a spelling in a code sample would count against the prose.
 
 ## Risks / Trade-offs
 
@@ -120,8 +144,8 @@ Alternatives:
 - [A `consistency` alert at its own match can differ from Vale's column] → this happens only when the matched text appears earlier in the node.  
   The rule, level, message and matched text still agree.
 
-[engine-design]: ../rule-engine/design.md
-[loading]: ../rule-engine/specs/rule-loading/spec.md
+[engine-design]: ../archive/2026-11-10-rule-engine/design.md
+[loading]: ../../specs/rule-loading/spec.md
 [readability]: specs/readability-check/spec.md
 [pattern]: specs/pattern-checks/spec.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale

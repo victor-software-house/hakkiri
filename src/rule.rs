@@ -18,7 +18,10 @@ use ctl_core::input::{Input, InputError};
 use serde::de::DeserializeOwned;
 
 use self::build::Source;
-use self::schema::{ExistenceFields, MetricFields, OccurrenceFields, Probe, SubstitutionFields};
+use self::schema::{
+    ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields, Probe,
+    ReadabilityFields, RepetitionFields, SubstitutionFields,
+};
 use crate::formula::Formula;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
@@ -106,6 +109,15 @@ pub enum Check {
     Occurrence(Occurrence),
     /// Computes a formula over counts of the text, and tests the result.
     Metric(Metric),
+    /// Reports a file that uses both forms of a pair.
+    Consistency(Consistency),
+    /// Reports a match of one pattern that the file has not defined with
+    /// another.
+    Conditional(Conditional),
+    /// Reports a match that repeats the one before it.
+    Repetition(Repetition),
+    /// Averages grade-level scores of the text, and tests the average.
+    Readability(Readability),
 }
 
 /// The patterns that hold a match back.
@@ -185,6 +197,116 @@ pub struct Metric {
     /// What the formula's `occurrences` counts, when the rule has `tokens` or
     /// `raw`.
     pub tokens: Option<Existence>,
+}
+
+/// A `consistency` rule.
+#[derive(Debug)]
+pub struct Consistency {
+    /// One pattern for each pair of `either`, by key: the pair's two forms are
+    /// the groups [`Consistency::FORM`] and 0, and [`Consistency::FORM`] and 1.
+    pub pairs: Vec<Pattern>,
+}
+
+impl Consistency {
+    /// The name of the group that holds a pair's form number `n` is this,
+    /// then the number.
+    pub const FORM: &'static str = "form_";
+}
+
+/// A `conditional` rule.
+#[derive(Debug)]
+pub struct Conditional {
+    /// The `first` pattern, as written.
+    pub first: Pattern,
+    /// The `second` pattern, as written.
+    pub second: Pattern,
+    /// Whether `second` has a capture group, which makes the texts it captures
+    /// the terms `first` may use; without one, `second` must match in the same
+    /// block.
+    pub defines: bool,
+    /// Whether both patterns, and a term, match without regard to case.
+    pub ignorecase: bool,
+    /// What holds a match of `first` back.
+    pub exceptions: Exceptions,
+}
+
+/// A `repetition` rule.
+#[derive(Debug)]
+pub struct Repetition {
+    /// The `tokens`, joined into one group.
+    pub pattern: Pattern,
+    /// The most repeats a node may hold before one is reported.
+    pub max: usize,
+    /// Whether two matches are equal without regard to case.
+    pub ignorecase: bool,
+    /// With `alpha`, the pattern a match must satisfy whole: letters only.
+    pub letters: Option<Pattern>,
+    /// What holds a repeat back.
+    pub exceptions: Exceptions,
+}
+
+/// A grade-level score a `readability` rule may average.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Score {
+    /// `Automated Readability`.
+    AutomatedReadability,
+    /// `Coleman-Liau`.
+    ColemanLiau,
+    /// `Flesch-Kincaid`.
+    FleschKincaid,
+    /// `Gunning Fog`.
+    GunningFog,
+    /// `SMOG`.
+    Smog,
+}
+
+impl Score {
+    /// Every score, in the order the error for an unknown one lists them.
+    pub const ALL: [Self; 5] = [
+        Self::AutomatedReadability,
+        Self::ColemanLiau,
+        Self::FleschKincaid,
+        Self::GunningFog,
+        Self::Smog,
+    ];
+
+    /// The name a rule's `metrics` list uses.
+    #[must_use]
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::AutomatedReadability => "Automated Readability",
+            Self::ColemanLiau => "Coleman-Liau",
+            Self::FleschKincaid => "Flesch-Kincaid",
+            Self::GunningFog => "Gunning Fog",
+            Self::Smog => "SMOG",
+        }
+    }
+
+    /// The score named `name`, written as a rule's `metrics` list writes it.
+    #[must_use]
+    pub fn named(name: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|score| score.name() == name)
+    }
+
+    /// The metric variable that holds the score.
+    pub(crate) const fn variable(self) -> &'static str {
+        match self {
+            Self::AutomatedReadability => "automated_readability",
+            Self::ColemanLiau => "coleman_liau",
+            Self::FleschKincaid => "flesch_kincaid",
+            Self::GunningFog => "gunning_fog",
+            Self::Smog => "smog",
+        }
+    }
+}
+
+/// A `readability` rule.
+#[derive(Debug)]
+pub struct Readability {
+    /// The scores to average, at least one.
+    pub scores: Vec<Score>,
+    /// The highest average a text may have.
+    pub grade: f64,
 }
 
 /// One thing wrong with a rule file.
@@ -274,6 +396,10 @@ impl Rule {
                 build::substitution_rule(&source, &read::<SubstitutionFields>(&input)?)
             }
             "occurrence" => build::occurrence_rule(&source, &read::<OccurrenceFields>(&input)?),
+            "conditional" => build::conditional_rule(&source, &read::<ConditionalFields>(&input)?),
+            "consistency" => build::consistency_rule(&source, &read::<ConsistencyFields>(&input)?),
+            "repetition" => build::repetition_rule(&source, &read::<RepetitionFields>(&input)?),
+            "readability" => build::readability_rule(&source, &read::<ReadabilityFields>(&input)?),
             _ => build::metric_rule(&source, &read::<MetricFields>(&input)?),
         }
     }

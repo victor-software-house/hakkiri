@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use crate::formula::{Formula, Value};
 use crate::readability::{Counts, quoted_words};
-use crate::rule::Metric;
+use crate::rule::{Metric, Readability};
 use crate::splitter::Model;
 use crate::summary::Elements;
 
@@ -126,6 +126,25 @@ pub(crate) fn measure(
         .eval(&|name| found.get(name).copied())
         .ok()?;
     (holds == Value::Bool(true)).then_some(result)
+}
+
+/// The average of the scores of `readability` over a text with the variables
+/// `base`, when it is over the rule's grade.
+///
+/// A text with no words or no sentence holds nothing: each score divides by
+/// one of those counts.
+pub(crate) fn graded(readability: &Readability, base: &Variables) -> Option<f64> {
+    let has = |name: &str| base.get(name).is_some_and(|count| *count > 0.0);
+    if !has("words") || !has("sentences") {
+        return None;
+    }
+    let sum = readability
+        .scores
+        .iter()
+        .map(|score| base.get(score.variable()).copied())
+        .sum::<Option<f64>>()?;
+    let average = sum / float(readability.scores.len());
+    (average.is_finite() && average > readability.grade).then_some(average)
 }
 
 /// Whether `formula` is one that reads `result`; the name is a variable of a

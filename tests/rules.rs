@@ -127,10 +127,10 @@ fn a_script_rule_is_refused() -> TestResult {
 #[test]
 fn a_check_type_for_a_later_change_is_refused() -> TestResult {
     let (_, _, message) = refused(indoc! {"
-        extends: consistency
+        extends: capitalization
         message: m
     "})?;
-    assert!(message.contains("consistency"), "{message}");
+    assert!(message.contains("capitalization"), "{message}");
     Ok(())
 }
 

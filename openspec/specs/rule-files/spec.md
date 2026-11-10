@@ -162,7 +162,7 @@ A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`,
 
 #### Scenario: A semicolon rate
 
-- **WHEN** a rule has `extends: metric`, `message: "%s semicolons per 1,000 words, over 3: split the sentences."`, `tokens: [';']`, `formula: occurrences / words * 1000` and `condition: '> 3'`, and the input is `One; two; three four five six seven eight nine ten.`
+- **WHEN** a rule has `extends: metric`, `message: "%s semicolons per 1,000 words, over 3: split the sentences."`, `nonword: true`, `tokens: [';']`, `formula: occurrences / words * 1000` and `condition: '> 3'`, and the input is `One; two; three four five six seven eight nine ten.`
 - **THEN** hakkiri reports one alert with the message `200.00 semicolons per 1,000 words, over 3: split the sentences.`
 
 ### Requirement: A metric with no scope measures the whole file
@@ -198,3 +198,12 @@ A `want` of `''` SHALL mean no alerts.
 
 - **WHEN** a case has `input: "It works."` and `want: ''`, and the rule reports no alert
 - **THEN** the case passes
+
+### Requirement: Metric tokens match as existence tokens do
+
+The `tokens` of a `metric` rule SHALL match as the `tokens` of an `existence` rule do, with word boundaries unless `nonword` is `true`, and with `ignorecase`, `raw` and `exceptions`.
+
+#### Scenario: A semicolon with word boundaries
+
+- **WHEN** the semicolon rule above has no `nonword` and reads `One; two; three four five six seven eight nine ten.`
+- **THEN** its formula reads `occurrences` as 0, and hakkiri reports no alert

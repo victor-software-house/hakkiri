@@ -705,16 +705,24 @@ fn eight_whole_file_metrics_over_sixty_thousand_lines() -> TestResult {
         .collect::<Result<Vec<_>, _>>()?;
     let source = "A marker.\n".repeat(60_000);
     let tree = parse(Language::Markdown, &source)?;
-    let start = Instant::now();
-    let one = lint(&rules[..1], &tree, &source, "md")?;
-    let one_time = start.elapsed();
-    let start = Instant::now();
-    let eight = lint(&rules, &tree, &source, "md")?;
-    let eight_time = start.elapsed();
+    // The best of three runs of each, so a pause on a shared machine does not
+    // fail correct code.
+    let best = |rules: &[Rule]| -> Result<(usize, Duration), Box<dyn Error>> {
+        let mut best = Duration::MAX;
+        let mut count = 0;
+        for _ in 0..3 {
+            let start = Instant::now();
+            count = lint(rules, &tree, &source, "md")?.len();
+            best = best.min(start.elapsed());
+        }
+        Ok((count, best))
+    };
+    let (one, one_time) = best(&rules[..1])?;
+    let (eight, eight_time) = best(&rules)?;
     eprintln!("one rule: {one_time:?}, eight rules: {eight_time:?}");
-    assert_eq!((one.len(), eight.len()), (1, 8));
+    assert_eq!((one, eight), (1, 8));
     assert!(
-        eight_time < one_time * 4,
+        eight_time < one_time * 3,
         "eight rules took {eight_time:?}, one took {one_time:?}"
     );
     Ok(())

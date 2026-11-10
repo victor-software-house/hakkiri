@@ -36,6 +36,6 @@ None.
 - One new module per check type, with unit tests.
 
 [ledger]: ../../../tasks.yaml
-[engine]: ../rule-engine/proposal.md
+[engine]: ../archive/2026-11-10-rule-engine/proposal.md
 [pattern]: ../pattern-and-readability-checks/proposal.md
 [design]: design.md

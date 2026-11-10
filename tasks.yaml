@@ -1,30 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-004
+active: HKR-013
 queue:
-  - id: HKR-004
-    title: Build the rule engine
-    scope: engine
-    outcome: >-
-      Rules select text by scope, then run existence, substitution, occurrence and metric, with rates through metric.
-    blocked_by: []
-    acceptance:
-      - Flesch-Kincaid matches Vale on the prose-style fixtures within a stated tolerance.
-      - A 50,000-character line and a 60,000-line file finish with no panic.
-      - Each of existence, substitution, occurrence and metric has unit tests.
-    notes:
-      - 2026-11-09, a word count reads a code span as one word, where Vale 3.26.0 reads none; link text counts and its target does not, as in Vale. HKR-002 lists the intended differences.
-    plan: openspec/changes/rule-engine/proposal.md
-
   - id: HKR-013
     title: Run the pattern and readability checks
     scope: engine
     outcome: >-
       Rules run consistency, conditional, repetition and readability with Vale
       3.26.0's meaning, or a better one where Vale's is a defect.
-    blocked_by:
-      - HKR-004
+    blocked_by: []
     acceptance:
       - Each of consistency, conditional, repetition and readability has unit tests.
       - A 50,000-character line and a 60,000-line file finish with no panic for these four checks.
@@ -50,8 +35,7 @@ queue:
     outcome: >-
       hakkiri check lints files in parallel and hakkiri test runs rule cases,
       released as binaries through verctl.
-    blocked_by:
-      - HKR-004
+    blocked_by: []
     acceptance:
       - Integration tests cover line and JSON output, exit status by level, and .ctl/hakkiri.yaml globs and levels.
       - JSON output holds no ESC byte with CLICOLOR_FORCE=1.
@@ -113,6 +97,19 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-004
+    title: Build the rule engine
+    scope: engine
+    outcome: >-
+      Rules select text by scope, then run existence, substitution, occurrence and metric, with rates through metric.
+    notes:
+      - 2026-11-09, a word count reads a code span as one word, where Vale 3.26.0 reads none; link text counts and its target does not, as in Vale. HKR-002 lists the intended differences.
+    plan: openspec/changes/archive/2026-11-10-rule-engine/proposal.md
+    completed: 2026-11-10T15:24:36
+    evidence:
+      - PRs 17, 18, 20, 21, 22 and 23 merged the rule engine at e7c546a, with Flesch-Kincaid within 0.01 of Vale on 51 inputs; the rule-engine OpenSpec change is archived.
+    disposition: completed
+
   - id: HKR-015
     title: Split sentences
     scope: engine

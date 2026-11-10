@@ -116,7 +116,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     Before [7950466][c-once] it was 43 ms and 341 ms.  
     The earlier 66 ms for one rule was a single run with no warm-up.
   - 2026-11-10 (UTC), a test lints 60,000 lines with one metric rule and with eight, in [df67f66][c-long-metric].  
-    Eight take 463 ms and one takes 488 ms, and the test holds eight to under four times one.  
+    Eight take 463 ms and one takes 488 ms, and the test holds eight to under three times one.  
     Before [7950466][c-once] eight took 3.59 s against 480 ms, which fails that bound.
 
 ## 7. Flesch-Kincaid parity
@@ -193,8 +193,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [alerts]: specs/alerts/spec.md
 [match]: specs/match-checks/spec.md
 [metric]: specs/metric-check/spec.md
-[rule-files]: ../../specs/rule-files/spec.md
+[rule-files]: ../../../specs/rule-files/spec.md
 [ps-commit]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846
-[fk-tsv]: ../../../tests/fixtures/fk-parity/vale-fk.tsv
-[fk-inputs]: ../../../tests/fixtures/fk-parity/inputs
-[fk-sources]: ../../../tests/fixtures/fk-parity/SOURCES.md
+[fk-tsv]: ../../../../tests/fixtures/fk-parity/vale-fk.tsv
+[fk-inputs]: ../../../../tests/fixtures/fk-parity/inputs
+[fk-sources]: ../../../../tests/fixtures/fk-parity/SOURCES.md

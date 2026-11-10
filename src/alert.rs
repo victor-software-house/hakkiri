@@ -170,6 +170,18 @@ impl<'a> Locator<'a> {
         self.report(rule, (offset, None), "", messages)
     }
 
+    /// The alert of `rule` for a text with no match to point at, at column 1
+    /// of the line the text starts on.
+    pub fn alert_on_line(&mut self, rule: &Rule, text: &Text, messages: (String, String)) -> Alert {
+        let (line, _) = self.place(text.file_offset(0).unwrap_or_default());
+        let start = line
+            .checked_sub(1)
+            .and_then(|index| self.starts.get(index))
+            .copied()
+            .unwrap_or_default();
+        self.report(rule, (start, None), "", messages)
+    }
+
     /// `(offset, last)` is the file byte where the match starts, and where its
     /// last character starts when it has one.
     fn report(

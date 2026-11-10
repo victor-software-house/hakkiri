@@ -1,12 +1,16 @@
 //! Checks: what each check type finds in one block of text.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ops::Range;
 
 use crate::alert::fill;
-use crate::metric::{Variables, measure, variables};
-use crate::pattern::{Pattern, SearchError};
-use crate::rule::{Check, Exceptions, Existence, Metric, Occurrence, Rule, Substitution, Swap};
+use crate::metric::{Variables, graded, measure, variables};
+use crate::pattern::{Captured, Pattern, SearchError};
+use crate::rule::{
+    Check, Conditional, Consistency, Exceptions, Existence, Metric, Occurrence, Readability,
+    Repetition, Rule, Substitution, Swap,
+};
+use crate::splitter::Model;
 use crate::summary::{Elements, Summary};
 use crate::text::Text;
 
@@ -36,17 +40,39 @@ impl Hit {
     }
 }
 
-/// The matches `check` finds in `text`.
+/// What one rule remembers from the blocks of one file it has read.
+///
+/// A rule starts each file with none, so two rules never share it.
+#[derive(Debug, Default)]
+pub(crate) struct Memory {
+    /// The pairs of a `consistency` rule, by position, and for each the forms
+    /// seen so far, as 0 or 1.
+    seen: HashSet<(usize, usize)>,
+    /// The terms a `conditional` rule has read defined so far, lowercased when
+    /// the rule ignores case.
+    terms: HashSet<String>,
+}
+
+/// The matches `check` finds in `text`, the next block of a file whose earlier
+/// blocks `memory` holds.
 ///
 /// # Errors
 ///
 /// Returns a [`SearchError`] when a pattern gives up on the text.
-pub(crate) fn run(check: &Check, text: &Text) -> Result<Vec<Hit>, SearchError> {
+pub(crate) fn run(
+    check: &Check,
+    text: &Text,
+    memory: &mut Memory,
+) -> Result<Vec<Hit>, SearchError> {
     match check {
         Check::Existence(existence) => run_existence(existence, text),
         Check::Substitution(substitution) => run_substitution(substitution, text),
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
         Check::Metric(metric) => run_metric(metric, text),
+        Check::Consistency(consistency) => run_consistency(consistency, text, memory),
+        Check::Conditional(conditional) => run_conditional(conditional, text, memory),
+        Check::Repetition(repetition) => run_repetition(repetition, text),
+        Check::Readability(readability) => Ok(run_readability(readability, text)),
     }
 }
 
@@ -308,21 +334,225 @@ fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
         .collect())
 }
 
-/// What the metric reports for the prose of the whole file, whose variables
-/// are `base`.
+/// The term a text of `conditional` stands for: the text, in lower case when
+/// the rule ignores case.
+fn term(conditional: &Conditional, text: &str) -> String {
+    if conditional.ignorecase {
+        text.to_lowercase()
+    } else {
+        text.to_owned()
+    }
+}
+
+/// Each match of `first` in `text` that the file has not defined, and no
+/// exception holds back.
+///
+/// With no group in `second`, a match of `second` in `text` defines every
+/// `first` in it. With one, the texts its groups capture in `text` are
+/// defined from here to the end of the file, and a `first` is defined when it
+/// is one of them. A match that overlaps a code span is no match of either.
+fn run_conditional(
+    conditional: &Conditional,
+    text: &Text,
+    memory: &mut Memory,
+) -> Result<Vec<Hit>, SearchError> {
+    let content = text.as_str();
+    let seconds: Vec<Captured> = conditional
+        .second
+        .find_captured(content)?
+        .into_iter()
+        .filter(|found| !text.overlaps_code(&found.whole))
+        .collect();
+    if !conditional.defines && !seconds.is_empty() {
+        return Ok(Vec::new());
+    }
+    for found in &seconds {
+        for group in &found.groups {
+            if let Some(defined) = content.get(group.clone()) {
+                memory.terms.insert(term(conditional, defined));
+            }
+        }
+    }
+    let firsts = conditional.first.find_all(content)?;
+    let phrases = phrase_spans(&conditional.exceptions, content, !firsts.is_empty())?;
+    let mut hits = Vec::new();
+    for range in firsts {
+        let Some(observed) = content.get(range.clone()) else {
+            continue;
+        };
+        if text.overlaps_code(&range)
+            || (conditional.defines && memory.terms.contains(&term(conditional, observed)))
+            || excepted(&conditional.exceptions, &phrases, &range, observed)?
+        {
+            continue;
+        }
+        hits.push(Hit {
+            values: vec![observed.to_owned()],
+            numbered: false,
+            range,
+        });
+    }
+    Ok(hits)
+}
+
+/// One hit for each pair that matched in `text` once both of its forms have
+/// matched in the file so far, `text` included.
+///
+/// The hit is at the last match of the pair in `text`, and holds its text. A
+/// match that overlaps a code span is no match.
+fn run_consistency(
+    consistency: &Consistency,
+    text: &Text,
+    memory: &mut Memory,
+) -> Result<Vec<Hit>, SearchError> {
+    let content = text.as_str();
+    let mut hits = Vec::new();
+    for (pair, pattern) in consistency.pairs.iter().enumerate() {
+        let mut last = None;
+        for (form, range) in pattern.find_groups(content, Consistency::FORM)? {
+            if text.overlaps_code(&range) {
+                continue;
+            }
+            memory.seen.insert((pair, form));
+            last = Some(range);
+        }
+        if let Some(range) = last
+            && memory.seen.contains(&(pair, 0))
+            && memory.seen.contains(&(pair, 1))
+            && let Some(matched) = content.get(range.clone())
+        {
+            hits.push(Hit {
+                values: vec![matched.to_owned()],
+                numbered: false,
+                range,
+            });
+        }
+    }
+    Ok(hits)
+}
+
+/// Whether the matches `before` and `current` are the same word.
+fn same(repetition: &Repetition, before: &str, current: &str) -> bool {
+    if repetition.ignorecase {
+        before.to_lowercase() == current.to_lowercase()
+    } else {
+        before == current
+    }
+}
+
+/// Each match of the tokens that repeats the one before it, once the repeats
+/// of the text are over `max`.
+///
+/// A match is compared, trimmed of spaces, with the match before it. The
+/// count of repeats goes back to 0 only after a hit, as Vale counts it. A
+/// repeat that spans more than one sentence, or that an exception holds back,
+/// is no hit. A match that overlaps a code span is no match, and it breaks the
+/// chain: the match after it has nothing before it to repeat.
+fn run_repetition(repetition: &Repetition, text: &Text) -> Result<Vec<Hit>, SearchError> {
+    let content = text.as_str();
+    let found = repetition.pattern.find_all(content)?;
+    // The sentence model is embedded and loads; without it no span could be
+    // told from two sentences, and a repeat is not reported.
+    let Ok(model) = Model::english() else {
+        return Ok(Vec::new());
+    };
+    let mut phrases: Option<PhraseSpans> = None;
+    let mut hits = Vec::new();
+    let mut before: Option<(usize, &str)> = None;
+    let mut count = 0_usize;
+    for range in found {
+        let Some(matched) = content.get(range.clone()) else {
+            continue;
+        };
+        if text.overlaps_code(&range) {
+            before = None;
+            continue;
+        }
+        let current = matched.trim();
+        let repeated = match before {
+            Some((_, earlier)) => !current.is_empty() && same(repetition, earlier, current),
+            None => false,
+        };
+        let spelled = match &repetition.letters {
+            Some(letters) => letters.is_match(current)?,
+            None => true,
+        };
+        if let Some((start, _)) = before
+            && repeated
+            && spelled
+        {
+            count += 1;
+            let span = start..range.end;
+            if count > repetition.max
+                && let Some(spanned) = content.get(span.clone())
+                && model.split(spanned).len() == 1
+            {
+                let held = match &phrases {
+                    Some(held) => held,
+                    None => phrases.insert(phrase_spans(&repetition.exceptions, content, true)?),
+                };
+                if !excepted(&repetition.exceptions, held, &span, spanned)? {
+                    hits.push(Hit {
+                        range: span,
+                        values: vec![current.to_owned()],
+                        numbered: false,
+                    });
+                    count = 0;
+                }
+            }
+        }
+        before = Some((range.start, current));
+    }
+    Ok(hits)
+}
+
+/// One hit at the start of `text` when the average grade of the text is over
+/// the rule's grade, measured apart from the rest of the file.
+fn run_readability(readability: &Readability, text: &Text) -> Vec<Hit> {
+    let Some(base) = variables(text.as_str(), Elements::default()) else {
+        return Vec::new();
+    };
+    graded(readability, &base)
+        .map(grade_hit)
+        .into_iter()
+        .collect()
+}
+
+/// The hit of an average grade, at the start of the text.
+fn grade_hit(average: f64) -> Hit {
+    Hit {
+        range: 0..0,
+        values: vec![format!("{average:.2}")],
+        numbered: false,
+    }
+}
+
+/// What the check reports for the prose of the whole file, whose variables
+/// are `base`: a `metric` or a `readability` rule that measures the file.
 pub(crate) fn run_summary(
-    metric: &Metric,
+    check: &Check,
     summary: &Summary,
     base: &Variables,
 ) -> Result<Option<Hit>, SearchError> {
-    let occurrences = metric
-        .tokens
-        .as_ref()
-        .map(|tokens| count_tokens(tokens, &summary.content))
-        .transpose()?;
-    Ok(measure(metric, base, occurrences).map(|result| Hit {
-        range: 0..0,
-        values: vec![format!("{result:.2}")],
-        numbered: false,
-    }))
+    match check {
+        Check::Metric(metric) => {
+            let occurrences = metric
+                .tokens
+                .as_ref()
+                .map(|tokens| count_tokens(tokens, &summary.content))
+                .transpose()?;
+            Ok(measure(metric, base, occurrences).map(|result| Hit {
+                range: 0..0,
+                values: vec![format!("{result:.2}")],
+                numbered: false,
+            }))
+        }
+        Check::Readability(readability) => Ok(graded(readability, base).map(grade_hit)),
+        Check::Existence(_)
+        | Check::Substitution(_)
+        | Check::Occurrence(_)
+        | Check::Consistency(_)
+        | Check::Conditional(_)
+        | Check::Repetition(_) => Ok(None),
+    }
 }

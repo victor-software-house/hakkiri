@@ -11,6 +11,16 @@ pub const BACKTRACK_LIMIT: usize = 1_000_000;
 /// `regex` crate, since a rule with hundreds of swaps compiles to a big one.
 const SIZE_LIMIT: usize = 64 << 20;
 
+/// One match and the groups in it that hold text.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) struct Captured {
+    /// The bytes of the whole match.
+    pub(crate) whole: Range<usize>,
+    /// The bytes of each capture group that matched and holds text, in group
+    /// order.
+    pub(crate) groups: Vec<Range<usize>>,
+}
+
 /// A compiled pattern.
 #[derive(Debug)]
 pub struct Pattern {
@@ -88,6 +98,22 @@ impl SearchError {
             Self::BacktrackLimit { pattern }
         }
     }
+}
+
+/// The whole match and the groups with text, from the groups of one match,
+/// the whole match first.
+fn captured<M: Into<Range<usize>>>(
+    mut groups: impl Iterator<Item = Option<M>>,
+) -> Option<Captured> {
+    let whole = groups.next()??.into();
+    Some(Captured {
+        whole,
+        groups: groups
+            .flatten()
+            .map(Into::into)
+            .filter(|range: &Range<usize>| !range.is_empty())
+            .collect(),
+    })
 }
 
 impl Pattern {
@@ -233,6 +259,30 @@ impl Pattern {
                     found.extend(groups.iter().find_map(|&(group, number)| {
                         captures.get(group).map(|hit| (number, hit.range()))
                     }));
+                }
+            }
+        }
+        Ok(found)
+    }
+
+    /// Each match with the groups in it that hold text.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`SearchError`] when `fancy-regex` gives up on `text`.
+    pub(crate) fn find_captured(&self, text: &str) -> Result<Vec<Captured>, SearchError> {
+        let mut found = Vec::new();
+        match &self.engine {
+            Engine::Regex(regex) => {
+                for captures in regex.captures_iter(text) {
+                    found.extend(captured(captures.iter()));
+                }
+            }
+            Engine::Fancy(regex) => {
+                for captures in regex.captures_iter(text) {
+                    let captures =
+                        captures.map_err(|error| SearchError::new(&self.source, &error))?;
+                    found.extend(captured(captures.iter()));
                 }
             }
         }

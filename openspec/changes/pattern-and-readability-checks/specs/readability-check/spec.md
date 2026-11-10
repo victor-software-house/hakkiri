@@ -37,6 +37,15 @@ hakkiri SHALL refuse a rule whose list is empty or names any other score, with a
 - **WHEN** rule `Team.Grade` has `extends: readability` and `metrics: [Dale-Chall]`
 - **THEN** hakkiri reports an error naming `Team.Grade` and `Dale-Chall`, and exits with a failure status
 
+### Requirement: readability counts a repeated score once
+
+A score listed more than once in `metrics` SHALL count once in the average.
+
+#### Scenario: One score listed twice
+
+- **WHEN** the rule has `metrics: [Flesch-Kincaid, Flesch-Kincaid]` and `grade: -2`, and reads `The cat sat on the mat.`
+- **THEN** hakkiri reports one alert, with the message `Grade -1.45.`
+
 ### Requirement: readability measures the whole file by default
 
 A `readability` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.  
@@ -62,4 +71,4 @@ A `readability` rule with any other `scope` SHALL measure each selected node on 
 - **WHEN** the rule above has `scope: paragraph` and reads the paragraphs `The cat sat.` and `The dog ran.`
 - **THEN** hakkiri reports two alerts, at lines 1 and 3, each with the message `Grade -2.62.`
 
-[metric]: ../../../rule-engine/specs/metric-check/spec.md
+[metric]: ../../../../specs/metric-check/spec.md

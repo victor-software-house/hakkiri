@@ -1,7 +1,7 @@
 //! The engine: one file's rules run over its tree, and the alerts they give.
 
 use crate::alert::{Alert, Locator, settle};
-use crate::check::{run, run_summary};
+use crate::check::{Memory, run, run_summary};
 use crate::metric::{Variables, variables};
 use crate::rule::{Check, Rule};
 use crate::select::{SelectError, select};
@@ -14,9 +14,10 @@ use crate::tree::Tree;
 /// without the dot. Alerts at one place keep the order of their rules.
 /// A rule whose pattern gives up on a block reports one `error` alert at the
 /// block, and the other rules still run.
-/// A `metric` rule with no `scope`, or `scope: text`, measures the prose of the
-/// whole file, the comments of a code file included, and reports at its start;
-/// any other scope measures each block it selects.
+/// A `metric` or `readability` rule with no `scope`, or `scope: text`, measures
+/// the prose of the whole file, the comments of a code file included, and
+/// reports at its start; any other scope measures each block it selects.
+/// A `readability` rule reports at column 1 of the first line of each block.
 /// The counts and scores of that prose are worked out once, and each rule adds
 /// only its `occurrences`.
 ///
@@ -33,7 +34,7 @@ pub fn lint(
     let mut alerts = Vec::new();
     let mut measured: Option<(Summary, Option<Variables>)> = None;
     for rule in rules {
-        if let Check::Metric(metric) = &rule.check
+        if matches!(rule.check, Check::Metric(_) | Check::Readability(_))
             && rule.scope.measures_file()
         {
             if measured.is_none() {
@@ -46,7 +47,7 @@ pub fn lint(
             }
             let hit = measured.as_ref().map_or(Ok(None), |(summary, base)| {
                 base.as_ref()
-                    .map_or(Ok(None), |base| run_summary(metric, summary, base))
+                    .map_or(Ok(None), |base| run_summary(&rule.check, summary, base))
             });
             match hit {
                 Ok(hit) => {
@@ -58,12 +59,17 @@ pub fn lint(
         }
         let mut found = Vec::new();
         let mut failure = None;
+        let mut memory = Memory::default();
         'blocks: for block in select(&rule.scope, tree, source, extension)? {
-            match run(&rule.check, &block.text) {
+            match run(&rule.check, &block.text, &mut memory) {
                 Ok(hits) => {
                     for hit in hits {
                         let messages = hit.messages(rule);
-                        found.extend(locator.alert(rule, &block.text, hit.range, messages));
+                        found.extend(if matches!(rule.check, Check::Readability(_)) {
+                            Some(locator.alert_on_line(rule, &block.text, messages))
+                        } else {
+                            locator.alert(rule, &block.text, hit.range, messages)
+                        });
                     }
                 }
                 Err(error) => {

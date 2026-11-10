@@ -6,10 +6,13 @@
 
 use std::cmp::Reverse;
 
-use super::schema::{ExistenceFields, MetricFields, OccurrenceFields, SubstitutionFields};
+use super::schema::{
+    ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields,
+    ReadabilityFields, RepetitionFields, SubstitutionFields,
+};
 use super::{
-    Action, Check, Exceptions, Existence, LoadError, LoadProblem, Metric, Occurrence, Rule,
-    Substitution, Swap, level_of,
+    Action, Check, Conditional, Consistency, Exceptions, Existence, LoadError, LoadProblem, Metric,
+    Occurrence, Readability, Repetition, Rule, Score, Substitution, Swap, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -391,6 +394,181 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
     })
 }
 
+/// Whether `pattern` holds a capture group: a `(` that is not escaped, not in
+/// a character class and not the start of an extension such as `(?:`, or a
+/// named group.
+fn has_capture_group(pattern: &str) -> bool {
+    let bytes = pattern.as_bytes();
+    let mut in_class = false;
+    let mut at = 0;
+    while let Some(&byte) = bytes.get(at) {
+        match byte {
+            b'\\' => at += 1,
+            b'[' => in_class = true,
+            b']' => in_class = false,
+            b'(' if !in_class => {
+                if bytes.get(at + 1) != Some(&b'?') {
+                    return true;
+                }
+                let rest = pattern.get(at + 2..).unwrap_or_default();
+                if rest.starts_with("P<")
+                    || (rest.starts_with('<') && !rest.starts_with("<=") && !rest.starts_with("<!"))
+                {
+                    return true;
+                }
+            }
+            _ => {}
+        }
+        at += 1;
+    }
+    false
+}
+
+fn conditional(source: &Source<'_>, fields: &ConditionalFields) -> Result<Conditional, LoadError> {
+    if !fields.within.value().is_empty() {
+        return Err(source.problem(
+            "in",
+            format!(
+                "rule `{}`: `in` names a View scope, and hakkiri has no Views",
+                source.name
+            ),
+        ));
+    }
+    for (field, pattern) in [("first", &fields.first), ("second", &fields.second)] {
+        if pattern.value().is_empty() {
+            return Err(source.problem(
+                field,
+                format!(
+                    "rule `{}`: `{field}` holds nothing to match, so the pattern would match at \
+                     every position",
+                    source.name
+                ),
+            ));
+        }
+    }
+    let ignorecase = fields.ignorecase.value();
+    let compile = |field: &str, pattern: &str| {
+        let written = if ignorecase {
+            format!("(?i){pattern}")
+        } else {
+            pattern.to_owned()
+        };
+        let compiled = source.compile(field, &written, &[pattern])?;
+        if matches!(compiled.is_match(""), Ok(true)) {
+            return Err(source.problem(
+                field,
+                format!(
+                    "rule `{}`: `{field}` matches the empty string, so the pattern would match \
+                     at every position",
+                    source.name
+                ),
+            ));
+        }
+        Ok(compiled)
+    };
+    let second = fields.second.value();
+    Ok(Conditional {
+        first: compile("first", fields.first.value())?,
+        second: compile("second", second)?,
+        defines: has_capture_group(second),
+        ignorecase,
+        exceptions: exceptions(source, fields.exceptions.values())?,
+    })
+}
+
+/// One pattern for each pair of a `consistency` rule, by key.
+///
+/// A pair matches as `existence` tokens do, its two forms as groups, and a
+/// space in a form matches a line wrap too.
+fn consistency(source: &Source<'_>, fields: &ConsistencyFields) -> Result<Consistency, LoadError> {
+    let mut entries: Vec<&(String, String)> = fields.either.entries().iter().collect();
+    entries.sort_by(|left, right| left.0.cmp(&right.0));
+    let pairs = entries
+        .into_iter()
+        .map(|(first, second)| {
+            let body = format!(
+                "(?P<{form}0>{})|(?P<{form}1>{})",
+                wrap_spaces(first),
+                wrap_spaces(second),
+                form = Consistency::FORM
+            );
+            let pattern = template(!fields.nonword.value(), fields.ignorecase.value(), &body);
+            source.compile("either", &pattern, &[first, second])
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(Consistency { pairs })
+}
+
+/// The pattern of a `repetition` rule: its tokens in one group, with no word
+/// template.
+fn repetition(source: &Source<'_>, fields: &RepetitionFields) -> Result<Repetition, LoadError> {
+    // A blank token is left out, as an `existence` rule leaves it out, since
+    // it would match the empty string at every position.
+    let tokens: Vec<&str> = fields
+        .tokens
+        .values()
+        .iter()
+        .map(String::as_str)
+        .filter(|token| !token.trim().is_empty())
+        .collect();
+    let group = format!("({})", tokens.join("|"));
+    let pattern = if fields.ignorecase.value() {
+        format!("(?i){group}")
+    } else {
+        group
+    };
+    Ok(Repetition {
+        pattern: source.compile("tokens", &pattern, &tokens)?,
+        max: fields.max.value(),
+        ignorecase: fields.ignorecase.value(),
+        letters: if fields.alpha.value() {
+            Some(source.compile("alpha", r"\A\p{L}+\z", &[])?)
+        } else {
+            None
+        },
+        exceptions: exceptions(source, fields.exceptions.values())?,
+    })
+}
+
+fn readability(source: &Source<'_>, fields: &ReadabilityFields) -> Result<Readability, LoadError> {
+    let names = fields.metrics.values();
+    if names.is_empty() {
+        return Err(source.problem(
+            "metrics",
+            format!(
+                "rule `{}`: `metrics` lists no score: use one or more of {}",
+                source.name,
+                score_names()
+            ),
+        ));
+    }
+    let mut scores = Vec::new();
+    for name in names {
+        let score = Score::named(name).ok_or_else(|| {
+            source.problem(
+                "metrics",
+                format!(
+                    "rule `{}`: `{name}` is not a score hakkiri knows: use one of {}",
+                    source.name,
+                    score_names()
+                ),
+            )
+        })?;
+        if !scores.contains(&score) {
+            scores.push(score);
+        }
+    }
+    Ok(Readability {
+        scores,
+        grade: fields.grade.value(),
+    })
+}
+
+/// The names a `metrics` list accepts, as a list for an error.
+fn score_names() -> String {
+    Score::ALL.map(Score::name).join(", ")
+}
+
 /// `formula` with `heading.h2` written as the variable `heading_h2`.
 fn read_headings(formula: &str) -> String {
     (1..=6).fold(formula.to_owned(), |text, depth| {
@@ -460,5 +638,49 @@ pub(super) fn metric_rule(source: &Source<'_>, fields: &MetricFields) -> Result<
         source,
         fields,
         Check::Metric(metric(source, fields)?)
+    ))
+}
+
+pub(super) fn readability_rule(
+    source: &Source<'_>,
+    fields: &ReadabilityFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Readability(readability(source, fields)?)
+    ))
+}
+
+pub(super) fn repetition_rule(
+    source: &Source<'_>,
+    fields: &RepetitionFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Repetition(repetition(source, fields)?)
+    ))
+}
+
+pub(super) fn consistency_rule(
+    source: &Source<'_>,
+    fields: &ConsistencyFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Consistency(consistency(source, fields)?)
+    ))
+}
+
+pub(super) fn conditional_rule(
+    source: &Source<'_>,
+    fields: &ConditionalFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Conditional(conditional(source, fields)?)
     ))
 }

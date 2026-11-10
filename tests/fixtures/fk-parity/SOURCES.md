@@ -44,4 +44,4 @@ The measuring files are not committed.
 
 [prose-style]: https://github.com/victor-software-house/prose-style
 [prose-style-commit]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846
-[change]: ../../../openspec/changes/rule-engine/design.md
+[change]: ../../../openspec/changes/archive/2026-11-10-rule-engine/design.md
