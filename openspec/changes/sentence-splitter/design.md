@@ -55,8 +55,11 @@ A small set of rules runs after Punkt:
 - No sentence ends inside brackets that close later in the same node.
 - A token with no space inside, such as `v1.2.3`, `README.md` or `3.50`, never holds a boundary.
 - An ellipsis followed by a lower-case word does not end a sentence.
+- A number or a letter with a period, at the start of a sentence or after a colon, numbers a list item and ends nothing: `1. Install it.`
 
 These are the failure classes the [pySBD paper][pysbd] reports for Punkt.
+
+Two more changes sit inside the Punkt step: a run of initials, such as `J. R. R. Tolkien`, goes on, and a run of lone periods, such as `. . .`, reads as one ellipsis.
 
 Alternative: Punkt alone. Lost: the Golden Rules score stays near Vale's.
 

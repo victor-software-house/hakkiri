@@ -59,6 +59,15 @@ The splitter SHALL NOT end a sentence inside brackets that close later in the sa
 - **WHEN** the splitter reads `Run it twice (the cache needs one pass. The second is fast) and stop.`
 - **THEN** it returns one sentence
 
+### Requirement: A list number ends nothing
+
+The splitter SHALL NOT end a sentence after a number or a letter with a period when it starts a sentence or follows a colon.
+
+#### Scenario: Numbered steps
+
+- **WHEN** the splitter reads `Steps: 1. Install it. 2. Run it.`
+- **THEN** it returns the sentences `Steps: 1. Install it.` and `2. Run it.`
+
 ### Requirement: An ellipsis before a lower-case word does not end a sentence
 
 The splitter SHALL NOT end a sentence at `...` or `…` when the next word starts in lower case.

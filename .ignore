@@ -1,0 +1,3 @@
+# The trained splitter model is a word table that tools write and nobody edits.
+# typos, rg and fd skip it.
+data/splitter/en.tsv

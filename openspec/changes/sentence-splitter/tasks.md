@@ -70,8 +70,25 @@ Training and measurement run in an ephemeral build box.
 
 ## 3. Model
 
-- [ ] 3.1 Build the trainer and a mise task that fetches the three sources, filters `github_archive` by license, and writes `data/splitter/en.tsv` with a source list.  
+- [x] 3.1 Build the trainer and mise tasks that fetch the four sources, filter `stackv2` by license, and write `data/splitter/en.tsv` with a source list.  
   Verify two runs in a build box write byte-identical files, and record the run time and token counts under this task.
+  - 2026-11-10 (UTC), two runs of `mise run splitter:train` in a 4x8 build box wrote byte-identical `en.tsv` and `SOURCES.md`, and the fetched corpus files were identical too.  
+    The SHA-256 of `en.tsv` is `09927086…` and of `SOURCES.md` is `3684c458…` in both runs.
+  - Each run took about 2 minutes: the fetch about 75 seconds, reading the corpus about 22 seconds, training 6.6 to 7.2 seconds.
+  - The corpus holds 26,144,179 tokens, counted as whitespace-separated words, after the Markdown sources are cut to the text of their paragraphs:
+
+    | Source | Documents | Tokens |
+    |:--|--:|--:|
+    | Owner's public repositories, 48 | 1,037 | 574,192 |
+    | `stackv2` Markdown, first 512 MiB of shard 129 | 46,146 | 10,782,267 |
+    | Python Enhancement Proposals | 818 | 1,625,676 |
+    | `project_gutenberg`, first 32 MiB of shard 0 | 186 | 13,162,044 |
+
+  - The model is 571,359 bytes in 24,632 lines: 2,655 abbreviations, 1,183 collocations, 793 sentence starters and 20,000 capitalization entries cut from 817,997.  
+    The data comes from 1,262,092 word types, 1,225,698 tokens that end in a period.
+  - `stackv2` spreads its Markdown over many of its 764 shards, mixed with code.  
+    Shard 129 holds 45,915 `.md` and `.markdown` records, the densest of the shards counted, and a prefix of it is read.
+  - `github_archive` holds issue and pull request threads, not `.md` files, so it is not a source.
 - [ ] 3.2 Embed the model and parse it once per process.  
   Verify a test reads the embedded model in CI.
 
