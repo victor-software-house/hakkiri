@@ -701,7 +701,23 @@ impl AffixFile {
             {
                 continue;
             }
+            // A rule whose strip text is not on the word makes nothing, as in
+            // Hunspell.
+            let word = match class.kind {
+                Kind::Prefix => base
+                    .word
+                    .strip_prefix(rule.strip.as_str())
+                    .map(|stripped| format!("{}{stripped}", rule.text)),
+                Kind::Suffix => base
+                    .word
+                    .strip_suffix(rule.strip.as_str())
+                    .map(|stripped| format!("{stripped}{}", rule.text)),
+            };
+            let Some(word) = word else {
+                continue;
+            };
             let mut form = base.clone();
+            form.word = word;
             form.cont.clone_from(&rule.cont);
             if !rule.cont.is_empty() {
                 form.flags = union(&base.flags, &rule.cont);
@@ -717,24 +733,6 @@ impl AffixFile {
                     Some(_) | None => Some(class.kind),
                 };
             }
-            form.word = match class.kind {
-                Kind::Prefix => {
-                    let stripped = base
-                        .word
-                        .strip_prefix(rule.strip.as_str())
-                        .filter(|_| !rule.strip.is_empty())
-                        .unwrap_or(base.word.as_str());
-                    format!("{}{stripped}", rule.text)
-                }
-                Kind::Suffix => {
-                    let stripped = base
-                        .word
-                        .strip_suffix(rule.strip.as_str())
-                        .filter(|_| !rule.strip.is_empty())
-                        .unwrap_or(base.word.as_str());
-                    format!("{stripped}{}", rule.text)
-                }
-            };
             out.push(form);
         }
         out

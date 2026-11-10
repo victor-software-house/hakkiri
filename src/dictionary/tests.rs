@@ -122,3 +122,13 @@ fn a_latin1_dictionary_reads() -> TestResult {
     assert!(dictionary.spell("r\u{e9}sum\u{e9}", &HashSet::new()));
     Ok(())
 }
+
+#[test]
+fn a_rule_whose_strip_text_is_not_on_the_word_makes_nothing() -> TestResult {
+    let aff = b"SFX A Y 1\nSFX A y ies .\n";
+    let dictionary = Dictionary::parse(aff, b"2\ncat/A\nfly/A\n")?;
+    assert_eq!(dictionary.expand("cat", "A")?, ["cat"]);
+    assert_eq!(dictionary.expand("fly", "A")?, ["fly", "flies"]);
+    assert!(!dictionary.spell("caties", &HashSet::new()));
+    Ok(())
+}
