@@ -22,6 +22,7 @@ pub mod scope;
 pub mod select;
 pub mod splitter;
 pub mod summary;
+pub mod tagger;
 pub mod text;
 mod tree;
 pub mod words;

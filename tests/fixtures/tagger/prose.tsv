@@ -1,0 +1,188 @@
+The file can be read.	0:3:DT 4:8:NN 9:12:MD 13:15:VB 16:20:VBN 20:21:.
+Open the file.	0:4:VB 5:8:DT 9:13:NN 13:14:.
+They'll save and invest more.	0:4:PRP 4:7:VBP 8:12:VB 13:16:CC 17:23:VB 24:28:JJR 28:29:.
+Don't stop.	0:2:VBP 2:5:DT 6:10:VB 10:11:.
+$100 well spent.	0:1:$ 1:4:CD 5:9:RB 10:15:VBN 15:16:.
+Well) done	0:4:UH 4:5:-RRB- 6:10:VBN
+He said “hi” now.	0:2:PRP 3:7:VBD 8:11:`` 11:13:UH 13:16:'' 17:20:RB 20:21:.
+It’s fine.	0:2:PRP 2:6:VBZ 7:11:JJ 11:12:.
+Dr. Smith went to Washington, D.C. on Jan. 5.	0:3:NNP 4:9:NNP 10:14:VBD 15:17:IN 18:28:NNP 28:29:, 30:34:NNP 35:37:IN 38:42:NNP 43:44:CD 44:45:.
+(-8 :) 8-D	0:3:SYM 4:5:: 5:6:-RRB- 7:10:SYM
+http://example.com/path?q=1 and user@example.com	0:27:ADD 28:31:CC 32:48:ADD
+Do it your self.	0:2:VB 3:5:PRP 6:10:PRP$ 11:15:PRP 15:16:.
+If it rains then stay.	0:2:IN 3:5:PRP 6:11:VBZ 12:16:RB 17:21:VB 21:22:.
+Pick the red one.	0:4:VB 5:8:DT 9:12:JJ 13:16:NN 16:17:.
+A Trip to Paris	0:1:DT 2:6:NN 7:9:IN 10:15:NNP
+Welcome to the Team	0:7:VB 8:10:IN 11:14:DT 15:19:NN
+Notes From the Field	0:5:NNS 6:10:IN 11:14:DT 15:20:NNP
+Ünïcödé wörds with áccents and ñ.	0:11:NNP 12:18:VBZ 19:23:IN 24:32:NNS 33:36:CC 37:39:NN 39:40:.
+emoji 🎉 and 😀 mixed with ASCII	0:5:CC 6:10:: 11:14:CC 15:19:NFP 20:25:VBN 26:30:IN 31:36:NN
+multiple    spaces and tabs and newlines	0:8:JJ 12:18:NNS 19:22:CC 23:27:NNS 28:31:CC 32:40:NNS
+	
+ 	
+...	0:1:. 1:2:. 2:3:.
+a	0:1:DT
+-LRB- word -RRB- *-1 *T*-2 0 -	0:5:-LRB- 6:10:NN 11:16:-RRB- 17:20:-NONE- 21:26:-NONE- 27:28:-NONE- 29:30:-
+Copy 2014 and 12 and 1,000 and 3rd and well-known and U.S. rules.	0:4:NN 5:9:CD 10:13:CC 14:16:CD 17:20:CC 21:26:CD 27:30:CC 31:34:JJ 35:38:CC 39:49:JJ 50:53:CC 54:58:NNP 59:64:NNS 64:65:.
+We can't, won't and shan't.	0:2:PRP 3:5:VBP 5:8:NNS 8:9:, 10:12:NN 12:15:NN 16:19:CC 20:23:NN 23:26:NN 26:27:.
+think, to see me.	0:5:VB 5:6:, 7:9:TO 10:13:VB 14:16:PRP 16:17:.
+matter of the very deepest moment.	0:6:NN 7:9:IN 10:13:DT 14:18:RB 19:26:JJ 27:33:NN 33:34:.
+"Not a bit, Doctor.	0:1:`` 1:4:RB 5:6:DT 7:10:NN 10:11:, 12:18:NN 18:19:.
+"You will excuse this mask," continued our strange visitor.	0:1:`` 1:4:PRP 5:9:MD 10:16:VB 17:21:DT 22:26:NN 26:27:, 27:28:'' 29:38:VBD 39:42:PRP$ 43:50:JJ 51:58:NN 58:59:.
+Holmes laughed.	0:6:NNP 7:14:VBD 14:15:.
+"Well, really!"	0:1:`` 1:5:UH 5:6:, 7:13:RB 13:14:. 14:15:''
+drove up to Briony Lodge, and a gentleman sprang out.	0:5:VBD 6:8:RP 9:11:IN 12:18:NNP 19:24:NNP 24:25:, 26:29:CC 30:31:DT 32:41:NN 42:48:NN 49:52:RB 52:53:.
+"Well, I found my plans very seriously menaced.	0:1:`` 1:5:UH 5:6:, 7:8:PRP 9:14:VBD 15:17:PRP$ 18:23:NNS 24:28:RB 29:38:RB 39:46:VBN 46:47:.
+it will be taken up by quite a number of people.	0:2:PRP 3:7:MD 8:10:VB 11:16:VBN 17:19:RP 20:22:IN 23:28:PDT 29:30:DT 31:37:NN 38:40:IN 41:47:NNS 47:48:.
+had resolved to use it within a few days.	0:3:VBD 4:12:VBN 13:15:TO 16:19:VB 20:22:PRP 23:29:IN 30:31:DT 32:35:JJ 36:40:NNS 40:41:.
+upon the couch.	0:4:IN 5:8:DT 9:14:NN 14:15:.
+the Arnsworth Castle business.	0:3:DT 4:13:NNP 14:20:NNP 21:29:NN 29:30:.
+upon the steps.	0:4:IN 5:8:DT 9:14:NNS 14:15:.
+you call to-morrow.	0:3:PRP 4:8:VBP 9:18:NN 18:19:.
+routine of everyday life.	0:7:NN 8:10:IN 11:19:NN 20:24:NN 24:25:.
+of twenty-one years, are eligible.	0:2:IN 3:13:CD 14:19:NNS 19:20:, 21:24:VBP 25:33:JJ 33:34:.
+to do with the money.	0:2:TO 3:5:VB 6:10:IN 11:14:DT 15:20:NN 20:21:.
+"'And he is admirably suited for it,' the other answered.	0:1:`` 1:5:IN 6:8:PRP 9:11:VBZ 12:21:RB 22:28:VBN 29:32:IN 33:35:PRP 35:36:, 36:37:`` 38:41:DT 42:47:JJ 48:56:NN 56:57:.
+"'No excuse will avail,' said Mr.	0:1:`` 1:4:UH 5:11:NN 12:16:MD 17:22:VB 22:23:, 23:24:'' 25:29:VBD 30:33:NNP
+never heard of any such body.	0:5:RB 6:11:VBD 12:14:IN 15:18:DT 19:23:JJ 24:28:NN 28:29:.
+one or two questions, Mr.	0:3:CD 4:6:CC 7:10:CD 11:20:NNS 20:21:, 22:25:NNP
+introspective, and I want to introspect.	0:13:JJ 13:14:, 15:18:CC 19:20:PRP 21:25:VBP 26:28:TO 29:39:VB 39:40:.
+that afternoon so enwrapped in the music at St.	0:4:DT 5:14:NN 15:17:RB 18:27:VBD 28:30:IN 31:34:DT 35:40:NN 41:43:IN 44:47:NNP
+that the play will be more exciting.	0:4:IN 5:8:DT 9:13:NN 14:18:MD 19:21:VB 22:26:RBR 27:35:JJ 35:36:.
+the City branch of one of the principal London banks.	0:3:DT 4:8:NNP 9:15:NN 16:18:IN 19:22:CD 23:25:IN 26:29:DT 30:39:NN 40:46:NNP 47:52:NNS 52:53:.
+What a time it seemed!	0:4:WDT 5:6:DT 7:11:NN 12:14:PRP 15:21:VBD 21:22:.
+"That is better," said John Clay serenely.	0:1:`` 1:5:DT 6:8:VBZ 9:15:RBR 15:16:, 16:17:'' 18:22:VBD 23:27:NNP 28:32:NNP 33:41:RB 41:42:.
+those hours of burrowing.	0:5:DT 6:11:NNS 12:14:IN 15:24:VBG 24:25:.
+reading it that it is all perfectly familiar to me.	0:7:VBG 8:10:PRP 11:15:IN 16:18:PRP 19:21:VBZ 22:25:RB 26:35:RB 36:44:JJ 45:47:IN 48:50:PRP 50:51:.
+given him up for dead.	0:5:VBN 6:9:PRP 10:12:RP 13:16:IN 17:21:JJ 21:22:.
+sent them to mother.	0:4:VBD 5:9:PRP 10:12:IN 13:19:NN 19:20:.
+Can you remember any other little things about Mr.	0:3:MD 4:7:PRP 8:16:VB 17:20:DT 21:26:JJ 27:33:JJ 34:40:NNS 41:46:IN 47:50:NNP
+"One more question.	0:1:`` 1:4:CD 5:9:JJR 10:18:NN 18:19:.
+is rather a trite one.	0:2:VBZ 3:9:RB 10:11:DT 12:17:NN 18:21:NN 21:22:.
+the other a plain one.	0:3:DT 4:9:JJ 10:11:DT 12:17:JJ 18:21:NN 21:22:.
+male relatives.	0:4:NN 5:14:NNS 14:15:.
+Now, you remark in this note of yours, Mr.	0:3:RB 3:4:, 5:8:PRP 9:15:VBP 16:18:IN 19:23:DT 24:28:NN 29:31:IN 32:37:PRP 37:38:, 39:42:NNP
+answer forever.	0:6:NN 7:14:RB 14:15:.
+threw himself down into his chair once more.	0:5:VBD 6:13:PRP 14:18:RP 19:23:IN 24:27:PRP$ 28:33:NN 34:38:RB 39:43:RBR 43:44:.
+cab with my valise, rattling away to Paddington Station.	0:3:NN 4:8:IN 9:11:PRP$ 12:18:NN 18:19:, 20:28:VBG 29:33:RB 34:36:IN 37:47:NNP 48:55:NNP 55:56:.
+these witnesses depose that Mr.	0:5:DT 6:15:NNS 16:22:VBP 23:27:IN 28:31:NNP
+than the other.	0:4:IN 5:8:DT 9:14:JJ 14:15:.
+to run back again.	0:2:TO 3:6:VB 7:11:RB 12:17:RB 17:18:.
+"It was very nice and complimentary of you," Holmes answered.	0:1:`` 1:3:PRP 4:7:VBD 8:12:RB 13:17:JJ 18:21:CC 22:35:JJ 36:38:IN 39:42:PRP 42:43:, 43:44:'' 45:51:NNP 52:60:VBD 60:61:.
+I know that he is right.	0:1:PRP 2:6:VBP 7:11:IN 12:14:PRP 15:17:VBZ 18:23:JJ 23:24:.
+"Then I shall reconsider my resolution about going out.	0:1:`` 1:5:RB 6:7:PRP 8:13:MD 14:24:VB 25:27:PRP$ 28:38:NN 39:44:IN 45:50:VBG 51:54:RP 54:55:.
+It was late before Sherlock Holmes returned.	0:2:PRP 3:6:VBD 7:11:JJ 12:18:IN 19:27:NN 28:34:NNP 35:43:VBD 43:44:.
+The daughter told us as much.	0:3:DT 4:12:NN 13:17:VBD 18:20:PRP 21:23:IN 24:28:JJ 28:29:.
+there it vanishes among the reeds.	0:5:RB 6:8:PRP 9:17:VBZ 18:23:IN 24:27:DT 28:33:NNS 33:34:.
+word with Moran, and perhaps write a little note.	0:4:NN 5:9:IN 10:15:NNP 15:16:, 17:20:CC 21:28:RB 29:34:VB 35:36:DT 37:43:JJ 44:48:NN 48:49:.
+"Well, obviously it could not have been meant for the son.	0:1:`` 1:5:UH 5:6:, 7:16:RB 17:19:PRP 20:25:MD 26:29:RB 30:34:VB 35:39:VBN 40:45:VBN 46:49:IN 50:53:DT 54:57:NN 57:58:.
+varieties of pipe, cigar, and cigarette tobacco.	0:9:NNS 10:12:IN 13:17:NN 17:18:, 19:24:NN 24:25:, 26:29:CC 30:39:NN 40:47:NN 47:48:.
+last extremity to save young McCarthy.	0:4:JJ 5:14:NN 15:17:TO 18:22:VB 23:28:JJ 29:37:NNP 37:38:.
+which I could not give.	0:5:WDT 6:7:PRP 8:13:MD 14:17:RB 18:22:VB 22:23:.
+play such tricks with poor, helpless worms?	0:4:VB 5:9:JJ 10:16:NNS 17:21:IN 22:26:JJ 26:27:, 28:36:JJ 37:42:NNS 42:43:.
+"None of those which come to me are.	0:1:`` 1:5:NN 6:8:IN 9:14:DT 15:20:WDT 21:25:VBP 26:28:IN 29:31:PRP 32:35:VBP 35:36:.
+said he with an oath.	0:4:VBD 5:7:PRP 8:12:IN 13:15:DT 16:20:NN 20:21:.
+been destroyed by Colonel Openshaw.	0:4:VBN 5:14:VBN 15:17:IN 18:25:NNP 26:34:NNP 34:35:.
+why I did not dispose of it?	0:3:WRB 4:5:PRP 6:9:VBD 10:13:RB 14:21:VB 22:24:IN 25:27:PRP 27:28:.
+the mention of pips, I do not see that it helps us much.	0:3:DT 4:11:NN 12:14:IN 15:19:NNS 19:20:, 21:22:PRP 23:25:VBP 26:29:RB 30:33:VB 34:38:IN 39:41:PRP 42:47:VBZ 48:50:PRP 51:55:RB 55:56:.
+He shook hands with us and took his leave.	0:2:PRP 3:8:VBD 9:14:NNS 15:19:IN 20:22:PRP 23:26:CC 27:31:VBD 32:35:PRP$ 36:41:NN 41:42:.
+and his successors.	0:3:CC 4:7:PRP$ 8:18:NNS 18:19:.
+parts, melon seeds or orange pips in others.	0:5:NNS 5:6:, 7:12:NN 13:18:NNS 19:21:CC 22:28:NN 29:33:NNS 34:36:IN 37:43:NNS 43:44:.
+"They must be cunning devils," he exclaimed at last.	0:1:`` 1:5:PRP 6:10:MD 11:13:VB 14:21:VBG 22:28:NNS 28:29:, 29:30:'' 31:33:PRP 34:43:VBD 44:46:IN 47:51:JJ 51:52:.
+"Oh, I have my hand upon him.	0:1:`` 1:3:UH 3:4:, 5:6:PRP 7:11:VBP 12:14:PRP$ 15:19:NN 20:24:IN 25:28:PRP 28:29:.
+and school companion.	0:3:CC 4:10:NN 11:20:NN 20:21:.
+reaction, with every nerve in a twitter.	0:8:NN 8:9:, 10:14:IN 15:20:DT 21:26:NN 27:29:IN 30:31:DT 32:39:NN 39:40:.
+such a quiet air of mastery.	0:4:PDT 5:6:DT 7:12:JJ 13:16:NN 17:19:IN 20:27:NN 27:28:.
+not over-pleasant.	0:3:RB 4:17:JJ 17:18:.
+sign of him there.	0:4:NN 5:7:IN 8:11:PRP 12:17:RB 17:18:.
+thrown at him by the passers-by.	0:6:VBN 7:9:IN 10:13:PRP 14:16:IN 17:20:DT 21:31:NN 31:32:.
+been anything against him.	0:4:VBN 5:13:NN 14:21:IN 22:25:PRP 25:26:.
+had left my chair and was gazing at it over his shoulder.	0:3:VBD 4:8:VBN 9:11:PRP$ 12:17:NN 18:21:CC 22:25:VBD 26:32:VBG 33:35:IN 36:38:PRP 39:43:IN 44:47:PRP$ 48:56:NN 56:57:.
+piece of evidence to corroborate your view.	0:5:NN 6:8:IN 9:17:NN 18:20:TO 21:32:VB 33:37:PRP$ 38:42:NN 42:43:.
+"In the bathroom," he answered.	0:1:`` 1:3:IN 4:7:DT 8:16:NN 16:17:, 17:18:'' 19:21:PRP 22:30:VBD 30:31:.
+We both put our eyes to the grating.	0:2:PRP 3:7:DT 8:11:VBD 12:15:PRP$ 16:20:NNS 21:23:IN 24:27:DT 28:35:NN 35:36:.
+he, "of course you can hardly avoid publicity.	0:2:PRP 2:3:, 4:5:'' 5:7:IN 8:14:NN 15:18:PRP 19:22:MD 23:29:RB 30:35:VB 36:45:NN 45:46:.
+street, with her eyes fixed full upon me.	0:6:NN 6:7:, 8:12:IN 13:16:PRP$ 17:21:NNS 22:27:VBN 28:32:JJ 33:37:IN 38:40:PRP 40:41:.
+adventure of the man with the twisted lip.	0:9:NN 10:12:IN 13:16:DT 17:20:NN 21:25:IN 26:29:DT 30:37:VBN 38:41:NN 41:42:.
+which represent at least a strong balance of probability.	0:5:WDT 6:15:VBP 16:18:IN 19:24:JJS 25:26:DT 27:33:JJ 34:41:NN 42:44:IN 45:56:NN 56:57:.
+"This hat has not been brushed for weeks.	0:1:`` 1:5:DT 6:9:NN 10:13:VBZ 14:17:RB 18:22:VBN 23:30:VBN 31:34:IN 35:40:NNS 40:41:.
+has been referred to the Assizes.	0:3:VBZ 4:8:VBN 9:17:VBN 18:20:IN 21:24:DT 25:32:NNS 32:33:.
+"Ah, yes, I shall keep the stone.	0:1:`` 1:3:NNP 3:4:, 5:8:UH 8:9:, 10:11:PRP 12:17:MD 18:22:VB 23:26:DT 27:32:NN 32:33:.
+grizzled brown.	0:8:VBD 9:14:JJ 14:15:.
+of the streets which runs down into Holborn.	0:2:IN 3:6:DT 7:14:NNS 15:20:WDT 21:25:VBP 26:30:RB 31:35:IN 36:43:NNP 43:44:.
+"That's the list of the folk from whom I buy.	0:1:`` 1:5:DT 5:7:VBZ 8:11:DT 12:16:NN 17:19:IN 20:23:DT 24:28:NN 29:33:IN 34:38:WP 39:40:PRP 41:44:VBP 44:45:.
+What do you want?"	0:4:WP 5:7:VBP 8:11:PRP 12:16:VB 16:17:. 17:18:''
+"The game's up, Ryder," said Holmes quietly.	0:1:`` 1:4:DT 5:9:NN 9:11:VBZ 12:14:RP 14:15:, 16:21:NNP 21:22:, 22:23:'' 24:28:VBD 29:35:NNP 36:43:RB 43:44:.
+We will talk about that.	0:2:PRP 3:7:MD 8:12:VB 13:18:IN 19:23:DT 23:24:.
+all the way to Kilburn.	0:3:PDT 4:7:DT 8:11:NN 12:14:TO 15:22:NNP 22:23:.
+is waiting now in the sitting-room.	0:2:VBZ 3:10:VBG 11:14:RB 15:17:IN 18:21:DT 22:34:NN 34:35:.
+"Farintosh," said he.	0:1:`` 1:10:UH 10:11:, 11:12:'' 13:17:VBD 18:20:PRP 20:21:.
+wandering away with them sometimes for weeks on end.	0:9:VBG 10:14:RB 15:19:IN 20:24:PRP 25:34:RB 35:38:IN 39:44:NNS 45:47:IN 48:51:NN 51:52:.
+"I could not sleep that night.	0:1:`` 1:2:PRP 3:8:MD 9:12:RB 13:18:VB 19:23:DT 24:29:NN 29:30:.
+which were secured every night.	0:5:WDT 6:10:VBD 11:18:VBN 19:24:DT 25:30:NN 30:31:.
+day, and that there would be nothing to disturb you.	0:3:NN 3:4:, 5:8:CC 9:13:IN 14:19:EX 20:25:MD 26:28:VB 29:36:NN 37:39:TO 40:47:VB 48:51:PRP 51:52:.
+forward and shaking his hunting-crop.	0:7:RB 8:11:CC 12:19:VBG 20:23:PRP$ 24:36:NN 36:37:.
+smell of the moist earth.	0:5:NN 6:8:IN 9:12:DT 13:18:NN 19:24:NN 24:25:.
+"Pending the alterations, as I understand.	0:1:`` 1:8:VBG 9:12:DT 13:24:NNS 24:25:, 26:28:IN 29:30:PRP 31:41:VBP 41:42:.
+"Very strange!"	0:1:`` 1:5:DT 6:13:JJ 13:14:. 14:15:''
+Let me explain.	0:3:VB 4:6:PRP 7:14:VB 14:15:.
+"Subtle enough and horrible enough.	0:1:`` 1:7:NNP 8:14:RB 15:18:CC 19:27:JJ 28:34:RB 34:35:.
+the cheetah was indeed at liberty.	0:3:DT 4:11:NN 12:15:VBD 16:22:RB 23:25:IN 26:33:NN 33:34:.
+"It is a swamp adder!"	0:1:`` 1:3:PRP 4:6:VBZ 7:8:DT 9:14:NN 15:20:NN 20:21:. 21:22:''
+Warburton's madness.	0:9:NNP 9:11:VBZ 12:19:NN 19:20:.
+is over and gone.	0:2:VBZ 3:7:RB 8:11:CC 12:16:JJ 16:17:.
+Matheson, the well-known firm, of Greenwich.	0:8:NNP 8:9:, 10:13:DT 14:24:JJ 25:29:NN 29:30:, 31:33:IN 34:43:NNP 43:44:.
+"'Precisely so.	0:1:`` 1:11:RB 12:14:RB 14:15:.
+fields and carrying out our plans.	0:6:NNS 7:10:CC 11:19:VBG 20:23:RP 24:27:PRP$ 28:33:NNS 33:34:.
+conversation soon flagged.	0:12:NN 13:17:RB 18:25:VBD 25:26:.
+"'But, madam,' said I, 'I have not yet done what I came for.	0:1:`` 1:5:UH 5:6:, 7:12:UH 12:13:, 13:14:'' 15:19:VBD 20:21:PRP 21:22:, 23:25:NNS 26:30:VBP 31:34:RB 35:38:RB 39:43:VBN 44:48:WP 49:50:PRP 51:55:VBD 56:59:IN 59:60:.
+many tons upon this metal floor.	0:4:JJ 5:9:NNS 10:14:IN 15:19:DT 20:25:NN 26:31:NN 31:32:.
+broadened and broadened as a small panel was pushed backward.	0:9:VBD 10:13:CC 14:23:VBD 24:26:IN 27:28:DT 29:34:JJ 35:40:NN 41:44:VBD 45:51:VBN 52:60:RB 60:61:.
+understood that I was far from being out of danger yet.	0:10:VBD 11:15:IN 16:17:PRP 18:21:VBD 22:25:RB 26:30:IN 31:36:VBG 37:40:IN 41:43:IN 44:50:NN 51:54:RB 54:55:.
+o'clock at night, and has not been heard of since.	0:7:NN 8:10:IN 11:16:NN 16:17:, 18:21:CC 22:25:VBZ 26:29:RB 30:34:VBN 35:40:VBN 41:43:IN 44:49:RB 49:50:.
+Nothing simpler.	0:7:NN 8:15:NN 15:16:.
+gossips away from this four-year-old drama.	0:7:NNS 8:12:RB 13:17:IN 18:22:DT 23:36:JJ 37:42:NN 42:43:.
+the distaff side.	0:3:DT 4:11:NN 12:16:NN 16:17:.
+Lord Backwater, Lord Eustace and Lady Clara St.	0:4:NNP 5:14:NNP 14:15:, 16:20:NNP 21:28:NNP 29:32:CC 33:37:NNP 38:43:NNP 44:47:NNP
+I have been cut to the quick.	0:1:PRP 2:6:VBP 7:11:VBN 12:15:VBN 16:18:IN 19:22:DT 23:28:JJ 28:29:.
+fell over into the pew.	0:4:VBD 5:9:RB 10:14:IN 15:18:DT 19:22:NN 22:23:.
+"I did not say a probable one.	0:1:`` 1:2:PRP 3:6:VBD 7:10:RB 11:14:VB 15:16:DT 17:25:JJ 26:29:NN 29:30:.
+It is this infernal St.	0:2:PRP 3:5:VBZ 6:10:DT 11:19:JJ 20:23:NNP
+very fine indeed.	0:4:RB 5:9:JJ 10:16:RB 16:17:.
+Simon has not already arrived.	0:5:NNP 6:9:VBZ 10:13:RB 14:21:RB 22:29:VBN 29:30:.
+was working a claim.	0:3:VBD 4:11:VBG 12:13:DT 14:19:NN 19:20:.
+I slipped out, put on my things, and followed him.	0:1:PRP 2:9:VBD 10:13:RP 13:14:, 15:18:VB 19:21:IN 22:24:PRP$ 25:31:NNS 31:32:, 33:36:CC 37:45:VBD 46:49:PRP 49:50:.
+before I ever heard Lord St.	0:6:IN 7:8:PRP 9:13:RB 14:19:VBD 20:24:NNP 25:28:NNP
+extreme limits of his reason.	0:7:JJ 8:14:NNS 15:17:IN 18:21:PRP$ 22:28:NN 28:29:.
+sum which I have asked.	0:3:NN 4:9:WDT 10:11:PRP 12:16:VBP 17:22:VBN 22:23:.
+will not take me long to describe it.	0:4:MD 5:8:RB 9:13:VB 14:16:PRP 17:21:RB 22:24:TO 25:33:VB 34:36:PRP 36:37:.
+whole life; but now, alas!	0:5:JJ 6:10:NN 10:11:, 12:15:CC 16:19:RB 19:20:, 21:25:NNS 25:26:.
+call you a liar as well as a thief?	0:4:VB 5:8:PRP 9:10:DT 11:15:JJ 16:18:RB 19:23:RB 24:26:IN 27:28:DT 29:34:NN 34:35:.
+Besides, she is not so very young.	0:7:RB 7:8:, 9:12:PRP 13:15:VBZ 16:19:RB 20:22:RB 23:27:RB 28:33:JJ 33:34:.
+which closed the entrance.	0:5:WDT 6:12:VBD 13:16:DT 17:25:NN 25:26:.
+snow from his shoes.	0:4:VB 5:9:IN 10:13:PRP$ 14:19:NNS 19:20:.
+The banker recoiled in horror.	0:3:DT 4:10:NN 11:19:VBN 20:22:IN 23:29:NN 29:30:.
+shall soon know which it is.	0:5:MD 6:10:RB 11:15:VB 16:21:WDT 22:24:PRP 25:27:VBZ 27:28:.
+leave you forever.	0:5:VB 6:9:PRP 10:17:RB 17:18:.
+"I cannot, and I will not, believe it!"	0:1:`` 1:2:PRP 3:9:MD 9:10:, 11:14:CC 15:16:PRP 17:21:MD 22:25:RB 25:26:, 27:34:VB 35:37:PRP 37:38:. 38:39:''
+found it all trampled down and indistinguishable.	0:5:VBD 6:8:PRP 9:12:RB 13:21:VBN 22:26:RP 27:30:CC 31:48:JJ 48:49:.
+and changed my clothes.	0:3:CC 4:11:VBD 12:14:PRP$ 15:22:NNS 22:23:.
+outside the pale of the law.	0:7:IN 8:11:DT 12:16:NN 17:19:IN 20:23:DT 24:27:NN 27:28:.
+"'Tut, tut!' he cried.	0:1:`` 1:5:UH 5:6:, 7:10:UH 10:11:. 11:12:'' 13:15:PRP 16:21:VBD 21:22:.
+ladies' fancies must be consulted.	0:6:NNS 6:7:`` 8:15:NNS 16:20:MD 21:23:VB 24:33:VBN 33:34:.
+my mind is made up that I will accept it.	0:2:PRP$ 3:7:NN 8:10:VBZ 11:15:VBN 16:18:RP 19:23:WDT 24:25:PRP 26:30:MD 31:37:VB 38:40:PRP 40:41:.
+"And she would need to be," said Holmes gravely.	0:1:`` 1:4:CC 5:8:PRP 9:14:MD 15:19:VB 20:22:TO 23:25:VB 25:26:, 26:27:'' 28:32:VBD 33:39:NNP 40:47:RB 47:48:.
+can do in the town what the law cannot accomplish.	0:3:MD 4:6:VB 7:9:IN 10:13:DT 14:18:NN 19:23:WP 24:27:DT 28:31:NN 32:38:MD 39:49:VB 49:50:.
+a hundred yards from the front door.	0:1:DT 2:9:CD 10:15:NNS 16:20:IN 21:24:DT 25:30:JJ 31:35:NN 35:36:.
+quite drunk, and yet Mr.	0:5:RB 6:11:JJ 11:12:, 13:16:CC 17:20:RB 21:24:NNP
+impossible, but I soon devised a means.	0:10:JJ 10:11:, 12:15:CC 16:17:PRP 18:22:RB 23:30:VBD 31:32:DT 33:38:NN 38:39:.
+anything with him.	0:8:NN 9:13:IN 14:17:PRP 17:18:.
+One day, however, as I ascended the stair, I met Mr.	0:3:CD 4:7:NN 7:8:, 9:16:RB 16:17:, 18:20:IN 21:22:PRP 23:31:VBD 32:35:DT 36:41:NN 41:42:, 43:44:PRP 45:48:VBD 49:52:NNP
+all that he had left it there.	0:3:DT 4:8:IN 9:11:PRP 12:15:VBD 16:20:VBN 21:23:PRP 24:29:RB 29:30:.
+If I could only bring you down all would be well.	0:2:IN 3:4:PRP 5:10:MD 11:15:RB 16:21:VB 22:25:PRP 26:30:RP 31:34:DT 35:40:MD 41:43:VB 44:48:RB 48:49:.
+figure, and the colour of your hair.	0:6:VB 6:7:, 8:11:CC 12:15:DT 16:22:NN 23:25:IN 26:30:PRP$ 31:35:NN 35:36:.
+"I trust that we are not too late," said he.	0:1:`` 1:2:PRP 3:8:VBP 9:13:IN 14:16:PRP 17:20:VBP 21:24:RB 25:28:RB 29:33:JJ 33:34:, 34:35:'' 36:40:VBD 41:43:PRP 43:44:.
+screamed upon the ground.	0:8:VBN 9:13:IN 14:17:DT 18:24:NN 24:25:.
+his devoted wife.	0:3:PRP$ 4:11:JJ 12:16:NN 16:17:.
+word processing or hypertext form.	0:4:NN 5:15:NN 16:18:CC 19:28:NN 29:33:NN 33:34:.
+where we have not received written confirmation of compliance.	0:5:WRB 6:8:PRP 9:13:VBP 14:17:RB 18:26:VBN 27:34:VBN 35:47:NN 48:50:IN 51:61:NN 61:62:.
