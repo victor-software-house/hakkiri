@@ -80,6 +80,7 @@ A sentence is a piece of one paragraph, heading or table cell, cut by hakkiri's 
 Vale segments the same blocks ([provider.go][v-segment]).
 
 A whole-file metric reads the paragraphs, list items and quotes joined by blank lines, as Vale's summary does ([ast.go][v-summary]).  
+In a code file it reads the paragraphs of the comments, as Vale's summary of a code file does ([code_ts.go][v-code-summary]).  
 It then cuts at blank lines and sentences ([summarize.go][p-init]).  
 A word is a match of `(?:[A-Z]\.){2,}|[\p{N}\p{L}']+`, prose's word pattern ([regexp.go][p-words]).
 
@@ -272,6 +273,7 @@ Each crate was read on crates.io on 2026-11-10.
 [v-within]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L541-L555
 [v-expand]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/substitution.go#L516-L522
 [v-occ-count]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/occurrence.go#L63-L109
+[v-code-summary]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code_ts.go#L112-L114
 [v-measure]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L701-L729
 [v-metrics]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L362-L405
 [v-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L19-L121

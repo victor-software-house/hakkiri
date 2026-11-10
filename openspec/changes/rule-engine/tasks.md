@@ -103,7 +103,10 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify every [metric-check scenario][metric] and the metric scenarios of the rule-files spec pass as unit tests in CI.
   - 2026-11-10 (UTC), 13 metric tests cover every metric-check scenario and both rule-files scenarios, with 7 formula tests, in a Linux box, in [d324f02][c-metric].  
     All 4,383 words of prose's syllable data match.  
-    Two of its three score cases match to 0.01, and the third has two sentences here, where prose finds one.
+    Two of its three score cases match to 0.01, and the third has two sentences here, where prose finds one.  
+  - 2026-11-10 (UTC), the Rust comment test and the heading condition test pass in a box run of [4fabe24][c-condition].  
+    A whole-file metric now measures the comments of a code file, from [f312d38][c-comments].  
+    Eight such rules over a 50,000-character line take 42 ms, from 327 ms, in [7950466][c-once].
 
 ## 7. Flesch-Kincaid parity
 
@@ -155,6 +158,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-last-column]: https://github.com/victor-software-house/hakkiri/commit/6d389747e25ba07db83d15c90587a0b9d9362d0f
 [c-occ-code]: https://github.com/victor-software-house/hakkiri/commit/1341734eede62760dbfb78284a10a8fa60265dc3
 [c-expander]: https://github.com/victor-software-house/hakkiri/commit/91fc2e4c6dbac9f093d47ead2bd433654388fb53
+[c-comments]: https://github.com/victor-software-house/hakkiri/commit/f312d389cc2566bdaf3ced6fbc153f4c3173a456
+[c-once]: https://github.com/victor-software-house/hakkiri/commit/7950466010eebccf5c05016a6a2d784e76c8671f
+[c-condition]: https://github.com/victor-software-house/hakkiri/commit/4fabe241fbc5a9b973a0cc12e699f92dac9e321d
 [c-load]: https://github.com/victor-software-house/hakkiri/commit/389d5b4791be8248e954e303fd78f9314d1111ca
 [segments]: specs/node-segments/spec.md
 [tree]: specs/document-tree/spec.md
