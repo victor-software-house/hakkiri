@@ -130,6 +130,15 @@ It SHALL refuse a rule whose path to a dictionary, a folder or a word list leave
 - **WHEN** rule `Team.Spelling` has `dictionaries: [absent]` and its package holds no `absent.dic`
 - **THEN** hakkiri reports an error naming `Team.Spelling` and `absent`, and exits with a failure status
 
+### Requirement: A field with no effect is refused
+
+hakkiri SHALL refuse a `spelling` rule that sets `exceptions`, or a `threshold` other than 0, since neither changes what the rule reports.
+
+#### Scenario: Exceptions in a spelling rule
+
+- **WHEN** rule `Team.Spelling` has `exceptions: [blorft]`
+- **THEN** hakkiri reports an error naming `Team.Spelling` that says `exceptions` has no effect, and exits with a failure status
+
 ### Requirement: affix expands a word with flags
 
 When an `existence` or `substitution` rule sets `affix`, each token or key part written `word/FLAGS` SHALL match the word and each form the flags name in that affix file.  

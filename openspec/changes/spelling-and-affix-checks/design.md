@@ -57,9 +57,16 @@ Lost: the [project config][project-config] pins each package by hash, and a dict
 
 ### 3. Fields Vale reads and never uses
 
-A `spelling` rule's own `exceptions` and its `threshold` load with no effect.  
-Vale builds its exception pattern before it decodes the rule's fields, and reads `threshold` nowhere ([spelling.go][v-spell-new]).
+Vale accepts `exceptions` and `threshold` in a `spelling` rule and uses neither.  
+It builds its exception pattern before it decodes the rule's fields, and reads `threshold` nowhere ([spelling.go][v-spell-new]).  
+A probe of Vale 66bbb85 gave the same seven alerts over four rules, with `blorft` and a misspelling of `receive` among them: one with `exceptions` that name both words, one with `threshold: 99`, one with both fields, and one with neither.
 
+hakkiri refuses a rule that sets either one, with a message that says the field has no effect on a spelling rule.  
+This is an intended difference from Vale: a rule that Vale loads and hakkiri refuses.  
+A `threshold` of 0 reads as unset, as in a `capitalization` rule.
+
+Alternative: load both and ignore them, as Vale does.  
+Lost: the rule's author wrote the field to change what is reported, and it would change nothing, with no sign.  
 Alternative: apply `exceptions` as a skip list.  
 Lost: imported rules would report fewer words than in Vale, a difference the [format design][format-7] does not list.
 

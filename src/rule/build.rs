@@ -947,7 +947,26 @@ pub(super) fn sequence_rule(
 }
 
 /// The check of a `spelling` rule: its dictionaries, word lists and filters.
+///
+/// Vale reads `exceptions` and `threshold` in a `spelling` rule and uses
+/// neither, so each is refused here rather than accepted and ignored. A
+/// `threshold` of 0 reads as unset, as it does in a `capitalization` rule.
 fn spelling(source: &Source<'_>, fields: &SpellingFields) -> Result<Spelling, LoadError> {
+    let name = source.name;
+    if !fields.exceptions.values().is_empty() {
+        return Err(source.problem(
+            "exceptions",
+            format!(
+                "rule `{name}`: `exceptions` has no effect on a spelling rule; to accept a word, list it in a dictionary, or match it with `filters`"
+            ),
+        ));
+    }
+    if fields.threshold.value() != 0.0 {
+        return Err(source.problem(
+            "threshold",
+            format!("rule `{name}`: `threshold` has no effect on a spelling rule; remove it"),
+        ));
+    }
     let filters = fields
         .filters
         .values()

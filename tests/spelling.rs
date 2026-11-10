@@ -223,6 +223,37 @@ fn a_path_that_leaves_the_package_is_refused() -> TestResult {
 }
 
 #[test]
+fn a_field_that_has_no_effect_is_refused() -> TestResult {
+    for (extra, field) in [
+        ("exceptions: [blorft]\n", "exceptions"),
+        ("threshold: 90\n", "threshold"),
+    ] {
+        let refused = Rule::from_text_in(
+            "Team.Spelling",
+            "Team/Spelling.yml",
+            &rule(extra),
+            &package(),
+        )
+        .err()
+        .ok_or("the rule loaded")?;
+        let message = refused.to_string();
+        assert!(message.contains("Team.Spelling"), "{extra}: {message}");
+        assert!(
+            message.contains(&format!("`{field}` has no effect")),
+            "{extra}: {message}"
+        );
+    }
+    // A threshold of 0 reads as unset.
+    Rule::from_text_in(
+        "Team.Spelling",
+        "Team/Spelling.yml",
+        &rule("threshold: 0\n"),
+        &package(),
+    )?;
+    Ok(())
+}
+
+#[test]
 fn a_rule_outside_a_package_reads_no_file() -> TestResult {
     let refused = Rule::from_text("Team.Spelling", "Team/Spelling.yml", &rule("ignore: [x]\n"))
         .err()
