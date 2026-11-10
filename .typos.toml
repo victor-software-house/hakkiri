@@ -1,11 +1,11 @@
 # Spelling, checked by `mise run lint:typos`.
 [files]
 extend-exclude = [
-    "*.lock",
-    "tests/fixtures/readability/syllables.tsv",
-    "data/dictionary/en_US-web.aff",
-    "data/dictionary/en_US-web.dic",
-    "tests/fixtures/dictionary/vale.tsv",
+  "*.lock",
+  "tests/fixtures/readability/syllables.tsv",
+  "data/dictionary/en_US-web.aff",
+  "data/dictionary/en_US-web.dic",
+  "tests/fixtures/dictionary/vale.tsv",
 ]
 
 # Word endings in the syllable rules of `src/readability.rs`.
