@@ -46,7 +46,7 @@ pub enum FormatError {
         /// The byte offset of the name.
         at: usize,
     },
-    /// The tables disagree with each other.
+    /// The tables conflict with each other.
     Invalid(&'static str),
     /// The model is not the English Penn Treebank model this tagger reads.
     Unsupported(&'static str),
@@ -177,7 +177,7 @@ impl Model {
     /// # Errors
     ///
     /// Returns a [`FormatError`] when the magic or version is wrong, a table
-    /// is cut short, or the tables disagree.
+    /// is cut short, or the tables conflict.
     pub(super) fn parse(data: &[u8]) -> Result<Self, FormatError> {
         let mut reader = Reader { bytes: data, at: 0 };
         if reader.take(MAGIC.len())? != MAGIC {
@@ -203,7 +203,9 @@ impl Model {
         let class_ids = reader.take(pair_count)?.to_vec();
         let weights = reader.weights(pair_count)?;
         let word_count = reader.size()?;
-        let mut tag_map = HashMap::with_capacity(word_count);
+        // Each word takes at least three bytes: a length and a class.
+        let room = data.len().saturating_sub(reader.at) / 3;
+        let mut tag_map = HashMap::with_capacity(word_count.min(room));
         for _ in 0..word_count {
             let word = reader.string()?;
             let id = reader.u8()?;
@@ -245,7 +247,7 @@ impl Model {
             ));
         }
         if self.feature_offsets.len() != self.pair_offsets.len() {
-            return Err(FormatError::Invalid("the offset tables disagree"));
+            return Err(FormatError::Invalid("the offset tables conflict"));
         }
         if self.feature_offsets.len() > 1
             && (self.feature_offsets.last() != Some(&self.blob.len())
