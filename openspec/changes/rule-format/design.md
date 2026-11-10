@@ -106,7 +106,8 @@ Lost: a 10-word and a 60-word paragraph get the same limit, and each threshold w
 
 Release 1 implements the 11 [check types Vale defines][vale-types] other than `script` (operator, 2026-11-09).  
 These are `existence`, `substitution`, `occurrence`, `metric`, `capitalization`, `consistency`, `conditional`, `repetition`, `sequence`, `spelling` and `readability`.  
-`script` runs Tengo code, and a rule file stays data.
+`script` runs Tengo code, and a rule file stays data.  
+This replaces the [bootstrap design][bootstrap] non-goal that left spelling, `conditional` and `sequence` out of release 1.
 
 Alternative: only the four types ProseStyle uses today. Lost: a style that uses another type could not be imported.
 
@@ -159,6 +160,7 @@ A sentence of two words, a four-word code span and one more word counts 3 words 
 ### 8. Every comment reads as Markdown
 
 hakkiri reads every comment as Markdown, plain `//` and `/* */` comments included (operator, 2026-11-10).  
+This replaces the [bootstrap design][bootstrap] rule that plain comments are text.  
 A code span, a link and a bare URL then mean the same in a comment as in a `.md` file.  
 ProseStyle's [`BareURLInComment`][bare-url-in-comment] test already expects a code span in a plain `//` comment to pass.
 
