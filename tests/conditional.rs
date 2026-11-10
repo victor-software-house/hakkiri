@@ -219,12 +219,33 @@ fn a_rule_that_looks_in_a_view() {
 
 #[test]
 fn a_pattern_with_no_text_is_refused() {
-    for (first, second, field) in [("", "interface", "first"), (r"\bAPI\b", " ", "second")] {
+    for (first, second, field) in [("", "interface", "first"), (r"\bAPI\b", "", "second")] {
         let error =
             Rule::from_text("Team.Defined", "Team/Defined.yml", &rule(first, second, "")).err();
         let text = error.map(|error| error.to_string()).unwrap_or_default();
         assert!(text.contains("Team.Defined"), "{text}");
         assert!(text.contains(&format!("`{field}` holds nothing")), "{text}");
+    }
+}
+
+#[test]
+fn a_space_is_a_pattern() -> TestResult {
+    let found = matched(&rule(" ", "zzz", ""), "a b\n")?;
+    assert_eq!(found, [" "]);
+    Ok(())
+}
+
+#[test]
+fn a_pattern_that_matches_the_empty_string_is_refused() {
+    for (first, second, field) in [("x*", "interface", "first"), (r"\bAPI\b", "()", "second")] {
+        let error =
+            Rule::from_text("Team.Defined", "Team/Defined.yml", &rule(first, second, "")).err();
+        let text = error.map(|error| error.to_string()).unwrap_or_default();
+        assert!(text.contains("Team.Defined"), "{text}");
+        assert!(
+            text.contains(&format!("`{field}` matches the empty string")),
+            "{text}"
+        );
     }
 }
 

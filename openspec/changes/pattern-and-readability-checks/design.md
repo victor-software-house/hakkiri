@@ -55,6 +55,11 @@ Alternatives:
 `first` and `second` compile as written, with no word template, as Vale compiles them ([conditional.go][v-cond-new]).  
 Group detection follows Vale's: a `(` that is not escaped, not inside a class and not `(?`, or a named group ([conditional.go][v-cond-group]).
 
+A `first` or `second` that is empty or matches the empty string is refused.  
+An empty `first` would alert at every position, and an empty `second` would stop every alert.  
+A space is a pattern.  
+A zero-width match such as `\b` still gives an alert, as it does for `existence`.
+
 When `second` has no capture group, a node passes if `second` matches anywhere in it.  
 Otherwise each match of `first` in the node is an alert ([conditional.go][v-cond-plain]).
 

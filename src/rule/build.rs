@@ -435,7 +435,7 @@ fn conditional(source: &Source<'_>, fields: &ConditionalFields) -> Result<Condit
         ));
     }
     for (field, pattern) in [("first", &fields.first), ("second", &fields.second)] {
-        if pattern.value().trim().is_empty() {
+        if pattern.value().is_empty() {
             return Err(source.problem(
                 field,
                 format!(
@@ -453,7 +453,18 @@ fn conditional(source: &Source<'_>, fields: &ConditionalFields) -> Result<Condit
         } else {
             pattern.to_owned()
         };
-        source.compile(field, &written, &[pattern])
+        let compiled = source.compile(field, &written, &[pattern])?;
+        if matches!(compiled.is_match(""), Ok(true)) {
+            return Err(source.problem(
+                field,
+                format!(
+                    "rule `{}`: `{field}` matches the empty string, so the pattern would match \
+                     at every position",
+                    source.name
+                ),
+            ));
+        }
+        Ok(compiled)
     };
     let second = fields.second.value();
     Ok(Conditional {

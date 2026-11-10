@@ -21,6 +21,8 @@ This change starts after the [rule-engine change][engine] merges.
   Verify every conditional scenario passes as a unit test in CI.
   - 2026-11-10 (UTC), 15 tests in `tests/conditional.rs` cover every conditional scenario, in a Linux box run of [b4ae3a2][c-conditional].  
     They add a definition in the same block, case, an exception, code, groups that are not groups, and two refusals.
+  - 2026-11-10 (UTC), a `first` or `second` that is empty or matches the empty string is refused, and a single space loads, in `tests/conditional.rs`: 17 tests in all.  
+    fmt, clippy, the whole test suite and rustdoc pass in a Linux box run of the tree, and I did not run cargo deny.
 - [x] 2.3 Build `repetition`: the joined pattern, the trimmed comparison, `alpha`, `max` with Vale's count, the one-sentence check and `exceptions`.  
   Verify every repetition scenario passes as a unit test in CI.
   - 2026-11-10 (UTC), 11 tests in `tests/repetition.rs` cover every repetition scenario, in a Linux box run of [ec04711][c-repetition].  

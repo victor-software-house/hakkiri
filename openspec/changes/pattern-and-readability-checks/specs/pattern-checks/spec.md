@@ -132,13 +132,18 @@ It SHALL be no form seen, give no alert, define nothing, and leave the next matc
 
 ### Requirement: the pattern checks need something to match
 
-hakkiri SHALL refuse a `consistency` rule whose `either` holds no pair or a form with no text, a `repetition` rule whose `tokens` hold no text, and a `conditional` rule whose `first` or `second` holds no text.  
+hakkiri SHALL refuse a `consistency` rule whose `either` holds no pair or a form with no text, a `repetition` rule whose `tokens` hold no text, and a `conditional` rule whose `first` or `second` is empty or matches the empty string.  
 The error SHALL name the field.
 
 #### Scenario: No pair
 
 - **WHEN** a rule has `extends: consistency` and no `either`
 - **THEN** hakkiri reports an error naming `either`, and exits with a failure status
+
+#### Scenario: A pattern that matches the empty string
+
+- **WHEN** a rule has `extends: conditional` and `first: 'x*'`
+- **THEN** hakkiri reports an error naming `first`, and exits with a failure status
 
 ### Requirement: conditional refuses a View scope
 
