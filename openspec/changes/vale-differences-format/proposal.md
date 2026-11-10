@@ -11,7 +11,7 @@ Checked against Vale 66bbb85, three decisions that the designs treat as choices 
 
 ## Changes
 
-- The `vale-differences` spec gains three requirements: comments read as Markdown, what a rule file accepts or refuses where Vale does the opposite, and the configuration and packages.
+- The `vale-differences` spec gains three requirements: comments read as Markdown, what a rule file accepts, refuses or selects where Vale does otherwise, and the configuration and packages.
 - Each difference is a scenario with a link to the decision that records it.
 
 ## Capabilities

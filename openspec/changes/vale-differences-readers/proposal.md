@@ -24,7 +24,7 @@ None.
 
 ### Modified Capabilities
 
-- `vale-differences`: two requirements added.
+- `vale-differences`: three requirements added.
 
 ## Impact
 

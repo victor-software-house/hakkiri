@@ -2,7 +2,7 @@
 
 ### Requirement: Ported readers differ from Vale in detail
 
-hakkiri SHALL read tags, dictionaries and spelling as each scenario below says, where Vale 3.26.0 reads them otherwise.
+hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, dictionaries and spelling.
 
 #### Scenario: A sentence is tagged whole
 
@@ -44,9 +44,9 @@ hakkiri SHALL read tags, dictionaries and spelling as each scenario below says, 
 - **WHEN** a project checks text in a language other than English
 - **THEN** hakkiri does not support it, which the spelling change states as a non-goal, and Vale reads a dictionary for the language ([spelling goals][spelling-goals])
 
-### Requirement: No input makes a run fail where Vale's would
+### Requirement: A run finishes where Vale's panics or stalls
 
-hakkiri SHALL finish a run on each input below without a panic and without exhausting memory, where Vale 3.26.0 does not.
+hakkiri SHALL finish a run on each input below in bounded time and memory, where Vale 3.26.0 panics, runs out of memory, or takes cubic or exponential time.
 
 #### Scenario: A pattern reaches its limit
 

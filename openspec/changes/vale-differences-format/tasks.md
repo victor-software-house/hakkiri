@@ -5,7 +5,7 @@ This change adds to the spec that [`vale-differences`][first] creates.
 
 ## 1. The list
 
-- [ ] 1.1 Add the three requirements for comments, for what a rule file accepts or refuses, and for the configuration and packages, each scenario with a link to its decision.  
+- [ ] 1.1 Add the three requirements for comments, for what a rule file accepts, refuses or selects, and for the configuration and packages, each scenario with a link to its decision.  
   Verify `openspec validate --all --strict` and the link check pass in CI, and that each scenario's link resolves to its decision.
 
 ## 2. Integration

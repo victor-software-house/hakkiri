@@ -11,7 +11,7 @@ hakkiri SHALL read every comment of a code file as Markdown, where Vale 3.26.0 r
 
 ### Requirement: Rule files differ from Vale in what they accept
 
-hakkiri SHALL accept or refuse each rule below as its scenario says, where Vale 3.26.0 does the opposite.
+hakkiri SHALL load, refuse or select as each scenario below says, where Vale 3.26.0 does otherwise.
 
 #### Scenario: A table row is a scope
 

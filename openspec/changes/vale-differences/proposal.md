@@ -30,7 +30,7 @@ None.
 ## Impact
 
 - No code changes.
-- The spec joins `openspec/specs/` when this change is archived, and the two later changes then add their requirements to it.
+- The spec joins `openspec/specs/` when this change is archived, and the three later changes then add their requirements to it.
 
 [ledger]: ../../../tasks.yaml
 [checks]: ../vale-differences-checks/proposal.md
