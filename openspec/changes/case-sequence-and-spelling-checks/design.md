@@ -40,6 +40,22 @@ In sentence case, a text fails when its first word fails.
 Otherwise it passes when enough words agree: equal to the converted form, in capitals, or matching an exception.  
 The share that agrees must be at least `threshold`.
 
+Vale hands the converters its own `exceptions` list after [`updateExceptions`][v-update-exceptions] has sorted it and rewritten each term in place, as `(?-i)` and the term with its periods escaped.  
+The converters therefore match an exception as a case-sensitive pattern, and keep a word as written when one matches it.  
+They do not set a word to the case an exception was written in.  
+hakkiri hands its converters the same rewritten list.
+
+Four more points follow Vale or prose as they are:
+
+- A text with no word has a share of 0 over 0, which is not at least `threshold`, so it fails.
+- A pattern that gives up on a text finds nothing, as prose's wrapper reads it.
+- `vocab` loads and has no effect, since hakkiri has no project vocabulary.
+- An empty `match` is refused, since every text would pass it, and a `style` other than `AP` or `Chicago` is refused where Vale reads any other value as `AP`.
+
+The title converter's tagging and its checks of the text around a word use prose's byte offsets, as prose writes them.  
+Prose counts the width of each word in characters and adds it to a byte offset, and searches a copy of the title whose curly quotes and dashes are plain marks.  
+hakkiri keeps both, so a title with those marks gets the same words in lower case as in Vale.
+
 Alternative: `titlecase` 3.6.0, which applies John Gruber's rules.  
 Lost: it keeps a different list of small words, so headings that pass in Vale would fail.
 
@@ -49,8 +65,10 @@ In AP style, `to` is lower case only when the tag after it starts with `NN` ([ti
 So `to` before an article starts with a capital.
 
 Vale reads that tag by the position of the word among the converter's words.  
-The tags come from the tagger's own words, and a contraction or hyphen before `to` shifts the two lists.  
-hakkiri reads the tag the same way.
+The tags come from prose's Treebank word tokenizer and the tagger, not from the tokenizer that `sequence` uses, and a contraction or hyphen before `to` shifts the two lists.  
+hakkiri ports that tokenizer, and reads the tag the same way.  
+Go reads each map of its replacements in an order that changes between runs, and hakkiri reads them in the order the file lists them.  
+A test compares its words with prose's on over 600 texts.
 
 Alternative: find the tag by the word's byte offset.  
 Lost: it gives a different answer from Vale in exactly the headings where the lists shift.
@@ -221,6 +239,7 @@ Each crate was read on crates.io on 2026-11-10.
 [v-tag-text]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/prose.go#L253-L288
 [v-upos]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/upos.go#L78-L95
 [v-cap-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L72-L109
+[v-update-exceptions]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L473-L507
 [v-case]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/variables.go#L87-L144
 [v-spell-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L74-L135
 [v-spell-run]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L188-L280
