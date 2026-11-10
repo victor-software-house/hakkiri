@@ -11,6 +11,29 @@ queue:
     acceptance:
       - The list names each difference recorded in the archived designs (rule-format decision 7, rule-engine, pattern-and-readability, case-and-sequence) and the spelling refusal of exceptions and threshold, each with a link to its decision.
       - Every later change that adds a difference updates the list in the same pull request.
+    plan: openspec/changes/vale-differences/proposal.md
+
+  - id: HKR-023
+    title: List the check and refusal differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how the pattern checks differ from Vale and
+      each rule that hakkiri refuses where Vale loads it.
+    blocked_by: []
+    acceptance:
+      - Each difference in the pattern-and-readability, case-and-sequence and spelling-and-affix designs that is a pattern-check difference or a refusal is a scenario with a link to its decision.
+    plan: openspec/changes/vale-differences-checks/proposal.md
+
+  - id: HKR-024
+    title: List the reader and resource-use differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how the ported readers differ from Vale and
+      each input on which a run finishes in hakkiri and fails or stalls in Vale.
+    blocked_by: []
+    acceptance:
+      - Each reader difference and each resource-use difference in the case-and-sequence and spelling-and-affix designs, and the regex limit of the rule-engine and bootstrap designs, is a scenario with a link to its decision.
+    plan: openspec/changes/vale-differences-readers/proposal.md
 
   - id: HKR-005
     title: Ship the check and test commands
