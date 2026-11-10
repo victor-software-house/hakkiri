@@ -35,14 +35,10 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
   Kody left no open thread on [PR 36][hakkiri#36].
 - [ ] 3.2 Build `sequence`: token compilation, `skip` and `min`, the anchor walk, `negate`, `target`, `upos`, `exceptions`, and the refusal of `model`.  
   Verify every [sequence scenario][sequence] passes as a unit test in CI.
-- [ ] 3.3 Build `spelling`: Vale's word tokenizer, the filters, `ignore`, `split`, the two message rewrites, package dictionaries, and the refusal of a path that leaves the package.  
-  Verify every [spelling scenario][spelling] passes as a unit test in CI.
-- [ ] 3.4 Expand `affix` in `existence` and `substitution`, and remove the rule-engine change's refusal of the field.  
-  Verify both affix scenarios pass in CI, and the rule-engine change's `affix` refusal test is gone.
 
 ## 4. Long inputs
 
-- [ ] 4.1 Run the three check types over the rule-engine change's 50,000-character line and 60,000-line file.  
+- [ ] 4.1 Run `capitalization` and `sequence` over the rule-engine change's 50,000-character line and 60,000-line file.  
   Verify both tests pass in CI with no panic, and record their run time in the evidence note.
 
 ## 5. Integration
@@ -62,4 +58,3 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
 [design]: design.md
 [capitalization]: specs/capitalization-check/spec.md
 [sequence]: specs/sequence-check/spec.md
-[spelling]: specs/spelling-check/spec.md

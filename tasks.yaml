@@ -4,17 +4,28 @@ prefix: HKR
 active: HKR-014
 queue:
   - id: HKR-014
-    title: Run the capitalization, sequence and spelling checks
+    title: Run the capitalization and sequence checks
     scope: engine
     outcome: >-
-      Rules run capitalization, sequence and spelling, and existence and substitution
-      accept affix, with Vale 3.26.0's meaning, or a better one where Vale's is a
-      defect.
+      Rules run capitalization and sequence, with Vale 3.26.0's meaning, or a better one where Vale's is a defect.
     blocked_by: []
     acceptance:
-      - Each of capitalization, sequence, spelling and affix has unit tests.
-      - A 50,000-character line and a 60,000-line file finish with no panic for these three checks.
+      - Each of capitalization and sequence has unit tests.
+      - A 50,000-character line and a 60,000-line file finish with no panic for these two checks.
     plan: openspec/changes/case-sequence-and-spelling-checks/proposal.md
+
+  - id: HKR-020
+    title: Run the spelling check and affix
+    scope: engine
+    outcome: >-
+      Rules run spelling, and existence and substitution accept affix, with Vale
+      3.26.0's meaning, or a better one where Vale's is a defect.
+    blocked_by:
+      - HKR-014
+    acceptance:
+      - Each of spelling and affix has unit tests.
+      - A 50,000-character line and a 60,000-line file finish with no panic for spelling and affix.
+    plan: openspec/changes/spelling-and-affix-checks/proposal.md
 
   - id: HKR-005
     title: Ship the check and test commands
@@ -64,6 +75,7 @@ queue:
     blocked_by:
       - HKR-005
       - HKR-014
+      - HKR-020
     acceptance:
       - Each converted Voices, Std and Readability rule passes the cases from its own Vale file.
 
@@ -197,7 +209,7 @@ horizon:
       A Markdown file of 60,000 lines parses in time that grows linearly with its
       size.
     kind: research
-    open: "Measured: markdown-rs 1.0.0 alone takes 2.5 s at 60,000 lines in a release build, and 0.17 s at 15,000, so its time grows with the square of the line count, for one paragraph and for 60,000 separate paragraphs. Missing: whether upstream knows of it, and a fix, in markdown-rs or by splitting the source before it parses."
+    open: 'Measured: markdown-rs 1.0.0 alone takes 2.5 s at 60,000 lines in a release build, and 0.17 s at 15,000, so its time grows with the square of the line count, for one paragraph and for 60,000 separate paragraphs. Missing: whether upstream knows of it, and a fix, in markdown-rs or by splitting the source before it parses.'
 
   - id: HKR-017
     title: Read comments in more languages
