@@ -19,8 +19,8 @@ use serde::de::DeserializeOwned;
 
 use self::build::Source;
 use self::schema::{
-    ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields, Probe, ReadabilityFields,
-    RepetitionFields, SubstitutionFields,
+    ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields, Probe,
+    ReadabilityFields, RepetitionFields, SubstitutionFields,
 };
 use crate::formula::Formula;
 use crate::pattern::Pattern;
@@ -111,6 +111,9 @@ pub enum Check {
     Metric(Metric),
     /// Reports a file that uses both forms of a pair.
     Consistency(Consistency),
+    /// Reports a match of one pattern that the file has not defined with
+    /// another.
+    Conditional(Conditional),
     /// Reports a match that repeats the one before it.
     Repetition(Repetition),
     /// Averages grade-level scores of the text, and tests the average.
@@ -208,6 +211,23 @@ impl Consistency {
     /// The name of the group that holds a pair's form number `n` is this,
     /// then the number.
     pub const FORM: &'static str = "form_";
+}
+
+/// A `conditional` rule.
+#[derive(Debug)]
+pub struct Conditional {
+    /// The `first` pattern, as written.
+    pub first: Pattern,
+    /// The `second` pattern, as written.
+    pub second: Pattern,
+    /// Whether `second` has a capture group, which makes the texts it captures
+    /// the terms `first` may use; without one, `second` must match in the same
+    /// block.
+    pub defines: bool,
+    /// Whether both patterns, and a term, match without regard to case.
+    pub ignorecase: bool,
+    /// What holds a match of `first` back.
+    pub exceptions: Exceptions,
 }
 
 /// A `repetition` rule.
@@ -376,6 +396,7 @@ impl Rule {
                 build::substitution_rule(&source, &read::<SubstitutionFields>(&input)?)
             }
             "occurrence" => build::occurrence_rule(&source, &read::<OccurrenceFields>(&input)?),
+            "conditional" => build::conditional_rule(&source, &read::<ConditionalFields>(&input)?),
             "consistency" => build::consistency_rule(&source, &read::<ConsistencyFields>(&input)?),
             "repetition" => build::repetition_rule(&source, &read::<RepetitionFields>(&input)?),
             "readability" => build::readability_rule(&source, &read::<ReadabilityFields>(&input)?),

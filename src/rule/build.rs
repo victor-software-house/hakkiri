@@ -7,12 +7,12 @@
 use std::cmp::Reverse;
 
 use super::schema::{
-    ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields, ReadabilityFields,
-    RepetitionFields, SubstitutionFields,
+    ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields, OccurrenceFields,
+    ReadabilityFields, RepetitionFields, SubstitutionFields,
 };
 use super::{
-    Action, Check, Consistency, Exceptions, Existence, LoadError, LoadProblem, Metric, Occurrence,
-    Readability, Repetition, Rule, Score, Substitution, Swap, level_of,
+    Action, Check, Conditional, Consistency, Exceptions, Existence, LoadError, LoadProblem, Metric,
+    Occurrence, Readability, Repetition, Rule, Score, Substitution, Swap, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -394,6 +394,65 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
     })
 }
 
+/// Whether `pattern` holds a capture group: a `(` that is not escaped, not in
+/// a character class and not the start of an extension such as `(?:`, or a
+/// named group.
+fn has_capture_group(pattern: &str) -> bool {
+    let bytes = pattern.as_bytes();
+    let mut in_class = false;
+    let mut at = 0;
+    while let Some(&byte) = bytes.get(at) {
+        match byte {
+            b'\\' => at += 1,
+            b'[' => in_class = true,
+            b']' => in_class = false,
+            b'(' if !in_class => {
+                if bytes.get(at + 1) != Some(&b'?') {
+                    return true;
+                }
+                let rest = pattern.get(at + 2..).unwrap_or_default();
+                if rest.starts_with("P<")
+                    || (rest.starts_with('<') && !rest.starts_with("<=") && !rest.starts_with("<!"))
+                {
+                    return true;
+                }
+            }
+            _ => {}
+        }
+        at += 1;
+    }
+    false
+}
+
+fn conditional(source: &Source<'_>, fields: &ConditionalFields) -> Result<Conditional, LoadError> {
+    if !fields.within.value().is_empty() {
+        return Err(source.problem(
+            "in",
+            format!(
+                "rule `{}`: `in` names a View scope, and hakkiri has no Views",
+                source.name
+            ),
+        ));
+    }
+    let ignorecase = fields.ignorecase.value();
+    let compile = |field: &str, pattern: &str| {
+        let written = if ignorecase {
+            format!("(?i){pattern}")
+        } else {
+            pattern.to_owned()
+        };
+        source.compile(field, &written, &[pattern])
+    };
+    let second = fields.second.value();
+    Ok(Conditional {
+        first: compile("first", fields.first.value())?,
+        second: compile("second", second)?,
+        defines: has_capture_group(second),
+        ignorecase,
+        exceptions: exceptions(source, fields.exceptions.values())?,
+    })
+}
+
 /// One pattern for each pair of a `consistency` rule, by key.
 ///
 /// A pair matches as `existence` tokens do, its two forms as groups.
@@ -579,5 +638,16 @@ pub(super) fn consistency_rule(
         source,
         fields,
         Check::Consistency(consistency(source, fields)?)
+    ))
+}
+
+pub(super) fn conditional_rule(
+    source: &Source<'_>,
+    fields: &ConditionalFields,
+) -> Result<Rule, LoadError> {
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Conditional(conditional(source, fields)?)
     ))
 }

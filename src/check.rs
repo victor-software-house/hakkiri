@@ -5,10 +5,10 @@ use std::ops::Range;
 
 use crate::alert::fill;
 use crate::metric::{Variables, graded, measure, variables};
-use crate::pattern::{Pattern, SearchError};
+use crate::pattern::{Captured, Pattern, SearchError};
 use crate::rule::{
-    Check, Consistency, Exceptions, Existence, Metric, Occurrence, Readability, Repetition, Rule,
-    Substitution, Swap,
+    Check, Conditional, Consistency, Exceptions, Existence, Metric, Occurrence, Readability,
+    Repetition, Rule, Substitution, Swap,
 };
 use crate::splitter::Model;
 use crate::summary::{Elements, Summary};
@@ -48,6 +48,9 @@ pub(crate) struct Memory {
     /// The pairs of a `consistency` rule, by position, and for each the forms
     /// seen so far, as 0 or 1.
     seen: HashSet<(usize, usize)>,
+    /// The terms a `conditional` rule has read defined so far, lowercased when
+    /// the rule ignores case.
+    terms: HashSet<String>,
 }
 
 /// The matches `check` finds in `text`, the next block of a file whose earlier
@@ -67,6 +70,7 @@ pub(crate) fn run(
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
         Check::Metric(metric) => run_metric(metric, text),
         Check::Consistency(consistency) => run_consistency(consistency, text, memory),
+        Check::Conditional(conditional) => run_conditional(conditional, text, memory),
         Check::Repetition(repetition) => run_repetition(repetition, text),
         Check::Readability(readability) => Ok(run_readability(readability, text)),
     }
@@ -330,6 +334,67 @@ fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
         .collect())
 }
 
+/// The term a text of `conditional` stands for: the text, in lower case when
+/// the rule ignores case.
+fn term(conditional: &Conditional, text: &str) -> String {
+    if conditional.ignorecase {
+        text.to_lowercase()
+    } else {
+        text.to_owned()
+    }
+}
+
+/// Each match of `first` in `text` that the file has not defined, and no
+/// exception holds back.
+///
+/// With no group in `second`, a match of `second` in `text` defines every
+/// `first` in it. With one, the texts its groups capture in `text` are
+/// defined from here to the end of the file, and a `first` is defined when it
+/// is one of them. A match that overlaps a code span is no match of either.
+fn run_conditional(
+    conditional: &Conditional,
+    text: &Text,
+    memory: &mut Memory,
+) -> Result<Vec<Hit>, SearchError> {
+    let content = text.as_str();
+    let seconds: Vec<Captured> = conditional
+        .second
+        .find_captured(content)?
+        .into_iter()
+        .filter(|found| !text.overlaps_code(&found.whole))
+        .collect();
+    if !conditional.defines && !seconds.is_empty() {
+        return Ok(Vec::new());
+    }
+    for found in &seconds {
+        for group in &found.groups {
+            if let Some(defined) = content.get(group.clone()) {
+                memory.terms.insert(term(conditional, defined));
+            }
+        }
+    }
+    let firsts = conditional.first.find_all(content)?;
+    let phrases = phrase_spans(&conditional.exceptions, content, !firsts.is_empty())?;
+    let mut hits = Vec::new();
+    for range in firsts {
+        let Some(observed) = content.get(range.clone()) else {
+            continue;
+        };
+        if text.overlaps_code(&range)
+            || (conditional.defines && memory.terms.contains(&term(conditional, observed)))
+            || excepted(&conditional.exceptions, &phrases, &range, observed)?
+        {
+            continue;
+        }
+        hits.push(Hit {
+            values: vec![observed.to_owned()],
+            numbered: false,
+            range,
+        });
+    }
+    Ok(hits)
+}
+
 /// One hit for each pair that matched in `text` once both of its forms have
 /// matched in the file so far, `text` included.
 ///
@@ -487,6 +552,7 @@ pub(crate) fn run_summary(
         | Check::Substitution(_)
         | Check::Occurrence(_)
         | Check::Consistency(_)
+        | Check::Conditional(_)
         | Check::Repetition(_) => Ok(None),
     }
 }

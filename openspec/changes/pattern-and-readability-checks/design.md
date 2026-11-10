@@ -103,7 +103,7 @@ Lost: a misspelt score name lowers the grade with no sign of why, measured on ot
 
 ### 7. ignorecase on a conditional applies to both patterns
 
-When `ignorecase` is `true`, a `conditional` rule matches `first` and `second` without regard to case.  
+When `ignorecase` is `true`, a `conditional` rule matches `first` and `second` without regard to case, and compares a match of `first` with a captured term the same way.  
 Vale decodes the field and nothing reads it, so both patterns stay case-sensitive ([conditional.go][v-cond-fields]).  
 The [pattern-checks spec][pattern] states the behaviour, by the same rule as decision 6 (operator, 2026-11-10).
 
@@ -125,7 +125,8 @@ Lost: `[SMOG, SMOG]` would report half of SMOG's grade.
 Vale masks code in the text a rule reads, so two adjacent code spans can read as one repeated word, and a form in code counts as seen.  
 hakkiri treats a match that overlaps a code span as no match, as `existence` does.  
 For `repetition`, the match after it has none before it to repeat.  
-For `consistency`, it is not a form seen.
+For `consistency`, it is not a form seen.  
+For `conditional`, a match of `first` gives no alert and a match of `second` defines nothing.
 
 Alternative: Vale's masked text.  
 Lost: ``Use `a` `b` `c` `` would report a repeat of nothing the reader sees, and a spelling in a code sample would count against the prose.

@@ -32,24 +32,6 @@ Each pair of `either` SHALL be checked on its own, and an alert SHALL carry the 
 - **WHEN** rule `Team.Spelling` has `either: {advisor: adviser, color: colour}`, and the input is `The advisor likes color. The adviser likes color.`
 - **THEN** hakkiri reports one alert from `Team.Spelling`, with the matched text `adviser`
 
-### Requirement: consistency ignores code
-
-A match of a `consistency` rule that overlaps a code span SHALL NOT count as a form seen, and SHALL NOT give an alert.
-
-#### Scenario: A form in code
-
-- **WHEN** the rule above reads the paragraph `An advisor came.` and then ``The `adviser` left.``
-- **THEN** hakkiri reports no alert
-
-### Requirement: consistency needs a pair
-
-hakkiri SHALL refuse a `consistency` rule whose `either` holds no pair, or a pair with a form that holds no text, with an error that names the field.
-
-#### Scenario: No pair
-
-- **WHEN** a rule has `extends: consistency` and no `either`
-- **THEN** hakkiri reports an error naming `either`, and exits with a failure status
-
 ### Requirement: conditional without a group needs second in the node
 
 When `second` has no capture group, a `conditional` rule SHALL report each match of `first` in a selected node where `second` does not match.
@@ -110,24 +92,6 @@ A `repetition` rule SHALL NOT report a repeat when the text it spans matches an 
 - **WHEN** the rule above has `exceptions: ['had had']` and reads `She had had enough.`
 - **THEN** hakkiri reports no alert
 
-### Requirement: repetition ignores code
-
-A match of a `repetition` rule that overlaps a code span SHALL NOT be a match, and the match after it SHALL have none before it to repeat.
-
-#### Scenario: A word and a code span
-
-- **WHEN** the rule above reads ``This `is` is a test.``
-- **THEN** hakkiri reports no alert
-
-### Requirement: repetition needs a token
-
-hakkiri SHALL refuse a `repetition` rule whose `tokens` hold nothing to match, with an error that names the field.
-
-#### Scenario: No token
-
-- **WHEN** a rule has `extends: repetition` and no `tokens`
-- **THEN** hakkiri reports an error naming `tokens`, and exits with a failure status
-
 ### Requirement: conditional honours ignorecase
 
 When `ignorecase` is `true`, a `conditional` rule SHALL match `first` and `second` without regard to case.
@@ -136,6 +100,45 @@ When `ignorecase` is `true`, a `conditional` rule SHALL match `first` and `secon
 
 - **WHEN** a rule has `extends: conditional`, `message: "Define '%s'."`, `ignorecase: true`, `first: '\bAPI\b'` and `second: 'application programming interface'`, and the input is `The Application Programming Interface is stable. Call the API.`
 - **THEN** hakkiri reports no alert
+
+### Requirement: conditional compares a defined term without regard to case too
+
+When `ignorecase` is `true`, a match of `first` SHALL count as defined when it equals a captured term without regard to case.
+
+#### Scenario: A term defined in capitals
+
+- **WHEN** a rule has `ignorecase: true`, `first: '\b[A-Za-z]{3}\b'` and `second: '\(([A-Z]{3})\)'`, and the input is `Centers (CDC) met. The cdc agreed.`
+- **THEN** hakkiri reports two alerts, with the matched texts `met` and `The`
+
+### Requirement: the pattern checks ignore code
+
+A match that overlaps a code span SHALL NOT count for `consistency`, `conditional` or `repetition`.  
+It SHALL be no form seen, give no alert, define nothing, and leave the next match nothing before it to repeat.
+
+#### Scenario: A repeat across code
+
+- **WHEN** the doubled-word rule reads ``This `is` is a test.``
+- **THEN** hakkiri reports no alert
+
+#### Scenario: A form in code
+
+- **WHEN** the spelling rule reads `An advisor came.` and then ``The `adviser` left.``
+- **THEN** hakkiri reports no alert
+
+#### Scenario: A definition in code
+
+- **WHEN** the acronym rule reads ``Run `(CDC)` first.`` and then `The CDC said no.`
+- **THEN** hakkiri reports one alert, with the matched text `CDC`
+
+### Requirement: consistency and repetition need something to match
+
+hakkiri SHALL refuse a `consistency` rule whose `either` holds no pair or a form with no text, and a `repetition` rule whose `tokens` hold no text.  
+The error SHALL name the field.
+
+#### Scenario: No pair
+
+- **WHEN** a rule has `extends: consistency` and no `either`
+- **THEN** hakkiri reports an error naming `either`, and exits with a failure status
 
 ### Requirement: conditional refuses a View scope
 
