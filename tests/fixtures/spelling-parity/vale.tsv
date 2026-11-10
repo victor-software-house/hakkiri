@@ -1,0 +1,789 @@
+Parity.alone	edge.md	1	1	6	blorft	'blorft'
+Parity.alone	edge.md	1	100	106	blorfts	'blorfts'
+Parity.alone	edge.md	1	12	17	blorft	'blorft'
+Parity.alone	edge.md	1	135	144	blorft_teh	'blorft_teh' looks like code; format it as code.
+Parity.alone	edge.md	1	21	26	blorft	'blorft'
+Parity.alone	edge.md	1	30	35	blorft	'blorft'
+Parity.alone	edge.md	1	38	43	blorft	'blorft'
+Parity.alone	edge.md	1	47	52	blorft	'blorft'
+Parity.alone	edge.md	1	56	61	blorft	'blorft'
+Parity.alone	edge.md	1	64	69	blorft	'blorft'
+Parity.alone	edge.md	1	74	79	blorft	'blorft'
+Parity.alone	edge.md	1	84	89	blorft	'blorft'
+Parity.alone	edge.md	1	91	98	blorft's	'blorft's'
+Parity.alone	edge.md	2	12	14	and	'and'
+Parity.alone	edge.md	2	27	29	and	'and'
+Parity.alone	edge.md	2	39	41	and	'and'
+Parity.alone	edge.md	2	55	57	teh	'teh'
+Parity.alone	edge.md	3	1	3	Two	'Two'
+Parity.alone	edge.md	3	13	15	and	'and'
+Parity.alone	edge.md	3	17	17	a	'a'
+Parity.alone	edge.md	3	19	21	tab	'tab'
+Parity.alone	edge.md	3	23	26	with	'with'
+Parity.alone	edge.md	3	28	33	blorft	'blorft'
+Parity.alone	edge.md	3	35	37	teh	'teh'
+Parity.alone	edge.md	3	39	41	and	'and'
+Parity.alone	edge.md	3	43	43	a	'a'
+Parity.alone	edge.md	3	58	63	blorft	'blorft'
+Parity.alone	edge.md	3	6	11	spaces	'spaces'
+Parity.alone	edge.md	3	65	67	teh	'teh'
+Parity.alone	edge.md	3	69	73	space	'space'
+Parity.alone	edge.md	4	3	12	hyphenated	'hyphenated'
+Parity.alone	edge.md	5	1	3	teh	'teh'
+Parity.alone	edge.md	5	12	16	lines	'lines'
+Parity.alone	edge.md	5	19	21	and	'and'
+Parity.alone	edge.md	5	23	23	a	'a'
+Parity.alone	edge.md	5	25	30	blorft	'blorft'
+Parity.alone	edge.md	5	5	10	across	'across'
+Parity.alone	edge.md	6	1	3	teh	'teh'
+Parity.alone	edge.md	6	13	18	phrase	'phrase'
+Parity.alone	edge.md	6	5	11	wrapped	'wrapped'
+Parity.alone	edge.md	7	102	111	postgresql	'postgresql'
+Parity.alone	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.alone	edge.md	7	120	125	Ubuntu	'Ubuntu'
+Parity.alone	edge.md	7	15	20	github	'github'
+Parity.alone	edge.md	7	27	30	Json	'Json'
+Parity.alone	edge.md	7	32	35	json	'json'
+Parity.alone	edge.md	7	37	46	javascript	'javascript'
+Parity.alone	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.alone	edge.md	7	59	68	Kubernetes	'Kubernetes'
+Parity.alone	edge.md	7	75	78	nasa	'nasa'
+Parity.alone	edge.md	7	8	13	Github	'Github'
+Parity.alone	edge.md	7	80	85	iphone	'iphone'
+Parity.alone	edge.md	7	87	89	ios	'ios'
+Parity.alone	edge.md	8	1	5	Don't	'Don't'
+Parity.alone	edge.md	8	13	17	don't	'don't'
+Parity.alone	edge.md	8	20	22	tis	'tis'
+Parity.alone	edge.md	8	25	30	single	'single'
+Parity.alone	edge.md	8	34	39	double	'double'
+Parity.alone	edge.md	8	43	47	plain	'plain'
+Parity.alone	edge.md	8	50	54	l'eau	'l'eau'
+Parity.alone	edge.md	8	56	62	o'clock	'o'clock'
+Parity.alone	edge.md	8	64	74	rock'n'roll	'rock'n'roll'
+Parity.alone	identifiers.md	1	1	4	Call	'Call'
+Parity.alone	identifiers.md	1	25	27	and	'and'
+Parity.alone	identifiers.md	1	29	42	recieveMessage	'recieveMessage' looks like code; format it as code.
+Parity.alone	identifiers.md	1	45	48	then	'then'
+Parity.alone	identifiers.md	1	65	67	and	'and'
+Parity.alone	identifiers.md	1	69	83	recieve_message	'recieve_message' looks like code; format it as code.
+Parity.alone	identifiers.md	11	20	22	and	'and'
+Parity.alone	identifiers.md	11	38	40	and	'and'
+Parity.alone	identifiers.md	2	1	3	Set	'Set'
+Parity.alone	identifiers.md	2	17	26	myVariable	'myVariable' looks like code; format it as code.
+Parity.alone	identifiers.md	2	29	44	snake_case_value	'snake_case_value' looks like code; format it as code.
+Parity.alone	identifiers.md	2	5	14	apiVersion	'apiVersion' looks like code; format it as code.
+Parity.alone	identifiers.md	2	64	66	and	'and'
+Parity.alone	identifiers.md	2	68	77	HTTPServer	'HTTPServer'
+Parity.alone	identifiers.md	2	79	83	first	'first'
+Parity.alone	identifiers.md	3	1	3	Try	'Try'
+Parity.alone	identifiers.md	3	5	17	blorftMessage	'blorftMessage' looks like code; format it as code.
+Parity.alone	identifiers.md	3	50	52	and	'and'
+Parity.alone	identifiers.md	3	69	71	too	'too'
+Parity.alone	identifiers.md	4	1	3	The	'The'
+Parity.alone	identifiers.md	4	11	11	x	'x'
+Parity.alone	identifiers.md	4	13	15	and	'and'
+Parity.alone	identifiers.md	4	17	17	y	'y'
+Parity.alone	identifiers.md	4	19	21	and	'and'
+Parity.alone	identifiers.md	4	23	23	z	'z'
+Parity.alone	identifiers.md	4	25	27	and	'and'
+Parity.alone	identifiers.md	4	29	30	ok	'ok'
+Parity.alone	identifiers.md	4	32	34	are	'are'
+Parity.alone	identifiers.md	4	36	40	short	'short'
+Parity.alone	identifiers.md	4	43	45	and	'and'
+Parity.alone	identifiers.md	4	47	48	so	'so'
+Parity.alone	identifiers.md	4	5	9	words	'words'
+Parity.alone	identifiers.md	4	50	51	is	'is'
+Parity.alone	identifiers.md	4	56	57	or	'or'
+Parity.alone	identifiers.md	4	59	61	aBc	'aBc'
+Parity.alone	identifiers.md	5	1	3	See	'See'
+Parity.alone	identifiers.md	5	18	20	and	'and'
+Parity.alone	identifiers.md	5	22	24	run	'run'
+Parity.alone	identifiers.md	5	41	42	in	'in'
+Parity.alone	identifiers.md	5	44	47	code	'code'
+Parity.alone	identifiers.md	5	50	52	but	'but'
+Parity.alone	identifiers.md	5	54	66	blorftOutside	'blorftOutside' looks like code; format it as code.
+Parity.alone	identifiers.md	5	68	69	is	'is'
+Parity.alone	identifiers.md	5	71	75	plain	'plain'
+Parity.alone	prose.md	1	12	17	Parity	'Parity'
+Parity.alone	prose.md	1	19	24	Headng	'Headng'
+Parity.alone	prose.md	1	3	10	Spelling	'Spelling'
+Parity.alone	prose.md	10	15	20	blorft	'blorft'
+Parity.alone	prose.md	10	22	25	item	'item'
+Parity.alone	prose.md	10	6	13	numbered	'numbered'
+Parity.alone	prose.md	11	12	15	item	'item'
+Parity.alone	prose.md	11	17	20	with	'with'
+Parity.alone	prose.md	11	22	24	teh	'teh'
+Parity.alone	prose.md	11	26	29	word	'word'
+Parity.alone	prose.md	11	4	10	Another	'Another'
+Parity.alone	prose.md	13	12	17	blorft	'blorft'
+Parity.alone	prose.md	13	19	22	line	'line'
+Parity.alone	prose.md	13	24	27	with	'with'
+Parity.alone	prose.md	13	29	29	a	'a'
+Parity.alone	prose.md	13	31	34	link	'link'
+Parity.alone	prose.md	13	5	10	quoted	'quoted'
+Parity.alone	prose.md	15	17	21	Other	'Other'
+Parity.alone	prose.md	15	23	26	cell	'cell'
+Parity.alone	prose.md	15	3	6	Cell	'Cell'
+Parity.alone	prose.md	15	8	13	blorft	'blorft'
+Parity.alone	prose.md	17	14	17	more	'more'
+Parity.alone	prose.md	17	3	6	text	'text'
+Parity.alone	prose.md	17	8	10	teh	'teh'
+Parity.alone	prose.md	2	1	5	Don't	'Don't'
+Parity.alone	prose.md	3	1	2	We	'We'
+Parity.alone	prose.md	3	107	111	costs	'costs'
+Parity.alone	prose.md	3	11	14	mail	'mail'
+Parity.alone	prose.md	3	113	116	more	'more'
+Parity.alone	prose.md	3	16	18	and	'and'
+Parity.alone	prose.md	3	20	22	teh	'teh'
+Parity.alone	prose.md	3	24	28	quick	'quick'
+Parity.alone	prose.md	3	30	34	brown	'brown'
+Parity.alone	prose.md	3	36	39	foxs	'foxs'
+Parity.alone	prose.md	3	4	9	blorft	'blorft'
+Parity.alone	prose.md	3	48	52	worry	'worry'
+Parity.alone	prose.md	3	55	56	it	'it'
+Parity.alone	prose.md	3	58	62	isn't	'isn't'
+Parity.alone	prose.md	3	65	70	quoted	'quoted'
+Parity.alone	prose.md	3	74	79	really	'really'
+Parity.alone	prose.md	3	82	83	or	'or'
+Parity.alone	prose.md	3	86	94	bracketed	'bracketed'
+Parity.alone	prose.md	3	98	100	and	'and'
+Parity.alone	prose.md	4	1	5	Visit	'Visit'
+Parity.alone	prose.md	4	108	110	and	'and'
+Parity.alone	prose.md	4	116	120	place	'place'
+Parity.alone	prose.md	4	15	24	javascript	'javascript'
+Parity.alone	prose.md	4	26	28	and	'and'
+Parity.alone	prose.md	4	30	33	json	'json'
+Parity.alone	prose.md	4	35	40	before	'before'
+Parity.alone	prose.md	4	42	47	iPhone	'iPhone'
+Parity.alone	prose.md	4	50	56	vSphere	'vSphere'
+Parity.alone	prose.md	4	58	60	and	'and'
+Parity.alone	prose.md	4	69	71	Ask	'Ask'
+Parity.alone	prose.md	4	7	12	github	'github'
+Parity.alone	prose.md	4	86	88	and	'and'
+Parity.alone	prose.md	4	99	103	about	'about'
+Parity.alone	prose.md	5	1	3	The	'The'
+Parity.alone	prose.md	5	10	12	and	'and'
+Parity.alone	prose.md	5	18	22	Smith	'Smith'
+Parity.alone	prose.md	5	29	34	blorft	'blorft'
+Parity.alone	prose.md	5	37	40	also	'also'
+Parity.alone	prose.md	5	48	50	and	'and'
+Parity.alone	prose.md	6	102	104	too	'too'
+Parity.alone	prose.md	6	21	23	and	'and'
+Parity.alone	prose.md	6	31	33	are	'are'
+Parity.alone	prose.md	6	35	41	spelled	'spelled'
+Parity.alone	prose.md	6	53	55	and	'and'
+Parity.alone	prose.md	6	58	62	curly	'curly'
+Parity.alone	prose.md	6	65	69	words	'words'
+Parity.alone	prose.md	6	72	74	and	'and'
+Parity.alone	prose.md	6	83	88	entity	'entity'
+Parity.alone	prose.md	6	97	100	ones	'ones'
+Parity.alone	prose.md	7	10	15	blorft	'blorft'
+Parity.alone	prose.md	7	17	22	blorft	'blorft'
+Parity.alone	prose.md	7	24	31	repeated	'repeated'
+Parity.alone	prose.md	7	3	8	blorft	'blorft'
+Parity.alone	prose.md	7	33	37	three	'three'
+Parity.alone	prose.md	7	39	43	times	'times'
+Parity.alone	prose.md	7	45	46	on	'on'
+Parity.alone	prose.md	7	48	50	one	'one'
+Parity.alone	prose.md	7	52	55	line	'line'
+Parity.alone	prose.md	7	58	61	then	'then'
+Parity.alone	prose.md	7	63	68	blorft	'blorft'
+Parity.alone	prose.md	7	70	74	again	'again'
+Parity.alone	prose.md	8	21	23	and	'and'
+Parity.alone	prose.md	8	33	38	appear	'appear'
+Parity.alone	prose.md	8	41	42	so	'so'
+Parity.alone	prose.md	8	44	45	do	'do'
+Parity.alone	prose.md	8	47	48	ab	'ab'
+Parity.alone	prose.md	8	50	52	and	'and'
+Parity.alone	prose.md	8	54	56	xyz	'xyz'
+Parity.alone	prose.md	8	9	11	and	'and'
+Parity.custom	edge.md	1	1	6	blorft	'blorft'
+Parity.custom	edge.md	1	100	106	blorfts	'blorfts'
+Parity.custom	edge.md	1	113	122	non-blorft	'non-blorft'
+Parity.custom	edge.md	1	12	17	blorft	'blorft'
+Parity.custom	edge.md	1	124	133	blorft/teh	'blorft/teh'
+Parity.custom	edge.md	1	135	144	blorft_teh	'blorft_teh' looks like code; format it as code.
+Parity.custom	edge.md	1	146	152	1blorft	'1blorft'
+Parity.custom	edge.md	1	154	160	blorft1	'blorft1'
+Parity.custom	edge.md	1	21	26	blorft	'blorft'
+Parity.custom	edge.md	1	30	35	blorft	'blorft'
+Parity.custom	edge.md	1	38	43	blorft	'blorft'
+Parity.custom	edge.md	1	47	52	blorft	'blorft'
+Parity.custom	edge.md	1	56	61	blorft	'blorft'
+Parity.custom	edge.md	1	64	69	blorft	'blorft'
+Parity.custom	edge.md	1	74	79	blorft	'blorft'
+Parity.custom	edge.md	1	84	89	blorft	'blorft'
+Parity.custom	edge.md	1	91	98	blorft's	'blorft's'
+Parity.custom	edge.md	2	1	10	blorft—teh	'blorft—teh'
+Parity.custom	edge.md	2	16	25	blorft…teh	'blorft…teh'
+Parity.custom	edge.md	2	31	37	blorft。	'blorft。'
+Parity.custom	edge.md	2	43	49	Ünïcödé	'Ünïcödé'
+Parity.custom	edge.md	2	51	53	日本語	'日本語'
+Parity.custom	edge.md	2	55	57	teh	'teh'
+Parity.custom	edge.md	3	28	33	blorft	'blorft'
+Parity.custom	edge.md	3	35	37	teh	'teh'
+Parity.custom	edge.md	3	58	63	blorft	'blorft'
+Parity.custom	edge.md	3	65	67	teh	'teh'
+Parity.custom	edge.md	4	14	20	blorft-	'blorft-'
+Parity.custom	edge.md	5	1	3	teh	'teh'
+Parity.custom	edge.md	5	25	30	blorft	'blorft'
+Parity.custom	edge.md	6	1	3	teh	'teh'
+Parity.custom	edge.md	7	102	111	postgresql	Use 'PostgreSQL' instead of 'postgresql'.
+Parity.custom	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.custom	edge.md	7	15	20	github	Use 'GitHub' instead of 'github'.
+Parity.custom	edge.md	7	27	30	Json	Use 'JSON' instead of 'Json'.
+Parity.custom	edge.md	7	32	35	json	Use 'JSON' instead of 'json'.
+Parity.custom	edge.md	7	37	46	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.custom	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.custom	edge.md	7	75	78	nasa	Use 'NASA' instead of 'nasa'.
+Parity.custom	edge.md	7	8	13	Github	Use 'GitHub' instead of 'Github'.
+Parity.custom	edge.md	7	80	85	iphone	Use 'iPhone' instead of 'iphone'.
+Parity.custom	edge.md	7	87	89	ios	Use 'iOS' instead of 'ios'.
+Parity.custom	edge.md	8	20	22	tis	'tis'
+Parity.custom	edge.md	8	50	54	l'eau	'l'eau'
+Parity.custom	edge.md	8	64	74	rock'n'roll	'rock'n'roll'
+Parity.custom	identifiers.md	1	29	42	recieveMessage	'recieveMessage' looks like code; format it as code.
+Parity.custom	identifiers.md	1	50	63	RecieveMessage	'RecieveMessage'
+Parity.custom	identifiers.md	1	6	23	getHTTPResponse_v2	'getHTTPResponse_v2' looks like code; format it as code.
+Parity.custom	identifiers.md	1	69	83	recieve_message	'recieve_message' looks like code; format it as code.
+Parity.custom	identifiers.md	11	1	5	Naïve	'Naïve'
+Parity.custom	identifiers.md	11	24	36	straße_blorft	'straße_blorft'
+Parity.custom	identifiers.md	11	42	51	ÜberBlorft	'ÜberBlorft'
+Parity.custom	identifiers.md	11	7	18	résuméFormat	'résuméFormat'
+Parity.custom	identifiers.md	2	17	26	myVariable	'myVariable' looks like code; format it as code.
+Parity.custom	identifiers.md	2	29	44	snake_case_value	'snake_case_value' looks like code; format it as code.
+Parity.custom	identifiers.md	2	5	14	apiVersion	'apiVersion' looks like code; format it as code.
+Parity.custom	identifiers.md	2	68	77	HTTPServer	'HTTPServer'
+Parity.custom	identifiers.md	3	20	32	BlorftMessage	'BlorftMessage'
+Parity.custom	identifiers.md	3	35	48	BLORFT_MESSAGE	'BLORFT_MESSAGE' looks like code; format it as code.
+Parity.custom	identifiers.md	3	5	17	blorftMessage	'blorftMessage' looks like code; format it as code.
+Parity.custom	identifiers.md	3	54	67	blorft_MESSAGE	'blorft_MESSAGE' looks like code; format it as code.
+Parity.custom	identifiers.md	4	53	54	aB	'aB'
+Parity.custom	identifiers.md	4	59	61	aBc	Use 'ABC' instead of 'aBc'.
+Parity.custom	identifiers.md	5	54	66	blorftOutside	'blorftOutside' looks like code; format it as code.
+Parity.custom	prose.md	1	19	24	Headng	'Headng'
+Parity.custom	prose.md	10	15	20	blorft	'blorft'
+Parity.custom	prose.md	11	22	24	teh	'teh'
+Parity.custom	prose.md	13	12	17	blorft	'blorft'
+Parity.custom	prose.md	15	8	13	blorft	'blorft'
+Parity.custom	prose.md	17	8	10	teh	'teh'
+Parity.custom	prose.md	2	1	8	blorft's	'blorft's'
+Parity.custom	prose.md	3	20	22	teh	'teh'
+Parity.custom	prose.md	3	36	39	foxs	'foxs'
+Parity.custom	prose.md	3	4	9	blorft	'blorft'
+Parity.custom	prose.md	4	105	106	v2	'v2'
+Parity.custom	prose.md	4	15	24	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.custom	prose.md	4	30	33	json	Use 'JSON' instead of 'json'.
+Parity.custom	prose.md	4	50	56	vSphere	'vSphere'
+Parity.custom	prose.md	4	62	66	macOS	'macOS' looks like code; format it as code.
+Parity.custom	prose.md	4	7	12	github	Use 'GitHub' instead of 'github'.
+Parity.custom	prose.md	4	73	78	FooBar	'FooBar'
+Parity.custom	prose.md	5	24	27	e.g.	'e.g.'
+Parity.custom	prose.md	5	29	34	blorft	'blorft'
+Parity.custom	prose.md	5	45	46	:P	':P'
+Parity.custom	prose.md	5	5	8	U.S.	'U.S.'
+Parity.custom	prose.md	6	1	4	Café	'Café'
+Parity.custom	prose.md	6	14	19	résumé	'résumé'
+Parity.custom	prose.md	6	25	29	señor	'señor'
+Parity.custom	prose.md	6	7	11	naïve	'naïve'
+Parity.custom	prose.md	7	10	15	blorft	'blorft'
+Parity.custom	prose.md	7	17	22	blorft	'blorft'
+Parity.custom	prose.md	7	3	8	blorft	'blorft'
+Parity.custom	prose.md	7	63	68	blorft	'blorft'
+Parity.custom	prose.md	8	1	7	hakkiri	'hakkiri'
+Parity.custom	prose.md	8	13	19	Hakkiri	'Hakkiri'
+Parity.custom	prose.md	8	25	31	HAKKIRI	'HAKKIRI'
+Parity.custom	prose.md	8	54	56	xyz	'xyz'
+Parity.filters	edge.md	1	1	6	blorft	'blorft'
+Parity.filters	edge.md	1	100	106	blorfts	'blorfts'
+Parity.filters	edge.md	1	12	17	blorft	'blorft'
+Parity.filters	edge.md	1	135	144	blorft_teh	'blorft_teh' looks like code; format it as code.
+Parity.filters	edge.md	1	21	26	blorft	'blorft'
+Parity.filters	edge.md	1	30	35	blorft	'blorft'
+Parity.filters	edge.md	1	38	43	blorft	'blorft'
+Parity.filters	edge.md	1	47	52	blorft	'blorft'
+Parity.filters	edge.md	1	56	61	blorft	'blorft'
+Parity.filters	edge.md	1	64	69	blorft	'blorft'
+Parity.filters	edge.md	1	74	79	blorft	'blorft'
+Parity.filters	edge.md	1	84	89	blorft	'blorft'
+Parity.filters	edge.md	1	91	98	blorft's	'blorft's'
+Parity.filters	edge.md	2	55	57	teh	'teh'
+Parity.filters	edge.md	3	28	33	blorft	'blorft'
+Parity.filters	edge.md	3	35	37	teh	'teh'
+Parity.filters	edge.md	3	58	63	blorft	'blorft'
+Parity.filters	edge.md	3	65	67	teh	'teh'
+Parity.filters	edge.md	5	1	3	teh	'teh'
+Parity.filters	edge.md	5	25	30	blorft	'blorft'
+Parity.filters	edge.md	6	1	3	teh	'teh'
+Parity.filters	edge.md	7	102	111	postgresql	Use 'PostgreSQL' instead of 'postgresql'.
+Parity.filters	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.filters	edge.md	7	15	20	github	Use 'GitHub' instead of 'github'.
+Parity.filters	edge.md	7	27	30	Json	Use 'JSON' instead of 'Json'.
+Parity.filters	edge.md	7	32	35	json	Use 'JSON' instead of 'json'.
+Parity.filters	edge.md	7	37	46	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.filters	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.filters	edge.md	7	75	78	nasa	Use 'NASA' instead of 'nasa'.
+Parity.filters	edge.md	7	8	13	Github	Use 'GitHub' instead of 'Github'.
+Parity.filters	edge.md	7	80	85	iphone	Use 'iPhone' instead of 'iphone'.
+Parity.filters	edge.md	7	87	89	ios	Use 'iOS' instead of 'ios'.
+Parity.filters	edge.md	8	20	22	tis	'tis'
+Parity.filters	edge.md	8	50	54	l'eau	'l'eau'
+Parity.filters	edge.md	8	64	74	rock'n'roll	'rock'n'roll'
+Parity.filters	identifiers.md	1	29	42	recieveMessage	'recieveMessage' looks like code; format it as code.
+Parity.filters	identifiers.md	1	69	83	recieve_message	'recieve_message' looks like code; format it as code.
+Parity.filters	identifiers.md	2	17	26	myVariable	'myVariable' looks like code; format it as code.
+Parity.filters	identifiers.md	2	29	44	snake_case_value	'snake_case_value' looks like code; format it as code.
+Parity.filters	identifiers.md	2	5	14	apiVersion	'apiVersion' looks like code; format it as code.
+Parity.filters	identifiers.md	2	68	77	HTTPServer	'HTTPServer'
+Parity.filters	identifiers.md	3	5	17	blorftMessage	'blorftMessage' looks like code; format it as code.
+Parity.filters	identifiers.md	4	59	61	aBc	Use 'ABC' instead of 'aBc'.
+Parity.filters	identifiers.md	5	54	66	blorftOutside	'blorftOutside' looks like code; format it as code.
+Parity.filters	prose.md	1	19	24	Headng	'Headng'
+Parity.filters	prose.md	10	15	20	blorft	'blorft'
+Parity.filters	prose.md	11	22	24	teh	'teh'
+Parity.filters	prose.md	13	12	17	blorft	'blorft'
+Parity.filters	prose.md	15	8	13	blorft	'blorft'
+Parity.filters	prose.md	17	8	10	teh	'teh'
+Parity.filters	prose.md	2	1	8	blorft's	'blorft's'
+Parity.filters	prose.md	3	20	22	teh	'teh'
+Parity.filters	prose.md	3	36	39	foxs	'foxs'
+Parity.filters	prose.md	3	4	9	blorft	'blorft'
+Parity.filters	prose.md	4	15	24	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.filters	prose.md	4	30	33	json	Use 'JSON' instead of 'json'.
+Parity.filters	prose.md	4	50	56	vSphere	'vSphere'
+Parity.filters	prose.md	4	7	12	github	Use 'GitHub' instead of 'github'.
+Parity.filters	prose.md	5	29	34	blorft	'blorft'
+Parity.filters	prose.md	7	10	15	blorft	'blorft'
+Parity.filters	prose.md	7	17	22	blorft	'blorft'
+Parity.filters	prose.md	7	3	8	blorft	'blorft'
+Parity.filters	prose.md	7	63	68	blorft	'blorft'
+Parity.filters	prose.md	8	13	19	Hakkiri	'Hakkiri'
+Parity.filters	prose.md	8	54	56	xyz	'xyz'
+Parity.heading	prose.md	1	19	24	Headng	'Headng'
+Parity.ignore	edge.md	1	1	6	blorft	'blorft'
+Parity.ignore	edge.md	1	100	106	blorfts	'blorfts'
+Parity.ignore	edge.md	1	12	17	blorft	'blorft'
+Parity.ignore	edge.md	1	135	144	blorft_teh	'blorft_teh' looks like code; format it as code.
+Parity.ignore	edge.md	1	21	26	blorft	'blorft'
+Parity.ignore	edge.md	1	30	35	blorft	'blorft'
+Parity.ignore	edge.md	1	38	43	blorft	'blorft'
+Parity.ignore	edge.md	1	47	52	blorft	'blorft'
+Parity.ignore	edge.md	1	56	61	blorft	'blorft'
+Parity.ignore	edge.md	1	64	69	blorft	'blorft'
+Parity.ignore	edge.md	1	74	79	blorft	'blorft'
+Parity.ignore	edge.md	1	84	89	blorft	'blorft'
+Parity.ignore	edge.md	1	91	98	blorft's	'blorft's'
+Parity.ignore	edge.md	2	55	57	teh	'teh'
+Parity.ignore	edge.md	3	28	33	blorft	'blorft'
+Parity.ignore	edge.md	3	35	37	teh	'teh'
+Parity.ignore	edge.md	3	58	63	blorft	'blorft'
+Parity.ignore	edge.md	3	65	67	teh	'teh'
+Parity.ignore	edge.md	5	1	3	teh	'teh'
+Parity.ignore	edge.md	5	25	30	blorft	'blorft'
+Parity.ignore	edge.md	6	1	3	teh	'teh'
+Parity.ignore	edge.md	7	102	111	postgresql	Use 'PostgreSQL' instead of 'postgresql'.
+Parity.ignore	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.ignore	edge.md	7	15	20	github	Use 'GitHub' instead of 'github'.
+Parity.ignore	edge.md	7	27	30	Json	Use 'JSON' instead of 'Json'.
+Parity.ignore	edge.md	7	32	35	json	Use 'JSON' instead of 'json'.
+Parity.ignore	edge.md	7	37	46	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.ignore	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.ignore	edge.md	7	75	78	nasa	Use 'NASA' instead of 'nasa'.
+Parity.ignore	edge.md	7	8	13	Github	Use 'GitHub' instead of 'Github'.
+Parity.ignore	edge.md	7	80	85	iphone	Use 'iPhone' instead of 'iphone'.
+Parity.ignore	edge.md	7	87	89	ios	Use 'iOS' instead of 'ios'.
+Parity.ignore	edge.md	8	20	22	tis	'tis'
+Parity.ignore	edge.md	8	50	54	l'eau	'l'eau'
+Parity.ignore	edge.md	8	64	74	rock'n'roll	'rock'n'roll'
+Parity.ignore	identifiers.md	1	29	42	recieveMessage	'recieveMessage' looks like code; format it as code.
+Parity.ignore	identifiers.md	1	69	83	recieve_message	'recieve_message' looks like code; format it as code.
+Parity.ignore	identifiers.md	2	17	26	myVariable	'myVariable' looks like code; format it as code.
+Parity.ignore	identifiers.md	2	29	44	snake_case_value	'snake_case_value' looks like code; format it as code.
+Parity.ignore	identifiers.md	2	5	14	apiVersion	'apiVersion' looks like code; format it as code.
+Parity.ignore	identifiers.md	2	68	77	HTTPServer	'HTTPServer'
+Parity.ignore	identifiers.md	3	5	17	blorftMessage	'blorftMessage' looks like code; format it as code.
+Parity.ignore	identifiers.md	4	59	61	aBc	Use 'ABC' instead of 'aBc'.
+Parity.ignore	identifiers.md	5	54	66	blorftOutside	'blorftOutside' looks like code; format it as code.
+Parity.ignore	prose.md	1	19	24	Headng	'Headng'
+Parity.ignore	prose.md	10	15	20	blorft	'blorft'
+Parity.ignore	prose.md	11	22	24	teh	'teh'
+Parity.ignore	prose.md	13	12	17	blorft	'blorft'
+Parity.ignore	prose.md	15	8	13	blorft	'blorft'
+Parity.ignore	prose.md	17	8	10	teh	'teh'
+Parity.ignore	prose.md	2	1	8	blorft's	'blorft's'
+Parity.ignore	prose.md	3	20	22	teh	'teh'
+Parity.ignore	prose.md	3	36	39	foxs	'foxs'
+Parity.ignore	prose.md	3	4	9	blorft	'blorft'
+Parity.ignore	prose.md	4	15	24	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.ignore	prose.md	4	30	33	json	Use 'JSON' instead of 'json'.
+Parity.ignore	prose.md	4	50	56	vSphere	'vSphere'
+Parity.ignore	prose.md	4	7	12	github	Use 'GitHub' instead of 'github'.
+Parity.ignore	prose.md	5	29	34	blorft	'blorft'
+Parity.ignore	prose.md	7	10	15	blorft	'blorft'
+Parity.ignore	prose.md	7	17	22	blorft	'blorft'
+Parity.ignore	prose.md	7	3	8	blorft	'blorft'
+Parity.ignore	prose.md	7	63	68	blorft	'blorft'
+Parity.ignore	prose.md	8	54	56	xyz	'xyz'
+Parity.plain	edge.md	1	1	6	blorft	'blorft'
+Parity.plain	edge.md	1	100	106	blorfts	'blorfts'
+Parity.plain	edge.md	1	12	17	blorft	'blorft'
+Parity.plain	edge.md	1	135	144	blorft_teh	'blorft_teh' looks like code; format it as code.
+Parity.plain	edge.md	1	21	26	blorft	'blorft'
+Parity.plain	edge.md	1	30	35	blorft	'blorft'
+Parity.plain	edge.md	1	38	43	blorft	'blorft'
+Parity.plain	edge.md	1	47	52	blorft	'blorft'
+Parity.plain	edge.md	1	56	61	blorft	'blorft'
+Parity.plain	edge.md	1	64	69	blorft	'blorft'
+Parity.plain	edge.md	1	74	79	blorft	'blorft'
+Parity.plain	edge.md	1	84	89	blorft	'blorft'
+Parity.plain	edge.md	1	91	98	blorft's	'blorft's'
+Parity.plain	edge.md	2	55	57	teh	'teh'
+Parity.plain	edge.md	3	28	33	blorft	'blorft'
+Parity.plain	edge.md	3	35	37	teh	'teh'
+Parity.plain	edge.md	3	58	63	blorft	'blorft'
+Parity.plain	edge.md	3	65	67	teh	'teh'
+Parity.plain	edge.md	5	1	3	teh	'teh'
+Parity.plain	edge.md	5	25	30	blorft	'blorft'
+Parity.plain	edge.md	6	1	3	teh	'teh'
+Parity.plain	edge.md	7	102	111	postgresql	Use 'PostgreSQL' instead of 'postgresql'.
+Parity.plain	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.plain	edge.md	7	15	20	github	Use 'GitHub' instead of 'github'.
+Parity.plain	edge.md	7	27	30	Json	Use 'JSON' instead of 'Json'.
+Parity.plain	edge.md	7	32	35	json	Use 'JSON' instead of 'json'.
+Parity.plain	edge.md	7	37	46	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.plain	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.plain	edge.md	7	75	78	nasa	Use 'NASA' instead of 'nasa'.
+Parity.plain	edge.md	7	8	13	Github	Use 'GitHub' instead of 'Github'.
+Parity.plain	edge.md	7	80	85	iphone	Use 'iPhone' instead of 'iphone'.
+Parity.plain	edge.md	7	87	89	ios	Use 'iOS' instead of 'ios'.
+Parity.plain	edge.md	8	20	22	tis	'tis'
+Parity.plain	edge.md	8	50	54	l'eau	'l'eau'
+Parity.plain	edge.md	8	64	74	rock'n'roll	'rock'n'roll'
+Parity.plain	identifiers.md	1	29	42	recieveMessage	'recieveMessage' looks like code; format it as code.
+Parity.plain	identifiers.md	1	69	83	recieve_message	'recieve_message' looks like code; format it as code.
+Parity.plain	identifiers.md	2	17	26	myVariable	'myVariable' looks like code; format it as code.
+Parity.plain	identifiers.md	2	29	44	snake_case_value	'snake_case_value' looks like code; format it as code.
+Parity.plain	identifiers.md	2	5	14	apiVersion	'apiVersion' looks like code; format it as code.
+Parity.plain	identifiers.md	2	68	77	HTTPServer	'HTTPServer'
+Parity.plain	identifiers.md	3	5	17	blorftMessage	'blorftMessage' looks like code; format it as code.
+Parity.plain	identifiers.md	4	59	61	aBc	Use 'ABC' instead of 'aBc'.
+Parity.plain	identifiers.md	5	54	66	blorftOutside	'blorftOutside' looks like code; format it as code.
+Parity.plain	prose.md	1	19	24	Headng	'Headng'
+Parity.plain	prose.md	10	15	20	blorft	'blorft'
+Parity.plain	prose.md	11	22	24	teh	'teh'
+Parity.plain	prose.md	13	12	17	blorft	'blorft'
+Parity.plain	prose.md	15	8	13	blorft	'blorft'
+Parity.plain	prose.md	17	8	10	teh	'teh'
+Parity.plain	prose.md	2	1	8	blorft's	'blorft's'
+Parity.plain	prose.md	3	20	22	teh	'teh'
+Parity.plain	prose.md	3	36	39	foxs	'foxs'
+Parity.plain	prose.md	3	4	9	blorft	'blorft'
+Parity.plain	prose.md	4	15	24	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.plain	prose.md	4	30	33	json	Use 'JSON' instead of 'json'.
+Parity.plain	prose.md	4	50	56	vSphere	'vSphere'
+Parity.plain	prose.md	4	7	12	github	Use 'GitHub' instead of 'github'.
+Parity.plain	prose.md	5	29	34	blorft	'blorft'
+Parity.plain	prose.md	7	10	15	blorft	'blorft'
+Parity.plain	prose.md	7	17	22	blorft	'blorft'
+Parity.plain	prose.md	7	3	8	blorft	'blorft'
+Parity.plain	prose.md	7	63	68	blorft	'blorft'
+Parity.plain	prose.md	8	1	7	hakkiri	'hakkiri'
+Parity.plain	prose.md	8	13	19	Hakkiri	'Hakkiri'
+Parity.plain	prose.md	8	54	56	xyz	'xyz'
+Parity.sentence	edge.md	1	1	6	blorft	'blorft'
+Parity.sentence	edge.md	1	100	106	blorfts	'blorfts'
+Parity.sentence	edge.md	1	12	17	blorft	'blorft'
+Parity.sentence	edge.md	1	135	144	blorft_teh	'blorft_teh' looks like code; format it as code.
+Parity.sentence	edge.md	1	21	26	blorft	'blorft'
+Parity.sentence	edge.md	1	30	35	blorft	'blorft'
+Parity.sentence	edge.md	1	38	43	blorft	'blorft'
+Parity.sentence	edge.md	1	47	52	blorft	'blorft'
+Parity.sentence	edge.md	1	56	61	blorft	'blorft'
+Parity.sentence	edge.md	1	64	69	blorft	'blorft'
+Parity.sentence	edge.md	1	74	79	blorft	'blorft'
+Parity.sentence	edge.md	1	84	89	blorft	'blorft'
+Parity.sentence	edge.md	1	91	98	blorft's	'blorft's'
+Parity.sentence	edge.md	2	55	57	teh	'teh'
+Parity.sentence	edge.md	3	28	33	blorft	'blorft'
+Parity.sentence	edge.md	3	35	37	teh	'teh'
+Parity.sentence	edge.md	3	58	63	blorft	'blorft'
+Parity.sentence	edge.md	3	65	67	teh	'teh'
+Parity.sentence	edge.md	5	1	3	teh	'teh'
+Parity.sentence	edge.md	5	25	30	blorft	'blorft'
+Parity.sentence	edge.md	6	1	3	teh	'teh'
+Parity.sentence	edge.md	7	102	111	postgresql	Use 'PostgreSQL' instead of 'postgresql'.
+Parity.sentence	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.sentence	edge.md	7	15	20	github	Use 'GitHub' instead of 'github'.
+Parity.sentence	edge.md	7	27	30	Json	Use 'JSON' instead of 'Json'.
+Parity.sentence	edge.md	7	32	35	json	Use 'JSON' instead of 'json'.
+Parity.sentence	edge.md	7	37	46	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.sentence	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.sentence	edge.md	7	75	78	nasa	Use 'NASA' instead of 'nasa'.
+Parity.sentence	edge.md	7	8	13	Github	Use 'GitHub' instead of 'Github'.
+Parity.sentence	edge.md	7	80	85	iphone	Use 'iPhone' instead of 'iphone'.
+Parity.sentence	edge.md	7	87	89	ios	Use 'iOS' instead of 'ios'.
+Parity.sentence	edge.md	8	20	22	tis	'tis'
+Parity.sentence	edge.md	8	50	54	l'eau	'l'eau'
+Parity.sentence	edge.md	8	64	74	rock'n'roll	'rock'n'roll'
+Parity.sentence	identifiers.md	1	29	42	recieveMessage	'recieveMessage' looks like code; format it as code.
+Parity.sentence	identifiers.md	1	69	83	recieve_message	'recieve_message' looks like code; format it as code.
+Parity.sentence	identifiers.md	2	17	26	myVariable	'myVariable' looks like code; format it as code.
+Parity.sentence	identifiers.md	2	29	44	snake_case_value	'snake_case_value' looks like code; format it as code.
+Parity.sentence	identifiers.md	2	5	14	apiVersion	'apiVersion' looks like code; format it as code.
+Parity.sentence	identifiers.md	2	68	77	HTTPServer	'HTTPServer'
+Parity.sentence	identifiers.md	3	5	17	blorftMessage	'blorftMessage' looks like code; format it as code.
+Parity.sentence	identifiers.md	4	59	61	aBc	Use 'ABC' instead of 'aBc'.
+Parity.sentence	identifiers.md	5	54	66	blorftOutside	'blorftOutside' looks like code; format it as code.
+Parity.sentence	prose.md	1	19	24	Headng	'Headng'
+Parity.sentence	prose.md	10	15	20	blorft	'blorft'
+Parity.sentence	prose.md	11	22	24	teh	'teh'
+Parity.sentence	prose.md	13	12	17	blorft	'blorft'
+Parity.sentence	prose.md	15	8	13	blorft	'blorft'
+Parity.sentence	prose.md	17	8	10	teh	'teh'
+Parity.sentence	prose.md	3	20	22	teh	'teh'
+Parity.sentence	prose.md	3	36	39	foxs	'foxs'
+Parity.sentence	prose.md	3	4	9	blorft	'blorft'
+Parity.sentence	prose.md	4	122	129	blorft's	'blorft's'
+Parity.sentence	prose.md	4	15	24	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.sentence	prose.md	4	30	33	json	Use 'JSON' instead of 'json'.
+Parity.sentence	prose.md	4	50	56	vSphere	'vSphere'
+Parity.sentence	prose.md	4	7	12	github	Use 'GitHub' instead of 'github'.
+Parity.sentence	prose.md	5	29	34	blorft	'blorft'
+Parity.sentence	prose.md	7	10	15	blorft	'blorft'
+Parity.sentence	prose.md	7	17	22	blorft	'blorft'
+Parity.sentence	prose.md	7	3	8	blorft	'blorft'
+Parity.sentence	prose.md	7	63	68	blorft	'blorft'
+Parity.sentence	prose.md	8	1	7	hakkiri	'hakkiri'
+Parity.sentence	prose.md	8	13	19	Hakkiri	'Hakkiri'
+Parity.sentence	prose.md	8	54	56	xyz	'xyz'
+Parity.split	edge.md	1	1	6	blorft	'blorft'
+Parity.split	edge.md	1	100	106	blorfts	'blorfts'
+Parity.split	edge.md	1	117	122	blorft	'blorft'
+Parity.split	edge.md	1	12	17	blorft	'blorft'
+Parity.split	edge.md	1	135	140	blorft	'blorft'
+Parity.split	edge.md	1	142	144	teh	'teh'
+Parity.split	edge.md	1	147	152	blorft	'blorft'
+Parity.split	edge.md	1	154	159	blorft	'blorft'
+Parity.split	edge.md	1	21	26	blorft	'blorft'
+Parity.split	edge.md	1	30	35	blorft	'blorft'
+Parity.split	edge.md	1	38	43	blorft	'blorft'
+Parity.split	edge.md	1	47	52	blorft	'blorft'
+Parity.split	edge.md	1	56	61	blorft	'blorft'
+Parity.split	edge.md	1	64	69	blorft	'blorft'
+Parity.split	edge.md	1	74	79	blorft	'blorft'
+Parity.split	edge.md	1	84	89	blorft	'blorft'
+Parity.split	edge.md	1	91	96	blorft	'blorft'
+Parity.split	edge.md	2	43	49	Ünïcödé	'Ünïcödé'
+Parity.split	edge.md	2	51	53	日本語	'日本語'
+Parity.split	edge.md	2	55	57	teh	'teh'
+Parity.split	edge.md	3	28	33	blorft	'blorft'
+Parity.split	edge.md	3	35	37	teh	'teh'
+Parity.split	edge.md	3	58	63	blorft	'blorft'
+Parity.split	edge.md	3	65	67	teh	'teh'
+Parity.split	edge.md	4	14	19	blorft	'blorft'
+Parity.split	edge.md	5	1	3	teh	'teh'
+Parity.split	edge.md	5	25	30	blorft	'blorft'
+Parity.split	edge.md	6	1	3	teh	'teh'
+Parity.split	edge.md	7	102	111	postgresql	Use 'PostgreSQL' instead of 'postgresql'.
+Parity.split	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.split	edge.md	7	15	20	github	Use 'GitHub' instead of 'github'.
+Parity.split	edge.md	7	27	30	Json	Use 'JSON' instead of 'Json'.
+Parity.split	edge.md	7	32	35	json	Use 'JSON' instead of 'json'.
+Parity.split	edge.md	7	37	46	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.split	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.split	edge.md	7	75	78	nasa	Use 'NASA' instead of 'nasa'.
+Parity.split	edge.md	7	8	13	Github	Use 'GitHub' instead of 'Github'.
+Parity.split	edge.md	7	80	85	iphone	Use 'iPhone' instead of 'iphone'.
+Parity.split	edge.md	7	87	89	ios	Use 'iOS' instead of 'ios'.
+Parity.split	edge.md	8	20	22	tis	'tis'
+Parity.split	identifiers.md	1	29	35	recieve	'recieve'
+Parity.split	identifiers.md	1	50	56	Recieve	'Recieve'
+Parity.split	identifiers.md	1	69	75	recieve	'recieve'
+Parity.split	identifiers.md	11	1	5	Naïve	'Naïve'
+Parity.split	identifiers.md	11	24	29	straße	'straße'
+Parity.split	identifiers.md	11	31	36	blorft	'blorft'
+Parity.split	identifiers.md	11	42	45	Über	'Über'
+Parity.split	identifiers.md	11	46	51	Blorft	'Blorft'
+Parity.split	identifiers.md	11	7	12	résumé	'résumé'
+Parity.split	identifiers.md	2	5	7	api	'api'
+Parity.split	identifiers.md	3	20	25	Blorft	'Blorft'
+Parity.split	identifiers.md	3	5	10	blorft	'blorft'
+Parity.split	identifiers.md	3	54	59	blorft	'blorft'
+Parity.split	identifiers.md	5	54	59	blorft	'blorft'
+Parity.split	prose.md	1	19	24	Headng	'Headng'
+Parity.split	prose.md	10	15	20	blorft	'blorft'
+Parity.split	prose.md	11	22	24	teh	'teh'
+Parity.split	prose.md	13	12	17	blorft	'blorft'
+Parity.split	prose.md	15	8	13	blorft	'blorft'
+Parity.split	prose.md	17	8	10	teh	'teh'
+Parity.split	prose.md	2	1	6	blorft	'blorft'
+Parity.split	prose.md	3	20	22	teh	'teh'
+Parity.split	prose.md	3	36	39	foxs	'foxs'
+Parity.split	prose.md	3	4	9	blorft	'blorft'
+Parity.split	prose.md	4	15	24	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.split	prose.md	4	30	33	json	Use 'JSON' instead of 'json'.
+Parity.split	prose.md	4	7	12	github	Use 'GitHub' instead of 'github'.
+Parity.split	prose.md	5	29	34	blorft	'blorft'
+Parity.split	prose.md	6	1	4	Café	'Café'
+Parity.split	prose.md	6	14	19	résumé	'résumé'
+Parity.split	prose.md	6	25	29	señor	'señor'
+Parity.split	prose.md	6	7	11	naïve	'naïve'
+Parity.split	prose.md	7	10	15	blorft	'blorft'
+Parity.split	prose.md	7	17	22	blorft	'blorft'
+Parity.split	prose.md	7	3	8	blorft	'blorft'
+Parity.split	prose.md	7	63	68	blorft	'blorft'
+Parity.split	prose.md	8	1	7	hakkiri	'hakkiri'
+Parity.split	prose.md	8	13	19	Hakkiri	'Hakkiri'
+Parity.split	prose.md	8	25	31	HAKKIRI	'HAKKIRI'
+Parity.split	prose.md	8	54	56	xyz	'xyz'
+Parity.splitcustom	edge.md	1	1	6	blorft	'blorft'
+Parity.splitcustom	edge.md	1	100	106	blorfts	'blorfts'
+Parity.splitcustom	edge.md	1	117	122	blorft	'blorft'
+Parity.splitcustom	edge.md	1	12	17	blorft	'blorft'
+Parity.splitcustom	edge.md	1	124	129	blorft	'blorft'
+Parity.splitcustom	edge.md	1	131	133	teh	'teh'
+Parity.splitcustom	edge.md	1	135	140	blorft	'blorft'
+Parity.splitcustom	edge.md	1	142	144	teh	'teh'
+Parity.splitcustom	edge.md	1	147	152	blorft	'blorft'
+Parity.splitcustom	edge.md	1	154	159	blorft	'blorft'
+Parity.splitcustom	edge.md	1	21	26	blorft	'blorft'
+Parity.splitcustom	edge.md	1	30	35	blorft	'blorft'
+Parity.splitcustom	edge.md	1	38	43	blorft	'blorft'
+Parity.splitcustom	edge.md	1	47	52	blorft	'blorft'
+Parity.splitcustom	edge.md	1	56	61	blorft	'blorft'
+Parity.splitcustom	edge.md	1	64	69	blorft	'blorft'
+Parity.splitcustom	edge.md	1	74	79	blorft	'blorft'
+Parity.splitcustom	edge.md	1	84	89	blorft	'blorft'
+Parity.splitcustom	edge.md	1	91	96	blorft	'blorft'
+Parity.splitcustom	edge.md	2	1	6	blorft	'blorft'
+Parity.splitcustom	edge.md	2	16	21	blorft	'blorft'
+Parity.splitcustom	edge.md	2	23	25	teh	'teh'
+Parity.splitcustom	edge.md	2	31	36	blorft	'blorft'
+Parity.splitcustom	edge.md	2	43	49	Ünïcödé	'Ünïcödé'
+Parity.splitcustom	edge.md	2	51	53	日本語	'日本語'
+Parity.splitcustom	edge.md	2	55	57	teh	'teh'
+Parity.splitcustom	edge.md	2	8	10	teh	'teh'
+Parity.splitcustom	edge.md	3	28	33	blorft	'blorft'
+Parity.splitcustom	edge.md	3	35	37	teh	'teh'
+Parity.splitcustom	edge.md	3	58	63	blorft	'blorft'
+Parity.splitcustom	edge.md	3	65	67	teh	'teh'
+Parity.splitcustom	edge.md	4	14	19	blorft	'blorft'
+Parity.splitcustom	edge.md	5	1	3	teh	'teh'
+Parity.splitcustom	edge.md	5	25	30	blorft	'blorft'
+Parity.splitcustom	edge.md	6	1	3	teh	'teh'
+Parity.splitcustom	edge.md	7	102	111	postgresql	Use 'PostgreSQL' instead of 'postgresql'.
+Parity.splitcustom	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.splitcustom	edge.md	7	15	20	github	Use 'GitHub' instead of 'github'.
+Parity.splitcustom	edge.md	7	27	30	Json	Use 'JSON' instead of 'Json'.
+Parity.splitcustom	edge.md	7	32	35	json	Use 'JSON' instead of 'json'.
+Parity.splitcustom	edge.md	7	37	46	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.splitcustom	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.splitcustom	edge.md	7	75	78	nasa	Use 'NASA' instead of 'nasa'.
+Parity.splitcustom	edge.md	7	8	13	Github	Use 'GitHub' instead of 'Github'.
+Parity.splitcustom	edge.md	7	80	85	iphone	Use 'iPhone' instead of 'iphone'.
+Parity.splitcustom	edge.md	7	87	89	ios	Use 'iOS' instead of 'ios'.
+Parity.splitcustom	edge.md	8	20	22	tis	'tis'
+Parity.splitcustom	identifiers.md	1	29	35	recieve	'recieve'
+Parity.splitcustom	identifiers.md	1	50	56	Recieve	'Recieve'
+Parity.splitcustom	identifiers.md	1	69	75	recieve	'recieve'
+Parity.splitcustom	identifiers.md	11	1	5	Naïve	'Naïve'
+Parity.splitcustom	identifiers.md	11	24	29	straße	'straße'
+Parity.splitcustom	identifiers.md	11	31	36	blorft	'blorft'
+Parity.splitcustom	identifiers.md	11	42	45	Über	'Über'
+Parity.splitcustom	identifiers.md	11	46	51	Blorft	'Blorft'
+Parity.splitcustom	identifiers.md	11	7	12	résumé	'résumé'
+Parity.splitcustom	identifiers.md	2	5	7	api	'api'
+Parity.splitcustom	identifiers.md	3	20	25	Blorft	'Blorft'
+Parity.splitcustom	identifiers.md	3	5	10	blorft	'blorft'
+Parity.splitcustom	identifiers.md	3	54	59	blorft	'blorft'
+Parity.splitcustom	identifiers.md	5	54	59	blorft	'blorft'
+Parity.splitcustom	prose.md	1	19	24	Headng	'Headng'
+Parity.splitcustom	prose.md	10	15	20	blorft	'blorft'
+Parity.splitcustom	prose.md	11	22	24	teh	'teh'
+Parity.splitcustom	prose.md	13	12	17	blorft	'blorft'
+Parity.splitcustom	prose.md	15	8	13	blorft	'blorft'
+Parity.splitcustom	prose.md	17	8	10	teh	'teh'
+Parity.splitcustom	prose.md	2	1	6	blorft	'blorft'
+Parity.splitcustom	prose.md	3	20	22	teh	'teh'
+Parity.splitcustom	prose.md	3	36	39	foxs	'foxs'
+Parity.splitcustom	prose.md	3	4	9	blorft	'blorft'
+Parity.splitcustom	prose.md	4	15	24	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.splitcustom	prose.md	4	30	33	json	Use 'JSON' instead of 'json'.
+Parity.splitcustom	prose.md	4	7	12	github	Use 'GitHub' instead of 'github'.
+Parity.splitcustom	prose.md	5	29	34	blorft	'blorft'
+Parity.splitcustom	prose.md	6	1	4	Café	'Café'
+Parity.splitcustom	prose.md	6	14	19	résumé	'résumé'
+Parity.splitcustom	prose.md	6	25	29	señor	'señor'
+Parity.splitcustom	prose.md	6	7	11	naïve	'naïve'
+Parity.splitcustom	prose.md	7	10	15	blorft	'blorft'
+Parity.splitcustom	prose.md	7	17	22	blorft	'blorft'
+Parity.splitcustom	prose.md	7	3	8	blorft	'blorft'
+Parity.splitcustom	prose.md	7	63	68	blorft	'blorft'
+Parity.splitcustom	prose.md	8	1	7	hakkiri	'hakkiri'
+Parity.splitcustom	prose.md	8	13	19	Hakkiri	'Hakkiri'
+Parity.splitcustom	prose.md	8	25	31	HAKKIRI	'HAKKIRI'
+Parity.splitcustom	prose.md	8	54	56	xyz	'xyz'
+Parity.team	edge.md	1	1	6	blorft	'blorft'
+Parity.team	edge.md	1	100	106	blorfts	'blorfts'
+Parity.team	edge.md	1	12	17	blorft	'blorft'
+Parity.team	edge.md	1	135	144	blorft_teh	'blorft_teh' looks like code; format it as code.
+Parity.team	edge.md	1	21	26	blorft	'blorft'
+Parity.team	edge.md	1	30	35	blorft	'blorft'
+Parity.team	edge.md	1	38	43	blorft	'blorft'
+Parity.team	edge.md	1	47	52	blorft	'blorft'
+Parity.team	edge.md	1	56	61	blorft	'blorft'
+Parity.team	edge.md	1	64	69	blorft	'blorft'
+Parity.team	edge.md	1	74	79	blorft	'blorft'
+Parity.team	edge.md	1	84	89	blorft	'blorft'
+Parity.team	edge.md	1	91	98	blorft's	'blorft's'
+Parity.team	edge.md	2	55	57	teh	'teh'
+Parity.team	edge.md	3	28	33	blorft	'blorft'
+Parity.team	edge.md	3	35	37	teh	'teh'
+Parity.team	edge.md	3	58	63	blorft	'blorft'
+Parity.team	edge.md	3	65	67	teh	'teh'
+Parity.team	edge.md	5	1	3	teh	'teh'
+Parity.team	edge.md	5	25	30	blorft	'blorft'
+Parity.team	edge.md	6	1	3	teh	'teh'
+Parity.team	edge.md	7	102	111	postgresql	Use 'PostgreSQL' instead of 'postgresql'.
+Parity.team	edge.md	7	113	118	ubuntu	'ubuntu'
+Parity.team	edge.md	7	15	20	github	Use 'GitHub' instead of 'github'.
+Parity.team	edge.md	7	27	30	Json	Use 'JSON' instead of 'Json'.
+Parity.team	edge.md	7	32	35	json	Use 'JSON' instead of 'json'.
+Parity.team	edge.md	7	37	46	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.team	edge.md	7	48	57	kubernetes	'kubernetes'
+Parity.team	edge.md	7	75	78	nasa	Use 'NASA' instead of 'nasa'.
+Parity.team	edge.md	7	8	13	Github	Use 'GitHub' instead of 'Github'.
+Parity.team	edge.md	7	80	85	iphone	Use 'iPhone' instead of 'iphone'.
+Parity.team	edge.md	7	87	89	ios	Use 'iOS' instead of 'ios'.
+Parity.team	edge.md	8	20	22	tis	'tis'
+Parity.team	edge.md	8	50	54	l'eau	'l'eau'
+Parity.team	edge.md	8	64	74	rock'n'roll	'rock'n'roll'
+Parity.team	identifiers.md	1	29	42	recieveMessage	'recieveMessage' looks like code; format it as code.
+Parity.team	identifiers.md	1	69	83	recieve_message	'recieve_message' looks like code; format it as code.
+Parity.team	identifiers.md	2	17	26	myVariable	'myVariable' looks like code; format it as code.
+Parity.team	identifiers.md	2	29	44	snake_case_value	'snake_case_value' looks like code; format it as code.
+Parity.team	identifiers.md	2	5	14	apiVersion	'apiVersion' looks like code; format it as code.
+Parity.team	identifiers.md	2	68	77	HTTPServer	'HTTPServer'
+Parity.team	identifiers.md	3	5	17	blorftMessage	'blorftMessage' looks like code; format it as code.
+Parity.team	identifiers.md	4	59	61	aBc	Use 'ABC' instead of 'aBc'.
+Parity.team	identifiers.md	5	54	66	blorftOutside	'blorftOutside' looks like code; format it as code.
+Parity.team	prose.md	1	19	24	Headng	'Headng'
+Parity.team	prose.md	10	15	20	blorft	'blorft'
+Parity.team	prose.md	11	22	24	teh	'teh'
+Parity.team	prose.md	13	12	17	blorft	'blorft'
+Parity.team	prose.md	15	8	13	blorft	'blorft'
+Parity.team	prose.md	17	8	10	teh	'teh'
+Parity.team	prose.md	2	1	8	blorft's	'blorft's'
+Parity.team	prose.md	3	20	22	teh	'teh'
+Parity.team	prose.md	3	36	39	foxs	'foxs'
+Parity.team	prose.md	3	4	9	blorft	'blorft'
+Parity.team	prose.md	4	15	24	javascript	Use 'JavaScript' instead of 'javascript'.
+Parity.team	prose.md	4	30	33	json	Use 'JSON' instead of 'json'.
+Parity.team	prose.md	4	50	56	vSphere	'vSphere'
+Parity.team	prose.md	4	7	12	github	Use 'GitHub' instead of 'github'.
+Parity.team	prose.md	5	29	34	blorft	'blorft'
+Parity.team	prose.md	7	10	15	blorft	'blorft'
+Parity.team	prose.md	7	17	22	blorft	'blorft'
+Parity.team	prose.md	7	3	8	blorft	'blorft'
+Parity.team	prose.md	7	63	68	blorft	'blorft'
+Parity.team	prose.md	8	54	56	xyz	'xyz'

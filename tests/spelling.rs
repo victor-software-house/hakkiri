@@ -139,6 +139,7 @@ fn a_word_with_a_curly_quote_is_reported_whole() -> TestResult {
     assert_eq!(found.len(), 1);
     assert_eq!(found[0].matched, "blorft\u{2019}s");
     assert_eq!(found[0].message, "Did you really mean 'blorft's'?");
+    assert_eq!((found[0].line, found[0].first_column), (1, 4));
     Ok(())
 }
 
@@ -156,6 +157,30 @@ fn a_team_dictionary_alone() -> TestResult {
         matched(&text, "Run hakkiri on mail.\n")?,
         ["Run", "on", "mail"]
     );
+    Ok(())
+}
+
+#[test]
+fn a_dictionary_by_its_two_files() -> TestResult {
+    let text = rule("aff: team.aff\ndic: team.dic\n");
+    assert_eq!(
+        matched(&text, "Run hakkiri on mail.\n")?,
+        ["Run", "on", "mail"]
+    );
+    Ok(())
+}
+
+#[test]
+fn an_aff_without_a_dic_is_refused() -> TestResult {
+    let refused = Rule::from_text_in(
+        "Team.Spelling",
+        "Team/Spelling.yml",
+        &rule("aff: team.aff\n"),
+        &package(),
+    )
+    .err()
+    .ok_or("the rule loaded")?;
+    assert!(refused.to_string().contains("`dic`"), "{refused}");
     Ok(())
 }
 

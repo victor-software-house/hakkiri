@@ -25,6 +25,11 @@ When the rule loads no other dictionary, the dictionary SHALL be Vale's built-in
 - **WHEN** the same rule reads ``Run `blorft` now.``
 - **THEN** hakkiri reports no alert
 
+#### Scenario: A word with a curly quote
+
+- **WHEN** the same rule reads `We blorft’s mail.`
+- **THEN** hakkiri reports one alert at line 1, column 4, with the matched text `blorft’s`
+
 ### Requirement: Built-in filters skip names and codes
 
 Unless the rule sets `custom: true`, three kinds of word SHALL be skipped.  
@@ -95,13 +100,30 @@ Otherwise, without `split`, a word shaped like an identifier in a Markdown or MD
 When `dicpath` is set, they SHALL be read from that folder inside the package instead.  
 `append: true` SHALL add the built-in dictionary to the ones the rule loads.
 
-`aff` and `dic` SHALL name one dictionary's two files inside the package.  
-hakkiri SHALL refuse a rule whose dictionary is missing or whose path leaves its package.
-
 #### Scenario: A team dictionary
 
 - **WHEN** the rule has `dictionaries: [team]` and `append: true`, its package holds `config/dictionaries/team.aff` and a `team.dic` with the word `hakkiri`, and the input is `Run hakkiri on blorft.`
 - **THEN** hakkiri reports one alert, with the matched text `blorft`
+
+### Requirement: aff and dic name one dictionary
+
+`aff` and `dic` SHALL name one dictionary's two files inside the package.  
+hakkiri SHALL refuse a rule that sets only one of them.
+
+#### Scenario: One dictionary by its two files
+
+- **WHEN** the rule has `aff: team.aff` and `dic: team.dic`, found in `config/dictionaries`, and the input is `Run hakkiri on mail.`
+- **THEN** hakkiri reports three alerts, with the matched texts `Run`, `on` and `mail`
+
+### Requirement: A dictionary that cannot be read is refused
+
+hakkiri SHALL refuse a rule whose dictionary is missing.  
+It SHALL refuse a rule whose path to a dictionary, a folder or a word list leaves its package.
+
+#### Scenario: A path that leaves the package
+
+- **WHEN** the rule has `dictionaries: ['../x']`
+- **THEN** hakkiri reports an error that says the path leaves the package, and exits with a failure status
 
 #### Scenario: A missing dictionary
 

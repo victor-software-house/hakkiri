@@ -45,7 +45,7 @@ static IDENTIFIER: LazyLock<Regex> = LazyLock::new(|| {
     reason = "The pattern is a constant that compiles."
 )]
 static NOT_IDENTIFIER: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"[^\p{L}\p{Nd}_\-']").expect("the non-identifier pattern compiles")
+    Regex::new(r"[^\p{L}\p{Decimal_Number}_\-']").expect("the non-identifier pattern compiles")
 });
 
 /// One character of a category, tested as a text of its own.
@@ -256,9 +256,11 @@ fn tokenize(text: &str) -> Vec<Word> {
     words
 }
 
-/// Whether the filters a rule has unless it sets `custom` skip `word`: a word
-/// that holds a character other than an ASCII letter, `_` or `'`, one that
-/// ends in capitals, and one made of a capital, lower-case letters and more
+/// Whether the filters a rule has unless it sets `custom` skip `word`.
+///
+/// They skip a word that holds a character other than an ASCII letter, `_`
+/// or `'`, and one that ends in capitals.
+/// They also skip a word made of a capital, lower-case letters and more
 /// capitals, such as `FooBar`.
 ///
 /// With `split` an identifier is taken apart and not skipped, so only a word

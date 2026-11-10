@@ -7,6 +7,7 @@ extend-exclude = [
   "data/dictionary/en_US-web.dic",
   "tests/fixtures/dictionary/vale.tsv",
   "tests/fixtures/capitalization/vale.tsv",
+  "tests/fixtures/spelling-parity",
   "tests/fixtures/tagger/treebank.tsv",
 ]
 

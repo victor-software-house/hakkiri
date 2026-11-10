@@ -1,0 +1,4 @@
+extends: spelling
+message: "'%s'"
+split: true
+custom: true
