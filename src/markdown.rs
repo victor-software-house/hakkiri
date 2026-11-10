@@ -372,7 +372,14 @@ impl Builder<'_> {
                 return Visited::default();
             };
             if let Some((child, cell, first)) = top.next_child() {
-                match self.step(child) {
+                let step = if let Mdast::Html(html) = child
+                    && Self::holds_blocks(top.node)
+                {
+                    Step::Done(self.html_block(child, &html.value, first))
+                } else {
+                    self.step(child)
+                };
+                match step {
                     Step::Done(visited) => {
                         top.inner = std::mem::take(&mut top.inner).append(visited);
                     }
@@ -391,6 +398,32 @@ impl Builder<'_> {
                 None => return visited,
             }
         }
+    }
+
+    /// Whether the children of `node` are blocks, so that an HTML node among
+    /// them is an HTML block and not an inline tag.
+    const fn holds_blocks(node: &Mdast) -> bool {
+        matches!(
+            node,
+            Mdast::Root(_)
+                | Mdast::Blockquote(_)
+                | Mdast::ListItem(_)
+                | Mdast::FootnoteDefinition(_)
+                | Mdast::MdxJsxFlowElement(_)
+        )
+    }
+
+    /// An HTML block: a gap in the nodes around it, and the nodes for the text
+    /// Vale reads in it.
+    fn html_block(&self, node: &Mdast, value: &str, first: bool) -> Visited {
+        let span = span_of(node);
+        let mut visited = Visited::cut(span.clone());
+        if let Some(span) = span
+            && let Some(nodes) = crate::html_text::nodes(self.source, &span, value, first)
+        {
+            visited.nodes = nodes;
+        }
+        visited
     }
 
     fn step(&self, node: &Mdast) -> Step {

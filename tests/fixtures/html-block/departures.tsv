@@ -1,0 +1,25 @@
+vale	Scope.entity-amp	entity-tokens.md	1	4	22	marker & marker
+vale	Scope.entity-amp	entity-tokens.md	3	6	24	marker & marker
+vale	Scope.existence-paragraph	lines-and-images.md	3	9	14	marker
+vale	Scope.existence-paragraph-not-list	lines-and-images.md	3	9	14	marker
+vale	Scope.existence-sentence	headings-and-tables.md	3	17	22	marker
+vale	Scope.existence-sentence	lines-and-images.md	3	9	14	marker
+vale	Scope.existence-sentence	other-block-tags.md	7	21	26	marker
+vale	Scope.existence-sentence-not-blockquote	headings-and-tables.md	3	17	22	marker
+vale	Scope.existence-sentence-not-blockquote	lines-and-images.md	3	9	14	marker
+vale	Scope.existence-sentence-not-blockquote	other-block-tags.md	7	21	26	marker
+vale	Scope.existence-sentence-not-heading	headings-and-tables.md	3	17	22	marker
+vale	Scope.existence-sentence-not-heading	lines-and-images.md	3	9	14	marker
+vale	Scope.existence-sentence-not-heading	other-block-tags.md	7	21	26	marker
+vale	Scope.existence-sentence-not-list	headings-and-tables.md	3	17	22	marker
+vale	Scope.existence-sentence-not-list	lines-and-images.md	3	9	14	marker
+vale	Scope.existence-sentence-not-list	other-block-tags.md	7	21	26	marker
+vale	Scope.existence-sentence-not-table	lines-and-images.md	3	9	14	marker
+vale	Scope.existence-sentence-not-table	other-block-tags.md	7	21	26	marker
+vale	Scope.existence-sentence-table	headings-and-tables.md	3	17	22	marker
+vale	Scope.existence-table	headings-and-tables.md	3	17	22	marker
+vale	Scope.existence-text	headings-and-tables.md	3	17	22	marker
+vale	Scope.existence-text	lines-and-images.md	3	9	14	marker
+vale	Scope.existence-text	lines-and-images.md	4	14	19	marker
+vale	Scope.existence-text	meta-and-data.md	1	35	40	marker
+vale	Scope.existence-text	other-block-tags.md	7	21	26	marker

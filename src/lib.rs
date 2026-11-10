@@ -15,6 +15,7 @@ pub mod engine;
 mod error;
 pub mod formula;
 mod html;
+mod html_text;
 mod jsdoc;
 mod language;
 mod markdown;

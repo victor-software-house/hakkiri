@@ -163,6 +163,8 @@ snapshots! {
     snapshot_jsdoc_more: "jsdoc-more.ts",
     snapshot_banner: "banner.rs",
     snapshot_crlf_md: "crlf.md",
+    snapshot_html_block: "html-block.md",
+    snapshot_html_block_crlf: "html-block-crlf.md",
     snapshot_quote_paragraph: "quote-paragraph.md",
     snapshot_crlf_rs: "crlf.rs",
     snapshot_tabs_rs: "tabs.rs",
@@ -300,7 +302,6 @@ fn a_url_in_a_fenced_block() -> TestResult {
     let fixture = load("code-and-markup.md")?;
     for url in [
         "https://example.com",
-        "https://html.example",
         "https://definition.example",
         "A title",
     ] {
@@ -313,6 +314,19 @@ fn a_url_in_a_fenced_block() -> TestResult {
     assert_eq!(raw.len(), 1);
     assert_eq!(raw[0].span, 0..fixture.source.len());
     assert!(fixture.text(raw[0]).contains("https://example.com"));
+    Ok(())
+}
+
+#[test]
+fn text_in_an_html_block_is_prose() -> TestResult {
+    let fixture = load("code-and-markup.md")?;
+    assert!(
+        fixture
+            .prose()
+            .iter()
+            .any(|text| text == "https://html.example")
+    );
+    assert!(!fixture.prose().iter().any(|text| text.contains("<div")));
     Ok(())
 }
 
@@ -846,19 +860,28 @@ fn a_node_records_whether_it_is_first_in_its_container() -> TestResult {
         ("> -\n>\n> Two.\n", &[("Two.", false)]),
         ("> [r]: /u\n>\n> Two.\n", &[("Two.", true)]),
         ("> <!-- c -->\n>\n> Two.\n", &[("Two.", true)]),
-        ("> <div>x</div>\n>\n> Two.\n", &[("Two.", false)]),
+        (
+            "> <div>x</div>\n>\n> Two.\n",
+            &[("x", true), ("Two.", false)],
+        ),
         ("> <hr>\n>\n> Two.\n", &[("Two.", true)]),
         ("> <div>\n>\n> Two.\n", &[("Two.", true)]),
-        ("> <!-- c --> <div>x</div>\n>\n> Two.\n", &[("Two.", false)]),
+        (
+            "> <!-- c --> <div>x</div>\n>\n> Two.\n",
+            &[("x", true), ("Two.", false)],
+        ),
         ("> <span>\n>\n> Two.\n", &[("Two.", true)]),
         ("> <hr>\n> <hr>\n>\n> Two.\n", &[("Two.", true)]),
         ("> </div>\n>\n> Two.\n", &[("Two.", false)]),
         ("> <?x y ?>\n>\n> Two.\n", &[("Two.", true)]),
         (
             "> <?php echo \"<div>\"; ?>\n>\n> Two.\n",
-            &[("Two.", false)],
+            &[("\"; ?>", true), ("Two.", false)],
         ),
-        ("> <![CDATA[<div>]]>\n>\n> Two.\n", &[("Two.", false)]),
+        (
+            "> <![CDATA[<div>]]>\n>\n> Two.\n",
+            &[("]]>", true), ("Two.", false)],
+        ),
         ("> <!DOCTYPE html><div>\n>\n> Two.\n", &[("Two.", true)]),
         ("> <div title=\"a>b\">\n>\n> Two.\n", &[("Two.", true)]),
         ("> <hr title=\"a><div>\">\n>\n> Two.\n", &[("Two.", true)]),

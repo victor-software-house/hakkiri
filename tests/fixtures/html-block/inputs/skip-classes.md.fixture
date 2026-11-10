@@ -1,0 +1,7 @@
+<div class="code">marker in class code</div>
+
+<div><span class="pre">marker</span> marker after span</div>
+
+<div class="highlight">marker in highlight</div>
+
+<div class="problematic">marker problem</div>

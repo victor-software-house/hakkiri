@@ -1,0 +1,8 @@
+---
+source: tests/tree.rs
+expression: "load(\"html-block-crlf.md\")? .render()"
+---
+raw 0..68 [0..68] "<div>\r\nFirst line\r\nsecond line.\r\n</div>\r\n\r\n> <p>Quoted\r\n> text</p>\r\n"
+  paragraph 7..31 [7..17, 19..31] "First line\nsecond line."
+  blockquote 48..62 [48..54, 58..62] "Quoted\ntext"
+    paragraph 48..62 [48..54, 58..62] "Quoted\ntext"
