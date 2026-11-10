@@ -301,11 +301,14 @@ fn substitution(
             if !has_group_reference(&swap.value) {
                 return Ok(None);
             }
-            let key = if fields.ignorecase.value() {
-                format!("(?i){}", swap.key)
+            // The key as the main pattern reads it, spaces matching a line
+            // wrap included, and held to the whole match.
+            let flags = if fields.ignorecase.value() {
+                "(?m)(?i)"
             } else {
-                swap.key.clone()
+                "(?m)"
             };
+            let key = format!(r"{flags}\A(?:{})\z", wrap_spaces(&swap.key));
             source.compile("swap", &key, &[&swap.key]).map(Some)
         })
         .collect::<Result<Vec<_>, _>>()?;

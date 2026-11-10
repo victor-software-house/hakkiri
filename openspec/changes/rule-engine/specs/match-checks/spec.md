@@ -99,6 +99,11 @@ A `$1` in a swap value SHALL read as the text the first group of its key matched
 - **WHEN** a rule has `message: "Use '%s' instead of '%s'."` and `swap: {'(\w+) out of': '$1 from'}`, and the input is `Jump out of it.`
 - **THEN** hakkiri reports one alert, with the message `Use 'Jump from' instead of 'Jump out of'.`
 
+#### Scenario: A key across a line wrap
+
+- **WHEN** the rule above reads `Jump` and a line feed before `out of it.`
+- **THEN** hakkiri reports one alert, with the message `Use 'Jump from' instead of 'Jump out of'.`
+
 ### Requirement: occurrence counts the token as written
 
 An `occurrence` rule SHALL count the matches of its `token` in each selected node, with no word boundaries added.  

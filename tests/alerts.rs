@@ -415,6 +415,23 @@ fn a_match_that_starts_with_a_digit_is_not_capitalized() -> TestResult {
 }
 
 #[test]
+fn a_verb_kept_from_a_match_across_a_line_wrap() -> TestResult {
+    let found = markdown(
+        indoc! {r#"
+            extends: substitution
+            message: "Use '%s' instead of '%s'."
+            swap: {'(\w+) out of': '$1 from'}
+        "#},
+        "Jump\nout of it.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.message.as_str()).collect::<Vec<_>>(),
+        ["Use 'Jump from' instead of 'Jump out of'."]
+    );
+    Ok(())
+}
+
+#[test]
 fn a_verb_kept_from_the_match() -> TestResult {
     let found = markdown(
         indoc! {r#"
