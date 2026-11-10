@@ -127,6 +127,9 @@ The port keeps prose's case and category tests where Go and Rust agree.
 The shape of a word reads Rust's Unicode properties and not Go's categories, so a word of characters such as `²` can get another shape, and so another feature.  
 A test compares tokens and tags with prose's on 188 sentences.
 
+The port splits a token's prefixes, suffixes and contractions in one pass, with the same tokens.  
+prose searches what is left of a token for a contraction ending again after each prefix or suffix it takes off, so a token of 20,000 marks takes quadratic time there.
+
 Creative Commons lists GPLv3 as compatible with BY-SA 4.0 ([compatible licenses][cc-compat]).  
 Section 13 of hakkiri's AGPLv3 allows a combination with GPLv3 work.
 
@@ -150,7 +153,15 @@ The port is smaller than Vale's package in three ways, none of which changes wha
 - It leaves out the directives for compounds made by flag (`COMPOUNDFLAG`, `COMPOUNDBEGIN`, `COMPOUNDMIDDLE`, `COMPOUNDEND`), for suggestions, for Turkic casing and for `ß`. A dictionary that uses them loads, and a German or Dutch compound is not accepted.
 - It reads UTF-8 and ISO 8859-1 and refuses any other `SET` with an error that names it (operator, 2026-11-10). Vale reads every character set that `golang.org/x/text` knows, and reading them here would add `encoding_rs` as a dependency.
 
-A test compares the words accepted with Vale's on about 7,000 words, run in Go.
+It differs from Vale's package in two behaviours, where the port does what Hunspell does or what costs less:
+
+- A rule whose strip text is not on the word makes no form, as in Hunspell. Vale puts the affix on the whole word, so `cat` with a rule that strips `y` and adds `ies` gives `caties` there.
+- A word split at its breaks keeps the result of each part for each depth, so a token of many hyphenated parts takes polynomial time. Vale checks every part again at each split, and caches only the result for the whole word, so such a token takes exponential time there.
+
+A flag is one byte in a file that declares `SET UTF-8` and no `FLAG`, and one character in any other file, as in Vale.  
+In a Latin-1 file, `é` and `è` are therefore two flags.
+
+A test compares the words accepted with Vale's on about 9,000 words, run in Go.
 
 Alternatives:
 
