@@ -7,7 +7,9 @@ clippy_disallowed_types: []
 default_branch: main
 deny_bans: []
 deny_ignore: []
-deny_licenses: []
+deny_licenses:
+-   license: Zlib
+    reason: foldhash, through serde_json in tree-sitter's build
 deny_skip: []
 feature_sets: []
 generated_paths: []
