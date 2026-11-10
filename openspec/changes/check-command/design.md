@@ -76,7 +76,7 @@ Lost: the project-config spec reads the config from the current directory, and a
 
 A `packages` entry holds a `path` to a directory whose subfolders are styles, each with one `.yml` file per rule.
 The style name is the subfolder, and `styles: [ProseStyle]` in a glob selects it.
-`HKR-006` adds the entry that holds `url` and `sha256`, which unpacks to the same shape.
+`HKR-006` adds the entry that holds `url` and `sha256`, which unpacks to the same shape; until then an entry with a `url` is refused with a message that says so.
 Two entries that hold one style name are refused, and the error names both.
 
 A local path is needed beyond this change: a style repository runs `hakkiri test` over its own folder.
@@ -101,14 +101,15 @@ Vale reports such documents after the alerts of the rest ([exit][v-exit]).
 
 ### 7. Output is a line per alert, or JSON
 
-The pretty form prints one line per alert and then a count:
+The pretty form prints one line per alert, one `failed <path>: <message>` line per failure, and then a count:
 
 ```text
 docs/guide.md:12:5: warning ProseStyle.Filler: Remove 'very'.
 1 alert in 3 files
 ```
 
-The level word takes the colour of its level when colour is on.
+The lines hold no colour and no frame, because tools read them: an editor's problem matcher and a hook split them on the colons.
+ctl-core's table and colour roles would box the lines or colour the level, so the result is one verbatim block.
 `--format json` prints one object: `alerts`, each with `path`, `line`, `column`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`; `failures`, each with `path` or `config` and `message`; and `files`, the count of files linted.
 Both forms are one result that ctl-core renders, so they cannot differ.
 
@@ -117,6 +118,9 @@ The level is added because `--fail-level` decides the exit by it.
 
 Alternative: a third `--format line`.
 Lost: ctl-core's two formats are shared by every ctl CLI, and the pretty form of a linter is already a line per finding.
+
+Alternative: a table of alerts with a coloured level.
+Lost: a frame around the rows and a wrap at the terminal width make the lines unreadable to a tool.
 
 ### 8. Exit status follows Vale's, with a level flag
 

@@ -71,8 +71,8 @@ hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL stil
 
 ### Requirement: The pretty output is a line per alert
 
-hakkiri SHALL print each alert as `path:line:column: level Rule: message`, in order of path, then line, then column, and then one count line.  
-Two runs over the same files SHALL print the same text.
+hakkiri SHALL print each alert as `path:line:column: level Rule: message`, in order of path, then line, then column, then each failure as `failed path: message`, and then one count line.  
+The lines SHALL hold no colour and no frame, and two runs over the same files SHALL print the same text.
 
 #### Scenario: A warning
 
