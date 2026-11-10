@@ -111,9 +111,9 @@ Training and measurement run in an ephemeral build box.
     The model was not tuned on either, and nothing from them is committed.
   - 2026-11-10 (UTC), a scratch program in an ephemeral build box, since removed, split each record as task 1.3 defines it.  
     Both files had the SHA-256 recorded under 1.3, and both gave the same gold counts, 1,223 and 901.
-  - On EWT hakkiri scores F1 0.8783 (precision 0.9828, recall 0.7939) against Vale's 0.8777.  
-    On GUM it scores 0.9580 (precision 0.9661, recall 0.9501) against Vale's 0.9549.
-  - hakkiri is not below Vale on either set, so the penalty stands without a retune.  
+  - On EWT hakkiri scores F1 0.8783 (precision 0.9828, recall 0.7939) against Vale's 0.8777.
+  - On GUM it scores 0.9580 (precision 0.9661, recall 0.9501) against Vale's 0.9549.
+  - Neither score is below Vale's, so the penalty stands without a retune.  
     The program is not committed, as with Vale's.
 - [x] 4.2 Split a 50,000-character paragraph and a 60,000-line file.  
   Verify both finish in CI with no panic, and record the time per paragraph.
