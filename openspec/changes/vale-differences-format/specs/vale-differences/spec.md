@@ -9,7 +9,7 @@ hakkiri SHALL read every comment of a code file as Markdown, where Vale 3.26.0 r
 - **WHEN** a Rust file holds ``// Use `utilize` here.`` and an `existence` rule matches `utilize`
 - **THEN** hakkiri reads the span as code and reports nothing, and Vale reports `utilize` inside the backticks ([format 8][format-8])
 
-### Requirement: Rule files differ from Vale in what they accept
+### Requirement: Rule files differ from Vale in what they accept or select
 
 hakkiri SHALL load, refuse or select as each scenario below says, where Vale 3.26.0 does otherwise.
 

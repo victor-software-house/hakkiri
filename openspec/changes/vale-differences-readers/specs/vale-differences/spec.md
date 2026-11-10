@@ -44,7 +44,7 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 - **WHEN** a project checks text in a language other than English
 - **THEN** hakkiri does not support it, which the spelling change states as a non-goal, and Vale reads a dictionary for the language ([spelling goals][spelling-goals])
 
-### Requirement: A run finishes where Vale's panics or stalls
+### Requirement: A run finishes where Vale panics, stalls or runs out of memory
 
 hakkiri SHALL finish a run on each input below in bounded time and memory, where Vale 3.26.0 panics, runs out of memory, or takes cubic or exponential time.
 
