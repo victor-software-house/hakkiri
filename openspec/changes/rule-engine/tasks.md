@@ -73,6 +73,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     The percent scenario gained `ignorecase: true`, which its capital letter needs.  
   - 2026-11-10 (UTC), the markup test and the wide character test pass in a box run of [6d38974][c-last-column].  
     The end column goes through the byte table, as the start does.  
+    A zero-width match keeps both columns equal, in [28e2bd4][c-zero].  
     No Vale binary was at hand, so only its source was read, not run.
 - [x] 5.3 Run every check type of this change over a 50,000-character line and a 60,000-line file.  
   Verify both long-input tests pass in CI with no panic, and record their run time in the evidence note.
@@ -87,7 +88,10 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     The rule-files spec has no `existence` scenario.  
     The alerts tests need a check to run, so this task moved up.  
   - 2026-11-10 (UTC), the nested phrases test passes in a box run of [f59a77f][c-phrases], and the 50,000-character test runs in 95 ms with a phrase that matches throughout.  
-    A scratch case of 25,000 matches in 25,000 phrase spans took 0.6 s: `excepted` scans every span per match.
+    A scratch case of 25,000 matches in 25,000 phrase spans took 0.6 s, since `excepted` scanned every span per match.  
+  - 2026-11-10 (UTC), `excepted` looks a match up by binary search in [7cbdcc5][c-linear]: 50,000 matches in 50,000 spans take 118 ms, and the test holds them to 5 s.  
+    The 50,000-character test takes 92 ms.  
+    Tests cover a phrase in another case and two phrase searches that give up, as one error alert.
 - [x] 6.2 Build `substitution`, with longer keys first, the already-correct skip, `capitalize` and `$1` values.  
   Verify its match-checks and rule-files scenarios pass as unit tests in CI.
   - 2026-11-10 (UTC), the five `substitution` scenarios of the match-checks spec pass in a Linux box, in [3868424][c-checks].  
@@ -98,7 +102,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify its match-checks and rule-files scenarios pass as unit tests in CI.
   - 2026-11-10 (UTC), the two `occurrence` scenarios of the match-checks spec pass in the same box run, in [3868424][c-checks].  
     The rule-files spec has no `occurrence` scenario.  
-  - 2026-11-10 (UTC), three tests pass in a box run of [1341734][c-occ-code]: a match in code is not counted, one outside is, and none in code misses a minimum.
+  - 2026-11-10 (UTC), three tests pass in a box run of [1341734][c-occ-code]: a match in code is not counted, one outside is, and none in code misses a minimum.  
+  - 2026-11-10 (UTC), a token that matches only blanks points at the first word under `min`, in [eb734af][c-blank].
 - [x] 6.4 Build `metric`: the variables, `occurrences`, element counts, the evaluator, the condition with `result`, and load errors.  
   Verify every [metric-check scenario][metric] and the metric scenarios of the rule-files spec pass as unit tests in CI.
   - 2026-11-10 (UTC), 13 metric tests cover every metric-check scenario and both rule-files scenarios, with 7 formula tests, in a Linux box, in [d324f02][c-metric].  
@@ -161,6 +166,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-comments]: https://github.com/victor-software-house/hakkiri/commit/f312d389cc2566bdaf3ced6fbc153f4c3173a456
 [c-once]: https://github.com/victor-software-house/hakkiri/commit/7950466010eebccf5c05016a6a2d784e76c8671f
 [c-condition]: https://github.com/victor-software-house/hakkiri/commit/4fabe241fbc5a9b973a0cc12e699f92dac9e321d
+[c-linear]: https://github.com/victor-software-house/hakkiri/commit/7cbdcc598fd42e2940db9746f9ebaee574b25722
+[c-zero]: https://github.com/victor-software-house/hakkiri/commit/28e2bd40b28d871c0e5802e7ac14a29f21c84c9d
+[c-blank]: https://github.com/victor-software-house/hakkiri/commit/eb734afda9d33ab272ab83d0bde22e0fbf8dab6b
 [c-load]: https://github.com/victor-software-house/hakkiri/commit/389d5b4791be8248e954e303fd78f9314d1111ca
 [segments]: specs/node-segments/spec.md
 [tree]: specs/document-tree/spec.md
