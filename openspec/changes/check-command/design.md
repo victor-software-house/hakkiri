@@ -116,6 +116,8 @@ Lost: a caller could not tell a failing check from a broken setup.
 
 ### 9. Dependencies
 
+The four crates below are approved, and no other crate is added (operator, 2026-11-10).
+
 | Crate | Why | Alternative lost |
 |:--|:--|:--|
 | `clap` 4, `derive` and `env` | The derive macros expand to `clap::` paths, so a program names it, as ctl-core's prelude says. ctl-core's `app` feature pulls it in, so the graph gains no crate. | None. |

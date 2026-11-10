@@ -17,7 +17,7 @@ Goals:
 Non-goals:
 
 - A crates.io crate: `publish = false` stays, so no registry token or trusted publisher is set up.
-- Static musl and `aarch64` Linux builds, until a consumer locks them (decision 3).
+- Static musl and `aarch64` Linux builds, and any cross-compiling (decision 3).
 - Signed checksum sets.
 
 ## Decisions
@@ -39,15 +39,21 @@ One fragment under `.changeset/` names `hakkiri` with a patch bump and says the 
 The Version PR moves `Cargo.toml` from `0.0.0` to `0.0.1`, and `prepare.after` regenerates `Cargo.lock` so the commit stays clean.
 Later behaviour changes add their own fragment.
 
-### 3. Two assets, built in
+### 3. Two assets, built natively on hosted runners
 
-`assets` lists `darwin-arm64` and `linux-x64`, verctl's built-in records, as qctl does.
-The Linux build is the default `x86_64-unknown-linux-gnu`.
+`assets` lists `darwin-arm64` and `linux-x64`, verctl's built-in records, as qctl and verctl do (operator, 2026-11-10).
+Each asset builds on a free GitHub-hosted runner of its own OS, with no cross-compiling and no extra C toolchain, because the repository is public:
+
+| Asset | Runner label | Triple |
+|:--|:--|:--|
+| `darwin-arm64` | `macos-latest` | `aarch64-apple-darwin` |
+| `linux-x64` | `ubuntu-latest` | `x86_64-unknown-linux-gnu` |
+
+The built-in records carry the labels ([verctl README][v-readme]), so `.ctl/ver.yaml` has no `runners` entry.
 A release then has the two platforms the template locks and no other.
 
 Alternative: static musl for `x86_64` and `aarch64`, as rgbctl has.
-Lost for now: hakkiri links tree-sitter's C grammars, so a musl build needs a musl C compiler that the release job does not declare, and an `aarch64` Linux consumer does not exist yet.
-The first release run shows whether the glibc binary starts on the machines that lint; a row follows if the choice turns to musl.
+Lost: hakkiri links tree-sitter's C grammars, so a musl build needs a musl C compiler that the release job does not declare, and an `aarch64` Linux consumer does not exist yet.
 
 ### 4. mise installs the asset
 
@@ -63,7 +69,7 @@ A pattern that matches nowhere or twice stops the release.
 
 ## Risks / Trade-offs
 
-- [The glibc binary may not start on NixOS] → The install proof runs on a NixOS machine before consumers switch; a failure turns decision 3 to musl.
+- [The glibc binary may not start on NixOS] → The install proof runs on a NixOS machine before consumers switch. A failure is reported as a finding, and the lane is not changed to work around it.
 - [The workflow ref is a commit, so it ages] → Moving it is a deliberate change, made with the verctl pin in `mise.toml`.
 - [A Version PR opened with `GITHUB_TOKEN` starts no CI] → The App token opens it.
 

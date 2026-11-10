@@ -8,7 +8,7 @@ This change follows [`check-command`][check] and [`test-command`][test], so the 
 
 - [ ] 1.1 Add `.github/workflows/release.yml`, which calls verctl's reusable workflow at the commit of its latest release, and pin that verctl in `mise.toml` with its `ver` task include and a refreshed lock.  
   Verify `lint:workflow-policy` and `lint:workflows` pass, and `check:versions` passes in CI.
-- [ ] 1.2 Add `.ctl/ver.yaml` with `publisher: none`, the `prepare.after` that regenerates `Cargo.lock`, the two assets, the two patterns and their pins, and the `changelog` block.  
+- [ ] 1.2 Add `.ctl/ver.yaml` with `publisher: none`, the `prepare.after` that regenerates `Cargo.lock`, the two assets (built natively on `macos-latest` and `ubuntu-latest`, with no `runners` entry), the two patterns and their pins, and the `changelog` block.  
   Verify `verctl status` in CI reports one package at `0.0.0` and no pattern error.
 - [ ] 1.3 Add the changeset fragment that ships `check` and `test` as a patch.  
   Verify the Version PR that the first push after the merge opens bumps `Cargo.toml` and `Cargo.lock` to `0.0.1`.
@@ -21,7 +21,8 @@ This change follows [`check-command`][check] and [`test-command`][test], so the 
 ## 3. The install proof
 
 - [ ] 3.1 In an empty folder on a Mac and on Linux x86-64, including a NixOS machine, pin `github:victor-software-house/hakkiri` at `0.0.1`, run `mise lock` for both platforms, then `mise install`.  
-  Verify `hakkiri --version` prints `0.0.1` on both, and `hakkiri check` lints a Markdown file on both, and record whether the glibc binary starts on the NixOS machine.
+  Verify `hakkiri --version` prints `0.0.1` on both, and `hakkiri check` lints a Markdown file on both, and record whether the glibc binary starts on the NixOS machine.  
+  A binary that does not start there is reported as a finding, and the lane is not changed to work around it.
 - [ ] 3.2 Update `AGENTS.md` with the release rule: a behaviour change adds a fragment, and the Version PR is the release.  
   Verify `AGENTS.md` holds the rule.
 
