@@ -1,9 +1,14 @@
 //! Long inputs: the four check types of the pattern-and-readability-checks
-//! change over a line of 50,000 characters and a file of 60,000 lines.
+//! change, and `capitalization` and `sequence`, over a line of 50,000
+//! characters and a file of 60,000 lines.
 //!
 //! Each test lints one input with `consistency`, `conditional`, `repetition`
-//! and `readability` rules together, checks the alerts each gives, and prints
-//! the time of the run.
+//! and `readability` rules together, or with a `capitalization` and a
+//! `sequence` rule, checks the alerts each gives, and prints the time of the
+//! run.
+//! One more test reads a single sentence of 50,000 characters with a
+//! `sequence` rule, where the walk starts once for each word the anchor
+//! accepts.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -11,7 +16,7 @@
 )]
 
 use std::error::Error;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use hakkiri::alert::Alert;
 use hakkiri::engine::lint;
@@ -77,5 +82,73 @@ fn a_file_of_sixty_thousand_lines() -> TestResult {
     let source = "Some words are here.\nSome terms are the the there.\n".repeat(30_000);
     let alerts = lint_four(&source)?;
     assert_eq!(per_rule(&alerts), [1, 60_000, 30_000, 1]);
+    Ok(())
+}
+
+/// The `capitalization` and `sequence` rules, as a name and a rule file.
+const CASE_RULES: [(&str, &str); 2] = [
+    (
+        "Team.Capitalization",
+        "extends: capitalization\nmessage: m\nmatch: $upper\n",
+    ),
+    (
+        "Team.Sequence",
+        "extends: sequence\nmessage: m\ntokens: [{pattern: the}, {pattern: the}]\n",
+    ),
+];
+
+/// How many alerts `rule` gave.
+fn count(alerts: &[Alert], rule: &str) -> usize {
+    alerts.iter().filter(|alert| alert.rule == rule).count()
+}
+
+/// The alerts of `rules` in `source`, and the time the lint took.
+fn lint_rules(
+    rules: &[(&str, &str)],
+    source: &str,
+) -> Result<(Vec<Alert>, Duration), Box<dyn Error>> {
+    let rules = rules
+        .iter()
+        .map(|(name, text)| Rule::from_text(name, "Team/Rule.yml", text))
+        .collect::<Result<Vec<_>, _>>()?;
+    let tree = parse(Language::Markdown, source)?;
+    let start = Instant::now();
+    let alerts = lint(&rules, &tree, source, "md")?;
+    let took = start.elapsed();
+    eprintln!("{} alerts in {took:?}", alerts.len());
+    Ok((alerts, took))
+}
+
+#[test]
+fn case_and_sequence_over_a_line_of_fifty_thousand_characters() -> TestResult {
+    let unit = "Some words are here. Some terms are the the there. ";
+    let repeats = 50_000 / unit.len() + 1;
+    let source = format!("{}\n", unit.repeat(repeats));
+    let (alerts, _) = lint_rules(&CASE_RULES, &source)?;
+    assert_eq!(count(&alerts, "Team.Capitalization"), 1);
+    assert_eq!(count(&alerts, "Team.Sequence"), repeats);
+    Ok(())
+}
+
+#[test]
+fn case_and_sequence_over_a_file_of_sixty_thousand_lines() -> TestResult {
+    let source = "Some words are here.\nSome terms are the the there.\n".repeat(30_000);
+    let (alerts, _) = lint_rules(&CASE_RULES, &source)?;
+    assert_eq!(count(&alerts, "Team.Capitalization"), 1);
+    assert_eq!(count(&alerts, "Team.Sequence"), 30_000);
+    Ok(())
+}
+
+#[test]
+fn a_sentence_of_fifty_thousand_characters() -> TestResult {
+    let words = 50_000 / "go ".len() + 1;
+    let source = format!("{}\n", "go ".repeat(words));
+    let rules = [(
+        "Team.Sequence",
+        "extends: sequence\nmessage: m\ntokens: [{pattern: go}]\n",
+    )];
+    let (alerts, took) = lint_rules(&rules, &source)?;
+    assert_eq!(count(&alerts, "Team.Sequence"), words);
+    assert!(took < Duration::from_secs(20), "took {took:?}");
     Ok(())
 }

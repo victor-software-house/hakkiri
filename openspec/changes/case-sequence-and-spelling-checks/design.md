@@ -94,12 +94,13 @@ Vale's walk has two quirks that hakkiri keeps ([sequence.go][v-seq-run]):
 - It starts once for each place the anchor's pattern occurs, or each word for a tag anchor, and each start passes over the words earlier starts took. A sentence can give fewer alerts than the pattern has places.
 - A `target` on a token with `skip` narrows the alert only when every copy of the token read a word.
 
-Vale also cuts each block again with prose's segmenter and tags each part apart ([prose.go][v-tag-text]), and skips the tagger when a literal that a token needs is missing.
-hakkiri tags the sentence its own splitter gave, whole, so a text the two cut differently can get other tags.
+Vale cuts each block again with prose's segmenter and tags each part apart ([prose.go][v-tag-text]), and skips the tagger when a literal that a token needs is missing.  
+hakkiri tags its own sentence whole, so a text the two cut differently can get other tags.
 
-Vale makes one step for each copy of a `skip` and `min` before it walks ([sequence.go][v-seq-tokens]).  
-With a 6 GB limit, `skip: 1000` and `min: 1000` ran out of memory after 13 seconds on a three-word text.  
-hakkiri counts the steps and stores none, so `skip: 100000000` loads and reads a short text at once.
+Two costs differ:
+
+- Vale makes one step for each copy of a `skip` and `min` ([sequence.go][v-seq-tokens]). With a 6 GB limit, `skip: 1000` with `min: 1000` ran out of memory in 13 seconds. hakkiri counts the steps and stores none.
+- Vale finds each start by scanning from the first word and through the earlier starts, so a sentence whose anchor matches most words costs the cube of its words. It took 18 seconds for 8,000 words and passed 100 for 16,667. hakkiri takes the next word the anchor accepts, and reads 16,667 words in 31 ms.
 
 hakkiri refuses what Vale loads and never matches: tokens with nothing to start from (a `pattern`, `tag` or `upos` without `negate`), a token field it does not define, and a `skip` or `min` below 0.  
 It refuses a `skip` and `min` whose steps overflow a count too.
@@ -202,7 +203,7 @@ Four cases follow, and the `scope-selection` spec records them:
 
 A test runs an `existence` and a `sequence` rule for 24 scopes over five Markdown files that nest sentences in items, quotes, tables and headings.  
 Of the 1,735 alerts Vale gave to the rules hakkiri loads, 1,610 are hakkiri's too, and `departures.tsv` lists the other 125 and the 156 that only hakkiri gives.  
-`heading`, `heading.h2`, `table`, `table.cell`, `text`, `sentence`, and `sentence` joined to `heading`, `table`, `~heading` or `~table`, equal Vale's alerts.
+The other scopes tested give Vale's alerts, `heading`, `table`, `text` and `sentence` among them.
 
 Alternative: Vale's own element only.  
 Lost: it changes the text every `list` and `blockquote` rule reads, and the node-segments change fixed that text.

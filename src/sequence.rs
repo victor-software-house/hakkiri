@@ -152,23 +152,27 @@ fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Fou
     })
 }
 
-/// The first word the anchor step accepts that no earlier walk started from,
-/// and the match its walk found.
+/// The next word from `cursor` that the anchor step accepts, which no earlier
+/// walk started from.
 ///
-/// With no such word the index is 0, and the walk is recorded as if it had
-/// started there.
-fn start(
+/// Walks start from the words the anchor accepts in order, so the words before
+/// `cursor` are the ones already taken or refused. Vale looks each start up
+/// from the first word and in the list of earlier starts, which takes time
+/// that grows with the cube of the words when the anchor matches most of them.
+fn next_start(
     sequence: &Sequence,
     words: &[Word<'_>],
-    visited: &[usize],
-) -> Result<(usize, Option<Found>), SearchError> {
+    cursor: &mut usize,
+) -> Result<Option<usize>, SearchError> {
     let anchor = &sequence.tokens[sequence.token_of(sequence.anchor)];
-    for (index, word) in words.iter().enumerate() {
-        if accepts(anchor, word)? && !visited.contains(&index) {
-            return Ok((index, walk(sequence, words, index)?));
+    while let Some(word) = words.get(*cursor) {
+        let index = *cursor;
+        *cursor += 1;
+        if accepts(anchor, word)? {
+            return Ok(Some(index));
         }
     }
-    Ok((0, None))
+    Ok(None)
 }
 
 /// The words from the first to the last of the `target` tokens, when every
@@ -262,12 +266,14 @@ pub(crate) fn find(sequence: &Sequence, sentence: &str) -> Result<Vec<Matched>, 
         None => words.len(),
     };
     let mut excluded: Option<Vec<Range<usize>>> = None;
-    let mut visited = Vec::new();
+    let mut cursor = 0;
     let mut matches = Vec::new();
     for _ in 0..tries {
-        let (index, found) = start(sequence, &words, &visited)?;
-        visited.push(index);
-        let Some(found) = found else {
+        // A try with no word left to start from finds nothing.
+        let Some(start) = next_start(sequence, &words, &mut cursor)? else {
+            continue;
+        };
+        let Some(found) = walk(sequence, &words, start)? else {
             continue;
         };
         let (first, last) = targeted(sequence, &found).unwrap_or((found.first, found.last));
