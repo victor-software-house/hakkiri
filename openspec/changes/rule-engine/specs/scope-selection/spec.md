@@ -77,11 +77,17 @@ A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes o
 ### Requirement: An inline exclusion blanks the element
 
 A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.
+The exclusion SHALL apply only to the blocks that its own scope item selects.
 
 #### Scenario: A word outside and inside a link
 
 - **WHEN** a rule has `scope: text & ~link` and `tokens: [marker]`, and the input is `See marker and [marker](https://x.example).`
 - **THEN** hakkiri reports one alert, at line 1, column 5
+
+#### Scenario: An exclusion in one item
+
+- **WHEN** a rule has `scope: [heading, 'paragraph & ~link']` and `tokens: [marker]`, and the input is a heading `# A [marker](https://x.example)` and a paragraph `See [marker](https://x.example).`
+- **THEN** hakkiri reports one alert, on the heading
 
 ### Requirement: A check reads text without inline markup
 

@@ -17,9 +17,6 @@ const EXTENSIONS: [&str; 33] = [
     "scala", "scss", "swift", "ts", "tsx",
 ];
 
-/// The inline elements a `~` part blanks instead of leaving out.
-const INLINE: [&str; 4] = ["link", "strong", "emphasis", "code"];
-
 /// An inline element whose text a scope reads as spaces.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Inline {
@@ -30,6 +27,18 @@ pub(crate) enum Inline {
 }
 
 impl Inline {
+    /// The inline element a `~` part of this name blanks instead of leaving
+    /// out.
+    fn of(name: &str) -> Option<Self> {
+        match name {
+            "link" => Some(Self::Link),
+            "strong" => Some(Self::Strong),
+            "emphasis" => Some(Self::Emphasis),
+            "code" => Some(Self::Code),
+            _ => None,
+        }
+    }
+
     pub(crate) const fn scope(self) -> NodeScope {
         match self {
             Self::Link => NodeScope::Link,
@@ -84,7 +93,6 @@ struct Alternative {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Selector {
     alternatives: Vec<Alternative>,
-    blank: Vec<Inline>,
     declared: bool,
 }
 
@@ -111,7 +119,6 @@ impl Selector {
         let text = [String::from("text")];
         let items = if declared { items } else { &text };
         let mut alternatives = Vec::new();
-        let mut blank = Vec::new();
         for item in items {
             let refuse = |message: &str| ScopeError {
                 scope: item.clone(),
@@ -136,16 +143,6 @@ impl Selector {
                 if !known {
                     return Err(refuse("is not a scope hakkiri defines"));
                 }
-                let inline = match name {
-                    "link" => Some(Inline::Link),
-                    "strong" => Some(Inline::Strong),
-                    "emphasis" => Some(Inline::Emphasis),
-                    "code" => Some(Inline::Code),
-                    _ => None,
-                };
-                if negated && let Some(inline) = inline {
-                    blank.push(inline);
-                }
                 parts.push(Part {
                     name: name.to_owned(),
                     negated,
@@ -154,10 +151,8 @@ impl Selector {
             }
             alternatives.push(Alternative { parts });
         }
-        blank.dedup();
         Ok(Self {
             alternatives,
-            blank,
             declared,
         })
     }
@@ -173,29 +168,45 @@ impl Selector {
         self.alternatives.iter().any(Alternative::wants_sentences)
     }
 
-    /// The inline elements whose text reads as spaces.
-    pub(crate) fn blank(&self) -> &[Inline] {
-        &self.blank
-    }
-
-    /// Whether a block selects.
+    /// What a block reads, or `None` when no item selects it.
     ///
     /// `names` are the scope names the block holds, `ancestors` the scopes
     /// above its node, and `extension` the file's extension.
-    pub(crate) fn selects(
+    /// The block reads as spaces the inline elements that the selecting items
+    /// leave out, such as `~link`; an item that does not select the block
+    /// leaves out nothing.
+    pub(crate) fn reads(
         &self,
         names: &[&str],
         ancestors: &[NodeScope],
         extension: &str,
         sentence: bool,
-    ) -> bool {
-        self.alternatives
-            .iter()
-            .any(|item| item.selects(names, ancestors, extension, sentence))
+    ) -> Option<Vec<Inline>> {
+        let mut blank = Vec::new();
+        let mut selected = false;
+        for item in &self.alternatives {
+            if item.selects(names, ancestors, extension, sentence) {
+                selected = true;
+                for inline in item.blank(extension) {
+                    if !blank.contains(&inline) {
+                        blank.push(inline);
+                    }
+                }
+            }
+        }
+        selected.then_some(blank)
     }
 }
 
 impl Alternative {
+    /// The inline elements the item leaves out in a file with `extension`.
+    fn blank(&self, extension: &str) -> impl Iterator<Item = Inline> {
+        self.parts
+            .iter()
+            .filter(move |part| part.negated && part.applies_to(extension))
+            .filter_map(|part| Inline::of(&part.name))
+    }
+
     fn wants_sentences(&self) -> bool {
         self.parts
             .iter()
@@ -237,7 +248,7 @@ impl Alternative {
         self.parts
             .iter()
             .filter(|part| {
-                part.negated && !INLINE.contains(&part.name.as_str()) && part.applies_to(extension)
+                part.negated && Inline::of(&part.name).is_none() && part.applies_to(extension)
             })
             .all(|part| {
                 !names.iter().any(|name| named(&part.name, name))

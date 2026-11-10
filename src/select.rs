@@ -175,34 +175,43 @@ pub fn select(
             }
         };
         let held = names(node.scope, enclosing > 0);
-        let own = selector.selects(&held, &path, extension, false);
+        let own = selector.reads(&held, &path, extension, false);
         let prose = held.contains(&"text");
-        let sentences = prose && model.is_some() && {
+        let sentences = if prose && model.is_some() {
             let mut with_sentence = vec!["sentence"];
             with_sentence.extend(&held);
-            selector.selects(&with_sentence, &path, extension, true)
+            selector.reads(&with_sentence, &path, extension, true)
+        } else {
+            None
         };
-        if own || sentences {
+        if own.is_some() || sentences.is_some() {
             let rows = node.rows();
-            let built = if node.scope == Scope::Raw {
-                Text::build(source, &segments(node), &rows, &[])
-            } else {
-                Text::build(
-                    source,
-                    &segments(node),
-                    &rows,
-                    &replacements(node, selector.blank()),
-                )
-            }
-            .ok_or(SelectError::Segment(node.scope))?;
-            if own && !built.as_str().is_empty() {
+            let text_for = |blank: &[Inline]| {
+                if node.scope == Scope::Raw {
+                    Text::build(source, &segments(node), &rows, &[])
+                } else {
+                    Text::build(source, &segments(node), &rows, &replacements(node, blank))
+                }
+                .ok_or(SelectError::Segment(node.scope))
+            };
+            let own_text = match &own {
+                Some(blank) => Some(text_for(blank)?),
+                None => None,
+            };
+            if let Some(text) = &own_text
+                && !text.as_str().is_empty()
+            {
                 blocks.push(Block {
                     scope: node.scope,
                     sentence: false,
-                    text: built.clone(),
+                    text: text.clone(),
                 });
             }
-            if let (true, Some(model)) = (sentences, model) {
+            if let (Some(blank), Some(model)) = (&sentences, model) {
+                let built = match (&own, &own_text) {
+                    (Some(own), Some(text)) if own == blank => text.clone(),
+                    _ => text_for(blank)?,
+                };
                 for range in model.split(built.as_str()) {
                     if let Some(text) = built.slice(range) {
                         blocks.push(Block {

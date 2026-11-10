@@ -309,3 +309,11 @@ fn a_negated_part_with_another_extension_leaves_nothing_out() -> TestResult {
     assert_eq!(texts(&found), ["Body."]);
     Ok(())
 }
+
+#[test]
+fn an_exclusion_belongs_to_its_item() -> TestResult {
+    let source = "# See [the guide](u.md) now\n\nSee [the guide](u.md) now.\n";
+    let found = blocks(&["heading", "paragraph & ~link"], "a.md", source)?;
+    assert_eq!(texts(&found), ["See the guide now", "See           now."]);
+    Ok(())
+}

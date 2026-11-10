@@ -184,6 +184,17 @@ These rows join the intended differences of [rule-format decision 7][format-7]:
 
 Alternative: Vale's behaviour in each case. Lost: a word with an accent would read as two words, and an alert would point at a bullet.
 
+### 17. An inline exclusion belongs to its scope item
+
+`~link`, `~code`, `~strong` and `~emphasis` blank an element for the blocks that the item holding them selects, and for no other block.  
+With `scope: [heading, 'paragraph & ~link']`, a link in a heading still reads as text, and a link in a paragraph reads as spaces.  
+When two items select one block, it reads with the exclusions of both.
+
+Vale gathers the exclusions of every item into one list, `Excluded`, and blanks them in every block the rule reads ([scope.go][v-excluded-list], [lint.go][v-excluded-use]).  
+That is a defect: an exclusion written for one item changes the text of another.
+
+Alternative: Vale's one list for the rule. Lost: `[heading, 'paragraph & ~link']` would also blank the links in headings, and a rule could not exclude an element in one scope only.
+
 ### Crates read
 
 Each crate was read on crates.io on 2026-11-10.
@@ -226,6 +237,8 @@ Each crate was read on crates.io on 2026-11-10.
 [v-blocks]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L51-L58
 [v-paragraph]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L396-L461
 [v-summary]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L465-L472
+[v-excluded-list]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/scope.go#L60-L62
+[v-excluded-use]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/lint.go#L781-L785
 [v-without]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/provider.go#L81-L100
 [v-segment]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/provider.go#L322-L357
 [v-columns]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L505-L551
