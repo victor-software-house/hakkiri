@@ -39,6 +39,7 @@ Lost: ctl-core already owns presentation for the other ctl CLIs, and JSON that n
 An argument is a file, linted as given, or a directory, walked in sorted order.
 No argument means the current directory.
 The walk skips `node_modules`, `.git` and each folder a `packages` entry names, because a style folder holds rules and not prose.
+It compares each folder's resolved path with the resolved package paths, which are read from the project root, so a run from another folder skips them too.
 Vale skips the first two and its styles path ([the walk][v-walk], [the ignored names][v-ignore]).
 A dot directory is otherwise walked, so `.github` prose is linted when a glob matches it.
 
@@ -49,9 +50,15 @@ Lost: Vale does not, the `lint:prose` task already lists `git ls-files`, and a c
 
 The project root is the folder that holds the `.ctl` folder of the config file, so it is the current directory for the default config.
 A config file outside a `.ctl` folder makes its own folder the root.
-Each file is made absolute, with symlinks resolved, and a `files` glob matches its path relative to the root, with `/` separators.
+The root is resolved through symlinks, so `/tmp` on macOS and a symlinked home folder give the same root as the files do.
+A file is resolved by its folders, and keeps its own name: a symlink `docs/a.md` to `../shared/a.md` matches by the link path, `docs/a.md`, and not by its target.
+Vale does the same, because its walk takes a symlink to a file as a file and matches the path it reached.
+A `files` glob matches the path relative to the root, with `/` separators.
 `docs/**` therefore matches `docs/a.md` however it is named: `docs`, `./docs`, `docs/../docs`, `../proj/docs` or the absolute path.
-A file outside the root matches no glob, so it is not linted, and it is not a failure.
+A path outside the root matches no glob, so it is not linted, and the run says so.
+Each path given that is outside the root, and does not hold it, draws a warning on standard error.
+When no path given lies under the root or holds it, the run reports a failure and exits 2, so a wrong `--config` is not a clean run.
+A directory that holds the root is walked, and the files outside the root are skipped with no warning.
 `*` crosses `/`, so `'*.rs'` matches `src/a.rs`, as in Vale, and `**` and `{a,b}` work.
 A `packages` `path` is relative to the root too.
 The config is still read from `.ctl/hakkiri.yaml` in the current directory unless `--config` or `HAKKIRI_CONFIG` names another.

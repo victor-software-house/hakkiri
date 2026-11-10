@@ -189,10 +189,33 @@ pub(crate) struct Plan<'a> {
 }
 
 impl Project {
-    /// The path of `file` relative to the project root, with `/` separators,
-    /// or `None` when the file is outside the root or cannot be resolved.
+    /// The project root.
+    pub(crate) fn root(&self) -> &Path {
+        &self.root
+    }
+
+    /// Whether `argument` can lead to a file under the project root: a file
+    /// that is under it, or a directory that is under it or holds it.
+    pub(crate) fn reaches(&self, argument: &Path, directory: bool) -> bool {
+        if directory {
+            fs::canonicalize(argument)
+                .is_ok_and(|real| real.starts_with(&self.root) || self.root.starts_with(&real))
+        } else {
+            self.relative(argument).is_some()
+        }
+    }
+
+    /// The path of the file `file` relative to the project root, with `/`
+    /// separators, or `None` when it is outside the root or cannot be resolved.
+    ///
+    /// The folders of `file` are resolved through symlinks, as the root is, but
+    /// its own name is kept: a symlink to a file is matched by the name it is
+    /// reached by, as Vale matches it.
     pub(crate) fn relative(&self, file: &Path) -> Option<String> {
-        let real = fs::canonicalize(file).ok()?;
+        let absolute = std::path::absolute(file).ok()?;
+        let real = fs::canonicalize(absolute.parent()?)
+            .ok()?
+            .join(absolute.file_name()?);
         let inside = real.strip_prefix(&self.root).ok()?;
         Some(
             inside

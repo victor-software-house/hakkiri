@@ -20,7 +20,13 @@ Only the binary size measurement in task 1.2 runs on a box, because CI cannot.
   Verify the three local package scenarios (a local folder, an entry with both, one style in two folders) and the config-from-another-folder scenario pass, and that `HAKKIRI_CONFIG` names a config.  
   The two download scenarios (a matching package, one that does not match) need `HKR-006` and are covered there.
 - [ ] 2.3 Match `files` globs with `globset`, apply every matching glob in order, and read `styles`, rule levels and `off`.  
-  Verify the scenarios for two globs, an unmatched file, an empty `styles` and a misspelled rule name pass, and the four project-root scenarios (a dot-slash, an absolute and a parent argument, and a file outside the root).
+  Verify the scenarios for two globs, an unmatched file, an empty `styles` and a misspelled rule name pass.
+- [ ] 2.4 Resolve the project root, match globs and read package paths from it, and warn on a path outside it.  
+  Verify these scenario groups pass.
+  - A dot-slash, an absolute and a parent argument.
+  - A root reached through a symlink, and a symlink to a file.
+  - A path outside the root with its warning, no path under the root, and a config elsewhere.
+  - A walk from another folder that skips the package folders.
 
 ## 3. Finding and linting files
 

@@ -28,7 +28,20 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
         Ok(project) => project,
         Err(error) => return Check::stopped(&error, fail_level),
     };
-    let (jobs, mut failures) = find(&project, &args.paths);
+    let found = find(&project, &args.paths);
+    for warning in &found.warnings {
+        eprintln!("warning {warning}");
+    }
+    let (jobs, mut failures) = (found.jobs, found.failures);
+    if !found.reached {
+        failures.push(Failure::root(
+            config,
+            format!(
+                "no path given lies under the project root `{}`, so nothing was linted",
+                project.root().display()
+            ),
+        ));
+    }
     let outcomes = match parallel(&jobs, lint_file) {
         Ok(outcomes) => outcomes,
         Err(error) => {

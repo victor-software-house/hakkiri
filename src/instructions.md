@@ -54,7 +54,7 @@ A parse error under `--format json` is JSON too.
 |:--|:--|
 | 0 | No reported alert reaches `--fail-level` |
 | 1 | A reported alert reaches `--fail-level`, which is `suggestion`, `warning` or `error` and defaults to `error` |
-| 2 | The config or a rule is wrong, a file failed, or the command line is wrong |
+| 2 | The config or a rule is wrong, a file failed, no path lies under the project root, or the command line is wrong |
 
 The config's `level` hides alerts below it first, so `--fail-level` sees only what is reported.
 A broken config stops the run before any file lints, and prints to standard error.
@@ -78,7 +78,7 @@ files:
   CHANGELOG.md: {styles: []}
 ```
 
-- The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every `path` and glob is relative to the project root, the folder that holds `.ctl`, and a file outside it matches no glob.
+- The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every `path` and glob is relative to the project root, the folder that holds `.ctl`, and a file outside it matches no glob. A path given outside the root draws a warning on standard error, and a run where no path lies under the root exits 2.
 - A key the config does not define is an error that names the key and its line.
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
 - `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule. Two folders that hold one style name are refused.

@@ -42,7 +42,7 @@ JSON never holds an escape byte.
 |:--|:--|
 | 0 | No reported alert reaches `--fail-level` |
 | 1 | A reported alert reaches `--fail-level`, which defaults to `error` |
-| 2 | The config or a rule is wrong, a file failed, or the command line is wrong |
+| 2 | The config or a rule is wrong, a file failed, no path lies under the project root, or the command line is wrong |
 
 ## Flags and variables
 
@@ -61,6 +61,7 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 
 1. Exit 2 with a config error: the message names the file, the line and the key. Fix the config first, because no file was linted.
 2. Exit 2 with `failed <path>`: that file could not be read or parsed. The other files were linted.
+   Exit 2 with `no path given lies under the project root`: the config names another root than the files you gave. Check `--config` and `HAKKIRI_CONFIG`.
 3. Exit 1: fix the alerts, or lower the rule's level under `files` when the rule is too strict for those files.
 4. An alert that looks wrong is a rule fault. Set the rule `off` for those files in the config, and say why in the pull request.
 

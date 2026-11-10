@@ -38,18 +38,23 @@ struct Finder<'a> {
     failures: Vec<Failure>,
 }
 
-/// The path as a report prints it: no `.` part, `/` between the parts, and
-/// relative to `current` when it lies inside it.
+/// The path as a report prints it: no `.` part unless that is all there is,
+/// `/` between the parts, and relative to `current` when it lies inside it.
 fn display(path: &Path, current: Option<&Path>) -> String {
     let relative = current
         .and_then(|current| path.strip_prefix(current).ok())
         .unwrap_or(path);
-    relative
+    let shown = relative
         .components()
         .filter(|part| !matches!(part, Component::CurDir))
         .map(|part| part.as_os_str().to_string_lossy())
         .collect::<Vec<_>>()
-        .join("/")
+        .join("/");
+    if shown.is_empty() {
+        ".".to_owned()
+    } else {
+        shown
+    }
 }
 
 impl Finder<'_> {
@@ -130,9 +135,21 @@ impl Finder<'_> {
     }
 }
 
+/// What a search found.
+pub(crate) struct Found<'a> {
+    /// The files to lint.
+    pub(crate) jobs: Vec<Job<'a>>,
+    /// The paths that could not be read.
+    pub(crate) failures: Vec<Failure>,
+    /// One line for each path given that lies outside the project root.
+    pub(crate) warnings: Vec<String>,
+    /// Whether any path given lies under the project root, or holds it.
+    pub(crate) reached: bool,
+}
+
 /// The files to lint for `paths`, or for the current directory when it is
-/// empty, and the paths that could not be read.
-pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf]) -> (Vec<Job<'a>>, Vec<Failure>) {
+/// empty.
+pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf]) -> Found<'a> {
     let mut finder = Finder {
         project,
         current: std::env::current_dir().ok(),
@@ -145,10 +162,22 @@ pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf]) -> (Vec<Job<'a>>
     } else {
         paths.to_vec()
     };
+    let mut warnings = Vec::new();
+    let mut reached = false;
     for root in roots {
         match fs::metadata(&root) {
-            Ok(meta) if meta.is_dir() => finder.walk(&root),
-            Ok(_) => finder.file(&root, true),
+            Ok(meta) if !project.reaches(&root, meta.is_dir()) => warnings.push(format!(
+                "{}: outside the project root, so no glob matches it and it is not linted",
+                display(&root, finder.current.as_deref())
+            )),
+            Ok(meta) if meta.is_dir() => {
+                reached = true;
+                finder.walk(&root);
+            }
+            Ok(_) => {
+                reached = true;
+                finder.file(&root, true);
+            }
             Err(error) => {
                 let path = display(&root, finder.current.as_deref());
                 finder
@@ -157,5 +186,10 @@ pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf]) -> (Vec<Job<'a>>
             }
         }
     }
-    (finder.jobs, finder.failures)
+    Found {
+        jobs: finder.jobs,
+        failures: finder.failures,
+        warnings,
+        reached,
+    }
 }

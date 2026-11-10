@@ -1,5 +1,7 @@
 //! What a run gives back: one value that ctl-core prints as lines or as JSON.
 
+use std::path::Path;
+
 use ctl_core::view::Outcome;
 use ctl_core::{Document, Present};
 use hakkiri::alert::Alert;
@@ -135,6 +137,15 @@ impl Failure {
                 }
             })
             .collect()
+    }
+
+    /// A fault in the project root of the config file `config`.
+    pub(crate) fn root(config: &Path, message: impl Into<String>) -> Self {
+        Self {
+            path: None,
+            config: Some(config.display().to_string()),
+            message: message.into(),
+        }
     }
 
     /// The path or config file the failure is about.

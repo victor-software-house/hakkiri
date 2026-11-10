@@ -24,6 +24,7 @@ A project also needs its styles from somewhere before packages arrive in `HKR-00
 ### New Capabilities
 
 - `check-command`: which files `check` lints, what it prints, and how it exits.
+- `project-root`: the folder that globs and package paths are read from, and what a path outside it does.
 
 ### Modified Capabilities
 

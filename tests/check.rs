@@ -427,10 +427,9 @@ fn a_parent_argument_matches_the_glob() -> TestResult {
     Ok(())
 }
 
-#[test]
-fn a_file_outside_the_root_gets_no_glob() -> TestResult {
-    let suite = Suite::new("check-outside");
-    let root = suite.scenario("outside");
+/// A project in `project/` whose one glob is `**`, beside `outside.md`.
+fn nested<'a>(suite: &'a Suite, name: &str) -> Root<'a> {
+    let root = suite.scenario(name);
     root.file("project/styles/Team/Filler.yml", FILLER);
     root.file(
         "project/.ctl/hakkiri.yaml",
@@ -438,6 +437,13 @@ fn a_file_outside_the_root_gets_no_glob() -> TestResult {
     );
     root.file("project/in.md", "This is very good.\n");
     root.file("outside.md", "This is very good.\n");
+    root
+}
+
+#[test]
+fn a_file_outside_the_root_draws_a_warning() -> TestResult {
+    let suite = Suite::new("check-outside");
+    let root = nested(&suite, "outside");
     let result = run(
         &root.path().join("project"),
         &["check", "in.md", "../outside.md"],
@@ -445,6 +451,124 @@ fn a_file_outside_the_root_gets_no_glob() -> TestResult {
     )?;
     assert_eq!(result.code, 0, "{}", result.err);
     assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
+    assert_eq!(
+        result.err,
+        "warning ../outside.md: outside the project root, so no glob matches it and it is not linted\n"
+    );
+    Ok(())
+}
+
+#[test]
+fn no_path_under_the_root_exits_2() -> TestResult {
+    let suite = Suite::new("check-none-under");
+    let root = nested(&suite, "none-under");
+    let result = run(
+        &root.path().join("project"),
+        &["check", "../outside.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 2);
+    assert!(result.err.contains("../outside.md"), "{}", result.err);
+    assert!(
+        result
+            .out
+            .contains("failed .ctl/hakkiri.yaml: no path given lies under the project root"),
+        "{}",
+        result.out
+    );
+    Ok(())
+}
+
+#[test]
+fn a_config_elsewhere_puts_the_current_directory_outside_the_root() -> TestResult {
+    let suite = Suite::new("check-config-elsewhere");
+    let root = nested(&suite, "config-elsewhere");
+    root.file("other/hakkiri.yaml", "files: {}\n");
+    let result = run(
+        &root.path().join("project"),
+        &["check"],
+        &[("HAKKIRI_CONFIG", "../other/hakkiri.yaml")],
+    )?;
+    assert_eq!(result.code, 2);
+    assert!(
+        result
+            .err
+            .starts_with("warning .: outside the project root"),
+        "{}",
+        result.err
+    );
+    Ok(())
+}
+
+#[cfg(unix)]
+#[test]
+fn a_root_reached_through_a_symlink_still_matches() -> TestResult {
+    let suite = Suite::new("check-root-link");
+    let root = nested(&suite, "root-link");
+    std::os::unix::fs::symlink(root.path().join("project"), root.path().join("link"))?;
+    let result = run(
+        root.path(),
+        &["check", "link/in.md"],
+        &[("HAKKIRI_CONFIG", "link/.ctl/hakkiri.yaml")],
+    )?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
+    assert_eq!(result.err, "");
+    Ok(())
+}
+
+#[cfg(unix)]
+#[test]
+fn a_file_symlink_matches_by_the_name_it_is_reached_by() -> TestResult {
+    let suite = Suite::new("check-file-link");
+    let root = suite.scenario("file-link");
+    root.file("styles/Team/Filler.yml", FILLER);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  'docs/**': {styles: [Team]}\n",
+    );
+    root.file("shared/a.md", "This is very good.\n");
+    root.file("outside/b.md", "This is very good.\n");
+    std::fs::create_dir_all(root.path().join("docs"))?;
+    std::os::unix::fs::symlink("../shared/a.md", root.path().join("docs/a.md"))?;
+    std::os::unix::fs::symlink("../outside/b.md", root.path().join("docs/b.md"))?;
+    let result = run(root.path(), &["check", "docs", "shared/a.md"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "docs/a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "docs/b.md:1:9: warning Team.Filler: Remove 'very'.",
+            "2 alerts in 2 files",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_walk_from_another_folder_skips_the_package_folders() -> TestResult {
+    let suite = Suite::new("check-walk-skip");
+    let root = project(
+        &suite,
+        "walk-skip",
+        "packages:\n  - path: styles\nfiles:\n  '**/*.md': {styles: [Team]}\n",
+    );
+    root.file("docs/a.md", "This is very good.\n");
+    root.file("styles/Team/notes.md", "This is very good.\n");
+    root.file("other/.keep", "");
+    let result = run(
+        &root.path().join("other"),
+        &["check", ".."],
+        &[("HAKKIRI_CONFIG", "../.ctl/hakkiri.yaml")],
+    )?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "../docs/a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file",
+        ]
+    );
     Ok(())
 }
 

@@ -2,8 +2,8 @@
 
 ### Requirement: Paths in the config are relative to the project root
 
-The project root SHALL be the folder that holds the `.ctl` folder of the config file, or the folder of the config file when it is not in a `.ctl` folder.  
-hakkiri SHALL read every `path` in the config relative to that root.
+The project root SHALL be the folder that holds the `.ctl` folder of the config file, or the folder of the config file when it is not in a `.ctl` folder, with symlinks resolved.  
+hakkiri SHALL read every `path` in the config relative to that root, and a walk SHALL compare each folder's resolved path with those resolved package paths when it skips package folders.
 
 #### Scenario: A config named from another folder
 
