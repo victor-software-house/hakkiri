@@ -17,9 +17,10 @@ Only the binary size measurement in task 1.2 runs on a box, because CI cannot.
 - [ ] 2.1 Read `.ctl/hakkiri.yaml`, or `--config`, through ctl-core's `input` reader, and refuse an unknown key with its line.  
   Verify the scenarios of the `project-config` spec for the file, the unknown key and `level` pass as integration tests.
 - [ ] 2.2 Read `packages` entries with a `path`, load each style folder, and refuse an entry with both `path` and `url`, and two folders that hold one style name.  
-  Verify the four package scenarios pass, and that `HAKKIRI_CONFIG` names a config.
+  Verify the three local package scenarios (a local folder, an entry with both, one style in two folders) and the config-from-another-folder scenario pass, and that `HAKKIRI_CONFIG` names a config.  
+  The two download scenarios (a matching package, one that does not match) need `HKR-006` and are covered there.
 - [ ] 2.3 Match `files` globs with `globset`, apply every matching glob in order, and read `styles`, rule levels and `off`.  
-  Verify the scenarios for two globs, an unmatched file, an empty `styles` and a misspelled rule name pass.
+  Verify the scenarios for two globs, an unmatched file, an empty `styles` and a misspelled rule name pass, and the four project-root scenarios (a dot-slash, an absolute and a parent argument, and a file outside the root).
 
 ## 3. Finding and linting files
 

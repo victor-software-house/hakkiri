@@ -1,3 +1,15 @@
+## ADDED Requirements
+
+### Requirement: Paths in the config are relative to the project root
+
+The project root SHALL be the folder that holds the `.ctl` folder of the config file, or the folder of the config file when it is not in a `.ctl` folder.  
+hakkiri SHALL read every `path` in the config relative to that root.
+
+#### Scenario: A config named from another folder
+
+- **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml` is set in `other/` and `packages` holds `{path: styles}`
+- **THEN** hakkiri loads the styles from `styles/` beside `.ctl`, not from `other/styles`
+
 ## RENAMED Requirements
 
 - FROM: `### Requirement: A package is pinned by URL and hash`
@@ -8,7 +20,6 @@
 ### Requirement: A package is a folder or a download
 
 Each entry in `packages` SHALL hold a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
-hakkiri SHALL read a `path` as it is, relative to the current directory.  
 It SHALL fetch and cache each `url` with no separate sync step, and lint with it only when its download matches the hash.  
 It SHALL refuse two entries that hold a style of one name, and the error SHALL name both.
 

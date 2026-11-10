@@ -20,6 +20,31 @@ A walk SHALL skip `node_modules`, `.git` and each folder a `packages` entry name
 - **WHEN** a walk meets `node_modules/x.md`, `.git/y.md` and a `packages` folder `styles/` holding `z.md`
 - **THEN** hakkiri lints none of them, and lints a file of `.github/` that a glob matches
 
+### Requirement: A glob matches the path under the project root
+
+hakkiri SHALL match each `files` glob against the file's absolute path, with symlinks resolved, taken relative to the project root with `/` separators.  
+A file outside the root SHALL match no glob, so hakkiri lints none of it and reports no failure for it.
+
+#### Scenario: A dot-slash argument
+
+- **WHEN** `files` holds `'docs/**'` and `hakkiri check ./docs` runs
+- **THEN** hakkiri lints `docs/a.md` with the styles of that glob
+
+#### Scenario: An absolute argument
+
+- **WHEN** `files` holds `'docs/**'` and `hakkiri check` is given the absolute path of `docs/a.md`
+- **THEN** hakkiri lints it with the styles of that glob
+
+#### Scenario: A parent argument
+
+- **WHEN** `files` holds `'docs/**'` and `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ../docs/a.md` runs in `other/`
+- **THEN** hakkiri lints `docs/a.md` with the styles of that glob
+
+#### Scenario: A file outside the root
+
+- **WHEN** `files` holds `'**'` and `hakkiri check ../outside.md` runs from the root
+- **THEN** hakkiri reports no alert and no failure for it
+
 ### Requirement: A language is read by extension
 
 hakkiri SHALL read a `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` file as Markdown, MDX, Rust, TypeScript, TSX or JavaScript.  

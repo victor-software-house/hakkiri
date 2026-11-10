@@ -45,15 +45,32 @@ A dot directory is otherwise walked, so `.github` prose is linted when a glob ma
 Alternative: honour `.gitignore` through the `ignore` crate.
 Lost: Vale does not, the `lint:prose` task already lists `git ls-files`, and a config glob such as `'target/**': {styles: []}` states the same skip in the file that owns it.
 
-### 3. Globs and paths are relative to the current directory
+### 3. Globs and paths are relative to the project root
 
-A `files` glob matches the path as written relative to the current directory, with `/` separators.
+The project root is the folder that holds the `.ctl` folder of the config file, so it is the current directory for the default config.
+A config file outside a `.ctl` folder makes its own folder the root.
+Each file is made absolute, with symlinks resolved, and a `files` glob matches its path relative to the root, with `/` separators.
+`docs/**` therefore matches `docs/a.md` however it is named: `docs`, `./docs`, `docs/../docs`, `../proj/docs` or the absolute path.
+A file outside the root matches no glob, so it is not linted, and it is not a failure.
 `*` crosses `/`, so `'*.rs'` matches `src/a.rs`, as in Vale, and `**` and `{a,b}` work.
-A `packages` `path` is relative to the current directory too.
-The project-config spec already reads the config from the current directory.
+A `packages` `path` is relative to the root too.
+The config is still read from `.ctl/hakkiri.yaml` in the current directory unless `--config` or `HAKKIRI_CONFIG` names another.
+
+Vale matches the path as given after cleaning it ([the match][v-match]).
+Probed on Vale 3.26.0 with a `.vale.ini` that holds `[docs/**]`:
+
+- `docs`, `./docs` and `docs/../docs` match it.
+- The absolute path of `docs/a.md` does not, and only `[**/docs/**]` matches it.
+- `a.md`, checked from inside `docs/`, does not match it either.
+
+One file would draw different alerts by how it is named.
+hakkiri departs from Vale here, and the `vale-differences` spec records it.
+
+Alternative: match the path as given, as Vale does.
+Lost: an absolute path or a run from a subdirectory with `HAKKIRI_CONFIG` set would lint a file with no styles and no message.
 
 Alternative: walk up to find `.ctl/`.
-Lost: a run from a subdirectory would lint other files than a run from the root, and the spec fixes the current directory.
+Lost: the project-config spec reads the config from the current directory, and a walk would change which config a run uses.
 
 ### 4. A package is a folder of style folders
 
@@ -146,6 +163,7 @@ Lost: it needs `minijinja` and a surface build for one command, and the text sta
 [format]: ../archive/2026-11-10-rule-format/design.md
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
 [ledger]: ../../../tasks.yaml
+[v-match]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/lint.go#L892-L913
 [v-walk]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/lint.go#L283-L333
 [v-ignore]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/util.go#L14-L16
 [v-exit]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/cmd/vale/main.go#L186-L198

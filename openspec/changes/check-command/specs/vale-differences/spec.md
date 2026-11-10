@@ -24,6 +24,20 @@ hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.2
 - **WHEN** a caller gives `--glob`, `--filter`, `--ext`, `--sort`, `--relative` or `--no-global`
 - **THEN** hakkiri refuses the flag as unknown and exits 2, and Vale reads each ([check 1][check-1])
 
+### Requirement: Globs match from the project root
+
+hakkiri SHALL match each `files` glob against the file's path relative to the project root, where Vale 3.26.0 matches the path as given after cleaning it.
+
+#### Scenario: A file named by its absolute path
+
+- **WHEN** `files` holds `'docs/**'` and a caller names `docs/a.md` by its absolute path
+- **THEN** hakkiri lints it with the styles of that glob, and Vale matches only a glob such as `**/docs/**` ([check 3][check-3])
+
+#### Scenario: A run from a subdirectory
+
+- **WHEN** a caller runs from `docs/` with the config named by `HAKKIRI_CONFIG`, and checks `a.md`
+- **THEN** hakkiri matches `docs/a.md`, and Vale matches `a.md`, so `[docs/**]` does not apply ([check 3][check-3])
+
 ## MODIFIED Requirements
 
 ### Requirement: Known gaps are listed apart
@@ -60,6 +74,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 [ledger]: ../../../../../tasks.yaml
 [check-1]: ../../design.md#1-one-binary-on-ctl-cores-app
+[check-3]: ../../design.md#3-globs-and-paths-are-relative-to-the-project-root
 [check-5]: ../../design.md#5-a-language-is-read-by-extension
 [check-7]: ../../design.md#7-output-is-a-line-per-alert-or-json
 [check-8]: ../../design.md#8-exit-status-follows-vales-with-a-level-flag
