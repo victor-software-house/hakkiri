@@ -4,16 +4,40 @@ prefix: HKR
 active: HKR-005
 queue:
   - id: HKR-005
-    title: Ship the check and test commands
+    title: Ship the check command
     scope: cli
     outcome: >-
-      hakkiri check lints files in parallel and hakkiri test runs rule cases,
-      released as binaries through verctl.
+      hakkiri check lints files in parallel under .ctl/hakkiri.yaml, prints a line per alert or JSON, and exits by level.
     blocked_by: []
     acceptance:
       - Integration tests cover line and JSON output, exit status by level, and .ctl/hakkiri.yaml globs and levels.
       - JSON output holds no ESC byte with CLICOLOR_FORCE=1.
-      - A verctl Version PR publishes a release that mise installs.
+    plan: openspec/changes/check-command/proposal.md
+
+  - id: HKR-028
+    title: Ship the test command
+    scope: cli
+    outcome: >-
+      hakkiri test runs the cases of rule files and test files, and fails when a rule
+      fires in no case.
+    blocked_by:
+      - HKR-005
+    acceptance:
+      - Integration tests cover the cases of a rule file and of a test file, an isolated and a project run, coverage, and exit status by outcome.
+      - JSON output holds no ESC byte with CLICOLOR_FORCE=1.
+    plan: openspec/changes/test-command/proposal.md
+
+  - id: HKR-029
+    title: Release hakkiri through verctl
+    scope: release
+    outcome: A verctl Version PR publishes a release of hakkiri, and mise installs it.
+    blocked_by:
+      - HKR-005
+      - HKR-028
+    acceptance:
+      - A verctl Version PR publishes 0.0.1 as a tag and a GitHub Release with a linux-x64 and a darwin-arm64 tarball and their checksums, and no crates.io crate.
+      - mise installs the release on a Mac and on Linux x86-64 from a pinned version and a locked checksum.
+    plan: openspec/changes/release-lane/proposal.md
 
   - id: HKR-006
     title: Fetch and cache rule packages
@@ -102,6 +126,15 @@ queue:
       - A corpus of Markdown inputs runs through hakkiri and Vale 66bbb85, and each text or scope that differs is listed.
       - Each difference found is fixed, or recorded as an intended difference in the vale-differences spec.
 
+  - id: HKR-030
+    title: Lint plain-text files
+    scope: engine
+    outcome: A file that no language reads is linted as plain text, as Vale lints it.
+    blocked_by:
+      - HKR-005
+    acceptance:
+      - A file with another extension, such as notes.txt, that a files glob matches is linted as plain text, and the vale-differences scenario for it is removed.
+
   - id: HKR-009
     title: Switch the template to hakkiri
     scope: template
@@ -110,6 +143,7 @@ queue:
       left.
     blocked_by:
       - HKR-008
+      - HKR-029
     acceptance:
       - The templates Template check passes, and one pilot project passes CI on its update.
 
