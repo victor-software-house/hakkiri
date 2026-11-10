@@ -370,12 +370,94 @@ fn a_variable_sets_a_flag_and_the_flag_wins() -> TestResult {
 fn the_variable_names_the_config() -> TestResult {
     let suite = Suite::new("check-config-env");
     let root = project(&suite, "config-env", "files: {}\n");
-    root.file("docs/hakkiri.yaml", CONFIG);
+    root.file(".ctl/other.yaml", CONFIG);
     root.file("a.md", "This is very good.\n");
     let result = run(
         root.path(),
         &["check"],
-        &[("HAKKIRI_CONFIG", "docs/hakkiri.yaml")],
+        &[("HAKKIRI_CONFIG", ".ctl/other.yaml")],
+    )?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
+    Ok(())
+}
+
+/// A config whose one glob is `docs/**`.
+const DOCS_CONFIG: &str = "packages:\n  - path: styles\nfiles:\n  'docs/**': {styles: [Team]}\n";
+
+#[test]
+fn a_dot_slash_argument_matches_the_glob() -> TestResult {
+    let suite = Suite::new("check-dot-slash");
+    let root = project(&suite, "dot-slash", DOCS_CONFIG);
+    root.file("docs/a.md", "This is very good.\n");
+    let result = run(root.path(), &["check", "./docs"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines().first(),
+        Some(&"docs/a.md:1:9: warning Team.Filler: Remove 'very'.")
+    );
+    Ok(())
+}
+
+#[test]
+fn an_absolute_argument_matches_the_glob() -> TestResult {
+    let suite = Suite::new("check-absolute");
+    let root = project(&suite, "absolute", DOCS_CONFIG);
+    let file = root.file("docs/a.md", "This is very good.\n");
+    let argument = file.to_string_lossy().into_owned();
+    let result = run(root.path(), &["check", &argument], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
+    Ok(())
+}
+
+#[test]
+fn a_parent_argument_matches_the_glob() -> TestResult {
+    let suite = Suite::new("check-parent");
+    let root = project(&suite, "parent", DOCS_CONFIG);
+    root.file("docs/a.md", "This is very good.\n");
+    root.file("other/b.md", "Fine.\n");
+    let result = run(
+        &root.path().join("other"),
+        &["check", "../docs/a.md"],
+        &[("HAKKIRI_CONFIG", "../.ctl/hakkiri.yaml")],
+    )?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
+    Ok(())
+}
+
+#[test]
+fn a_file_outside_the_root_gets_no_glob() -> TestResult {
+    let suite = Suite::new("check-outside");
+    let root = suite.scenario("outside");
+    root.file("project/styles/Team/Filler.yml", FILLER);
+    root.file(
+        "project/.ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  '**': {styles: [Team]}\n",
+    );
+    root.file("project/in.md", "This is very good.\n");
+    root.file("outside.md", "This is very good.\n");
+    let result = run(
+        &root.path().join("project"),
+        &["check", "in.md", "../outside.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
+    Ok(())
+}
+
+#[test]
+fn a_package_path_is_read_from_the_root() -> TestResult {
+    let suite = Suite::new("check-root-package");
+    let root = project(&suite, "root-package", DOCS_CONFIG);
+    root.file("docs/a.md", "This is very good.\n");
+    root.file("other/.keep", "");
+    let result = run(
+        &root.path().join("other"),
+        &["check", "../docs"],
+        &[("HAKKIRI_CONFIG", "../.ctl/hakkiri.yaml")],
     )?;
     assert_eq!(result.code, 0, "{}", result.err);
     assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));

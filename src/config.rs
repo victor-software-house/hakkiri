@@ -9,7 +9,7 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
-use std::{fmt, fs};
+use std::{fmt, fs, io};
 
 use ctl_core::input::Input;
 use garde::Validate;
@@ -174,6 +174,9 @@ pub(crate) struct Project {
     pub(crate) level: Option<Level>,
     /// The package folders, which a walk leaves alone.
     pub(crate) packages: Vec<PathBuf>,
+    /// The project root: the folder that holds the `.ctl` folder of the
+    /// config, with symlinks resolved.
+    root: PathBuf,
 }
 
 /// The rules that run on one file, and the levels the config sets for some.
@@ -186,7 +189,21 @@ pub(crate) struct Plan<'a> {
 }
 
 impl Project {
-    /// The rules for `path`, written relative to the current directory with `/`
+    /// The path of `file` relative to the project root, with `/` separators,
+    /// or `None` when the file is outside the root or cannot be resolved.
+    pub(crate) fn relative(&self, file: &Path) -> Option<String> {
+        let real = fs::canonicalize(file).ok()?;
+        let inside = real.strip_prefix(&self.root).ok()?;
+        Some(
+            inside
+                .components()
+                .map(|part| part.as_os_str().to_string_lossy())
+                .collect::<Vec<_>>()
+                .join("/"),
+        )
+    }
+
+    /// The rules for `path`, written relative to the project root with `/`
     /// separators, or `None` when no glob matches it or it has no rule to run.
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
         let mut matched = false;
@@ -270,6 +287,21 @@ struct Loaded {
     packages: Vec<PathBuf>,
 }
 
+/// The folder that holds the `.ctl` folder of the config file `config`, or the
+/// folder of `config` when it is not in a `.ctl` folder, with symlinks
+/// resolved.
+fn project_root(config: &Path) -> io::Result<PathBuf> {
+    let real = fs::canonicalize(config)?;
+    let folder = real
+        .parent()
+        .ok_or_else(|| io::Error::other("the config file has no folder"))?;
+    let root = match folder.file_name() {
+        Some(name) if name == ".ctl" => folder.parent().unwrap_or(folder),
+        _ => folder,
+    };
+    Ok(root.to_path_buf())
+}
+
 /// Reads the config at `path`, and loads the style folders of its packages.
 ///
 /// # Errors
@@ -286,7 +318,16 @@ pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
         file: input.name(),
         problems: Vec::new(),
     };
-    let loaded = load_packages(&raw.packages, text, &mut faults);
+    let root = match project_root(path) {
+        Ok(root) => root,
+        Err(error) => {
+            faults.add(None, "config", format!("`{}`: {error}", path.display()));
+            return Err(LoadError {
+                problems: faults.problems,
+            });
+        }
+    };
+    let loaded = load_packages(&raw.packages, &root, text, &mut faults);
     let globs = read_globs(raw.files, text, &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
@@ -299,32 +340,36 @@ pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
         globs,
         level: raw.level.as_deref().and_then(level_named),
         packages: loaded.packages,
+        root,
     })
 }
 
-/// Loads the style folders of each package `entries` names.
-fn load_packages(entries: &[Entry], text: &str, faults: &mut Faults<'_>) -> Loaded {
+/// Loads the style folders of each package `entries` names, each `path` read
+/// relative to `root`.
+fn load_packages(entries: &[Entry], root: &Path, text: &str, faults: &mut Faults<'_>) -> Loaded {
     let mut loaded = Loaded::default();
     let mut folders: BTreeMap<String, PathBuf> = BTreeMap::new();
     let mut from = key_line(text, "packages", 1).unwrap_or(1);
     for entry in entries {
-        let Some(folder) = entry.path.as_deref().map(Path::new) else {
+        let Some(written) = entry.path.as_deref().map(Path::new) else {
             continue;
         };
+        let folder = root.join(written);
         let line = key_line(text, "path", from);
         from = line.map_or(from, |line| line + 1);
-        match fs::canonicalize(folder) {
+        match fs::canonicalize(&folder) {
             Ok(real) => loaded.packages.push(real),
             Err(error) => {
-                faults.add(line, "path", format!("`{}`: {error}", folder.display()));
+                faults.add(line, "path", format!("`{}`: {error}", written.display()));
                 continue;
             }
         }
-        for style in style_folders(folder, line, faults) {
+        for style in style_folders(&folder, line, faults) {
             let name = style
                 .file_name()
                 .map(|name| name.to_string_lossy().into_owned())
                 .unwrap_or_default();
+            let shown = written.join(&name);
             if let Some(first) = folders.get(&name) {
                 faults.add(
                     line,
@@ -332,7 +377,7 @@ fn load_packages(entries: &[Entry], text: &str, faults: &mut Faults<'_>) -> Load
                     format!(
                         "the style `{name}` is in both `{}` and `{}`",
                         first.display(),
-                        style.display()
+                        shown.display()
                     ),
                 );
                 continue;
@@ -347,7 +392,7 @@ fn load_packages(entries: &[Entry], text: &str, faults: &mut Faults<'_>) -> Load
                 }
                 Err(error) => faults.problems.extend(error.problems),
             }
-            folders.insert(name, style);
+            folders.insert(name, shown);
         }
     }
     loaded

@@ -78,7 +78,7 @@ files:
   CHANGELOG.md: {styles: []}
 ```
 
-- The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every path and glob is relative to the current directory.
+- The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every `path` and glob is relative to the project root, the folder that holds `.ctl`, and a file outside it matches no glob.
 - A key the config does not define is an error that names the key and its line.
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
 - `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule. Two folders that hold one style name are refused.

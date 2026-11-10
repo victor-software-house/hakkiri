@@ -26,6 +26,8 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    Rules ship as versioned packages that a project pins by version and hash.  
    hakkiri fetches and caches them; there is no separate sync step.  
    Until `HKR-006`, a package entry is a local `path` to a folder of style folders, and an entry with a `url` is refused.
+   Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
+   Vale matches the path as given; the departure is in the `vale-differences` spec.
 6. **Exit status.**
    `hakkiri check` exits as Vale does: 2 when the config, a rule or a file failed, then 1 when a reported alert reaches `--fail-level` (default `error`), then 0.  
    `--fail-level` takes the place of Vale's `--no-exit`.  
