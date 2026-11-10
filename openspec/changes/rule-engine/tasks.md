@@ -44,17 +44,17 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 - [x] 4.1 Parse scopes with `&`, `~`, lists and extension parts, and match parts by dotted prefix, with `text`, `paragraph` and `sentence` as the design states.  
   Verify every [scope-selection scenario][selection] and every scope scenario in the [rule-files spec][rule-files] pass as unit tests in CI.
-  - 2026-11-10 (UTC), 23 selection tests and the unknown-scope load test pass in a Linux box, in [3529f38][c-select].  
+  - 2026-11-10 (UTC), 23 selection tests and the unknown-scope load test pass in a Linux box, in [3fdac6d][c-select].  
     They assert the selected blocks and their file bytes, since alerts come with task 5.2.  
     An item of only `~` parts reads as `text`.  
     A last part from Vale's extension list narrows the scope, so a rule for another language selects nothing.
 - [x] 4.2 Build each node's check text with its byte table, the code span word and blanked inline exclusions.  
   Verify the inline markup, code span and inline exclusion scenarios pass in CI.
-  - 2026-11-10 (UTC), the markup, code span and exclusion tests pass in the same box run, in [3529f38][c-select].  
+  - 2026-11-10 (UTC), the markup, code span and exclusion tests pass in the same box run, in [3fdac6d][c-select].  
     A comment node reads as the Markdown inside it, without its markers.
 - [x] 4.3 Cut sentences with the `HKR-015` splitter and words with prose's word pattern.  
   Verify the sentence scenario and the word count scenarios of the rule-files spec pass in CI.
-  - 2026-11-10 (UTC), the sentence test and the two word count tests pass in the same box run, in [3529f38][c-select].  
+  - 2026-11-10 (UTC), the sentence test and the two word count tests pass in the same box run, in [3fdac6d][c-select].  
     The counts are of `words` over the selected text; the `occurrence` rule that reports them comes with task 6.3.  
     `words` reads alphabetic characters as letters, which adds a few combining marks to prose's `\p{L}`.
 
@@ -117,7 +117,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [design]: design.md
 [c-deny]: https://github.com/victor-software-house/hakkiri/commit/f23a9c9776a9e45e2acac151b825c0fdeedb2fb8
 [c-tree]: https://github.com/victor-software-house/hakkiri/commit/462eaa9e82ec229444a658904a23fbcd5be274ac
-[c-select]: https://github.com/victor-software-house/hakkiri/commit/3529f382a82ff1347e3401a526eeff2871156a23
+[c-select]: https://github.com/victor-software-house/hakkiri/commit/3fdac6d3dcd3d3929577c34ff37f3e48a222e050
 [c-load]: https://github.com/victor-software-house/hakkiri/commit/389d5b4791be8248e954e303fd78f9314d1111ca
 [segments]: specs/node-segments/spec.md
 [tree]: specs/document-tree/spec.md
