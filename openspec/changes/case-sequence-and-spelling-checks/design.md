@@ -45,12 +45,16 @@ The converters therefore match an exception as a case-sensitive pattern, and kee
 They do not set a word to the case an exception was written in.  
 hakkiri hands its converters the same rewritten list.
 
-Four more points follow Vale or prose as they are:
+Three more points follow Vale or prose as they are:
 
 - A text with no word has a share of 0 over 0, which is not at least `threshold`, so it fails.
 - A pattern that gives up on a text finds nothing, as prose's wrapper reads it.
-- `vocab` loads and has no effect, since hakkiri has no project vocabulary.
 - An empty `match` is refused, since every text would pass it, and a `style` other than `AP` or `Chicago` is refused where Vale reads any other value as `AP`.
+
+One point is a gap, not a departure: `vocab` loads and has no effect.  
+In Vale, `vocab` defaults to true, and `true` adds the project's accepted Vocab terms to the rule's exceptions, both in the exceptions pattern and in the list the converters read ([capitalization.go][v-capitalization-vocab]).  
+hakkiri has no project vocabulary yet, so a rule's exceptions are only its own.  
+When Vocab lands, `vocab` must add the accepted terms before `exceptions` is rewritten and sorted.
 
 The title converter's tagging and its checks of the text around a word use prose's byte offsets, as prose writes them.  
 Prose counts the width of each word in characters and adds it to a byte offset, and searches a copy of the title whose curly quotes and dashes are plain marks.  
@@ -247,6 +251,7 @@ Each crate was read on crates.io on 2026-11-10.
 [v-spell-dicpath]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L450-L506
 [v-spell-license]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell/LICENSE
 [v-affix]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/affix.go#L11-L70
+[v-capitalization-vocab]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L52-L70
 [v-find-affix]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/vocab.go#L93-L102
 [p-title]: https://github.com/jdkato/prose/blob/b33e60dbff0492289b227f3681120ac057d8131b/strcase/title.go#L99-L164
 [p-sentence]: https://github.com/jdkato/prose/blob/b33e60dbff0492289b227f3681120ac057d8131b/strcase/sentence.go#L62-L119
