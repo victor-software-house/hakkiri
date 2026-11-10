@@ -44,7 +44,9 @@ This change starts after the [rule-engine change][engine] merges.
 
 ## 5. Integration
 
-- [ ] 5.1 Verify the pull request's CI passes: build, lint, tests, docs, deny, prose lint, OpenSpec and the Template check.
+- [x] 5.1 Verify the pull request's CI passes: build, lint, tests, docs, deny, prose lint, OpenSpec and the Template check.
+  - 2026-11-10 (UTC), CI passes on [95255ab][c-empty] of [PR 30][pr-30], the top of the stack: Build and test, Static checks, Verify, CodeQL, both Analyze jobs, secrets and the Kody review.  
+    The Template check and Publish checks skip on this branch, and I did not run them.
 
 ## Workflow follow-up
 
@@ -60,3 +62,5 @@ This change starts after the [rule-engine change][engine] merges.
 [c-conditional]: https://github.com/victor-software-house/hakkiri/commit/b4ae3a23b012a68da4157af139f6aefa63d19e4a
 [c-long]: https://github.com/victor-software-house/hakkiri/commit/9c98c9c570946359f0a94831b83ec702cf3238b1
 [hkr-016]: ../../../tasks.yaml
+[c-empty]: https://github.com/victor-software-house/hakkiri/commit/95255abde6a3e08a6b998559604578a14ddbeb99
+[pr-30]: https://github.com/victor-software-house/hakkiri/pull/30
