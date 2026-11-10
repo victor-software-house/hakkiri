@@ -90,6 +90,16 @@ The search starts from the first token with a pattern, or else the first with a 
 It walks left and right from each place that token matches ([sequence.go][v-seq-match]).  
 The alert spans the matched words, or the words from the first to the last `target` token.
 
+Vale's walk has two quirks that hakkiri keeps ([sequence.go][v-seq-run]):
+
+- It starts once for each place the anchor's pattern occurs, or each word for a tag anchor, and each start passes over the words earlier starts took. A sentence can give fewer alerts than the pattern has places.
+- A `target` on a token with `skip` narrows the alert only when every copy of the token read a word.
+
+Vale also cuts each block again with prose's segmenter and tags each part apart ([prose.go][v-tag-text]), and skips the tagger when a literal that a token needs is missing.
+hakkiri tags the sentence its own splitter gave, whole, so a text the two cut differently can get other tags.
+
+hakkiri refuses what Vale loads and never matches: tokens with nothing to start from (a `pattern`, `tag` or `upos` without `negate`), a token field it does not define, and a `skip` or `min` below 0.
+
 Alternative: compile the tokens into one pattern over a string of `word/TAG` pairs.  
 Lost: `negate` at a sentence edge and `target` spans have no direct form there, and results would drift from Vale's walk.
 

@@ -29,8 +29,10 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
 
 ## 3. Checks
 
-- [ ] 3.1 Build `capitalization`: the ported converters, the agreement count, indicators, exceptions, `$lower`, `$upper` and patterns.  
-  Verify every [capitalization scenario][capitalization] passes as a unit test in CI.
+- [x] 3.1 Build `capitalization`: the ported converters, the agreement count, indicators, exceptions, `$lower`, `$upper` and patterns.  
+  Verify every [capitalization scenario][capitalization] passes as a unit test in CI.  
+  2026-11-10, the 14 tests of `tests/capitalization.rs` and `converts_and_counts_as_vale_does`, which compares 1,566 rows with Vale, pass in the [CI run on PR 36][pr36-ci].  
+  Kody left no open thread on [PR 36][hakkiri#36].
 - [ ] 3.2 Build `sequence`: token compilation, `skip` and `min`, the anchor walk, `negate`, `target`, `upos`, `exceptions`, and the refusal of `model`.  
   Verify every [sequence scenario][sequence] passes as a unit test in CI.
 - [ ] 3.3 Build `spelling`: Vale's word tokenizer, the filters, `ignore`, `split`, the two message rewrites, package dictionaries, and the refusal of a path that leaves the package.  
@@ -53,6 +55,8 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
 
 [hakkiri#33]: https://github.com/victor-software-house/hakkiri/pull/33
 [hakkiri#35]: https://github.com/victor-software-house/hakkiri/pull/35
+[hakkiri#36]: https://github.com/victor-software-house/hakkiri/pull/36
+[pr36-ci]: https://github.com/victor-software-house/hakkiri/actions/runs/42868740193
 [main-ci]: https://github.com/victor-software-house/hakkiri/actions/runs/42865681901
 [pattern]: ../archive/2026-11-10-pattern-and-readability-checks/proposal.md
 [design]: design.md
