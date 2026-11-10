@@ -14,8 +14,8 @@ use crate::tree::Tree;
 /// A rule whose pattern gives up on a block reports one `error` alert at the
 /// block, and the other rules still run.
 /// A `metric` rule with no `scope`, or `scope: text`, measures the prose of the
-/// whole file and reports at its start; any other scope measures each block it
-/// selects.
+/// whole file, the comments of a code file included, and reports at its start;
+/// any other scope measures each block it selects.
 ///
 /// # Errors
 ///
@@ -34,11 +34,7 @@ pub fn lint(
             && rule.scope.measures_file()
         {
             if summary.is_none() {
-                summary = Some(if matches!(extension, "md" | "mdx") {
-                    summarize(tree, source)?
-                } else {
-                    Summary::default()
-                });
+                summary = Some(summarize(tree, source)?);
             }
             let hit = summary
                 .as_ref()

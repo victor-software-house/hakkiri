@@ -85,6 +85,26 @@ fn second_level_headings() -> TestResult {
 }
 
 #[test]
+fn the_comments_of_a_code_file_are_measured() -> TestResult {
+    let rule = Rule::from_text(
+        "Team.Rule",
+        "Team/Rule.yml",
+        "extends: metric\nmessage: \"%s\"\nformula: words\ncondition: '> 1'\n",
+    )?;
+    let source = "// One two three.\n// Four five.\nfn main() {}\n";
+    let tree = parse(Language::Rust, source)?;
+    let found = lint(&[rule], &tree, source, "rs")?;
+    assert_eq!(
+        found
+            .iter()
+            .map(|a| (a.message.as_str(), a.line))
+            .collect::<Vec<_>>(),
+        [("5.00", 1)]
+    );
+    Ok(())
+}
+
+#[test]
 fn an_element_count_is_zero_with_a_scope() -> TestResult {
     let found = messages(
         "extends: metric\nmessage: \"%s\"\nscope: paragraph\nformula: heading.h2 + paragraphs\ncondition: '>= 0'\n",

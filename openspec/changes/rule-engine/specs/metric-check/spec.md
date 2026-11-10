@@ -54,7 +54,7 @@ In a metric with a scope, each element count SHALL be 0.
 ### Requirement: With no scope, a metric measures the prose of the file
 
 A `metric` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.  
-It SHALL leave out headings and table cells.  
+It SHALL leave out headings and table cells, and in a code file it SHALL measure the paragraphs of the comments.  
 Text with no words SHALL give no alert.  
 A `metric` rule with another `scope` SHALL measure each block that scope selects, and report at the start of that block.
 
@@ -72,6 +72,11 @@ A `metric` rule with another `scope` SHALL measure each block that scope selects
 
 - **WHEN** a rule has `message: "%s"`, `scope: paragraph`, `formula: words` and `condition: '> 1'`, and the input is the paragraphs `One two three.`, `Four.` and `Five six.`
 - **THEN** hakkiri reports two alerts, with the messages `3.00` and `2.00`
+
+#### Scenario: A comment in a code file
+
+- **WHEN** the same rule reads a Rust file that holds `// One two three.` and `// Four five.` on two lines, above `fn main() {}`
+- **THEN** hakkiri reports one alert, with the message `5.00`
 
 ### Requirement: Formulas use Tengo's expression syntax
 

@@ -1,4 +1,4 @@
-//! The summary of a Markdown file: the prose a whole-file metric measures,
+//! The summary of a file: the prose a whole-file metric measures,
 //! and the counts of its elements.
 
 use crate::select::{SelectError, replacements};
@@ -56,7 +56,8 @@ enum Step<'t> {
     Exit,
 }
 
-/// The summary of `tree`, a Markdown file of `source`.
+/// The summary of `tree`, the tree of `source`: its paragraphs, which in a code
+/// file are the paragraphs of its comments.
 ///
 /// # Errors
 ///
