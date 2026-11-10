@@ -425,3 +425,19 @@ fn a_metric_counts_tokens() -> TestResult {
     assert_eq!(metric.formula, "occurrences / words");
     Ok(())
 }
+
+#[test]
+fn a_scope_hakkiri_does_not_define() -> TestResult {
+    let error = load(indoc! {"
+        extends: existence
+        message: m
+        scope: chapter
+        tokens: [a]
+    "})
+    .err()
+    .ok_or("the rule loaded")?;
+    let message = error.to_string();
+    assert!(message.contains("Team.Rule"), "{message}");
+    assert!(message.contains("chapter"), "{message}");
+    Ok(())
+}

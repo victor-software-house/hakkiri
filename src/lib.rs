@@ -12,8 +12,12 @@ mod language;
 mod markdown;
 pub mod pattern;
 pub mod rule;
+pub mod scope;
+pub mod select;
 pub mod splitter;
+pub mod text;
 mod tree;
+pub mod words;
 
 pub use error::Error;
 pub use language::Language;

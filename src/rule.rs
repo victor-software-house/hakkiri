@@ -20,6 +20,7 @@ use serde::de::DeserializeOwned;
 use self::build::Source;
 use self::schema::{ExistenceFields, MetricFields, OccurrenceFields, Probe, SubstitutionFields};
 use crate::pattern::Pattern;
+use crate::scope::Selector;
 
 /// How serious an alert is.
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -85,8 +86,8 @@ pub struct Rule {
     pub link: String,
     /// The most alerts the rule reports in one file, or 0 for no limit.
     pub limit: usize,
-    /// The `scope` of the rule as written, one entry for each item.
-    pub scope: Vec<String>,
+    /// The text the rule reads, from its `scope`.
+    pub scope: Selector,
     /// The rule's `action`.
     pub action: Option<Action>,
     /// What the rule checks.

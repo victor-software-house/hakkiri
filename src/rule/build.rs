@@ -12,6 +12,7 @@ use super::{
     Substitution, Swap, level_of,
 };
 use crate::pattern::Pattern;
+use crate::scope::Selector;
 
 /// Where a rule came from, for the errors that name it.
 #[derive(Clone, Copy, Debug)]
@@ -321,16 +322,19 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
 
 /// The fields every check type has, and the check built from the rest.
 macro_rules! rule_of {
-    ($name:expr, $fields:expr, $check:expr) => {{
+    ($source:expr, $fields:expr, $check:expr) => {{
         let fields = $fields;
+        let scope = Selector::parse(fields.scope.values()).map_err(|refused| {
+            $source.problem("scope", format!("rule `{}`: {refused}", $source.name))
+        })?;
         Rule {
-            name: $name.to_owned(),
+            name: $source.name.to_owned(),
             level: level_of(fields.level.value()),
             message: fields.message.value().to_owned(),
             description: fields.description.value().to_owned(),
             link: fields.link.value().to_owned(),
             limit: fields.limit.value(),
-            scope: fields.scope.values().to_vec(),
+            scope,
             action: fields.action.as_ref().map(|action| Action {
                 name: action.name.value().to_owned(),
                 params: action.params.values().to_vec(),
@@ -345,7 +349,7 @@ pub(super) fn existence_rule(
     fields: &ExistenceFields,
 ) -> Result<Rule, LoadError> {
     Ok(rule_of!(
-        source.name,
+        source,
         fields,
         Check::Existence(existence(source, fields)?)
     ))
@@ -356,7 +360,7 @@ pub(super) fn substitution_rule(
     fields: &SubstitutionFields,
 ) -> Result<Rule, LoadError> {
     Ok(rule_of!(
-        source.name,
+        source,
         fields,
         Check::Substitution(substitution(source, fields)?)
     ))
@@ -367,7 +371,7 @@ pub(super) fn occurrence_rule(
     fields: &OccurrenceFields,
 ) -> Result<Rule, LoadError> {
     Ok(rule_of!(
-        source.name,
+        source,
         fields,
         Check::Occurrence(occurrence(source, fields)?)
     ))
@@ -375,7 +379,7 @@ pub(super) fn occurrence_rule(
 
 pub(super) fn metric_rule(source: &Source<'_>, fields: &MetricFields) -> Result<Rule, LoadError> {
     Ok(rule_of!(
-        source.name,
+        source,
         fields,
         Check::Metric(metric(source, fields)?)
     ))
