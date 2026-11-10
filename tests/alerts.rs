@@ -714,7 +714,7 @@ fn eight_whole_file_metrics_over_sixty_thousand_lines() -> TestResult {
     eprintln!("one rule: {one_time:?}, eight rules: {eight_time:?}");
     assert_eq!((one.len(), eight.len()), (1, 8));
     assert!(
-        eight_time < one_time * 4,
+        eight_time < one_time * 3,
         "eight rules took {eight_time:?}, one took {one_time:?}"
     );
     Ok(())
