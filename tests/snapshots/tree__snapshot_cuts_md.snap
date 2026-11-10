@@ -3,6 +3,6 @@ source: tests/tree.rs
 expression: "load(\"cuts.md\")? .render()"
 ---
 raw 0..153 [0..153] "- An item\n\n  ```sh\n  curl https://example.com\n  ```\n\n> [ref]: https://def.example\n\nClick <a href=\"https://h.example\">here</a>.\n\n[ref]: https://x.example\n"
-  list 0..9 [0..9] "- An item"
+  list 2..9 [2..9] "An item"
     paragraph 2..9 [2..9] "An item"
   paragraph 83..126 [83..89, 117..121, 125..126] "Click here."

@@ -139,6 +139,7 @@ macro_rules! snapshots {
 snapshots! {
     snapshot_heading_paragraph: "heading-paragraph.md",
     snapshot_headings: "headings.md",
+    snapshot_heading_syntax: "heading-syntax.md",
     snapshot_nested_list: "nested-list.md",
     snapshot_table: "table.md",
     snapshot_code_and_markup: "code-and-markup.md",
@@ -181,7 +182,7 @@ fn a_paragraph_in_a_markdown_file() -> TestResult {
     let heading = fixture.nodes(Scope::Heading1);
     let paragraph = fixture.nodes(Scope::Paragraph);
     assert_eq!(heading.len(), 1);
-    assert_eq!(heading[0].span, 0..7);
+    assert_eq!(heading[0].span, 2..7);
     assert_eq!(paragraph.len(), 1);
     assert_eq!(paragraph[0].span, 9..18);
     Ok(())
@@ -192,13 +193,13 @@ fn a_nested_list() -> TestResult {
     let fixture = load("nested-list.md")?;
     let lists = fixture.nodes(Scope::List);
     let one = lists.first().ok_or("no list node")?;
-    assert!(fixture.text(one).starts_with("- One"));
+    assert!(fixture.text(one).starts_with("One"));
     let two = one
         .children
         .iter()
         .find(|child| child.scope == Scope::List)
         .ok_or("no nested list node")?;
-    assert!(fixture.text(two).starts_with("- Two"));
+    assert!(fixture.text(two).starts_with("Two"));
     Ok(())
 }
 
@@ -299,7 +300,7 @@ fn a_jsx_element_with_text() -> TestResult {
         }
     }
     assert!(paragraphs.iter().any(|text| text == "A paragraph inside."));
-    assert_eq!(fixture.texts(Scope::List), ["- A list item"]);
+    assert_eq!(fixture.texts(Scope::List), ["A list item"]);
     // One paragraph, with the expression and the tags as gaps in its segments.
     assert_eq!(
         paragraphs
@@ -467,7 +468,7 @@ fn code_html_and_definitions_are_gaps() -> TestResult {
         );
     }
     assert_eq!(fixture.texts(Scope::Paragraph), ["An item", "Click here."]);
-    assert_eq!(fixture.texts(Scope::List), ["- An item"]);
+    assert_eq!(fixture.texts(Scope::List), ["An item"]);
     Ok(())
 }
 
@@ -485,7 +486,7 @@ fn html_in_a_doc_comment_is_a_gap() -> TestResult {
 fn an_export_block_with_a_blank_line() -> TestResult {
     let fixture = load("esm.mdx")?;
     assert_eq!(fixture.texts(Scope::Paragraph), ["Text."]);
-    assert_eq!(fixture.texts(Scope::Heading1), ["# Heading"]);
+    assert_eq!(fixture.texts(Scope::Heading1), ["Heading"]);
     assert!(
         !fixture
             .prose()
@@ -694,6 +695,46 @@ fn a_paragraph_in_a_quote_or_a_list_item_leaves_out_the_markers() -> TestResult 
             assert_eq!(line, line.trim(), "{line:?} keeps a marker or indentation");
             assert!(!line.starts_with('>'), "{line:?} keeps a marker");
         }
+    }
+    Ok(())
+}
+
+#[test]
+fn a_heading_leaves_out_its_hashes_and_underline() -> TestResult {
+    let fixture = load("heading-syntax.md")?;
+    assert_eq!(
+        fixture.texts(Scope::Heading1),
+        ["Closed", "Multi line\nsetext", "Quoted heading"]
+    );
+    assert_eq!(
+        fixture.texts(Scope::Heading2),
+        ["Closed with more", "Setext two"]
+    );
+    assert_eq!(fixture.texts(Scope::Heading3), ["Hash# stays"]);
+    assert_eq!(fixture.texts(Scope::Heading4), Vec::<String>::new());
+    Ok(())
+}
+
+#[test]
+fn a_quote_or_a_list_item_reads_as_its_content() -> TestResult {
+    let fixture = load("quote-paragraph.md")?;
+    let quotes = fixture.texts(Scope::Blockquote);
+    assert_eq!(quotes.len(), 4);
+    let lists = fixture.texts(Scope::List);
+    assert_eq!(lists.len(), 3);
+    for text in quotes.iter().chain(&lists) {
+        for line in text.lines() {
+            assert!(!line.starts_with(['>', '-', ' ']), "{line:?} keeps syntax");
+        }
+    }
+    for container in fixture
+        .nodes(Scope::Blockquote)
+        .into_iter()
+        .chain(fixture.nodes(Scope::List))
+    {
+        let first = container.segments.first().ok_or("no segment")?;
+        let last = container.segments.last().ok_or("no segment")?;
+        assert_eq!(container.span, first.start..last.end);
     }
     Ok(())
 }

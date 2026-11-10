@@ -341,8 +341,10 @@ impl Builder<'_> {
     ///
     /// Syntax that is not prose and sits inside the node is a gap between its
     /// segments.
-    /// A table row has the segments of its cells.
-    /// A block quote or list item with no prose below it gives no node.
+    /// A table row, a block quote and a list item have the segments of the
+    /// nodes inside them.
+    /// No marker, bullet or indentation is in their text.
+    /// A container with no prose inside it gives no node.
     fn scoped(&self, node: &Mdast, scope: Scope, inner: Visited) -> Visited {
         let Some(span) = span_of(node).map(|span| self.trimmed(scope, span)) else {
             return inner;
@@ -351,22 +353,37 @@ impl Builder<'_> {
             nodes: children,
             cuts,
         } = inner;
-        let segments = if scope == Scope::TableRow {
-            children
+        let segments = match scope {
+            // A container reads as the content inside it.
+            Scope::TableRow | Scope::Blockquote | Scope::List => children
                 .iter()
                 .flat_map(|child| child.segments.clone())
-                .collect()
-        } else if matches!(scope, Scope::Blockquote | Scope::List) {
-            if children.is_empty() {
-                Vec::new()
-            } else {
-                self.segments(&span, &cuts)
+                .collect(),
+            Scope::Heading1
+            | Scope::Heading2
+            | Scope::Heading3
+            | Scope::Heading4
+            | Scope::Heading5
+            | Scope::Heading6 => {
+                let atx = self
+                    .source
+                    .get(span.clone())
+                    .is_some_and(|text| !text.contains('\n'));
+                self.heading_text(self.lines_of(&span, &cuts), atx)
             }
-        } else {
-            self.segments(&span, &cuts)
-                .into_iter()
-                .flat_map(|part| self.lines(part))
-                .collect()
+            Scope::Paragraph
+            | Scope::TableHeader
+            | Scope::TableCell
+            | Scope::Link
+            | Scope::Code
+            | Scope::Strong
+            | Scope::Emphasis
+            | Scope::Alt
+            | Scope::Raw
+            | Scope::CommentLine
+            | Scope::CommentBlock
+            | Scope::CommentDocLine
+            | Scope::CommentDocBlock => self.lines_of(&span, &cuts),
         };
         // A node with no text gives way to the nodes below it.
         let nodes = if segments.is_empty() {
@@ -377,6 +394,46 @@ impl Builder<'_> {
                 .collect()
         };
         Visited { nodes, cuts }
+    }
+
+    /// The lines of `span` that no cut covers, one range each.
+    fn lines_of(&self, span: &Range<usize>, cuts: &[Range<usize>]) -> Vec<Range<usize>> {
+        self.segments(span, cuts)
+            .into_iter()
+            .flat_map(|part| self.lines(part))
+            .collect()
+    }
+
+    /// The lines of a heading without its syntax.
+    ///
+    /// An ATX heading loses its opening `#` run with the space after it, and
+    /// its closing `#` run.
+    /// A setext heading loses its underline.
+    fn heading_text(&self, mut lines: Vec<Range<usize>>, atx: bool) -> Vec<Range<usize>> {
+        let text_of = |line: &Range<usize>| self.source.get(line.clone()).unwrap_or_default();
+        if atx {
+            if let Some(first) = lines.first_mut() {
+                let text = text_of(first);
+                let rest = text.trim_start_matches('#');
+                first.start += text.len() - rest.trim_start().len();
+            }
+            if let Some(last) = lines.last_mut() {
+                let text = text_of(last);
+                let body = text.trim_end_matches('#');
+                if body.len() < text.len() && (body.is_empty() || body.ends_with([' ', '\t'])) {
+                    last.end = last.start + body.trim_end().len();
+                }
+            }
+        } else if lines.len() > 1
+            && lines.last().is_some_and(|last| {
+                let text = text_of(last).trim();
+                text.chars().all(|c| c == '=') || text.chars().all(|c| c == '-')
+            })
+        {
+            lines.pop();
+        }
+        lines.retain(|line| !line.is_empty());
+        lines
     }
 
     /// `span` without the line ending and padding that markdown-rs leaves at

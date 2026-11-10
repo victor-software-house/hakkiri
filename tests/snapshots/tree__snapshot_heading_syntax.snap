@@ -1,0 +1,12 @@
+---
+source: tests/tree.rs
+expression: "load(\"heading-syntax.md\")? .render()"
+---
+raw 0..130 [0..130] "# Closed #\n\n## Closed with more ###\n\n### Hash# stays\n\n#### #\n\nSetext two\n----------\n\nMulti line\nsetext\n======\n\n> # Quoted heading\n"
+  heading.h1 2..8 [2..8] "Closed"
+  heading.h2 15..31 [15..31] "Closed with more"
+  heading.h3 41..52 [41..52] "Hash# stays"
+  heading.h2 62..72 [62..72] "Setext two"
+  heading.h1 85..102 [85..95, 96..102] "Multi line\nsetext"
+  blockquote 115..129 [115..129] "Quoted heading"
+    heading.h1 115..129 [115..129] "Quoted heading"

@@ -3,5 +3,5 @@ source: tests/tree.rs
 expression: "load(\"esm.mdx\")? .render()"
 ---
 raw 0..95 [0..95] "export const meta = {\n  title: 'A page',\n\n  source: 'https://esm.example',\n}\n\n# Heading\n\nText.\n"
-  heading.h1 78..87 [78..87] "# Heading"
+  heading.h1 80..87 [80..87] "Heading"
   paragraph 89..94 [89..94] "Text."
