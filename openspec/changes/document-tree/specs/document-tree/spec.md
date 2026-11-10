@@ -9,7 +9,9 @@ Rules select text from this tree, and alerts point back into the file through th
 
 ### Requirement: Every node holds a scope and a span
 
-Each node in the tree SHALL hold its scope name, the byte span of its text in the file, and its child nodes.
+Each node in the tree SHALL hold its scope name, the byte span of its text in the file, its segments and its child nodes.  
+The segments are the byte ranges of the node's text.  
+The span runs from the start of the first segment to the end of the last.
 
 #### Scenario: A paragraph in a Markdown file
 
@@ -30,25 +32,40 @@ The table covers paragraphs, headings, block quotes, list items, table rows and 
 
 - **WHEN** a Markdown file holds a table with header `| Name | Note |` and one body row `| a | b |`
 - **THEN** the tree holds two `table.row` nodes, the first with two `table.header` cells and the second with two `table.cell` cells, each span covering its cell text
+- **AND** each row reads as its cells without the pipes, one space apart
 
 ### Requirement: Code and markup are not prose
 
-Fenced code, raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.
+Fenced code, raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.  
+Where such syntax sits inside a prose node, it SHALL be a gap between the segments of that node.
 
 #### Scenario: A URL in a fenced block
 
 - **WHEN** a Markdown file holds a fenced block with `curl https://example.com`
 - **THEN** no prose node holds `https://example.com`, and the `raw` node of the file does
 
+#### Scenario: HTML inside a paragraph
+
+- **WHEN** a Markdown file holds `Click <a href="https://h.example">here</a>.`
+- **THEN** the `paragraph` node has three segments, and its text is `Click here.`
+
 ### Requirement: MDX keeps prose and leaves code out
 
 In an MDX file, text inside a JSX element SHALL be prose.  
-Imports, exports, expressions, and the tags and attributes of JSX elements SHALL carry no prose scope.
+Imports, exports, expressions, and the tags and attributes of JSX elements SHALL carry no prose scope.  
+An export block SHALL end where its brackets close, also across a blank line.
+
+A paragraph that holds an expression or a tag SHALL stay one node, with the expression and the tags as gaps between its segments.
 
 #### Scenario: A JSX element with text
 
 - **WHEN** an MDX file holds `import X from './x'` and `<Note title="t">Read this.</Note>`
 - **THEN** the tree holds a `paragraph` node for `Read this.` and no prose node for the import or for `title="t"`
+
+#### Scenario: An expression in a paragraph
+
+- **WHEN** an MDX file holds `Text with {expression} inside.`
+- **THEN** the tree holds one `paragraph` node whose text is `Text with  inside.`
 
 ### Requirement: Source files give the tree their comments only
 
@@ -80,11 +97,10 @@ Adjacent line comments of the same type SHALL join into one comment node, read a
 ### Requirement: Spans inside comments point into the file
 
 A node inside a comment SHALL span the bytes of its text in the file, not in the text with markers stripped.  
-The span runs from the start of the node's first segment to the end of its last.
+A node SHALL hold one segment for each line of its text.  
+A segment leaves out the comment marker and the indentation that hakkiri strips.
 
-A node SHALL hold its segments: one byte range for each line of its text.  
-A segment leaves out the comment marker and the indentation that hakkiri strips.  
-The text of the node is its segments joined by a line feed.
+The text of the node is its segments in order, with a line feed between two segments on different lines.
 
 #### Scenario: A link in a doc comment
 
@@ -100,9 +116,20 @@ The text of the node is its segments joined by a line feed.
 ### Requirement: JSDoc tags are not prose
 
 In a `/** */` comment of a TypeScript or JavaScript file, a tag name SHALL carry no prose scope.  
-The name after `@param` or `@typedef` SHALL carry no prose scope, and the description after it SHALL be prose.
+A type in braces after a tag SHALL carry none either, and neither SHALL the name after `@param`, `@typedef`, `@property`, `@prop`, `@arg`, `@argument`, `@template` or `@callback`.  
+The description after them SHALL be prose, and the body of `@example` SHALL be code.  
+A line inside a fenced block SHALL begin no tag.
 
 #### Scenario: A parameter tag
 
 - **WHEN** a TypeScript file holds `/** Sum two numbers.` on one line and `* @param a The first number. */` on the next
 - **THEN** the tree holds prose for `Sum two numbers.` and `The first number.`, and none for `@param` or `a`
+
+### Requirement: A banner leaves no punctuation
+
+The run of `/` or `*` that follows the opener of a plain comment SHALL be stripped with the opener.
+
+#### Scenario: A line of slashes
+
+- **WHEN** a Rust file holds `////// Banner`
+- **THEN** the tree holds a `paragraph` node whose text is `Banner`
