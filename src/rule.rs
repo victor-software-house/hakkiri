@@ -20,7 +20,8 @@ use serde::de::DeserializeOwned;
 use self::build::Source;
 use self::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
-    OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, SubstitutionFields,
+    OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, SequenceFields,
+    SubstitutionFields,
 };
 use crate::formula::Formula;
 use crate::pattern::Pattern;
@@ -121,6 +122,8 @@ pub enum Check {
     Readability(Readability),
     /// Reports a text that is not in the case it names.
     Capitalization(Capitalization),
+    /// Reports a run of words that its tokens match in order.
+    Sequence(Sequence),
 }
 
 /// The patterns that hold a match back.
@@ -342,6 +345,60 @@ pub struct Capitalization {
     pub words: Pattern,
 }
 
+/// One token of a `sequence` rule.
+#[derive(Debug)]
+pub struct Token {
+    /// The `pattern`, matched against a whole word.
+    pub word: Option<Pattern>,
+    /// The `tag`, or the Penn tags a `upos` stands for, matched anywhere in
+    /// the word's tag.
+    pub tag: Option<Pattern>,
+    /// The words a `upos` that Penn cannot tell apart is limited to, matched
+    /// against a whole word.
+    pub words: Option<Pattern>,
+    /// Whether the token matches a word its pattern and tag do not match.
+    pub negate: bool,
+    /// Whether the alert spans this token's word alone.
+    pub target: bool,
+    /// The `skip`: how many words may come before the word.
+    pub skip: usize,
+}
+
+/// One position a `sequence` walk checks: a token, or one copy of it.
+///
+/// A token with `skip: N` becomes N optional steps and the required one, and a
+/// token with `min: N` repeats that N times.
+#[derive(Clone, Copy, Debug)]
+pub struct Step {
+    /// The index of the token in [`Sequence::tokens`].
+    pub token: usize,
+    /// Whether a word that does not match is passed over.
+    pub optional: bool,
+    /// Whether it is the first of the optional steps of a `skip`.
+    pub start: bool,
+    /// Whether it is the required step that the optional ones pad.
+    pub end: bool,
+    /// The steps that one occurrence of a token made share a group.
+    pub group: usize,
+}
+
+/// A `sequence` rule.
+#[derive(Debug)]
+pub struct Sequence {
+    /// The tokens as written.
+    pub tokens: Vec<Token>,
+    /// The tokens as the walk reads them.
+    pub steps: Vec<Step>,
+    /// The step the walk starts from: the first with a `pattern`, or else the
+    /// first with a tag, that is not negated.
+    pub anchor: usize,
+    /// Where the anchor's pattern occurs in a sentence, which bounds how many
+    /// times the walk starts. A tag has no text to search for.
+    pub candidates: Option<Pattern>,
+    /// The `exceptions`: a match that begins inside a match of one is dropped.
+    pub exceptions: Vec<Pattern>,
+}
+
 /// One thing wrong with a rule file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LoadProblem {
@@ -436,6 +493,7 @@ impl Rule {
             "capitalization" => {
                 build::capitalization_rule(&source, &read::<CapitalizationFields>(&input)?)
             }
+            "sequence" => build::sequence_rule(&source, &read::<SequenceFields>(&input)?),
             _ => build::metric_rule(&source, &read::<MetricFields>(&input)?),
         }
     }

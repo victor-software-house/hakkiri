@@ -1,0 +1,5 @@
+extends: sequence
+message: "Found '%s %s'."
+tokens:
+  - pattern: the
+  - upos: NOUN

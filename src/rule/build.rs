@@ -8,17 +8,19 @@ use std::cmp::Reverse;
 
 use super::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
-    OccurrenceFields, ReadabilityFields, RepetitionFields, SubstitutionFields,
+    OccurrenceFields, ReadabilityFields, RepetitionFields, SequenceFields, SubstitutionFields,
+    TokenFields,
 };
 use super::{
     Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence,
-    LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Substitution,
-    Swap, level_of,
+    LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Sequence,
+    Step, Substitution, Swap, Token, level_of,
 };
 use crate::formula::Formula;
 use crate::metric;
 use crate::pattern::Pattern;
 use crate::scope::Selector;
+use crate::sequence::{sentence_scope, upos};
 use crate::strcase::{Sentence, Style, Title, WORD};
 
 /// Where a rule came from, for the errors that name it.
@@ -652,9 +654,12 @@ fn capitalization(
 
 /// The fields every check type has, and the check built from the rest.
 macro_rules! rule_of {
-    ($source:expr, $fields:expr, $check:expr) => {{
+    ($source:expr, $fields:expr, $check:expr) => {
+        rule_of!($source, $fields, $check, $fields.scope.values())
+    };
+    ($source:expr, $fields:expr, $check:expr, $scope:expr) => {{
         let fields = $fields;
-        let scope = Selector::parse(fields.scope.values()).map_err(|refused| {
+        let scope = Selector::parse($scope).map_err(|refused| {
             $source.problem("scope", format!("rule `{}`: {refused}", $source.name))
         })?;
         Rule {
@@ -767,5 +772,177 @@ pub(super) fn capitalization_rule(
         source,
         fields,
         Check::Capitalization(capitalization(source, fields)?)
+    ))
+}
+
+/// One token of a `sequence` rule with its patterns compiled, and whether it
+/// names a word, a tag or a universal tag, which makes a step that must match.
+fn sequence_token(
+    source: &Source<'_>,
+    number: usize,
+    written: &TokenFields,
+    flag: &str,
+) -> Result<(Token, bool), LoadError> {
+    let name = source.name;
+    let at = |part: &str| format!("tokens[{number}].{part}");
+    let pattern = written.pattern.value();
+    let universal = written.upos.value();
+    let mut tag = written.tag.value().to_owned();
+    let mut words = None;
+    if !universal.is_empty() {
+        if !tag.is_empty() {
+            return Err(source.problem(
+                &at("upos"),
+                format!("rule `{name}`: a token cannot set both `tag` and `upos`"),
+            ));
+        }
+        tag = upos::tag_pattern(universal).map_err(|unknown| {
+            source.problem(
+                &at("upos"),
+                format!(
+                    "rule `{name}`: `{unknown}` is not a universal part-of-speech tag: \
+                     use one of {}",
+                    upos::names()
+                ),
+            )
+        })?;
+        // A tag Penn cannot tell apart also limits the words, unless the rule
+        // asked for a pattern, which is the more specific request.
+        if pattern.is_empty()
+            && let Some(listed) = upos::word_pattern(universal)
+        {
+            words = Some(source.compile(&at("upos"), &listed, &[])?);
+        }
+    }
+    let word = if pattern.is_empty() {
+        None
+    } else {
+        Some(source.compile(
+            &at("pattern"),
+            &format!("{flag}^(?:{pattern})$"),
+            &[pattern],
+        )?)
+    };
+    let tag = if tag.is_empty() {
+        None
+    } else {
+        Some(source.compile(&at("tag"), &tag, &[])?)
+    };
+    let required = word.is_some() || tag.is_some();
+    Ok((
+        Token {
+            word,
+            tag,
+            words,
+            negate: written.negate.value(),
+            target: written.target.value(),
+            skip: written.skip.value(),
+        },
+        required,
+    ))
+}
+
+/// The tokens of a `sequence` rule as steps, and the patterns they match with.
+fn sequence(source: &Source<'_>, fields: &SequenceFields) -> Result<Sequence, LoadError> {
+    let name = source.name;
+    if !fields.model.value().is_empty() {
+        return Err(source.problem(
+            "model",
+            format!(
+                "rule `{name}`: `model` is not supported: hakkiri reads no other tagger's model"
+            ),
+        ));
+    }
+    let flag = if fields.ignorecase.value() {
+        "(?i)"
+    } else {
+        ""
+    };
+    let mut tokens = Vec::new();
+    let mut patterns: Vec<&str> = Vec::new();
+    let mut steps = Vec::new();
+    let mut group = 0;
+    for (number, written) in fields.tokens.iter().enumerate() {
+        let (token, required) = sequence_token(source, number, written, flag)?;
+        for _ in 0..written.min.value().max(1) {
+            group += 1;
+            for left in (1..=token.skip).rev() {
+                steps.push(Step {
+                    token: tokens.len(),
+                    optional: true,
+                    start: left == token.skip,
+                    end: false,
+                    group,
+                });
+            }
+            if required {
+                steps.push(Step {
+                    token: tokens.len(),
+                    optional: false,
+                    start: false,
+                    end: true,
+                    group,
+                });
+            }
+        }
+        patterns.push(written.pattern.value());
+        tokens.push(token);
+    }
+    let anchor = steps
+        .iter()
+        .position(|step| !tokens[step.token].negate && tokens[step.token].word.is_some())
+        .or_else(|| {
+            steps
+                .iter()
+                .position(|step| !tokens[step.token].negate && tokens[step.token].tag.is_some())
+        })
+        .ok_or_else(|| {
+            source.problem(
+                "tokens",
+                format!(
+                    "rule `{name}`: no token has a `pattern`, `tag` or `upos` without `negate`, \
+                     so the rule would never match: add one"
+                ),
+            )
+        })?;
+    let anchor_token = steps[anchor].token;
+    let candidates = if tokens[anchor_token].word.is_some() {
+        let pattern = patterns[anchor_token];
+        Some(source.compile(
+            &format!("tokens[{anchor_token}].pattern"),
+            &format!("{flag}(?m)(?:{pattern})"),
+            &[pattern],
+        )?)
+    } else {
+        None
+    };
+    let exceptions = fields
+        .exceptions
+        .values()
+        .iter()
+        .map(|exception| source.compile("exceptions", exception, &[]))
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(Sequence {
+        tokens,
+        steps,
+        anchor,
+        candidates,
+        exceptions,
+    })
+}
+
+pub(super) fn sequence_rule(
+    source: &Source<'_>,
+    fields: &SequenceFields,
+) -> Result<Rule, LoadError> {
+    // A scope that names no scope is refused under the name it was written
+    // with, before it is joined to `sentence`.
+    Selector::parse(fields.scope.values())
+        .map_err(|refused| source.problem("scope", format!("rule `{}`: {refused}", source.name)))?;
+    Ok(rule_of!(
+        source,
+        fields,
+        Check::Sequence(sequence(source, fields)?),
+        &sentence_scope(fields.scope.values())
     ))
 }

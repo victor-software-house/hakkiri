@@ -1,0 +1,5 @@
+extends: sequence
+message: "Repeated: '%s %s'."
+tokens:
+  - pattern: very
+    min: 2

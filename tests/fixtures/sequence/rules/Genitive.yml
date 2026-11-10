@@ -1,0 +1,6 @@
+extends: sequence
+message: "Of '%s %s %s'."
+tokens:
+  - tag: NN|NNS
+  - pattern: of
+  - upos: PROPN|NOUN

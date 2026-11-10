@@ -1,0 +1,6 @@
+extends: sequence
+message: "Join '%s'."
+tokens:
+  - pattern: your
+  - pattern: self
+    target: true

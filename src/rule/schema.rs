@@ -10,7 +10,7 @@ use serde::Deserialize;
 use super::field::{Count, Flag, Number, Pairs, Text, Texts, valid};
 
 /// The check types of Vale 3.26.0 that hakkiri runs.
-pub(super) const RUNNABLE: [&str; 9] = [
+pub(super) const RUNNABLE: [&str; 10] = [
     "existence",
     "substitution",
     "occurrence",
@@ -20,10 +20,11 @@ pub(super) const RUNNABLE: [&str; 9] = [
     "repetition",
     "readability",
     "capitalization",
+    "sequence",
 ];
 
 /// The check types of Vale 3.26.0 that a later change adds.
-pub(super) const PLANNED: [&str; 2] = ["sequence", "spelling"];
+pub(super) const PLANNED: [&str; 1] = ["spelling"];
 
 /// The levels of an alert.
 pub(super) const LEVELS: [&str; 3] = ["suggestion", "warning", "error"];
@@ -457,5 +458,50 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         prefix: Text,
+    }
+}
+
+/// One token of a `sequence` rule.
+#[derive(Debug, Deserialize, Validate)]
+#[serde(deny_unknown_fields)]
+#[garde(allow_unvalidated)]
+pub(super) struct TokenFields {
+    #[serde(default)]
+    #[garde(custom(valid))]
+    pub(super) pattern: Text,
+    #[serde(default)]
+    #[garde(custom(valid))]
+    pub(super) tag: Text,
+    #[serde(default)]
+    #[garde(custom(valid))]
+    pub(super) upos: Text,
+    #[serde(default)]
+    #[garde(custom(valid))]
+    pub(super) skip: Count,
+    #[serde(default)]
+    #[garde(custom(valid))]
+    pub(super) min: Count,
+    #[serde(default)]
+    #[garde(custom(valid))]
+    pub(super) target: Flag,
+    #[serde(default)]
+    #[garde(custom(valid))]
+    pub(super) negate: Flag,
+}
+
+rule_fields! {
+    /// A `sequence` rule.
+    SequenceFields {
+        #[garde(dive)]
+        tokens: Vec<TokenFields>,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        exceptions: Texts,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        ignorecase: Flag,
+        #[serde(default)]
+        #[garde(custom(valid))]
+        model: Text,
     }
 }

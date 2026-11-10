@@ -1,0 +1,6 @@
+extends: sequence
+message: "Pet '%s %s'."
+ignorecase: true
+tokens:
+  - pattern: the
+  - pattern: (cat|dog)

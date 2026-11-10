@@ -1,0 +1,171 @@
+Getting Started With Hakkiri
+Install the CLI
+getting started
+Note: Run the tests
+Getting started with Hakkiri
+Notes From the Field
+Welcome to the Team
+A Trip to Paris
+Release Notes
+Changelog
+ChangeLog
+How to Use the API in Your Project
+What's New in v1.2
+Don't Stop Believing
+Well-Known Facts and Figures
+Input/Output Basics
+Ready — Set — Go
+“Quoted” Words in Titles
+Café Society of the World
+NASA's Mission to Mars
+THE END IS NEAR
+The End Is Near
+To Be or Not to Be
+Going to the Store
+I Want to Go
+Learn to Code
+Using the Tools From Start to Finish
+This is the end
+this Is Mixed
+Install, Configure, and Run
+Q&A About Releases
+Over the Hills and Far Away
+Throughout the Day
+Up and Down
+Self-Hosted Installation Guide
+Release Notes for 2.0.1
+Getting Started with Hakkiri and the API
+Using Hakkiri's Rules
+The hakkiri CLI
+Python and PyPI: Basics
+Pyspark Basics
+an Apple a day
+A
+To
+to be
+Go to
+What to Do
+How To
+Who Is the Author?
+Why Not?
+See Also
+FAQ
+FAQs and Answers
+vs. the World
+Chapter 1: The Beginning
+Part II - The Journey
+Hello, World!
+!!!
+...
+Ünïcödé Wörds Here
+ǆ test
+İstanbul Guide
+Use the web and Hakkiri
+Run the The Web Tool
+API: Overview
+note: the API: a guide
+Project Gutenberg's The Adventures of Sherlock Holmes, by Arthur Conan Doyle
+"Well, some hundreds of times."
+"But your client--"
+"I was mad--insane."
+"'Come, man, come, only three minutes, or it won't be legal.'
+It is cabinet size.
+"I know where it is."
+"But she could not love him."
+Sherlock Holmes were beaten by a woman's wit.
+It is not a common experience among employers in this age.
+"'That would suit me very well,' said I.
+"'Where could I find him?'
+"Sarasate plays at the St.
+Jones, it is all right," said the stranger with deference.
+"It's all clear," he whispered.
+"And you are a benefactor of the race," said I.
+"I met him first at the gasfitters' ball," she said.
+He was too good and kind to leave me so.
+Would you mind reading me the advertised description of Mr.
+What does her clever stepfather do then?
+"It is a murder, then?"
+I thought that he was delirious.
+Do you not yourself think that he is innocent?"
+Clearly such a blow must have been struck from behind.
+A mole could trace it, and there it vanishes among the reeds.
+The other was his singular dying reference to a rat.
+I know all about McCarthy."
+Some friend of yours, perhaps?"
+repeated upon it, and 'Letters, memoranda, receipts, and a register' written beneath.
+"Has he come with you to-night?"
+K., and why does he pursue this unhappy family?"
+"Holmes," I cried, "you are too late."
+THE MAN WITH THE TWISTED LIP
+"Yes, I have one waiting."
+"Last Monday Mr.
+"This is my friend, Dr.
+"I cannot imagine.
+"In the cells."
+My dear wife knew that I had business in the City.
+"My dear Holmes!"
+"What will you say?"
+Well, that is a list of my town suppliers.
+"No, no; the real name," said Holmes sweetly.
+We will talk about that.
+This is my intimate friend and associate, Dr.
+We had no feeling of security unless our doors were locked."
+"No, I must go.
+"Yes, sir, that be the house of Dr.
+"My stepfather's business papers."
+"You speak of danger.
+"Yes, it did.
+"'I shall come down in a carriage to meet you.'
+I fear that you have felt the draught.'
+Jeremiah Hayling, aged twenty-six, a hydraulic engineer.
+"There is the gravel-drive, and there are the rose-bushes where I lay.
+"Before the what?" asked Holmes with a start.
+"But you were on a friendly footing?"
+"Oh, a few minutes.
+"It is very good of Lord St.
+Come at once.
+"It was a slight, sir, a public slight," said Lord St.
+Simon in particular.
+I do not know what I could do without her.
+Oh, what shall I do!"
+Oh, do, do take my word for it that he is innocent.
+"It is a noiseless lock," said he.
+One sorrow comes close upon the heels of another.
+"It is unfortunately more than possible; it is certain.
+Yours faithfully, JEPHRO RUCASTLE.'
+She has her freedom."
+"'No, no, we should have him loitering here always.
+That is obvious.
+Toller knows more about this matter than anyone else."
+Do it your self.
+Value your self-worth.
+Do it your self and then your self again.
+Consider your selfishness here.
+He wrote "your self" twice.
+If it rains then stay.
+If it rains all day then stay.
+if it rains, then it pours, and if not then not.
+This is very very good.
+This is very very very good.
+Very good, very very good, very bad.
+The file can be read.
+It will be done and you can be sure.
+Open the file.
+Pick the red one.
+Open the
+The
+the the the cat
+The dog and the cat saw the man.
+The tall man and the old woman saw the small dog.
+After we ate, they left because it rained.
+The quick brown fox jumps over the lazy dog.
+A black cat is an animal that can run.
+Café your self café, naïve the résumé of the café.
+I think that the results of the tests of the code are good.
+There are many cats, dogs, and birds; some of them are big.
+She said the man of the house saw the picture of London.
+It is, in fact, an apple (or two) of the best kind.
+the cat the dog the man the cat
+very very very very good
+a b a b a
+and the, and the and the

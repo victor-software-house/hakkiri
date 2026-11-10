@@ -1,0 +1,6 @@
+extends: sequence
+message: "Modal '%s %s'."
+tokens:
+  - pattern: can|will
+    tag: MD
+  - pattern: be

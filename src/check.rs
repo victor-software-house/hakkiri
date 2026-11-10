@@ -9,8 +9,9 @@ use crate::metric::{Variables, graded, measure, variables};
 use crate::pattern::{Captured, Pattern, SearchError};
 use crate::rule::{
     Capitalization, Check, Conditional, Consistency, Exceptions, Existence, Metric, Occurrence,
-    Readability, Repetition, Rule, Substitution, Swap,
+    Readability, Repetition, Rule, Sequence, Substitution, Swap,
 };
+use crate::sequence::find;
 use crate::splitter::Model;
 use crate::summary::{Elements, Summary};
 use crate::text::Text;
@@ -75,6 +76,7 @@ pub(crate) fn run(
         Check::Repetition(repetition) => run_repetition(repetition, text),
         Check::Readability(readability) => Ok(run_readability(readability, text)),
         Check::Capitalization(capitalization) => Ok(run_capitalization(capitalization, text)),
+        Check::Sequence(sequence) => run_sequence(sequence, text),
     }
 }
 
@@ -525,6 +527,19 @@ fn run_capitalization(capitalization: &Capitalization, text: &Text) -> Vec<Hit> 
     }]
 }
 
+/// One hit for each run of words in `text`, a sentence, that the rule's tokens
+/// match. The message's `%s` read the words of the run.
+fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchError> {
+    Ok(find(sequence, text.as_str())?
+        .into_iter()
+        .map(|matched| Hit {
+            range: matched.range,
+            values: matched.words,
+            numbered: false,
+        })
+        .collect())
+}
+
 /// One hit at the start of `text` when the average grade of the text is over
 /// the rule's grade, measured apart from the rest of the file.
 fn run_readability(readability: &Readability, text: &Text) -> Vec<Hit> {
@@ -573,6 +588,7 @@ pub(crate) fn run_summary(
         | Check::Consistency(_)
         | Check::Conditional(_)
         | Check::Repetition(_)
-        | Check::Capitalization(_) => Ok(None),
+        | Check::Capitalization(_)
+        | Check::Sequence(_) => Ok(None),
     }
 }

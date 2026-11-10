@@ -1,0 +1,7 @@
+extends: sequence
+message: "Write '%s%s' as one word."
+exceptions:
+  - '"[^"]*"'
+tokens:
+  - pattern: your
+  - pattern: self

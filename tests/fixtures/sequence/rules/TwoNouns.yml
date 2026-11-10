@@ -1,0 +1,6 @@
+extends: sequence
+message: "Two nouns '%s'."
+tokens:
+  - tag: NN
+    skip: 8
+    min: 2

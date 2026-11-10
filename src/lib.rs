@@ -23,6 +23,7 @@ pub mod readability;
 pub mod rule;
 pub mod scope;
 pub mod select;
+mod sequence;
 pub mod splitter;
 pub mod strcase;
 pub mod summary;

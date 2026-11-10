@@ -1,0 +1,6 @@
+extends: sequence
+message: "Join '%s'."
+tokens:
+  - pattern: and
+    skip: 1
+  - pattern: the
