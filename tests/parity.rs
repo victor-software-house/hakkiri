@@ -4,6 +4,10 @@
 //! The fixture is `tests/fixtures/fk-parity/vale-fk.tsv`. Where hakkiri's
 //! counts equal Vale's, the score is within 0.01 of Vale's, and on every input
 //! it is within 0.5. The test prints each input whose counts differ.
+//!
+//! The 10 Rust inputs are the one place hakkiri departs from Vale, by decision
+//! 16 of the rule-engine design: Vale prints no value for them, and hakkiri
+//! measures the prose of a code file's comments.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -104,5 +108,72 @@ fn flesch_kincaid_matches_vale() -> TestResult {
     }
     assert_eq!(compared, 51);
     assert!(failures.is_empty(), "{failures:#?}");
+    Ok(())
+}
+
+/// The Rust inputs where Vale prints no value and hakkiri gives one, because
+/// each holds a comment whose prose it measures.
+const RUST_WITH_COMMENTS: [&str; 6] = [
+    "BareURLInComment-01",
+    "BareWorkItemInComment-01",
+    "package-05",
+    "package-06",
+    "package-12",
+    "package-15",
+];
+
+/// The Rust inputs with no comment, only strings and code. Vale prints no
+/// value, and hakkiri has no prose to measure either.
+const RUST_WITHOUT_COMMENTS: [&str; 4] = [
+    "BareURLInComment-07",
+    "BareWorkItemInComment-03",
+    "package-11",
+    "package-14",
+];
+
+/// The word count that hakkiri gives for the Rust `source`, or `None` when it
+/// gives no value.
+fn rust_words(source: &str) -> Result<Option<f64>, Box<dyn Error>> {
+    let rule = value_rule("Metrics.Words", "words")?;
+    let tree = parse(Language::Rust, source)?;
+    let alerts = lint(&[rule], &tree, source, "rs")?;
+    alerts
+        .first()
+        .map(|alert| alert.message.parse::<f64>())
+        .transpose()
+        .map_err(Into::into)
+}
+
+#[test]
+fn a_rust_input_vale_cannot_measure_is_measured_by_its_comments() -> TestResult {
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fk-parity");
+    let table = fs::read_to_string(root.join("vale-fk.tsv"))?;
+    let mut rows: Vec<&str> = table
+        .lines()
+        .skip(1)
+        .filter(|row| {
+            let cells: Vec<&str> = row.split('\t').collect();
+            cells.get(3) == Some(&"rs") && cells.get(4) == Some(&"no-words")
+        })
+        .filter_map(|row| row.split('\t').next())
+        .collect();
+    rows.sort_unstable();
+    let mut expected: Vec<&str> = RUST_WITH_COMMENTS
+        .iter()
+        .chain(&RUST_WITHOUT_COMMENTS)
+        .copied()
+        .collect();
+    expected.sort_unstable();
+    assert_eq!(rows, expected, "the fixture's Rust no-words rows changed");
+    for id in rows {
+        let source = fs::read_to_string(root.join(format!("inputs/{id}.rs.fixture")))?;
+        let words = rust_words(&source)?;
+        eprintln!("{id}: hakkiri counts {words:?} words, Vale none");
+        if RUST_WITH_COMMENTS.contains(&id) {
+            assert!(words.is_some_and(|count| count > 0.0), "{id}: {words:?}");
+        } else {
+            assert_eq!(words, None, "{id}");
+        }
+    }
     Ok(())
 }
