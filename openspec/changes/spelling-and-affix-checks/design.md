@@ -38,6 +38,8 @@ A word that overlaps a code span gives no alert, as the rule-engine change decid
 
 A word with a curly quote or `&rsquo;` is read with a straight quote, as Vale reads it, and reported where it stands in the file, as written.
 Vale gives such a word no position ([tokenize.go][v-tokenize-offsets]), so its alert lands at a wrong place, and its text is the straight form.
+The text of an autolink, a URL or an email address is a gap in the prose around it ([node-segments spec][node-segments], [format design][format-7]), so no word in it is read.
+Vale reads an email address, so it reports one when `custom` turns the filters off.
 The [parity test][parity-test] lists these alerts as departures.
 
 Alternative: one word splitter for every check.  
@@ -71,6 +73,7 @@ The expansion uses the dictionary reader's affix rules, which `main` holds, and 
 [case-reader]: ../archive/2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
 [project-config]: ../../specs/project-config/spec.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[node-segments]: ../../specs/node-segments/spec.md#requirement-a-url-is-a-gap-in-the-prose-around-the-link
 [parity-test]: ../../../tests/spelling_parity.rs
 [v-tokenize-offsets]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/tokenize.go#L80-L148
 [v-spell-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L74-L135
