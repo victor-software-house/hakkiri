@@ -26,6 +26,16 @@ Lines and columns SHALL start at 1, and a column SHALL count characters, not byt
 - **WHEN** the rule above reads `Café very good.`
 - **THEN** the alert is on line 1, columns 6 to 9
 
+### Requirement: The last column is where the match ends in the file
+
+The last column SHALL be that of the match's last character in the file, so markup inside a match counts toward it.  
+A match that goes on to the next line SHALL end at the end of its first line.
+
+#### Scenario: A match across markup
+
+- **WHEN** a rule has `tokens: ['very easy']` and the input is `**very** easy`
+- **THEN** the alert is on line 1, columns 3 to 13
+
 ### Requirement: A position inside a comment points into the file
 
 The line and columns of a match inside a comment SHALL be those of its bytes in the file.

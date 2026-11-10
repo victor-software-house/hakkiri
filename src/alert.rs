@@ -24,7 +24,8 @@ pub struct Alert {
     /// The 1-based column, in characters, where the match starts.
     pub first_column: usize,
     /// The 1-based column, in characters, of the last character of the match
-    /// on its first line.
+    /// in the file, or of the end of the first line when the match goes on to
+    /// the next.
     pub last_column: usize,
     /// The text that matched.
     pub matched: String,
@@ -125,6 +126,17 @@ impl<'a> Locator<'a> {
         (line, self.cursor.columns + 1)
     }
 
+    /// The column of the last character of `line`, counting its line feed.
+    fn line_end(&self, line: usize) -> usize {
+        let start = line
+            .checked_sub(1)
+            .and_then(|index| self.starts.get(index))
+            .copied()
+            .unwrap_or_default();
+        let end = self.starts.get(line).copied().unwrap_or(self.source.len());
+        self.characters(start..end)
+    }
+
     /// The characters that start inside the bytes `range` of the source.
     fn characters(&self, range: Range<usize>) -> usize {
         self.source.as_bytes().get(range).map_or(0, |bytes| {
@@ -144,24 +156,38 @@ impl<'a> Locator<'a> {
         (message, description): (String, String),
     ) -> Option<Alert> {
         let matched = text.as_str().get(range.clone())?;
-        let offset = text.file_range(range)?.start;
-        Some(self.report(rule, offset, matched, (message, description)))
+        let offset = text.file_range(range.clone())?.start;
+        let last = matched
+            .chars()
+            .next_back()
+            .and_then(|c| text.file_offset(range.end - c.len_utf8()));
+        Some(self.report(rule, (offset, last), matched, (message, description)))
     }
 
     /// The alert of `rule` for a text with no match to point at, at the file
     /// byte `offset`.
     pub fn alert_at(&mut self, rule: &Rule, offset: usize, messages: (String, String)) -> Alert {
-        self.report(rule, offset, "", messages)
+        self.report(rule, (offset, None), "", messages)
     }
 
+    /// `(offset, last)` is the file byte where the match starts, and where its
+    /// last character starts when it has one.
     fn report(
         &mut self,
         rule: &Rule,
-        offset: usize,
+        (offset, last): (usize, Option<usize>),
         matched: &str,
         (message, description): (String, String),
     ) -> Alert {
         let (line, first_column) = self.place(offset);
+        let last_column = last.map_or(first_column, |last| {
+            let (last_line, column) = self.place(last);
+            if last_line > line {
+                self.line_end(line)
+            } else {
+                column.max(first_column)
+            }
+        });
         Alert {
             rule: rule.name.clone(),
             level: rule.level,
@@ -170,7 +196,7 @@ impl<'a> Locator<'a> {
             link: rule.link.clone(),
             line,
             first_column,
-            last_column: first_column + extent(matched),
+            last_column,
             matched: matched.to_owned(),
             action: rule.action.clone(),
         }
@@ -199,15 +225,6 @@ impl<'a> Locator<'a> {
             action: None,
         }
     }
-}
-
-/// How many columns past its first one a match reaches, counting only its
-/// first line. A match with no text reaches none.
-fn extent(matched: &str) -> usize {
-    matched
-        .split_inclusive('\n')
-        .next()
-        .map_or(0, |line| line.chars().count().saturating_sub(1))
 }
 
 /// The alerts of one rule in one file, in file order, without a second alert

@@ -134,6 +134,30 @@ fn a_percent_sign() -> TestResult {
 }
 
 #[test]
+fn a_match_across_markup_ends_at_its_last_character() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: ['very easy']\n",
+        "**very** easy",
+    )?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(alert.matched, "very easy");
+    assert_eq!(place(alert), (1, 3, 13));
+    Ok(())
+}
+
+#[test]
+fn a_match_that_ends_in_a_wide_character() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: ['café']\n",
+        "Un café.",
+    )?;
+    assert_eq!(found.iter().map(place).collect::<Vec<_>>(), [(1, 4, 7)]);
+    Ok(())
+}
+
+#[test]
 fn a_match_across_a_line_break() -> TestResult {
     let found = markdown(
         "extends: existence\nmessage: \"'%s'\"\ntokens: ['very good']\n",
