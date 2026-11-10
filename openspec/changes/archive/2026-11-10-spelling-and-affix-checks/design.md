@@ -87,12 +87,12 @@ The same probe refused each of these as a rule error, as hakkiri does: a flag th
 One difference is read from Vale's source and not probed: two keys of a `swap` that expand to the same text.  
 Vale keeps the replacement of the key its map visits last, which can change from run to run, and hakkiri keeps both in the order written, so the first gives the replacement.
 
-[case-design]: ../archive/2026-11-10-case-and-sequence-checks/design.md
-[case-reader]: ../archive/2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
-[project-config]: ../../specs/project-config/spec.md
-[format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[node-segments]: ../../specs/node-segments/spec.md#requirement-a-url-is-a-gap-in-the-prose-around-the-link
-[parity-test]: ../../../tests/spelling_parity.rs
+[case-design]: ../2026-11-10-case-and-sequence-checks/design.md
+[case-reader]: ../2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
+[project-config]: ../../../specs/project-config/spec.md
+[format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[node-segments]: ../../../specs/node-segments/spec.md#requirement-a-url-is-a-gap-in-the-prose-around-the-link
+[parity-test]: ../../../../tests/spelling_parity.rs
 [v-tokenize-offsets]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/tokenize.go#L80-L148
 [v-spell-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L74-L135
 [v-spell-run]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L188-L280

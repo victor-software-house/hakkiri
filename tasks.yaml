@@ -1,20 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-020
+active: HKR-022
 queue:
-  - id: HKR-020
-    title: Run the spelling check and affix
-    scope: engine
-    outcome: >-
-      Rules run spelling, and existence and substitution accept affix, with Vale
-      3.26.0's meaning, or a better one where Vale's is a defect.
-    blocked_by: []
-    acceptance:
-      - Each of spelling and affix has unit tests.
-      - A 50,000-character line and a 60,000-line file finish with no panic for spelling and affix.
-    plan: openspec/changes/spelling-and-affix-checks/proposal.md
-
   - id: HKR-022
     title: List every difference from Vale in one place
     scope: docs
@@ -23,6 +11,41 @@ queue:
     acceptance:
       - The list names each difference recorded in the archived designs (rule-format decision 7, rule-engine, pattern-and-readability, case-and-sequence) and the spelling refusal of exceptions and threshold, each with a link to its decision.
       - Every later change that adds a difference updates the list in the same pull request.
+    plan: openspec/changes/vale-differences/proposal.md
+
+  - id: HKR-023
+    title: List the check and refusal differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how the pattern checks differ from Vale and
+      each rule that hakkiri refuses where Vale loads it.
+    blocked_by: []
+    acceptance:
+      - Each difference in the pattern-and-readability, case-and-sequence and spelling-and-affix designs that is a pattern-check difference or a refusal is a scenario with a link to its decision.
+    plan: openspec/changes/vale-differences-checks/proposal.md
+
+  - id: HKR-024
+    title: List the reader and resource-use differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how the ported readers differ from Vale and
+      each input on which a run finishes in hakkiri and fails or stalls in Vale.
+    blocked_by: []
+    acceptance:
+      - Each reader difference and each resource-use difference in the case-and-sequence and spelling-and-affix designs, and the regex limit of the rule-engine and bootstrap designs, is a scenario with a link to its decision.
+      - The spec lists each known gap apart from the differences, with its queue row, and a language other than English as an intended difference.
+    plan: openspec/changes/vale-differences-readers/proposal.md
+
+  - id: HKR-025
+    title: List the format and configuration differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how comments, rule files, configuration and
+      packages differ from Vale.
+    blocked_by: []
+    acceptance:
+      - Each decision of the rule-format, rule-engine and bootstrap designs that differs from Vale in behaviour, checked against Vale by source and probe, is a scenario with a link to its decision.
+    plan: openspec/changes/vale-differences-format/proposal.md
 
   - id: HKR-005
     title: Ship the check and test commands
@@ -71,7 +94,6 @@ queue:
       hakkiri import vale converts every Vale rule type except script into the format.
     blocked_by:
       - HKR-005
-      - HKR-020
     acceptance:
       - Each converted Voices, Std and Readability rule passes the cases from its own Vale file.
 
@@ -103,6 +125,27 @@ queue:
       - Entity unescaping, the masking of code, tt, kbd and samp text, and the handling of pre match Vale on probes.
       - The text after a closed raw-text tag on the same line and after --!> in a comment block gets the alerts Vale gives it, or a departure records why not.
 
+  - id: HKR-026
+    title: Run Vale's built-in spelling rule
+    scope: engine
+    outcome: >-
+      A project that enables Vale.Spelling gets its alerts from hakkiri, with Vale's default ignore list.
+    blocked_by: []
+    acceptance:
+      - A rule named Vale.Spelling runs with the built-in dictionary and the default ignore list, and gives the alerts Vale 66bbb85 gives on the spelling parity inputs.
+      - Any alert that differs is fixed or recorded as an intended difference in the vale-differences spec.
+
+  - id: HKR-027
+    title: Probe the Markdown parser against Vale's converter
+    scope: tree
+    outcome: >-
+      The differences between hakkiri's Markdown parser and Vale's converter are
+      measured on one corpus.
+    blocked_by: []
+    acceptance:
+      - A corpus of Markdown inputs runs through hakkiri and Vale 66bbb85, and each text or scope that differs is listed.
+      - Each difference found is fixed, or recorded as an intended difference in the vale-differences spec.
+
   - id: HKR-009
     title: Switch the template to hakkiri
     scope: template
@@ -123,6 +166,18 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-020
+    title: Run the spelling check and affix
+    scope: engine
+    outcome: >-
+      Rules run spelling, and existence and substitution accept affix, with Vale
+      3.26.0's meaning, or a better one where Vale's is a defect.
+    plan: openspec/changes/archive/2026-11-10-spelling-and-affix-checks/proposal.md
+    completed: 2026-11-10T21:49:59
+    evidence:
+      - PRs 41, 44 and 46 merged the spelling check, its review fixes, affix and the long-input tests at ae6f269; the spelling-and-affix-checks OpenSpec change is archived.
+    disposition: completed
+
   - id: HKR-014
     title: Run the capitalization and sequence checks
     scope: engine

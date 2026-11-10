@@ -242,7 +242,7 @@ Each crate was read on crates.io on 2026-11-10.
 
 [engine-design]: ../2026-11-10-rule-engine/design.md
 [pattern-design]: ../2026-11-10-pattern-and-readability-checks/design.md
-[spelling-design]: ../../spelling-and-affix-checks/design.md
+[spelling-design]: ../2026-11-10-spelling-and-affix-checks/design.md
 [deny]: ../../../../deny.toml
 [v-tag-reset]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L335-L346
 [v-tag-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L396-L405

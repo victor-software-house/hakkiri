@@ -30,5 +30,5 @@ None.
 - The rule-engine change's refusal of `affix` ends here.
 - One new module for the `spelling` check, with unit tests.
 
-[ledger]: ../../../tasks.yaml
-[case]: ../archive/2026-11-10-case-and-sequence-checks/proposal.md
+[ledger]: ../../../../tasks.yaml
+[case]: ../2026-11-10-case-and-sequence-checks/proposal.md

@@ -36,4 +36,4 @@ ProseStyle uses none of them, so no project that hakkiri lints today waits on th
 [engine]: ../2026-11-10-rule-engine/proposal.md
 [pattern]: ../2026-11-10-pattern-and-readability-checks/proposal.md
 [design]: design.md
-[spelling]: ../../spelling-and-affix-checks/proposal.md
+[spelling]: ../2026-11-10-spelling-and-affix-checks/proposal.md
