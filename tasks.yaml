@@ -35,6 +35,17 @@ queue:
       - Each reader difference and each resource-use difference in the case-and-sequence and spelling-and-affix designs, and the regex limit of the rule-engine and bootstrap designs, is a scenario with a link to its decision.
     plan: openspec/changes/vale-differences-readers/proposal.md
 
+  - id: HKR-025
+    title: List the format and configuration differences from Vale
+    scope: docs
+    outcome: >-
+      The vale-differences spec lists how comments, rule files, configuration and
+      packages differ from Vale.
+    blocked_by: []
+    acceptance:
+      - Each decision of the rule-format, rule-engine and bootstrap designs that differs from Vale in behaviour, checked against Vale by source and probe, is a scenario with a link to its decision.
+    plan: openspec/changes/vale-differences-format/proposal.md
+
   - id: HKR-005
     title: Ship the check and test commands
     scope: cli

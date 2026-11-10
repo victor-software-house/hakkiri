@@ -5,7 +5,9 @@ This change reads the designs that [`spelling-and-affix-checks`][spelling] and t
 
 ## 1. The list
 
-- [ ] 1.1 Write the first four requirements of the `vale-differences` spec: the rule that every difference is listed, and the differences in what a rule reads, where an alert points and how text is measured, each scenario with a link to its decision.  
+- [ ] 1.1 Write the first four requirements of the `vale-differences` spec.  
+  They state that every difference is listed, and give the differences in what a rule reads, where an alert points and how text is measured.  
+  Each scenario links its decision.  
   Verify `openspec validate --all --strict` and the link check pass in CI, and that each scenario's link resolves to its decision.
 
 ## 2. The rule
@@ -19,8 +21,9 @@ This change reads the designs that [`spelling-and-affix-checks`][spelling] and t
 
 ## Workflow follow-up
 
-- Archive this change first after the pull request merges, then [`vale-differences-checks`][checks] and [`vale-differences-readers`][readers], each in turn, and archive `HKR-022`, `HKR-023` and `HKR-024` with `qctl close-from-openspec`.
+- Archive this change first after the pull request merges, then [`vale-differences-checks`][checks], [`vale-differences-readers`][readers] and [`vale-differences-format`][format], each in turn, and archive `HKR-022` to `HKR-025` with `qctl close-from-openspec`.
 
 [spelling]: ../archive/2026-11-10-spelling-and-affix-checks/proposal.md
 [checks]: ../vale-differences-checks/proposal.md
 [readers]: ../vale-differences-readers/proposal.md
+[format]: ../vale-differences-format/proposal.md

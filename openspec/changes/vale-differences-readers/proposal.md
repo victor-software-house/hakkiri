@@ -1,7 +1,7 @@
 # Proposal
 
 Queue row: `HKR-024` in [tasks.yaml][ledger].  
-It is the last of three changes that build the `vale-differences` spec, after [`vale-differences`][first] and [`vale-differences-checks`][checks].
+It is the third of four changes that build the `vale-differences` spec, after [`vale-differences`][first] and [`vale-differences-checks`][checks], and before [`vale-differences-format`][format].
 
 ## Motivation
 
@@ -31,3 +31,4 @@ None.
 [ledger]: ../../../tasks.yaml
 [first]: ../vale-differences/proposal.md
 [checks]: ../vale-differences-checks/proposal.md
+[format]: ../vale-differences-format/proposal.md

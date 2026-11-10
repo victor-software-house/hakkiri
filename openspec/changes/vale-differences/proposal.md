@@ -1,7 +1,7 @@
 # Proposal
 
 Queue row: `HKR-022` in [tasks.yaml][ledger].  
-The list is long enough to exceed the spec budget, so it comes in three changes that add to one spec: this one, [`vale-differences-checks`][checks] (`HKR-023`) and [`vale-differences-readers`][readers] (`HKR-024`).
+The list is long enough to exceed the spec budget, so it comes in four changes that add to one spec: this one, [`vale-differences-checks`][checks] (`HKR-023`), [`vale-differences-readers`][readers] (`HKR-024`) and [`vale-differences-format`][format] (`HKR-025`).
 
 ## Motivation
 
@@ -37,3 +37,4 @@ None.
 [readers]: ../vale-differences-readers/proposal.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [case-9]: ../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[format]: ../vale-differences-format/proposal.md

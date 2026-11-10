@@ -21,18 +21,18 @@ The [bootstrap design][bootstrap] and the [sentence-splitter design][splitter] h
 
 ## Decisions
 
-### 1. One spec, one scenario for each difference, in three changes
+### 1. One spec, one scenario for each difference, in four changes
 
 The spec is `openspec/specs/vale-differences/spec.md`.  
 A requirement groups the scenarios that share a subject, and each scenario states the case, Vale's behaviour and hakkiri's, with a link to its decision.  
-The whole list is over 2,500 words, and `specs:budget` allows 1,200 for one change's spec, so [`vale-differences-checks`][checks] and [`vale-differences-readers`][readers] add their requirements to this spec once this change has created it.
+The whole list is over 3,000 words, and `specs:budget` allows 1,200 for one change's spec, so [`vale-differences-checks`][checks], [`vale-differences-readers`][readers] and [`vale-differences-format`][format] add their requirements to this spec once this change has created it.
 
 Alternatives:
 
 - A table in the spec body. Lost: OpenSpec checks only requirements and scenarios, so a table could drift with no check, and it counts toward the 500-character limit of a requirement.
 - A page outside `openspec/specs`. Lost: every other behaviour of hakkiri is a spec there, and a change updates specs.
 - Leave the differences in the designs. Lost: archived designs are not edited, so no current list exists.
-- One spec for each area. Lost: the outcome is one list, and a reader would open three.
+- One spec for each area. Lost: the outcome is one list, and a reader would open four.
 
 ### 2. The list holds what is true now
 
@@ -66,3 +66,4 @@ Alternative: the spec alone. Lost: an author who writes a delta for another capa
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
 [splitter]: ../archive/2026-11-10-sentence-splitter/design.md
 [case-9]: ../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[format]: ../vale-differences-format/proposal.md

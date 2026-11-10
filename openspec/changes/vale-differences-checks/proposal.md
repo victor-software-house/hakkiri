@@ -1,7 +1,7 @@
 # Proposal
 
 Queue row: `HKR-023` in [tasks.yaml][ledger].  
-It is the second of three changes that build the `vale-differences` spec, after [`vale-differences`][first] and before [`vale-differences-readers`][readers].
+It is the second of four changes that build the `vale-differences` spec, after [`vale-differences`][first] and before [`vale-differences-readers`][readers].
 
 ## Motivation
 
