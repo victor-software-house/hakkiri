@@ -2,7 +2,7 @@
 source: tests/tree.rs
 expression: "load(\"inline.md\")? .render()"
 ---
-raw 0..255 [0..255] "A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,\n`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png \"title\").\n\nCafé [naïve link](https://b.example) with non-ASCII letters.\n\n[ref]: https://c.example\n"
+raw 0..310 [0..310] "A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,\n`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png \"title\").\n\nCafé [naïve link](https://b.example) with non-ASCII letters.\n\nAn image reference ![logo][img] here.\n\n[ref]: https://c.example\n[img]: logo.png\n"
   paragraph 0..164 [0..164] "A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,\n`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png \"title\")."
     link 2..27 [2..27] "[link](https://a.example)"
     link 32..50 [32..50] "[a reference][ref]"
@@ -13,3 +13,5 @@ raw 0..255 [0..255] "A [link](https://a.example) and [a reference][ref], a bare 
     alt 133..143 [133..143] "alt *text*"
   paragraph 166..228 [166..228] "Café [naïve link](https://b.example) with non-ASCII letters."
     link 172..204 [172..204] "[naïve link](https://b.example)"
+  paragraph 230..267 [230..267] "An image reference ![logo][img] here."
+    alt 251..255 [251..255] "logo"

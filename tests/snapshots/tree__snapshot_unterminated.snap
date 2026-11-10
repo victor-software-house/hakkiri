@@ -1,0 +1,10 @@
+---
+source: tests/tree.rs
+expression: "load(\"unterminated.js\")? .render()"
+---
+raw 22..38 [22..38] "// comment after"
+  text.comment.line 22..38 [22..38] "// comment after"
+    paragraph 25..38 [25..38] "comment after"
+raw 50..61 [50..61] "// trailing"
+  text.comment.line 50..61 [50..61] "// trailing"
+    paragraph 53..61 [53..61] "trailing"

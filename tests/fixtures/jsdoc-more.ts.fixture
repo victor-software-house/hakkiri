@@ -1,0 +1,16 @@
+/**
+ * Summary line.
+ *
+ * @returns {number} The count.
+ * @property {string} name The name.
+ * @template {object} T - The type.
+ * @callback Done Called when finished.
+ * @example
+ * const x = add(1, 2);
+ * @see {@link Other} for more.
+ * Text with a fence:
+ * ```ts
+ * @Component()
+ * class A {}
+ * ```
+ */

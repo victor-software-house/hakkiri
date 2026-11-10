@@ -1,0 +1,10 @@
+---
+source: tests/tree.rs
+expression: "load(\"crlf.rs\")? .render()"
+---
+raw 0..32 [0..14, 16..32] "/// First line\n/// second line."
+  text.comment.doc.line 0..32 [0..14, 16..32] "/// First line\n/// second line."
+    paragraph 4..32 [4..14, 20..32] "First line\nsecond line."
+raw 36..63 [36..63] "/*\r\n * Block\r\n * text.\r\n */"
+  text.comment.block 36..63 [36..63] "/*\r\n * Block\r\n * text.\r\n */"
+    paragraph 43..58 [43..48, 53..58] "Block\ntext."

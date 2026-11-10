@@ -1,0 +1,11 @@
+- An item
+
+  ```sh
+  curl https://example.com
+  ```
+
+> [ref]: https://def.example
+
+Click <a href="https://h.example">here</a>.
+
+[ref]: https://x.example

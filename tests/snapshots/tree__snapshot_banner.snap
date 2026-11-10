@@ -1,0 +1,13 @@
+---
+source: tests/tree.rs
+expression: "load(\"banner.rs\")? .render()"
+---
+raw 0..20 [0..13, 14..20] "////// Banner\n//// x"
+  text.comment.line 0..20 [0..13, 14..20] "////// Banner\n//// x"
+    paragraph 7..20 [7..13, 19..20] "Banner\nx"
+raw 21..47 [21..47] "/***** Banner block *****/"
+  text.comment.block 21..47 [21..47] "/***** Banner block *****/"
+    paragraph 28..40 [28..40] "Banner block"
+raw 48..71 [48..71] "/*****\n * Text.\n *****/"
+  text.comment.block 48..71 [48..71] "/*****\n * Text.\n *****/"
+    paragraph 58..63 [58..63] "Text."

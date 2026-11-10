@@ -1,0 +1,12 @@
+---
+source: tests/tree.rs
+expression: "load(\"jsdoc-more.ts\")? .render()"
+---
+raw 0..308 [0..308] "/**\n * Summary line.\n *\n * @returns {number} The count.\n * @property {string} name The name.\n * @template {object} T - The type.\n * @callback Done Called when finished.\n * @example\n * const x = add(1, 2);\n * @see {@link Other} for more.\n * Text with a fence:\n * ```ts\n * @Component()\n * class A {}\n * ```\n */"
+  text.comment.doc.block 0..308 [0..308] "/**\n * Summary line.\n *\n * @returns {number} The count.\n * @property {string} name The name.\n * @template {object} T - The type.\n * @callback Done Called when finished.\n * @example\n * const x = add(1, 2);\n * @see {@link Other} for more.\n * Text with a fence:\n * ```ts\n * @Component()\n * class A {}\n * ```\n */"
+    paragraph 7..20 [7..20] "Summary line."
+    paragraph 45..55 [45..55] "The count."
+    paragraph 83..92 [83..92] "The name."
+    paragraph 119..128 [119..128] "The type."
+    paragraph 147..168 [147..168] "Called when finished."
+    paragraph 213..258 [213..236, 240..258] "{@link Other} for more.\nText with a fence:"

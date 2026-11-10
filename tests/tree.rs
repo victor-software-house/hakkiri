@@ -154,6 +154,20 @@ snapshots! {
     snapshot_jsdoc_tags: "jsdoc-tags.js",
     snapshot_jsdoc_braces: "jsdoc-braces.ts",
     snapshot_line_comments: "line-comments.rs",
+    snapshot_cuts_md: "cuts.md",
+    snapshot_cuts_rs: "cuts.rs",
+    snapshot_esm: "esm.mdx",
+    snapshot_table_no_pipes: "table-no-pipes.md",
+    snapshot_jsdoc_more: "jsdoc-more.ts",
+    snapshot_banner: "banner.rs",
+    snapshot_crlf_md: "crlf.md",
+    snapshot_crlf_rs: "crlf.rs",
+    snapshot_tabs_rs: "tabs.rs",
+    snapshot_tabs_md: "tabs.md",
+    snapshot_unicode: "unicode.rs",
+    snapshot_no_stars: "no-stars.ts",
+    snapshot_jsx_text: "jsx-text.tsx",
+    snapshot_unterminated: "unterminated.js",
     snapshot_doc_indented_lines: "doc-indented-lines.rs",
     snapshot_tsx: "view.tsx",
     snapshot_mjs: "module.mjs",
@@ -191,6 +205,11 @@ fn a_table() -> TestResult {
     let fixture = load("table.md")?;
     let rows = fixture.nodes(Scope::TableRow);
     assert_eq!(rows.len(), 3);
+    // A row reads its cells without the pipes, one space apart.
+    assert_eq!(
+        fixture.texts(Scope::TableRow),
+        ["Name Note", "a b", "longer cell `code` and **strong**"]
+    );
     let headers = fixture.texts(Scope::TableHeader);
     assert_eq!(headers, ["Name", "Note"]);
     let cells = fixture.texts(Scope::TableCell);
@@ -251,7 +270,7 @@ fn spans_are_bytes_not_characters() -> TestResult {
     assert_eq!(fixture.texts(Scope::Code), ["`code`"]);
     assert_eq!(fixture.texts(Scope::Strong), ["**strong**"]);
     assert_eq!(fixture.texts(Scope::Emphasis), ["*emphasis*"]);
-    assert_eq!(fixture.texts(Scope::Alt), ["alt *text*"]);
+    assert_eq!(fixture.texts(Scope::Alt), ["alt *text*", "logo"]);
     Ok(())
 }
 
@@ -279,6 +298,14 @@ fn a_jsx_element_with_text() -> TestResult {
     }
     assert!(paragraphs.iter().any(|text| text == "A paragraph inside."));
     assert_eq!(fixture.texts(Scope::List), ["- A list item"]);
+    // One paragraph, with the expression and the tags as gaps in its segments.
+    assert_eq!(
+        paragraphs
+            .iter()
+            .filter(|text| text.starts_with("Text with"))
+            .collect::<Vec<_>>(),
+        ["Text with  inside and bold too."]
+    );
     Ok(())
 }
 
@@ -420,5 +447,182 @@ fn a_paragraph_over_indented_doc_lines() -> TestResult {
             .map_or(0, |i| i + 1);
         assert_eq!(&fixture.source[line_start..segment.start], "    /// ");
     }
+    Ok(())
+}
+
+#[test]
+fn code_html_and_definitions_are_gaps() -> TestResult {
+    let fixture = load("cuts.md")?;
+    for url in [
+        "https://example.com",
+        "https://def.example",
+        "https://h.example",
+        "https://x.example",
+    ] {
+        assert!(
+            !fixture.prose().iter().any(|text| text.contains(url)),
+            "{url} reached a prose node"
+        );
+    }
+    assert_eq!(fixture.texts(Scope::Paragraph), ["An item", "Click here."]);
+    assert_eq!(fixture.texts(Scope::List), ["- An item"]);
+    Ok(())
+}
+
+#[test]
+fn html_in_a_doc_comment_is_a_gap() -> TestResult {
+    let fixture = load("cuts.rs")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        ["Use Vec here, and `Vec<u8>` there."]
+    );
+    Ok(())
+}
+
+#[test]
+fn an_export_block_with_a_blank_line() -> TestResult {
+    let fixture = load("esm.mdx")?;
+    assert_eq!(fixture.texts(Scope::Paragraph), ["Text."]);
+    assert_eq!(fixture.texts(Scope::Heading1), ["# Heading"]);
+    assert!(
+        !fixture
+            .prose()
+            .iter()
+            .any(|text| text.contains("esm.example"))
+    );
+    Ok(())
+}
+
+#[test]
+fn table_rows_without_outer_pipes_and_in_a_quote() -> TestResult {
+    let fixture = load("table-no-pipes.md")?;
+    assert_eq!(
+        fixture.texts(Scope::TableRow),
+        ["Name Note", "a b", "Q R", "c d"]
+    );
+    assert_eq!(
+        fixture.texts(Scope::TableHeader),
+        ["Name", "Note", "Q", "R"]
+    );
+    assert_eq!(fixture.texts(Scope::TableCell), ["a", "b", "c", "d"]);
+    Ok(())
+}
+
+#[test]
+fn jsdoc_types_names_and_examples_are_not_prose() -> TestResult {
+    let fixture = load("jsdoc-more.ts")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        [
+            "Summary line.",
+            "The count.",
+            "The name.",
+            "The type.",
+            "Called when finished.",
+            "{@link Other} for more.\nText with a fence:",
+        ]
+    );
+    let prose = fixture.prose().join("\n");
+    for code in ["const x", "@Component", "class A", "{number}", "{string}"] {
+        assert!(!prose.contains(code), "{code} reached the prose");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_banner_leaves_no_punctuation() -> TestResult {
+    let fixture = load("banner.rs")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        ["Banner\nx", "Banner block", "Text."]
+    );
+    Ok(())
+}
+
+#[test]
+fn line_endings_and_tabs_stay_out_of_the_text() -> TestResult {
+    for name in ["crlf.rs", "tabs.rs", "tabs.md"] {
+        let fixture = load(name)?;
+        let paragraphs = fixture.texts(Scope::Paragraph);
+        assert!(!paragraphs.is_empty(), "{name} gave no paragraph");
+        for text in &paragraphs {
+            assert!(!text.contains('\r'), "{name}: {text:?}");
+            assert!(!text.contains("///"), "{name}: {text:?}");
+        }
+    }
+    // A Markdown file keeps its own line endings inside a paragraph.
+    assert_eq!(
+        load("crlf.md")?.texts(Scope::Paragraph),
+        ["First line\r\nsecond line.", "item"]
+    );
+    assert_eq!(
+        load("crlf.rs")?.texts(Scope::Paragraph),
+        ["First line\nsecond line.", "Block\ntext."]
+    );
+    assert_eq!(
+        load("tabs.rs")?.texts(Scope::Paragraph),
+        [
+            "Tabbed line one\ntabbed line two",
+            "Starred with tabs.\nSecond."
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn non_ascii_text_in_a_comment() -> TestResult {
+    let fixture = load("unicode.rs")?;
+    assert_eq!(
+        fixture.texts(Scope::Link),
+        ["[lien](https://é.example)", "[lien](https://é.example)"]
+    );
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        [
+            "Café naïve [lien](https://é.example) — ünï",
+            "Ünï [lien](https://é.example)",
+            "Ünïcode block"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_doc_block_without_stars() -> TestResult {
+    let fixture = load("no-stars.ts")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        ["Plain text line one.\nLine two."]
+    );
+    Ok(())
+}
+
+#[test]
+fn slashes_in_jsx_text_are_not_a_comment() -> TestResult {
+    let fixture = load("jsx-text.tsx")?;
+    assert_eq!(fixture.texts(Scope::CommentLine), ["// real comment"]);
+    assert_eq!(fixture.texts(Scope::Raw), ["// real comment"]);
+    Ok(())
+}
+
+/// The tree builder recurses once for each level of nesting.
+///
+/// Measured in a debug build on a test thread, which has a 2 MiB stack.
+/// Block quotes overflow between 500 and 750 levels, and nested lists between
+/// 250 and 500.
+/// markdown-rs itself parses 1,000 levels of either.
+/// The depths below stay well inside what works.
+#[test]
+fn deeply_nested_quotes_and_lists() -> TestResult {
+    let quotes = format!("{} deep\n", ">".repeat(400));
+    let tree = parse(Language::Markdown, &quotes)?;
+    assert_eq!(tree.roots.len(), 1);
+    let mut lists = String::new();
+    for level in 0..200 {
+        lists.push_str(&"  ".repeat(level));
+        lists.push_str("- item\n");
+    }
+    let tree = parse(Language::Markdown, &lists)?;
+    assert_eq!(tree.roots.len(), 1);
     Ok(())
 }

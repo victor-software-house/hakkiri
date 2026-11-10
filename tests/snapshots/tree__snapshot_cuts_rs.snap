@@ -1,0 +1,8 @@
+---
+source: tests/tree.rs
+expression: "load(\"cuts.rs\")? .render()"
+---
+raw 0..46 [0..46] "/// Use Vec<String> here, and `Vec<u8>` there."
+  text.comment.doc.line 0..46 [0..46] "/// Use Vec<String> here, and `Vec<u8>` there."
+    paragraph 4..46 [4..11, 19..46] "Use Vec here, and `Vec<u8>` there."
+      code 30..39 [30..39] "`Vec<u8>`"

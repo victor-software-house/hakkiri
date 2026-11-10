@@ -1,0 +1,3 @@
+let s = "unterminated
+// comment after
+let t = 1; // trailing
