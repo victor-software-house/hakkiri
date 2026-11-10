@@ -1,0 +1,9 @@
+---
+source: tests/tree.rs
+expression: "load(\"bare-url.rs\")? .render()"
+---
+raw 0..70 "// Read https://bare.example first.\n// Run `https://span.example` too."
+  text.comment.line 0..70 "// Read https://bare.example first.\n// Run `https://span.example` too."
+    paragraph 3..70 "Read https://bare.example first.\n// Run `https://span.example` too."
+      link 8..28 "https://bare.example"
+      code 43..65 "`https://span.example`"

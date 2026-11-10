@@ -1,0 +1,10 @@
+/** Sum two numbers.
+ * @param a The first number.
+ * @param {number} b - The second number.
+ * @returns The sum, as a [number](https://n.example).
+ */
+export function sum(a: number, b: number): number {
+    return a + b; // add them
+}
+
+const s = "https://string.example // not a comment";

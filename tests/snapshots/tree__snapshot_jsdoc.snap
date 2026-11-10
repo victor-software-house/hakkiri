@@ -1,0 +1,14 @@
+---
+source: tests/tree.rs
+expression: "load(\"jsdoc.ts\")? .render()"
+---
+raw 0..151 "/** Sum two numbers.\n * @param a The first number.\n * @param {number} b - The second number.\n * @returns The sum, as a [number](https://n.example).\n */"
+  text.comment.doc.block 0..151 "/** Sum two numbers.\n * @param a The first number.\n * @param {number} b - The second number.\n * @returns The sum, as a [number](https://n.example).\n */"
+    paragraph 4..20 "Sum two numbers."
+    paragraph 33..50 "The first number."
+    paragraph 74..92 "The second number."
+    paragraph 105..147 "The sum, as a [number](https://n.example)."
+      link 119..146 "[number](https://n.example)"
+raw 222..233 "// add them"
+  text.comment.line 222..233 "// add them"
+    paragraph 225..233 "add them"

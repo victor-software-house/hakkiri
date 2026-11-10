@@ -1,0 +1,6 @@
+fn main() {
+    let u = "https://example.com";
+    let w = r#"https://raw.example // not a comment"#;
+    println!("see https://macro.example");
+    // see the docs
+}

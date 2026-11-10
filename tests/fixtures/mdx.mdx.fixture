@@ -1,0 +1,21 @@
+---
+title: A page
+---
+
+import X from './x'
+
+export const meta = {}
+
+# Heading {meta.title}
+
+<Note title="t">Read this.</Note>
+
+Text with {expression} inside and <b>bold</b> too.
+
+<Callout>
+
+A paragraph inside.
+
+- A list item
+
+</Callout>

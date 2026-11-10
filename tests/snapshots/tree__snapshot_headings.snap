@@ -1,0 +1,15 @@
+---
+source: tests/tree.rs
+expression: "load(\"headings.md\")? .render()"
+---
+raw 0..134 "# One\n\n## Two\n\n### Three\n\n#### Four\n\n##### Five\n\n###### Six\n\nSetext title\n============\n\n> A quote with a [link](https://example.com).\n"
+  heading.h1 0..5 "# One"
+  heading.h2 7..13 "## Two"
+  heading.h3 15..24 "### Three"
+  heading.h4 26..35 "#### Four"
+  heading.h5 37..47 "##### Five"
+  heading.h6 49..59 "###### Six"
+  heading.h1 61..86 "Setext title\n============"
+  blockquote 88..133 "> A quote with a [link](https://example.com)."
+    paragraph 90..133 "A quote with a [link](https://example.com)."
+      link 105..132 "[link](https://example.com)"

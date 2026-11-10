@@ -1,0 +1,17 @@
+---
+source: tests/tree.rs
+expression: "load(\"doc-lines.rs\")? .render()"
+---
+raw 0..40 "/// First line\n///\n/// Second paragraph."
+  text.comment.doc.line 0..40 "/// First line\n///\n/// Second paragraph."
+    paragraph 4..14 "First line"
+    paragraph 23..40 "Second paragraph."
+raw 56..70 "//! Inner doc."
+  text.comment.doc.line 56..70 "//! Inner doc."
+    paragraph 60..70 "Inner doc."
+raw 72..109 "// A plain comment\n// over two lines."
+  text.comment.line 72..109 "// A plain comment\n// over two lines."
+    paragraph 75..109 "A plain comment\n// over two lines."
+raw 126..154 "//// Four slashes are plain."
+  text.comment.line 126..154 "//// Four slashes are plain."
+    paragraph 128..154 "// Four slashes are plain."
