@@ -31,4 +31,4 @@ None.
 - Sentences and words are not in this slice; the engine slice adds them with word counting.
 
 [ledger]: ../../../tasks.yaml
-[rule-format]: ../rule-format/design.md
+[rule-format]: ../archive/2026-11-10-rule-format/design.md

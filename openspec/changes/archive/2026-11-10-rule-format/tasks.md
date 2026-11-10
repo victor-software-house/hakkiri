@@ -18,8 +18,13 @@
 
 ## 3. Integration
 
-- [ ] 3.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
-- [ ] 3.2 Verify the operator approved the format on the pull request.
+- [x] 3.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+  - 2026-11-10 (UTC), [Verify][run-pr3] passed on [PR 3][pr3] at `e63c150`, and [Verify][run-pr4] passed on [PR 4][pr4] at `210b1f6`.  
+    The Template check skipped: neither pull request changed template files.
+- [x] 3.2 Verify the operator approved the format on the pull request.
+  - 2026-11-10 (UTC), the operator chose each format decision (operator, 2026-11-09 and 2026-11-10).  
+    The operator then directed the merge once every review thread was answered and resolved (operator, 2026-11-10).  
+    Kody's findings on [PR 3][pr3] and [PR 4][pr4] were fixed in [PR 4][pr4] and resolved, and the stack merged at `4646cb0`.
 
 ## Workflow follow-up
 
@@ -27,3 +32,7 @@
 
 [design]: design.md
 [rules]: prose-style-rules.md
+[pr3]: https://github.com/victor-software-house/hakkiri/pull/3
+[pr4]: https://github.com/victor-software-house/hakkiri/pull/4
+[run-pr3]: https://github.com/victor-software-house/hakkiri/actions/runs/42769690302
+[run-pr4]: https://github.com/victor-software-house/hakkiri/actions/runs/42770664229

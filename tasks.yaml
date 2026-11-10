@@ -1,29 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-002
+active: HKR-003
 queue:
-  - id: HKR-002
-    title: Design the rule and config format
-    scope: format
-    outcome: >-
-      One approved spec defines the rule files and .ctl/hakkiri.yaml before any
-      engine code.
-    blocked_by: []
-    acceptance:
-      - Every enabled ProseStyle rule and every frequency-habit rule is written in the format, none using lookbehind to rebuild structure.
-      - The operator approved the format.
-      - The rule-format OpenSpec change specifies rule files and .ctl/hakkiri.yaml, with fields and scopes from Vale and prose checks from Vale plus rates.
-    plan: openspec/changes/rule-format/proposal.md
-
   - id: HKR-003
     title: Build the document tree and language profiles
     scope: tree
     outcome: >-
       Markdown, MDX, and Rust, TypeScript and JavaScript comments parse into one node
       tree with byte spans.
-    blocked_by:
-      - HKR-002
+    blocked_by: []
     acceptance:
       - Snapshot tests show trees and spans for block comments, strings holding URLs, nested lists, tables and MDX.
       - String literals never appear as prose nodes.
@@ -34,8 +20,7 @@ queue:
     scope: engine
     outcome: >-
       Rules select text by scope, then run every Vale check type except script, with rates through metric.
-    blocked_by:
-      - HKR-002
+    blocked_by: []
     acceptance:
       - Each check type has unit tests.
       - Flesch-Kincaid matches Vale on the prose-style fixtures within a stated tolerance.
@@ -111,6 +96,18 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-002
+    title: Design the rule and config format
+    scope: format
+    outcome: >-
+      One approved spec defines the rule files and .ctl/hakkiri.yaml before any
+      engine code.
+    plan: openspec/changes/archive/2026-11-10-rule-format/proposal.md
+    completed: 2026-11-10T06:51:07
+    evidence:
+      - The rule-format change merged in PR 3 and PR 4 at 4646cb0 and is archived.
+    disposition: completed
+
   - id: HKR-001
     title: Scaffold the repository
     scope: repo
