@@ -153,10 +153,25 @@ impl Node {
         })
     }
 
+    /// Whether `gap`, which follows the byte `end` of `source`, holds a table
+    /// pipe that no backslash escapes.
+    fn has_delimiter(source: &str, end: usize, gap: &str) -> bool {
+        let mut previous = source
+            .get(..end)
+            .and_then(|before| before.chars().next_back());
+        for c in gap.chars() {
+            if c == '|' && previous != Some('\\') {
+                return true;
+            }
+            previous = Some(c);
+        }
+        false
+    }
+
     /// The text of this node in `source`: its segments in order.
     ///
     /// A line feed separates two segments with a line break between them,
-    /// and one space separates two cells of a table row.
+    /// and one space separates two cells of a table row, at a pipe in the gap.
     /// Any other gap reads as nothing.
     /// Returns `None` when a segment is not a slice of `source`.
     #[must_use]
@@ -168,7 +183,7 @@ impl Node {
                 let gap = source.get(end..segment.start)?;
                 if gap.contains('\n') {
                     text.push('\n');
-                } else if gap.contains('|') && gap.chars().all(|c| c == '|' || c.is_whitespace()) {
+                } else if Self::has_delimiter(source, end, gap) {
                     text.push(' ');
                 }
             }
@@ -201,4 +216,7 @@ pub struct Tree {
     /// The `raw` roots: one for a Markdown or MDX file, one per comment group
     /// for a source file.
     pub roots: Vec<Node>,
+    /// The number of fenced and indented code blocks in a Markdown or MDX
+    /// file, and 0 for a source file.
+    pub code_blocks: usize,
 }

@@ -10,6 +10,8 @@ mod error;
 mod jsdoc;
 mod language;
 mod markdown;
+pub mod pattern;
+pub mod rule;
 pub mod splitter;
 mod tree;
 
@@ -19,7 +21,8 @@ pub use tree::{Node, Scope, Tree};
 
 /// Parses `source`, the text of a file in `language`, into its document tree.
 ///
-/// A Markdown or MDX file gives one `raw` root that spans the whole file.
+/// A Markdown or MDX file gives one `raw` root that spans the whole file, and
+/// the tree counts its code blocks.
 /// A source file gives one `raw` root per comment group, so no string literal
 /// reaches the tree.
 /// A group is one comment, or adjacent line comments that share a marker.
@@ -29,13 +32,13 @@ pub use tree::{Node, Scope, Tree};
 /// Returns an [`Error`] when an MDX file has a syntax error, or when the
 /// grammar of a source language cannot load or cannot parse the file.
 pub fn parse(language: Language, source: &str) -> Result<Tree, Error> {
-    let roots = match language {
+    let (roots, code_blocks) = match language {
         Language::Markdown => markdown::document(source, markdown::Flavor::Markdown)?,
         Language::Mdx => markdown::document(source, markdown::Flavor::Mdx)?,
-        Language::Rust => comments::roots(comments::Dialect::Rust, source)?,
-        Language::TypeScript => comments::roots(comments::Dialect::TypeScript, source)?,
-        Language::Tsx => comments::roots(comments::Dialect::Tsx, source)?,
-        Language::JavaScript => comments::roots(comments::Dialect::JavaScript, source)?,
+        Language::Rust => (comments::roots(comments::Dialect::Rust, source)?, 0),
+        Language::TypeScript => (comments::roots(comments::Dialect::TypeScript, source)?, 0),
+        Language::Tsx => (comments::roots(comments::Dialect::Tsx, source)?, 0),
+        Language::JavaScript => (comments::roots(comments::Dialect::JavaScript, source)?, 0),
     };
-    Ok(Tree { roots })
+    Ok(Tree { roots, code_blocks })
 }
