@@ -59,8 +59,9 @@ fn is_decimal_integer(word: &str) -> bool {
 /// The shape of `word`: `d` for digits only, `p` for punctuation only, `o` for
 /// anything else without letters, `XX`, `xx`, `Xx` and `xX` for letters.
 ///
-/// Go reads the Unicode categories `Lu`, `Ll`, `Nd`, `P` and `S`. This reads
-/// the properties Rust has, which differ for a few characters such as `²`.
+/// Go reads the Unicode categories of upper and lower case letters, decimal
+/// digits, punctuation and symbols. This reads the properties Rust has, which
+/// differ for a few characters such as `²`.
 fn shape(word: &str) -> &'static str {
     let (mut upper, mut lower_count, mut digit, mut punct) = (0_usize, 0_usize, 0_usize, 0_usize);
     for c in word.chars() {
