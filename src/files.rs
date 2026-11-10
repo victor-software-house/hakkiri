@@ -74,14 +74,13 @@ impl Finder<'_> {
             }
             return;
         };
-        let Some(plan) = self
-            .project
-            .relative(file)
-            .and_then(|relative| self.project.plan(&relative))
-        else {
+        let Some(relative) = self.project.relative(file) else {
             return;
         };
-        if !self.seen.insert(path.clone()) {
+        let Some(plan) = self.project.plan(&relative) else {
+            return;
+        };
+        if !self.seen.insert(relative) {
             return;
         }
         let extension = file

@@ -3,12 +3,18 @@
 ### Requirement: A path is a file or a directory
 
 `hakkiri check` SHALL lint each file it is given and each file under each directory it is given, and SHALL lint the current directory when it is given none.  
-A walk SHALL skip `node_modules`, `.git` and each folder a `packages` entry names, comparing the resolved path of each folder with the resolved package paths.
+A walk SHALL skip `node_modules`, `.git` and each folder a `packages` entry names, comparing the resolved path of each folder with the resolved package paths.  
+It SHALL lint a file once, however many of the paths it is given reach that file.
 
 #### Scenario: A directory and a file
 
 - **WHEN** `hakkiri check docs README.md` runs and `docs` holds `a.md` and `sub/b.md`
 - **THEN** hakkiri lints `docs/a.md`, `docs/sub/b.md` and `README.md`
+
+#### Scenario: A file named two ways
+
+- **WHEN** `hakkiri check ../a.md .. ../../docs/a.md` runs in `docs/sub/` and `docs/a.md` draws one warning
+- **THEN** hakkiri prints that warning once, and counts one file
 
 #### Scenario: No argument
 

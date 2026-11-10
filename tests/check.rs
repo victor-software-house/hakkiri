@@ -573,6 +573,28 @@ fn a_walk_from_another_folder_skips_the_package_folders() -> TestResult {
 }
 
 #[test]
+fn a_file_named_two_ways_is_linted_once() -> TestResult {
+    let suite = Suite::new("check-twice");
+    let root = project(&suite, "twice", CONFIG);
+    root.file("docs/a.md", "This is very good.\n");
+    root.file("docs/sub/.keep", "");
+    let result = run(
+        &root.path().join("docs/sub"),
+        &["check", "../a.md", "..", "../../docs/a.md"],
+        &[("HAKKIRI_CONFIG", "../../.ctl/hakkiri.yaml")],
+    )?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "../a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
 fn a_package_path_is_read_from_the_root() -> TestResult {
     let suite = Suite::new("check-root-package");
     let root = project(&suite, "root-package", DOCS_CONFIG);

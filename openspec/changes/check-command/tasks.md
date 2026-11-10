@@ -27,6 +27,7 @@ Only the binary size measurement in task 1.2 runs on a box, because CI cannot.
   - A root reached through a symlink, and a symlink to a file.
   - A path outside the root with its warning, no path under the root, and a config elsewhere.
   - A walk from another folder that skips the package folders.
+  - A file named two ways, which is linted once.
 
 ## 3. Finding and linting files
 
