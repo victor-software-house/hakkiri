@@ -83,16 +83,16 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 - **WHEN** a dictionary declares a `SET` other than UTF-8 and ISO 8859-1
 - **THEN** hakkiri refuses it with an error that names the set, and Vale reads every set that `golang.org/x/text` knows ([case 6][case-6])
 
-[case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
-[case-3]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
-[case-4]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#4-model-is-refused
-[case-6]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
-[case-8]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#8-a-style-other-than-ap-or-chicago-is-refused
-[pattern-1]: ../../../archive/2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
-[pattern-2]: ../../../archive/2026-11-10-pattern-and-readability-checks/design.md#2-consistency-matches-as-existence-does-one-pattern-per-pair
-[pattern-3]: ../../../archive/2026-11-10-pattern-and-readability-checks/design.md#3-conditional-has-two-modes-chosen-by-the-second-pattern
-[pattern-6]: ../../../archive/2026-11-10-pattern-and-readability-checks/design.md#6-an-unknown-or-empty-metrics-list-is-refused
-[pattern-7]: ../../../archive/2026-11-10-pattern-and-readability-checks/design.md#7-ignorecase-on-a-conditional-applies-to-both-patterns
-[pattern-9]: ../../../archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
-[spelling-2]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
-[spelling-3]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses
+[case-1]: ../../../2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[case-3]: ../../../2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
+[case-4]: ../../../2026-11-10-case-and-sequence-checks/design.md#4-model-is-refused
+[case-6]: ../../../2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
+[case-8]: ../../../2026-11-10-case-and-sequence-checks/design.md#8-a-style-other-than-ap-or-chicago-is-refused
+[pattern-1]: ../../../2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
+[pattern-2]: ../../../2026-11-10-pattern-and-readability-checks/design.md#2-consistency-matches-as-existence-does-one-pattern-per-pair
+[pattern-3]: ../../../2026-11-10-pattern-and-readability-checks/design.md#3-conditional-has-two-modes-chosen-by-the-second-pattern
+[pattern-6]: ../../../2026-11-10-pattern-and-readability-checks/design.md#6-an-unknown-or-empty-metrics-list-is-refused
+[pattern-7]: ../../../2026-11-10-pattern-and-readability-checks/design.md#7-ignorecase-on-a-conditional-applies-to-both-patterns
+[pattern-9]: ../../../2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
+[spelling-2]: ../../../2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
+[spelling-3]: ../../../2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses

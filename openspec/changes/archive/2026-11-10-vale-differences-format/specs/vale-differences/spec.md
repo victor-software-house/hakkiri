@@ -57,13 +57,13 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml` and take Vale styles on
 - **WHEN** a project pins a package by version and hash
 - **THEN** hakkiri fetches and caches it with no separate sync step, where Vale needs `vale sync` ([bootstrap 5][bootstrap-5])
 
-[format-4]: ../../../archive/2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
-[format-5]: ../../../archive/2026-11-10-rule-format/design.md#5-release-1-implements-every-vale-check-type-but-script
-[format-6]: ../../../archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
-[format-8]: ../../../archive/2026-11-10-rule-format/design.md#8-every-comment-reads-as-markdown
-[format-9]: ../../../archive/2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
-[engine-3]: ../../../archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
-[engine-11]: ../../../archive/2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
-[engine-14]: ../../../archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
-[bootstrap-1]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
-[bootstrap-5]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#5-rules-ship-as-versioned-packages
+[format-4]: ../../../2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
+[format-5]: ../../../2026-11-10-rule-format/design.md#5-release-1-implements-every-vale-check-type-but-script
+[format-6]: ../../../2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
+[format-8]: ../../../2026-11-10-rule-format/design.md#8-every-comment-reads-as-markdown
+[format-9]: ../../../2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
+[engine-3]: ../../../2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
+[engine-11]: ../../../2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
+[engine-14]: ../../../2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
+[bootstrap-1]: ../../../2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
+[bootstrap-5]: ../../../2026-11-09-bootstrap-hakkiri/design.md#5-rules-ship-as-versioned-packages

@@ -42,10 +42,10 @@ Alternative: leave configuration to the importer's documentation. Lost: the list
 - [A probe of one input is read as a rule] → each scenario states the case it measured and no more.
 - [Decisions with no stated Vale behaviour stay unchecked] → a decision found later gets a probe before it joins the list.
 
-[first-design]: ../vale-differences/design.md
-[format]: ../archive/2026-11-10-rule-format/design.md
-[engine]: ../archive/2026-11-10-rule-engine/design.md
-[bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
+[first-design]: ../2026-11-10-vale-differences/design.md
+[format]: ../2026-11-10-rule-format/design.md
+[engine]: ../2026-11-10-rule-engine/design.md
+[bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
 [v-comment]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code_ts.go#L199-L203
 [v-rust]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/rs.go#L9-L19
 [v-table]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L51-L58

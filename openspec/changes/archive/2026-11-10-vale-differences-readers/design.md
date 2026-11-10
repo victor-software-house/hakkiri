@@ -48,8 +48,8 @@ Alternatives:
 
 - [A cost is read as a guarantee] → each scenario states the case and the cost the design measured, and no bound beyond it.
 
-[first-design]: ../vale-differences/design.md
-[case]: ../archive/2026-11-10-case-and-sequence-checks/design.md
-[spelling]: ../archive/2026-11-10-spelling-and-affix-checks/design.md
-[engine]: ../archive/2026-11-10-rule-engine/design.md
-[bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
+[first-design]: ../2026-11-10-vale-differences/design.md
+[case]: ../2026-11-10-case-and-sequence-checks/design.md
+[spelling]: ../2026-11-10-spelling-and-affix-checks/design.md
+[engine]: ../2026-11-10-rule-engine/design.md
+[bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
