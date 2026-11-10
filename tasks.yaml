@@ -88,6 +88,7 @@ queue:
       - Text inside an HTML block gets the alerts Vale 66bbb85 gives it, with the scope Vale gives it, on a fixture probed against Vale.
       - Entity unescaping, the masking of code, tt, kbd and samp text, and the handling of pre match Vale on probes.
       - The text after a closed raw-text tag on the same line and after --!> in a comment block gets the alerts Vale gives it, or a departure records why not.
+    plan: openspec/changes/html-block-text/proposal.md
 
   - id: HKR-026
     title: Run Vale's built-in spelling rule
