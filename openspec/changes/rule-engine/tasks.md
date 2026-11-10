@@ -70,11 +70,10 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify every [alerts scenario][alerts] passes as a unit test in CI.
   - 2026-11-10 (UTC), a test for each alerts scenario passes in the same box run, in [0647690][c-alerts].  
     The percent scenario gained `ignorecase: true`, which its capital letter needs.
-- [ ] 5.3 Run every check type of this change over a 50,000-character line and a 60,000-line file.  
+- [x] 5.3 Run every check type of this change over a 50,000-character line and a 60,000-line file.  
   Verify both long-input tests pass in CI with no panic, and record their run time in the evidence note.
-  - 2026-11-10 (UTC), both tests pass for `existence`, `substitution` and `occurrence` in a debug build: 26 ms for 50,000 characters, 25.3 s for 60,000 lines.  
-    `parse` takes nearly all of it: markdown-rs grows with the square of the line count, 2.5 s alone in a release build.  
-    `metric` joins with task 6.4.
+  - 2026-11-10 (UTC), both tests pass for all four check types in a Linux box, in a debug build: 88 ms for 50,000 characters, 27.7 s for 60,000 lines, in [d324f02][c-metric].  
+    `parse` takes nearly all of it: markdown-rs grows with the square of the line count, 2.5 s alone in a release build.
 
 ## 6. Checks
 
@@ -92,8 +91,11 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify its match-checks and rule-files scenarios pass as unit tests in CI.
   - 2026-11-10 (UTC), the two `occurrence` scenarios of the match-checks spec pass in the same box run, in [3868424][c-checks].  
     The rule-files spec has no `occurrence` scenario.
-- [ ] 6.4 Build `metric`: the variables, `occurrences`, element counts, the evaluator, the condition with `result`, and load errors.  
+- [x] 6.4 Build `metric`: the variables, `occurrences`, element counts, the evaluator, the condition with `result`, and load errors.  
   Verify every [metric-check scenario][metric] and the metric scenarios of the rule-files spec pass as unit tests in CI.
+  - 2026-11-10 (UTC), 13 metric tests cover every metric-check scenario and both rule-files scenarios, with 7 formula tests, in a Linux box, in [d324f02][c-metric].  
+    All 4,383 words of prose's syllable data match.  
+    Two of its three score cases match to 0.01, and the third has two sentences here, where prose finds one.
 
 ## 7. Flesch-Kincaid parity
 
@@ -102,8 +104,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify the measurement covers every such input.
 - [x] 7.2 Store the values in a fixture file under `tests/fixtures/` that names the Vale version and the prose-style commit.  
   Verify the fixture holds one entry per input.
-- [ ] 7.3 Compare hakkiri's values with the fixture at the tolerance the design states.  
+- [x] 7.3 Compare hakkiri's values with the fixture at the tolerance the design states.  
   Verify the parity test passes in CI and prints each input whose counts differ from Vale's.
+  - 2026-11-10 (UTC), the parity test passes in the same box run: 51 inputs, counts equal Vale's on all 51, scores within 0.01, in [d324f02][c-metric].
 
 ### Evidence for 7.1
 
@@ -135,6 +138,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-deny]: https://github.com/victor-software-house/hakkiri/commit/f23a9c9776a9e45e2acac151b825c0fdeedb2fb8
 [c-tree]: https://github.com/victor-software-house/hakkiri/commit/462eaa9e82ec229444a658904a23fbcd5be274ac
 [c-select]: https://github.com/victor-software-house/hakkiri/commit/3fdac6d3dcd3d3929577c34ff37f3e48a222e050
+[c-metric]: https://github.com/victor-software-house/hakkiri/commit/d324f02867451066e0af61e255c22fd803e36d5f
 [c-checks]: https://github.com/victor-software-house/hakkiri/commit/386842412facac10075a4b35a9ea49f0961a21e8
 [c-alerts]: https://github.com/victor-software-house/hakkiri/commit/06476907b5853a47114fceac438d3ce5125c86f3
 [c-words]: https://github.com/victor-software-house/hakkiri/commit/e5c502ed40a89137e68af0149b8c1b59d2ccef29
