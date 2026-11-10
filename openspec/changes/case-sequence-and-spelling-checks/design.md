@@ -118,9 +118,17 @@ The expansion uses the dictionary reader's affix rules, so `affix` lands with th
 
 ### 9. Tags come from a port of prose's tagger and model
 
-hakkiri ports prose's averaged perceptron and its Treebank tokenizer, about 2,300 lines of Go, and embeds the English model (operator, 2026-11-10).  
+hakkiri ports prose's averaged perceptron and its English tokenizer, `tokenize.New()`, and embeds the English model (operator, 2026-11-10).  
+Vale tags each sentence with that tokenizer and the perceptron, so the port is those two and not prose's Treebank tokenizer ([tag step][v-tag-text]).  
 The model is trained on UD English EWT under CC BY-SA 4.0, and weighs 1.9 MB ([MODELS.md][p-models]).  
 It ships as its own data file with its notice.
+
+The port keeps prose's case and category tests where Go and Rust agree.  
+The shape of a word reads Rust's Unicode properties and not Go's categories, so a word of characters such as `²` can get another shape, and so another feature.  
+A test compares tokens and tags with prose's on 188 sentences.
+
+The port splits a token's prefixes, suffixes and contractions in one pass, with the same tokens.  
+prose searches what is left of a token for a contraction ending again after each prefix or suffix it takes off, so a token of 20,000 marks takes quadratic time there.
 
 Creative Commons lists GPLv3 as compatible with BY-SA 4.0 ([compatible licenses][cc-compat]).  
 Section 13 of hakkiri's AGPLv3 allows a combination with GPLv3 work.
@@ -138,6 +146,22 @@ Alternatives:
 hakkiri ports Vale's `spell` package, about 2,900 lines of Go under MIT ([LICENSE][v-spell-license]) (operator, 2026-11-10).  
 It needs no C++ build, and it reads `ICONV` and the affix flags as Vale does.  
 The `affix` field reuses it.
+
+The port is smaller than Vale's package in three ways, none of which changes what an English dictionary accepts:
+
+- It makes every form of every entry when it loads, where Vale makes the forms of an entry when it looks a word up.
+- It leaves out the directives for compounds made by flag (`COMPOUNDFLAG`, `COMPOUNDBEGIN`, `COMPOUNDMIDDLE`, `COMPOUNDEND`), for suggestions, for Turkic casing and for `ß`. A dictionary that uses them loads, and a German or Dutch compound is not accepted.
+- It reads UTF-8 and ISO 8859-1 and refuses any other `SET` with an error that names it (operator, 2026-11-10). Vale reads every character set that `golang.org/x/text` knows, and reading them here would add `encoding_rs` as a dependency.
+
+It differs from Vale's package in two behaviours, where the port does what Hunspell does or what costs less:
+
+- A rule whose strip text is not on the word makes no form, as in Hunspell. Vale puts the affix on the whole word, so `cat` with a rule that strips `y` and adds `ies` gives `caties` there.
+- A word split at its breaks keeps the result of each part for each depth, so a token of many hyphenated parts takes polynomial time. Vale checks every part again at each split, and caches only the result for the whole word, so such a token takes exponential time there.
+
+A flag is one byte in a file that declares `SET UTF-8` and no `FLAG`, and one character in any other file, as in Vale.  
+In a Latin-1 file, `é` and `è` are therefore two flags.
+
+A test compares the words accepted with Vale's on about 9,000 words, run in Go.
 
 Alternatives:
 
@@ -186,7 +210,7 @@ Each crate was read on crates.io on 2026-11-10.
   Each has its own tests.
 
 [engine-design]: ../archive/2026-11-10-rule-engine/design.md
-[pattern-design]: ../pattern-and-readability-checks/design.md
+[pattern-design]: ../archive/2026-11-10-pattern-and-readability-checks/design.md
 [project-config]: ../../specs/project-config/spec.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [deny]: ../../../deny.toml
@@ -194,6 +218,7 @@ Each crate was read on crates.io on 2026-11-10.
 [v-seq-tokens]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L289-L330
 [v-seq-match]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L387-L497
 [v-seq-run]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L643-L733
+[v-tag-text]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/prose.go#L253-L288
 [v-upos]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/upos.go#L78-L95
 [v-cap-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L72-L109
 [v-case]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/variables.go#L87-L144

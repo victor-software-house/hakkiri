@@ -54,7 +54,7 @@ This change starts after the [rule-engine change][engine] merges.
 
 - Archive this change after the pull request merges, then archive `HKR-013` with `qctl close-from-openspec`.
 
-[engine]: ../archive/2026-11-10-rule-engine/proposal.md
+[engine]: ../2026-11-10-rule-engine/proposal.md
 [design]: design.md
 [pattern]: specs/pattern-checks/spec.md
 [readability]: specs/readability-check/spec.md
@@ -63,6 +63,6 @@ This change starts after the [rule-engine change][engine] merges.
 [c-consistency]: https://github.com/victor-software-house/hakkiri/commit/94c564949d03f8da42fdf3a2e50eee6216954a0e
 [c-conditional]: https://github.com/victor-software-house/hakkiri/commit/b4ae3a23b012a68da4157af139f6aefa63d19e4a
 [c-long]: https://github.com/victor-software-house/hakkiri/commit/9c98c9c570946359f0a94831b83ec702cf3238b1
-[hkr-016]: ../../../tasks.yaml
+[hkr-016]: ../../../../tasks.yaml
 [c-empty]: https://github.com/victor-software-house/hakkiri/commit/95255abde6a3e08a6b998559604578a14ddbeb99
 [pr-30]: https://github.com/victor-software-house/hakkiri/pull/30

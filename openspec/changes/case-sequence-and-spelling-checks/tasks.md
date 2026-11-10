@@ -43,7 +43,7 @@ This change starts after the [`pattern-and-readability-checks` change][pattern] 
 
 - Archive this change after the pull request merges, then archive `HKR-014` with `qctl close-from-openspec`.
 
-[pattern]: ../pattern-and-readability-checks/proposal.md
+[pattern]: ../archive/2026-11-10-pattern-and-readability-checks/proposal.md
 [design]: design.md
 [capitalization]: specs/capitalization-check/spec.md
 [sequence]: specs/sequence-check/spec.md
