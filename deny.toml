@@ -17,6 +17,8 @@ allow = [
     "Zlib",
     # hakkiri's own license
     "AGPL-3.0-or-later",
+    # encoding_rs, through ctl-core's input feature
+    "BSD-3-Clause",
 ]
 confidence-threshold = 0.93
 

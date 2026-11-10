@@ -12,6 +12,8 @@ deny_licenses:
     reason: foldhash, through serde_json in tree-sitter's build
 -   license: AGPL-3.0-or-later
     reason: hakkiri's own license
+-   license: BSD-3-Clause
+    reason: encoding_rs, through ctl-core's input feature
 deny_skip: []
 feature_sets: []
 generated_paths: []
