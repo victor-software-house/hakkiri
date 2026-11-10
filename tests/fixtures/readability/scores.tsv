@@ -1,0 +1,4 @@
+id	words	sentences	characters	automated_readability	coleman_liau	flesch_kincaid	gunning_fog	smog	dale_chall	flesch_reading_ease	lix
+scores-1	43	2	222	13.64	13.18	12.0	14.18	13.02	9.51	47.29	54.06
+scores-2	119	5	639	15.76	14.53	15.8	17.59	18.03	12.19	24.14	59.09
+scores-3	16	1	75	8.65	9.91	9.82	13.9	13.02	10.66	53.12	47.25

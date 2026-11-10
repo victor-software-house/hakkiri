@@ -177,3 +177,37 @@ horizon:
     outcome: hakkiri lsp shows alerts and offers swap fixes in editors.
     kind: deferred
     open: Release 1 has not shipped.
+
+  - id: HKR-016
+    title: Parse long Markdown files in linear time
+    scope: tree
+    outcome: >-
+      A Markdown file of 60,000 lines parses in time that grows linearly with its
+      size.
+    kind: research
+    open: "Measured: markdown-rs 1.0.0 alone takes 2.5 s at 60,000 lines in a release build, and 0.17 s at 15,000, so its time grows with the square of the line count, for one paragraph and for 60,000 separate paragraphs. Missing: whether upstream knows of it, and a fix, in markdown-rs or by splitting the source before it parses."
+
+  - id: HKR-017
+    title: Read comments in more languages
+    scope: tree
+    outcome: Comment prose in the common programming languages is linted, built in.
+    kind: deferred
+    open: The language list and its parsers are not chosen yet.
+
+  - id: HKR-018
+    title: Lint identifiers for machine-made naming
+    scope: rules
+    outcome: >-
+      Rules flag identifiers and code terms in the style recent language models
+      favour, such as kind, seam and gate.
+    kind: research
+    open: >-
+      No published study measures identifier vocabulary before and after 2022; a
+      counterfactual excess-frequency run on dated GitHub identifier tokens is the missing
+      evidence.
+    notes:
+      - 2026-11-10, Kobak et al. (Science Advances 2025) measure excess style words in PubMed abstracts against a pre-2023 counterfactual; their 900-word list is MIT at https://github.com/berenslab/llm-excess-vocab.
+      - '2026-11-10, Abraham (2026, unreviewed) clusters 461,121 GitHub PR descriptions; per secondary coverage, not checked in the repo, the growing cluster favours load-bearing, quietly, seam and genuinely: https://github.com/louisabraham/load-bearing.'
+      - '2026-11-10, Ronacher (2026) ranks agent-session words by inflation against wordfreq: https://lucumr.pocoo.org/2026/5/4/content-for-contents-sake/.'
+      - '2026-11-10, prior rule sets: https://github.com/tbhb/vale-ai-tells and https://github.com/Syntaf/vale-llm-slop (comments in source files).'
+      - 2026-11-10, Wikipedia Signs of AI writing warns that word tells change across model generations, so a list needs dated evidence and review.

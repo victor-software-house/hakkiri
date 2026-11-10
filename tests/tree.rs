@@ -177,6 +177,64 @@ snapshots! {
 }
 
 #[test]
+fn strong_text_and_a_link() -> TestResult {
+    let fixture = load("markup.md")?;
+    let paragraphs = fixture.texts(Scope::Paragraph);
+    assert_eq!(paragraphs[0], "A bold link here.");
+    assert_eq!(fixture.texts(Scope::Strong), ["bold"]);
+    assert_eq!(fixture.texts(Scope::Link)[0], "link");
+    Ok(())
+}
+
+#[test]
+fn a_code_span_and_an_image() -> TestResult {
+    let fixture = load("markup.md")?;
+    assert_eq!(fixture.texts(Scope::Code), ["cargo test"]);
+    assert_eq!(fixture.texts(Scope::Alt), ["the logo"]);
+    assert_eq!(fixture.texts(Scope::Paragraph)[1], "Run cargo test near .");
+    Ok(())
+}
+
+#[test]
+fn an_autolink_is_a_gap_around_itself() -> TestResult {
+    let fixture = load("markup.md")?;
+    assert_eq!(fixture.texts(Scope::Paragraph)[2], "Read  first.");
+    assert_eq!(fixture.texts(Scope::Link)[1], "https://b.example");
+    Ok(())
+}
+
+#[test]
+fn a_pipe_in_a_link_destination_outside_a_table_is_no_space() -> TestResult {
+    let fixture = load("pipe-link.md")?;
+    assert_eq!(fixture.texts(Scope::Paragraph), ["Open the page now."]);
+    Ok(())
+}
+
+#[test]
+fn a_bare_url_in_a_comment_is_a_gap_around_itself() -> TestResult {
+    let fixture = load("bare-url-gap.rs")?;
+    assert_eq!(
+        fixture.texts(Scope::CommentLine),
+        [fixture.source.trim_end()]
+    );
+    assert_eq!(fixture.texts(Scope::Paragraph), ["Read  first."]);
+    assert_eq!(fixture.texts(Scope::Link), ["https://bare.example"]);
+    Ok(())
+}
+
+#[test]
+fn two_fences_and_an_indented_block() -> TestResult {
+    assert_eq!(load("code-blocks.md")?.tree.code_blocks, 3);
+    Ok(())
+}
+
+#[test]
+fn a_source_file_has_no_code_blocks() -> TestResult {
+    assert_eq!(load("doc-lines.rs")?.tree.code_blocks, 0);
+    Ok(())
+}
+
+#[test]
 fn a_paragraph_in_a_markdown_file() -> TestResult {
     let fixture = load("heading-paragraph.md")?;
     let heading = fixture.nodes(Scope::Heading1);
@@ -211,12 +269,12 @@ fn a_table() -> TestResult {
     // A row reads its cells without the pipes, one space apart.
     assert_eq!(
         fixture.texts(Scope::TableRow),
-        ["Name Note", "a b", "longer cell `code` and **strong**"]
+        ["Name Note", "a b", "longer cell code and strong"]
     );
     let headers = fixture.texts(Scope::TableHeader);
     assert_eq!(headers, ["Name", "Note"]);
     let cells = fixture.texts(Scope::TableCell);
-    assert_eq!(cells, ["a", "b", "longer cell", "`code` and **strong**"]);
+    assert_eq!(cells, ["a", "b", "longer cell", "code and strong"]);
     for row in &rows[..2] {
         assert!(row.children.iter().all(|cell| cell.scope != Scope::Raw));
     }
@@ -263,16 +321,11 @@ fn spans_are_bytes_not_characters() -> TestResult {
     let fixture = load("inline.md")?;
     assert_eq!(
         fixture.texts(Scope::Link),
-        [
-            "[link](https://a.example)",
-            "[a reference][ref]",
-            "https://bare.example",
-            "[naïve link](https://b.example)",
-        ]
+        ["link", "a reference", "https://bare.example", "naïve link",]
     );
-    assert_eq!(fixture.texts(Scope::Code), ["`code`"]);
-    assert_eq!(fixture.texts(Scope::Strong), ["**strong**"]);
-    assert_eq!(fixture.texts(Scope::Emphasis), ["*emphasis*"]);
+    assert_eq!(fixture.texts(Scope::Code), ["code"]);
+    assert_eq!(fixture.texts(Scope::Strong), ["strong"]);
+    assert_eq!(fixture.texts(Scope::Emphasis), ["emphasis"]);
     assert_eq!(fixture.texts(Scope::Alt), ["alt *text*", "logo"]);
     Ok(())
 }
@@ -371,9 +424,9 @@ fn a_link_in_an_indented_doc_comment() -> TestResult {
         .source
         .find(doc_line)
         .ok_or("fixture line not found")?;
-    let target = "[the guide](https://g.example)";
-    let start = line_start + doc_line.find(target).ok_or("link not in line")?;
-    assert_eq!(links[0].span, start..start + target.len());
+    let text = "the guide";
+    let start = line_start + doc_line.find(text).ok_or("link not in line")?;
+    assert_eq!(links[0].span, start..start + text.len());
     Ok(())
 }
 
@@ -381,7 +434,7 @@ fn a_link_in_an_indented_doc_comment() -> TestResult {
 fn a_bare_url_in_a_plain_comment_is_a_link() -> TestResult {
     let fixture = load("bare-url.rs")?;
     assert_eq!(fixture.texts(Scope::Link), ["https://bare.example"]);
-    assert_eq!(fixture.texts(Scope::Code), ["`https://span.example`"]);
+    assert_eq!(fixture.texts(Scope::Code), ["https://span.example"]);
     Ok(())
 }
 
@@ -395,7 +448,7 @@ fn a_parameter_tag() -> TestResult {
             "Sum two numbers.",
             "The first number.",
             "The second number.",
-            "The sum, as a [number](https://n.example).",
+            "The sum, as a number.",
             "add them",
         ]
     );
@@ -477,7 +530,7 @@ fn html_in_a_doc_comment_is_a_gap() -> TestResult {
     let fixture = load("cuts.rs")?;
     assert_eq!(
         fixture.texts(Scope::Paragraph),
-        ["Use Vec here, and `Vec<u8>` there."]
+        ["Use Vec here, and Vec<u8> there."]
     );
     Ok(())
 }
@@ -574,17 +627,10 @@ fn line_endings_and_tabs_stay_out_of_the_text() -> TestResult {
 #[test]
 fn non_ascii_text_in_a_comment() -> TestResult {
     let fixture = load("unicode.rs")?;
-    assert_eq!(
-        fixture.texts(Scope::Link),
-        ["[lien](https://é.example)", "[lien](https://é.example)"]
-    );
+    assert_eq!(fixture.texts(Scope::Link), ["lien", "lien"]);
     assert_eq!(
         fixture.texts(Scope::Paragraph),
-        [
-            "Café naïve [lien](https://é.example) — ünï",
-            "Ünï [lien](https://é.example)",
-            "Ünïcode block"
-        ]
+        ["Café naïve lien — ünï", "Ünï lien", "Ünïcode block"]
     );
     Ok(())
 }

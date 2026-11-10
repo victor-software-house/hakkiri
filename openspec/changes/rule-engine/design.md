@@ -65,6 +65,7 @@ So is an autolink or a bare URL, which counts no words in Vale ([rule-format dec
 
 A code span becomes the one-letter word `x`, so it counts as one word, as the format decides.  
 An `existence` or `substitution` match that overlaps that word gives no alert.  
+An `occurrence` match that overlaps it does not count.  
 An inline exclusion such as `~link` turns each character of the element into spaces of the same byte width.  
 Vale does the same ([provider.go][v-without]), and offsets hold.
 
@@ -79,6 +80,7 @@ A sentence is a piece of one paragraph, heading or table cell, cut by hakkiri's 
 Vale segments the same blocks ([provider.go][v-segment]).
 
 A whole-file metric reads the paragraphs, list items and quotes joined by blank lines, as Vale's summary does ([ast.go][v-summary]).  
+In a code file it reads the paragraphs of the comments, which Vale's default does not (decision 16).  
 It then cuts at blank lines and sentences ([summarize.go][p-init]).  
 A word is a match of `(?:[A-Z]\.){2,}|[\p{N}\p{L}']+`, prose's word pattern ([regexp.go][p-words]).
 
@@ -88,6 +90,10 @@ Alternative: count words by whitespace. Lost: `characters` and syllables are cou
 
 The engine builds one table of line starts per file and finds a line by binary search.  
 A column counts characters from the line start, 1-based, and the last column is inclusive, as in Vale ([file.go][v-columns]).
+
+The last column is where the match's last character lies in the file.  
+Markup inside a match widens it, as in Vale's placement by byte offsets.  
+A match that goes on to the next line ends at the end of its first line.
 
 Alternative: find the match by searching for its text, as Vale's default path does ([file.go][v-search]). Lost: a repeated phrase lands on the wrong copy, and the search is quadratic on a long paragraph.
 
@@ -181,8 +187,44 @@ These rows join the intended differences of [rule-format decision 7][format-7]:
 | `\w`, `\d` and `\s` in a pattern | ASCII, while `\b` is Unicode ([regexp2 README][re2-mode]) | Unicode, as `\b` is, so `naïve` is one word |
 | Where a measurement alert points | Column 1 of its block's first line ([file.go][v-measure]) | The first byte of the measured node, so a list item points past its bullet |
 | A long word | Over six bytes ([summarize.go][p-complex]) | Over six characters |
+| `capitalize` on a match that starts with a digit or a symbol | Capitalizes the value, since changing the first character leaves the match unchanged ([substitution.go][v-capitalize]) | Capitalizes only when the match starts with a capital letter |
+| `$1` in a swap value, for a key with a space | The key as written misses a line wrap, so the alert is lost ([substitution.go][v-expand]) | The key as matched, its spaces matching a line wrap |
+| `occurrence` with matches of blank text only | Counts them, points at none, and gives no alert ([occurrence.go][v-occ-count]) | Points at the first word of the node |
+| `occurrence` over a match in code | Counts every match, then points at the first one that is not code ([occurrence.go][v-occ-count]) | A match that overlaps a code span is not counted |
+| A whole-file metric in a code file | Prints no value (operator, 2026-11-10). A comment joins the summary only when a `tree-sitter` View gives its query a markup format ([code_ts.go][v-code-summary]). The default Rust query has none ([rs.go][v-rust-query], [query.go][v-query-format]), so `lintLines` writes no summary ([code_ts.go][v-comment-lint], [ast.go][v-summarize]) | Measures the prose of the comments, built in |
 
-Alternative: Vale's behaviour in each case. Lost: a word with an accent would read as two words, and an alert would point at a bullet.
+Alternative: Vale's behaviour in each case.  
+Lost: a word with an accent would read as two words, an alert would point at a bullet, and `1st` would swap to `First`.  
+A `$1` key would lose its alert across a line wrap, and a count would include code.
+
+The comments row is a choice, not a repair of a Vale defect (operator, 2026-11-10).  
+The same holds at Vale 3.26.0 ([e2d4374][v-3-26-0]).  
+Alternative: match Vale's empty summary for a code file.  
+Lost: hakkiri measures comment prose by default, and the list of languages it reads will grow.  
+The [parity test][parity] asserts it on the 10 Rust inputs.
+
+### 17. An inline exclusion belongs to its scope item
+
+`~link`, `~code`, `~strong` and `~emphasis` blank an element for the blocks that the item holding them selects, and for no other block.  
+With `scope: [heading, 'paragraph & ~link']`, a link in a heading still reads as text, and a link in a paragraph reads as spaces.  
+When two items select one block, it reads with the exclusions of both.
+
+Vale gathers the exclusions of every item into one list, `Excluded`, and blanks them in every block the rule reads ([scope.go][v-excluded-list], [lint.go][v-excluded-use]).  
+That is a defect: an exclusion written for one item changes the text of another.
+
+Alternative: Vale's one list for the rule. Lost: `[heading, 'paragraph & ~link']` would also blank the links in headings, and a rule could not exclude an element in one scope only.
+
+### 18. Every phrase exception holds, overlapping or nested
+
+A match is held back when it lies inside any match of any multi-word exception.  
+That holds when two phrases overlap, such as `a b` and `b c` in `a b c`, and when one holds the other, such as `a b` and `a b c`.  
+Each phrase is searched on its own, and each search restarts one character past the start of its last match.
+
+Vale joins the phrases into one alternation, in list order, and reads its non-overlapping matches ([definition.go][v-phrases], [definition.go][v-within]).  
+In `a b c`, `b c` is never found after `a b`, and with `a b` ahead of `a b c`, the alternation stops at `a b`.  
+Vale then reports the `c`, in the first case and in the second when the list names `a b` first.
+
+Alternative: Vale's one alternation. Lost: an accepted phrase would still raise an alert when it overlaps another, or follows a shorter one in the list.
 
 ### Crates read
 
@@ -226,12 +268,26 @@ Each crate was read on crates.io on 2026-11-10.
 [v-blocks]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L51-L58
 [v-paragraph]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L396-L461
 [v-summary]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L465-L472
+[v-excluded-list]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/scope.go#L60-L62
+[v-excluded-use]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/lint.go#L781-L785
 [v-without]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/provider.go#L81-L100
 [v-segment]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/provider.go#L322-L357
 [v-columns]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L505-L551
 [v-search]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L612-L651
 [v-sort]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L343-L353
 [v-history]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L667-L685
+[v-capitalize]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/substitution.go#L500-L506
+[v-phrases]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L517-L539
+[v-within]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L541-L555
+[v-expand]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/substitution.go#L516-L522
+[v-occ-count]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/occurrence.go#L63-L109
+[v-code-summary]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code_ts.go#L112-L114
+[v-comment-lint]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code_ts.go#L199-L215
+[v-rust-query]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/rs.go#L11-L16
+[v-query-format]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/query.go#L166
+[v-summarize]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L464-L481
+[v-3-26-0]: https://github.com/vale-cli/vale/tree/e2d4374b1c66c8a1dd6d912bebc135040d8833fa
+[parity]: ../../../tests/parity.rs
 [v-measure]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L701-L729
 [v-metrics]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L362-L405
 [v-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L19-L121

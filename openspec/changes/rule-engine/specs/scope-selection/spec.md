@@ -62,20 +62,38 @@ A sentence SHALL keep the nodes around its node, so an exclusion such as `~block
 ### Requirement: A file extension narrows a scope
 
 A last scope part that names a file extension, such as `rs` in `raw.rs`, SHALL limit the scope to files with that extension.
+A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes only in files with that extension.  
+A scope item whose every part names another extension SHALL select nothing.
 
 #### Scenario: raw.rs in two files
 
 - **WHEN** a rule has `scope: raw.rs` and `tokens: [marker]`, and a Markdown file holds `A marker.` and a Rust file holds `// A marker.`
 - **THEN** hakkiri reports one alert, in the Rust file
 
+#### Scenario: A negated part for another language
+
+- **WHEN** a rule has `scope: text & ~heading.rs` and `tokens: [marker]`, and a Markdown file holds `# A marker`
+- **THEN** hakkiri reports one alert, on the heading
+
+#### Scenario: An item that names only another language
+
+- **WHEN** a rule has `scope: [~heading.rs]` and `tokens: [marker]`, and a Markdown file holds `# A marker` and `A marker.`
+- **THEN** hakkiri reports no alert
+
 ### Requirement: An inline exclusion blanks the element
 
 A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.
+The exclusion SHALL apply only to the blocks that its own scope item selects.
 
 #### Scenario: A word outside and inside a link
 
 - **WHEN** a rule has `scope: text & ~link` and `tokens: [marker]`, and the input is `See marker and [marker](https://x.example).`
 - **THEN** hakkiri reports one alert, at line 1, column 5
+
+#### Scenario: An exclusion in one item
+
+- **WHEN** a rule has `scope: [heading, 'paragraph & ~link']` and `tokens: [marker]`, and the input is a heading `# A [marker](https://x.example)` and a paragraph `See [marker](https://x.example).`
+- **THEN** hakkiri reports one alert, on the heading
 
 ### Requirement: A check reads text without inline markup
 

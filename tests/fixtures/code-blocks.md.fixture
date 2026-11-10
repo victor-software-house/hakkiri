@@ -1,0 +1,18 @@
+First fence:
+
+```sh
+cargo test
+```
+
+Second fence:
+
+```
+plain
+```
+
+An indented block:
+
+    indented
+    code
+
+Done.

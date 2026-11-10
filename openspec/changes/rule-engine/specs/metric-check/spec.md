@@ -54,8 +54,9 @@ In a metric with a scope, each element count SHALL be 0.
 ### Requirement: With no scope, a metric measures the prose of the file
 
 A `metric` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.  
-It SHALL leave out headings and table cells.  
-Text with no words SHALL give no alert.
+It SHALL leave out headings and table cells, and in a code file it SHALL measure the paragraphs of the comments.  
+Text with no words SHALL give no alert.  
+A `metric` rule with another `scope` SHALL measure each block that scope selects, and report at the start of that block.
 
 #### Scenario: A heading is not measured
 
@@ -67,15 +68,30 @@ Text with no words SHALL give no alert.
 - **WHEN** the same rule reads a file that holds only `# One two three`
 - **THEN** hakkiri reports no alert
 
+#### Scenario: A scope measures each block
+
+- **WHEN** a rule has `message: "%s"`, `scope: paragraph`, `formula: words` and `condition: '> 1'`, and the input is the paragraphs `One two three.`, `Four.` and `Five six.`
+- **THEN** hakkiri reports two alerts, with the messages `3.00` and `2.00`
+
+#### Scenario: A comment in a code file
+
+- **WHEN** the same rule reads a Rust file that holds `// One two three.` and `// Four five.` on two lines, above `fn main() {}`
+- **THEN** hakkiri reports one alert, with the message `5.00`
+
 ### Requirement: Formulas use Tengo's expression syntax
 
 A formula and a condition SHALL accept numbers, variables, parentheses, `+`, `-`, `*`, `/`, `%`, comparisons, `&&`, `||`, `!`, the functions of Tengo's `math` module written `math.sqrt(x)`, and `round(x)` or `round(x, places)`.  
-A condition MAY read `result`.
+A condition MAY read `result`, and the element counts as a formula does.
 
 #### Scenario: A two-sided condition
 
 - **WHEN** a rule has `message: "%s"`, `formula: round(words / 3, 1)` and `condition: '> 0.5 && result < 1'`, and the input is `One two.`
 - **THEN** hakkiri reports one alert, with the message `0.70`
+
+#### Scenario: A heading count in a condition
+
+- **WHEN** a rule has `message: "%s"`, `formula: paragraphs` and `condition: '>= heading.h2'`, and the input holds two `##` headings, each followed by a paragraph
+- **THEN** hakkiri reports one alert, with the message `2.00`
 
 ### Requirement: A formula that cannot run is refused
 

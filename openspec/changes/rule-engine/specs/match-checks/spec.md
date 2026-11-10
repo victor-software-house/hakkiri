@@ -47,6 +47,16 @@ A match inside a multi-word exception SHALL give no alert.
 - **WHEN** a rule has `tokens: [culpa]` and `exceptions: ['mea culpa']`, and the input is `A mea culpa and a culpa.`
 - **THEN** hakkiri reports one alert, at the second `culpa`
 
+#### Scenario: Two phrases that overlap
+
+- **WHEN** a rule has `tokens: [c]` and `exceptions: ['a b', 'b c']`, and the input is `a b c`
+- **THEN** hakkiri reports no alert
+
+#### Scenario: A phrase inside a longer phrase
+
+- **WHEN** a rule has `tokens: [c]` and `exceptions: ['a b', 'a b c']`, and the input is `a b c`
+- **THEN** hakkiri reports no alert
+
 ### Requirement: substitution tries longer keys first
 
 A `substitution` rule SHALL match its `swap` keys as `existence` matches tokens, trying longer keys first.  
@@ -75,6 +85,11 @@ With `capitalize: true`, a `substitution` rule SHALL capitalize the swap value w
 - **WHEN** a rule has `capitalize: true`, `message: "Use '%s' instead of '%s'."` and `swap: {utilize: use}`, and the input is `Utilize it.` with `ignorecase: true`
 - **THEN** hakkiri reports one alert, with the message `Use 'Use' instead of 'Utilize'.`
 
+#### Scenario: A match that starts with a digit
+
+- **WHEN** a rule has `capitalize: true`, `nonword: true`, `message: "Use '%s' instead of '%s'."` and `swap: {'\d+st': first}`, and the input is `Take 1st.`
+- **THEN** hakkiri reports one alert, with the message `Use 'first' instead of '1st'.`
+
 ### Requirement: A swap value can use the key's groups
 
 A `$1` in a swap value SHALL read as the text the first group of its key matched, and so on for each group.
@@ -84,10 +99,16 @@ A `$1` in a swap value SHALL read as the text the first group of its key matched
 - **WHEN** a rule has `message: "Use '%s' instead of '%s'."` and `swap: {'(\w+) out of': '$1 from'}`, and the input is `Jump out of it.`
 - **THEN** hakkiri reports one alert, with the message `Use 'Jump from' instead of 'Jump out of'.`
 
+#### Scenario: A key across a line wrap
+
+- **WHEN** the rule above reads `Jump` and a line feed before `out of it.`
+- **THEN** hakkiri reports one alert, with the message `Use 'Jump from' instead of 'Jump out of'.`
+
 ### Requirement: occurrence counts the token as written
 
 An `occurrence` rule SHALL count the matches of its `token` in each selected node, with no word boundaries added.  
 It SHALL report when the count is over `max` or under `min`.  
+A match that overlaps a code span SHALL NOT count.  
 Its message and description SHALL read `%d` as `%s`, so the count fills either one.
 
 #### Scenario: Matches inside words
@@ -97,8 +118,18 @@ Its message and description SHALL read `%d` as `%s`, so the count fills either o
 
 ### Requirement: An occurrence alert points at a match
 
-An alert over `max` SHALL point at the first match that is not a code span.  
-An alert under `min` with no match SHALL point at the first word of the node.
+An alert SHALL point at the first counted match that is not blank.  
+When there is none, it SHALL point at the first word of the node.
+
+#### Scenario: A match inside code
+
+- **WHEN** a rule has `extends: occurrence`, `max: 1` and `token: x`, and the input is ``A box, `cargo` and `make`.``
+- **THEN** hakkiri reports no alert
+
+#### Scenario: Matches of blanks only
+
+- **WHEN** a rule has `extends: occurrence`, `message: "%d found"`, `min: 3` and `token: '[ ]'`, and the input is `One two three.`
+- **THEN** hakkiri reports one alert, with the message `2 found` and the matched text `One`
 
 #### Scenario: Too few matches
 

@@ -53,6 +53,32 @@ pub enum Scope {
 }
 
 impl Scope {
+    /// Every scope.
+    pub const ALL: [Self; 22] = [
+        Self::Paragraph,
+        Self::Heading1,
+        Self::Heading2,
+        Self::Heading3,
+        Self::Heading4,
+        Self::Heading5,
+        Self::Heading6,
+        Self::Blockquote,
+        Self::List,
+        Self::TableRow,
+        Self::TableHeader,
+        Self::TableCell,
+        Self::Link,
+        Self::Code,
+        Self::Strong,
+        Self::Emphasis,
+        Self::Alt,
+        Self::Raw,
+        Self::CommentLine,
+        Self::CommentBlock,
+        Self::CommentDocLine,
+        Self::CommentDocBlock,
+    ];
+
     /// The lowercase dotted name a rule's `scope` uses, such as `heading.h1`.
     #[must_use]
     pub const fn name(self) -> &'static str {
@@ -153,24 +179,77 @@ impl Node {
         })
     }
 
+    /// What reads between two segments: the byte `end` of `source`, where one
+    /// segment ends, and `next`, where the next one starts.
+    ///
+    /// A line feed reads where the gap holds a line break, and one space where
+    /// the gap lies inside one of the table `rows` and holds a pipe that no
+    /// backslash escapes.
+    /// Any other gap, such as a link's destination, and a gap that is not a
+    /// slice of `source`, reads as nothing.
+    pub(crate) fn separator(
+        source: &str,
+        rows: &[Range<usize>],
+        end: usize,
+        next: usize,
+    ) -> Option<char> {
+        let gap = source.get(end..next)?;
+        if gap.contains('\n') {
+            return Some('\n');
+        }
+        if !Self::in_row(rows, end, next) {
+            return None;
+        }
+        let mut previous = source
+            .get(..end)
+            .and_then(|before| before.chars().next_back());
+        for c in gap.chars() {
+            if c == '|' && previous != Some('\\') {
+                return Some(' ');
+            }
+            previous = Some(c);
+        }
+        None
+    }
+
+    /// The spans of the table rows in this node and below it, in document
+    /// order. A row's cells are not read: a row holds no other row.
+    pub(crate) fn rows(&self) -> Vec<Range<usize>> {
+        let mut rows = Vec::new();
+        let mut pending = vec![self];
+        while let Some(node) = pending.pop() {
+            if node.scope == Scope::TableRow {
+                rows.push(node.span.clone());
+            } else {
+                pending.extend(node.children.iter().rev());
+            }
+        }
+        rows
+    }
+
+    /// Whether the gap from the byte `end` to the byte `next` lies inside one
+    /// of the `rows`.
+    fn in_row(rows: &[Range<usize>], end: usize, next: usize) -> bool {
+        let row = rows.partition_point(|row| row.end < next);
+        rows.get(row).is_some_and(|row| row.start <= end)
+    }
+
     /// The text of this node in `source`: its segments in order.
     ///
     /// A line feed separates two segments with a line break between them,
-    /// and one space separates two cells of a table row.
-    /// Any other gap reads as nothing.
+    /// and one space separates two cells of a table row, at a pipe in a gap
+    /// inside the row. Any other gap, such as a link's destination, reads as
+    /// nothing.
     /// Returns `None` when a segment is not a slice of `source`.
     #[must_use]
     pub fn text(&self, source: &str) -> Option<String> {
+        let rows = self.rows();
         let mut text = String::new();
         let mut previous_end = None;
         for segment in &self.segments {
             if let Some(end) = previous_end {
-                let gap = source.get(end..segment.start)?;
-                if gap.contains('\n') {
-                    text.push('\n');
-                } else if gap.contains('|') && gap.chars().all(|c| c == '|' || c.is_whitespace()) {
-                    text.push(' ');
-                }
+                source.get(end..segment.start)?;
+                text.extend(Self::separator(source, &rows, end, segment.start));
             }
             text.push_str(source.get(segment.clone())?);
             previous_end = Some(segment.end);
@@ -201,4 +280,7 @@ pub struct Tree {
     /// The `raw` roots: one for a Markdown or MDX file, one per comment group
     /// for a source file.
     pub roots: Vec<Node>,
+    /// The number of fenced and indented code blocks in a Markdown or MDX
+    /// file, and 0 for a source file.
+    pub code_blocks: usize,
 }

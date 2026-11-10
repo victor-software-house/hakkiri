@@ -83,6 +83,26 @@ hakkiri SHALL refuse a rule with a pattern that neither regex engine compiles, a
 - **WHEN** `Team.Broken` has `extends: existence` and `tokens: ['(unclosed']`
 - **THEN** hakkiri reports an error naming `Team.Broken` and `(unclosed`, and exits with a failure status
 
+### Requirement: A pattern with nothing to match is refused
+
+hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` hold nothing to match, and a `metric` rule that lists `tokens` or `raw` holding nothing, because such a pattern matches at every position.  
+The error SHALL name the file, the line, `tokens` and `raw`.
+
+#### Scenario: An existence rule with no tokens
+
+- **WHEN** `Team/Empty.yml` holds `extends: existence` and `message: m` only
+- **THEN** hakkiri reports an error naming `Team/Empty.yml`, line 1, `tokens` and `raw`, and exits with a failure status
+
+#### Scenario: Tokens of blanks only
+
+- **WHEN** an `existence` rule holds `tokens: ['', '  ']` and no `raw`
+- **THEN** hakkiri reports the same error
+
+#### Scenario: A metric with an empty raw
+
+- **WHEN** a `metric` rule holds `raw: ['']` and no `tokens`
+- **THEN** hakkiri reports the same error
+
 ### Requirement: A YAML error names the line
 
 hakkiri SHALL refuse a rule file that is not valid YAML, and report an error that names the file and the line of the fault.

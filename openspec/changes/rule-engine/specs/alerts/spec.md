@@ -26,6 +26,16 @@ Lines and columns SHALL start at 1, and a column SHALL count characters, not byt
 - **WHEN** the rule above reads `Café very good.`
 - **THEN** the alert is on line 1, columns 6 to 9
 
+### Requirement: The last column is where the match ends in the file
+
+The last column SHALL be that of the match's last character in the file, so markup inside a match counts toward it.  
+A match that goes on to the next line SHALL end at the end of its first line.
+
+#### Scenario: A match across markup
+
+- **WHEN** a rule has `tokens: ['very easy']` and the input is `**very** easy`
+- **THEN** the alert is on line 1, columns 3 to 13
+
 ### Requirement: A position inside a comment points into the file
 
 The line and columns of a match inside a comment SHALL be those of its bytes in the file.
@@ -42,7 +52,7 @@ A line break inside a value SHALL read as one space.
 
 #### Scenario: A percent sign
 
-- **WHEN** a rule has `message: "'%s' is 100%% filler."` and `tokens: [basically]`, and the input is `Basically, yes.`
+- **WHEN** a rule has `message: "'%s' is 100%% filler."`, `ignorecase: true` and `tokens: [basically]`, and the input is `Basically, yes.`
 - **THEN** the alert message is `'Basically' is 100% filler.`
 
 #### Scenario: A match across a line break
@@ -86,7 +96,7 @@ It SHALL NOT panic.
 
 #### Scenario: Nested repeats with a lookahead
 
-- **WHEN** rule `Team.Slow` has `nonword: true` and `tokens: ['(a+)+(?=b)']`, and the input is one line of 50,000 `a` characters
+- **WHEN** rule `Team.Slow` has `nonword: true` and `tokens: ['(a+)+(?=b)c']`, and the input is one line of 50,000 `a` characters
 - **THEN** hakkiri reports one `error` alert for `Team.Slow` that names the backtrack limit, and the other rules report as usual
 
 ### Requirement: Long input finishes

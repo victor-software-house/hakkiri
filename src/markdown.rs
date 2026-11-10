@@ -1,6 +1,6 @@
 //! Markdown and MDX text into nodes, through markdown-rs.
 
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::ops::Range;
 
 use markdown::mdast::Node as Mdast;
@@ -171,16 +171,29 @@ fn first_error(root: SyntaxNode<'_>) -> SyntaxNode<'_> {
 }
 
 /// The tree of a whole Markdown or MDX file: one `raw` root over the prose
-/// nodes.
-pub(crate) fn document(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
-    let children = blocks(source, flavor)?;
-    Ok(vec![Node::new(Scope::Raw, 0..source.len(), children)])
+/// nodes, and the number of its fenced and indented code blocks.
+pub(crate) fn document(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
+    let (children, code_blocks) = build(source, flavor)?;
+    Ok((
+        vec![Node::new(Scope::Raw, 0..source.len(), children)],
+        code_blocks,
+    ))
 }
 
 /// The prose nodes of `source`, with spans in `source`.
 pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
+    Ok(build(source, flavor)?.0)
+}
+
+/// The prose nodes of `source` and its number of code blocks.
+fn build(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
     let root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
-    Ok(Builder { source }.visit(&root, Scope::TableCell).nodes)
+    let builder = Builder {
+        source,
+        code_blocks: Cell::new(0),
+    };
+    let nodes = builder.visit(&root, Scope::TableCell).nodes;
+    Ok((nodes, builder.code_blocks.get()))
 }
 
 /// What a visit of one mdast node gives its parent.
@@ -210,6 +223,8 @@ impl Visited {
 
 struct Builder<'a> {
     source: &'a str,
+    /// The fenced and indented code blocks seen so far.
+    code_blocks: Cell<usize>,
 }
 
 /// How a node of the mdast takes part in the tree.
@@ -222,6 +237,16 @@ enum Kind {
     Jsx,
     /// No node of its own: the nodes below it go to its parent.
     Transparent,
+}
+
+/// The syntax an inline node holds that is not its text.
+struct Markup {
+    /// The span of the node's own text, markers aside.
+    span: Range<usize>,
+    /// What the node's own text leaves out.
+    own: Vec<Range<usize>>,
+    /// What the text around the node leaves out.
+    up: Vec<Range<usize>>,
 }
 
 /// What the builder does with a node before it looks below it.
@@ -322,6 +347,10 @@ impl Builder<'_> {
             Mdast::Image(_) | Mdast::ImageReference(_) => Step::Done(self.alt(node)),
             Mdast::MdxJsxFlowElement(_) | Mdast::MdxJsxTextElement(_) => Step::Open(Kind::Jsx),
             // Syntax that is not prose is a gap in the text around it.
+            Mdast::Code(_) => {
+                self.code_blocks.set(self.code_blocks.get() + 1);
+                Step::Done(Visited::cut(span_of(node)))
+            }
             Mdast::MdxjsEsm(_)
             | Mdast::MdxFlowExpression(_)
             | Mdast::MdxTextExpression(_)
@@ -329,7 +358,6 @@ impl Builder<'_> {
             | Mdast::Yaml(_)
             | Mdast::InlineMath(_)
             | Mdast::Html(_)
-            | Mdast::Code(_)
             | Mdast::Math(_)
             | Mdast::Definition(_) => Step::Done(Visited::cut(span_of(node))),
             Mdast::Root(_)
@@ -350,7 +378,7 @@ impl Builder<'_> {
             Kind::Scoped(scope) => self.scoped(frame.node, scope, frame.inner),
             Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner),
             Kind::Jsx => Self::jsx(frame.node, frame.inner),
-            Kind::Transparent => frame.inner,
+            Kind::Transparent => Self::strikethrough(frame.node, frame.inner),
         }
     }
 
@@ -366,10 +394,12 @@ impl Builder<'_> {
         let Some(span) = span_of(node).map(|span| self.trimmed(scope, span)) else {
             return inner;
         };
+        let Markup { span, own, up } = self.markup(node, scope, span);
         let Visited {
             nodes: children,
-            cuts,
+            mut cuts,
         } = inner;
+        cuts.extend(own);
         let segments = match scope {
             // A container reads as the content inside it.
             Scope::TableRow | Scope::Blockquote | Scope::List => children
@@ -410,7 +440,130 @@ impl Builder<'_> {
                 .into_iter()
                 .collect()
         };
+        cuts.extend(up);
         Visited { nodes, cuts }
+    }
+
+    /// The syntax of an inline node that is not its text.
+    ///
+    /// Strong text, emphasis and a link written with brackets lose the
+    /// markers around what they hold, in their own text and in the text
+    /// around them.
+    /// A code span loses its backticks the same way, and keeps its content.
+    /// An autolink and a bare URL keep their address as their own text, and
+    /// the text around them loses the whole of it.
+    fn markup(&self, node: &Mdast, scope: Scope, span: Range<usize>) -> Markup {
+        match scope {
+            Scope::Strong | Scope::Emphasis => {
+                let cuts = Self::wrapper(node, &span);
+                Markup {
+                    span,
+                    own: cuts.clone(),
+                    up: cuts,
+                }
+            }
+            Scope::Link => {
+                let text = self.source.get(span.clone()).unwrap_or_default();
+                if text.starts_with('[') {
+                    let cuts = Self::wrapper(node, &span);
+                    return Markup {
+                        span,
+                        own: cuts.clone(),
+                        up: cuts,
+                    };
+                }
+                let inner = if text.starts_with('<') && text.ends_with('>') && text.len() >= 2 {
+                    span.start + 1..span.end - 1
+                } else {
+                    span.clone()
+                };
+                Markup {
+                    span: inner,
+                    own: Vec::new(),
+                    up: vec![span],
+                }
+            }
+            Scope::Code => {
+                let content = self.code_content(&span);
+                let cuts = vec![span.start..content.start, content.end..span.end];
+                Markup {
+                    span: content,
+                    own: cuts.clone(),
+                    up: cuts,
+                }
+            }
+            Scope::Paragraph
+            | Scope::Heading1
+            | Scope::Heading2
+            | Scope::Heading3
+            | Scope::Heading4
+            | Scope::Heading5
+            | Scope::Heading6
+            | Scope::Blockquote
+            | Scope::List
+            | Scope::TableRow
+            | Scope::TableHeader
+            | Scope::TableCell
+            | Scope::Alt
+            | Scope::Raw
+            | Scope::CommentLine
+            | Scope::CommentBlock
+            | Scope::CommentDocLine
+            | Scope::CommentDocBlock => Markup {
+                span,
+                own: Vec::new(),
+                up: Vec::new(),
+            },
+        }
+    }
+
+    /// The markers before the first child of `node` and after its last.
+    ///
+    /// A node with no child is cut whole.
+    fn wrapper(node: &Mdast, span: &Range<usize>) -> Vec<Range<usize>> {
+        let children = node.children().map_or(&[][..], Vec::as_slice);
+        match (
+            children.first().and_then(span_of),
+            children.last().and_then(span_of),
+        ) {
+            (Some(first), Some(last)) => {
+                vec![span.start..first.start, last.end..span.end]
+            }
+            _ => vec![span.clone()],
+        }
+    }
+
+    /// A strikethrough loses its tildes, and gives the nodes inside it to its
+    /// parent.
+    fn strikethrough(node: &Mdast, mut inner: Visited) -> Visited {
+        if let (Mdast::Delete(_), Some(span)) = (node, span_of(node)) {
+            inner.cuts.extend(Self::wrapper(node, &span));
+        }
+        inner
+    }
+
+    /// The content of the code span at `span`: between its backtick runs,
+    /// without the one space a span pads its content with when both ends have
+    /// one.
+    fn code_content(&self, span: &Range<usize>) -> Range<usize> {
+        let text = self.source.get(span.clone()).unwrap_or_default();
+        let ticks = text.len() - text.trim_start_matches('`').len();
+        if text.len() < ticks * 2 {
+            return span.clone();
+        }
+        let start = span.start + ticks;
+        let end = span.end - ticks;
+        let content = self.source.get(start..end).unwrap_or_default();
+        let padding = |c: char| c == ' ' || c == '\n';
+        let padded = content.len() >= 2
+            && content.starts_with(padding)
+            && content.ends_with(padding)
+            && !content.chars().all(padding);
+        if padded {
+            start + 1..end - 1
+        } else {
+            start..end
+        }
     }
 
     /// The lines of `span` that no cut covers, one range each.
@@ -575,7 +728,7 @@ impl Builder<'_> {
                 .map(|span| Node::new(Scope::Alt, span, Vec::new()))
                 .into_iter()
                 .collect(),
-            cuts: Vec::new(),
+            cuts: span_of(node).into_iter().collect(),
         }
     }
 }
