@@ -161,6 +161,7 @@ snapshots! {
     snapshot_jsdoc_more: "jsdoc-more.ts",
     snapshot_banner: "banner.rs",
     snapshot_crlf_md: "crlf.md",
+    snapshot_quote_paragraph: "quote-paragraph.md",
     snapshot_crlf_rs: "crlf.rs",
     snapshot_tabs_rs: "tabs.rs",
     snapshot_tabs_md: "tabs.md",
@@ -550,10 +551,9 @@ fn line_endings_and_tabs_stay_out_of_the_text() -> TestResult {
             assert!(!text.contains("///"), "{name}: {text:?}");
         }
     }
-    // A Markdown file keeps its own line endings inside a paragraph.
     assert_eq!(
         load("crlf.md")?.texts(Scope::Paragraph),
-        ["First line\r\nsecond line.", "item"]
+        ["First line\nsecond line.", "item"]
     );
     assert_eq!(
         load("crlf.rs")?.texts(Scope::Paragraph),
@@ -624,5 +624,35 @@ fn deeply_nested_quotes_and_lists() -> TestResult {
     }
     let tree = parse(Language::Markdown, &lists)?;
     assert_eq!(tree.roots.len(), 1);
+    Ok(())
+}
+
+#[test]
+fn a_paragraph_in_a_quote_or_a_list_item_leaves_out_the_markers() -> TestResult {
+    let fixture = load("quote-paragraph.md")?;
+    let paragraphs = fixture.nodes(Scope::Paragraph);
+    let texts: Vec<String> = paragraphs
+        .iter()
+        .map(|paragraph| fixture.text(paragraph))
+        .collect();
+    assert_eq!(
+        texts,
+        [
+            "First line\nsecond line.",
+            "Nested one\nnested two.",
+            "Item first\nitem second",
+            "Child first\nchild second",
+            "Quoted item\ncontinues here.",
+            "Lazy start\nlazy line.",
+        ]
+    );
+    for paragraph in paragraphs {
+        assert_eq!(paragraph.segments.len(), 2);
+        for segment in &paragraph.segments {
+            let line = fixture.source.get(segment.clone()).unwrap_or_default();
+            assert_eq!(line, line.trim(), "{line:?} keeps a marker or indentation");
+            assert!(!line.starts_with('>'), "{line:?} keeps a marker");
+        }
+    }
     Ok(())
 }

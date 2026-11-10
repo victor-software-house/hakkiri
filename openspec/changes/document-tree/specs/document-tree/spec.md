@@ -11,12 +11,30 @@ Rules select text from this tree, and alerts point back into the file through th
 
 Each node in the tree SHALL hold its scope name, the byte span of its text in the file, its segments and its child nodes.  
 The segments are the byte ranges of the node's text.  
-The span runs from the start of the first segment to the end of the last.
+The span runs from the start of the first segment to the end of the last.  
 
 #### Scenario: A paragraph in a Markdown file
 
 - **WHEN** a Markdown file holds `# Title`, a blank line, and `One line.`
 - **THEN** the tree holds a `heading.h1` node spanning bytes 0 to 7 and a `paragraph` node spanning bytes 9 to 18
+
+### Requirement: A Markdown line is one segment
+
+A Markdown paragraph, heading or inline node SHALL hold one segment for each line of its text.
+
+A segment leaves out the line ending.  
+It also leaves out the indentation and the block quote markers in front of the line.
+
+#### Scenario: A paragraph in a block quote
+
+- **WHEN** a Markdown file holds the lines `> First line` and `> second line.`
+- **THEN** the tree holds one `paragraph` node with two segments, the bytes of `First line` and of `second line.`, with no `>` marker in either
+- **AND** its text is those two lines joined by a line feed
+
+#### Scenario: A list item that continues on an indented line
+
+- **WHEN** a Markdown file holds the line `- Item first` and a line `item second` that is indented by two spaces
+- **THEN** the `paragraph` node has two segments, the second without its two-space indent
 
 ### Requirement: Markdown nodes carry Vale scope names
 

@@ -9,7 +9,7 @@ raw 0..134 [0..134] "# One\n\n## Two\n\n### Three\n\n#### Four\n\n##### Five\n\n
   heading.h4 26..35 [26..35] "#### Four"
   heading.h5 37..47 [37..47] "##### Five"
   heading.h6 49..59 [49..59] "###### Six"
-  heading.h1 61..86 [61..86] "Setext title\n============"
+  heading.h1 61..86 [61..73, 74..86] "Setext title\n============"
   blockquote 88..133 [88..133] "> A quote with a [link](https://example.com)."
     paragraph 90..133 [90..133] "A quote with a [link](https://example.com)."
       link 105..132 [105..132] "[link](https://example.com)"

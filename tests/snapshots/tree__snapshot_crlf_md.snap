@@ -4,6 +4,6 @@ expression: "load(\"crlf.md\")? .render()"
 ---
 raw 0..47 [0..47] "# Title\r\n\r\nFirst line\r\nsecond line.\r\n\r\n- item\r\n"
   heading.h1 0..7 [0..7] "# Title"
-  paragraph 11..35 [11..35] "First line\r\nsecond line."
+  paragraph 11..35 [11..21, 23..35] "First line\nsecond line."
   list 39..45 [39..45] "- item"
     paragraph 41..45 [41..45] "item"

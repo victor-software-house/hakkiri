@@ -47,6 +47,13 @@ The stripped text parses as Markdown (rule-format decision 8).
 Each Markdown node maps back through that table to its segments, one byte range for each line of its text.  
 A segment leaves out the markers and the stripped indentation.
 
+In a Markdown file the same holds for a paragraph inside a block quote or a list item.
+
+Each line is one segment, without its line ending.  
+The indentation and the `>` markers of the containers stay out of it.
+
+A block quote or list node keeps its own markers, because it is the container.
+
 A source file has one `raw` root for each comment group: one comment, or adjacent line comments that share a marker.
 
 The span of the node covers its segments from the first byte to the last.  

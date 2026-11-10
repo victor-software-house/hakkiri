@@ -3,7 +3,7 @@ source: tests/tree.rs
 expression: "load(\"inline.md\")? .render()"
 ---
 raw 0..310 [0..310] "A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,\n`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png \"title\").\n\nCafé [naïve link](https://b.example) with non-ASCII letters.\n\nAn image reference ![logo][img] here.\n\n[ref]: https://c.example\n[img]: logo.png\n"
-  paragraph 0..164 [0..164] "A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,\n`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png \"title\")."
+  paragraph 0..164 [0..85, 86..164] "A [link](https://a.example) and [a reference][ref], a bare https://bare.example link,\n`code`, **strong**, *emphasis*, and an image ![alt *text*](image.png \"title\")."
     link 2..27 [2..27] "[link](https://a.example)"
     link 32..50 [32..50] "[a reference][ref]"
     link 59..79 [59..79] "https://bare.example"

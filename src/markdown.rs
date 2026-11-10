@@ -222,8 +222,13 @@ impl Builder<'_> {
                 .iter()
                 .flat_map(|child| child.segments.clone())
                 .collect()
+        } else if matches!(scope, Scope::Blockquote | Scope::List) {
+            self.segments(&span, &cuts)
         } else {
             self.segments(&span, &cuts)
+                .into_iter()
+                .flat_map(|part| self.lines(part))
+                .collect()
         };
         Visited {
             nodes: Node::from_segments(scope, segments, children)
@@ -299,6 +304,33 @@ impl Builder<'_> {
         parts
     }
 
+    /// One range for each line of `part`, without its line ending.
+    ///
+    /// A line after the first also loses the indentation and the block quote
+    /// markers that open it: they belong to the containers around the node.
+    /// A line that is left empty gives no range.
+    fn lines(&self, part: Range<usize>) -> Vec<Range<usize>> {
+        let Some(text) = self.source.get(part.clone()) else {
+            return vec![part];
+        };
+        let count = text.split('\n').count();
+        let mut lines = Vec::new();
+        let mut offset = 0;
+        for (index, line) in text.split('\n').enumerate() {
+            let start = part.start + offset;
+            offset += line.len() + 1;
+            let line = if index + 1 < count {
+                line.strip_suffix('\r').unwrap_or(line)
+            } else {
+                line
+            };
+            let opening = if index == 0 { 0 } else { opening_length(line) };
+            lines.push(start + opening..start + line.len());
+        }
+        lines.retain(|line| !line.is_empty());
+        lines
+    }
+
     /// A JSX element: its children stay prose and its tags are gaps.
     fn jsx(&self, node: &Mdast, cell: Scope) -> Visited {
         let mut visited = self.children(node, cell);
@@ -339,6 +371,24 @@ impl Builder<'_> {
 fn span_of(node: &Mdast) -> Option<Range<usize>> {
     node.position()
         .map(|position| position.start.offset..position.end.offset)
+}
+
+/// The byte length of the indentation and block quote markers that open
+/// `line`, a line of text inside a paragraph.
+///
+/// A line of a paragraph never starts with `>` unless a block quote around
+/// the paragraph put it there, because a `>` would end the paragraph.
+fn opening_length(line: &str) -> usize {
+    let mut at = 0;
+    loop {
+        let rest = line.get(at..).unwrap_or_default();
+        at += rest.len() - rest.trim_start_matches([' ', '\t']).len();
+        if line.get(at..).is_some_and(|rest| rest.starts_with('>')) {
+            at += 1;
+        } else {
+            return at;
+        }
+    }
 }
 
 /// The byte length of a link label that starts `label`, up to its closing
