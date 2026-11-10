@@ -18,7 +18,7 @@ use std::error::Error;
 use std::time::{Duration, Instant};
 
 use super::tokens::{CONTRACTIONS, Contractions, is_emoticon, is_special};
-use super::{FormatError, Tagger};
+use super::{FormatError, Tagger, treebank};
 
 type TestResult = Result<(), Box<dyn Error>>;
 
@@ -321,4 +321,26 @@ fn the_contractions_found_once_equal_a_search_of_each_window() {
         texts = longer;
     }
     assert!(checked > 100_000, "{checked} windows");
+}
+
+#[test]
+fn the_treebank_words_equal_prose() -> TestResult {
+    // `tests/fixtures/tagger/treebank.tsv` holds a text and its words, joined
+    // by spaces, from `NewTreebankWordTokenizer` of prose `b33e60d` run in Go.
+    // A line break in a text is written `\n` or `\r`.
+    let fixture = include_str!("../../tests/fixtures/tagger/treebank.tsv");
+    let mut wrong = Vec::new();
+    let mut checked = 0;
+    for line in fixture.lines() {
+        let (text, words) = line.split_once('\t').ok_or("a line has no tab")?;
+        let text = text.replace("\\n", "\n").replace("\\r", "\r");
+        let found = treebank::tokenize(&text).join(" ");
+        if found != words {
+            wrong.push(format!("{text:?} gave {found:?}, not {words:?}"));
+        }
+        checked += 1;
+    }
+    assert!(checked > 600, "{checked} texts");
+    assert_eq!(wrong, Vec::<String>::new());
+    Ok(())
 }
