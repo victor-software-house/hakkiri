@@ -63,40 +63,52 @@ Training and measurement run in an ephemeral build box.
 
 ## 2. Splitter
 
-- [ ] 2.1 Build Punkt's decision over a model: candidate end marks, abbreviations, pairs, sentence starters and the capitalization table.  
+- [x] 2.1 Build Punkt's decision over a model: candidate end marks, abbreviations, pairs, sentence starters and the capitalization table.  
   Verify the plain, question and abbreviation scenarios of the [sentence-splitting spec][spec] pass as unit tests in CI.
-- [ ] 2.2 Add the override rules for tokens with no space, closing marks, brackets and ellipses.  
+  - 2026-11-10 (UTC), `two_plain_sentences`, `a_question_inside_a_paragraph`, `a_title_before_a_name` and `a_latin_abbreviation_in_the_middle` in `src/splitter/tests.rs` run the embedded model.  
+    [Verify][run-splitter] passed on [PR 14][pr14] at `cac88f4`.
+- [x] 2.2 Add the override rules for tokens with no space, closing marks, brackets, ellipses and list numbers.  
   Verify the remaining scenarios pass as unit tests in CI.
+  - 2026-11-10 (UTC), one test per remaining scenario passed in the same [Verify][run-splitter] run.  
+    The tests for the list number and for a chain of initials cover the two rules added after the design.
 
 ## 3. Model
 
 - [x] 3.1 Build the trainer and mise tasks that fetch the four sources, filter `stackv2` by license, and write `data/splitter/en.tsv` with a source list.  
   Verify two runs in a build box write byte-identical files, and record the run time and token counts under this task.
   - 2026-11-10 (UTC), two runs of `mise run splitter:train` in a 4x8 build box wrote byte-identical `en.tsv` and `SOURCES.md`, and the fetched corpus files were identical too.  
-    The SHA-256 of `en.tsv` is `09927086…` and of `SOURCES.md` is `3684c458…` in both runs.
-  - Each run took about 2 minutes: the fetch about 75 seconds, reading the corpus about 22 seconds, training 6.6 to 7.2 seconds.
-  - The corpus holds 26,144,179 tokens.  
+    The SHA-256 of `en.tsv` is `b4ec6f04…` and of `SOURCES.md` is `dd147b99…` in both runs.
+  - Each run took about 2 minutes: the fetch about 75 seconds, reading the corpus about 22 seconds, training 5.8 seconds.
+  - The corpus holds 26,079,695 tokens.  
     A token is a whitespace-separated word, counted after the Markdown sources are cut to the text of their paragraphs.
   - The owner's 48 public repositories give 1,037 documents and 574,192 tokens.
-  - The first 512 MiB of `stackv2` shard 129 gives 46,146 Markdown documents and 10,782,267 tokens.
+  - The first 512 MiB of `stackv2` shard 129 gives 45,930 Markdown documents and 10,717,783 tokens.
   - The Python Enhancement Proposals give 818 documents and 1,625,676 tokens.
   - The first 32 MiB of `project_gutenberg` shard 0 gives 186 documents and 13,162,044 tokens.
-  - The model is 571,359 bytes in 24,632 lines: 2,655 abbreviations, 1,183 collocations, 793 sentence starters and 20,000 capitalization entries cut from 817,997.  
-    The data comes from 1,262,092 word types, 1,225,698 tokens that end in a period.
+  - The model is 570,625 bytes in 24,598 lines: 2,629 abbreviations, 1,181 collocations, 787 sentence starters and 20,000 capitalization entries cut from 815,218.  
+    The data comes from 1,257,144 word types, 1,222,335 tokens that end in a period.
   - `stackv2` spreads its Markdown over many of its 764 shards, mixed with code.  
     Shard 129 holds 45,915 `.md` and `.markdown` records, the densest of the shards counted, and a prefix of it is read.
   - `github_archive` holds issue and pull request threads, not `.md` files, so it is not a source.
-- [ ] 3.2 Embed the model and parse it once per process.  
+- [x] 3.2 Embed the model and parse it once per process.  
   Verify a test reads the embedded model in CI.
+  - 2026-11-10 (UTC), `the_embedded_model_is_read_and_is_in_file_order` reads the embedded model, finds `dr` in it, and checks that the model writes back the same text as the file.  
+    [Verify][run-splitter] passed on [PR 14][pr14] at `cac88f4`.
 
 ## 4. Accuracy and speed
 
 - [ ] 4.1 Add the evaluation test.  
   Verify it passes in CI, and record hakkiri's and Vale's F1 per set under this task.
-- [ ] 4.2 Split a 50,000-character paragraph and a 60,000-line file.  
+- [x] 4.2 Split a 50,000-character paragraph and a 60,000-line file.  
   Verify both finish in CI with no panic, and record the time per paragraph.
+  - 2026-11-10 (UTC), `a_50000_character_paragraph_splits`, `a_50000_character_run_with_no_space_is_one_sentence` and `a_60000_line_input_splits` passed in [Verify][run-splitter] on [PR 14][pr14] at `cac88f4`.
+  - In the build box, a 50,000-character paragraph of 2,845 sentences took 8 ms in a debug build and 0.7 ms in a release build.  
+    A 60,000-line input of 120,000 sentences took 290 ms and 20 ms.  
+    The cost is linear in the length of the text.
 
 [spec]: specs/sentence-splitting/spec.md
+[run-splitter]: https://github.com/victor-software-house/hakkiri/actions/runs/42817055813
+[pr14]: https://github.com/victor-software-house/hakkiri/pull/14
 [docs-set]: ../../../tests/fixtures/splitter/docs.fixture
 [hard-set]: ../../../tests/fixtures/splitter/hard.fixture
 [golden-set]: ../../../tests/fixtures/splitter/golden-rules.fixture

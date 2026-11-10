@@ -8,7 +8,8 @@ set -euo pipefail
 export GIT_TERMINAL_PROMPT=0
 owner=victor-software-house
 listing=$(mktemp)
-trap 'rm -f "$listing"' EXIT
+pins=$(mktemp)
+trap 'rm -f "$listing" "$pins"' EXIT
 page=1
 while true; do
   rows=$(curl -fsSL "https://api.github.com/orgs/$owner/repos?type=public&per_page=100&page=$page")
@@ -25,4 +26,7 @@ LC_ALL=C sort "$listing" | while IFS=$'\t' read -r name license; do
     exit 1
   fi
   printf '%s\t%s\t%s\n' "$name" "$commit" "$license"
-done >data/splitter/repositories.tsv
+done >"$pins"
+# A failed listing or lookup stops the script above, so the pin file is
+# replaced only by a complete one.
+mv "$pins" data/splitter/repositories.tsv

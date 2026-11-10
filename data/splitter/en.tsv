@@ -147,7 +147,6 @@ abbreviation	bres
 abbreviation	bri
 abbreviation	brit
 abbreviation	britzelm
-abbreviation	bro
 abbreviation	bros
 abbreviation	bspw
 abbreviation	buco
@@ -995,7 +994,6 @@ abbreviation	przyszłości
 abbreviation	ps
 abbreviation	psa
 abbreviation	psh
-abbreviation	ptu
 abbreviation	publ
 abbreviation	puc
 abbreviation	puck
@@ -1454,8 +1452,8 @@ abbreviation	див
 abbreviation	дна
 abbreviation	дней
 abbreviation	днѝ
+abbreviation	дома
 abbreviation	др
-abbreviation	дэд
 abbreviation	е.с
 abbreviation	еф
 abbreviation	ефес
@@ -1503,7 +1501,6 @@ abbreviation	п.а
 abbreviation	п.в
 abbreviation	пер
 abbreviation	пет
-abbreviation	пн
 abbreviation	поступлений
 abbreviation	пр
 abbreviation	пс
@@ -1680,7 +1677,6 @@ abbreviation	가다
 abbreviation	가리킨다
 abbreviation	가보자
 abbreviation	가정한다
-abbreviation	가져온다
 abbreviation	가진다
 abbreviation	가짐
 abbreviation	가집니다
@@ -1735,7 +1731,6 @@ abbreviation	결과이다
 abbreviation	결정된다
 abbreviation	결정한다
 abbreviation	결정합니다
-abbreviation	경로이다
 abbreviation	경우다
 abbreviation	경우이다
 abbreviation	경험함
@@ -1754,7 +1749,6 @@ abbreviation	공유한다
 abbreviation	과정이다
 abbreviation	관리한다
 abbreviation	괜찮다
-abbreviation	구나
 abbreviation	구조다
 abbreviation	구한다
 abbreviation	구함
@@ -1762,7 +1756,6 @@ abbreviation	구합니다
 abbreviation	구현한다
 abbreviation	국가다
 abbreviation	군요
-abbreviation	궁금하다
 abbreviation	권장함
 abbreviation	권한다
 abbreviation	그랬다
@@ -1803,7 +1796,6 @@ abbreviation	끕니다
 abbreviation	끝난다
 abbreviation	끝났다
 abbreviation	끝냈다
-abbreviation	끼친다
 abbreviation	나뉜다
 abbreviation	나라
 abbreviation	나쁘다
@@ -1877,7 +1869,6 @@ abbreviation	담는다
 abbreviation	담았다
 abbreviation	담자
 abbreviation	답이다
-abbreviation	당신
 abbreviation	당연하다
 abbreviation	당했다
 abbreviation	더한다
@@ -1939,7 +1930,6 @@ abbreviation	때이다
 abbreviation	떠났다
 abbreviation	떡이죠
 abbreviation	떨어진다
-abbreviation	떨어짐
 abbreviation	떴다
 abbreviation	똑같다
 abbreviation	뛴다
@@ -2023,7 +2013,6 @@ abbreviation	문제였다
 abbreviation	문제이다
 abbreviation	뭐냐다
 abbreviation	미친다
-abbreviation	믿는다
 abbreviation	밀도다
 abbreviation	밀린다
 abbreviation	바꾼다
@@ -2038,7 +2027,6 @@ abbreviation	박았다
 abbreviation	반대
 abbreviation	반대다
 abbreviation	반복한다
-abbreviation	반영됨
 abbreviation	반영한다
 abbreviation	반환된다
 abbreviation	반환한다
@@ -2159,7 +2147,6 @@ abbreviation	상보적
 abbreviation	상태다
 abbreviation	상태이다
 abbreviation	생각한다
-abbreviation	생각합니다
 abbreviation	생각했다
 abbreviation	생겼다
 abbreviation	생긴다
@@ -2186,7 +2173,6 @@ abbreviation	센다
 abbreviation	셈이다
 abbreviation	셈이죠
 abbreviation	소요된다
-abbreviation	소유
 abbreviation	소통
 abbreviation	속성이다
 abbreviation	속한다
@@ -2232,7 +2218,6 @@ abbreviation	싶습니다
 abbreviation	싶었다
 abbreviation	쌓았다
 abbreviation	쌓인다
-abbreviation	써냈다
 abbreviation	써라
 abbreviation	써봤다
 abbreviation	써요
@@ -2250,7 +2235,6 @@ abbreviation	아쉬웠다
 abbreviation	아쉽다
 abbreviation	아팠다
 abbreviation	아프다
-abbreviation	아하
 abbreviation	안간다
 abbreviation	안됐다
 abbreviation	안된다
@@ -2264,7 +2248,6 @@ abbreviation	않았습니다
 abbreviation	않았음
 abbreviation	알겠지
 abbreviation	알려준다
-abbreviation	알림
 abbreviation	알맞다
 abbreviation	알아보자
 abbreviation	알아본다
@@ -2310,7 +2293,6 @@ abbreviation	예정이다
 abbreviation	예제이다
 abbreviation	오픈함
 abbreviation	오해다
-abbreviation	올라감
 abbreviation	올렸다
 abbreviation	올린다
 abbreviation	옮긴다
@@ -2476,8 +2458,6 @@ abbreviation	줍시다
 abbreviation	중요하다
 abbreviation	중이다
 abbreviation	줬다
-abbreviation	즐겁다
-abbreviation	즐긴다
 abbreviation	증가한다
 abbreviation	지능
 abbreviation	지닙니다
@@ -2546,17 +2526,14 @@ abbreviation	클릭한다
 abbreviation	클릭합니다
 abbreviation	큽니다
 abbreviation	타입이다
-abbreviation	탈락
 abbreviation	탑니다
 abbreviation	태도다
 abbreviation	태운다
 abbreviation	택했다
-abbreviation	테니까
 abbreviation	테다
 abbreviation	통한다
 abbreviation	툴이다
 abbreviation	튄다
-abbreviation	파일이다
 abbreviation	파일입니다
 abbreviation	파트다
 abbreviation	판다
@@ -2569,7 +2546,6 @@ abbreviation	편이다
 abbreviation	편하다
 abbreviation	편합니다
 abbreviation	편해
-abbreviation	편했다
 abbreviation	폐해다
 abbreviation	포함한다
 abbreviation	포함합니다
@@ -2639,8 +2615,6 @@ abbreviation	했었다
 abbreviation	했죠
 abbreviation	행태다
 abbreviation	향한다
-abbreviation	향했다
-abbreviation	허용한다
 abbreviation	헤더다
 abbreviation	형태이다
 abbreviation	호빵맨입니다
@@ -3221,7 +3195,6 @@ collocation	f	w
 collocation	f	yeung
 collocation	g	ab.
 collocation	g	addison
-collocation	g	barto
 collocation	g	bishop
 collocation	g	dawnay
 collocation	g	dyer
@@ -3673,7 +3646,6 @@ collocation	s	paule
 collocation	s	pietro
 collocation	s	r
 collocation	s	s
-collocation	s	sutton
 collocation	s	t
 collocation	s	torr
 collocation	s	tsuneyuki
@@ -4054,6 +4026,7 @@ starter	enter
 starter	entretanto
 starter	es
 starter	essa
+starter	esse
 starter	essentially
 starter	esta
 starter	este
@@ -4177,7 +4150,6 @@ starter	install
 starter	instead
 starter	instinctively
 starter	interestingly
-starter	internally
 starter	isso
 starter	it
 starter	ivandale
@@ -4191,7 +4163,6 @@ starter	je
 starter	jeg
 starter	jei
 starter	jeśli
-starter	jika
 starter	joe
 starter	johnnie
 starter	joltz
@@ -4364,7 +4335,6 @@ starter	please
 starter	pmid
 starter	pointe
 starter	por
-starter	portanto
 starter	potts
 starter	powerauth
 starter	praesent
@@ -4431,7 +4401,6 @@ starter	senderavatarurl
 starter	sendername
 starter	sentences
 starter	serve
-starter	several
 starter	shakespeare
 starter	shalah
 starter	shaw
@@ -4581,6 +4550,7 @@ starter	µtox
 starter	örneğin
 starter	öz
 starter	δείτε
+starter	атрибут
 starter	в
 starter	для
 starter	если
@@ -4595,14 +4565,12 @@ starter	обратите
 starter	однак
 starter	однако
 starter	олар
-starter	он
 starter	по
 starter	после
 starter	потомками
 starter	поэтому
 starter	при
 starter	пример
-starter	пусть
 starter	ранее
 starter	старший
 starter	таа
@@ -4611,8 +4579,6 @@ starter	так
 starter	также
 starter	таким
 starter	теперь
-starter	у
-starter	чтобы
 starter	элемент
 starter	это
 starter	קראו
@@ -4634,7 +4600,6 @@ orthography	a	126
 orthography	a.d.	14
 orthography	a.k.a	32
 orthography	a.m.	110
-orthography	a0	118
 orthography	a1	126
 orthography	aan	34
 orthography	aaron	46
@@ -4945,7 +4910,7 @@ orthography	advisable	96
 orthography	advise	106
 orthography	advised	124
 orthography	adviser	102
-orthography	advocate	126
+orthography	advocate	110
 orthography	advocates	100
 orthography	aegean	30
 orthography	aem	6
@@ -5664,7 +5629,7 @@ orthography	artifacts	126
 orthography	artificial	126
 orthography	artikel	46
 orthography	artillery	110
-orthography	artisan	102
+orthography	artisan	38
 orthography	artist	126
 orthography	artistic	102
 orthography	artists	110
@@ -5798,7 +5763,6 @@ orthography	atom	126
 orthography	atomic	110
 orthography	atoms	110
 orthography	atonement	108
-orthography	atop	54
 orthography	através	34
 orthography	atrocities	110
 orthography	att	110
@@ -6855,7 +6819,7 @@ orthography	buildings	110
 orthography	buildpack	36
 orthography	builds	126
 orthography	built	126
-orthography	built-in	126
+orthography	built-in	118
 orthography	builtin	102
 orthography	builtins	118
 orthography	bulgaria	14
@@ -7237,7 +7201,6 @@ orthography	cc0-1.0-universal	12
 orthography	ccf-a	4
 orthography	cconj	6
 orthography	cd	126
-orthography	cdc	38
 orthography	cdn	62
 orthography	ce	126
 orthography	cease	126
@@ -7800,12 +7763,11 @@ orthography	coffeescript	46
 orthography	coffin	124
 orthography	coghlan	12
 orthography	cognitive	102
-orthography	coherent	118
+orthography	coherent	102
 orthography	coil	102
 orthography	coin	110
 orthography	coincidence	102
 orthography	coins	126
-orthography	coisas	34
 orthography	col	126
 orthography	col.	46
 orthography	cold	126
@@ -8292,7 +8254,7 @@ orthography	consume	110
 orthography	consumed	108
 orthography	consumer	126
 orthography	consumer's	96
-orthography	consumers	126
+orthography	consumers	110
 orthography	consumes	118
 orthography	consuming	110
 orthography	consummate	98
@@ -8494,7 +8456,6 @@ orthography	corruption	110
 orthography	cors	62
 orthography	corse	44
 orthography	cosa	102
-orthography	cosas	32
 orthography	cosmos	110
 orthography	cost	126
 orthography	costard	46
@@ -8551,7 +8512,7 @@ orthography	courant	100
 orthography	cours	46
 orthography	course	126
 orthography	courses	126
-orthography	court	126
+orthography	court	110
 orthography	courteous	110
 orthography	courteously	96
 orthography	courtesy	102
@@ -8601,7 +8562,7 @@ orthography	crag	110
 orthography	crags	40
 orthography	craindre	32
 orthography	crash	102
-orthography	crashed	100
+orthography	crashed	96
 orthography	crashes	102
 orthography	crashing	100
 orthography	crate	118
@@ -8815,7 +8776,7 @@ orthography	cushions	98
 orthography	custard	110
 orthography	custards	110
 orthography	custodian	100
-orthography	custody	102
+orthography	custody	96
 orthography	custom	126
 orthography	customary	100
 orthography	customer	126
@@ -8900,7 +8861,7 @@ orthography	dalton	14
 orthography	dalzell	14
 orthography	dam	102
 orthography	damage	102
-orthography	damaged	102
+orthography	damaged	100
 orthography	damages	110
 orthography	damascus	14
 orthography	dame	126
@@ -8976,12 +8937,10 @@ orthography	datasource	118
 orthography	datastore	102
 orthography	datatype	118
 orthography	date	126
-orthography	date/time	126
 orthography	dated	118
 orthography	daten	14
 orthography	dates	118
 orthography	datetime	126
-orthography	dati	52
 orthography	datos	102
 orthography	daughter	126
 orthography	daughter's	100
@@ -9068,7 +9027,7 @@ orthography	declarative	126
 orthography	declare	126
 orthography	declared	126
 orthography	declares	126
-orthography	declaring	118
+orthography	declaring	102
 orthography	decline	126
 orthography	declined	118
 orthography	declining	108
@@ -9078,7 +9037,7 @@ orthography	decoder	118
 orthography	decoding	118
 orthography	decomposition	102
 orthography	decorated	126
-orthography	decoration	118
+orthography	decoration	102
 orthography	decorations	100
 orthography	decorator	126
 orthography	decorators	110
@@ -9872,7 +9831,7 @@ orthography	doubtfully	96
 orthography	doubting	110
 orthography	doubtless	126
 orthography	doubts	114
-orthography	dough	102
+orthography	dough	100
 orthography	douglas	14
 orthography	doute	32
 orthography	dove	110
@@ -10002,7 +9961,6 @@ orthography	dst	108
 orthography	dt	54
 orthography	du	126
 orthography	dual	118
-orthography	duas	38
 orthography	dubious	110
 orthography	dublin	14
 orthography	duc	46
@@ -10500,7 +10458,6 @@ orthography	ensemble	110
 orthography	ensign	108
 orthography	ensue	96
 orthography	ensued	106
-orthography	ensuing	120
 orthography	ensuite	58
 orthography	ensure	126
 orthography	ensured	114
@@ -10673,7 +10630,7 @@ orthography	estimating	110
 orthography	estimation	102
 orthography	esto	126
 orthography	estos	106
-orthography	estrutura	46
+orthography	estrutura	38
 orthography	está	46
 orthography	están	34
 orthography	estão	98
@@ -11118,7 +11075,7 @@ orthography	fascinating	98
 orthography	fascination	96
 orthography	fashion	110
 orthography	fashionable	110
-orthography	fashioned	100
+orthography	fashioned	96
 orthography	fashions	108
 orthography	fast	126
 orthography	fastapi	126
@@ -11408,7 +11365,7 @@ orthography	flaming	110
 orthography	flanders	14
 orthography	flank	100
 orthography	flanks	96
-orthography	flannel	102
+orthography	flannel	100
 orthography	flap	108
 orthography	flare	96
 orthography	flash	126
@@ -11590,7 +11547,7 @@ orthography	foreign	126
 orthography	foreigner	102
 orthography	foreigners	126
 orthography	foreman	102
-orthography	foremost	110
+orthography	foremost	102
 orthography	foresee	96
 orthography	foreseen	100
 orthography	foresight	100
@@ -12040,7 +11997,6 @@ orthography	geoffrey	14
 orthography	geographic	110
 orthography	geographical	110
 orthography	geography	126
-orthography	geolocation	126
 orthography	geological	110
 orthography	geology	118
 orthography	geometric	102
@@ -12432,7 +12388,6 @@ orthography	guards	110
 orthography	gud	46
 orthography	guess	126
 orthography	guessed	104
-orthography	guesses	102
 orthography	guessing	102
 orthography	guest	116
 orthography	guests	126
@@ -12501,7 +12456,6 @@ orthography	hadifah	14
 orthography	hadn't	118
 orthography	hadoop	126
 orthography	hadst	110
-orthography	haga	38
 orthography	haggard	110
 orthography	hai	46
 orthography	hail	126
@@ -12582,7 +12536,7 @@ orthography	harassed	100
 orthography	harbor	110
 orthography	harbour	108
 orthography	hard	126
-orthography	hard-coded	102
+orthography	hard-coded	38
 orthography	hardcoded	120
 orthography	harden	102
 orthography	hardened	126
@@ -13251,7 +13205,7 @@ orthography	ile	38
 orthography	ill	110
 orthography	illegal	110
 orthography	illegible	52
-orthography	illinois	46
+orthography	illinois	14
 orthography	illness	98
 orthography	ills	100
 orthography	illuminated	96
@@ -13368,7 +13322,6 @@ orthography	impudence	108
 orthography	impudent	106
 orthography	impulse	100
 orthography	impulses	96
-orthography	impure	110
 orthography	imputation	102
 orthography	in	126
 orthography	in-app	38
@@ -13612,7 +13565,6 @@ orthography	inning	96
 orthography	innocence	108
 orthography	innocent	126
 orthography	innovation	110
-orthography	innovative	44
 orthography	innumerable	122
 orthography	input	126
 orthography	input-toml	112
@@ -13887,7 +13839,6 @@ orthography	inward	106
 orthography	inwardly	98
 orthography	in’t	96
 orthography	io	126
-orthography	ioc	46
 orthography	ioerror	12
 orthography	ionic	54
 orthography	ios	118
@@ -13897,7 +13848,7 @@ orthography	ip	126
 orthography	ipad	52
 orthography	ipc	62
 orthography	ipfs	38
-orthography	iphone	118
+orthography	iphone	116
 orthography	ips	54
 orthography	ipsum	38
 orthography	ipv4	62
@@ -14010,6 +13961,7 @@ orthography	jackson	62
 orthography	jacob	14
 orthography	jacob’s	14
 orthography	jade	126
+orthography	jadi	106
 orthography	jag	62
 orthography	jagged	100
 orthography	jahr	12
@@ -14061,6 +14013,7 @@ orthography	jeg	38
 orthography	jehoshaphat	14
 orthography	jehu	12
 orthography	jekyll	126
+orthography	jellies	108
 orthography	jelly	110
 orthography	jenkins	62
 orthography	jenny	110
@@ -14092,7 +14045,7 @@ orthography	jewels	110
 orthography	jewish	46
 orthography	jews	12
 orthography	jeśli	114
-orthography	jika	126
+orthography	jika	110
 orthography	jim	46
 orthography	jimmie	14
 orthography	jira	62
@@ -14108,6 +14061,7 @@ orthography	jobs	118
 orthography	jocelyn	12
 orthography	joe	62
 orthography	jogo	38
+orthography	johann	14
 orthography	john	126
 orthography	john's	14
 orthography	johnnie	14
@@ -14235,7 +14189,8 @@ orthography	kan	102
 orthography	kann	102
 orthography	kansas	46
 orthography	kapitel	46
-orthography	karena	62
+orthography	kara	38
+orthography	karena	46
 orthography	karl	14
 orthography	karma	62
 orthography	kate	46
@@ -14252,6 +14207,7 @@ orthography	kdl	54
 orthography	ke	46
 orthography	keats	14
 orthography	keen	110
+orthography	keener	108
 orthography	keenly	96
 orthography	keep	126
 orthography	keeper	110
@@ -14291,6 +14247,8 @@ orthography	keyword	126
 orthography	keyword-only	110
 orthography	keywords	126
 orthography	kg	108
+orthography	khaled	14
+orthography	khan	46
 orthography	khi	46
 orthography	không	102
 orthography	ki	110
@@ -14300,6 +14258,7 @@ orthography	kicked	102
 orthography	kicking	110
 orthography	kid	110
 orthography	kidney	110
+orthography	kidneys	108
 orthography	kids	126
 orthography	kill	126
 orthography	killed	110
@@ -14636,6 +14595,7 @@ orthography	legislative	108
 orthography	legislature	108
 orthography	legitimate	108
 orthography	legs	124
+orthography	lehnberg	112
 orthography	lei	38
 orthography	leigh	14
 orthography	leilani	14
@@ -14660,7 +14620,7 @@ orthography	lend	126
 orthography	lendemain	32
 orthography	length	126
 orthography	lengths	108
-orthography	lengthy	98
+orthography	lengthy	96
 orthography	lenore	14
 orthography	lens	118
 orthography	lent	110
@@ -14702,6 +14662,7 @@ orthography	levy	108
 orthography	lewes	14
 orthography	lewis	14
 orthography	lexical	110
+orthography	lhs	126
 orthography	li	126
 orthography	liability	110
 orthography	liable	108
@@ -14835,6 +14796,7 @@ orthography	listening	126
 orthography	listens	110
 orthography	lister	46
 orthography	listing	118
+orthography	listings	52
 orthography	lists	126
 orthography	lit	110
 orthography	lite	38
@@ -15078,6 +15040,7 @@ orthography	lysander	14
 orthography	lysimachus	14
 orthography	là	46
 orthography	làm	54
+orthography	línea	38
 orthography	lý	38
 orthography	lại	32
 orthography	l’alinéa	36
@@ -15152,7 +15115,6 @@ orthography	mainly	118
 orthography	mainnet	118
 orthography	mains	44
 orthography	maintain	126
-orthography	maintainable	116
 orthography	maintained	126
 orthography	maintainer	110
 orthography	maintainers	102
@@ -15245,6 +15207,7 @@ orthography	many	126
 orthography	manylinux	98
 orthography	man’s	110
 orthography	map	126
+orthography	mapbox	54
 orthography	maple	110
 orthography	mapped	118
 orthography	mapper	116
@@ -15300,6 +15263,7 @@ orthography	marquis	46
 orthography	marriage	110
 orthography	marriages	110
 orthography	married	126
+orthography	marries	96
 orthography	marrow	110
 orthography	marry	126
 orthography	marrying	104
@@ -15345,13 +15309,13 @@ orthography	master	126
 orthography	master's	110
 orthography	mastered	100
 orthography	mastering	126
+orthography	masterly	102
 orthography	masters	110
 orthography	mastery	110
 orthography	master’s	100
 orthography	mat	126
 orthography	match	126
 orthography	matched	126
-orthography	matcher	118
 orthography	matches	126
 orthography	matching	126
 orthography	mate	102
@@ -15372,6 +15336,7 @@ orthography	matlab	62
 orthography	matplotlib	126
 orthography	matrices	110
 orthography	matrix	126
+orthography	matrícula	36
 orthography	matt	62
 orthography	matter	126
 orthography	matters	110
@@ -15415,6 +15380,7 @@ orthography	mean	126
 orthography	meanest	106
 orthography	meaning	126
 orthography	meaningful	118
+orthography	meaningless	100
 orthography	meanings	102
 orthography	means	126
 orthography	meant	110
@@ -15443,17 +15409,18 @@ orthography	mediaeval	110
 orthography	median	118
 orthography	mediante	34
 orthography	mediation	110
-orthography	mediawiki	62
+orthography	mediawiki	54
 orthography	medical	126
 orthography	medici	76
 orthography	medicinal	110
 orthography	medicine	126
 orthography	medicines	100
-orthography	medio	102
+orthography	medio	98
 orthography	meditated	96
 orthography	meditation	102
 orthography	mediterranean	30
 orthography	medium	126
+orthography	meed	96
 orthography	meek	110
 orthography	meet	126
 orthography	meeting	126
@@ -15476,6 +15443,7 @@ orthography	melody	102
 orthography	melt	126
 orthography	melted	122
 orthography	melting	108
+orthography	melts	108
 orthography	member	126
 orthography	memberof	50
 orthography	members	126
@@ -15585,6 +15553,7 @@ orthography	metres	48
 orthography	metric	118
 orthography	metrics	110
 orthography	metropolis	110
+orthography	metropolitan	108
 orthography	mettre	98
 orthography	meu	54
 orthography	mexican	14
@@ -15689,6 +15658,7 @@ orthography	ministers	110
 orthography	ministre	116
 orthography	ministry	108
 orthography	minnesota	14
+orthography	minnesotian	12
 orthography	minor	126
 orthography	minority	110
 orthography	minstrel	108
@@ -15697,6 +15667,7 @@ orthography	minus	102
 orthography	minute	126
 orthography	minutes	126
 orthography	minóok	14
+orthography	miocene	44
 orthography	mir	110
 orthography	miracle	116
 orthography	miracles	102
@@ -15736,6 +15707,7 @@ orthography	mist	102
 orthography	mistake	110
 orthography	mistaken	98
 orthography	mistakes	110
+orthography	mistaking	106
 orthography	mistook	100
 orthography	mistress	110
 orthography	mists	98
@@ -15806,6 +15778,7 @@ orthography	mods	102
 orthography	modular	118
 orthography	module	126
 orthography	module's	108
+orthography	module-level	118
 orthography	modules	126
 orthography	moffat	14
 orthography	mohammed	46
@@ -15861,7 +15834,9 @@ orthography	monsieur	126
 orthography	monster	110
 orthography	monsters	110
 orthography	monstrous	118
+orthography	mont	38
 orthography	montague	6
+orthography	montana	110
 orthography	monte	62
 orthography	montgomery	14
 orthography	month	126
@@ -15874,6 +15849,7 @@ orthography	mood	102
 orthography	moods	102
 orthography	moody	124
 orthography	moon	126
+orthography	moon's	102
 orthography	moonlight	126
 orthography	moons	108
 orthography	moor	110
@@ -15982,6 +15958,7 @@ orthography	msg	126
 orthography	mt	46
 orthography	much	126
 orthography	mucho	32
+orthography	muchos	38
 orthography	muckluck	110
 orthography	mud	110
 orthography	muddy	110
@@ -16111,6 +16088,7 @@ orthography	nakedness	96
 orthography	nam	62
 orthography	name	126
 orthography	named	126
+orthography	nameerror	14
 orthography	nameless	104
 orthography	namely	110
 orthography	names	126
@@ -16140,7 +16118,7 @@ orthography	narrowly	96
 orthography	nas	46
 orthography	nash	14
 orthography	nassau	12
-orthography	nasty	110
+orthography	nasty	108
 orthography	nat	126
 orthography	nathan	46
 orthography	nathaniel	14
@@ -16205,7 +16183,7 @@ orthography	needles	100
 orthography	needless	102
 orthography	needn't	98
 orthography	needs	126
-orthography	needy	100
+orthography	needy	96
 orthography	negation	112
 orthography	negative	126
 orthography	negatively	100
@@ -16228,7 +16206,7 @@ orthography	neighbours	110
 orthography	neither	126
 orthography	nel	62
 orthography	nell	46
-orthography	nella	46
+orthography	nella	38
 orthography	nelly	14
 orthography	nelson	14
 orthography	nem	110
@@ -16319,7 +16297,7 @@ orthography	night	126
 orthography	night's	108
 orthography	nightfall	106
 orthography	nightingale	108
-orthography	nightly	126
+orthography	nightly	110
 orthography	nightmare	118
 orthography	nights	110
 orthography	nil	126
@@ -16461,6 +16439,7 @@ orthography	nouvelle-zélande	4
 orthography	nouvelles	54
 orthography	nov	126
 orthography	nova	110
+orthography	novaya	6
 orthography	novel	110
 orthography	novels	102
 orthography	novelty	102
@@ -16522,6 +16501,7 @@ orthography	nvm	118
 orthography	nx	110
 orthography	ny	62
 orthography	nym	14
+orthography	nymph	110
 orthography	nymphs	108
 orthography	nº	38
 orthography	này	32
@@ -16530,7 +16510,7 @@ orthography	nécessaire	96
 orthography	néron	14
 orthography	nó	58
 orthography	nós	34
-orthography	número	54
+orthography	número	38
 orthography	nếu	46
 orthography	n’est	96
 orthography	o	126
@@ -16596,6 +16576,7 @@ orthography	observing	126
 orthography	obsolete	126
 orthography	obstacle	112
 orthography	obstacles	102
+orthography	obstinacy	98
 orthography	obstinate	98
 orthography	obtain	126
 orthography	obtainable	96
@@ -16611,6 +16592,7 @@ orthography	occasional	102
 orthography	occasionally	126
 orthography	occasioned	96
 orthography	occasions	110
+orthography	occult	100
 orthography	occupant	112
 orthography	occupants	96
 orthography	occupation	110
@@ -16629,6 +16611,7 @@ orthography	ocean	110
 orthography	och	102
 orthography	ocr	62
 orthography	oct	126
+orthography	octal	116
 orthography	octave	102
 orthography	octavia	14
 orthography	octavian	14
@@ -16652,7 +16635,6 @@ orthography	offend	110
 orthography	offended	98
 orthography	offender	100
 orthography	offenders	102
-orthography	offending	106
 orthography	offense	96
 orthography	offensive	102
 orthography	offer	126
@@ -16936,7 +16918,6 @@ orthography	outlines	124
 orthography	outlook	102
 orthography	output	126
 orthography	outputs	126
-orthography	outra	38
 orthography	outrage	100
 orthography	outrageous	104
 orthography	outras	118
@@ -17037,7 +17018,7 @@ orthography	packets	118
 orthography	packing	110
 orthography	packs	118
 orthography	pad	118
-orthography	pada	62
+orthography	pada	46
 orthography	padded	96
 orthography	padding	126
 orthography	paddle	102
@@ -17062,7 +17043,6 @@ orthography	painting	126
 orthography	paintings	118
 orthography	paints	108
 orthography	pair	126
-orthography	paired	34
 orthography	pairing	102
 orthography	pairs	126
 orthography	palace	110
@@ -17180,7 +17160,6 @@ orthography	partir	98
 orthography	partisans	98
 orthography	partition	126
 orthography	partitioned	42
-orthography	partitioning	102
 orthography	partitions	118
 orthography	partly	126
 orthography	partner	126
@@ -17622,7 +17601,7 @@ orthography	pisanio	14
 orthography	pistol	110
 orthography	pistols	102
 orthography	pit	108
-orthography	pitch	110
+orthography	pitch	102
 orthography	pitched	108
 orthography	pitcher	102
 orthography	pitching	110
@@ -17699,7 +17678,7 @@ orthography	plays	126
 orthography	plea	108
 orthography	plead	110
 orthography	pleaded	114
-orthography	pleading	122
+orthography	pleading	106
 orthography	pleasant	126
 orthography	pleasantly	98
 orthography	please	126
@@ -17769,7 +17748,7 @@ orthography	podfile	36
 orthography	pods	110
 orthography	poe	46
 orthography	poem	108
-orthography	poems	126
+orthography	poems	110
 orthography	poet	126
 orthography	poet's	108
 orthography	poetic	110
@@ -17839,7 +17818,6 @@ orthography	poorer	98
 orthography	poorest	96
 orthography	poorly	110
 orthography	pop	126
-orthography	pop-up	102
 orthography	pope	110
 orthography	pope's	46
 orthography	popes	110
@@ -18363,7 +18341,7 @@ orthography	protestant	46
 orthography	protested	112
 orthography	proteus	62
 orthography	protheus	14
-orthography	proto	126
+orthography	proto	110
 orthography	protobuf	126
 orthography	protocol	126
 orthography	protocols	126
@@ -20193,7 +20171,7 @@ orthography	sentinel	126
 orthography	sentinels	126
 orthography	sentry	110
 orthography	seo	54
-orthography	sep	118
+orthography	sep	116
 orthography	separate	126
 orthography	separated	118
 orthography	separately	118
@@ -20690,7 +20668,7 @@ orthography	skate	110
 orthography	skating	102
 orthography	skeleton	126
 orthography	sketch	110
-orthography	sketches	126
+orthography	sketches	110
 orthography	skewer	98
 orthography	skies	100
 orthography	skilful	106
@@ -20704,7 +20682,7 @@ orthography	skin	126
 orthography	skins	110
 orthography	skip	126
 orthography	skipped	118
-orthography	skipping	118
+orthography	skipping	102
 orthography	skips	118
 orthography	skirt	118
 orthography	skirts	96
@@ -21074,8 +21052,7 @@ orthography	spices	108
 orthography	spider	108
 orthography	spied	40
 orthography	spies	102
-orthography	spike	102
-orthography	spikes	102
+orthography	spikes	100
 orthography	spill	102
 orthography	spin	126
 orthography	spinach	110
@@ -21125,7 +21102,7 @@ orthography	spotless	110
 orthography	spotlight	38
 orthography	spots	110
 orthography	spotted	110
-orthography	spouse	118
+orthography	spouse	102
 orthography	sprague	12
 orthography	sprang	122
 orthography	spray	118
@@ -21552,7 +21529,6 @@ orthography	subdirectories	98
 orthography	subdirectory	102
 orthography	subdue	104
 orthography	subdued	96
-orthography	subfolder	32
 orthography	subject	126
 orthography	subjected	106
 orthography	subjection	96
@@ -21716,7 +21692,6 @@ orthography	superior	126
 orthography	superiority	96
 orthography	supernatural	110
 orthography	superseded	110
-orthography	superset	102
 orthography	superstition	102
 orthography	superstitions	110
 orthography	superstitious	102
@@ -21897,7 +21872,7 @@ orthography	synchronization	126
 orthography	synchronize	118
 orthography	synchronized	114
 orthography	synchronous	118
-orthography	synchronously	102
+orthography	synchronously	98
 orthography	synonym	102
 orthography	synonyms	110
 orthography	syntactic	102
@@ -21959,7 +21934,7 @@ orthography	tag	126
 orthography	tagged	102
 orthography	tagging	102
 orthography	tags	126
-orthography	tai	46
+orthography	tai	38
 orthography	tail	126
 orthography	tailor	102
 orthography	tails	110
@@ -22530,7 +22505,7 @@ orthography	top]](#	32
 orthography	tope	100
 orthography	topic	126
 orthography	topics	126
-orthography	topmost	116
+orthography	topmost	100
 orthography	topologicalinventory.defaultapi	10
 orthography	topology	102
 orthography	tops	100
@@ -22566,7 +22541,6 @@ orthography	touchstone	110
 orthography	tough	102
 orthography	toujours	102
 orthography	tour	126
-orthography	tournament	126
 orthography	tours	110
 orthography	tous	126
 orthography	tout	126
@@ -22587,7 +22561,6 @@ orthography	to’t	106
 orthography	tr	62
 orthography	tra	102
 orthography	trabajo	118
-orthography	trabalho	38
 orthography	trace	126
 orthography	traceback	126
 orthography	traced	100
@@ -22808,7 +22781,6 @@ orthography	trouver	36
 orthography	troy	30
 orthography	truce	100
 orthography	truck	108
-orthography	trucks	100
 orthography	true	126
 orthography	true`	36
 orthography	truer	104
@@ -22823,7 +22795,7 @@ orthography	trunks	102
 orthography	trust	126
 orthography	trusted	110
 orthography	trusting	110
-orthography	trustworthy	110
+orthography	trustworthy	108
 orthography	trusty	110
 orthography	truth	126
 orthography	truthful	100
@@ -23242,7 +23214,7 @@ orthography	uso	38
 orthography	usual	126
 orthography	usually	126
 orthography	usuario	38
-orthography	usuário	102
+orthography	usuário	38
 orthography	ut	126
 orthography	utc	62
 orthography	utensils	108
@@ -23322,7 +23294,7 @@ orthography	value	126
 orthography	valued	96
 orthography	valueerror	14
 orthography	values	126
-orthography	valve	110
+orthography	valve	108
 orthography	vamos	126
 orthography	van	126
 orthography	vanadium	46
@@ -23448,7 +23420,7 @@ orthography	versions	126
 orthography	versión	34
 orthography	versuche	110
 orthography	versus	116
-orthography	versão	38
+orthography	versão	34
 orthography	vertex	102
 orthography	vertical	118
 orthography	vertically	102
@@ -23747,7 +23719,6 @@ orthography	warning	126
 orthography	warnings	126
 orthography	warns	118
 orthography	warrant	110
-orthography	warranted	100
 orthography	warranties	108
 orthography	warranty	102
 orthography	warrior	102
@@ -24115,7 +24086,7 @@ orthography	wo	126
 orthography	woe	126
 orthography	woeful	100
 orthography	woes	100
-orthography	woke	114
+orthography	woke	112
 orthography	wolf	126
 orthography	wolf's	108
 orthography	wolsey	12
@@ -24476,14 +24447,13 @@ orthography	των	32
 orthography	а	126
 orthography	без	34
 orthography	бир	42
-orthography	более	38
+orthography	более	34
 orthography	больше	34
 orthography	бу	126
 orthography	будет	98
 orthography	будут	96
 orthography	бы	96
 orthography	был	32
-orthography	были	32
 orthography	было	98
 orthography	быть	34
 orthography	в	126
@@ -24491,12 +24461,12 @@ orthography	вам	110
 orthography	вас	36
 orthography	вершины	32
 orthography	во	114
-orthography	время	102
+orthography	время	38
 orthography	все	126
 orthography	всегда	34
 orthography	всех	34
 orthography	въ	102
-orthography	вы	126
+orthography	вы	118
 orthography	где	114
 orthography	года	32
 orthography	да	38
@@ -24525,22 +24495,20 @@ orthography	из	114
 orthography	или	118
 orthography	им	34
 orthography	имеет	34
-orthography	имя	54
 orthography	использовать	114
 orthography	используется	114
 orthography	их	34
 orthography	и҆	126
-orthography	к	126
+orthography	к	118
 orthography	каждый	114
 orthography	как	126
 orthography	когда	38
 orthography	код	58
-orthography	которая	98
-orthography	которой	96
+orthography	которой	32
 orthography	которые	98
 orthography	который	96
 orthography	ли	96
-orthography	между	114
+orthography	между	50
 orthography	ми	38
 orthography	могут	32
 orthography	может	38
@@ -24550,7 +24518,7 @@ orthography	мы	126
 orthography	на	126
 orthography	нам	38
 orthography	например	126
-orthography	нас	96
+orthography	нас	32
 orthography	не	126
 orthography	него	100
 orthography	необходимо	122
@@ -24561,11 +24529,10 @@ orthography	но	126
 orthography	нужно	42
 orthography	о	110
 orthography	об	62
-orthography	образом	32
 orthography	один	98
 orthography	он	62
 orthography	она	106
-orthography	они	50
+orthography	они	58
 orthography	от	110
 orthography	очень	50
 orthography	по	126
@@ -24576,7 +24543,7 @@ orthography	приложения	96
 orthography	пример	126
 orthography	про	38
 orthography	проекта	32
-orthography	просто	38
+orthography	просто	34
 orthography	работы	34
 orthography	раз	98
 orthography	ребра	32
@@ -24593,7 +24560,6 @@ orthography	список	54
 orthography	та	48
 orthography	так	110
 orthography	также	106
-orthography	те	34
 orthography	тем	50
 orthography	теперь	46
 orthography	то	110

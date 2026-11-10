@@ -42,8 +42,9 @@ while IFS=$'\t' read -r dataset revision file bytes _license; do
       # .markdown is parsed. The jq filter below decides.
       prefilter='"path": *"[^"]*\.(md|markdown)"'
       # metadata.license joins the licenses detected in the repository with
-      # commas; every one must be on the Blue Oak list.
-      filter='select(((.metadata.path // "") | test("\\.(md|markdown)$"; "i")) and (((.metadata.license // "") | ascii_downcase | split(",")) | all(IN($allowed[])))) | .text, "\f"'
+      # commas. There must be at least one, and every one must be on the Blue
+      # Oak list: an empty list would pass an all() test.
+      filter='select(((.metadata.path // "") | test("\\.(md|markdown)$"; "i")) and (((.metadata.license // "") | ascii_downcase | split(",") | map(gsub("^\\s+|\\s+$"; ""))) as $ids | (($ids | length > 0) and ($ids | all(IN($allowed[])))))) | .text, "\f"'
       ;;
     common-pile/python_enhancement_proposals)
       target=peps.txt

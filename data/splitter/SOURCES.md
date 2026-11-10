@@ -8,7 +8,7 @@ Two runs on these sources write byte-identical files.
 | File | Documents | Tokens |
 |:--|--:|--:|
 | `repositories` | 1037 | 574192 |
-| `stackv2` | 46146 | 10782267 |
+| `stackv2` | 45930 | 10717783 |
 | `peps` | 818 | 1625676 |
 | `books` | 186 | 13162044 |
 
@@ -95,12 +95,12 @@ The corpus holds every tracked `.md` file except `CHANGELOG.md`, and the trainer
 
 | Count | Value |
 |:--|--:|
-| Tokens read | 26144179 |
-| Word types | 1262092 |
-| Tokens that end in a period | 1225698 |
-| Possible sentence ends | 1295408 |
-| Abbreviations | 2655 |
-| Collocations | 1183 |
-| Sentence starters | 793 |
-| Capitalization entries seen | 817997 |
+| Tokens read | 26079695 |
+| Word types | 1257144 |
+| Tokens that end in a period | 1222335 |
+| Possible sentence ends | 1292054 |
+| Abbreviations | 2629 |
+| Collocations | 1181 |
+| Sentence starters | 787 |
+| Capitalization entries seen | 815218 |
 | Capitalization entries kept | 20000 |
