@@ -44,6 +44,10 @@ static ENGLISH: LazyLock<Result<Dictionary, DictionaryError>> =
 /// How many times a word may be split at a break.
 const MAX_BREAK_DEPTH: usize = 10;
 
+/// Whether each part of a word split at its breaks is a word, by the part and
+/// the number of splits that led to it.
+type Memo<'a> = HashMap<(&'a str, usize), bool>;
+
 /// What the forms of a word allow: some form is not only for compounds.
 const PLAIN: u8 = 1;
 /// Some form is not only for compounds and is not kept to its case.
@@ -436,7 +440,8 @@ impl Dictionary {
     #[must_use]
     pub fn spell(&self, word: &str, listed: &HashSet<String>) -> bool {
         let converted = self.affixes.convert(word);
-        self.spell_depth(&self.affixes.ignore(&converted), 0, listed)
+        let ignored = self.affixes.ignore(&converted);
+        self.spell_depth(&ignored, 0, listed, &mut Memo::new())
     }
 
     /// The one spelling the dictionary has for `word` in another case, such as
@@ -486,15 +491,22 @@ impl Dictionary {
         })
     }
 
-    /// `spell` with a count of the splits that led here.
-    fn spell_depth(&self, word: &str, depth: usize, listed: &HashSet<String>) -> bool {
+    /// `spell` with a count of the splits that led here, and what the parts
+    /// of the word already gave.
+    fn spell_depth<'a>(
+        &self,
+        word: &'a str,
+        depth: usize,
+        listed: &HashSet<String>,
+        memo: &mut Memo<'a>,
+    ) -> bool {
         if self.is_forbidden(word) {
             return false;
         }
         // A trailing period is an abbreviation's, or the sentence's.
         if word.ends_with('.') {
             let trimmed = word.trim_end_matches('.');
-            if !trimmed.is_empty() && self.spell_depth(trimmed, depth, listed) {
+            if !trimmed.is_empty() && self.spell_depth(trimmed, depth, listed, memo) {
                 return true;
             }
         }
@@ -547,7 +559,7 @@ impl Dictionary {
         {
             return true;
         }
-        self.spell_parts(word, depth, listed)
+        self.spell_parts(word, depth, listed, memo)
     }
 
     /// Whether an all-caps word is a word in lower case or capitalized, which
@@ -567,7 +579,17 @@ impl Dictionary {
     /// A break written at the start or end is taken off that end of the word,
     /// and any other splits the word at each place it occurs. The parts are
     /// then checked on their own, and split again as needed.
-    fn spell_parts(&self, word: &str, depth: usize, listed: &HashSet<String>) -> bool {
+    ///
+    /// The same part comes up again from other splits, so each part is
+    /// checked once for each depth. The depth is in the key because a part
+    /// checked deeper has fewer splits left.
+    fn spell_parts<'a>(
+        &self,
+        word: &'a str,
+        depth: usize,
+        listed: &HashSet<String>,
+        memo: &mut Memo<'a>,
+    ) -> bool {
         if depth >= MAX_BREAK_DEPTH {
             return false;
         }
@@ -576,14 +598,14 @@ impl Dictionary {
             if rule.at_start {
                 if word.len() > length
                     && let Some(rest) = word.strip_prefix(rule.pattern.as_str())
-                    && self.spell_depth(rest, depth + 1, listed)
+                    && self.spell_part(rest, depth + 1, listed, memo)
                 {
                     return true;
                 }
             } else if rule.at_end {
                 if word.len() > length
                     && let Some(rest) = word.strip_suffix(rule.pattern.as_str())
-                    && self.spell_depth(rest, depth + 1, listed)
+                    && self.spell_part(rest, depth + 1, listed, memo)
                 {
                     return true;
                 }
@@ -595,8 +617,8 @@ impl Dictionary {
                         break;
                     }
                     if let (Some(left), Some(right)) = (word.get(..at), word.get(at + length..))
-                        && self.spell_depth(left, depth + 1, listed)
-                        && self.spell_depth(right, depth + 1, listed)
+                        && self.spell_part(left, depth + 1, listed, memo)
+                        && self.spell_part(right, depth + 1, listed, memo)
                     {
                         return true;
                     }
@@ -605,6 +627,22 @@ impl Dictionary {
             }
         }
         false
+    }
+
+    /// `spell_depth` for a part of a word, from `memo` when it was checked.
+    fn spell_part<'a>(
+        &self,
+        part: &'a str,
+        depth: usize,
+        listed: &HashSet<String>,
+        memo: &mut Memo<'a>,
+    ) -> bool {
+        if let Some(known) = memo.get(&(part, depth)) {
+            return *known;
+        }
+        let spelled = self.spell_depth(part, depth, listed, memo);
+        memo.insert((part, depth), spelled);
+        spelled
     }
 
     /// The forms that `word` makes with the flags `flags`, such as `utilize`

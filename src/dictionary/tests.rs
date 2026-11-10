@@ -14,6 +14,7 @@
 
 use std::collections::HashSet;
 use std::error::Error;
+use std::time::{Duration, Instant};
 
 use super::{Dictionary, DictionaryError};
 
@@ -124,16 +125,6 @@ fn a_latin1_dictionary_reads() -> TestResult {
 }
 
 #[test]
-fn a_rule_whose_strip_text_is_not_on_the_word_makes_nothing() -> TestResult {
-    let aff = b"SFX A Y 1\nSFX A y ies .\n";
-    let dictionary = Dictionary::parse(aff, b"2\ncat/A\nfly/A\n")?;
-    assert_eq!(dictionary.expand("cat", "A")?, ["cat"]);
-    assert_eq!(dictionary.expand("fly", "A")?, ["fly", "flies"]);
-    assert!(!dictionary.spell("caties", &HashSet::new()));
-    Ok(())
-}
-
-#[test]
 fn flags_of_a_latin1_file_are_single_characters() -> TestResult {
     // No `SET`, and bytes that are not UTF-8, so the files read as Latin-1:
     // `\xe9` is `é` and `\xe8` is `è`. Read as UTF-8 bytes, both start with the
@@ -146,5 +137,43 @@ fn flags_of_a_latin1_file_are_single_characters() -> TestResult {
     assert!(dictionary.spell("dogx", &none));
     assert!(!dictionary.spell("catx", &none));
     assert!(!dictionary.spell("dogs", &none));
+    Ok(())
+}
+
+#[test]
+fn a_rule_whose_strip_text_is_not_on_the_word_makes_nothing() -> TestResult {
+    let aff = b"SFX A Y 1\nSFX A y ies .\n";
+    let dictionary = Dictionary::parse(aff, b"2\ncat/A\nfly/A\n")?;
+    assert_eq!(dictionary.expand("cat", "A")?, ["cat"]);
+    assert_eq!(dictionary.expand("fly", "A")?, ["fly", "flies"]);
+    assert!(!dictionary.spell("caties", &HashSet::new()));
+    Ok(())
+}
+
+#[test]
+fn a_long_hyphenated_word_is_checked_in_polynomial_time() -> TestResult {
+    let dictionary = english()?;
+    // The best of five runs of each, so a pause on a shared machine does not
+    // fail correct code.
+    let best = |parts: usize| {
+        let word = format!("{}zq", "zq-".repeat(parts));
+        let mut best = Duration::MAX;
+        for _ in 0..5 {
+            let start = Instant::now();
+            assert!(!dictionary.spell(&word, &HashSet::new()));
+            best = best.min(start.elapsed());
+        }
+        best
+    };
+    let twenty = best(20);
+    let forty = best(40);
+    eprintln!("20 parts: {twenty:?}, 40 parts: {forty:?}");
+    // Twice the parts cost eight times as much with one check of each part
+    // and depth; 24 leaves room for noise. Without it, the time grows past
+    // any such bound.
+    assert!(
+        forty < twenty.max(Duration::from_micros(200)) * 24,
+        "40 parts took {forty:?}, 20 took {twenty:?}"
+    );
     Ok(())
 }
