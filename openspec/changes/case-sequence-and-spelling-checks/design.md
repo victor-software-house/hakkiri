@@ -118,9 +118,14 @@ The expansion uses the dictionary reader's affix rules, so `affix` lands with th
 
 ### 9. Tags come from a port of prose's tagger and model
 
-hakkiri ports prose's averaged perceptron and its Treebank tokenizer, about 2,300 lines of Go, and embeds the English model (operator, 2026-11-10).  
+hakkiri ports prose's averaged perceptron and its English tokenizer, `tokenize.New()`, and embeds the English model (operator, 2026-11-10).  
+Vale tags each sentence with that tokenizer and the perceptron, so the port is those two and not prose's Treebank tokenizer ([tag step][v-tag-text]).  
 The model is trained on UD English EWT under CC BY-SA 4.0, and weighs 1.9 MB ([MODELS.md][p-models]).  
 It ships as its own data file with its notice.
+
+The port keeps prose's case and category tests where Go and Rust agree.  
+The shape of a word reads Rust's Unicode properties and not Go's categories, so a word of characters such as `²` can get another shape, and so another feature.  
+A test compares tokens and tags with prose's on 188 sentences.
 
 Creative Commons lists GPLv3 as compatible with BY-SA 4.0 ([compatible licenses][cc-compat]).  
 Section 13 of hakkiri's AGPLv3 allows a combination with GPLv3 work.
@@ -194,6 +199,7 @@ Each crate was read on crates.io on 2026-11-10.
 [v-seq-tokens]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L289-L330
 [v-seq-match]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L387-L497
 [v-seq-run]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L643-L733
+[v-tag-text]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/prose.go#L253-L288
 [v-upos]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/upos.go#L78-L95
 [v-cap-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L72-L109
 [v-case]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/variables.go#L87-L144
