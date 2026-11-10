@@ -14,6 +14,9 @@ use crate::check::Hit;
 use crate::rule::Spelling;
 use crate::text::Text;
 
+#[cfg(test)]
+mod tests;
+
 /// The shortest part of an identifier that `split` checks, in letters.
 const MIN_PART_LETTERS: usize = 3;
 
