@@ -43,7 +43,7 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 ## Impact
 
 - New dependencies: `regex` and `fancy-regex`, chosen in the [bootstrap design][bootstrap], and `ctl-core` for reading rule files ([design][design]).
-- Sentences come from the [`sentence-splitter`][splitter] change, so this row waits for `HKR-015`.
+- Sentences come from the [`sentence-splitter`][splitter] change, which is archived as the [`sentence-splitting`][sentence-splitting] spec.
 - New modules for rules, selection, text, patterns, alerts and the four checks; the tree builders and their snapshots change for inline gaps.
 - `HKR-005` builds the `check` and `test` commands on this engine.
 
@@ -55,3 +55,4 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 [bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
 [design]: design.md
 [splitter]: ../archive/2026-11-10-sentence-splitter/proposal.md
+[sentence-splitting]: ../../specs/sentence-splitting/spec.md
