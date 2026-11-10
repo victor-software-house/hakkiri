@@ -15,6 +15,8 @@ allow = [
     "Unicode-3.0",
     # foldhash, through serde_json in tree-sitter's build
     "Zlib",
+    # hakkiri's own license
+    "AGPL-3.0-or-later",
 ]
 confidence-threshold = 0.93
 
