@@ -188,9 +188,17 @@ fn capitalized(text: &str) -> String {
 }
 
 /// One hit when the matches of the token are over `max` or under `min`.
+///
+/// A match that overlaps a code span is no match: it is neither counted nor
+/// pointed at.
 fn run_occurrence(occurrence: &Occurrence, text: &Text) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
-    let found = occurrence.pattern.find_all(content)?;
+    let found: Vec<Range<usize>> = occurrence
+        .pattern
+        .find_all(content)?
+        .into_iter()
+        .filter(|range| !text.overlaps_code(range))
+        .collect();
     let count = found.len();
     let over = occurrence.max > 0 && count > occurrence.max;
     let under = occurrence.min > 0 && count < occurrence.min;
@@ -201,10 +209,9 @@ fn run_occurrence(occurrence: &Occurrence, text: &Text) -> Result<Vec<Hit>, Sear
         first_word(content)
     } else {
         found.into_iter().find(|range| {
-            !text.overlaps_code(range)
-                && content
-                    .get(range.clone())
-                    .is_some_and(|matched| !matched.trim().is_empty())
+            content
+                .get(range.clone())
+                .is_some_and(|matched| !matched.trim().is_empty())
         })
     };
     Ok(range

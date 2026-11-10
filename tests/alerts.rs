@@ -471,6 +471,45 @@ fn a_code_span_is_no_match() -> TestResult {
     Ok(())
 }
 
+/// The rule of `token` over `max` and `min`, counting what a message names.
+fn occurrence(token: &str, bound: &str) -> String {
+    format!("extends: occurrence\nmessage: \"%d found\"\n{bound}\ntoken: {token}\n")
+}
+
+#[test]
+fn a_match_in_code_is_not_counted() -> TestResult {
+    let found = markdown(&occurrence("x", "max: 1"), "A box, `cargo` and `make`.")?;
+    assert_eq!(found, Vec::<Alert>::new());
+    Ok(())
+}
+
+#[test]
+fn a_match_outside_code_is_counted_and_pointed_at() -> TestResult {
+    let found = markdown(&occurrence("x", "max: 1"), "A box, `cargo` and an ox.")?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(
+        (alert.message.as_str(), alert.matched.as_str()),
+        ("2 found", "x")
+    );
+    assert_eq!(place(alert), (1, 5, 5));
+    Ok(())
+}
+
+#[test]
+fn a_match_in_code_does_not_meet_a_minimum() -> TestResult {
+    let found = markdown(&occurrence("x", "min: 1"), "Run `cargo` now.")?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(
+        (alert.message.as_str(), alert.matched.as_str()),
+        ("0 found", "Run")
+    );
+    Ok(())
+}
+
 /// The rules the long-input tests run together: one of each check type.
 const MARKER_RULES: [(&str, &str); 4] = [
     (

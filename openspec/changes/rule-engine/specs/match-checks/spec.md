@@ -103,6 +103,7 @@ A `$1` in a swap value SHALL read as the text the first group of its key matched
 
 An `occurrence` rule SHALL count the matches of its `token` in each selected node, with no word boundaries added.  
 It SHALL report when the count is over `max` or under `min`.  
+A match that overlaps a code span SHALL NOT count.  
 Its message and description SHALL read `%d` as `%s`, so the count fills either one.
 
 #### Scenario: Matches inside words
@@ -114,6 +115,11 @@ Its message and description SHALL read `%d` as `%s`, so the count fills either o
 
 An alert over `max` SHALL point at the first match that is not a code span.  
 An alert under `min` with no match SHALL point at the first word of the node.
+
+#### Scenario: A match inside code
+
+- **WHEN** a rule has `extends: occurrence`, `max: 1` and `token: x`, and the input is ``A box, `cargo` and `make`.``
+- **THEN** hakkiri reports no alert
 
 #### Scenario: Too few matches
 
