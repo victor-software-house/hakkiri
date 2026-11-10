@@ -56,7 +56,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify the sentence scenario and the word count scenarios of the rule-files spec pass in CI.
   - 2026-11-10 (UTC), the sentence test and the two word count tests pass in the same box run, in [3fdac6d][c-select].  
     The counts are of `words` over the selected text; the `occurrence` rule that reports them comes with task 6.3.  
-    `words` reads alphabetic characters as letters, which adds a few combining marks to prose's `\p{L}`.
+    `words` runs prose's own pattern, so a combining mark ends a word.
+  - 2026-11-10 (UTC), the combining mark test passes in a box run of [e5c502e][c-words].
 
 ## 5. Patterns and alerts
 
@@ -118,6 +119,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-deny]: https://github.com/victor-software-house/hakkiri/commit/f23a9c9776a9e45e2acac151b825c0fdeedb2fb8
 [c-tree]: https://github.com/victor-software-house/hakkiri/commit/462eaa9e82ec229444a658904a23fbcd5be274ac
 [c-select]: https://github.com/victor-software-house/hakkiri/commit/3fdac6d3dcd3d3929577c34ff37f3e48a222e050
+[c-words]: https://github.com/victor-software-house/hakkiri/commit/e5c502ed40a89137e68af0149b8c1b59d2ccef29
 [c-load]: https://github.com/victor-software-house/hakkiri/commit/389d5b4791be8248e954e303fd78f9314d1111ca
 [segments]: specs/node-segments/spec.md
 [tree]: specs/document-tree/spec.md
