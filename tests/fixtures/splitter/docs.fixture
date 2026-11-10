@@ -1,0 +1,1500 @@
+# actions AGENTS.md
+CI verifies.
+x runs every check CI runs; push the branch and read the result on the pull request.
+
+# actions docs/rust-ci.md
+The workflow resolves no visibility, provider or machine size itself.
+Public callers carry only their own public configuration.
+Choices at run time follow only the event or the changed files, such as read-only cache safety for pull requests.
+
+# actions docs/rust-ci.md
+Each step has its own time limit, and the job has none, so the job ends within their sum.
+The mbx step's 7 minutes apply to the restore and to the export separately.
+A failed or timed-out export leaves the job green.
+The export removes the Cargo target first, after every step that reads it.
+
+# actions docs/rust-ci.md
+A ruleset requires only x, as x from a caller job named x.
+So the jobs behind it can change without a ruleset change.
+An upstream failure cannot skip a required check into green.
+
+# actions docs/rust-ci.md
+The mise cache key carries x and the hash of every x.
+So the build job's cache holds the profile's tools, and no other job restores it.
+
+# actions docs/rust-ci.md
+x fails when a required job failed or was cancelled.
+It passes a cancelled run only when a newer run replaced it, for the same event, branch and head commit.
+
+# actions docs/rust-ci.md
+A pull request, or a run on another branch, reads the volume and never commits it.
+
+# actions docs/secrets.md
+The install sets x, so mise takes the download URL and checksum from the caller's x and writes no lock entries.
+A gitleaks entry missing for the platform of the x input fails the job instead of slowing it.
+The default runner is linux-x64; a caller that picks a runner of another platform runs x for it.
+x skips the caller's x, such as x.
+
+# actions docs/secrets.md
+A scheduled or dispatched run scans the whole history.
+The pre-push hook scans only the commits it pushes, so the full scan runs here once a day.
+
+# actions docs/secrets.md
+The job installs gitleaks from the caller's x, with x.
+x lets the mise action download it through the release mirror.
+
+# actions macos-signing/README.md
+x loads the CI Developer ID identities and the notary key for a macOS release job.
+x removes them again.
+
+# actions mise/README.md
+The action requests the job's OIDC token for the mirror's address.
+It exchanges that token at the mirror's x for a session token that lasts six hours.
+No caller holds a mirror secret.
+
+# actions policy/README.md
+Each entry names the rule, the workflow file and a reason.
+An entry with no reason excepts nothing.
+
+# actions tasks/README.md
+A rustdoc warning fails x before docs.rs sees it.
+It builds every feature, even when a crate's docs.rs metadata lists fewer.
+So it checks every gated item docs.rs could render.
+
+# actions tasks/README.md
+That table chooses what docs.rs builds: x, or a x list.
+A list fits when all features would build heavy dependencies that gate no documented item.
+
+# actions tasks/README.md
+No tracked Rust, TOML or shell file names x or x.
+Neither does any file in a mise file-task directory.
+A crate names those lints only to change their level, which the standard forbids.
+
+# bun-release AGENTS.md
+This is standing procedure, not one-shot migration: every new npm name hits the same wall.
+Re-running it is a guard — existing versions skip publish, matching trust is left alone, a mismatch fails.
+Delete the helper when npm ships first-publish OIDC (npm/cli#8544).
+The consumer mise task maps the same staged packages CI will publish; do not hand-type a package list or add a bun-release CLI.
+
+# bun-release AGENTS.md
+Versioning is changeset-driven — CI owns the bump, publish, tag, and GitHub Release.
+Registry is public npm with OIDC trusted publishing.
+Runners are GitHub-hosted x.
+A GitHub Release is changelog notes plus the x tag.
+
+# ctl-core AGENTS.md
+A dated nightly carries only rustfmt: x runs on it for x's unstable options, and x builds on it as docs.rs does.
+The mise pin, x, and x move together in one commit; x fails when they differ.
+CI uses the same pins and caches through x.
+
+# ctl-core AGENTS.md
+x pins stable 1.99.1 for build, lint, and test, with x.
+That routes Cargo through mr-boxington so worktrees share one build store.
+
+# ctl-core AGENTS.md
+Measured on Linux and macOS with doc-tests included, cargo-nextest was 1.05 to 14 times slower (it starts one process per test).
+mbx test scheduling or a x cap slowed concurrent runs.
+Do not reintroduce them without new measurements.
+
+# ctl-core AGENTS.md
+Local edits survive an update.
+x allows the README banner's HTML, and x ignores commit hashes cited in prose.
+Change a shared rule in the template, then take its new tag here.
+
+# ctl-core AGENTS.md
+Markdown prose uses semantic line breaks.
+Each sentence starts a new line, and a long sentence may also break at a clause.
+No line is wrapped at a fixed column, so x turns off the line-length rule.
+
+# ctl-core ctl-core/AGENTS.md
+The crate-root x sections in x are the docs.rs landing page, and x there is authoritative for the feature graph.
+The README is the GitHub page and does not copy them.
+Crate-root re-exports stay x, so the page lists modules once; the prelude documents the flat surface.
+
+# ctl-core ctl-core/AGENTS.md
+Traits are the exception, with every type a required trait method takes or returns.
+cargo-semver-checks 0.51.0 treats a trait as public-API-sealed (x) when any x path reaches it or such a type.
+This holds even when another path is public.
+So x, x, and x (returned by x) stay visible at the root.
+
+# ctl-core ctl-core/AGENTS.md
+The automatic terminal-width buffer defaults to two columns and reads x; the automatic minimum defaults to 20.
+When no width is detected, output lays out to a fallback width of 80, and x disables it.
+x, x, and x expose the buffer, ordered environment names, minimum, and fallback.
+x returns its settings as a x from x.
+
+# ctl-core ctl-core/AGENTS.md
+A setter on a builder type takes the name of its setting (x, x, x), never a x prefix.
+A reader of the same setting gets another name, such as x, or no method at all.
+A method that reads the environment starts with x, so a caller sees which methods are not pure.
+
+# ctl-core ctl-core/AGENTS.md
+Write a new lock with the pinned mise, 2026.10.25.
+A newer mise writes a new file as lockfile version 4.
+CI's mise cannot read that version.
+
+# ctl-core ctl-core/AGENTS.md
+The format is chosen, never guessed.
+x reads it from the extension (x, x, x, any case).
+It refuses every other extension before reading, and names the feature a known extension needs.
+
+# ctl-core ctl-core/tests/parity/DIFFERENCES.md
+Every way a file in x differs from its file of the same name in x, grouped by kind.
+x is the comfy-table renderer of 0.6.x and stays frozen; x is the ctl-layout renderer.
+31 of the 208 files differ.
+Each kind names one example as case, width, and mode, and the design decision of the x change that produces it.
+No kind is an unfixable regression.
+
+# ctl-core ctl-term/AGENTS.md
+x: a real child process piped to x.
+It needs the x feature, and on a target that is not Unix it prints a skip line.
+It runs without libtest, because libtest prints its own banner to stdout, and x quits after the first line.
+The next libtest write would then fail before the code under test ran.
+Keep that target at x in x.
+
+# ctl-core ctl-text/README.md
+x lays text out as plain data before anything is written to a terminal.
+A x is text in one style, and a x is a list of spans.
+A x is a list of lines that wraps to a width.
+
+# ctl-core docs/brand.md
+A 32-unit square, corner radius 6.
+Two discs of r 8, centred x and x.
+The centres sit on x, 7 units apart on each axis.
+The figure is symmetric about the square's diagonal and clears the field by 4.5 units on every side.
+
+# ctl-core docs/brand.md
+Set in Geist Mono (OFL) and converted to outlines, so nothing depends on a font at render time.
+Sizes: wordmark Black 60px with −3 tracking, tagline Medium 17px, chip Regular 16px.
+To change the wording, reshape with x + x at those sizes.
+Do not add a x element.
+
+# ctl-core docs/presentation.md
+Sometimes neither a terminal nor x gives a width.
+Agent and CI captures, where every stream is piped, are examples.
+Then ctl-core lays out to a fallback width of 80.
+x changes it and x renders tables at their natural width.
+The fallback is separate from the minimum, which applies only to a detected width.
+
+# ctl-core docs/presentation.md
+The consumer's setter wins over the variable.
+x, x, x, and x replace each ordered name list, and an empty slice disables lookup.
+A value outside the list is ignored, and x prints one warning line that lists the accepted values.
+
+# ctl-core openspec/specs/declared-input/spec.md
+A refusal caused by a limit SHALL name the file, the line when known, the limit's field and value, and x.
+A limit hit while reading x itself SHALL point at the tool's process default instead.
+Without x, the message SHALL end with x.
+
+# exa-cli README.md
+x skips the read and overwrites the entry.
+Use only when staleness provably matters.
+
+# exa-cli skills/exa/SKILL.md
+Raw body is JSON text for that command's generated Hey API schema.
+Optique parses it; do not pass a file path:
+
+# fanctl AGENTS.md
+No daemon, no resume hook.
+The chip runs the curves itself.
+The driver (x, x) writes back after S3 resume the curves written through its attributes since it loaded, so a boot-time x covers resume too.
+
+# fanctl AGENTS.md
+Write order follows the driver.
+The driver checks each point write alone, against the curve as it stands, and refuses one that leaves the curve falling.
+fanctl orders the writes so every intermediate curve stays non-decreasing.
+The rule, with its proof, is on x; a test runs it over every pair of non-decreasing sequences of 7 values from 0 to 4.
+Every point is written, even one that holds its value, because the driver writes back after resume only the curves written since it loaded.
+
+# fanctl AGENTS.md
+Duty in percent, one decimal.
+The config states duty in percent with at most one decimal; it maps to the driver's 0-255 by rounding to the nearest step.
+One decimal names every step, so x prints a percent that maps back to the same step, which may differ from the percent the config gave (49.6 and 49.4 are both step 126).
+
+# fanctl AGENTS.md
+Headers, not channels.
+A config names fans by board header (x, x, x …).
+A table per board maps each header to its pwm channel; a header the table does not list is an error.
+
+# fanctl AGENTS.md
+Validate before writing.
+A config whose temperatures or duties fall from one point to the next, or that is out of range, is refused before anything is written.
+
+# fanctl README.md
+Each fan takes exactly 7 points: x in whole degrees C (0 to 127) and x in percent (0 to 100, one decimal at most).
+Neither may fall from one point to the next.
+A header the file does not name keeps its curve.
+
+# fanctl src/instructions.md
+x writes declared fan curves into the Nuvoton NCT6687D-R of an MSI board through the x hwmon driver, on Linux.
+The chip runs the curves itself; fanctl leaves no process behind.
+It finds the driver's device as the one x whose x reads x; the number is never fixed.
+
+# fanctl src/instructions.md
+x maps a board header to its curve.
+On the MS-7E70 the headers are x (pwm1), x (pwm2) and x to x (pwm3 to pwm8).
+A header the board does not have is refused.
+A header the file does not name keeps the curve it has.
+
+# fanctl src/instructions.md
+x prints the curves the driver holds now, as a config that x takes back unchanged.
+A duty prints with at most one decimal, which maps to the same 0-255 step.
+A header the driver exposes no curve for is left out.
+
+# fnox-export AGENTS.md
+The suite MUST stay hermetic and re-runnable.
+x sandboxes x and the x dirs and sets x so real fnox daemons (whose sockets live in x, outside the sandbox) are never spawned and cannot leak across runs.
+A test that needs the daemon flag stubs x (see x) — never force a real daemon in the suite.
+
+# fnox-export README.md
+A selector exports matching source keys unchanged.
+Supports x wildcards.
+Bare x exports all profile keys and succeeds even when the profile is empty.
+
+# fnox-export README.md
+The plugin sets x on every fnox process it spawns, and spawns nothing when it runs with that variable set.
+This matters when x on x is a mise shim: each plugin call to fnox is then mise again, which evaluates the env and runs the plugin again.
+Without the guard that recursion fills the per-user process table.
+With it, the nested evaluation returns an empty, uncacheable result and the shim runs the real fnox.
+
+# forkctl AGENTS.md
+CI sets explicit Cargo and rustup homes beneath mise's data directory, so mise provisions its own rustup and caches the actual toolchains instead of reusing runner-installed proxies.
+Both stable and nightly use minimal profiles with explicit components.
+The macOS gate verifies the provider and compiler paths; a manual dispatch skips the install cache to prove cold provisioning before running the normal gates.
+
+# forkctl docs/brand.md
+The square mark has one rust shape.
+The banner repeats that rust on the chip so the header matches the mark.
+It is the same accent, not a second role.
+
+# forkctl examples/README.md
+Merge the relevant sections from x into the consumer.
+The immutable remote catalog exposes one mounted x task whose Usage grammar comes directly from forkctl's Clap tree:
+
+# forkctl openspec/specs/manifest-upgrade/spec.md
+On a schema 2 manifest with uncommitted changes, x SHALL fail with x, because an upgrade whose bookkeeping refresh failed leaves the rewritten files uncommitted.
+When the bookkeeping refresh fails, the error SHALL name the commands that finish the commit.
+When writing the rewritten files fails, the error SHALL name the x that undoes them.
+
+# forkctl README.md
+Every long option also reads x, such as x or x.
+A flag on the command line wins over its variable, and an empty variable counts as unset.
+Help shows each variable beside its flag.
+
+# forkctl README.md
+A scheduled x job needs a GitHub App installation token, not the workflow's x.
+A rebase replays upstream changes to x, and x can never be granted x.
+A pull request opened with x also starts no workflows, so the proposal would get no CI.
+
+# forkctl README.md
+The extension selects the codec: x/x reads and rewrites canonical YAML; x reads and rewrites canonical JSON.
+Both deserialize into the same typed x, execute the same handlers, and produce the same generated evidence.
+Unknown or missing extensions are rejected — forkctl never sniffs bytes or silently changes a file's format.
+
+# forkctl README.md
+All three transitions require a clean fully checked stack and no active patch.
+They create an annotated recovery tag and publication operation, mutate the series through StGit, regenerate the manifest/ledger/exports, and stop at the same exact-lease atomic x gate as rebase.
+The bookkeeping patch cannot be removed or disabled.
+
+# forkctl README.md
+Every patch commit carries matching x, x, and x trailers.
+Source patches precede tooling patches.
+Every source export is generated deterministically as x; tooling patches have no export.
+The final tooling patch owns manifest, ledger, exports, and integration files.
+
+# forkctl README.md
+Disabled patches are absent from the source tree and active StGit series.
+Their metadata, former commit, original position, reason, and recovery evidence remain under x; fresh clone hydration fetches those recovery tags.
+Enabling imports the preserved patch at its former position with a 3-way apply and can continue or abort through the normal operation journal on conflict.
+Permanent removal writes the same evidence to manifest history instead.
+
+# forkctl README.md
+Clap remains the command grammar.
+Templates under x retain skill and instruction prose while ctl-core x renders their shared mounted invocation/no-x rule and visible command inventory.
+Tests byte-compare both committed documents.
+
+# forkctl README.md
+If the branch already matches while a ready operation remains, x verifies every recorded recovery ref before clearing the local journal and snapshot.
+Exact refs make the retry idempotent; missing required evidence is published atomically under the unchanged branch lease, while mismatched evidence fails closed.
+
+# forkctl skills/forkctl/SKILL.md
+x pushes x under a lease and opens or updates its draft pull request with x; a repeat updates that branch and pull request in place.
+Do not merge a proposal pull request: from a clone whose x is the reviewed candidate, run x.
+It refuses unless the proposal tree matches x.
+x names a branch, tag, or URL other than x.
+
+# forkctl skills/forkctl/SKILL.md
+JSON is never coloured, whatever x or x say, and a parse error under x is a JSON error even when the bad argument comes first.
+Keep stdout as exactly one JSON document and treat schema-derived command names, arguments, results, notices, error codes, and details as authoritative.
+Do not parse pretty tables or error prose.
+
+# forkctl skills/forkctl/SKILL.md
+Each transition requires a clean checked stack, creates immutable recovery evidence, regenerates exports and the ledger, and stops at the ordinary atomic exact-lease publication gate.
+A disabled patch is absent from the source tree but retained in manifest x with its former commit and recovery tag.
+x / x own conflicts during deletion, replay, or re-enable.
+The bookkeeping patch can never be removed or disabled.
+
+# forkctl skills/forkctl/SKILL.md
+Pretty output is for operators.
+Automation uses JSON output or the local one-request API:
+
+# forkctl src/instructions.md
+Checks never stage or rewrite.
+StGit refresh invokes the consumer's pre-commit hook and consumes its final index.
+A hook that leaves files dirty, such as a regenerated lockfile, fails the final check after the commit is written.
+A refresh or edit then stays an operation in phase x: stage the paths the patch owns, such as a x the new pin rewrote, restore or remove the others, and run x; or run x, which discards them.
+A remove, disable, enable, or rebase stays in x: restore those paths and run x, which checks again, or abort.
+x refuses while any operation is in flight.
+
+# forkctl src/instructions.md
+Everyday follow-up is a new top patch.
+x on a non-top patch is refused unless you pass x.
+That flag unapplies everything above the patch (including tooling that owns mise).
+It is recoverable via x / x; it is not the everyday edit path.
+
+# forkctl src/instructions.md
+forkctl snapshots x and x into x at operation start.
+If they vanish from the worktree, it restores them as temporary files so x still works.
+Continue/abort remove those temps before StGit reapplies later patches, so they cannot block x.
+The tracked manifest is not copied into the worktree; the Git-private JSON snapshot already covers operation continue/abort.
+
+# forkctl src/instructions.md
+Forkctl exposes commands; it does not own a hook manager:
+
+# hakkiri AGENTS.md
+Release scope.
+Release 1 is the CLI: x and x, run from a mise task, CI and a pre-commit hook.
+Release 2 is the language server, on the same per-file engine.
+
+# hakkiri AGENTS.md
+Structure first.
+A rule selects text by its scope in the document tree; a pattern only narrows that selection.
+A rule that needs a regular expression to find whether text sits in code, a link or a comment shows a missing scope.
+
+# hakkiri AGENTS.md
+Language profiles.
+Each source language has a profile that maps its comments and doc comments into the tree.
+Every comment reads as Markdown, plain x comments included; TSDoc and JSDoc keep their tags.
+String literals are never prose.
+The first release ships Rust, TypeScript, JavaScript, Markdown and MDX.
+
+# hakkiri openspec/specs/document-tree/spec.md
+In a x comment of a TypeScript or JavaScript file, a tag name SHALL carry no prose scope.
+A type in braces after a tag SHALL carry none either, and neither SHALL the name after x, x, x, x, x, x, x or x.
+The description after them SHALL be prose, and the body of x SHALL be code.
+A line inside a fenced block SHALL begin no tag.
+
+# hakkiri openspec/specs/document-tree/spec.md
+Adjacent line comments of the same type SHALL join into one comment node, read as one Markdown text.
+
+# hakkiri openspec/specs/node-segments/spec.md
+Every node of the document tree reads its text from segments: byte ranges of the file that hold prose and no syntax.
+A check reads the text, and an alert points at the span that covers it.
+
+# hakkiri openspec/specs/node-segments/spec.md
+THEN the x node has the segments of its two cells, and its text is x
+
+# herdr-restore-notice README.md
+The live test owns temporary homes, registries, sockets and fake agents.
+It proves real Ctrl-click dispatch, native resume arguments, double-click rejection, wrong-pane/stale-link rejection, output-only startup, and stop/crash recovery.
+It never touches an existing user session.
+Set x to test a copy of a full config; test-only shell/update/history overrides affect only the copy.
+The binary must be built before running live tests.
+
+# herdr-restore-notice README.md
+Herdr runs the startup hook after restoring a stopped server and opening its API.
+This covers both x → x and crash recovery.
+The plugin also prints a notice when a live agent exits and the native session is still retained (x with x).
+That is x and process death, not Pi x and not x.
+Merely attaching to an already running server, linking/enabling the plugin, or reloading configuration does not rerun startup.
+Do not restart a busy server to preview it; the next normal restore will use the installed plugin.
+
+# herdr-restore-notice README.md
+The action prints one JSON document to the plugin log, which x returns.
+Each paused pane names its directory and agent kind, which a JSON API Resume request names too, and the launch flags its notice shows.
+x appears only for a named Pi session, and x is null when no launch was recorded:
+
+# herdr-restore-notice README.md
+OSC links are enabled by default.
+Herdr preserves them; guessing outer-terminal capabilities from a server's environment is unreliable, especially before any client attaches.
+Use an explicit setting instead:
+
+# herdr-restore-notice README.md
+Before launching, the plugin verifies the clicked pane, native session, directory, shell PID/start time and PTY.
+Busy panes, missing transcripts, stale history links and reused tickets are rejected.
+An exclusive claim prevents two clicks from starting two agents.
+A readiness timeout does not trigger a retry: an agent may already have started, so inspect the pane and plugin log.
+
+# herdr-restore-notice README.md
+This prints the literal, copyable native resume command instead of clickable links.
+Set x, or remove the file, to restore links.
+Only this optional plugin-owned file is parsed; Herdr's config is never parsed by the plugin.
+Settings take effect on the next startup hook.
+
+# herdr-restore-notice README.md
+A small Herdr plugin that writes a colored, compact notice into restored shell scrollback.
+Nothing starts until you click Resume.
+No prefilled commands, prompt manipulation, background daemon or browser callback server.
+
+# herdr-restore-notice README.md
+The restored pane already has Herdr's native environment and cwd: x, x, current Herdr socket/binary and workspace/tab/pane IDs; inherited x and x are removed.
+The command inherits the restored shell's environment.
+Herdr does not reconstruct original flags, model settings or custom launch variables.
+This plugin applies flags only when a caller handed them over (see Launch flags) and never invents them; launch variables are not restored.
+If cwd changed, the click is rejected rather than silently changing directories.
+
+# herdr-restore-notice README.md
+Resume: Ctrl-click, including on macOS.
+Herdr handles the custom OSC 8 URI locally through the plugin's declared link handler.
+It starts the retained conversation in that same pane through x.
+The live routing name is an opaque ticket hash so it stays unique; the sidebar x token uses x (the Pi session name when present, otherwise x).
+
+# herdr-restore-notice README.md
+File-link opening depends on your outer terminal and OS.
+Remote file paths are not translated to local paths.
+No OS custom-protocol registration is required for Resume.
+The link contains an opaque ticket, not a shell command.
+
+# herdr-restore-notice README.md
+An explicit Pi session name appears when its retained transcript contains x metadata.
+Unnamed sessions show just x; no title is inferred from messages, IDs or filenames.
+The latest name wins, including an empty name that clears it.
+Names are capped at 64 characters; unsafe or unavailable names are omitted without preventing resume.
+Other agents retain the same compact x heading.
+
+# herdr-restore-notice README.md
+Retained sessions leave the agents sidebar when the process exits: Herdr has no paused or hibernated agent state.
+List them with:
+
+# herdr-restore-notice README.md
+A client of Herdr's JSON API, such as a phone client that asked its user first, can request the same resume without a click.
+It invokes the x action with the pane and the directory and agent kind it showed:
+
+# opencode-cursor-inference AGENTS.md
+x is the only permitted private build dependency.
+Import exact helpers, bundle and tree-shake them, keep GitHub Packages credentials distinct from release App credentials, and prove private names/source paths are absent from every runtime artifact.
+
+# opencode-cursor-inference AGENTS.md
+Never read an installed Cursor IDE or its storage to derive identity.
+
+# opencode-cursor-inference AGENTS.md
+x opens or updates the Version Packages pull request using the x GitHub App.
+
+# opencode-cursor-inference docs/decisions.md
+Decision: This supersedes the preceding pre-release hold.
+x is the public bootstrap release.
+Changesets, npm OIDC trusted publishing, and the Version Packages workflow own subsequent versions, tags, and GitHub Releases.
+
+# opencode-cursor-inference docs/decisions.md
+Consequences: Do not generate a new conversation id per call.
+Invocation ids remain unique per provider call.
+Route-key changes finish the old outer run, retire its HTTP/2 connection completely, and only then create the replacement run; Cursor can retire that connection after x, so immediate reuse or replacement before close can abort the first request after a model switch.
+
+# opencode-cursor-inference docs/decisions.md
+Decision: Cache files represent only catalogs produced by a successful authenticated refresh.
+A stale but structurally valid authenticated snapshot remains selectable after logout and after network or persistence failures.
+Without a credential and without such a snapshot, expose exactly one real Cursor routing row: model id x, display name x, and wire model id x.
+Never persist that fallback.
+
+# opencode-cursor-inference README.md
+Select Cursor and complete browser sign-in.
+OpenCode stores the OAuth credential through its own auth contract.
+This package does not maintain a credential database or secret store.
+
+# opencode-cursor-inference README.md
+Cursor supplies model inference and routing.
+OpenCode remains the agent host: it owns the complete message history, arbitrary tool schemas, tool execution, continuation, sessions, branching, compaction, and transcript.
+
+# opencode-cursor-inference README.md
+Derives Cursor's machine identity from the host.
+A random UUID is persisted in OpenCode's cache directory only when host derivation fails.
+
+# opencode-cursor-inference README.md
+The provider does not execute Cursor-native tools, project MCP servers, shell commands, or an agent loop.
+Unsupported request controls and response capabilities fail closed.
+
+# pi-auto-rename README.md
+Sessions are named automatically after the first assistant response.
+The extension uses the first user message to generate a 2-6 word Title Case name.
+Use x (no args) at any point to regenerate the name from the full conversation history.
+
+# pi-cursor AGENTS.md
+Keep evidence classes separate: pinned IDE source, application-message captures, Pi 0.84.4 tag.
+No packet-level claims.
+No credential, machine id, account id, or billing value in fixtures.
+
+# pi-cursor docs/brand.md
+Run the script in Regenerating the outlines with this x instead.
+Wordmark Black 104px with −5.2 tracking (the banner's −0.05 em), tagline Medium 24px, chip label Regular 20px; the three strings are the banner's, unchanged.
+
+# pi-cursor docs/brand.md
+Banner-only tints: x (muted on paper), x (muted on graphite), x / x (hairline).
+The muted tone carries the tagline and the chip outline; the hairline carries nothing but the 1.5-unit inset border.
+
+# pi-cursor docs/brand.md
+Before changing the accent hue, check it against this pair: any replacement must have WCAG relative luminance in L ∈ [0.119, 0.249] to clear 3:1 against both x and x.
+Magenta sits at 0.141.
+A hue outside that band fails one field.
+The band is specific to this field pair and does not transfer if the neutrals change.
+
+# pi-cursor docs/brand.md
+Slab thickness is 6.5 units, not 3.
+At 3 units the same four-slab arrangement scatters into unrelated dashes at 16px and the rotation stops reading.
+This was measured at 16px, not assumed, and it is the reason the slabs are slabs.
+
+# pi-cursor docs/brand.md
+pi.dev renders package media in a 232×129.625 box with x, so the source must be exactly 16:9 or the card crops it.
+x and x are 3840×2160 (4K), with the SVG retaining a x design grid so the construction coordinates below stay readable.
+Resolution is not the layout contract: 16:9 is.
+Never reduce the raster below 4K.
+The bordered card's inner image box still trims about 2.26 design-grid units off the top and bottom, so nothing may sit at the vertical edges.
+
+# pi-cursor docs/brand.md
+Inspect 1280×640 and smaller 2:1 downscales from the PNG, plus a centered 1.91:1 crop.
+The mark's gaps and magenta slab must remain visible.
+
+# pi-cursor docs/brand.md
+That rotation is the construction rule.
+Verify any edit by rotating one slab onto the next, never by eye.
+The figure spans x on both axes, so it is centred on the square and clears the field by 4.5 units on every side.
+
+# pi-cursor docs/brand.md
+The mark slabs are baked at x, exactly as the banner bakes them at 3.5×.
+The file carries no x attribute anywhere; a x wrapper makes every number in the table above unverifiable.
+
+# pi-cursor docs/brand.md
+Text clears 4.5:1 on both fields; the accent clears 3:1 for non-text on both.
+That is what lets one magenta value serve light and dark without a second file.
+
+# pi-cursor docs/brand.md
+Every gap is 3 units — one at each corner of the whirl: between the top slab's right end at x and the right slab at x, and its three rotations.
+That is 1.5px at 16px, which holds.
+Closing any gap turns the pinwheel into a closed ring, which is a different and much weaker mark.
+
+# pi-cursor docs/brand.md
+Set in Geist Mono (OFL) 1.700 and converted to outlines: wordmark Black 60px with −3 tracking, tagline Medium 17px, chip Regular 16px.
+Geist Mono advances 600/1000 units per glyph at every weight and applies no kerning, so a run of x characters at size x occupies x plus tracking — that is where the pen-end numbers in Banner geometry come from.
+
+# pi-cursor docs/decisions.md
+2026-09-03 npm's x packument has no x field and the package page shows no provenance badge.
+The release did use the configured trusted publisher: x successfully minted the npm OIDC token immediately before Bun published.
+Record OIDC authentication and registry integrity as proven, but do not claim Bun 1.4 emitted a separate npm provenance attestation.
+
+# pi-cursor docs/plan.md
+The npm packument does not expose a x field for these Bun 1.4 publications.
+The workflow logs prove trusted-publisher OIDC token minting and successful publication, but do not claim a separate npm provenance attestation.
+
+# pi-cursor docs/protocol/turn-accounting-source-audit-2026-09-04.md
+x registers the unary DashboardService method.
+Exhaustive exact-symbol searches of the full 3.18.9 desktop workbench, Glass workbench, and agent-host JavaScript find only this schema and service descriptor.
+There is no bundled call, no construction of its request fields, and no consumption of its response fields.
+The 3.18.25 desktop workbench has the same result.
+
+# pi-cursor docs/protocol/turn-accounting-source-audit-2026-09-04.md
+Relevant webpack module factories were extracted without executing their bodies and formatted with Prettier 3.6.2 using x.
+The audit then:
+
+# pi-cursor docs/protocol/turn-accounting-source-audit-2026-09-04.md
+The earlier turn-accounting description was incomplete.
+Cursor IDE 3.18.9 contains three additional cost-bearing contracts outside RunInference:
+
+# pi-cursor docs/protocol/turn-accounting-source-audit-2026-09-04.md
+A source-drift check against Cursor IDE 3.18.25 found the same contracts and the same absence of a x caller.
+That later client also uses x only for the usage-based-pricing preflight display.
+
+# pi-cursor README.md
+The same DashboardService schema includes x, whose request takes x and an int32 x, and whose response contains named x items.
+Exact-symbol searches find no caller or field consumer in the full packaged Cursor 3.18.9 workbench or agent-host JavaScript, so the source does not establish the timestamp unit, item meanings, settlement timing, or concurrent-request behavior.
+
+# pi-cursor README.md
+The implementation is pinned to Cursor IDE 3.18.9 for managed inference and x for catalog/usage evidence.
+Darwin host identity is verified against Cursor's algorithm.
+Linux and Windows identity branches have deterministic fixtures but have not been host-verified.
+Packet-level HTTP/2 framing and future Cursor server compatibility are not claimed.
+
+# prose-style AGENTS.md
+Books lag web and software usage.
+When every choice is near zero, as with "wall of prose" and "wall of text", the counts decide nothing and the writer's wording stands.
+The JSON form returns the same counts: x.
+
+# prose-style AGENTS.md
+Use word pairs that occur in ordinary English.
+Check a doubtful pair, such as "plain fix", against its alternatives in Google Books Ngram.
+Rewrite a pair near zero when an alternative scores well: "plain fix" has 0 per billion words, "quick fix" 280.
+
+# prose-style AGENTS.md
+x: the package configuration a project reads before its own.
+
+# prose-style openspec/changes/bareurl-single-scan/proposal.md
+Rust comments: Vale 3.26.0 reads only line comments as Markdown, so the x scope misses x blocks.
+Check them with a Tengo script rule that scans the file once, or keep raw scope for block comments only.
+
+# prose-style openspec/changes/bareurl-single-scan/proposal.md
+Markdown: replace BareURL's raw-scope regex with a rule on the x scope.
+Vale renders Markdown with goldmark and GFM, which turns a bare URL into a link, and maps x to x.
+A bare URL or an autolink then shows as a link whose text is its URL, and fenced code and code spans never reach that scope.
+
+# prose-style openspec/changes/frequency-habit-rules/proposal.md
+The package's rules come from habits readers noticed, and nothing measures how much more often agents use them than people do.
+research.md counts both sides: agent docs use semicolons 7.3 times as often as pre-2022 design docs, colons inside a sentence 4.0 times, and ", not the" contrasts 7.7 times.
+A linear model that sees no topic words tells agent sentences from human ones with a held-out ROC AUC of 0.958 to 0.987 on sources it never trained on, so the habits are real and measurable.
+
+# prose-style openspec/changes/frequency-habit-rules/research.md
+Split sentences, then keep a sentence only when it has 5 to 60 words, starts with a capital or a quote, and holds no more than one stray symbol.
+At least 85% of its tokens must look like words, and at least 70% of its words must be common English: a wordfreq 3.1.1 Zipf score of 3 or more.
+
+# prose-style openspec/changes/frequency-habit-rules/research.md
+Parse each format with its own parser: markdown-it-py 4.0.0 for Markdown, docutils 0.21.2 for reStructuredText, and Python's x for Stack Exchange HTML.
+Only paragraphs and list items remain; code, tables, block quotes, headings and HTML blocks are dropped.
+
+# prose-style openspec/changes/frequency-habit-rules/research.md
+The spread filter kept 1,724 single words, 2,041 pairs and 453 triples, across 58 large agent sources and 12 human ones.
+The verbs, adjectives and adverbs with the highest ratios fall into two groups.
+
+# prose-style openspec/changes/frequency-habit-rules/research.md
+Each candidate below scored high on both sides of the evidence: a large ratio and a wide spread.
+
+# qctl AGENTS.md
+The pull request's CI runs x; no hook runs it.
+Lefthook: pre-commit checks formatting and scans the staged diff for credentials, commit-msg lints the message with committed (x), and pre-push runs x, the commit lint over every pushed commit, and a full-history credential scan.
+Every hook runs with x.
+A fresh clone arms them with x, through x's postinstall hook; CI never loads x, so no runner gets them.
+
+# qctl AGENTS.md
+Growing domain features use nested module trees, not flat helper files.
+x is the row-edit entry point; its field, list, policy, and position mechanics live under x.
+Document rendering helpers live under x, and dependency ordering under x.
+Cross-feature APIs use the narrowest visibility that works.
+
+# qctl docs/brand.md
+A 32-unit square, corner radius 6, mirrored about x and inset 4.5 units left and right, 5 top and bottom.
+The rule is 3 units wide at x, running x to x.
+Two queued cells, 8×8, sit at x on x and x — their midpoint is the rule's centre, so the pair reads as balanced against it.
+The task in flight is 8×10 at x, centred on the same line and taller than either queued cell.
+Both side gaps to the rule are 2 units; closing them collapses the split, which is the whole statement.
+
+# qctl openspec/changes/horizon-reason/design.md
+See x for what the field is and where it reaches.
+A horizon row is x in x, and x makes every row type refuse a key it does not know, so a renamed key is a new schema version.
+x already upgrades older ledgers in x: schema 3 rewrites scalar notes, schema 4 sets the version, and the other verbs refuse both with a message that names x (x in x).
+
+# qctl openspec/changes/horizon-reason/proposal.md
+A horizon row carries two fields that keep it off the queue.
+x names what would end the wait, and x says why the row waits: x, x, or x.
+x names a category without saying what varies, which is the "kind as a noun" pattern the prose rules reject.
+A reader has to learn from the docs that the field is the reason the row is not startable.
+
+# qctl openspec/changes/horizon-reason/specs/horizon-rows/spec.md
+qctl SHALL write and accept x.
+x SHALL upgrade a schema 3, 4, or 5 ledger to 6.
+It SHALL rename each horizon row's x key to x where the key is written, keeping the value, its quotes, and every comment, and SHALL set x.
+No other path SHALL read x.
+
+# qctl openspec/changes/horizon-reason/tasks.md
+1.2 Teach x to rename each horizon x key in place when it upgrades schema 3, 4, or 5, and make every other verb refuse those versions with a message that names x.
+Verify x, x, and x pass in CI.
+
+# qctl openspec/specs/environment/spec.md
+Each long option of every verb SHALL read x, with the long name upper-cased and x written as x.
+A flag on the command line SHALL win over its variable, and an empty variable SHALL count as unset.
+Help SHALL print x beside each bound option.
+
+# qctl openspec/specs/ledger-style/spec.md
+With x, x SHALL leave exactly one blank line between each pair of consecutive rows in the queue, the archive, and the horizon.
+It SHALL NOT put a blank line between a list's key and its first row, and SHALL leave the space after a list's last row as written.
+The blank line SHALL go above the comments a row owns.
+x SHALL name the missing separator and write nothing.
+
+# qctl openspec/specs/ledger-style/spec.md
+The x block SHALL accept x, with the values x and x, which name yamled's one-line and automatic layouts.
+A ledger that omits it SHALL behave as x.
+Every writer and x SHALL lay out list items as it says.
+
+# qctl openspec/specs/list-items/spec.md
+Under x, x SHALL write each folded or literal item of a block list field on one line, reading as the same text.
+A non-note item holding a line break SHALL stay one item, with x escapes.
+A rewritten item's comments SHALL stay above it.
+x SHALL fail on such an item and write nothing, and a second x SHALL change nothing.
+
+# qctl openspec/specs/list-items/spec.md
+Under x, the default, every verb that writes an item of a row's list field SHALL write it on one line, as the item's own line of the block list, and never as a folded or literal block.
+The item SHALL be plain when plain text reads back as the same string, and quoted as the ledger's x say otherwise.
+Under x, the item SHALL be written as yamled's automatic layout writes it: on one line, or as a literal block when its text holds a line break.
+
+# qctl README.md
+Clap remains the command grammar.
+Templates under x retain skill and instruction prose while ctl-core x renders their shared version, mounted invocation/no-x rule, and visible command inventory.
+Tests byte-compare both committed documents.
+
+# qctl skills/qctl/SKILL.md
+x is an ordered list; each repeated x is one item.
+Use separate items for distinct facts.
+Every item is one line unless the ledger declares x, so a note holding a line break is refused: pass each line as its own x.
+Follow a note's date with a comma, not a colon, so it stays unquoted; do not rewrite existing notes for this.
+Qctl does not mechanically wrap sentences.
+
+# qctl skills/qctl/SKILL.md
+archive — done or dropped.
+Newest first.
+IDs never reused.
+
+# qctl src/instructions.md
+A row names an OpenSpec change through its x path: a file under x, or under x once the change is archived.
+A change mentioned only in a note is not named.
+One change may serve several rows; a row names at most one.
+
+# qctl src/instructions.md
+x moves a queued row to archive with x; x records work that will not be done.
+x archives every queued id a commit-body trailer closed.
+Default scan is the same history x uses.
+x narrows it.
+x reads the hook stdin.
+If it wrote the ledger, it exits non-zero so the file can be committed; it does not amend.
+
+# qctl src/instructions.md
+x is x.
+x is a list of strings on every row, an archived row may carry x, and a horizon row names its x.
+A schema 4 or 5 ledger still calls that field x: run x once, which renames the key in place and sets version 6.
+A schema 3 ledger also has scalar notes: x splits those on blank-line paragraphs as well.
+Other verbs refuse versions 3, 4, and 5 and name that command.
+A ledger on an earlier version is not rewritten.
+
+# qctl src/instructions.md
+x is an ordered list.
+Every repeated x is one item, so separate facts instead of building one unbounded paragraph.
+Under the default x, every list item is one line: a note holding a line break is refused, so pass each line as its own x.
+Under x, such a note is written as one x literal block.
+Qctl never inserts mechanical line breaks mid-sentence.
+
+# quickbar AGENTS.md
+Every private symbol is looked up at launch in x, and a missing one disables quickbar with a message rather than crashing.
+List each symbol in README.md "How it works".
+
+# quickbar AGENTS.md
+A menu bar app that shows the hidden menu bar of a full-screen space as soon as the pointer enters the menu bar band.
+README.md describes what it does and how it works.
+
+# rawr AGENTS.md
+The pull request's CI verifies: x is the one gate.
+Behaviour changes start as an OpenSpec change under x.
+Releases are patch bumps, and a release is cut only when the maintainer asks for one.
+
+# rawr openspec/changes/fullscreen-picker/design.md
+A click selects, and a click on the selected row resumes.
+A left click on a row that is not selected selects it; a left click on the selected row resumes it.
+Two clicks on a row therefore resume it at any speed.
+Alternative: a timed double click resumes, and a click on the selected row does nothing.
+It lost: the maintainer chose the faster path, and a click on the highlighted row reads as "open this one".
+Cost: the first row starts selected, so one click on it resumes at once.
+
+# rawr openspec/changes/fullscreen-picker/design.md
+Selection and hover are separate.
+The selected row has the x pointer and a bold title in bright blue (ANSI 12); a hovered row turns its dim text to the default foreground.
+Hover changes only the text colour, so it never reads as selected.
+Body text uses the terminal's default foreground and secondary text is dimmed, so both read in light and dark themes.
+
+# rawr openspec/changes/fullscreen-picker/design.md
+Alternate screen on stderr.
+The picker enters the alternate screen (DEC mode 1049) on stderr and leaves it on exit, so the pane's restored scrollback is shown again unchanged.
+Alternative: an inline viewport under the restored output.
+It lost: it pushes the output up, leaves its rows in scrollback, and cannot use the whole pane for long lists.
+
+# rawr openspec/changes/install-and-shells/design.md
+The formula lives in a tap of its own.
+x holds formulae for the organization's own tools; x stays for patched forks.
+The formula installs the binary and generates completions with x, and its caveats print the x line.
+
+# rawr openspec/changes/install-and-shells/design.md
+Completions come from ctl-core's x verb.
+It prints a short registration script that asks the installed binary for candidates at each TAB, so completions always match the installed version.
+Homebrew installs it with x, with no shell configuration.
+
+# rawr openspec/changes/install-and-shells/design.md
+x output is static.
+It depends only on the shell and the rawr version, never on the machine, so it can be saved once with x and sourced with no process at shell start.
+Alternative: x as the only form.
+It lost as the only form: it runs rawr in every new shell, a few milliseconds that add to start time; it stays the shortest form for those who accept that.
+
+# rawr openspec/changes/install-and-shells/design.md
+Targets: macOS on Apple silicon, Linux on glibc.
+x, x and x, built on free GitHub-hosted runners.
+Intel Macs and musl builds are out.
+
+# rawr openspec/changes/install-and-shells/design.md
+bash, zsh and fish.
+These are the shells Homebrew installs completions for, and each has a hook that runs once before the first prompt: x in bash, x in zsh, the x event in fish.
+Alternative: also nushell, PowerShell and others that mise supports.
+It lost for now: their quoting and x differ again, and nobody has asked for them.
+
+# rawr openspec/changes/install-and-shells/design.md
+Tools that hook into the shell split into two camps.
+[mise], [zoxide] and [starship] print the line to add and leave the shell files alone; their installers end with instructions.
+The [uv] installer, built by cargo-dist, appends to shell profiles unless x is set.
+rawr follows the first camp.
+
+# rawr openspec/changes/install-and-shells/proposal.md
+rawr only helps once two hooks are in place: one in the shell, to offer a restored pane its sessions, and one in Claude Code, to record them.
+Today both are snippets in the README, for zsh only, and there is no way to install rawr but building it.
+Installing must not touch the user's shell files or settings unasked, and must not add a process to every shell start for those who keep their configuration in files.
+
+# rawr openspec/changes/install-and-shells/tasks.md
+1.1 x and x quote through ctl-core's shell-integration feature; proved by a unit test in CI for the fish quote.
+Blocked on a ctl-core release with the feature.
+
+# rawr openspec/changes/install-and-shells/tasks.md
+1.4 x comes from ctl-core's completion verb; proved by a test that the bash script names every command.
+Blocked on a ctl-core release with the verb.
+
+# rawr openspec/changes/install-and-shells/tasks.md
+1.2 x comes from ctl-core's shell-integration feature with rawr's two hooks; proved by a test that two runs match byte for byte.
+Blocked on the same release.
+
+# rawr openspec/changes/session-search/design.md
+A session's title is its first prompt.
+Search rows show the first line of the first prompt that is not a slash command such as x, up to 120 characters, ending in x when cut.
+The pane's own sessions keep the title from their transcript, as before.
+Alternative: read the generated title from each matching transcript.
+It lost: it opens transcripts on every key press, and a first prompt says what the session was for.
+
+# rawr openspec/changes/session-search/design.md
+Words match by substring, all of them, ignoring case.
+A query of x matches a session whose prompts, folder or ID contain both words.
+Alternative: fuzzy subsequence matching, as fzf does.
+It lost: over long prompts nearly every short query matches every session, and the order stops meaning anything.
+
+# rawr openspec/changes/session-search/specs/session-search/spec.md
+THEN the picker closes, prints nothing and exits 1
+
+# rawr README.md
+Search matches every word typed, ignoring case, against the prompts typed in a session, its folder and its ID.
+It reads Claude Code's prompt history, x, and lists x once to keep only sessions whose transcript is still there; it opens no transcript.
+Search rows take their title from the session's first prompt that is not a slash command such as x.
+
+# rawr README.md
+Rex restores sessions, tabs and panes after a restart, but each pane comes back as a fresh shell.
+x remembers which Claude Code sessions ran in each pane, and in a restored pane offers them again in a full-screen picker.
+Choosing one resumes it in that pane; dismissing the picker leaves a plain shell.
+
+# rgbctl AGENTS.md
+No daemon, no boot service.
+The controller keeps a saved setting through power cycles.
+Effects that need a running process, such as colour by CPU temperature, are out of scope.
+
+# rgbctl AGENTS.md
+Write cycle.
+Read, decode, change the owned bytes, write, read back, compare.
+A read-back that differs from what was written outside the save flag is an error.
+
+# rgbctl AGENTS.md
+Config.
+x (or x) names the file.
+Otherwise rgbctl uses the nearest x walking up from the working directory, then x (x).
+No file means built-in defaults.
+The file holds named presets and the name of the default one.
+
+# rgbctl AGENTS.md
+Permissions come from a udev rule granting a group access to the hidraw node (see x).
+The binary never escalates.
+
+# rgbctl docs/hardware-test-2026-11-08.md
+Byte 7 of a x reply is the port's Gen2 strip count; byte 7 of a x reply is 1 when the port is in Gen2 mode.
+Byte 8 of port 0's x reply is x, which no source explains.
+
+# rgbctl docs/hardware-test-2026-11-08.md
+The second run assumed the whole cooler was on JARGB_V2_3; Test G in the fourth run established the map above.
+So Tests A to C wrote to the pump head's header, not the radiator fans'.
+
+# rgbctl docs/hardware-test-2026-11-08.md
+Per-header records with the select-all bit cleared work from a clean state: ColorRing on records 0 and 2 (style x) ran side by side at 01:45:40.
+In the white state (Test E) the Halo fans showed a rainbow instead of their own steady record.
+
+# rgbctl docs/hardware-test-2026-11-08.md
+Whether per-LED colours stay on the devices after the sender stops.
+
+# rgbctl docs/protocol.md
+SignalRGB and OpenRGB name the records in the same order: JARGB 1 to 3, JAF, JPIPE 1 to 5, JRGB 1 and 2, onboard 1 to 6, and a last record for all zones ("SelectAll").
+Sources: SignalRGB's x (plugin, line 898), and the comments of OpenRGB's x (x, line 178).
+MSI's x puts JRGB1 at area 9, which agrees (MB800 notes, zone mapping).
+
+# rgbctl docs/protocol.md
+Observed: ColorRing is a chase along the chain.
+The colours run through the devices one after another in header order, JARGB_V2_1, V2_2, V2_3, and each device starts just before the previous one finishes.
+At brightness 5 and medium speed it looked like many colours with the devices out of sync, each light dark about half the time; at brightness 1 and slow speed (style x) the chase was plain to see.
+
+# rgbctl docs/protocol.md
+MSI's x fills each record as below (MB800 notes, lines 99 to 110).
+SignalRGB's x decodes the same bytes (plugin, line 973).
+
+# rgbctl docs/protocol.md
+The test board has three ARGB headers in use, mapped by per-LED colours (test record):
+
+# rgbctl PORTING.md
+Preview by default.
+The script saved to flash unless told x; rgbctl saves only with x.
+
+# rgbctl README.md
+Status: in development; no release yet.
+Checked on an MS-7E70 on 2026-11-08, as volatile writes: x, x, x, x, and x with colours behave as described on every connected device.
+x without colours gives a smooth moving rainbow on every device.
+
+# rgbctl src/instructions.md
+Every write is a preview the controller forgets at power-off.
+x commits it to the controller's flash, which then survives power cycles.
+
+# rgbctl src/instructions.md
+Every long option reads x when the flag is absent: x, x.
+A flag wins over its variable; an empty variable counts as unset.
+
+# rgbctl src/instructions.md
+The node must open read-write: run as root, or install a udev rule that grants a group access to x hidraw nodes.
+An open failure says which.
+
+# swift-libdeflate AGENTS.md
+Each release pins one libdeflate release: move the submodule, add a row to the README version table, and tag the merged commit.
+The first release was x; bump the patch for a new libdeflate release, and the minor when the package's own interface breaks.
+
+# swift-ngtcp2 AGENTS.md
+x reads no files.
+SwiftPM reads a dependency's manifest from git without its submodules, so a manifest that lists x builds here and fails for every consumer (0.0.1 did).
+Its source lists are literals that x writes from the submodules; x (part of x) fails when they differ.
+
+# swift-ngtcp2 AGENTS.md
+Move a submodule only to an upstream release tag, never to a branch head, then run x and x.
+The x workflow does this every week and opens a pull request.
+
+# swift-ngtcp2 README.md
+Each release of this package pins one release of ngtcp2 and nghttp3, and takes swift-nio-ssl from the version listed up to its next major version.
+0.0.1 cannot be used as a dependency: its manifest read files from the submodules, which SwiftPM does not check out when it reads a manifest.
+0.0.1 and 0.0.2 built their own BoringSSL.
+
+# unixd AGENTS.md
+The service manager owns the socket.
+launchd on macOS and x on Linux, one x implementation each.
+No call site outside the activation module branches on the platform.
+The daemon never spawns itself.
+
+# unixd AGENTS.md
+x must never depend on an async runtime.
+Its consumer's direct path has no reactor.
+Only the daemon coalesces; the direct path relies on the key lock.
+
+# unixd AGENTS.md
+Read x before writing code.
+It is the contract, not a sketch.
+
+# unixd AGENTS.md
+Lints are denied, not warned.
+x is the gate.
+
+# unixd crates/unixd-cache/README.md
+Synchronous.
+No async runtime, no database.
+The same cache is correct whether a daemon or a direct in-process call owns it.
+
+# unixd docs/design/daemon-and-cache.md
+systemd fails the service after x starts (5 per 10 s by default), and the socket after x activations (20 per 2 s by default for x).
+A socket failed this way refuses every connection until x.
+Measured on Linux with a 1 s idle timeout and a connection every 0.9 to 1.2 s: under the defaults the service hit its start limit after 10 starts, the socket entered x, and 6 of 25 connections were refused.
+With x in a 10 s interval, all 25 connections succeeded across 14 starts, including connections that arrived while the daemon was exiting.
+
+# unixd docs/design/daemon-and-cache.md
+Neither crate renders anything.
+A consumer that wants a daemon status or cache statistics to look native in its own output can depend on a semantic document layer and have these crates emit documents rather than strings.
+That dependency must stay optional and must not pull a terminal renderer, a serializer, or an argument parser into either crate.
+
+# unixd docs/design/daemon-and-cache.md
+Activation proof.
+A throwaway example daemon receives its socket on stdin from launchd on macOS and from systemd on Linux, serves, exits idle, and is relaunched by the next connection.
+This decides the activation path before any crate code depends on it.
+
+# unixd docs/design/daemon-and-cache.md
+This path is chosen over the named-socket APIs for one reason.
+No maintained crate hands a macOS caller an owned listener from x without the caller writing x to adopt a raw descriptor.
+On Linux, x does return an owned listener, and it is the fallback if the stdin path fails its live proof.
+launchd's man page asks new jobs to avoid x; the live proof in slice 1 decides whether that warning matters here.
+
+# unixd docs/design/daemon-and-cache.md
+Neither macOS nor Linux cleans a plain program's cache directory, so the cache bounds itself.
+Every limit is a x field with a default; the maintenance research compares them with other tools.
+
+# unixd docs/design/daemon-and-cache.md
+Secrets never go into the disk cache, encrypted or not.
+A daemon that needs to hold one keeps it in memory, in the secret store.
+
+# unixd docs/design/daemon-and-cache.md
+The daemon never starts itself.
+The platform service manager creates the socket, listens on it, and starts the daemon on the first connection:
+
+# unixd docs/design/daemon-and-cache.md
+The cache names each cached request kind in one enum and has a lookup and a store method per kind.
+x takes caller-built keys and a caller policy, and stores any serializable value.
+
+# unixd openspec/specs/activation/spec.md
+WHEN the socket unit is started with x and the service is inactive
+
+# unixd openspec/specs/cache/spec.md
+When a write crosses a hard cap, the crate SHALL remove expired entries, then the least recently used, until entries and bytes are at or below their targets.
+It SHALL NOT remove an unexpired entry while an expired one remains, except that it SHALL skip an entry whose key another caller holds.
+
+# unixd openspec/specs/lifecycle/spec.md
+THEN the socket file still exists and the next connection starts a new daemon
+
+# unixd README.md
+macOS on Apple Silicon and Linux.
+The platform service manager owns the socket and starts the daemon on demand: launchd on macOS, x on Linux.
+The daemon never spawns itself.
+
+# verctl docs/brand.md
+A 32-unit square, corner radius 6.
+Line from x to x at 2 units wide.
+Nodes on that line at x and x at r 3.
+The new tag at x at r 4.75.
+Every node centre satisfies x, so the line needs no separate alignment, and the three sit 7.5 units apart in x.
+The figure clears the field by 4.5 units at the first node and 4.75 at the tag.
+
+# verctl docs/served-files.md
+Give the version a right-hand boundary.
+A match ending in literal text has one, so x reads x as no match at all and the arity stops the release.
+A match ending at the placeholder has none, and will rewrite the numeric head of a longer version, leaving the tail.
+x is the boundary for a line the match owns; otherwise put the text that follows into x.
+Nothing can be inferred for you here: x against x is correct and pins 1.2.3, so a rule that refused every trailing x would stop real releases.
+
+# verctl openspec/changes/building-blocks/tasks.md
+2026-11-09, partly shipped: x writes no lockfile outside tests.
+The lockfile ownership scenario needs steps (1.2).
+
+# verctl openspec/changes/command-renames/specs/command-names/spec.md
+x SHALL rewrite each x entry, then render every template in x, at the versions on HEAD.
+It SHALL take every flag the pins rewrite took in verctl 0.7.
+
+# verctl openspec/changes/docs-build-check/specs/docs-build/spec.md
+The x job SHALL run after x finishes, whether a leg failed or not, and SHALL NOT delay x or the next version commit's publish.
+A failed docs.rs build SHALL NOT make a release incomplete.
+
+# verctl openspec/changes/package-asset-files/proposal.md
+A package asset tarball holds exactly one file.
+x runs x (x), so a package whose release is a daemon, its client, a systemd unit, and a licence ships a tarball with only the first of the four.
+Probed on verctl 0.7.2 with a x package and a x target: the tarball listed one entry.
+Vendored sets already pack several files from a directory (x and x); package assets cannot.
+
+# verctl openspec/changes/package-resolution/design.md
+See proposal.md for why, and the spec for what.
+Today a package's x must name a manifest file.
+The stock publisher is chosen from the file name: x for x, x for x.
+x is parsed and validated once, at x, and nothing downstream checks it again.
+The version sources a path can resolve to are in x.
+
+# verctl openspec/changes/registry-publish-check/design.md
+It is one of the parts reusable-release-workflow was split into.
+The release at a version commit is release-at-version-commit, and the docs.rs check is docs-build-check.
+
+# verctl openspec/changes/registry-publish-check/tasks.md
+1.1 x on publisher recipes, stock x and x queries, and the pre- and post-publish checks.
+Proof: the idempotent-publish registry scenarios pass as tests with a fake publisher and query, including a mocked crates.io index that lacks the version of a workspace member
+
+# verctl openspec/changes/release-state-machine/design.md
+See proposal.md for why and research.md for the prior art.
+Today verctl keeps no model of a release.
+Each command rebuilds the state it needs from indirect signals:
+
+# verctl openspec/changes/release-state-machine/proposal.md
+Ship 0.4.0 from an integration branch x, then patches (design 4).
+Contradicted: 0.4.0 to 0.7.4 shipped from x, no x exists, and the 0.8.0 minor is held on a stack instead.
+
+# verctl openspec/changes/release-state-machine/proposal.md
+All breaking changes ship in one minor, 0.8.0, held with the rest of the minor backlog; later work ships as patches that add without breaking.
+0.4.0 to 0.7.4 shipped before this change, and the parts of it they carried are listed in audit.md.
+
+# verctl openspec/changes/release-state-machine/research.md
+x refreshes workspace versions from Bun 1.4.1 (oven-sh/bun#41302).
+On 1.4.0 it left the lockfile stale.
+
+# verctl openspec/changes/release-state-machine/research.md
+pnpm 12 is written in Rust.
+Read at v12.12.1, with its official binary run in a scratch workspace.
+
+# verctl openspec/changes/release-state-machine/research.md
+bun.lock decides published dependency versions.
+It records a x for every non-root workspace package (bun.lock.rs), and x and x replace x with the version from the lockfile, not from package.json (pack_command.rs).
+A run with Bun 1.4.0, 1.4.2, and 1.4.3 confirmed it: after a version bump, a pack without a lockfile refresh shipped the old dependency version.
+
+# verctl openspec/changes/release-state-machine/research.md
+Reuse.
+The packing, publish, lockfile, and versioning crates are MIT but declare x (publish/Cargo.toml); none is on crates.io.
+
+# verctl openspec/changes/semver-release-type/specs/semver-check/spec.md
+x SHALL leave out a crates.io crate whose manifest has no library target as Cargo resolves it (an explicit x table or an auto-discovered x), or whose library is a proc-macro.
+cargo-semver-checks does not check such a crate, and x SHALL run no check for it.
+The 1.0 rule below does not apply to such a crate.
+
+# verctl openspec/changes/version-files/design.md
+See proposal.md for why, and the spec for what.
+Today a package's x must name a manifest file.
+The stock drivers are x (TOML keys) and x (JSON keys), chosen from the file name, and any other file needs a x entry.
+The stock publisher is also chosen from the file name: x for x, x for x.
+x is parsed and validated once, at x, and nothing downstream checks it again.
+
+# verctl openspec/changes/version-pr-proposal/design.md
+Each job's first verctl step reads x and fails when it is below 0.8.0.
+The message names the installed version and the minimum, and says to move the verctl pin and the workflow ref together.
+The minimum is a literal in the workflow, raised only when the workflow needs a newer verctl.
+
+# verctl skills/verctl/SKILL.md
+x runs x on each crates.io crate whose next release is a patch, so only an API break fails, and skips a crate with a pending x fragment or a minor the Version PR already moved.
+A crate at 1.0 or later fails: the rule covers 0.x.
+
+# yamled AGENTS.md
+Tasks follow one layout.
+x holds tools, settings, and deps, and its x lists x first, then the pinned x catalogs.
+Every other task is a one-line fragment or a file task in x.
+Fragment names are not namespaced by file, so each name carries its prefix (x in x).
+
+# yamled AGENTS.md
+Tests put YAML in x blocks.
+A unit test binds the expected text before the assertion (x), so rustfmt keeps it readable.
+A test of an edit sequence goes in x: its x helper reads each edited value back through x, and an inline x snapshot records the whole file with each line marked x, x, or kept.
+Review a changed snapshot with x.
+
+# yamled openspec/specs/edits/spec.md
+x SHALL add a key and value to a block mapping at its end, before a named key, or after a named key, at the mapping's indentation.
+x SHALL append an item to a block sequence at the sequence's indentation.
+Pushing into an empty flow sequence x SHALL turn it into a block sequence under its key.
+A new nested value SHALL follow the file's list style: items indented under their key, or at the key's column.
+
+# yamled openspec/specs/edits/spec.md
+A document SHALL carry one quote preference, x, set with x and x by default, and every writer, flow sequence items included, SHALL follow it.
+Each preference SHALL write a string plain when it reads back unquoted; otherwise x SHALL write single quotes and x double quotes.
+A character only double quotes can carry, such as a control character, SHALL get double quotes.
+
+# yamled openspec/specs/edits/spec.md
+Every edit SHALL be applied as a byte splice of the source.
+Bytes outside the spliced range SHALL be identical before and after the edit.
+After each edit the document SHALL parse the result; when the result is not valid YAML, the edit SHALL fail and the source SHALL stay unchanged.
+
+# yamled openspec/specs/edits/spec.md
+The writer SHALL choose a string's style from one pass over its bytes, with no parse and no serialization: whether it can be plain in a block or flow context, which quotes it takes, and whether a block scalar holds it.
+The family reader, serde-saphyr with strict booleans, SHALL read every written form back as the same string, and plain SHALL be chosen exactly when that reader reads the unquoted text back as the string.
+
+# yamled openspec/specs/edits/spec.md
+An edit SHALL return x, and leave the source unchanged, for a value it cannot write in place: a key with no x after it, an empty value inside a flow collection, and an empty document.
+No edit SHALL panic on any input the parser accepts.
+
+# yamled openspec/specs/location-index/spec.md
+A comment line directly above a node, with no blank line between them, SHALL belong to that node.
+A comment after a node's value on the same line SHALL belong to that node.
+A node's owned range SHALL start at its first owned comment line and end at the end of its last line.
+
+# yamled README.md
+x edits a YAML file the way a person would.
+It replaces, removes, and inserts the values you name, and leaves comments, blank lines, quoting, block and flow style, and indentation as they were.
+It is pure Rust, built on x spans and x values.
+
+# actions AGENTS.md
+A step that several jobs of one workflow run, such as the toolchain install, is a YAML anchor repeated by alias.
+GitHub Actions resolves anchors but not merge keys (x), so an aliased step is identical everywhere.
+A job adjusts it only through the environment it sets.
+
+# actions AGENTS.md
+Shared workflows take concrete inputs, with no visibility detection or abstract runner modes.
+What depends on the event, and cache-write safety, stay decisions at run time.
+
+# actions docs/rust-ci.md
+The job restores the mise install cache and mbx's objects from the GitHub Actions cache instead.
+x saves under its own key suffix.
+A push to the default branch always builds, so the mbx cache saved from it stays current.
+
+# actions docs/rust-ci.md
+The caller selects a persistent cache volume with x.
+It must then supply its read-only safety label and a positive x that matches its runner labels.
+The render fragment derives the size label and the trim limit from one value, and render tests check they match.
+The workflow refuses a run that lacks this configuration.
+
+# actions docs/rust-ci.md
+A cache step that fails does not fail the job, since the result comes from the build and tests.
+One example is a save refused because the commit's key is already reserved on a re-run.
+Only the build job writes the build cache.
+
+# actions policy/README.md
+A workflow on x groups runs by x.
+The group may end with x, so a draft run never cancels the ready one.
+A workflow that also runs on x may end its group with the queue expression, which gives every merge queue entry one group per base branch, so a newer entry cancels the runs below it.
+The queue merges on the head entry's result alone, and that commit holds every entry below it.
+Outside the queue the expression gives the pull request group.
+It cancels the run a new push replaces, always or for pull request runs only.
+
+# actions policy/README.md
+the hosted and other accepted runner labels;
+
+# ctl-core ctl-core/AGENTS.md
+The baselines are plain files, not insta snapshots, because the 0.6.x files stay frozen once committed.
+The render-engine change adds the new engine's outputs beside them and lists each difference in its pull request.
+
+# ctl-core ctl-core/README.md
+x is a tree of semantic blocks: headings, prose, fields, tables, sections, notices, rules, and verbatim text.
+It holds meaning, not escape codes or table borders.
+The renderer chooses style, wrapping, width, and colour, through the x, x, and x crates.
+
+# ctl-core ctl-layout/AGENTS.md
+The layout rules of the widgets.
+They cover how a table chooses column widths and how a record and a rule fill a width.
+They also cover how a stack and an indent compose children, and how a breakpoint picks the widget for a width.
+
+# ctl-core docs/presentation.md
+An automatically detected TTY or x width reserves two columns before wrapping, stacking, help, fields, and table layout.
+This default protects hosts that indent tool output or whose frame consumes the rightmost column.
+The configured floor is 20 when the detected width permits it.
+A narrower terminal caps that floor, so ctl-core never claims columns the terminal does not have.
+
+# ctl-core docs/presentation.md
+Wrapping breaks at whitespace.
+A word wider than its column, such as a URL or a path, is not split in records, paragraphs, and headings.
+It runs past the width.
+That keeps it copyable whole.
+Grid tables still split it, to keep their borders intact.
+
+# ctl-core openspec/specs/env-flags/spec.md
+Bind every long option of a ctl CLI to an environment variable under one prefix.
+A caller that holds its settings in the environment can then run the bare verb.
+A flag wins over its variable, the variable over the config file, and the config file over the default.
+
+# ctl-core openspec/specs/features/spec.md
+All 12 directional formatting characters of UAX #9 at Unicode 16.0.0.
+They are ALM, LRM, RLM, LRE, RLE, PDF, LRO, RLO, LRI, RLI, FSI, and PDI.
+
+# ctl-core openspec/specs/usage-spec/spec.md
+For every command in the committed corpus, x SHALL return the bytes usage-lib 7.3.0 returns for the same command and bin name.
+The values the next requirement covers are the only exception.
+
+# exa-cli AGENTS.md
+API-key precedence is x → x → stored credential.
+x manages macOS Keychain, Linux Secret Service, or Windows Credential Manager through the x addon under one service/account pair (x / x).
+The Linux addon links no x, so no x is needed, but a D-Bus Secret Service provider must be running.
+Secure-storage failure is fatal unless login explicitly receives x; that fallback is an atomic x plaintext file.
+Tests inject x and never touch a real store.
+
+# fnox-export README.md
+Daemon-cached by default.
+Forces fnox's per-user daemon on (x).
+Once the daemon is warmed for a profile, resolutions that miss mise's env cache — a new shell, an expired TTL, an offsite x — are served from the daemon's memory (~0.1s) instead of re-hitting the provider (seconds each).
+The first warm-up still resolves live.
+Opt out with x.
+
+# forkctl docs/brand.md
+All the ink parts are subpaths of one x, and the same for rust.
+As separate xs they each antialias against the field, so a shared edge on a fractional coordinate composites to roughly 75% coverage and shows as a grey hairline through the figure — measured at the bus edge, x where it should be x.
+One path is rasterised in one pass and the seam cannot occur.
+Anything added to this mark goes in the same path.
+
+# forkctl examples/README.md
+x shows the complete tracked shape after source and tooling patches exist.
+Source exports are deterministic under x; do not declare per-patch export paths.
+Persistent ownership uses x globs where x stays within a path segment and x crosses directories.
+
+# forkctl openspec/specs/cli-environment/spec.md
+forkctl SHALL read each long option, global options included, from x when the command line does not give it, where x is the option's long name in upper case with x replaced by x.
+A flag on the command line SHALL win over its variable, and an empty variable SHALL count as unset.
+Help, version, hidden options, and the x side of a pair SHALL NOT read a variable.
+
+# forkctl openspec/specs/manifest-upgrade/spec.md
+x SHALL fail with x and write nothing while an operation journal exists, because that journal belongs to the forkctl that started it.
+It SHALL fail with x and write nothing for a manifest whose schema is neither 1 nor 2.
+On a schema 2 manifest with a clean worktree it SHALL succeed and change nothing.
+
+# forkctl README.md
+Most long options have collision-audited mnemonic shorts.
+Leaf parameters are grouped by subject, metadata/scope, capture, execution, and output.
+Help is generated from Clap metadata through ctl-core; no second parameter specification exists.
+Pretty help, result tables, notices, and errors wrap to the detected terminal width; captured non-TTY output may provide the standard x fallback.
+JSON, schemas, Usage KDL, and completion scripts never reflow.
+
+# forkctl README.md
+Persistent ownership uses x globs (x stays within a segment; x crosses directories).
+One-shot capture uses Git pathspecs.
+Forkctl never guesses intent.
+
+# forkctl README.md
+The API already accepts complete typed command arguments from JSON on stdin; x selects either a YAML or JSON manifest path.
+This is the generic programmatic interface — no second stdin argument grammar exists.
+
+# forkctl skills/forkctl/SKILL.md
+If a hook leaves files dirty, refresh and edit stop in phase x: stage the paths the patch owns (such as x after a pin change), restore the others, and run x.
+Remove, disable, enable, and rebase stop in x: restore those paths and x.
+x refuses while an operation is in flight.
+
+# hakkiri README.md
+Planned, not usable yet.
+The first release lints what Vale lints today with ProseStyle 0.0.7.
+It adds rules that count a habit per sentence or per number of words.
+An editor server follows in the second release.
+
+# herdr-restore-notice AGENTS.md
+A standalone Herdr plugin.
+Read README and coding standards.
+
+# opencode-cursor-inference docs/decisions.md
+Decision: This supersedes the preceding V1-primary decision.
+OpenCode V2 beta x is the design center, and stable OpenCode x is a compatibility target.
+Publish one hybrid default module whose V2 x and stable-V1 x members share auth, catalog, provider, and lifecycle primitives.
+Export that module at both the package root and x; keep x as the AI SDK x entry.
+
+# opencode-cursor-inference README.md
+The package sends the complete provider prompt, declared tool schemas, tool results, and supported image inputs to Cursor for inference.
+OpenCode executes tool calls locally according to its permission configuration.
+Treat both your OpenCode permissions and Cursor account as security boundaries.
+
+# pi-cursor docs/brand.md
+The tagline gap is exactly half the chip gap, and that ratio is load bearing.
+At the card's 0.19333× those three gaps become 10.1, 4.3 and 8.5 px.
+Equalise them and the card shows three equidistant grey lines instead of a wordmark with its subtitle and a separate chip.
+
+# pi-cursor docs/brand.md
+No two slabs touch.
+The magenta slab therefore abuts nothing, and no ink-to-accent antialias seam is possible anywhere in the file.
+The three graphite slabs are subpaths of one x for the same reason: as separate xs each antialiases against the field, so a shared edge on a fractional coordinate composites to roughly 75% coverage and shows as a grey hairline through the figure.
+One path rasterises in one pass.
+Anything added to this mark goes in the same path.
+
+# pi-cursor docs/decisions.md
+2026-09-03 A fresh OAuth live proof passed all three catalog calls, DashboardService usage, and a bounded Composer 2.5 RunInference response.
+A visible isolated Pi TUI in Herdr rendered live Enterprise Summary and Models views, switched tabs, closed normally, and exposed one timed-out aggregate sample as a named partial miss.
+The temporary access token and pane were removed after proof.
+This establishes the current Darwin account path, not Linux/Windows host behavior or future server compatibility.
+
+# pi-cursor docs/protocol/turn-accounting-source-audit-2026-09-04.md
+The formatted client proves that x is a preflight display, not measured usage.
+It contains no conversation or invocation identifier.
+x is present in generated schema and service descriptors but has no caller anywhere in the packaged 3.18.9 desktop workbench or agent-host JavaScript.
+Its name and wire fields are evidence of a conversation/time-bounded cost query; without a client caller or server implementation, they do not establish its timestamp unit, settlement timing, returned item meanings, or whether concurrent requests can be separated.
+
+# pi-cursor docs/protocol/turn-accounting-source-audit-2026-09-04.md
+The event schema has no x, request ID, generation ID, or response ID.
+The response's raw x has price data but no invocation field.
+Full-workbench symbol search finds only the generated filtered-method descriptor; the packaged desktop client does not call it.
+Cursor IDE 3.18.25 retains this field set and absence of a caller.
+
+# pi-cursor docs/protocol/turn-accounting-source-audit-2026-09-04.md
+No typed RunInference response message has a price, cents, charge, billing, or cost field.
+The x arm can carry arbitrary keys, so the schema alone cannot prove that a future server will never place cost there.
+The formatted client treats it as an opaque object and contains no logic that reads a billed-cost key from it.
+Module x maps the usage and extended-usage arms directly to their token values, resolves the invocation ID separately, and does not calculate or recover money from the stream.
+
+# pi-cursor README.md
+Persist diagnostics defaults to off.
+When enabled, each assistant message carries a x diagnostic in session JSONL.
+Its reconciliation census is payload-free; the same diagnostic can also retain provider metadata, image descriptions, and inference-extra side-channel data.
+The current structural census is about 0.6 kB per assistant message (roughly 56 kB per 100 turns); provider side channels can make it larger.
+When disabled, Cursor adds no assistant-message diagnostic data.
+
+# pi-cursor README.md
+The pane uses captured DashboardService calls and renderer-defined units.
+It does not infer prices from model tokens or substitute values for missing samples.
+Optional failed calls remain visible as named misses while available usage still renders.
+Outside TUI mode, print writes plain text, JSON emits a custom message event, and RPC uses a notification.
+
+# prose-style AGENTS.md
+Each rule catches one habit.
+Its comment states why, in one or two short sentences.
+No chat quotes, no profanity, no private paths or tool names.
+
+# prose-style AGENTS.md
+Match the habit.
+Let natural uses of the same word pass with x.
+Check each hit on a real document before raising a level.
+
+# prose-style openspec/changes/frequency-habit-rules/research.md
+Agent docs use semicolons seven times as often as design docs, and colons inside a sentence four times as often.
+Agents write ", not the" contrasts seven times as often, and almost never the human "not X but Y".
+Humans write "we" and ask questions far more.
+Agent replies average 13.4 words per sentence with a standard deviation of 5.8; in human text the deviation runs from 9 to 11.
+
+# qctl openspec/changes/horizon-reason/proposal.md
+x upgrades a schema 5 ledger to 6 by renaming each horizon row's x key to x where it is written, keeping its value, quotes, and comments.
+It upgrades schema 3 and 4 ledgers the same way, after the steps it already takes for them.
+
+# qctl openspec/changes/horizon-reason/tasks.md
+2.2 Move every test ledger to version 6 and x, and accept the changed mutation snapshots from a test run with x.
+Verify the mutation snapshots pass in CI.
+
+# qctl openspec/specs/ledger-style/spec.md
+x SHALL rewrite each string scalar written on one line whose quoting differs from what the declared x write, keeping its value.
+It SHALL leave block scalars, keys, values that are not strings, and the x block as written.
+x SHALL fail on such a scalar and write nothing.
+
+# qctl openspec/specs/list-items/spec.md
+Under x, x and x SHALL refuse a x value that holds a line break, before they write anything.
+The error SHALL say that a note is one line and that each line is passed as its own x.
+Under x, such a note SHALL be written as one literal block.
+
+# qctl README.md
+Acceptance states observable, demonstrably true end conditions for closing the task.
+Write the resulting state in the present tense.
+Put implementation steps in x and supporting context in x.
+Repeat x for distinct facts; each argument is one ordered list item, written on one line unless the ledger declares x.
+
+# qctl skills/qctl/SKILL.md
+Treat x as the policy owner for x.
+Do not reimplement validation with a copied Ajv test.
+Do not vendor x.
+
+# qctl src/instructions.md
+x includes the complete ledger state.
+The JSON from x carries x as an array and exits non-zero when it is not empty.
+
+# rawr openspec/changes/fullscreen-picker/design.md
+A title comes from the transcript's last megabyte.
+Transcripts reach hundreds of megabytes, and Claude Code writes the title rows again every few dozen kilobytes, the user's title next to each generated one.
+Reading the last 1 MiB finds the current title without reading the rest.
+Alternative: read the whole transcript.
+It lost: the picker runs as a shell starts, and local transcripts measured up to 417 MB, each read whole at every start.
+
+# rawr openspec/changes/install-and-shells/specs/install/spec.md
+THEN zsh completes x with no change to the user's shell files
+
+# rawr openspec/changes/session-search/proposal.md
+x in the picker opens a search line.
+Each key press filters every resumable local Claude Code session by the words typed, matched against the prompts the user typed in it, its folder and its ID.
+
+# rgbctl docs/protocol.md
+The per-zone records the board holds by default are mode x with rainbow colours at slow speed (x).
+x without colours writes the same mode and colour source to the last record at its default medium speed (style x).
+Observed: from a clean state that write gave a smooth moving rainbow on every device, the cooler included.
+
+# rgbctl docs/protocol.md
+JARGB_V2_1: two Cooler Master MF120 Halo fans, chained.
+Each has 24 LEDs, and units made after 1 June 2021 are Addressable Gen 2 RGB (Cooler Master specification).
+OpenRGB's sizing table lists the Halo as 24 LEDs wired in parallel (OpenRGB resize guide); whether the chained second fan repeats the first's data or continues it is not established.
+
+# rgbctl openspec/specs/lighting/spec.md
+rgbctl SHALL read presets from x or x, else the nearest x above the working directory, else x.
+It SHALL refuse an unknown field, a wave of more than four colours, and a x that names no preset.
+
+# unixd AGENTS.md
+Verification is named per change.
+A behaviour claim carries the check that proves it.
+The design document's verification table is the baseline, and step 7 is a required regression.
+
+# unixd docs/design/daemon-and-cache.md
+Synchronous, no reactor, no database.
+Versioned validated JSON envelopes on disk; directories x, files x.
+No existing crate covers stale-if-error, so the policy is this crate's own code; the pieces under it come from x and one small crate.
+
+# unixd docs/design/daemon-and-cache.md
+Every accepted connection is checked for the same effective UID as the serving process, with x, before any frame is read.
+It uses x on macOS and x on Linux.
+A mismatch closes the connection without a reply and without a log entry containing the peer's identity.
+The client checks the listener the same way, and also accepts root on macOS, because launchd creates every agent's socket as root; there the x directory around the socket keeps other users out.
+
+# unixd README.md
+Both crates are implemented and unreleased (x).
+x has the transport, serving from the service manager's socket with drain and idle exit, unit install for launchd and systemd, single flight, and an in-memory secret store.
+Read x for the contract, and x for the evidence behind it, before changing code.
+
+# yamled AGENTS.md
+Format-preserving YAML edits for Rust.
+A library without a command.
+Import as x.
+
+# yamled openspec/specs/location-index/spec.md
+x SHALL index one YAML document so that every scalar, sequence, and mapping node can be found by a x of mapping keys and sequence indexes.
+The index SHALL record each node's value byte range, its key's byte range when it is a mapping value, its style, and the number of children of a collection.
+A source that is not valid YAML SHALL be refused with the parser's line and column.

@@ -1,0 +1,340 @@
+# hard
+Use a tool, e.g. a linter, to check the text.
+Then fix it.
+
+# hard
+Use a tool, i.e. a linter, to check the text.
+Then fix it.
+
+# hard
+We need tests, docs, etc.
+Then we ship.
+
+# hard
+We need tests, docs, etc. and a release.
+
+# hard
+Dr. Smith wrote the guide.
+Mr. Jones read it.
+
+# hard
+Ask Dr. Smith about it.
+
+# hard
+Mr. Jones left early.
+He was tired.
+
+# hard
+Rust vs. Go is a common debate.
+Both are fine.
+
+# hard
+It is the U.S. government that asked.
+We replied.
+
+# hard
+He lives in the U.S. and works from home.
+
+# hard
+See No. 5 on the list.
+It is short.
+
+# hard
+Item No. 5 is open.
+
+# hard
+See Fig. 3 for details.
+It shows the flow.
+
+# hard
+Fig. 3 shows the flow.
+
+# hard
+Pi is 3.14 in short.
+That is enough here.
+
+# hard
+The value 3.14159 is a float.
+
+# hard
+Install v1.2.3 now.
+It fixes a bug.
+
+# hard
+Version 0.0.88 was released today.
+It is stable.
+
+# hard
+Wait...
+Then it started again.
+
+# hard
+He paused... and then he left.
+
+# hard
+Is this right?
+Yes it is.
+Why not!
+
+# hard
+Stop!
+Do not move.
+Wait here.
+
+# hard
+What?!
+That cannot be.
+Really?
+
+# hard
+He said "Stop."
+Then he left.
+
+# hard
+He said "Stop!"
+Then he left.
+
+# hard
+She asked "Why?"
+Then she waited.
+
+# hard
+(See below.)
+Next we start.
+
+# hard
+We started (see below).
+Next we stop.
+
+# hard
+Visit example.com for more.
+It has docs.
+
+# hard
+Open README.md and read it.
+Then close it.
+
+# hard
+Edit the file README.md before you push.
+
+# hard
+Run x first.
+Then run the tests.
+
+# hard
+Run cargo build.release first.
+Then run the tests.
+
+# hard
+Call x to start.
+Then call x.
+
+# hard
+Call a.b.c() to start.
+Then call d.e().
+
+# hard
+Set x to true.
+It is false by default.
+
+# hard
+Set foo.bar to true.
+It is false by default.
+
+# hard
+It ended.
+then it began again.
+
+# hard
+The tool ran.
+and nothing happened.
+
+# hard
+This sentence has no stop at the end
+
+# hard
+First sentence.
+Second sentence with no stop
+
+# hard
+Use a colon: it works.
+Use a semicolon; it also works.
+
+# hard
+The list follows: one, two, three.
+That is all.
+
+# hard
+He came; she left.
+They met later.
+
+# hard
+1. First do this.
+2. Then do that.
+
+# hard
+1. First
+
+# hard
+Steps: 1. Install it.
+2. Run it.
+
+# hard
+J. R. R. Tolkien wrote books.
+Many people read them.
+
+# hard
+Written by J. R. R. Tolkien.
+
+# hard
+We meet at 5 p.m. today.
+Bring the notes.
+
+# hard
+We meet at 5 p.m.
+Bring the notes.
+
+# hard
+The call is at 10 a.m. on Monday.
+Be ready.
+
+# hard
+The U.K. and the E.U. agreed.
+The deal is done.
+
+# hard
+Smith et al. found this result.
+We confirm it.
+
+# hard
+Prof. Brown and Mrs. White arrived.
+Sgt. Pepper played.
+
+# hard
+Mt. Everest is tall.
+It is in Nepal.
+
+# hard
+Gov. Lee spoke at noon.
+The crowd cheered.
+
+# hard
+Inc. and Ltd. are suffixes.
+They end names.
+
+# hard
+Cost is approx. $5 each.
+That is cheap.
+
+# hard
+It costs $3.50 per unit.
+That is cheap.
+
+# hard
+Mix 1.5 cups of flour.
+Then add water.
+
+# hard
+Email me at a.b@example.com.
+I reply fast.
+
+# hard
+See https://example.com/a.b/c.html for details.
+It is long.
+
+# hard
+Run ./build.sh then ./test.sh.
+Both pass.
+
+# hard
+The file is named config.v2.yaml.
+It is valid.
+
+# hard
+Hello.World is not a sentence boundary.
+
+# hard
+Line one.
+
+# hard
+Line two follows here.
+And a third.
+
+# hard
+Title Case Heading
+
+# hard
+He was born in 1990.
+She was born in 1992.
+
+# hard
+In 1990.
+She was born.
+
+# hard
+The end.
+
+# hard
+"Quoted text."
+He nodded.
+
+# hard
+"Is it?" she asked.
+He shrugged.
+
+# hard
+He said, "Go home."
+She went.
+
+# hard
+Wait (really!) before you go.
+Then go.
+
+# hard
+Note [1].
+This is next.
+
+# hard
+It works (mostly.)
+Then it fails.
+
+# hard
+The dog barked.
+The cat ran!
+The bird flew?
+
+# hard
+Use the A.P.I. wisely.
+It matters.
+
+# hard
+Add an item, e.g., a file.
+Then save.
+
+# hard
+Ask Ph.D. students about it.
+They know.
+
+# hard
+Visit St. Louis in June.
+It is warm.
+
+# hard
+Dr. J. Smith, M.D., arrived.
+The talk began.
+
+# hard
+Price: 5 USD.
+Pay now.
+
+# hard
+An ellipsis at the end...
+
+# hard
+It was fine...
+It was not.
+
+# hard
+Hmm.
+Okay.
+Fine.
