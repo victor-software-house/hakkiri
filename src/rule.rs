@@ -253,10 +253,10 @@ impl Rule {
     ///
     /// # Errors
     ///
-    /// Returns a [`LoadError`] when the text is not YAML, names no check
-    /// type, holds a field its check does not define or a value of the wrong
-    /// kind, asks for a feature hakkiri does not run, or holds a pattern that
-    /// does not compile.
+    /// Returns a [`LoadError`] when the text is not YAML or names no check
+    /// type. The same holds for a field its check does not define, a value of
+    /// the wrong kind, and a feature hakkiri does not run. A pattern that does
+    /// not compile is refused, and so is a pattern with nothing to match.
     pub fn from_text(name: &str, file: &str, text: &str) -> Result<Self, LoadError> {
         let input = Input::new(file, text);
         let probe: Probe = input.load().map_err(|error| at_tab(error, text))?;
