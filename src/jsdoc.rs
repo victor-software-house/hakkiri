@@ -5,22 +5,36 @@ use std::ops::Range;
 /// The ranges of `text` that are prose: the text before the first tag, and the
 /// description of each tag.
 ///
-/// A line that starts with `@` and a letter begins a tag.
-/// The tag name is not prose, and neither are the type and the name after
-/// `@param` or `@typedef`.
-/// The description runs to the next tag.
+/// A line that starts with `@` and a letter begins a tag, unless it sits in a
+/// fenced block.
+/// The tag name is not prose, and neither is a type in braces after it.
+/// After `@param` and the tags that name something, the name is not prose
+/// either.
+/// The body of `@example` is code, not prose.
+/// A description runs to the next tag.
 pub(crate) fn prose(text: &str) -> Vec<Range<usize>> {
     let mut ranges = Vec::new();
     let mut start = 0;
+    let mut code = false;
+    let mut fenced = false;
     let mut offset = 0;
     for line in text.split_inclusive('\n') {
-        if let Some(description) = description_start(line) {
-            ranges.push(start..offset);
-            start = offset + description;
+        let marker = line.trim_start();
+        if marker.starts_with("```") || marker.starts_with("~~~") {
+            fenced = !fenced;
+        }
+        if !fenced && let Some(tag) = Tag::of(line) {
+            if !code {
+                ranges.push(start..offset);
+            }
+            start = offset + tag.description;
+            code = tag.code;
         }
         offset += line.len();
     }
-    ranges.push(start..text.len());
+    if !code {
+        ranges.push(start..text.len());
+    }
     ranges.retain(|range| {
         text.get(range.clone())
             .is_some_and(|prose| !prose.trim().is_empty())
@@ -28,53 +42,81 @@ pub(crate) fn prose(text: &str) -> Vec<Range<usize>> {
     ranges
 }
 
-/// Where the description of the tag that `line` begins starts in `line`, or
-/// `None` when `line` begins no tag.
-fn description_start(line: &str) -> Option<usize> {
-    let body = line.trim_start();
-    let indent = line.len() - body.len();
-    let tag = body.strip_prefix('@')?;
-    if !tag.starts_with(|c: char| c.is_ascii_alphabetic()) {
-        return None;
-    }
-    let name = tag
-        .split(|c: char| !c.is_ascii_alphanumeric())
-        .next()
-        .unwrap_or_default();
-    let after_name = indent + "@".len() + name.len();
-    if matches!(name, "param" | "typedef") {
-        Some(after_parameter(line, after_name))
-    } else {
-        Some(skip_blanks(line, after_name))
+/// A tag that a line begins.
+struct Tag {
+    /// Where the description starts in the line.
+    description: usize,
+    /// Whether the description is code.
+    code: bool,
+}
+
+impl Tag {
+    /// The tag that `line` begins, or `None` when `line` begins no tag.
+    fn of(line: &str) -> Option<Self> {
+        let body = line.trim_start();
+        let indent = line.len() - body.len();
+        let tag = body.strip_prefix('@')?;
+        if !tag.starts_with(|c: char| c.is_ascii_alphabetic()) {
+            return None;
+        }
+        let name = tag
+            .split(|c: char| !c.is_ascii_alphanumeric())
+            .next()
+            .unwrap_or_default();
+        let mut at = skip_blanks(line, indent + "@".len() + name.len());
+        at = skip_type(line, at);
+        if matches!(
+            name,
+            "param"
+                | "typedef"
+                | "property"
+                | "prop"
+                | "arg"
+                | "argument"
+                | "template"
+                | "callback"
+        ) {
+            at = skip_name(line, at);
+        }
+        Some(Self {
+            description: at,
+            code: name == "example",
+        })
     }
 }
 
-/// The offset in `line` after the type and the name that follow `@param` or
-/// `@typedef` at `at`.
-fn after_parameter(line: &str, at: usize) -> usize {
-    let mut at = skip_blanks(line, at);
+/// The offset in `line` after the type in braces at `at`, or `at` when no type
+/// starts there.
+fn skip_type(line: &str, at: usize) -> usize {
     let rest = line.get(at..).unwrap_or_default();
-    if rest.starts_with('{')
-        && let Some(closed) = closing(rest, '{', '}')
-    {
-        at = skip_blanks(line, at + closed + 1);
+    match closing(rest, '{', '}') {
+        // `{@link X}` is an inline tag, not a type.
+        Some(closed) if rest.starts_with('{') && !rest.starts_with("{@") => {
+            skip_blanks(line, at + closed + 1)
+        }
+        _ => at,
     }
+}
+
+/// The offset in `line` after the name at `at` and the hyphen that follows it.
+fn skip_name(line: &str, at: usize) -> usize {
     let rest = line.get(at..).unwrap_or_default();
     let name = if rest.starts_with('[') {
         closing(rest, '[', ']').map_or(0, |closed| closed + 1)
     } else {
         rest.find(char::is_whitespace).unwrap_or(rest.len())
     };
-    at = skip_blanks(line, at + name);
+    let at = skip_blanks(line, at + name);
     // TSDoc puts a hyphen between the name and the description.
     let rest = line.get(at..).unwrap_or_default();
     if rest
         .strip_prefix('-')
         .is_some_and(|after| after.is_empty() || after.starts_with(char::is_whitespace))
     {
-        at = skip_blanks(line, at + 1);
+        skip_blanks(line, at + 1)
+    } else {
+        at
     }
-    at
 }
 
 fn skip_blanks(line: &str, at: usize) -> usize {
