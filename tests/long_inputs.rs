@@ -1,11 +1,12 @@
 //! Long inputs: the four check types of the pattern-and-readability-checks
-//! change, and `capitalization` and `sequence`, over a line of 50,000
-//! characters and a file of 60,000 lines.
+//! change, `capitalization` and `sequence`, and `spelling` with `affix`, over
+//! a line of 50,000 characters and a file of 60,000 lines.
 //!
-//! Each test lints one input with `consistency`, `conditional`, `repetition`
-//! and `readability` rules together, or with a `capitalization` and a
-//! `sequence` rule, checks the alerts each gives, and prints the time of the
-//! run.
+//! Each test lints one input with one set of rules:
+//! `consistency`, `conditional`, `repetition` and `readability`; or
+//! `capitalization` and `sequence`; or `spelling`, and an `existence` and a
+//! `substitution` rule that read `affix`.
+//! It checks the alerts each rule gives, and prints the time of the run.
 //! One more test reads a single sentence of 50,000 characters with a
 //! `sequence` rule, where the walk starts once for each word the anchor
 //! accepts.
@@ -150,5 +151,41 @@ fn a_sentence_of_fifty_thousand_characters() -> TestResult {
     let (alerts, took) = lint_rules(&rules, &source)?;
     assert_eq!(count(&alerts, "Team.Sequence"), words);
     assert!(took < Duration::from_secs(20), "took {took:?}");
+    Ok(())
+}
+
+/// The `spelling` rule, and the `existence` and `substitution` rules that
+/// read `affix`, as a name and a rule file.
+const SPELLING_RULES: [(&str, &str); 3] = [
+    ("Team.Spelling", "extends: spelling\nmessage: m\n"),
+    (
+        "Team.Existence",
+        "extends: existence\nmessage: m\naffix: en_US-web\ntokens: [utilize/DSG]\n",
+    ),
+    (
+        "Team.Substitution",
+        "extends: substitution\nmessage: m\naffix: en_US-web\nswap: {approve/DSG: okay}\n",
+    ),
+];
+
+#[test]
+fn spelling_and_affix_over_a_line_of_fifty_thousand_characters() -> TestResult {
+    let unit = "We utilize it, then blorft the approved one. ";
+    let repeats = 50_000 / unit.len() + 1;
+    let source = format!("{}\n", unit.repeat(repeats));
+    let (alerts, _) = lint_rules(&SPELLING_RULES, &source)?;
+    for (name, _) in SPELLING_RULES {
+        assert_eq!(count(&alerts, name), repeats, "{name}");
+    }
+    Ok(())
+}
+
+#[test]
+fn spelling_and_affix_over_a_file_of_sixty_thousand_lines() -> TestResult {
+    let source = "We utilize it.\nThen blorft the approved one.\n".repeat(30_000);
+    let (alerts, _) = lint_rules(&SPELLING_RULES, &source)?;
+    for (name, _) in SPELLING_RULES {
+        assert_eq!(count(&alerts, name), 30_000, "{name}");
+    }
     Ok(())
 }
