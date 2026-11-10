@@ -839,7 +839,7 @@ fn firsts(source: &str) -> Result<Vec<(String, bool)>, Box<dyn Error>> {
 
 #[test]
 fn a_node_records_whether_it_is_first_in_its_container() -> TestResult {
-    let cases: [(&str, &[(&str, bool)]); 10] = [
+    let cases: [(&str, &[(&str, bool)]); 15] = [
         ("- One.\n\n  Two.\n", &[("One.", true), ("Two.", false)]),
         ("- ```\n  x\n  ```\n\n  Two.\n", &[("Two.", false)]),
         ("> * * *\n>\n> Two.\n", &[("Two.", true)]),
@@ -848,6 +848,11 @@ fn a_node_records_whether_it_is_first_in_its_container() -> TestResult {
         ("> <!-- c -->\n>\n> Two.\n", &[("Two.", true)]),
         ("> <div>x</div>\n>\n> Two.\n", &[("Two.", false)]),
         ("> <hr>\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <!-- c --> <div>x</div>\n>\n> Two.\n", &[("Two.", false)]),
+        ("> <span>\n>\n> Two.\n", &[("Two.", true)]),
+        ("> <hr>\n> <hr>\n>\n> Two.\n", &[("Two.", true)]),
+        ("> </div>\n>\n> Two.\n", &[("Two.", false)]),
+        ("> <?x y ?>\n>\n> Two.\n", &[("Two.", true)]),
         (
             "> One\nlazy\n>\n> Two.\n",
             &[("One\nlazy", true), ("Two.", false)],

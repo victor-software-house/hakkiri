@@ -196,14 +196,19 @@ fn build(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
     Ok((nodes, builder.code_blocks.get()))
 }
 
-/// The HTML tags that never hold content, which Vale never counts as open.
-const VOID_TAGS: [&str; 13] = [
+/// The HTML tags Vale never counts as opening an element: the void tags,
+/// which hold no content, and the inline tags.
+const NO_ELEMENT_TAGS: [&str; 34] = [
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track",
-    "wbr",
+    "wbr", "b", "big", "i", "small", "abbr", "acronym", "cite", "dfn", "em", "kbd", "strong", "a",
+    "span", "sub", "sup", "code", "tt", "del", "q", "samp", "var",
 ];
 
-/// Whether a block opens no element: a thematic break, a link definition, an
-/// HTML comment, or a block that is one void tag.
+/// Whether a block opens no element: a thematic break, a link definition, or
+/// an HTML block whose tags are all void or inline.
+///
+/// A comment, a declaration and a processing instruction hold no tag.
+/// A tag after the end of a comment on its line is in the same block.
 fn opens_no_element(node: &Mdast) -> bool {
     if matches!(node, Mdast::ThematicBreak(_) | Mdast::Definition(_)) {
         return true;
@@ -211,19 +216,26 @@ fn opens_no_element(node: &Mdast) -> bool {
     let Mdast::Html(html) = node else {
         return false;
     };
-    let text = html.value.trim();
-    if text.starts_with("<!--") {
-        return true;
+    let mut rest = html.value.as_str();
+    while let Some(at) = rest.find('<') {
+        rest = rest.get(at + 1..).unwrap_or_default();
+        if let Some(comment) = rest.strip_prefix("!--") {
+            rest = comment.split_once("-->").map_or("", |(_, after)| after);
+            continue;
+        }
+        let tag = rest.strip_prefix('/').unwrap_or(rest);
+        let name: String = tag
+            .chars()
+            .take_while(|c| c.is_ascii_alphanumeric() || *c == '-')
+            .collect::<String>()
+            .to_ascii_lowercase();
+        if tag.starts_with(|c: char| c.is_ascii_alphabetic())
+            && !NO_ELEMENT_TAGS.contains(&name.as_str())
+        {
+            return false;
+        }
     }
-    let Some(tag) = text.strip_prefix('<').and_then(|tag| tag.strip_suffix('>')) else {
-        return false;
-    };
-    let name: String = tag
-        .chars()
-        .take_while(char::is_ascii_alphanumeric)
-        .collect::<String>()
-        .to_ascii_lowercase();
-    !tag.contains('>') && VOID_TAGS.contains(&name.as_str())
+    true
 }
 
 /// What a visit of one mdast node gives its parent.
@@ -323,9 +335,9 @@ impl<'n> Frame<'n> {
     ///
     /// The parser lists every child, a fenced block, a table, an empty list
     /// item and an HTML block included, and each takes the first place.
-    /// A thematic break, a link definition, an HTML comment and a void tag
-    /// such as `<hr>` open no element, so Vale reads past them: it takes a
-    /// block's scope from the elements opened since the last one closed.
+    /// A thematic break, a link definition, and an HTML block of comments, void
+    /// tags and inline tags open no element, so Vale reads past them: it takes
+    /// a block's scope from the elements opened since the last one closed.
     /// A node with no place of its own passes the place of its first child up.
     fn next_child(&mut self) -> Option<(&'n Mdast, Scope, bool)> {
         let child = self.children.next()?;

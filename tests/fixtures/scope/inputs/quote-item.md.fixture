@@ -132,3 +132,64 @@ lazy line marker aa.
 > <hr>
 >
 > After html rule marker jj.
+
+***
+
+> <!-- c --> <div>x</div>
+>
+> After comment and div marker kk.
+
+***
+
+> <!-- c -->
+>
+> After comment alone marker ll.
+
+***
+
+> <span>
+>
+> After span marker mm.
+
+***
+
+> <span>x</span>
+>
+> After inline span marker nn.
+
+***
+
+> <hr>
+> <hr>
+>
+> After two rules marker oo.
+
+***
+
+> <hr><br>
+>
+> After rule and break marker pp.
+
+***
+
+> <br>
+>
+> After break marker qq.
+
+***
+
+> </div>
+>
+> After end tag marker rr.
+
+***
+
+> <?x y ?>
+>
+> After instruction marker ss.
+
+***
+
+> <!DOCTYPE html>
+>
+> After declaration marker tt.
