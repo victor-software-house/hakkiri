@@ -7,24 +7,38 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 1.1 Record the operator's answer to each of the seven open decisions in [design.md][design], moving each into Decisions with the candidates that lost.  
   Verify the Open decisions section is empty and `mise run specs:budget` passes.  
   2026-11-10, the operator's answers are recorded as decisions, and the Open decisions section is gone.
-- [ ] 1.2 Add `regex` 1.13.1, `fancy-regex` 0.20.1 and `ctl-core` 0.7.0 with its `input` feature to `Cargo.toml`.  
+- [x] 1.2 Add `regex` 1.13.1, `fancy-regex` 0.20.1 and `ctl-core` 0.7.0 with its `input` feature to `Cargo.toml`.  
   Verify the `deny` and `deps` steps pass in CI.
+  - 2026-11-10 (UTC), `cargo deny check licenses bans sources` and `cargo-machete --with-metadata` pass in a throwaway Linux box, in [7e76b60][c-deny].  
+    `encoding_rs` needed `BSD-3-Clause` in the template answers and `deny.toml`.  
+    The rule files also need `serde` and `garde` as direct dependencies, for the derives.  
+    CI has not run yet (task 8.1).
 
 ## 2. The tree
 
-- [ ] 2.1 Make inline markup and URLs gaps between segments, so a link, a code span and an image read as their text.  
+- [x] 2.1 Make inline markup and URLs gaps between segments, so a link, a code span and an image read as their text.  
   Review the changed tree snapshots.  
   Verify every [node-segments scenario][segments] passes as a test in CI.
-- [ ] 2.2 Count the fenced and indented code blocks of a Markdown or MDX tree.  
+  - 2026-11-10 (UTC), the four scenario tests and 77 tree tests pass in the same box run, in [4f7f6b6][c-tree].  
+    Nine snapshots changed and were read.  
+    A strikethrough loses its tildes too.  
+    A paragraph that holds only a URL has no text, so its link node moves up a level.
+- [x] 2.2 Count the fenced and indented code blocks of a Markdown or MDX tree.  
   Verify the [document-tree scenario][tree] passes as a test in CI.
+  - 2026-11-10 (UTC), the two-fences-and-an-indented-block test passes in the same box run, in [4f7f6b6][c-tree].
 
 ## 3. Loading
 
-- [ ] 3.1 Decode each rule file into the rule type of its check.  
+- [x] 3.1 Decode each rule file into the rule type of its check.  
   Refuse a missing, unknown or wrongly typed field with its file and line.  
   Verify every [rule-loading scenario][loading] passes as a unit test in CI.
-- [ ] 3.2 Refuse `affix`, `doc(...)` scopes and `script` with an error that names them, and load `vocab` and `action` with no effect.  
+  - 2026-11-10 (UTC), the 24 loading tests pass in the same box run, in [9f79e32][c-load].  
+    The YAML parser reports a tab in an indentation on the line of the scalar above it, so loading moves the error to the line of the tab.
+- [x] 3.2 Refuse `affix`, `doc(...)` scopes and `script` with an error that names them, and load `vocab` and `action` with no effect.  
   Verify a unit test per field passes in CI.
+  - 2026-11-10 (UTC), one test per field passes in the same box run, in [9f79e32][c-load].  
+    The seven check types of later changes are refused by name too.  
+    `matchcase` loads with no effect, as `action` does.
 
 ## 4. Selection and text
 
@@ -92,6 +106,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - Archive this change after the pull request merges, then archive `HKR-004` with `qctl close-from-openspec`.
 
 [design]: design.md
+[c-deny]: https://github.com/victor-software-house/hakkiri/commit/7e76b608a2223bccf8b15df1b5b705137528887f
+[c-tree]: https://github.com/victor-software-house/hakkiri/commit/4f7f6b6934866edff220f6b55cd23075c872c40c
+[c-load]: https://github.com/victor-software-house/hakkiri/commit/9f79e325fc4bcbe083c63f04fd0233a66d1a8024
 [segments]: specs/node-segments/spec.md
 [tree]: specs/document-tree/spec.md
 [loading]: specs/rule-loading/spec.md
