@@ -1,20 +1,60 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-004
+active: HKR-015
 queue:
+  - id: HKR-015
+    title: Split sentences
+    scope: engine
+    outcome: >-
+      Sentences come from hakkiri's own Punkt splitter and model, at least as
+      accurate as Vale's on every evaluation set.
+    blocked_by: []
+    acceptance:
+      - On the committed documentation, Golden Rules and MASC sets, hakkiri's boundary F1 is at least Vale 3.26.0's.
+      - Two training runs on the committed sources write byte-identical model files.
+    plan: openspec/changes/sentence-splitter/proposal.md
+
   - id: HKR-004
     title: Build the rule engine
     scope: engine
     outcome: >-
-      Rules select text by scope, then run every Vale check type except script, with rates through metric.
-    blocked_by: []
+      Rules select text by scope, then run existence, substitution, occurrence and metric, with rates through metric.
+    blocked_by: [HKR-015]
     acceptance:
-      - Each check type has unit tests.
       - Flesch-Kincaid matches Vale on the prose-style fixtures within a stated tolerance.
       - A 50,000-character line and a 60,000-line file finish with no panic.
+      - Each of existence, substitution, occurrence and metric has unit tests.
     notes:
       - 2026-11-09, a word count reads a code span as one word, where Vale 3.26.0 reads none; link text counts and its target does not, as in Vale. HKR-002 lists the intended differences.
+    plan: openspec/changes/rule-engine/proposal.md
+
+  - id: HKR-013
+    title: Run the pattern and readability checks
+    scope: engine
+    outcome: >-
+      Rules run consistency, conditional, repetition and readability with Vale
+      3.26.0's meaning, or a better one where Vale's is a defect.
+    blocked_by:
+      - HKR-004
+    acceptance:
+      - Each of consistency, conditional, repetition and readability has unit tests.
+      - A 50,000-character line and a 60,000-line file finish with no panic for these four checks.
+    plan: openspec/changes/pattern-and-readability-checks/proposal.md
+
+  - id: HKR-014
+    title: Run the capitalization, sequence and spelling checks
+    scope: engine
+    outcome: >-
+      Rules run capitalization, sequence and spelling, and existence and substitution
+      accept affix, with Vale 3.26.0's meaning, or a better one where Vale's is a
+      defect.
+    blocked_by:
+      - HKR-013
+    acceptance:
+      - Each of capitalization, sequence, spelling and affix has unit tests.
+      - A 50,000-character line and a 60,000-line file finish with no panic for these three checks.
+    plan: openspec/changes/case-sequence-and-spelling-checks/proposal.md
 
   - id: HKR-005
     title: Ship the check and test commands
@@ -47,6 +87,8 @@ queue:
       hakkiri import vale converts every Vale rule type except script into the format.
     blocked_by:
       - HKR-005
+      - HKR-013
+      - HKR-014
     acceptance:
       - Each converted Voices, Std and Readability rule passes the cases from its own Vale file.
 

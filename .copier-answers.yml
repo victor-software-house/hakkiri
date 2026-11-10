@@ -10,6 +10,8 @@ deny_ignore: []
 deny_licenses:
 -   license: Zlib
     reason: foldhash, through serde_json in tree-sitter's build
+-   license: AGPL-3.0-or-later
+    reason: hakkiri's own license
 deny_skip: []
 feature_sets: []
 generated_paths: []
