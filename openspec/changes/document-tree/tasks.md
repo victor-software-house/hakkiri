@@ -5,7 +5,7 @@
 - [x] 1.1 Add the tree type and parse Markdown with markdown-rs.  
   Verify the snapshot tests for headings, nested lists and tables pass in CI.
   - 2026-11-10 (UTC), `mise run test` ran in a throwaway Linux box.  
-    The heading, nested list and table snapshot tests pass among 35 tests.  
+    The heading, nested list and table snapshot tests pass among 61 tests.  
     CI has not run yet (task 3.1).
 - [x] 1.2 Parse MDX, and verify the MDX snapshot test passes in CI.
   - 2026-11-10 (UTC), the MDX snapshot test and the JSX element test pass in the same box run.  
