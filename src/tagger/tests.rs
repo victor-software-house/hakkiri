@@ -134,6 +134,30 @@ fn a_file_cut_short_is_refused() -> TestResult {
 }
 
 #[test]
+fn a_word_count_beyond_the_file_is_refused() {
+    // A model with one class and no features, and then a count of four
+    // billion words that the file does not hold.
+    let model = [
+        &b"PROSETAG"[..],
+        &2_u32.to_le_bytes(),
+        &1_u32.to_le_bytes(),
+        &1_u16.to_le_bytes(),
+        b"X",
+        &0_u32.to_le_bytes(),
+        &0_u32.to_le_bytes(),
+        &0_u32.to_le_bytes(),
+        &0_u32.to_le_bytes(),
+        &0_u32.to_le_bytes(),
+        &u32::MAX.to_le_bytes(),
+    ]
+    .concat();
+    assert!(matches!(
+        Tagger::from_bytes(&model),
+        Err(FormatError::Truncated { .. })
+    ));
+}
+
+#[test]
 fn a_long_run_of_marks_splits_one_token_each() -> TestResult {
     let sentence = format!("word{}", ")".repeat(20_000));
     assert_eq!(english()?.tag(&sentence).len(), 20_001);
