@@ -168,14 +168,38 @@ impl Node {
         false
     }
 
+    /// The spans of the table rows in this node and below it, in document
+    /// order. A row's cells are not read: a row holds no other row.
+    fn rows(&self) -> Vec<Range<usize>> {
+        let mut rows = Vec::new();
+        let mut pending = vec![self];
+        while let Some(node) = pending.pop() {
+            if node.scope == Scope::TableRow {
+                rows.push(node.span.clone());
+            } else {
+                pending.extend(node.children.iter().rev());
+            }
+        }
+        rows
+    }
+
+    /// Whether the gap from the byte `end` to the byte `next` lies inside one
+    /// of the `rows`.
+    fn in_row(rows: &[Range<usize>], end: usize, next: usize) -> bool {
+        let row = rows.partition_point(|row| row.end < next);
+        rows.get(row).is_some_and(|row| row.start <= end)
+    }
+
     /// The text of this node in `source`: its segments in order.
     ///
     /// A line feed separates two segments with a line break between them,
-    /// and one space separates two cells of a table row, at a pipe in the gap.
-    /// Any other gap reads as nothing.
+    /// and one space separates two cells of a table row, at a pipe in a gap
+    /// inside the row. Any other gap, such as a link's destination, reads as
+    /// nothing.
     /// Returns `None` when a segment is not a slice of `source`.
     #[must_use]
     pub fn text(&self, source: &str) -> Option<String> {
+        let rows = self.rows();
         let mut text = String::new();
         let mut previous_end = None;
         for segment in &self.segments {
@@ -183,7 +207,9 @@ impl Node {
                 let gap = source.get(end..segment.start)?;
                 if gap.contains('\n') {
                     text.push('\n');
-                } else if Self::has_delimiter(source, end, gap) {
+                } else if Self::in_row(&rows, end, segment.start)
+                    && Self::has_delimiter(source, end, gap)
+                {
                     text.push(' ');
                 }
             }

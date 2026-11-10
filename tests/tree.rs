@@ -204,11 +204,18 @@ fn an_autolink_is_a_gap_around_itself() -> TestResult {
 }
 
 #[test]
+fn a_pipe_in_a_link_destination_outside_a_table_is_no_space() -> TestResult {
+    let fixture = load("pipe-link.md")?;
+    assert_eq!(fixture.texts(Scope::Paragraph), ["Open the page now."]);
+    Ok(())
+}
+
+#[test]
 fn a_bare_url_in_a_comment_is_a_gap_around_itself() -> TestResult {
     let fixture = load("bare-url-gap.rs")?;
     assert_eq!(
         fixture.texts(Scope::CommentLine),
-        ["// Read https://bare.example first."]
+        [fixture.source.trim_end()]
     );
     assert_eq!(fixture.texts(Scope::Paragraph), ["Read  first."]);
     assert_eq!(fixture.texts(Scope::Link), ["https://bare.example"]);
