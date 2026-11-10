@@ -20,7 +20,7 @@ Links keep their text, and emphasis marks are gone.
 | [`docs.fixture`](docs.fixture) | 298 | 905 | Markdown of public repositories of the owner | The owner's own text, each repository's `LICENSE` where it has one |
 | [`hard.fixture`](hard.fixture) | 88 | 165 | Written for this test | The owner's own text |
 | [`golden-rules.fixture`](golden-rules.fixture) | 48 | 80 | The English Golden Rules, as pySBD ships them | MIT, see [`golden-rules.LICENSE`](golden-rules.LICENSE) |
-| [`masc.fixture`](masc.fixture) | 73 | 292 | MASC 3.0.0 | No license or other restrictions |
+| [`masc.fixture`](masc.fixture) | 71 | 284 | MASC 3.0.0 | No license or other restrictions |
 
 ### docs
 
@@ -51,7 +51,7 @@ Links keep their text, and emphasis marks are gone.
 
 ### masc
 
-- Four consecutive sentences from each of 73 written texts of [MASC][masc] 3.0.0.
+- Four consecutive sentences from each of 71 written texts of [MASC][masc] 3.0.0.
 - The archive is `MASC-3.0.0.zip`, with SHA-256 `0b300d96016233c7c79b43559b477a6bb0ed16bb416d5c517eccb108a6228493`.
 - The gold sentences are the corpus's own `-s.xml` regions.  
   The corpus project made them with GATE's ANNIE splitter, a rule-based splitter, and then validated them by hand.  
@@ -59,7 +59,8 @@ Links keep their text, and emphasis marks are gone.
 - The MASC site states that MASC is distributed without license or other restrictions.
 - A seeded draw took up to seven texts from each written genre.
 - The `wsj` folder of the newspaper genre, the `spam` folder of the email genre, spoken data and Twitter are not used.
-- A window is skipped when a sentence has under four words, a non-ASCII symbol or no sentence stop.
+- A window is skipped when a sentence has under four words, a non-ASCII symbol, or no `.`, `?` or `!` before its closing quotes.
+- A window is also skipped when two of its sentence regions overlap or leave text between them.
 - A record with a phone number is skipped.
 - Records with a misspelling that `lint:typos` flags are left out, since the corpus text is verbatim.
 

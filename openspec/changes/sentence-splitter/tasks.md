@@ -24,7 +24,7 @@ Training and measurement run in an ephemeral build box.
 ### Evidence for 1.2
 
 - 2026-11-10 UTC: [`golden-rules.fixture`][golden-set] holds 48 rules from [pySBD][pysbd].
-- [`masc.fixture`][masc-set] holds 292 sentences in 73 records from [MASC 3.0.0][masc].
+- [`masc.fixture`][masc-set] holds 284 sentences in 71 records from [MASC 3.0.0][masc].
 - pySBD and pragmatic_segmenter are MIT, with both notices in [`golden-rules.LICENSE`][golden-license].
 - The MASC site states that MASC has no license or other restrictions.
 - MASC's gold is the corpus's own sentence regions, made with GATE's ANNIE splitter and validated by hand.
