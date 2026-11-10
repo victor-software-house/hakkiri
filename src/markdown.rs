@@ -1,11 +1,10 @@
 //! Markdown and MDX text into nodes, through markdown-rs.
 
-use std::iter::Peekable;
 use std::ops::Range;
-use std::str::Chars;
 
 use markdown::mdast::Node as Mdast;
 use markdown::{Constructs, MdxSignal, ParseOptions};
+use tree_sitter::{Node as SyntaxNode, Parser};
 
 use crate::error::Error;
 use crate::tree::{Node, Scope};
@@ -22,8 +21,7 @@ pub(crate) enum Flavor {
 }
 
 impl Flavor {
-    /// `source` is the file the options parse.
-    fn options(self, source: &str) -> ParseOptions {
+    fn options(self) -> ParseOptions {
         match self {
             Self::Markdown => ParseOptions {
                 constructs: Constructs {
@@ -33,192 +31,21 @@ impl Flavor {
                 ..ParseOptions::default()
             },
             Self::Comment => ParseOptions::gfm(),
-            Self::Mdx => {
-                let tail = source.trim_end().to_owned();
-                ParseOptions {
-                    constructs: Constructs {
-                        frontmatter: true,
-                        gfm_autolink_literal: true,
-                        gfm_footnote_definition: true,
-                        gfm_label_start_footnote: true,
-                        gfm_strikethrough: true,
-                        gfm_table: true,
-                        gfm_task_list_item: true,
-                        ..Constructs::mdx()
-                    },
-                    mdx_esm_parse: Some(Box::new(move |block: &str| esm(block, &tail))),
-                    ..ParseOptions::default()
-                }
-            }
+            Self::Mdx => ParseOptions {
+                constructs: Constructs {
+                    frontmatter: true,
+                    gfm_autolink_literal: true,
+                    gfm_footnote_definition: true,
+                    gfm_label_start_footnote: true,
+                    gfm_strikethrough: true,
+                    gfm_table: true,
+                    gfm_task_list_item: true,
+                    ..Constructs::mdx()
+                },
+                mdx_esm_parse: Some(Box::new(esm)),
+                ..ParseOptions::default()
+            },
         }
-    }
-}
-
-/// Where the lexer of an import or export block stands.
-#[derive(Clone, Copy, PartialEq)]
-enum Lex {
-    Code,
-    /// A string in single or double quotes. It ends at a line feed.
-    Quote(char),
-    /// A template literal. Its `${` opens code again.
-    Template,
-    /// A regular expression literal. It ends at a line feed.
-    Regex {
-        class: bool,
-    },
-    LineComment,
-    BlockComment,
-}
-
-/// The characters after which a `/` starts a regular expression and not a
-/// division.
-const BEFORE_REGEX: &str = "(,=:[!&|?{};+-*%<>~^";
-
-/// The keywords after which a `/` starts a regular expression.
-const KEYWORDS_BEFORE_REGEX: [&str; 14] = [
-    "return",
-    "typeof",
-    "case",
-    "yield",
-    "await",
-    "void",
-    "delete",
-    "in",
-    "of",
-    "instanceof",
-    "new",
-    "throw",
-    "else",
-    "do",
-];
-
-fn is_identifier_char(c: char) -> bool {
-    c.is_alphanumeric() || c == '_' || c == '$'
-}
-
-/// The lexer of an import or export block.
-struct Scanner {
-    state: Lex,
-    depth: usize,
-    /// The bracket depth of each `${` that is still open.
-    templates: Vec<usize>,
-    /// The last character of code that is not whitespace.
-    previous: Option<char>,
-    /// The identifier that ends the code so far, or nothing when another
-    /// character ends it.
-    word: String,
-    in_word: bool,
-    /// A `>` that is not part of `=>` came earlier on this line.
-    tag_on_line: bool,
-}
-
-impl Scanner {
-    fn new() -> Self {
-        Self {
-            state: Lex::Code,
-            depth: 0,
-            templates: Vec::new(),
-            previous: None,
-            word: String::new(),
-            in_word: false,
-            tag_on_line: false,
-        }
-    }
-
-    /// Whether a `/` here starts a regular expression and not a division.
-    fn regex_may_start(&self) -> bool {
-        match self.previous {
-            None => true,
-            Some(previous) if is_identifier_char(previous) => {
-                KEYWORDS_BEFORE_REGEX.contains(&self.word.as_str())
-            }
-            Some(previous) => BEFORE_REGEX.contains(previous),
-        }
-    }
-
-    fn step(&mut self, c: char, chars: &mut Peekable<Chars<'_>>) {
-        let state = self.state;
-        self.state = match (state, c) {
-            (Lex::Code, '\'' | '"') => Lex::Quote(c),
-            // A backtick after a tag on the same line is JSX text.
-            // It ends at the line end, as a quote does.
-            (Lex::Code, '`') if self.tag_on_line => Lex::Quote(c),
-            (Lex::Code, '`') => Lex::Template,
-            (Lex::Template, '`')
-            | (Lex::Quote(_) | Lex::Regex { .. } | Lex::LineComment, '\n')
-            | (Lex::Regex { class: false }, '/') => Lex::Code,
-            (Lex::Template, '$') if chars.next_if_eq(&'{').is_some() => {
-                self.depth += 1;
-                self.templates.push(self.depth);
-                Lex::Code
-            }
-            (Lex::Code, '/') if chars.next_if_eq(&'/').is_some() => Lex::LineComment,
-            (Lex::Code, '/') if chars.next_if_eq(&'*').is_some() => Lex::BlockComment,
-            (Lex::Code, '/') if self.regex_may_start() => Lex::Regex { class: false },
-            (Lex::Code, '(' | '[' | '{') => {
-                self.depth += 1;
-                Lex::Code
-            }
-            (Lex::Code, '}') if self.templates.last() == Some(&self.depth) => {
-                self.templates.pop();
-                self.depth = self.depth.saturating_sub(1);
-                Lex::Template
-            }
-            (Lex::Code, ')' | ']' | '}') => {
-                self.depth = self.depth.saturating_sub(1);
-                Lex::Code
-            }
-            (Lex::Quote(_) | Lex::Template | Lex::Regex { .. }, '\\') => {
-                chars.next();
-                state
-            }
-            (Lex::Quote(quote), _) if quote == c => Lex::Code,
-            (Lex::Regex { .. }, '[') => Lex::Regex { class: true },
-            (Lex::Regex { .. }, ']') => Lex::Regex { class: false },
-            (Lex::BlockComment, '*') if chars.next_if_eq(&'/').is_some() => Lex::Code,
-            _ => state,
-        };
-        self.track(c);
-    }
-
-    /// Records `c` in the code history when it is code.
-    fn track(&mut self, c: char) {
-        if c == '\n' {
-            self.tag_on_line = false;
-        }
-        if self.state != Lex::Code {
-            return;
-        }
-        if c.is_whitespace() {
-            self.in_word = false;
-            return;
-        }
-        if is_identifier_char(c) {
-            if !self.in_word {
-                self.word.clear();
-                self.in_word = true;
-            }
-            self.word.push(c);
-        } else {
-            self.word.clear();
-            self.in_word = false;
-        }
-        if c == '>' && self.previous != Some('=') {
-            self.tag_on_line = true;
-        }
-        self.previous = Some(c);
-    }
-
-    /// Whether the block ends with nothing open.
-    ///
-    /// A block ends at a line end, which closes a string or a regular
-    /// expression.
-    fn complete(&self) -> bool {
-        self.depth == 0
-            && matches!(
-                self.state,
-                Lex::Code | Lex::LineComment | Lex::Quote(_) | Lex::Regex { .. }
-            )
     }
 }
 
@@ -226,45 +53,67 @@ impl Scanner {
 ///
 /// markdown-rs reads such a block only when it has a parser for it.
 /// It ends the block at the first blank line the parser accepts.
-/// hakkiri needs the extent of the block, not its syntax.
-/// The block is complete when no bracket, string, template literal, regular
-/// expression or comment is open.
+/// The TSX grammar of tree-sitter parses the block, as acorn does in the MDX
+/// compiler.
 ///
-/// `source` is the whole file without its trailing whitespace.
-/// A block that ends the file is complete whatever the lexer saw.
-/// It cannot grow, and an error would fail the whole file over a misread
-/// literal.
-/// The library has no channel for warnings yet, so such a block raises none.
-/// The CLI and the engine add that in `HKR-004` and later.
-///
-/// The lexer is a heuristic, and its known gaps are:
-///
-/// - A block still open at the end of the file ends there. The prose after a
-///   misread literal is lost to the block, with no warning.
-/// - A `/` after `)`, `]` or `}` is a division, so `if (x) /a{/.test(y)` is
-///   misread.
-/// - A `/` after `++` or `--` is a regular expression.
-/// - A regular expression and a quote end at a line feed, so a literal that a
-///   line continuation extends is misread.
-/// - In JSX text, a backtick after a `>` earlier on the line, such as in a tag,
-///   closes at the line end. So does a template literal after a comparison or a
-///   generic type argument on the same line.
-/// - Brackets in JSX text count, so an unmatched `(` there keeps the block
-///   open.
-fn esm(block: &str, source: &str) -> MdxSignal {
-    let mut scanner = Scanner::new();
-    let mut chars = block.chars().peekable();
-    while let Some(c) = chars.next() {
-        scanner.step(c, &mut chars);
+/// - No syntax error: the block ends here.
+/// - The first error reaches the end of the block, such as a missing bracket.
+///   The code is incomplete, so markdown-rs reads on past the blank line. At
+///   the end of the file markdown-rs turns that into an error.
+/// - Any other error is a syntax error, reported at its position.
+fn esm(block: &str) -> MdxSignal {
+    let source = Box::new("hakkiri".to_owned());
+    let rule = Box::new("esm".to_owned());
+    let Some(tree) = parse_tsx(block) else {
+        return MdxSignal::Error(
+            "Cannot parse an import or export".to_owned(),
+            0,
+            source,
+            rule,
+        );
+    };
+    let root = tree.root_node();
+    if !root.has_error() {
+        return MdxSignal::Ok;
     }
-    if scanner.complete() || source.ends_with(block.trim_end()) {
-        MdxSignal::Ok
-    } else {
+    let error = first_error(root);
+    if error.end_byte() >= block.trim_end().len() {
         MdxSignal::Eof(
             "Unexpected end of file in an import or export".to_owned(),
-            Box::new("hakkiri".to_owned()),
-            Box::new("esm".to_owned()),
+            source,
+            rule,
         )
+    } else {
+        MdxSignal::Error(
+            "Unexpected syntax in an import or export".to_owned(),
+            error.start_byte(),
+            source,
+            rule,
+        )
+    }
+}
+
+/// The syntax tree of `block` in the TSX grammar.
+fn parse_tsx(block: &str) -> Option<tree_sitter::Tree> {
+    let mut parser = Parser::new();
+    parser
+        .set_language(&tree_sitter_typescript::LANGUAGE_TSX.into())
+        .ok()?;
+    parser.parse(block, None)
+}
+
+/// The first `ERROR` or `MISSING` node of a tree that has one, in file order.
+fn first_error(root: SyntaxNode<'_>) -> SyntaxNode<'_> {
+    let mut cursor = root.walk();
+    let mut node = root;
+    loop {
+        if node.is_error() || node.is_missing() {
+            return node;
+        }
+        match node.children(&mut cursor).find(SyntaxNode::has_error) {
+            Some(child) => node = child,
+            None => return node,
+        }
     }
 }
 
@@ -277,7 +126,7 @@ pub(crate) fn document(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error>
 
 /// The prose nodes of `source`, with spans in `source`.
 pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
-    let root = markdown::to_mdast(source, &flavor.options(source)).map_err(Error::Mdx)?;
+    let root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
     Ok(Builder { source }.visit(&root, Scope::TableCell).nodes)
 }
 

@@ -42,3 +42,17 @@ Prose after an escaped slash.
 export const J = () => <p>press ` to open</p>
 
 Prose after a backtick in JSX text.
+
+export const P = () => (<p>hi</p>)
+
+Prose after a closing tag in parentheses.
+
+export const T = () => <p>{`a
+
+b`}</p>
+
+Prose after a template with a blank line in JSX.
+
+export default function X() { return <p>It's</p> }
+
+Prose after an apostrophe in a function.

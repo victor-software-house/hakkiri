@@ -13,7 +13,7 @@ use std::error::Error;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use hakkiri::{Language, Node, Scope, Tree, parse};
+use hakkiri::{Error as ParseError, Language, Node, Scope, Tree, parse};
 
 type TestResult = Result<(), Box<dyn Error>>;
 
@@ -655,15 +655,32 @@ fn literals_in_an_export_block() -> TestResult {
             "Prose after a character class.",
             "Prose after an escaped slash.",
             "Prose after a backtick in JSX text.",
+            "Prose after a closing tag in parentheses.",
+            "Prose after a template with a blank line in JSX.",
+            "Prose after an apostrophe in a function.",
         ]
     );
     Ok(())
 }
 
 #[test]
-fn an_unclosed_export_block_does_not_fail_the_file() -> TestResult {
-    let tree = parse(Language::Mdx, "export const a = {\n\nProse.\n")?;
-    assert_eq!(tree.roots.len(), 1);
+fn an_unclosed_export_block_fails_the_file() {
+    let result = parse(Language::Mdx, "export const a = {\n\nProse.\n");
+    assert!(matches!(result, Err(ParseError::Mdx(_))), "{result:?}");
+}
+
+#[test]
+fn a_syntax_error_in_an_export_block_fails_the_file() -> TestResult {
+    let result = parse(
+        Language::Mdx,
+        "Intro.\n\nexport const = 1\n\nProse after.\n",
+    );
+    let Err(ParseError::Mdx(message)) = result else {
+        return Err(format!("expected an MDX error, got {result:?}").into());
+    };
+    let text = message.to_string();
+    assert!(text.contains("3:"), "{text}");
+    assert!(text.contains("Unexpected syntax"), "{text}");
     Ok(())
 }
 

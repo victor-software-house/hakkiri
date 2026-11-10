@@ -2,7 +2,7 @@
 source: tests/tree.rs
 expression: "load(\"esm-literals.mdx\")? .render()"
 ---
-raw 0..749 [0..749] "export const a = `x ${ { b: `}` }.b } y`\n\nProse after a template.\n\nexport const b = `line\n${\n  1 + 1\n}\n\ntail`\n\nProse after a template with a blank line.\n\nexport const re = /{/\n\nProse after a regular expression.\n\nexport const q = /'/.test(\"it's\")\n\nProse after a regular expression with a quote.\n\nexport const A = () => <p>Don't</p>\n\nProse after an apostrophe.\n\nexport const k = () => { return /{/ }\n\nProse after a keyword and a regular expression.\n\nexport const t = (x) => typeof /'/.test(x)\n\nProse after typeof and a quote in a regular expression.\n\nexport const cls = /[/]{/\n\nProse after a character class.\n\nexport const esc = /a\\/{/\n\nProse after an escaped slash.\n\nexport const J = () => <p>press ` to open</p>\n\nProse after a backtick in JSX text.\n"
+raw 0..1012 [0..1012] "export const a = `x ${ { b: `}` }.b } y`\n\nProse after a template.\n\nexport const b = `line\n${\n  1 + 1\n}\n\ntail`\n\nProse after a template with a blank line.\n\nexport const re = /{/\n\nProse after a regular expression.\n\nexport const q = /'/.test(\"it's\")\n\nProse after a regular expression with a quote.\n\nexport const A = () => <p>Don't</p>\n\nProse after an apostrophe.\n\nexport const k = () => { return /{/ }\n\nProse after a keyword and a regular expression.\n\nexport const t = (x) => typeof /'/.test(x)\n\nProse after typeof and a quote in a regular expression.\n\nexport const cls = /[/]{/\n\nProse after a character class.\n\nexport const esc = /a\\/{/\n\nProse after an escaped slash.\n\nexport const J = () => <p>press ` to open</p>\n\nProse after a backtick in JSX text.\n\nexport const P = () => (<p>hi</p>)\n\nProse after a closing tag in parentheses.\n\nexport const T = () => <p>{`a\n\nb`}</p>\n\nProse after a template with a blank line in JSX.\n\nexport default function X() { return <p>It's</p> }\n\nProse after an apostrophe in a function.\n"
   paragraph 42..65 [42..65] "Prose after a template."
   paragraph 111..152 [111..152] "Prose after a template with a blank line."
   paragraph 177..210 [177..210] "Prose after a regular expression."
@@ -13,3 +13,6 @@ raw 0..749 [0..749] "export const a = `x ${ { b: `}` }.b } y`\n\nProse after a t
   paragraph 576..606 [576..606] "Prose after a character class."
   paragraph 635..664 [635..664] "Prose after an escaped slash."
   paragraph 713..748 [713..748] "Prose after a backtick in JSX text."
+  paragraph 786..827 [786..827] "Prose after a closing tag in parentheses."
+  paragraph 869..917 [869..917] "Prose after a template with a blank line in JSX."
+  paragraph 971..1011 [971..1011] "Prose after an apostrophe in a function."

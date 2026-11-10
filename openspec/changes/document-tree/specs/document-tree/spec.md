@@ -54,14 +54,33 @@ Imports, exports, expressions, and the tags and attributes of JSX elements SHALL
 
 ### Requirement: Export blocks end at the end of their code
 
-An export block SHALL end where its brackets, strings, template literals, regular expressions and comments close, also across a blank line.
-
-An export block that runs to the end of the file with something still open SHALL NOT fail the file.
+An export block SHALL end at the first blank line after which its code parses as TSX.  
+Incomplete code SHALL read on past the blank line.
 
 #### Scenario: A quote or a regular expression in an export block
 
 - **WHEN** an MDX file holds `export const re = /'/`, a blank line and a paragraph
 - **THEN** the tree holds a `paragraph` node for that paragraph and none for the export
+
+#### Scenario: Incomplete code reads on
+
+- **WHEN** an MDX file holds ``export const T = () => <p>{`a``, a blank line, `` b`}</p> `` and a paragraph
+- **THEN** the export covers both lines and the paragraph stays prose
+
+### Requirement: Invalid export code is an error
+
+A syntax error in an import or export block SHALL fail the file with an error that names its line.  
+A block incomplete at the end of the file SHALL fail the file too.
+
+#### Scenario: A syntax error in an export
+
+- **WHEN** an MDX file holds `export const = 1` on line 3
+- **THEN** parsing fails and the error names line 3
+
+#### Scenario: An unclosed export at the end of the file
+
+- **WHEN** an MDX file holds `export const a = {`, a blank line and a paragraph
+- **THEN** parsing fails
 
 ### Requirement: Deep nesting does not crash hakkiri
 
