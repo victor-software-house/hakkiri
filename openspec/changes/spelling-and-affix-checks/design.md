@@ -62,8 +62,8 @@ A `word/FLAGS` part of an `existence` token or a `substitution` key becomes an a
 The alternation holds the word and the forms its flags name.  
 The expansion uses the dictionary reader's affix rules, which `main` holds, and the rule-engine change's refusal ends here.
 
-[case-design]: ../case-and-sequence-checks/design.md
-[case-reader]: ../case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
+[case-design]: ../archive/2026-11-10-case-and-sequence-checks/design.md
+[case-reader]: ../archive/2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
 [project-config]: ../../specs/project-config/spec.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [v-spell-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L74-L135

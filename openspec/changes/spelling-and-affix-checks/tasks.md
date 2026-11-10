@@ -23,5 +23,5 @@ This change builds on the dictionary reader and the built-in dictionary that the
 
 - Archive this change after the pull request merges, then archive `HKR-020` with `qctl close-from-openspec`.
 
-[case]: ../case-and-sequence-checks/proposal.md
+[case]: ../archive/2026-11-10-case-and-sequence-checks/proposal.md
 [spelling]: specs/spelling-check/spec.md

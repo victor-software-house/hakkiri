@@ -32,8 +32,8 @@ ProseStyle uses none of them, so no project that hakkiri lints today waits on th
 - Ported code and data for the tagger, the dictionary and its reader, as the [design][design] decides.
 - One new module per check type, with unit tests.
 
-[ledger]: ../../../tasks.yaml
-[engine]: ../archive/2026-11-10-rule-engine/proposal.md
-[pattern]: ../archive/2026-11-10-pattern-and-readability-checks/proposal.md
+[ledger]: ../../../../tasks.yaml
+[engine]: ../2026-11-10-rule-engine/proposal.md
+[pattern]: ../2026-11-10-pattern-and-readability-checks/proposal.md
 [design]: design.md
-[spelling]: ../spelling-and-affix-checks/proposal.md
+[spelling]: ../../spelling-and-affix-checks/proposal.md

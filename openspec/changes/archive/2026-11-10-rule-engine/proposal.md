@@ -51,7 +51,7 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 [document-tree]: ../../../specs/document-tree/spec.md
 [node-segments]: ../../../specs/node-segments/spec.md
 [next]: ../2026-11-10-pattern-and-readability-checks/proposal.md
-[last]: ../../case-and-sequence-checks/proposal.md
+[last]: ../2026-11-10-case-and-sequence-checks/proposal.md
 [bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
 [design]: design.md
 [splitter]: ../2026-11-10-sentence-splitter/proposal.md

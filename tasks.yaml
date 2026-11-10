@@ -1,27 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-014
+active: HKR-020
 queue:
-  - id: HKR-014
-    title: Run the capitalization and sequence checks
-    scope: engine
-    outcome: >-
-      Rules run capitalization and sequence, with Vale 3.26.0's meaning, or a better one where Vale's is a defect.
-    blocked_by: []
-    acceptance:
-      - Each of capitalization and sequence has unit tests.
-      - A 50,000-character line and a 60,000-line file finish with no panic for these two checks.
-    plan: openspec/changes/case-and-sequence-checks/proposal.md
-
   - id: HKR-020
     title: Run the spelling check and affix
     scope: engine
     outcome: >-
       Rules run spelling, and existence and substitution accept affix, with Vale
       3.26.0's meaning, or a better one where Vale's is a defect.
-    blocked_by:
-      - HKR-014
+    blocked_by: []
     acceptance:
       - Each of spelling and affix has unit tests.
       - A 50,000-character line and a 60,000-line file finish with no panic for spelling and affix.
@@ -74,7 +62,6 @@ queue:
       hakkiri import vale converts every Vale rule type except script into the format.
     blocked_by:
       - HKR-005
-      - HKR-014
       - HKR-020
     acceptance:
       - Each converted Voices, Std and Readability rule passes the cases from its own Vale file.
@@ -112,6 +99,17 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-014
+    title: Run the capitalization and sequence checks
+    scope: engine
+    outcome: >-
+      Rules run capitalization and sequence, with Vale 3.26.0's meaning, or a better one where Vale's is a defect.
+    plan: openspec/changes/archive/2026-11-10-case-and-sequence-checks/proposal.md
+    completed: 2026-11-10T20:59:39
+    evidence:
+      - PRs 33 and 35 merged the tagger and the dictionary at e32201f, and PRs 36, 37 and 39 merged the capitalization and sequence checks, their scope rules and the long-input tests at d541214; the case-and-sequence-checks OpenSpec change is archived.
+    disposition: completed
+
   - id: HKR-013
     title: Run the pattern and readability checks
     scope: engine
@@ -235,3 +233,14 @@ horizon:
       - '2026-11-10, Ronacher (2026) ranks agent-session words by inflation against wordfreq: https://lucumr.pocoo.org/2026/5/4/content-for-contents-sake/.'
       - '2026-11-10, prior rule sets: https://github.com/tbhb/vale-ai-tells and https://github.com/Syntaf/vale-llm-slop (comments in source files).'
       - 2026-11-10, Wikipedia Signs of AI writing warns that word tells change across model generations, so a list needs dated evidence and review.
+
+  - id: HKR-021
+    title: Read the text inside HTML blocks as prose
+    scope: tree
+    outcome: Text inside an HTML block is linted as prose, with the scope Vale gives it.
+    kind: deferred
+    open: A decision on whether hakkiri reads text inside HTML blocks as prose.
+    notes:
+      - 2026-11-10, Vale lints the text of an HTML block with the scope of its block. hakkiri reads an HTML block as markup and lints none of it, so Vale gives alerts there that hakkiri does not.
+      - '2026-11-10, a decision to read it also needs three behaviours of Vale checked first, and none is checked yet: unescaping HTML entities, masking the text of code, tt, kbd and samp, and handling pre.'
+      - '2026-11-10, Vale lints the text after a closed raw-text tag on the same line, such as `<style></style > x` and `<style></style/> x`, and after `--!>` in a comment block. hakkiri keeps that text as HTML, from the CommonMark end condition of the block.'

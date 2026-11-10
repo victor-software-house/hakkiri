@@ -207,6 +207,12 @@ Two cases differ, where Vale's behaviour is a defect:
 A test runs 57 `existence` and `sequence` rules for 29 scopes over nine Markdown files that nest sentences in items, quotes, tables and headings.  
 It matches all of Vale's 4,513 alerts but those 104, and `departures.tsv` lists them and the 156 that only hakkiri gives.
 
+Three gaps are not departures, since Vale's behaviour is not a defect there ([HKR-021][hkr-021]):
+
+- Text that Vale lints after a closed raw-text tag on the same line, such as `<style></style > x` and `<style></style/> x`, and after `--!>` in a comment block, stays HTML in hakkiri, from the [CommonMark end condition][cm-html-blocks] of the block.
+- hakkiri reads no text inside an HTML block as prose, so Vale's alerts there are missing.
+- Three behaviours of Vale in that text are not probed: unescaping HTML entities, masking the text of `code`, `tt`, `kbd` and `samp`, and handling `pre`.
+
 Alternative: keep the container text and filter blocks by depth.  
 Lost: it needs a depth rule for each scope, and Vale's rule is the chain of first children.
 
@@ -234,16 +240,18 @@ Each crate was read on crates.io on 2026-11-10.
 - [Porting about 5,600 lines of Go is the largest task in the engine work] → the tasks split the tagger, the converters and the reader.  
   Each has its own tests.
 
-[engine-design]: ../archive/2026-11-10-rule-engine/design.md
-[pattern-design]: ../archive/2026-11-10-pattern-and-readability-checks/design.md
-[spelling-design]: ../spelling-and-affix-checks/design.md
-[deny]: ../../../deny.toml
+[engine-design]: ../2026-11-10-rule-engine/design.md
+[pattern-design]: ../2026-11-10-pattern-and-readability-checks/design.md
+[spelling-design]: ../../spelling-and-affix-checks/design.md
+[deny]: ../../../../deny.toml
 [v-tag-reset]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L335-L346
 [v-tag-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L396-L405
 [v-scope-match]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/scope.go#L122-L178
 [v-seq-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L593-L641
-[node-segments]: ../../specs/node-segments/spec.md
-[format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[node-segments]: ../../../specs/node-segments/spec.md
+[hkr-021]: ../../../../tasks.yaml
+[cm-html-blocks]: https://spec.commonmark.org/0.31.2/#html-blocks
+[format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [v-seq-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L123-L236
 [v-seq-tokens]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L289-L330
 [v-seq-match]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L387-L497
