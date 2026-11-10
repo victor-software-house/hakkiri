@@ -50,6 +50,44 @@ pub(crate) fn run(check: &Check, text: &Text) -> Result<Vec<Hit>, SearchError> {
     }
 }
 
+/// The spans of the multi-word exceptions in a text, ready to ask whether a
+/// range lies inside one.
+#[derive(Debug, Default)]
+struct PhraseSpans {
+    /// The start of each span, in order.
+    starts: Vec<usize>,
+    /// For each span, the furthest end among it and the spans before it.
+    reach: Vec<usize>,
+}
+
+impl PhraseSpans {
+    fn new(mut spans: Vec<Range<usize>>) -> Self {
+        spans.sort_by_key(|span| span.start);
+        let mut furthest = 0;
+        let reach = spans
+            .iter()
+            .map(|span| {
+                furthest = furthest.max(span.end);
+                furthest
+            })
+            .collect();
+        Self {
+            starts: spans.iter().map(|span| span.start).collect(),
+            reach,
+        }
+    }
+
+    /// Whether `range` lies inside a span: one starts at or before it, and
+    /// none of the spans that do ends past it.
+    fn hold(&self, range: &Range<usize>) -> bool {
+        let before = self.starts.partition_point(|start| *start <= range.start);
+        before
+            .checked_sub(1)
+            .and_then(|last| self.reach.get(last))
+            .is_some_and(|end| range.end <= *end)
+    }
+}
+
 /// The spans of the multi-word exceptions in `content`, when `found` holds a
 /// match to check them against.
 ///
@@ -59,20 +97,20 @@ fn phrase_spans(
     exceptions: &Exceptions,
     content: &str,
     found: bool,
-) -> Result<Vec<Range<usize>>, SearchError> {
+) -> Result<PhraseSpans, SearchError> {
     let mut spans = Vec::new();
     if found {
         for phrase in &exceptions.phrases {
             spans.extend(phrase.find_overlapping(content)?);
         }
     }
-    Ok(spans)
+    Ok(PhraseSpans::new(spans))
 }
 
 /// Whether an exception holds back the match `range`, which reads `observed`.
 fn excepted(
     exceptions: &Exceptions,
-    phrases: &[Range<usize>],
+    phrases: &PhraseSpans,
     range: &Range<usize>,
     observed: &str,
 ) -> Result<bool, SearchError> {
@@ -81,9 +119,7 @@ fn excepted(
     {
         return Ok(true);
     }
-    Ok(phrases
-        .iter()
-        .any(|phrase| phrase.start <= range.start && range.end <= phrase.end))
+    Ok(phrases.hold(range))
 }
 
 /// Each match of the tokens that no exception holds back and no code span

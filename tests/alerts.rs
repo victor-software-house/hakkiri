@@ -10,7 +10,7 @@
 
 use std::error::Error;
 use std::path::Path;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use ctl_core::indoc;
 use hakkiri::alert::Alert;
@@ -342,6 +342,55 @@ fn a_word_inside_nested_phrases() -> TestResult {
         "a b c",
     )?;
     assert_eq!(found, Vec::<Alert>::new());
+    Ok(())
+}
+
+#[test]
+fn a_phrase_exception_ignores_case() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: [culpa]\nexceptions: ['Mea Culpa']\n",
+        "A mea culpa.",
+    )?;
+    assert_eq!(found, Vec::<Alert>::new());
+    Ok(())
+}
+
+#[test]
+fn a_phrase_search_that_gives_up_is_one_error() -> TestResult {
+    let found = markdown(
+        indoc! {r"
+            extends: existence
+            message: m
+            nonword: true
+            tokens: [a]
+            exceptions: ['(a|aa)+(?=b)\s', '(a|aa)+(?=b)\s\s']
+        "},
+        &"a".repeat(50_000),
+    )?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(alert.level, Level::Error);
+    assert!(
+        alert.message.contains("backtrack limit"),
+        "{}",
+        alert.message
+    );
+    Ok(())
+}
+
+#[test]
+fn many_matches_inside_many_phrase_spans() -> TestResult {
+    let source = format!("{}\n", "a ".repeat(50_000));
+    let start = Instant::now();
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: [a]\nexceptions: ['a a']\n",
+        &source,
+    )?;
+    let took = start.elapsed();
+    eprintln!("50,000 matches in 50,000 phrase spans: {took:?}");
+    assert_eq!(found, Vec::<Alert>::new());
+    assert!(took < Duration::from_secs(5), "{took:?}");
     Ok(())
 }
 
