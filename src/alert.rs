@@ -132,8 +132,8 @@ impl<'a> Locator<'a> {
         })
     }
 
-    /// The alert of `rule` for the bytes `range` of `text`, whose message and
-    /// description take `values`.
+    /// The alert of `rule` for the bytes `range` of `text`, with the filled
+    /// `message` and `description`.
     ///
     /// Returns `None` when `range` is not in `text`.
     pub fn alert(
@@ -141,7 +141,7 @@ impl<'a> Locator<'a> {
         rule: &Rule,
         text: &Text,
         range: Range<usize>,
-        values: &[&str],
+        (message, description): (String, String),
     ) -> Option<Alert> {
         let matched = text.as_str().get(range.clone())?;
         let offset = text.file_range(range)?.start;
@@ -149,8 +149,8 @@ impl<'a> Locator<'a> {
         Some(Alert {
             rule: rule.name.clone(),
             level: rule.level,
-            message: fill(&rule.message, values),
-            description: fill(&rule.description, values),
+            message,
+            description,
             link: rule.link.clone(),
             line,
             first_column,

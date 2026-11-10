@@ -192,6 +192,69 @@ impl Pattern {
         Ok(found)
     }
 
+    /// Each match as the number in the name of its first group that starts
+    /// with `prefix` and sits in the match, and the byte range of that group.
+    ///
+    /// A group named `swap_3` with the prefix `swap_` has the number 3.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`SearchError`] when `fancy-regex` gives up on `text`.
+    pub fn find_groups(
+        &self,
+        text: &str,
+        prefix: &str,
+    ) -> Result<Vec<(usize, Range<usize>)>, SearchError> {
+        let numbered = |names: Vec<Option<&str>>| -> Vec<(usize, usize)> {
+            names
+                .into_iter()
+                .enumerate()
+                .filter_map(|(group, name)| {
+                    let number = name?.strip_prefix(prefix)?.parse().ok()?;
+                    Some((group, number))
+                })
+                .collect()
+        };
+        let mut found = Vec::new();
+        match &self.engine {
+            Engine::Regex(regex) => {
+                let groups = numbered(regex.capture_names().collect());
+                for captures in regex.captures_iter(text) {
+                    found.extend(groups.iter().find_map(|&(group, number)| {
+                        captures.get(group).map(|hit| (number, hit.range()))
+                    }));
+                }
+            }
+            Engine::Fancy(regex) => {
+                let groups = numbered(regex.capture_names().collect());
+                for captures in regex.captures_iter(text) {
+                    let captures =
+                        captures.map_err(|error| SearchError::new(&self.source, &error))?;
+                    found.extend(groups.iter().find_map(|&(group, number)| {
+                        captures.get(group).map(|hit| (number, hit.range()))
+                    }));
+                }
+            }
+        }
+        Ok(found)
+    }
+
+    /// `text` with every match replaced by `replacement`, where `$1` reads as
+    /// the text of the first group.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`SearchError`] when `fancy-regex` gives up on `text`.
+    pub fn replace_all(&self, text: &str, replacement: &str) -> Result<String, SearchError> {
+        match &self.engine {
+            Engine::Regex(regex) => Ok(regex.replace_all(text, replacement).into_owned()),
+            Engine::Fancy(regex) => regex
+                .try_replacen(text, 0, replacement)
+                .map(std::borrow::Cow::into_owned)
+                .map_err(|error| SearchError::new(&self.source, &error)),
+        }
+    }
+
     /// The pattern as it was compiled.
     #[must_use]
     pub fn source(&self) -> &str {

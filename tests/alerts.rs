@@ -312,6 +312,122 @@ fn a_word_inside_overlapping_phrases() -> TestResult {
 }
 
 #[test]
+fn a_phrase_that_holds_a_shorter_key() -> TestResult {
+    let found = markdown(
+        indoc! {"
+            extends: substitution
+            message: \"Use '%s' instead of '%s'.\"
+            ignorecase: true
+            swap: {in order to: to, order: sequence}
+        "},
+        "In order to win.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.message.as_str()).collect::<Vec<_>>(),
+        ["Use 'to' instead of 'In order to'."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_name_in_two_spellings() -> TestResult {
+    let found = markdown(
+        "extends: substitution\nmessage: m\nignorecase: true\nswap: {github: GitHub}\n",
+        "Use GitHub and github.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.matched.as_str()).collect::<Vec<_>>(),
+        ["github"]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_sentence_that_starts_with_the_key() -> TestResult {
+    let found = markdown(
+        indoc! {"
+            extends: substitution
+            message: \"Use '%s' instead of '%s'.\"
+            capitalize: true
+            ignorecase: true
+            swap: {utilize: use}
+        "},
+        "Utilize it.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.message.as_str()).collect::<Vec<_>>(),
+        ["Use 'Use' instead of 'Utilize'."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_match_that_starts_with_a_digit_is_not_capitalized() -> TestResult {
+    let found = markdown(
+        indoc! {"
+            extends: substitution
+            message: \"Use '%s' instead of '%s'.\"
+            capitalize: true
+            nonword: true
+            swap: {'\\d+st': first}
+        "},
+        "Take 1st.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.message.as_str()).collect::<Vec<_>>(),
+        ["Use 'first' instead of '1st'."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_verb_kept_from_the_match() -> TestResult {
+    let found = markdown(
+        indoc! {r#"
+            extends: substitution
+            message: "Use '%s' instead of '%s'."
+            swap: {'(\w+) out of': '$1 from'}
+        "#},
+        "Jump out of it.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.message.as_str()).collect::<Vec<_>>(),
+        ["Use 'Jump from' instead of 'Jump out of'."]
+    );
+    Ok(())
+}
+
+#[test]
+fn matches_inside_words() -> TestResult {
+    let found = markdown(
+        "extends: occurrence\nmessage: \"%d endings\"\nmax: 1\ntoken: 'ing\\b'\n",
+        "Going and coming.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.message.as_str()).collect::<Vec<_>>(),
+        ["2 endings"]
+    );
+    Ok(())
+}
+
+#[test]
+fn too_few_matches() -> TestResult {
+    let found = markdown(
+        "extends: occurrence\nmessage: \"%d uses\"\nscope: paragraph\nmin: 2\ntoken: '\\bthe\\b'\n",
+        "A cat sat.",
+    )?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(
+        (alert.message.as_str(), alert.matched.as_str()),
+        ("0 uses", "A")
+    );
+    assert_eq!(alert.first_column, 1);
+    Ok(())
+}
+
+#[test]
 fn a_code_span_is_no_match() -> TestResult {
     let found = markdown(
         "extends: existence\nmessage: m\nnonword: true\ntokens: ['x']\n",
@@ -321,18 +437,53 @@ fn a_code_span_is_no_match() -> TestResult {
     Ok(())
 }
 
+/// The rules the long-input tests run together: one of each match check.
+const MARKER_RULES: [(&str, &str); 3] = [
+    (
+        "Team.Existence",
+        "extends: existence\nmessage: m\ntokens: [marker]\n",
+    ),
+    (
+        "Team.Substitution",
+        "extends: substitution\nmessage: \"Use '%s' instead of '%s'.\"\nswap: {marker: signpost}\n",
+    ),
+    (
+        "Team.Occurrence",
+        "extends: occurrence\nmessage: \"%d markers\"\nmax: 1\nmin: 2\ntoken: marker\n",
+    ),
+];
+
+/// How many alerts of each rule the alerts hold.
+fn per_rule(found: &[Alert]) -> Vec<(&str, usize)> {
+    MARKER_RULES
+        .iter()
+        .map(|(name, _)| {
+            (
+                *name,
+                found.iter().filter(|alert| alert.rule == *name).count(),
+            )
+        })
+        .collect()
+}
+
 #[test]
 fn a_match_at_the_end_of_a_long_line() -> TestResult {
     let source = format!("{}marker\n", "a ".repeat(24_997));
     let start = Instant::now();
-    let found = markdown(
-        "extends: existence\nmessage: m\ntokens: [marker]\n",
-        &source,
-    )?;
+    let found = alerts(&MARKER_RULES, "a.md", &source)?;
     eprintln!("a 50,000-character line: {:?}", start.elapsed());
     assert_eq!(
-        found.iter().map(place).collect::<Vec<_>>(),
-        [(1, 49_995, 50_000)]
+        per_rule(&found),
+        [
+            ("Team.Existence", 1),
+            ("Team.Substitution", 1),
+            ("Team.Occurrence", 1)
+        ]
+    );
+    assert!(
+        found
+            .iter()
+            .all(|alert| place(alert) == (1, 49_995, 50_000))
     );
     Ok(())
 }
@@ -341,12 +492,16 @@ fn a_match_at_the_end_of_a_long_line() -> TestResult {
 fn sixty_thousand_lines() -> TestResult {
     let source = "A marker.\n".repeat(60_000);
     let start = Instant::now();
-    let found = markdown(
-        "extends: existence\nmessage: m\ntokens: [marker]\n",
-        &source,
-    )?;
+    let found = alerts(&MARKER_RULES, "a.md", &source)?;
     eprintln!("a 60,000-line file: {:?}", start.elapsed());
-    assert_eq!(found.len(), 60_000);
+    assert_eq!(
+        per_rule(&found),
+        [
+            ("Team.Existence", 60_000),
+            ("Team.Substitution", 60_000),
+            ("Team.Occurrence", 1)
+        ]
+    );
     assert_eq!(found.last().map(|alert| alert.line), Some(60_000));
     Ok(())
 }

@@ -12,9 +12,8 @@ use crate::tree::Tree;
 /// without the dot. Alerts at one place keep the order of their rules.
 /// A rule whose pattern gives up on a block reports one `error` alert at the
 /// block, and the other rules still run.
-///
-/// Only `existence` rules run; the other check types come in a later change
-/// of the stack.
+/// A `metric` rule reports nothing yet; it comes in a later change of the
+/// stack.
 ///
 /// # Errors
 ///
@@ -34,8 +33,8 @@ pub fn lint(
             match run(&rule.check, &block.text) {
                 Ok(hits) => {
                     for hit in hits {
-                        let values: Vec<&str> = hit.values.iter().map(String::as_str).collect();
-                        found.extend(locator.alert(rule, &block.text, hit.range, &values));
+                        let messages = hit.messages(rule);
+                        found.extend(locator.alert(rule, &block.text, hit.range, messages));
                     }
                 }
                 Err(error) => {

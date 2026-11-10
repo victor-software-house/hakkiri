@@ -248,6 +248,16 @@ fn existence(source: &Source<'_>, fields: &ExistenceFields) -> Result<Existence,
     })
 }
 
+/// Whether `value` holds a `$` and a digit, a reference to a group of the key.
+fn has_group_reference(value: &str) -> bool {
+    value.match_indices('$').any(|(index, _)| {
+        value
+            .get(index + 1..)
+            .and_then(|rest| rest.chars().next())
+            .is_some_and(|c| c.is_ascii_digit())
+    })
+}
+
 fn substitution(
     source: &Source<'_>,
     fields: &SubstitutionFields,
@@ -273,9 +283,24 @@ fn substitution(
         &alternatives.join("|"),
     );
     let keys: Vec<&str> = swaps.iter().map(|swap| swap.key.as_str()).collect();
+    let expanders = swaps
+        .iter()
+        .map(|swap| {
+            if !has_group_reference(&swap.value) {
+                return Ok(None);
+            }
+            let key = if fields.ignorecase.value() {
+                format!("(?i){}", swap.key)
+            } else {
+                swap.key.clone()
+            };
+            source.compile("swap", &key, &[&swap.key]).map(Some)
+        })
+        .collect::<Result<Vec<_>, _>>()?;
     Ok(Substitution {
         pattern: source.compile("swap", &pattern, &keys)?,
         swaps,
+        expanders,
         exceptions: exceptions(source, fields.exceptions.values())?,
         capitalize: fields.capitalize.value(),
         ignorecase: fields.ignorecase.value(),

@@ -181,8 +181,9 @@ These rows join the intended differences of [rule-format decision 7][format-7]:
 | `\w`, `\d` and `\s` in a pattern | ASCII, while `\b` is Unicode ([regexp2 README][re2-mode]) | Unicode, as `\b` is, so `naïve` is one word |
 | Where a measurement alert points | Column 1 of its block's first line ([file.go][v-measure]) | The first byte of the measured node, so a list item points past its bullet |
 | A long word | Over six bytes ([summarize.go][p-complex]) | Over six characters |
+| `capitalize` on a match that starts with a digit or a symbol | Capitalizes the value, since changing the first character leaves the match unchanged ([substitution.go][v-capitalize]) | Capitalizes only when the match starts with a capital letter |
 
-Alternative: Vale's behaviour in each case. Lost: a word with an accent would read as two words, and an alert would point at a bullet.
+Alternative: Vale's behaviour in each case. Lost: a word with an accent would read as two words, an alert would point at a bullet, and `1st` would swap to `First`.
 
 ### 17. An inline exclusion belongs to its scope item
 
@@ -245,6 +246,7 @@ Each crate was read on crates.io on 2026-11-10.
 [v-search]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L612-L651
 [v-sort]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L343-L353
 [v-history]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L667-L685
+[v-capitalize]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/substitution.go#L500-L506
 [v-measure]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L701-L729
 [v-metrics]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L362-L405
 [v-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L19-L121

@@ -80,6 +80,11 @@ With `capitalize: true`, a `substitution` rule SHALL capitalize the swap value w
 - **WHEN** a rule has `capitalize: true`, `message: "Use '%s' instead of '%s'."` and `swap: {utilize: use}`, and the input is `Utilize it.` with `ignorecase: true`
 - **THEN** hakkiri reports one alert, with the message `Use 'Use' instead of 'Utilize'.`
 
+#### Scenario: A match that starts with a digit
+
+- **WHEN** a rule has `capitalize: true`, `nonword: true`, `message: "Use '%s' instead of '%s'."` and `swap: {'\d+st': first}`, and the input is `Take 1st.`
+- **THEN** hakkiri reports one alert, with the message `Use 'first' instead of '1st'.`
+
 ### Requirement: A swap value can use the key's groups
 
 A `$1` in a swap value SHALL read as the text the first group of its key matched, and so on for each group.

@@ -150,6 +150,10 @@ pub struct Substitution {
     /// The swaps, longest key first: swap number `n` is the group
     /// [`Swap::GROUP`] and `n`.
     pub swaps: Vec<Swap>,
+    /// For each swap, in the same order, its key as a pattern of its own when
+    /// the value holds `$1` or another group reference, to read the groups
+    /// from the matched text.
+    pub expanders: Vec<Option<Pattern>>,
     /// What holds a match back.
     pub exceptions: Exceptions,
     /// Whether the value takes a capital when the match does.
