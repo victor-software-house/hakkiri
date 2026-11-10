@@ -144,11 +144,11 @@ Lost: ``Use `a` `b` `c` `` would report a repeat of nothing the reader sees, and
 - [A `consistency` alert at its own match can differ from Vale's column] → this happens only when the matched text appears earlier in the node.  
   The rule, level, message and matched text still agree.
 
-[engine-design]: ../archive/2026-11-10-rule-engine/design.md
-[loading]: ../../specs/rule-loading/spec.md
+[engine-design]: ../2026-11-10-rule-engine/design.md
+[loading]: ../../../specs/rule-loading/spec.md
 [readability]: specs/readability-check/spec.md
 [pattern]: specs/pattern-checks/spec.md
-[format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [v-cons-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/consistency.go#L35-L85
 [v-cons-run]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/consistency.go#L88-L126
 [v-cond-fields]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/conditional.go#L14-L34

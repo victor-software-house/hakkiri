@@ -31,5 +31,5 @@ None.
 - No new dependency: the scores, sentences and patterns come from the rule-engine change.
 - One new module per check type, with unit tests.
 
-[ledger]: ../../../tasks.yaml
-[engine]: ../archive/2026-11-10-rule-engine/proposal.md
+[ledger]: ../../../../tasks.yaml
+[engine]: ../2026-11-10-rule-engine/proposal.md

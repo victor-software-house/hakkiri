@@ -71,4 +71,4 @@ A `readability` rule with any other `scope` SHALL measure each selected node on 
 - **WHEN** the rule above has `scope: paragraph` and reads the paragraphs `The cat sat.` and `The dog ran.`
 - **THEN** hakkiri reports two alerts, at lines 1 and 3, each with the message `Grade -2.62.`
 
-[metric]: ../../../../specs/metric-check/spec.md
+[metric]: ../../../../../specs/metric-check/spec.md

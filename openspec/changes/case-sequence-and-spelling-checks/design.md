@@ -186,7 +186,7 @@ Each crate was read on crates.io on 2026-11-10.
   Each has its own tests.
 
 [engine-design]: ../archive/2026-11-10-rule-engine/design.md
-[pattern-design]: ../pattern-and-readability-checks/design.md
+[pattern-design]: ../archive/2026-11-10-pattern-and-readability-checks/design.md
 [project-config]: ../../specs/project-config/spec.md
 [format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [deny]: ../../../deny.toml

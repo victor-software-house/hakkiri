@@ -50,7 +50,7 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 [ledger]: ../../../../tasks.yaml
 [document-tree]: ../../../specs/document-tree/spec.md
 [node-segments]: ../../../specs/node-segments/spec.md
-[next]: ../../pattern-and-readability-checks/proposal.md
+[next]: ../2026-11-10-pattern-and-readability-checks/proposal.md
 [last]: ../../case-sequence-and-spelling-checks/proposal.md
 [bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
 [design]: design.md

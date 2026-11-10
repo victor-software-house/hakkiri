@@ -37,5 +37,5 @@ None.
 
 [ledger]: ../../../tasks.yaml
 [engine]: ../archive/2026-11-10-rule-engine/proposal.md
-[pattern]: ../pattern-and-readability-checks/proposal.md
+[pattern]: ../archive/2026-11-10-pattern-and-readability-checks/proposal.md
 [design]: design.md
