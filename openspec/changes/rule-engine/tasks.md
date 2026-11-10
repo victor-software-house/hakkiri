@@ -72,9 +72,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     The percent scenario gained `ignorecase: true`, which its capital letter needs.
 - [ ] 5.3 Run every check type of this change over a 50,000-character line and a 60,000-line file.  
   Verify both long-input tests pass in CI with no panic, and record their run time in the evidence note.
-  - 2026-11-10 (UTC), both tests pass for `existence` in a debug build: 24 ms for 50,000 characters, 23.4 s for 60,000 lines.  
+  - 2026-11-10 (UTC), both tests pass for `existence`, `substitution` and `occurrence` in a debug build: 26 ms for 50,000 characters, 25.3 s for 60,000 lines.  
     `parse` takes nearly all of it: markdown-rs grows with the square of the line count, 2.5 s alone in a release build.  
-    The engine takes 10 ms. Other checks join later.
+    `metric` joins with task 6.4.
 
 ## 6. Checks
 
@@ -83,10 +83,15 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   - 2026-11-10 (UTC), the five `existence` scenarios of the match-checks spec pass in the same box run, in [0647690][c-alerts].  
     The rule-files spec has no `existence` scenario.  
     The alerts tests need a check to run, so this task moved up.
-- [ ] 6.2 Build `substitution`, with longer keys first, the already-correct skip, `capitalize` and `$1` values.  
+- [x] 6.2 Build `substitution`, with longer keys first, the already-correct skip, `capitalize` and `$1` values.  
   Verify its match-checks and rule-files scenarios pass as unit tests in CI.
-- [ ] 6.3 Build `occurrence`, with `max`, `min` and the alert place.  
+  - 2026-11-10 (UTC), the five `substitution` scenarios of the match-checks spec pass in a Linux box, in [3868424][c-checks].  
+    The rule-files spec has no `substitution` scenario.  
+    A sixth test shows `1st` is not capitalized, a difference from Vale in design decision 16.
+- [x] 6.3 Build `occurrence`, with `max`, `min` and the alert place.  
   Verify its match-checks and rule-files scenarios pass as unit tests in CI.
+  - 2026-11-10 (UTC), the two `occurrence` scenarios of the match-checks spec pass in the same box run, in [3868424][c-checks].  
+    The rule-files spec has no `occurrence` scenario.
 - [ ] 6.4 Build `metric`: the variables, `occurrences`, element counts, the evaluator, the condition with `result`, and load errors.  
   Verify every [metric-check scenario][metric] and the metric scenarios of the rule-files spec pass as unit tests in CI.
 
@@ -130,6 +135,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-deny]: https://github.com/victor-software-house/hakkiri/commit/f23a9c9776a9e45e2acac151b825c0fdeedb2fb8
 [c-tree]: https://github.com/victor-software-house/hakkiri/commit/462eaa9e82ec229444a658904a23fbcd5be274ac
 [c-select]: https://github.com/victor-software-house/hakkiri/commit/3fdac6d3dcd3d3929577c34ff37f3e48a222e050
+[c-checks]: https://github.com/victor-software-house/hakkiri/commit/386842412facac10075a4b35a9ea49f0961a21e8
 [c-alerts]: https://github.com/victor-software-house/hakkiri/commit/06476907b5853a47114fceac438d3ce5125c86f3
 [c-words]: https://github.com/victor-software-house/hakkiri/commit/e5c502ed40a89137e68af0149b8c1b59d2ccef29
 [c-load]: https://github.com/victor-software-house/hakkiri/commit/389d5b4791be8248e954e303fd78f9314d1111ca
