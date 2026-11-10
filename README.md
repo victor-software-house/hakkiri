@@ -30,7 +30,8 @@ An editor server follows in the second release.
 
 ## License
 
-[MIT](LICENSE)
+Copyright (c) 2026 Victor Software House.  
+[AGPL-3.0-or-later](LICENSE): GNU Affero General Public License, version 3 or any later version.
 
 [ProseStyle]: https://github.com/victor-software-house/prose-style
 [Vale]: https://vale.sh
