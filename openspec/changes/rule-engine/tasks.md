@@ -115,6 +115,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   - 2026-11-10 (UTC), after one warm-up run, the median of five runs on a 4x8 box is 42 ms for one rule and 42 ms for eight.  
     Before [7950466][c-once] it was 43 ms and 341 ms.  
     The earlier 66 ms for one rule was a single run with no warm-up.
+  - 2026-11-10 (UTC), a test lints 60,000 lines with one metric rule and with eight, in [df67f66][c-long-metric].  
+    Eight take 463 ms and one takes 488 ms, and the test holds eight to under four times one.  
+    Before [7950466][c-once] eight took 3.59 s against 480 ms, which fails that bound.
 
 ## 7. Flesch-Kincaid parity
 
@@ -178,6 +181,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-linear]: https://github.com/victor-software-house/hakkiri/commit/7cbdcc598fd42e2940db9746f9ebaee574b25722
 [c-horizon]: https://github.com/victor-software-house/hakkiri/commit/08a2d35e74598223592a5f4547f38b64f7952157
 [pr-23]: https://github.com/victor-software-house/hakkiri/pull/23
+[c-long-metric]: https://github.com/victor-software-house/hakkiri/commit/df67f660e42145161b46280a4a3c321b899663cc
 [c-rust-parity]: https://github.com/victor-software-house/hakkiri/commit/ff436183465279d09d9621cf8883bd2401fbbce9
 [c-zero]: https://github.com/victor-software-house/hakkiri/commit/28e2bd40b28d871c0e5802e7ac14a29f21c84c9d
 [c-blank]: https://github.com/victor-software-house/hakkiri/commit/eb734afda9d33ab272ab83d0bde22e0fbf8dab6b
