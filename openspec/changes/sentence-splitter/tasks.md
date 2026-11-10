@@ -5,13 +5,48 @@ Training and measurement run in an ephemeral build box.
 
 ## 1. Evaluation sets
 
-- [ ] 1.1 Label sentence boundaries by hand in paragraphs from the owner's public repositories, including the 89 measured hard cases.  
+- [x] 1.1 Label sentence boundaries by hand in paragraphs from the owner's public repositories, including the 89 measured hard cases.  
   Verify each paragraph's source and license are listed beside the set.
-- [ ] 1.2 Add the Golden Rules list and a MASC sample with their gold boundaries, after reading each license file.  
+  - Evidence, 2026-11-10 UTC: [`docs.fixture`][docs-set] holds 298 paragraphs, each headed by its repository and file.
+  - [`hard.fixture`][hard-set] holds 88 of the 89 cases, written for this test.  
+    The case with two spaces after a full stop is left out, since a record joins sentences with one space.
+  - Sources and licenses are in [`SOURCES.md`][sources].
+  - Not verified: one reader labelled the boundaries so far, and the review of this pull request is the second.
+- [x] 1.2 Add the Golden Rules list and a MASC sample with their gold boundaries, after reading each license file.  
   Verify the license of each set is named beside it.
-- [ ] 1.3 Measure Vale 3.26.0's F1 on each set, and on UD English-EWT and GUM.  
+  - Evidence, 2026-11-10 UTC: [`golden-rules.fixture`][golden-set] holds 48 rules from [pySBD][pysbd].
+  - [`masc.fixture`][masc-set] holds 292 sentences in 73 records from [MASC 3.0.0][masc].
+  - pySBD and pragmatic_segmenter are MIT, with both notices in [`golden-rules.LICENSE`][golden-license].
+  - The MASC site states that MASC has no license or other restrictions.
+  - MASC's gold is the corpus's own sentence regions, made with GATE's ANNIE splitter and validated by hand.
+- [x] 1.3 Measure Vale 3.26.0's F1 on each set, and on UD English-EWT and GUM.  
   Commit the numbers for the committed sets.  
   Record the EWT and GUM numbers under this task, with the command that produced them.
+  - Evidence, 2026-11-10 UTC: [`vale-f1.tsv`][vale-f1] holds the numbers for the four committed sets.
+  - Vale 3.26.0 [requires][vale-gomod] prose v3.2.2.  
+    Prose at the newer commit `b33e60d` scores the same on those four sets.
+  - The measure groups the sentences of UD English-EWT and GUM by `# newdoc` and `# newpar`.  
+    It joins each group's `# text` lines with one space.
+  - It ran in an ephemeral 4x8 build box, since removed, on the test files of [EWT r2.18][ewt] and [GUM r2.18][gum].  
+    The scores:
+
+    | Set | Boundaries | Precision | Recall | F1 |
+    |:--|--:|--:|--:|--:|
+    | UD English-EWT test | 1223 | 0.9750 | 0.7980 | 0.8777 |
+    | UD English-GUM test | 901 | 0.9586 | 0.9512 | 0.9549 |
+
+  - The EWT file has SHA-256 `fa024f43dc5da3c5ac02563bc9bd0e974f46cbb1560823976a8f342a37dc494a`.
+  - The GUM file has SHA-256 `cd96a285e7339f401f4803dd0f4f61109c51692e3ef6f9186a1f977544080b69`.
+  - Neither file nor anything derived from it is committed.
+  - The command, run from the [`vale-f1`][vale-f1-src] directory with both files beside it:
+
+    ```sh
+    go run . conllu ewt-test en_ewt-ud-test.conllu
+    go run . conllu gum-test en_gum-ud-test.conllu
+    ```
+
+  - The design cites 90.8 F1 for Punkt on EWT from the [SaT paper][sat].  
+    This run scores 87.8 on its own paragraph grouping, so the two numbers measure different things.
 
 ## 2. Splitter
 
@@ -35,3 +70,17 @@ Training and measurement run in an ephemeral build box.
   Verify both finish in CI with no panic, and record the time per paragraph.
 
 [spec]: specs/sentence-splitting/spec.md
+[docs-set]: ../../../tests/fixtures/splitter/docs.fixture
+[hard-set]: ../../../tests/fixtures/splitter/hard.fixture
+[golden-set]: ../../../tests/fixtures/splitter/golden-rules.fixture
+[masc-set]: ../../../tests/fixtures/splitter/masc.fixture
+[golden-license]: ../../../tests/fixtures/splitter/golden-rules.LICENSE
+[sources]: ../../../tests/fixtures/splitter/SOURCES.md
+[vale-f1]: ../../../tests/fixtures/splitter/vale-f1.tsv
+[vale-f1-src]: ../../../tests/fixtures/splitter/vale-f1/main.go
+[pysbd]: https://github.com/nipunsadvilkar/pySBD/blob/5905f13be4fc95f407b98392e0ec303617a33d86/tests/lang/test_english.py
+[masc]: https://anc.org/data/masc/about/
+[vale-gomod]: https://github.com/errata-ai/vale/blob/v3.26.0/go.mod
+[ewt]: https://github.com/UniversalDependencies/UD_English-EWT/blob/b7711cce01cdd4f5fcc0a8199b8a50d951b16c0c/en_ewt-ud-test.conllu
+[gum]: https://github.com/UniversalDependencies/UD_English-GUM/blob/b58e74bc22d17220c9198864c253a50a897bf27f/en_gum-ud-test.conllu
+[sat]: https://arxiv.org/abs/2406.16678
