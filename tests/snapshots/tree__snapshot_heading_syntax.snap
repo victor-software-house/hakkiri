@@ -2,7 +2,7 @@
 source: tests/tree.rs
 expression: "load(\"heading-syntax.md\")? .render()"
 ---
-raw 0..130 [0..130] "# Closed #\n\n## Closed with more ###\n\n### Hash# stays\n\n#### #\n\nSetext two\n----------\n\nMulti line\nsetext\n======\n\n> # Quoted heading\n"
+raw 0..143 [0..143] "# Closed #\n\n## Closed with more ###\n\n### Hash# stays\n\n#### #\n\nSetext two\n----------\n\nMulti line\nsetext\n======\n\n> # Quoted heading\n\n<b></b>\n===\n"
   heading.h1 2..8 [2..8] "Closed"
   heading.h2 15..31 [15..31] "Closed with more"
   heading.h3 41..52 [41..52] "Hash# stays"

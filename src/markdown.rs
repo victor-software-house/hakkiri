@@ -424,12 +424,10 @@ impl Builder<'_> {
                     last.end = last.start + body.trim_end().len();
                 }
             }
-        } else if lines.len() > 1
-            && lines.last().is_some_and(|last| {
-                let text = text_of(last).trim();
-                text.chars().all(|c| c == '=') || text.chars().all(|c| c == '-')
-            })
-        {
+        } else if lines.last().is_some_and(|last| {
+            let text = text_of(last).trim();
+            text.chars().all(|c| c == '=') || text.chars().all(|c| c == '-')
+        }) {
             lines.pop();
         }
         lines.retain(|line| !line.is_empty());
