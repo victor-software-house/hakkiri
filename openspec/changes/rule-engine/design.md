@@ -108,6 +108,8 @@ Alternative: `fancy-regex` for every pattern, since it hands simple ones to `reg
 
 `%s` takes the values in order and `%%` is `%`, as Vale's `CondSprintf` does ([util.go][v-format]).  
 A `%s` with no value left reads as nothing, where Go prints `%!s(MISSING)`.  
+An `occurrence` message reads `%d` as `%s` before the count fills it, as Vale does ([occurrence.go][v-occ-format]).
+
 Alerts sort by line and column, stable in rule order ([file.go][v-sort]).  
 An alert with the rule, line and column of an earlier one is dropped, and `limit` caps a rule per file ([file.go][v-history]).
 
@@ -234,6 +236,7 @@ Each crate was read on crates.io on 2026-11-10.
 [v-metrics]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L362-L405
 [v-metric]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L19-L121
 [v-condition]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/metric.go#L99-L106
+[v-occ-format]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/occurrence.go#L125-L126
 [v-format]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/util.go#L154-L163
 [v-regex]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/regex/regex.go#L1-L68
 [p-init]: https://github.com/jdkato/prose/blob/b33e60dbff0492289b227f3681120ac057d8131b/summarize/summarize.go#L110-L148

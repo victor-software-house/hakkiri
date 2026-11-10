@@ -87,7 +87,8 @@ A `$1` in a swap value SHALL read as the text the first group of its key matched
 ### Requirement: occurrence counts the token as written
 
 An `occurrence` rule SHALL count the matches of its `token` in each selected node, with no word boundaries added.  
-It SHALL report when the count is over `max` or under `min`.
+It SHALL report when the count is over `max` or under `min`.  
+Its message and description SHALL read `%d` as `%s`, so the count fills either one.
 
 #### Scenario: Matches inside words
 

@@ -10,7 +10,7 @@ Each keeps the meaning Vale 3.26.0 gives it.
 ### Requirement: consistency reports a file that uses both forms
 
 A `consistency` rule SHALL match each `either` key and value as an `existence` rule matches tokens.  
-Once both forms of a pair have matched in the file, each later node with a match of the pair SHALL give one alert.  
+A node with a match of the pair SHALL give one alert when both forms have matched in the file so far, that node included.  
 That alert SHALL sit at the last match of the pair in the node.
 
 #### Scenario: Two spellings in two paragraphs

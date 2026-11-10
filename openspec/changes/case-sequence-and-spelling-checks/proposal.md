@@ -31,7 +31,7 @@ None.
 
 ## Impact
 
-- New dependencies or ported data for the tagger, the dictionary and its reader; three choices stay open in the [design][design].
+- Ported code and data for the tagger, the dictionary and its reader, as the [design][design] decides.
 - The rule-engine change's refusal of `affix` ends here.
 - One new module per check type, with unit tests.
 
