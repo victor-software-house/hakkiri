@@ -49,8 +49,8 @@ Alternatives, each written as the same four rules and parsed with its own reader
 Every field takes Vale's name (operator, 2026-11-09).  
 A file holds one rule, and its file name is the rule name, as in Vale: `ProseStyle/rules/Filler.yml` is `ProseStyle.Filler`.
 
-The fields are `extends`, `message`, `level`, `description`, `link`, `scope`, `tokens`, `exceptions`, `ignorecase`, `swap`, `max` and `condition`.  
-Tests sit in the rule as `tests`, each with `name`, `input`, and `contains`, `absent` or `want`, as Vale's [test suite][vale-suite] reads them.
+The ProseStyle rules use `extends`, `message`, `level`, `scope`, `tokens`, `token`, `raw`, `nonword`, `exceptions`, `ignorecase`, `swap`, `max`, `formula` and `condition`; every other Vale field keeps its name too.  
+Tests sit in the rule as `tests`, each with `name`, `input`, an optional `format` and `about`, and `contains`, `absent` or `want`, as Vale's [test suite][vale-suite] reads them.
 
 The [25 ProseStyle rules][prose-style-rules] already use these names, so the importer maps most fields one to one.  
 `extends` names the check type, and Vale's levels have no `off`; turning a rule off belongs in `.ctl/hakkiri.yaml`.
