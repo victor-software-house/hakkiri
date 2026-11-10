@@ -46,8 +46,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify every [scope-selection scenario][selection] and every scope scenario in the [rule-files spec][rule-files] pass as unit tests in CI.
   - 2026-11-10 (UTC), 23 selection tests and the unknown-scope load test pass in a Linux box, in [3fdac6d][c-select].  
     They assert the selected blocks and their file bytes, since alerts come with task 5.2.  
-    An item of only `~` parts reads as `text`.  
-    A last part from Vale's extension list narrows the scope, so a rule for another language selects nothing.
+    An item of only `~` parts reads as `text`, unless every part names another extension.  
+    A last part from Vale's extension list narrows the scope.
+  - 2026-11-10 (UTC), the `~heading.rs` test passes in a Linux box run of [9220201][c-scope-only]: an item whose every part names another extension selects nothing.
 - [x] 4.2 Build each node's check text with its byte table, the code span word and blanked inline exclusions.  
   Verify the inline markup, code span and inline exclusion scenarios pass in CI.
   - 2026-11-10 (UTC), the markup, code span and exclusion tests pass in the same box run, in [3fdac6d][c-select].  
@@ -69,7 +70,10 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 5.2 Place alerts by the line table, fill messages, sort, drop duplicates and apply `limit`.  
   Verify every [alerts scenario][alerts] passes as a unit test in CI.
   - 2026-11-10 (UTC), a test for each alerts scenario passes in the same box run, in [0647690][c-alerts].  
-    The percent scenario gained `ignorecase: true`, which its capital letter needs.
+    The percent scenario gained `ignorecase: true`, which its capital letter needs.  
+  - 2026-11-10 (UTC), the markup test and the wide character test pass in a box run of [6d38974][c-last-column].  
+    The end column goes through the byte table, as the start does.  
+    No Vale binary was at hand, so only its source was read, not run.
 - [x] 5.3 Run every check type of this change over a 50,000-character line and a 60,000-line file.  
   Verify both long-input tests pass in CI with no panic, and record their run time in the evidence note.
   - 2026-11-10 (UTC), both tests pass for all four check types in a Linux box, in a debug build: 88 ms for 50,000 characters, 27.7 s for 60,000 lines, in [d324f02][c-metric].  
@@ -81,16 +85,20 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify its [match-checks scenarios][match] and its rule-files scenarios pass as unit tests in CI.
   - 2026-11-10 (UTC), the five `existence` scenarios of the match-checks spec pass in the same box run, in [0647690][c-alerts].  
     The rule-files spec has no `existence` scenario.  
-    The alerts tests need a check to run, so this task moved up.
+    The alerts tests need a check to run, so this task moved up.  
+  - 2026-11-10 (UTC), the nested phrases test passes in a box run of [f59a77f][c-phrases], and the 50,000-character test runs in 95 ms with a phrase that matches throughout.  
+    A scratch case of 25,000 matches in 25,000 phrase spans took 0.6 s: `excepted` scans every span per match.
 - [x] 6.2 Build `substitution`, with longer keys first, the already-correct skip, `capitalize` and `$1` values.  
   Verify its match-checks and rule-files scenarios pass as unit tests in CI.
   - 2026-11-10 (UTC), the five `substitution` scenarios of the match-checks spec pass in a Linux box, in [3868424][c-checks].  
     The rule-files spec has no `substitution` scenario.  
-    A sixth test shows `1st` is not capitalized, a difference from Vale in design decision 16.
+    A sixth test shows `1st` is not capitalized, a difference from Vale in design decision 16.  
+  - 2026-11-10 (UTC), the key across a line wrap passes in a box run of [91fc2e4][c-expander].
 - [x] 6.3 Build `occurrence`, with `max`, `min` and the alert place.  
   Verify its match-checks and rule-files scenarios pass as unit tests in CI.
   - 2026-11-10 (UTC), the two `occurrence` scenarios of the match-checks spec pass in the same box run, in [3868424][c-checks].  
-    The rule-files spec has no `occurrence` scenario.
+    The rule-files spec has no `occurrence` scenario.  
+  - 2026-11-10 (UTC), three tests pass in a box run of [1341734][c-occ-code]: a match in code is not counted, one outside is, and none in code misses a minimum.
 - [x] 6.4 Build `metric`: the variables, `occurrences`, element counts, the evaluator, the condition with `result`, and load errors.  
   Verify every [metric-check scenario][metric] and the metric scenarios of the rule-files spec pass as unit tests in CI.
   - 2026-11-10 (UTC), 13 metric tests cover every metric-check scenario and both rule-files scenarios, with 7 formula tests, in a Linux box, in [d324f02][c-metric].  
@@ -142,6 +150,11 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-checks]: https://github.com/victor-software-house/hakkiri/commit/386842412facac10075a4b35a9ea49f0961a21e8
 [c-alerts]: https://github.com/victor-software-house/hakkiri/commit/06476907b5853a47114fceac438d3ce5125c86f3
 [c-words]: https://github.com/victor-software-house/hakkiri/commit/e5c502ed40a89137e68af0149b8c1b59d2ccef29
+[c-scope-only]: https://github.com/victor-software-house/hakkiri/commit/92202016fad285a8d5771be70607f854c039451a
+[c-phrases]: https://github.com/victor-software-house/hakkiri/commit/f59a77f3b81f8dc41b84e3ec6bb3db0b598ae91c
+[c-last-column]: https://github.com/victor-software-house/hakkiri/commit/6d389747e25ba07db83d15c90587a0b9d9362d0f
+[c-occ-code]: https://github.com/victor-software-house/hakkiri/commit/1341734eede62760dbfb78284a10a8fa60265dc3
+[c-expander]: https://github.com/victor-software-house/hakkiri/commit/91fc2e4c6dbac9f093d47ead2bd433654388fb53
 [c-load]: https://github.com/victor-software-house/hakkiri/commit/389d5b4791be8248e954e303fd78f9314d1111ca
 [segments]: specs/node-segments/spec.md
 [tree]: specs/document-tree/spec.md
