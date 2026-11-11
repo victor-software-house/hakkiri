@@ -9,8 +9,8 @@ This change follows [`vocabularies`][vocabularies], which reads the lists and na
   Verify the file holds the alerts of every scenario of `Terms` and `Avoid`, with the Vale commit named in it.
 - [ ] 1.2 Build `Vale.Terms` and `Vale.Avoid` in a style `Vale`, with Vale's messages, levels, boundaries and recasing of the shown term.  
   Verify `tests/vocabulary_rules.rs` fails before the change and passes after it, against the alerts recorded in task 1.1.
-- [ ] 1.3 Run them where the style `Vale` or their name is listed, and refuse `Vale` as a style when no named vocabulary holds a term.  
-  Verify the three scenarios of the requirement on where they run pass, and `styles: [Vale]` with no term is an error.
+- [ ] 1.3 Run them where the style `Vale` or their name is listed, run a glob's rules on its files, and refuse `Vale` as a style when no named vocabulary holds a term.  
+  Verify the scenarios of the requirements on where they run and on a glob's rules pass, and `styles: [Vale]` with no term is an error.
 
 ## 2. The surfaces
 

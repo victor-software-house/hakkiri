@@ -12,18 +12,13 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: Vocabularies
 
-- **WHEN** a section of a Vale config sets `Vocab`
-- **THEN** hakkiri reads vocabularies for the whole project only, and Vale holds the accepted terms per file and builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` for the section (row [HKR-040][ledger], [vocabularies 2][vocabularies-2])
+- **WHEN** a section of a Vale config sets `Vocab`, or the top level names a vocabulary
+- **THEN** hakkiri holds back the matches the accepted terms name, and builds no `Vale.Terms`, `Vale.Avoid`, `Vale.<Name>.Terms` or `Vale.<Name>.Avoid`, which Vale runs for the project or the section (row [HKR-042][ledger], [vocabulary-rules 1][vocabulary-rules-1])
 
 #### Scenario: A YAML vocabulary
 
 - **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
 - **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 7][vocabularies-7])
-
-#### Scenario: The vocabulary rules
-
-- **WHEN** a Vale config names a vocabulary and its style list holds `Vale`
-- **THEN** hakkiri holds back matches with the accepted terms and builds no `Vale.Terms` or `Vale.Avoid`, which Vale builds from the lists (row [HKR-042][ledger], [vocabulary-rules 1][vocabulary-rules-1])
 
 #### Scenario: The Markdown parser
 
@@ -58,7 +53,8 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A doc selector or a View
 
 - **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`, refuses the case field, and Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
+  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 #### Scenario: A Vale configuration file
 
@@ -96,7 +92,6 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 - **WHEN** the config names a vocabulary that no package holds
 - **THEN** hakkiri names the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
 
-[vocabularies-2]: ../../design.md#2-the-config-key-that-names-vocabularies-is-open
 [vocabularies-3]: ../../design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../design.md#4-a-line-of-a-list-is-a-pattern
 [vocabularies-7]: ../../design.md#7-what-stays-different
@@ -105,3 +100,4 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
 [tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
 [check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
+[test-2]: ../../../archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record

@@ -12,10 +12,10 @@ Goals:
 
 - `Vale.Terms` and `Vale.Avoid` give the alerts of Vale's rules, with the same messages and levels.
 - A config runs them the way a Vale config does: the style `Vale`, or the rule's name.
+- A glob's vocabularies build rules of their own, which run on the glob's files.
 
 Non-goals:
 
-- Rules built per vocabulary and per glob, named `Vale.<Name>.Terms`: `HKR-040`.
 - The alert's action, which hakkiri loads and does not apply.
 
 ## Decisions
@@ -55,7 +55,14 @@ It lost because the probe shows Vale keeps them off unless the style or the name
 Alternative: own names such as `Vocab.Terms`.
 It lost because a name the operator did not choose is a decision for the operator, and Vale's names need none.
 
-### 3. Vale is a style only when a vocabulary gives it a rule
+### 3. A glob's vocabulary builds rules named after the vocabulary
+
+A glob that names `Team` builds `Vale.Team.Terms` and `Vale.Team.Avoid` from that vocabulary, as `Vale.Terms` and `Vale.Avoid` are built from the top level ([manager.go][v-load-rules]).
+Vale turns them on for the files the glob matches, so no style or setting is needed, and the probe shows `Use 'harness' instead of 'HARNESS'.` from `Vale.Team.Terms` with only a `Vocab` in the section.
+Alternative: build one `Vale.Terms` over the lists of the file.
+It lost because Vale's names and its alerts carry the vocabulary, and a project sets a level for one vocabulary's rule.
+
+### 4. The style Vale needs a vocabulary term
 
 `styles: [Vale]` is an error today, because no package holds a style `Vale`.
 It stays an error when no named vocabulary holds a term, and `HKR-026` and `HKR-038` will give the style rules that need no vocabulary.

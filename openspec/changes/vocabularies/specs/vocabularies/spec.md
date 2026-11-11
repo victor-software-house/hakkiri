@@ -60,7 +60,8 @@ A run of whitespace in a term SHALL match any run of whitespace.
 
 ### Requirement: Accepted terms hold back matches of the checks that read them
 
-hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule, before it rewrites and sorts them, and SHALL hold back a match that is an accepted term or lies inside an accepted phrase.
+hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule, before it rewrites and sorts them.
+It SHALL hold back a match that is an accepted term or lies inside an accepted phrase.
 A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonword` SHALL read none.
 
 #### Scenario: An existence rule
@@ -80,7 +81,8 @@ A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonwor
 
 ### Requirement: Spelling reads the accepted terms whole and without case
 
-hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule as a whole word matched without regard to case, with no `vocab` field to turn that off, and SHALL mask an accepted phrase before it checks the words.
+hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule as a whole word matched without regard to case, with no `vocab` field to turn that off.
+It SHALL mask an accepted phrase before it checks the words.
 
 #### Scenario: An accepted word and a near miss
 
@@ -91,6 +93,33 @@ hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule as a
 
 - **WHEN** `mea culpa` is accepted and the text is `The mea culpa stands, and mea alone.`
 - **THEN** a `spelling` rule that flags `mea` reports the lone `mea` once
+
+### Requirement: A glob adds vocabularies for its files
+
+hakkiri SHALL hold back, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.
+The match SHALL be an accepted term of a vocabulary that a matching glob names, or lie inside an accepted phrase of one.
+It SHALL do so whatever the rule's `vocab` and `nonword` say, and a `capitalization` or `conditional` rule SHALL read none.
+A file SHALL take the vocabularies of every glob that matches it, besides the top-level ones.
+
+#### Scenario: A glob's vocabulary
+
+- **WHEN** a glob names `Team`, `Team.Filler0` is an `existence` rule with `vocab: false` and the token `GitHub`, and the text is `Use GitHub here.`
+- **THEN** it reports nothing, and with `Team` named at the top level it reports ``warning Team.Filler0: Remove 'GitHub'.``
+
+#### Scenario: Rules a glob does not reach
+
+- **WHEN** a glob names `Team` and accepts `API` and `Kubernetes`, a `conditional` rule reads `The SDK and the API are here.` and a `capitalization` rule with `match: $sentence` reads `# Using Kubernetes with Terraform today`
+- **THEN** the `conditional` rule reports `SDK` and `API`, and the `capitalization` rule reports the heading, where the top level holds both back
+
+#### Scenario: Two globs and the top level
+
+- **WHEN** the top level names `Docs`, which accepts `Zebra`, one glob names `Team`, which accepts `GitHub`, and the text is `We saw Zebra and GitHub here.`
+- **THEN** `Team.Filler` with the tokens `Zebra` and `GitHub` reports nothing, and a second glob that names `Docs` for another file does not reach this one
+
+#### Scenario: Spelling reads a glob's terms exactly
+
+- **WHEN** `zorbl` is accepted, and a `spelling` rule reads `Zorbl, zorbl and ZORBL.`
+- **THEN** a vocabulary at the top level holds back all three words, and a glob's vocabulary holds back `zorbl` only, and the rule reports ``Did you really mean 'Zorbl'?``
 
 [vocabularies-3]: ../../design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../design.md#4-a-line-of-a-list-is-a-pattern

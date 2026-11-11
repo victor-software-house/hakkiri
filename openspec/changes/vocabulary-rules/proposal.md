@@ -13,6 +13,7 @@ The [vale-differences spec][differences] lists the missing rules as a known gap.
 
 - hakkiri builds `Vale.Terms` from the accepted terms and `Vale.Avoid` from the rejected ones, with Vale's messages, levels and boundaries.
 - A built-in style `Vale` holds the two rules, so `styles: [Vale]` runs them and `Vale.Terms: warning` sets one's level.
+- Each vocabulary a glob names builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no style or setting.
 - Without a vocabulary term, the style `Vale` is not a style in any package.
 - The `vale-differences` spec drops the gap for the vocabulary rules.
 
@@ -25,7 +26,7 @@ The [vale-differences spec][differences] lists the missing rules as a known gap.
 ### Modified Capabilities
 
 - `project-config`: a glob may list the built-in style `Vale`.
-- `vale-differences`: the gap for the vocabulary rules closes.
+- `vale-differences`: the gap for the vocabulary rules closes, and so does the gap for a glob's rules.
 
 ## Impact
 

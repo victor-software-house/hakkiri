@@ -76,3 +76,17 @@ hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file when a glob lists the 
 
 - **WHEN** a glob lists `styles: [Team]` and sets `Vale.Terms: warning` and `Vale.Avoid: suggestion`
 - **THEN** `github` draws a `warning` from `Vale.Terms` and `utilize` draws a `suggestion` from `Vale.Avoid`
+
+### Requirement: A glob's vocabularies build rules of their own
+
+hakkiri SHALL build `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` from each vocabulary a glob of `files` names, as it builds `Vale.Terms` and `Vale.Avoid`, and SHALL run them on the files that glob matches with no style or setting.
+
+#### Scenario: A glob names Team
+
+- **WHEN** a glob names `Team`, which accepts `harness(?:es)?` and `kubectl`, and the text is `We harness it. HARNESS it. Run KUBECTL.`
+- **THEN** the alerts are ``error Vale.Team.Terms: Use 'harness' instead of 'HARNESS'.`` and ``error Vale.Team.Terms: Use 'kubectl' instead of 'KUBECTL'.``
+
+#### Scenario: A file no glob names
+
+- **WHEN** `Team` is named at the top level only, and the text is `Run KUBECTL.`
+- **THEN** `Vale.Team.Terms` draws no alert, and `Vale.Terms` draws one only where the style `Vale` is listed

@@ -1,0 +1,5 @@
+extends: existence
+message: "Raw '%s'."
+level: warning
+nonword: true
+tokens: [GitHub]
