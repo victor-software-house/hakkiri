@@ -73,9 +73,11 @@ The top folder is the one that holds `styles`, where Vale keeps a package's `.va
 The operator chose the file from a preview that showed it there (operator, 2026-11-11).
 `config/vocabularies` stays inside `styles`, where Vale keeps it.
 
-hakkiri knows a package by its styles folder, since a `path` entry names one.
-The top folder is therefore the parent of a folder called `styles`: for a fetched zip, the one top folder of the zip.
-A zip whose top folder is itself a style has no folder called `styles`, so it has no top, and it cannot hold a settings file: a `.ctl` folder beside the style would be a second top folder, which the fetch refuses.
+A `path` entry names a package by its styles folder.
+The top folder is therefore the parent of a folder called `styles`.
+For a fetched zip it is the one top folder of the zip.
+A zip whose top folder is itself a style has no folder called `styles`, so it has no top.
+It cannot hold a settings file: a `.ctl` folder beside the style would be a second top folder, which the fetch refuses.
 
 For a `path` entry the parent of the folder is a top only when the folder is called `styles` and the parent is neither the project root nor a folder that holds it.
 This tells a package's file from the project's.

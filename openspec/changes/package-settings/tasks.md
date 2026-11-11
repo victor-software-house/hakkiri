@@ -7,7 +7,7 @@ The operator ruled on the three decisions of the [proposal][proposal] on 2026-11
 ## 1. Read the settings
 
 - [x] 1.1 Read `.ctl/hakkiri.yaml` of each loaded package with the schema of the project config, and name the package and the line in a fault, in `src/config.rs`.  
-  Verify `tests/package_settings.rs` holds a test for each scenario of "A package may ship a settings file", "A package's settings file sits in its top folder" and "A package's settings file holds the keys of a project config".  
+  Verify `tests/package_settings.rs` holds a test for each scenario of "A package may ship a settings file", "A package's settings file is in its top folder" and "A package's settings file holds the keys of a project config".  
   Each test fails on the code of main and passes with the change.
   - 2026-11-11 (UTC), 17 of the 21 tests of `tests/package_settings.rs` failed on `src/` of [PR 83][c-base] in a throwaway Linux box, and all 21 pass with the change.  
     The other four pass either way: a package with no settings file, and three that guard what is no package top, each failing when its rule is removed.

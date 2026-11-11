@@ -1,6 +1,6 @@
 ## ADDED Requirements
 
-### Requirement: A package's settings file sits in its top folder
+### Requirement: A package's settings file is in its top folder
 
 The top folder of a package SHALL be the folder that holds its `styles` folder, and a fetched zip's top folder SHALL be its one top folder.  
 The top folder of a `path` entry that names a folder called `styles` SHALL be that folder's parent, except when the parent is the project root or holds it.  
