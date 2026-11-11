@@ -14,7 +14,8 @@ The operator decided hakkiri names rules as Vale does (operator, 2026-11-10).
 ## Changes
 
 - A rule is named by its style folder, the folders under it, and its file name up to the first dot, joined by dots.
-- The loader reads every `.yml` file under a style folder, skips a folder that starts with `.` or `_` and a `*.test.yml` file, and refuses two files that give one name with an error that names both, when a glob lists the style.
+- The loader reads every `.yml` file under a style folder, and skips a folder that starts with `.` or `_` and a `*.test.yml` file.
+- It refuses two files that give one name with an error that names both, when a glob lists the style.
 - `check`, `test` and `test --coverage` name a rule through one function, and `test` finds the style folder from the packages of the config, as Vale finds it from the `StylesPath`.
 - A name with a bracket is refused under the same condition, as Vale refuses it.
 

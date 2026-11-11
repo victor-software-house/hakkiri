@@ -31,7 +31,8 @@ Once a name ends at the first dot, `Terms.yml` and `Terms.custom.yml` give one n
 The loader refuses the second file with an error that names both files and the rule name, when a glob lists the style.
 Vale refuses it too once a style enables it: its registration fails with "the rule has already been added" ([register][v-register]), and a probe of Vale `66bbb85` gave that error for `Terms.yml` with `Terms.custom.yml`, and for `Sub/Bar.yml` with `Sub/Bar.v2.yml`.
 The same probe gave no error when no `BasedOnStyles` named the style, and linted with exit 0.
-hakkiri does the same: it reads the faults in the names of every style, and refuses those of a style a glob lists in `styles`.
+hakkiri does the same.
+It reads the faults in the names of every style, and refuses those of a style a glob lists in `styles`.
 A rule key set under a glob does not enable a style, since hakkiri runs a rule only from a listed style.
 
 Alternative: let the first file win, silently.

@@ -9,7 +9,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify the rule names, the loaded rules and the errors match the scenarios of the `rule-loading` delta, and record what differs in `vale-differences`.
   - 2026-11-11 (UTC), `Terms.custom.yml` gave `Team.Terms`, and `Sub/Deep/Baz.yml` gave `Team.Sub.Deep.Baz`.  
     `Terms.yml` with `Terms.custom.yml`, and a bracket name, each failed with error E100 in an enabled style.  
-    Neither failed when no `BasedOnStyles` named the style, which `vale-differences` lists.  
+    Neither failed when no `BasedOnStyles` named the style, and Vale linted with exit 0.  
     `vale test --coverage` named a nested rule `Team.Sub.Deep.Bar` and left a rule under `_draft` out of the coverage.
 
 ## 2. Name and load
@@ -24,12 +24,15 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify the dotted and nested coverage tests fail on the old loader and pass on the new one.
   - 2026-11-11 (UTC), both `test_command` tests failed on the old loader and pass on [a1e07da][c-code].  
     The dotted test now holds `absent: Team.Foo.v2`, since `contains: Team.Foo` also matched the old name.
+- [x] 2.4 Refuse a name clash or a bracket only for a style a glob lists, as Vale does for an enabled style, and lint an unused style with no error.  
+  Verify the `check` tests for an unused style with a clash and with a bracket fail on the loader of [3e368a0][c-prior] and pass on the new one, and the tests for a listed style still pass.
+  - 2026-11-11 (UTC), both unused-style tests failed with exit status 2 on that loader, and pass in [eae1653][c-lazy], in a throwaway Linux box.
 
 ## 3. Record
 
-- [x] 3.1 Update `src/instructions.md`, the `rule-loading` spec, the unarchived `test-command` change and the `vale-differences` spec.  
+- [x] 3.1 Update `src/instructions.md`, the `rule-loading` spec, and the unarchived `test-command` change.  
   Verify `openspec validate --all --strict` and the budget check pass.
-  - 2026-11-11 (UTC), both pass on the Mac at [a76397e][c-docs].
+  - 2026-11-11 (UTC), both pass on the Mac for the docs of [eeafcb0][c-docs] with two sentences split.
 
 ## 4. Integration
 
@@ -41,4 +44,6 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 [c-base]: https://github.com/victor-software-house/hakkiri/commit/de3e392ed578ede50c86d753ec7c1e6114dbc9ad
 [c-code]: https://github.com/victor-software-house/hakkiri/commit/a1e07daf0072c127692d6f8979263bbde2e7b338
-[c-docs]: https://github.com/victor-software-house/hakkiri/commit/a76397e533ea4bf9f701aad76911e6a83c593a88
+[c-prior]: https://github.com/victor-software-house/hakkiri/commit/3e368a0cf0793030a21d33e10c884956f7a72bd1
+[c-lazy]: https://github.com/victor-software-house/hakkiri/commit/eae16539ebdb1c6b9b7e1123a2ac57ac951d17a2
+[c-docs]: https://github.com/victor-software-house/hakkiri/commit/eeafcb035627fee88eea11feb2232f123292868a
