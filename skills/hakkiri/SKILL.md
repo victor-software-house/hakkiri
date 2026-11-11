@@ -7,7 +7,7 @@ description: >-
   task or a pre-commit hook runs hakkiri, or when the user mentions hakkiri,
   prose lint alerts or ProseStyle.
 license: AGPL-3.0-or-later
-version: 0.0.2
+version: 0.0.3
 compatibility: Requires a hakkiri binary on the path.
 ---
 

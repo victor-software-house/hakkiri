@@ -1,5 +1,16 @@
 # Changelog
 
+## hakkiri 0.0.3
+
+### Added
+
+- A package pinned by `url` and `sha256` is downloaded on the first run, checked against its hash, and kept in a cache folder, so a second run needs no network.
+  A zip is a Vale package: one top folder that holds a `styles` folder, or is a style itself, kept as the zip laid it out.
+  `--cache-dir`, or `HAKKIRI_CACHE_DIR`, moves the cache from its default in the per-user cache folder ([`51cdd62`](https://github.com/victor-software-house/hakkiri/commit/51cdd62651718a6377c915eeb7e450174ef87ddd)).
+- A Vale style loads as it is: a rule whose `extends` names another rule starts from it, with `key+` and `key-`, as in Vale.
+  A rule hakkiri cannot run, a `script` rule or a `doc()` scope, no longer stops its style from loading.
+  The rest of the style runs, and the run exits 2 for that rule until the config sets it `off` ([`d4dc1f9`](https://github.com/victor-software-house/hakkiri/commit/d4dc1f9e29411884ddf002741e109dfa7507dacf)).
+
 ## hakkiri 0.0.2
 
 ### Added
