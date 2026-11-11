@@ -19,7 +19,7 @@ The node-segments spec states which ranges make the text of a node and how the s
 
 ### Requirement: Markdown nodes carry Vale scope names
 
-hakkiri SHALL give each Markdown node the scope the design's table names.  
+hakkiri SHALL give each Markdown node the scope the [design's table][tree-4] names.  
 The table covers paragraphs, headings, block quotes, list items, table rows and cells, links, code spans, strong and emphasis text, and image alt text.  
 The text of an HTML block adds table and figure captions, the content of a `data` element as `meta`, and the description of a page.
 
@@ -205,3 +205,5 @@ A thematic break, a link definition and any other HTML block SHALL leave it free
 
 - **WHEN** a Markdown file holds a quote whose first child is the HTML block `<?php echo "<div>"; ?>` and whose second child is the paragraph `After the block.`
 - **THEN** the tree holds a `paragraph` node for `After the block.` that is not first in its quote
+
+[tree-4]: ../../changes/archive/2026-11-10-document-tree/design.md#4-scopes-from-mdast-nodes

@@ -44,7 +44,7 @@ It SHALL read any other `.yml` file only when it holds `extends` and `tests`, an
 
 ### Requirement: A rule file may hold cases
 
-A rule file SHALL take `tests` as the cases of design decision 2.  
+A rule file SHALL take `tests` as the cases of [design decision 2][test-2].  
 `hakkiri check` SHALL load them and run none, and SHALL refuse a malformed `tests` with its line.
 
 #### Scenario: A rule with cases under check
@@ -128,3 +128,5 @@ It SHALL exit 0 when every case passes and no rule is uncovered, 1 when a case f
 
 - **WHEN** `hakkiri test --format json` runs with `CLICOLOR_FORCE=1`
 - **THEN** the output parses as JSON and holds no ESC byte
+
+[test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
