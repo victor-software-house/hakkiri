@@ -343,6 +343,53 @@ fn an_empty_vocab_list_drops_the_names_of_the_packages() -> TestResult {
 }
 
 #[test]
+fn a_later_package_and_a_glob_can_clear_vocabularies_too() -> TestResult {
+    let suite = Suite::new("package-settings-vocab-later");
+    let write = |root: &Root<'_>, a: &str| {
+        root.file("pkg/styles/Team/Filler.yml", TERMS);
+        root.file("pkg/styles/config/vocabularies/Docs/accept.txt", "GitHub\n");
+        root.file("pkg/.ctl/hakkiri.yaml", a);
+        root.file("a.md", "Use GitHub here.\n");
+        root.file("b.md", "Use GitHub here.\n");
+    };
+    let flagged = |lines: &[String], file: &str| {
+        lines
+            .iter()
+            .any(|line| line.starts_with(file) && line.contains("Remove 'GitHub'"))
+    };
+
+    let root = project(
+        &suite,
+        "package",
+        "packages:\n  - path: pkg/styles\n  - path: later/styles\n",
+    );
+    write(&root, "vocab: [Docs]\nfiles:\n  '*.md': {styles: [Team]}\n");
+    root.file("later/styles/.keep", "");
+    root.file("later/.ctl/hakkiri.yaml", "vocab: []\n");
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert!(
+        flagged(&lines, "a.md") && flagged(&lines, "b.md"),
+        "{lines:?}"
+    );
+
+    let root = project(
+        &suite,
+        "glob",
+        "packages:\n  - path: pkg/styles\nfiles:\n  'a.md': {vocab: []}\n",
+    );
+    write(
+        &root,
+        "files:\n  '*.md':\n    styles: [Team]\n    vocab: [Docs]\n",
+    );
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert!(flagged(&lines, "a.md"), "{lines:?}");
+    assert!(!flagged(&lines, "b.md"), "{lines:?}");
+    Ok(())
+}
+
+#[test]
 fn a_vocabulary_a_package_names_that_no_package_holds_is_an_error() -> TestResult {
     let suite = Suite::new("package-settings-vocab-unknown");
     let root = project(&suite, "unknown", "packages:\n  - path: pkg/styles\n");

@@ -213,8 +213,9 @@ struct Glob {
     pattern: String,
     matcher: GlobMatcher,
     styles: Option<Vec<String>>,
-    /// The vocabularies the glob names, for the files it matches.
-    vocab: Vec<String>,
+    /// The vocabularies the glob names, for the files it matches. A written
+    /// empty list drops the names earlier globs gave the file.
+    vocab: Option<Vec<String>>,
     choices: Vec<(String, Choice)>,
 }
 
@@ -319,9 +320,14 @@ impl Project {
         let mut named: Vec<&str> = Vec::new();
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
             matched = true;
-            for name in &glob.vocab {
-                if !named.contains(&name.as_str()) {
-                    named.push(name);
+            if let Some(names) = &glob.vocab {
+                if names.is_empty() {
+                    named.clear();
+                }
+                for name in names {
+                    if !named.contains(&name.as_str()) {
+                        named.push(name);
+                    }
                 }
             }
             if let Some(listed) = &glob.styles {
@@ -879,7 +885,7 @@ fn read_globs(
         };
         let inner = line.map_or(1, |line| line + 1);
         let mut listed = None;
-        let mut vocabularies = Vec::new();
+        let mut vocabularies = None;
         let mut choices = Vec::new();
         for (key, setting) in settings.0 {
             let at = key_line(text, &key, inner);
@@ -899,7 +905,7 @@ fn read_globs(
                 ("styles", Setting::Word(_)) => {
                     faults.add(at, "styles", "is a list of style names".to_owned());
                 }
-                ("vocab", Setting::List(list)) => vocabularies = list,
+                ("vocab", Setting::List(list)) => vocabularies = Some(list),
                 ("vocab", Setting::Word(_)) => {
                     faults.add(at, "vocab", "is a list of vocabulary names".to_owned());
                 }

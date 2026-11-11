@@ -130,7 +130,7 @@ files:
 - A package may hold `.ctl/hakkiri.yaml` in its top folder, the folder that holds `styles`, in the format of the config. A `path` entry that names a folder called `styles` has its top in the parent of that folder. When the parent is the project root or holds it, there is no top, so the project's own config is never read as a package's. For a zip the top is the top folder of the zip.
   The settings of each package apply before the project's own, in the order of `packages`, so the project overrides a package and a later package overrides an earlier one.
   The file holds `level`, `vocab`, `files` and `packages`. A `styles` list under the same glob text as a package's adds to its list, and under another glob it replaces it. `level` is the project's when it sets one.
-  A written `vocab: []` drops the vocabularies the packages named, and a missing `vocab` keeps them.
+  A written `vocab: []` drops the vocabularies the packages named, and a missing `vocab` keeps them. In a glob it drops what earlier globs gave the file.
   A package's `packages` hold a `url` and a `sha256`, never a `path`, and are fetched like the project's. A package named twice loads once, and a chain more than 10 packages deep is an error.
   A fault in the file is an error that names the package, the file and the line.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.

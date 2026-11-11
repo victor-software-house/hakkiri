@@ -62,6 +62,7 @@ A package named twice SHALL load once, by its `sha256` for a download and its fo
 
 The `vocab` names of the packages and the project SHALL add up, the packages' first.  
 A `vocab` written as an empty list SHALL drop the names before it, as Vale's `Vocab = NONE` does, and a missing key SHALL keep them.  
+The same SHALL hold between two packages, where the later one wins, and for the `vocab` of a glob, which drops the names earlier globs gave the file.  
 A name that no package holds, or that two packages hold, SHALL be an error on its line in the file that names it.
 
 #### Scenario: Two lists
@@ -73,6 +74,16 @@ A name that no package holds, or that two packages hold, SHALL be an error on it
 
 - **WHEN** a package sets `vocab: [Team]` and the project sets `vocab: []`
 - **THEN** hakkiri reads no vocabulary named by a package
+
+#### Scenario: A later package
+
+- **WHEN** the package `a` sets `vocab: [Team]` and the later package `b` sets `vocab: []`
+- **THEN** hakkiri reads no vocabulary named by a package
+
+#### Scenario: A glob's empty list
+
+- **WHEN** a package's glob `'*.md'` names `Team` and the project's glob `'a.md'` sets `vocab: []`
+- **THEN** `a.md` takes no vocabulary from the package's glob, and `b.md` still does
 
 #### Scenario: A missing key
 
