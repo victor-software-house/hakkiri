@@ -36,8 +36,12 @@ The probe of Vale at `66bbb85` (2026-11-11) found these:
 - A rejected term that is also accepted draws no `Vale.Avoid` alert.
 - `foo.*bar` draws one alert over the whole span from the first `foo` to the last `bar`.
 - `Bad Word` matches `Bad  Word` with two spaces, and not `bad word`.
-
-Not probed yet, and task 1.1 probes it before the code: a term whose pattern holds an escape such as `\W`, which Vale lowercases before it builds the swap key.
+- `colou?r` draws `Use 'color' instead of 'COLOR'.` and `Use 'colour' instead of 'Colour'.`, and a term with a class, a wildcard or a repeat is shown as written.
+- Two terms with one lowercase form, `iOS` and `IOS`, give one swap key, and the later one is the value: `ios`, `Ios` and `iOS` each draw `Use 'IOS' instead of ...`.
+- Vale lowercases the whole pattern, escapes included, so `data\Wset` builds the key `data\wset`: it flags `dataxset`, draws `Use 'data\Wset' instead of 'dataxset'.`, and leaves `data set` alone. hakkiri does the same, to match Vale.
+- A phrase that wraps matches across the line break: `mea\nCulpa` draws `Use 'mea culpa' instead of 'mea Culpa'.`, and `mea\nculpa` draws nothing.
+- Nothing runs from a vocabulary that a config lists without the style `Vale`, and `Vale.Terms: off` leaves `Vale.Avoid` on.
+- A glob's own rule turns on after the glob's settings, so `Vale.Team.Terms: off` beside `vocab: [Team]` in one glob leaves it on.
 
 Alternative: swap keys that keep the term's case and match with the `(?i)` flag.
 It lost because Vale lowercases the key, so a term written in capitals and one written in lowercase give one key, and the later term wins.
@@ -68,6 +72,13 @@ It lost because Vale's names and its alerts carry the vocabulary, and a project 
 It stays an error when no named vocabulary holds a term, and `HKR-026` and `HKR-038` will give the style rules that need no vocabulary.
 Alternative: a style `Vale` that is always present and holds no rule.
 It lost because an empty style hides a wrong vocabulary name: the config would load and lint nothing.
+
+### 5. A package style named Vale is refused
+
+Vale refuses a style named `Vale` beside its built-in one ([manager.go][v-load-rules]).
+hakkiri refuses it too, with an error on the package's entry, but only when a vocabulary gives the built-in style a rule: a project with no vocabulary term keeps a package style named `Vale`.
+Alternative: refuse it always.
+It lost because it would break a config that has never named a vocabulary.
 
 [vocabularies]: ../archive/2026-11-11-vocabularies/design.md
 [v-load-rules]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/manager.go#L559-L628

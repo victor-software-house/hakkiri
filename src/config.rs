@@ -16,7 +16,9 @@ use std::{fmt, fs, io};
 use ctl_core::input::Input;
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
-use hakkiri::rule::{Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style};
+use hakkiri::rule::{
+    Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style, vocabulary_rules,
+};
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 
@@ -317,7 +319,7 @@ impl Project {
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
         let mut matched = false;
         let mut styles: &[String] = &[];
-        let mut switches: HashMap<&str, bool> = HashMap::new();
+        let mut switches: HashMap<String, bool> = HashMap::new();
         let mut set_levels: HashMap<&str, Level> = HashMap::new();
         let mut named: Vec<&str> = Vec::new();
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
@@ -337,17 +339,20 @@ impl Project {
             for (name, choice) in &glob.choices {
                 match choice {
                     Choice::Off => {
-                        switches.insert(name.as_str(), false);
+                        switches.insert(name.clone(), false);
                     }
                     Choice::On => {
-                        switches.insert(name.as_str(), true);
+                        switches.insert(name.clone(), true);
                     }
                     Choice::Level(level) => {
-                        switches.insert(name.as_str(), true);
+                        switches.insert(name.clone(), true);
                         set_levels.insert(name.as_str(), *level);
                     }
                 }
             }
+            // A glob that names a vocabulary runs the rules of that vocabulary
+            // on its files, after the glob's own settings, as in Vale.
+            set_vocabulary_rules(&mut switches, &glob.vocab);
         }
         if !matched {
             return None;
@@ -404,6 +409,15 @@ impl Project {
             unrunnable,
             accepted,
         })
+    }
+}
+
+/// Turns the rules of each vocabulary in `names` on.
+fn set_vocabulary_rules<S: AsRef<str>>(switches: &mut HashMap<String, bool>, names: &[S]) {
+    for name in names {
+        for rule in ["Terms", "Avoid"] {
+            switches.insert(format!("Vale.{}.{rule}", name.as_ref()), true);
+        }
     }
 }
 
@@ -799,12 +813,20 @@ fn load_packages(
     loaded.packages = packages;
     let search = loaded.packages.clone();
     read_vocabularies(&found, vocab, &mut loaded, faults);
-    let accepted: Vec<String> = vocab
+    let top: Vec<&Vocabulary> = vocab
         .top
         .iter()
         .filter_map(|name| loaded.vocabularies.get(name))
+        .collect();
+    let accepted: Vec<String> = top
+        .iter()
         .flat_map(|vocabulary| vocabulary.accepted.iter().cloned())
         .collect();
+    let rejected: Vec<String> = top
+        .iter()
+        .flat_map(|vocabulary| vocabulary.rejected.iter().cloned())
+        .collect();
+    build_vocabulary_rules(&mut loaded, vocab, &accepted, &rejected, faults);
     for Found {
         origin,
         written,
@@ -823,6 +845,17 @@ fn load_packages(
                 .map(|name| name.to_string_lossy().into_owned())
                 .unwrap_or_default();
             let shown = written.join(&name);
+            if loaded.styles.contains_key(&name) && !folders.contains_key(&name) {
+                faults.add(
+                    line,
+                    key,
+                    format!(
+                        "the style `{name}` is built in from a vocabulary, and `{}` holds a style of that name",
+                        shown.display()
+                    ),
+                );
+                continue;
+            }
             if let Some(first) = folders.get(&name) {
                 at.add(
                     line,
@@ -974,6 +1007,8 @@ struct Named {
     /// Every name a top level wrote, cleared or not, which the config check
     /// reports on its own line.
     written: Vec<String>,
+    /// The names that a glob lists, each once.
+    globs: Vec<String>,
 }
 
 impl Named {
@@ -1004,6 +1039,9 @@ impl Named {
                     let at = key_line(text, "vocab", inner);
                     for name in names {
                         self.add(name, at, &layer.name);
+                        if !self.globs.contains(name) {
+                            self.globs.push(name.clone());
+                        }
                     }
                 }
             }
@@ -1068,6 +1106,50 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
             _ => {}
         }
         faults.problems.append(&mut at.problems);
+    }
+}
+
+/// Builds the rules of the vocabularies the config names, as Vale builds them.
+/// The lists of the top level give `Vale.Terms` and `Vale.Avoid` in a style
+/// `Vale`. Each vocabulary a glob lists gives `Vale.<Name>.Terms` and
+/// `Vale.<Name>.Avoid`, which that glob runs on its files.
+fn build_vocabulary_rules(
+    loaded: &mut Loaded,
+    vocab: &Named,
+    accepted: &[String],
+    rejected: &[String],
+    faults: &mut Faults<'_>,
+) {
+    let mut built = vec![(
+        "Vale".to_owned(),
+        accepted.to_vec(),
+        rejected.to_vec(),
+        true,
+    )];
+    for name in &vocab.globs {
+        if let Some(vocabulary) = loaded.vocabularies.get(name) {
+            built.push((
+                format!("Vale.{name}"),
+                vocabulary.accepted.clone(),
+                vocabulary.rejected.clone(),
+                false,
+            ));
+        }
+    }
+    for (prefix, own_accepted, own_rejected, style) in built {
+        match vocabulary_rules(&prefix, &own_accepted, &own_rejected, accepted) {
+            Ok(rules) if !rules.is_empty() => {
+                let first = loaded.rules.len();
+                loaded.rules.extend(rules);
+                if style {
+                    loaded
+                        .styles
+                        .insert(prefix, (first..loaded.rules.len()).collect());
+                }
+            }
+            Ok(_) => {}
+            Err(error) => faults.problems.extend(error.problems),
+        }
     }
 }
 

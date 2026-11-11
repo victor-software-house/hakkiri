@@ -19,6 +19,26 @@ hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the named v
 - **WHEN** `harness(?:es)?` is accepted and the text is `We saw Harnesses and harness and HARNESS.`
 - **THEN** the alerts are ``Use 'harnesses' instead of 'Harnesses'.`` and ``Use 'harness' instead of 'HARNESS'.``
 
+#### Scenario: A pattern shown as the spelling it matched
+
+- **WHEN** `colou?r` is accepted and the text is `The COLOR and Colour and color and colour.`
+- **THEN** the alerts are ``Use 'color' instead of 'COLOR'.`` and ``Use 'colour' instead of 'Colour'.``
+
+#### Scenario: Two terms with one lowercase form
+
+- **WHEN** `iOS` is accepted before `IOS`, and the text is `We use ios and iOS and IOS.`
+- **THEN** the alerts are ``Use 'IOS' instead of 'ios'.`` and ``Use 'IOS' instead of 'iOS'.``
+
+#### Scenario: An escape in a term
+
+- **WHEN** `data\Wset` is accepted and the text is `A data set, data-set and dataxset.`
+- **THEN** the only alert is ``Use 'data\Wset' instead of 'dataxset'.``, because the lowercased pattern reads `\W` as `\w`, as in Vale
+
+#### Scenario: A phrase that wraps
+
+- **WHEN** `mea culpa` is accepted and the text wraps `mea` and `Culpa`, or `mea` and `culpa`, over two lines
+- **THEN** the first draws ``Use 'mea culpa' instead of 'mea Culpa'.`` and the second draws nothing
+
 #### Scenario: A phrase in the wrong case
 
 - **WHEN** `mea culpa` is accepted and the text is `We said Mea Culpa and MEA CULPA.`
@@ -72,6 +92,11 @@ hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file when a glob lists the 
 - **WHEN** a glob lists `styles: [Team]` and the vocabulary accepts `GitHub`
 - **THEN** `github` draws no alert, and the accepted terms still hold back the `Team` rules' matches
 
+#### Scenario: One rule turned off
+
+- **WHEN** a glob lists `styles: [Team, Vale]` and sets `Vale.Terms: off`
+- **THEN** `Vale.Terms` draws nothing and `Vale.Avoid` still draws its alerts
+
 #### Scenario: A rule set by name
 
 - **WHEN** a glob lists `styles: [Team]` and sets `Vale.Terms: warning` and `Vale.Avoid: suggestion`
@@ -85,6 +110,11 @@ hakkiri SHALL build `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` from each vocabu
 
 - **WHEN** a glob names `Team`, which accepts `harness(?:es)?` and `kubectl`, and the text is `We harness it. HARNESS it. Run KUBECTL.`
 - **THEN** the alerts are ``error Vale.Team.Terms: Use 'harness' instead of 'HARNESS'.`` and ``error Vale.Team.Terms: Use 'kubectl' instead of 'KUBECTL'.``
+
+#### Scenario: A glob's own setting
+
+- **WHEN** a glob names `Team` and sets `Vale.Team.Terms: off`
+- **THEN** `Vale.Team.Terms` still runs on its files, because the vocabulary turns it on after the glob's settings
 
 #### Scenario: A file no glob names
 

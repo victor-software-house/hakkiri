@@ -9,12 +9,13 @@ use crate::metric::{Variables, graded, measure, variables};
 use crate::pattern::{Captured, Pattern, SearchError};
 use crate::rule::{
     Capitalization, Check, Conditional, Consistency, Exceptions, Existence, Metric, Occurrence,
-    Readability, Repetition, Rule, Sequence, Substitution, Swap,
+    Readability, Repetition, Rule, Sequence, Substitution, Swap, term_pattern,
 };
 use crate::sequence::find;
 use crate::spelling::run as run_spelling;
 use crate::splitter::Model;
 use crate::summary::{Elements, Summary};
+use crate::term::recase_to_term;
 use crate::text::Text;
 
 /// One match a check found in a block of text.
@@ -256,7 +257,12 @@ fn run_substitution(
         if let Some(Some(expander)) = substitution.expanders.get(index) {
             expected = expander.replace_all(observed, &expected)?;
         }
-        if in_form(&mut forms, &expected, observed)?
+        let (form, expected) = if substitution.terms {
+            (term_pattern(&expected), recase_to_term(&expected, observed))
+        } else {
+            (expected.clone(), expected)
+        };
+        if in_form(&mut forms, &form, observed)?
             || excepted(&substitution.exceptions, &phrases, &range, observed)?
             || accepted_hold(accepted, &held, &range, observed)?
         {

@@ -8,9 +8,6 @@
 //! level, the rule, the message and the matched text. The rows come from Vale
 //! at `66bbb85` run from the fixture folder as `vale --config=vale/<name>.ini
 //! --output=JSON text`.
-//!
-//! A row of a rule named `Vale.<Name>.Terms` is left out of the comparison: it
-//! belongs to the vocabulary-rules change.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -83,7 +80,7 @@ fn vale_rows(name: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
         else {
             return Err(format!("a row of vale.tsv has {} cells", cells.len()).into());
         };
-        if config == name && !rule.starts_with("Vale.") {
+        if config == name {
             rows.insert((
                 file.to_owned(),
                 line.parse()?,

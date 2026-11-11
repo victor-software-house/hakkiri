@@ -32,6 +32,7 @@ pub mod splitter;
 pub mod strcase;
 pub mod summary;
 pub mod tagger;
+mod term;
 pub mod text;
 mod tree;
 pub mod words;

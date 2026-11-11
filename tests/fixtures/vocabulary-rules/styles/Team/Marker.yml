@@ -1,0 +1,4 @@
+extends: existence
+message: "Marked '%s'."
+level: suggestion
+tokens: [marker]
