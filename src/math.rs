@@ -434,17 +434,19 @@ pub(crate) fn find(root: &Mdast, source: &str, braces: bool) -> Math {
 
 /// The container `node` is, when it is one that indents the lines it holds.
 fn container_of(node: &Mdast, source: &str) -> Option<Container> {
-    match node {
-        Mdast::ListItem(_) => node.position().map(|position| {
-            Container::Item(item_content(
-                source,
-                position.start.offset,
-                position.start.column,
-            ))
-        }),
-        Mdast::Blockquote(_) => Some(Container::Quote),
-        _ => None,
+    if matches!(node, Mdast::Blockquote(_)) {
+        return Some(Container::Quote);
     }
+    if !matches!(node, Mdast::ListItem(_)) {
+        return None;
+    }
+    node.position().map(|position| {
+        Container::Item(item_content(
+            source,
+            position.start.offset,
+            position.start.column,
+        ))
+    })
 }
 
 /// The containers from the entry `chain` of `chains` outwards, outermost first.
