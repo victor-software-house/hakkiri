@@ -141,7 +141,7 @@ files:
   The accepted terms of the top level hold back matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules. A rule with `vocab: false` reads none, and nor does an `existence` rule with `nonword`.
   A glob's list holds back matches in `existence`, `repetition`, `spelling` and `substitution` rules in the files that glob matches, whatever the rule sets. A file takes the lists of every glob that matches it.
   An unknown vocabulary, a name in two packages and a term that is not a pattern are errors.
-  The lists build rules, as in Vale. `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term, both at `error`. They belong to a style `Vale` that exists only while a top-level vocabulary holds a term. `Terms` matches a term without regard to case and keeps the escapes of a pattern term, so `data\Wset` keeps its `\W`, where Vale lowercases it to `\w`.
+  The lists build rules, as in Vale. `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term, both at `error`. They belong to a style `Vale` that exists only while a top-level vocabulary holds a term. `Terms` matches a term without regard to case and keeps the escapes of a pattern term, so `data\Wset` keeps its `\W`, where Vale lowercases it to `\w`. It also keeps the names of groups, the backreferences to them and the flags, such as `(?U)`.
   List `Vale` in `styles` to run them, or set them by name. A vocabulary that a glob lists builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no setting.
 - A package may hold `.ctl/hakkiri.yaml` in its top folder, the folder that holds `styles`, in the format of the config. A `path` entry that names a folder called `styles` has its top in the parent of that folder. When the parent is the project root or holds it, there is no top, so the project's own config is never read as a package's. For a zip the top is the top folder of the zip.
   The settings of each package apply before the project's own, in the order of `packages`, so the project overrides a package and a later package overrides an earlier one.
@@ -155,7 +155,7 @@ files:
   In a Markdown or MDX file, each match of a block pattern is read as a fenced code block that holds its first group, and each match of a token pattern as a code span that holds it. No rule that reads prose reports text inside them.
   A `scope: raw` rule still reads the file as written, and a `scope: code` rule reads each ignored token.
   The patterns run in order, block patterns first, each over the text the one before it left. A pattern with no group drops its match from the text, and a match of no bytes changes nothing.
-  A file takes the patterns of every glob that matches it, a package's first, so a project adds to a package. A source file takes them too, in the Markdown of each comment, where Vale applies none.
+  A file takes the patterns of every glob that matches it, a package's first, so a project adds to a package. A source file takes them too, in the Markdown of each comment, where Vale applies none. A `hakkiri test` case that runs through the config reads them too.
   A pattern that does not compile is an error on its line.
 - An HTML comment in a Markdown file turns rules off and on, as Vale's comments do.
   `<!-- hakkiri off -->` and `<!-- hakkiri on -->` leave out the text between them. `<!-- hakkiri Style.Rule: off -->` and `<!-- hakkiri Style.Rule: on -->` turn one rule off and on, and `<!-- hakkiri Style: off -->` and `on` a style.
@@ -167,7 +167,7 @@ files:
   An MDX file reads `{/* hakkiri off */}` and `{/* vale off */}` in the same way, as a block of its own or inside a line, and a source file reads no comment control.
 - Math in a Markdown or MDX file reads as code, as in Vale, so no text rule reports it and a `code` rule reads it.
   An inline span runs from a `$` that a non-space follows to a `$` that follows a non-space and is no digit's neighbour: `$5 and $10` is money and `$x$` is math. A span may wrap over lines of a paragraph.
-  A display block opens at a line that starts with `$$`, even in the middle of a paragraph, and closes at a line that ends with `$$`, a blank line or the end of the paragraph. The text before and after reads as separate paragraphs.
+  A display block opens at a line that starts with `$$`, even in the middle of a paragraph, and closes at a line that ends with `$$`, a blank line or the end of the paragraph. The text before and after reads as separate paragraphs. A line indented four columns or more past its container opens no block.
 - The top-level string values of a Markdown or MDX file's front matter are text, as in Vale: YAML between `---` lines, TOML between `+++` lines and JSON between `;;;` lines.
   A rule scoped `text`, `frontmatter`, `text.frontmatter`, `frontmatter.<key>` or `text.frontmatter.<key>` reads a value, and a `paragraph` or `sentence` rule does not.
   A key, a number, a boolean, a null, a date, a list and a nested mapping are not read, nor is a string below a TOML table. A block or token pattern leaves the front matter as written.
