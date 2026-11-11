@@ -4,7 +4,7 @@
 
 **Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for HTML-block text closes, so the requirement is removed and added again below without that scenario.
 
-**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from the differences". Its three remaining scenarios are unchanged.
+**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from the differences". Its three remaining scenarios are unchanged, and it adds a fourth.
 
 ## ADDED Requirements
 
@@ -27,6 +27,11 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 - **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
+
+#### Scenario: Comments that turn rules off and on
+
+- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
+- **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
 
 ### Requirement: HTML-block text differs from Vale in detail
 
@@ -67,6 +72,7 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 [html-3]: ../../../html-block-text/design.md#3-masked-text-reads-as-asterisks
 [html-4]: ../../../html-block-text/design.md#4-tags-join-the-text-around-them
 [html-5]: ../../../html-block-text/design.md#5-a-character-reference-reads-once
+[html-7]: ../../../html-block-text/design.md#not-ported
 [ledger]: ../../../../../tasks.yaml
 [case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
 [spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals

@@ -110,6 +110,21 @@ queue:
     acceptance:
       - A corpus of Markdown inputs runs through hakkiri and Vale 66bbb85, and each text or scope that differs is listed.
       - Each difference found is fixed, or recorded as an intended difference in the vale-differences spec.
+    notes:
+      - '2026-11-10, found while matching HTML-block text: a Markdown paragraph `a*b*c` reads `abc` in hakkiri and `a bc` in Vale, which reads the HTML its converter writes, where an opening inline tag puts a space before its text. The corpus covers inline markup between letters.'
+
+  - id: HKR-031
+    title: Turn rules off and on with comments
+    scope: engine
+    outcome: >-
+      A comment in a file turns rules off and on for the text after it, as the vale
+      off and vale on comments and the per-rule comments of Vale do.
+    blocked_by: []
+    acceptance:
+      - Vale's off and on comments and its per-rule comments give the alerts Vale 66bbb85 gives on probes, in Markdown text and in HTML blocks.
+      - Any alert that differs is fixed or recorded as an intended difference in the vale-differences spec.
+    notes:
+      - '2026-11-10, found while reading HTML-block text: hakkiri has no comment control, so a vale off comment turns nothing off and the text after it is linted.'
 
   - id: HKR-030
     title: Lint plain-text files

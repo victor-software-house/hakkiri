@@ -120,7 +120,7 @@ Lost: the `>` of a quote would read as text.
 
 ### Not ported
 
-- The `vale off` directive, and the selections and class scopes, which hakkiri has no rule syntax for.
+- The `vale off` and `vale on` comments (row HKR-031), and the selections and class scopes, which hakkiri has no rule syntax for.
 - A text equal to the name of an element of a skipped class, which Vale counts as a tag.
 
 ## Risks / Trade-offs
