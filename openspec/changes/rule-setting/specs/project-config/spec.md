@@ -1,9 +1,9 @@
 ## ADDED Requirements
 
-### Requirement: A level runs a rule whichever style holds it
+### Requirement: A level or `on` runs a rule whichever style holds it
 
 A rule name that gives a level SHALL run that rule on the matched files at that level, though no glob lists its style.  
-`off` SHALL stop a rule of a listed style, and SHALL change nothing for a rule of a style no glob lists.
+`on` SHALL run the rule at the level of its rule file, and `off` SHALL stop a rule of a listed style and change nothing for a rule of a style no glob lists.
 
 #### Scenario: A rule of a style no glob lists
 
@@ -14,6 +14,11 @@ A rule name that gives a level SHALL run that rule on the matched files at that 
 
 - **WHEN** `files` holds `'a.md': {Team.Hint: error}` and `a.md` holds `This is very terrible maybe bland.`
 - **THEN** hakkiri reports one error, `Team.Hint` on `maybe`, though the rule's own level is `suggestion`, and exits 1
+
+#### Scenario: A rule turned on at its own level
+
+- **WHEN** `files` holds `'a.md': {styles: [Other], Team.Hint: on}`, and `a.md` holds `This is very terrible maybe bland.`
+- **THEN** hakkiri reports `Team.Hint` as a suggestion, the level of its rule file, and `Other.Bland` as a warning, and exits 0
 
 #### Scenario: A rule turned off in a style no glob lists
 
@@ -41,6 +46,16 @@ The order of keys inside a glob SHALL NOT matter.
 
 - **WHEN** `files` holds `'*.md': {Team.Filler: warning}` and then `'a.md': {Team.Filler: off}`
 - **THEN** `a.md` runs nothing, and `b.md` runs `Team.Filler` as a warning
+
+#### Scenario: A rule turned back on
+
+- **WHEN** `files` holds `'*.md': {styles: [Team], Team.Harsh: off}` and then `'a.md': {Team.Harsh: on}`
+- **THEN** `a.md` runs `Team.Harsh` as an error, the level of its rule file, and `b.md` runs the rest of `Team`
+
+#### Scenario: A level that stays
+
+- **WHEN** `files` holds `'*.md': {Team.Hint: error}`, then `'a.md': {Team.Hint: off}`, then `'a?md': {Team.Hint: on}`
+- **THEN** `a.md` and `b.md` report `Team.Hint` as an error
 
 #### Scenario: A level set again
 

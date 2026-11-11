@@ -40,12 +40,12 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 ### Requirement: A rule setting is spelled as hakkiri's config spells it
 
-hakkiri SHALL turn a rule on by a level, and SHALL refuse a rule key that names no rule and a value that is no level, where Vale 3.26.0 reads other words.
+hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and SHALL refuse a rule key that names no rule and a value that is none of those words or a level.
 
 #### Scenario: A rule turned on at its own level
 
 - **WHEN** a glob turns a rule on without naming a level
-- **THEN** hakkiri has no word for it and the setting names a level, where Vale writes `YES` and keeps the rule's own level ([rule-setting 7][rule-setting-7])
+- **THEN** it sets the rule to `on`, where Vale writes `YES` ([rule-setting 7][rule-setting-7])
 
 #### Scenario: A key that names no rule
 

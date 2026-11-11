@@ -117,8 +117,9 @@ files:
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.
-- A rule name, such as `ProseStyle.BareURL`, sets that rule's level to `suggestion`, `warning` or `error`, or turns it `off`.
-  A level also runs the rule when no glob lists its style, as `Team.Terms: warning` does, and `off` on such a rule changes nothing.
+- A rule name, such as `ProseStyle.BareURL`, sets that rule's level to `suggestion`, `warning` or `error`, turns it `on` at the level of its rule file, or turns it `off`.
+  A level or `on` also runs the rule when no glob lists its style, as `Team.Terms: warning` does, and `off` on such a rule changes nothing.
+  A level set once stays when a later glob turns the rule `off` and `on` again.
   A name that no loaded style holds is an error that names it and its line.
 
 ## Differences from Vale
@@ -129,6 +130,6 @@ files:
 It prints the level in each line, and its JSON is one object, not a map from path to alerts.
 `--fail-level` takes the place of `--no-exit`.
 
-hakkiri turns a rule on by a level, since it reads no `YES`.
-A key that names no rule, or a word that is no level, is an error.
+hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.
+A key that names no rule, or a word that is neither a level, `on` nor `off`, is an error.
 Vale ignores the key, and warns and turns the rule off for the word.

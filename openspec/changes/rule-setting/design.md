@@ -16,6 +16,8 @@ The probes ran Vale `66bbb85` in a throwaway Linux box, over a style `Team` with
 `Team.Terms = YES` and `Team.Terms = error` under `BasedOnStyles = Extra` ran `Team.Terms`, at suggestion and at error.
 `Team.Terms = YES` alone, with no `BasedOnStyles`, ran only that rule.
 hakkiri runs a rule whose name a matching glob gives a level, whichever style holds it, at that level.
+The word `on` is `YES`: it runs the rule at the level of its rule file (operator, 2026-11-11).
+The reader gives a bare `on` as a string, as it gives `off`, in a flow and in a block map, so the setting needs no quotes.
 
 Alternative: keep running only the rules of listed styles.
 Lost: it is the gap this change closes, and a project that turned on one rule of a style would lose it.
@@ -29,6 +31,8 @@ hakkiri does the same, so `off` is a stop and never an enable.
 
 A later section won for the same rule: `NO` then `YES` ran it, `YES` then `NO` stopped it, and `warning` then `error` gave error on the file the later section matched.
 The order of keys inside one section did not matter.
+Vale keeps a level in its own map: `NO` turns a rule off without dropping the level, so `YES` after `error` and `NO` ran the rule at error.
+hakkiri keeps a switch and a level apart for the same reason.
 A rule turned on in a section that lists `Extra` kept running when a later section listed `Extra` alone, so a `styles` list replaces the list and leaves the rule settings.
 hakkiri keeps its single map, applied in glob order, and `styles` keeps replacing the list.
 
@@ -61,14 +65,13 @@ A test pins it.
 
 ### 7. What stays different
 
-- Vale reads `YES`, which turns a rule on at its own level.
-  hakkiri has no such word, so a setting that turns a rule on names a level.
+- Vale writes `YES` and `NO`, and hakkiri writes `on` and `off`.
 - Vale ignores a key that names no rule, such as `Team.Nope = YES` or a rule of a style no package holds.
   hakkiri refuses it with its line, which `project-config` already requires.
-- Vale reads a word that is no level, such as `yes`, with a warning and switches the rule off.
-  hakkiri refuses it.
+- Vale reads a word that is none of its words, such as `yes`, with a warning and switches the rule off.
+  hakkiri refuses a word that is neither a level, `on` nor `off`.
 
-Both departures go in `vale-differences`.
+These differences go in `vale-differences`.
 
 [v-merge]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L185-L211
 [plan]: https://github.com/victor-software-house/hakkiri/blob/bf04395ce723dbdcc2536b0fe099746f3d90d6ea/src/config.rs#L234
