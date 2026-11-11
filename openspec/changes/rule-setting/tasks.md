@@ -46,9 +46,23 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 4. Gate
 
-- [ ] 4.1 Pull request CI passes on the head of the pull request.  
+- [x] 4.1 Pull request CI passes on the head of the pull request.  
   Verify the checks of the head commit pass in the run on the pull request.
+  - 2026-11-11 (UTC), CI passed on the head of [PR 68][pr68], [aee57b0][c-head], in [run 42954833517][ci68].  
+    The Template check passed in [run 42954833405][tpl68], and the Secrets check in [run 42954833733][sec68].
+  - Main CI failed on [7e8fc5c][c-main] in [run 42955514585][ci-main], at `lint:prose`.  
+    Two lines of `design.md` broke rules that template v0.0.97 added, which merged beside PR 68.  
+    [e678c4f][c-fix] fixes both lines in [PR 69][pr69].
 
 [c-base]: https://github.com/victor-software-house/hakkiri/commit/bf04395ce723dbdcc2536b0fe099746f3d90d6ea
 [c-code]: https://github.com/victor-software-house/hakkiri/commit/0b15215ba10aa004b10d1221b0b5c99f38de020c
 [c-on]: https://github.com/victor-software-house/hakkiri/commit/80ae2110ce74a35ff000a6ebcd483f8349a11445
+[pr68]: https://github.com/victor-software-house/hakkiri/pull/68
+[c-head]: https://github.com/victor-software-house/hakkiri/commit/aee57b0d235b05a7c959418847dd97038711ffce
+[ci68]: https://github.com/victor-software-house/hakkiri/actions/runs/42954833517
+[tpl68]: https://github.com/victor-software-house/hakkiri/actions/runs/42954833405
+[sec68]: https://github.com/victor-software-house/hakkiri/actions/runs/42954833733
+[c-main]: https://github.com/victor-software-house/hakkiri/commit/7e8fc5c6288b10ec7b20b1930a3aea0f8fba74e0
+[ci-main]: https://github.com/victor-software-house/hakkiri/actions/runs/42955514585
+[c-fix]: https://github.com/victor-software-house/hakkiri/commit/e678c4fe40db172a9a974d8de19dd0af6bbedf48
+[pr69]: https://github.com/victor-software-house/hakkiri/pull/69
