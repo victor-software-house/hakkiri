@@ -19,10 +19,10 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 - **WHEN** a package's settings file holds a key hakkiri does not define
 - **THEN** hakkiri refuses it with the line and the package, and Vale warns that the key is not a core option and ignores it ([package settings 7][settings-7])
 
-#### Scenario: Packages that loop or nest deep
+#### Scenario: A deep chain of packages
 
-- **WHEN** a package lists itself through another package, or the chain is more than 10 packages deep
-- **THEN** hakkiri refuses it, and Vale follows each `Packages` entry with no check ([package settings 3][settings-3])
+- **WHEN** the chain of packages that list packages is more than 10 deep
+- **THEN** hakkiri refuses it, and Vale follows each `Packages` entry with no limit and no check for a loop ([package settings 3][settings-3])
 
 #### Scenario: A nested package pinned by path
 

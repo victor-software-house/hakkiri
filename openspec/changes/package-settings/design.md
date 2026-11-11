@@ -68,7 +68,10 @@ B and C lost because a second name for one schema costs a second page in the hel
 
 ### 3. Which keys a package may set, and nested packages
 
-`files`, `level`, `vocab` and `packages`, the keys of the project config.
+`files`, `level`, `vocab` and `packages`, the keys of the project config, in `.ctl/hakkiri.yaml` inside the package folder.
+The package folder is the folder of styles: the `path` of a project entry, or the `styles` folder of a fetched zip's top folder.
+It sits beside the `config` folder that holds a package's vocabularies, and a folder that starts with `.` is no style, so the file hides from the style walk.
+A package folder that holds the project's own config file, as `path: .` does, does not read it a second time.
 Vale applies a package's file as a project's, with only `StylesPath` dropped, so a package may set anything there.
 
 A package's `packages` are fetched, as Vale installs them, and the operator chose that (operator, 2026-11-11).
@@ -79,12 +82,16 @@ Vale sets no limit and no cycle check.
 `installPkg` calls `readPkg` for each name in the package's `Packages` and nothing records what is on the way ([sync.go][v-nested]); a search of `cmd/vale` for depth, cycle, visited and recursion finds no guard.
 Two packages that name each other therefore never end.
 This is read from the source, and was not run.
-hakkiri refuses a package that is its own ancestor, with an error that names the chain, and a chain more than 10 packages deep.
-The 10 matches the limit hakkiri sets on a chain of rules that extend each other, which Vale also sets at 10; it is the Vale figure for the nearest case and is open to change.
+hakkiri refuses a chain more than 10 packages deep.
+The 10 is the limit Vale sets on a chain of rules that extend each other, which hakkiri copies; it is the figure for the nearest case and is open to change.
+
+A cycle cannot occur in hakkiri.
+Each nested package is pinned by the hash of its zip, and a zip that listed itself would hold its own hash.
+Vale names a package by URL with no hash, so a loop is possible there, and Vale has no guard against one.
+The operator asked for a cycle to be refused; no check is written, because no config can reach the state, and the depth limit stops any long chain.
 
 A package named twice, by the project and by another package or by two packages, loads once, at the place of its first use.
-Two entries are the same package when they hold the same `url` and `sha256`.
-That is not a cycle.
+Two entries are the same package when they hold the same `sha256`, whatever the `url`, and two `path` entries when they name the same folder.
 
 Order: the nested packages of a package come before it, in the order written, so a package's own settings override those of the packages it lists.
 
@@ -126,8 +133,8 @@ The key is checked as the project's is, by the same type.
 ### 8. `vocab`
 
 The package vocabularies and the project's add up, in package order and then the project's.
-An empty `vocab` in the project drops what the packages named, as `NONE` does in Vale.
-`HKR-019` fixes the shape of the key, so this requirement is built after it.
+Vale's `NONE` clears the names before it; hakkiri has no such word for a list, and the operator's ruling on this change named none, so a project cannot drop a package's vocabulary.
+A name is checked as the project's is, by the vocabulary check of `HKR-019`.
 
 ## Risks
 

@@ -20,7 +20,7 @@ The operator decided that a package ships a settings file in hakkiri's own YAML 
 - A package file holds `files`, `level`, `vocab` and `packages`.
   Any other key is an error that names the key, the line and the package.
 - A package's `packages` are fetched like the project's, each pinned by `url` and `sha256`.
-  A cycle, and a chain more than 10 packages deep, is an error.
+  A chain more than 10 packages deep is an error.
 - The settings of a package that ships a rule `off` leave it off until the project turns it on.
 - The `vale-differences` spec records where this differs from how Vale 3.26.0 merges a package's `.vale.ini`.
 - A patch changeset ships the feature.
@@ -31,7 +31,7 @@ The operator ruled on 2026-11-11, and the design records each with its alternati
 
 1. **The file** is `.ctl/hakkiri.yaml` inside the package (operator, 2026-11-11).
 2. **Styles** add up under the same glob text and the project's list replaces the package's under another glob that matches the same files, as in Vale, with no warning (operator, 2026-11-11).
-3. **Nested packages** are fetched, as Vale does, pinned by `url` and `sha256`, with a cycle refused and a depth limit (operator, 2026-11-11).
+3. **Nested packages** are fetched, as Vale does, pinned by `url` and `sha256`, with a depth limit (operator, 2026-11-11).
 
 ## Capabilities
 

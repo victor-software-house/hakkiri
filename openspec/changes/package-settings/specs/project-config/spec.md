@@ -2,13 +2,13 @@
 
 ### Requirement: A package may ship a settings file
 
-hakkiri SHALL read `.ctl/hakkiri.yaml` inside each loaded package folder, when it exists, in the format of the project config.  
+hakkiri SHALL read `.ctl/hakkiri.yaml` inside each loaded package folder, the folder of styles, when it exists, in the format of the project config.  
 It SHALL apply the settings of each package before the project's own, in the order of `packages`, as if they were written ahead of the project's `files` entries.  
 A package with no such file SHALL change nothing.
 
 #### Scenario: A package turns a style on
 
-- **WHEN** the package `pkg` holds `styles/Team/Filler.yml` flagging `very` and `.ctl/hakkiri.yaml` with `files: {'*.md': {styles: [Team]}}`, the project config is `packages: [{path: pkg}]` with no `files`, and `a.md` holds `This is very good.`
+- **WHEN** the package folder `pkg` holds `Team/Filler.yml` flagging `very` and `.ctl/hakkiri.yaml` with `files: {'*.md': {styles: [Team]}}`, the project config is `packages: [{path: pkg}]` with no `files`, and `a.md` holds `This is very good.`
 - **THEN** hakkiri reports one warning from `Team.Filler` in `a.md`
 
 #### Scenario: A package with no settings file
@@ -18,8 +18,13 @@ A package with no such file SHALL change nothing.
 
 #### Scenario: A fetched package
 
-- **WHEN** a package pinned by `url` and `sha256` holds `.ctl/hakkiri.yaml`
+- **WHEN** a package pinned by `url` and `sha256` holds `styles/.ctl/hakkiri.yaml` in its top folder
 - **THEN** hakkiri reads it from the cache folder of the hash, with no further download
+
+#### Scenario: A package folder that holds the project config
+
+- **WHEN** the project config lists `path: .`, so the package folder holds the project's own `.ctl/hakkiri.yaml`
+- **THEN** hakkiri reads that file once, as the project's
 
 ### Requirement: The project overrides a package
 
@@ -92,8 +97,8 @@ A rule setting that names no loaded rule SHALL be an error, as in the project's 
 
 A package's `packages` SHALL be fetched like the project's, each entry holding a `url` and a `sha256`.  
 A `path` entry in a package's file SHALL be an error.  
-A package that is its own ancestor SHALL be an error that names the chain, and a chain more than 10 packages deep SHALL be an error.  
-A package named twice, by its `url` and `sha256`, SHALL load once, and the packages a package lists SHALL come before it, in the order written.
+A chain of packages more than 10 deep SHALL be an error.  
+A package named twice SHALL load once, by its `sha256` for a download and its folder for a `path`, and the packages a package lists SHALL come before it, in the order written.
 
 #### Scenario: A nested package
 
@@ -104,11 +109,6 @@ A package named twice, by its `url` and `sha256`, SHALL load once, and the packa
 
 - **WHEN** a package's file holds `packages: [{path: ../base}]` on line 2
 - **THEN** hakkiri reports an error naming `path`, line 2 and the package, and exits 2
-
-#### Scenario: A cycle
-
-- **WHEN** the package `a` lists `b` and `b` lists `a`
-- **THEN** hakkiri reports an error that names `a`, `b` and `a` again, and exits 2
 
 #### Scenario: Too deep
 
@@ -128,14 +128,14 @@ A package named twice, by its `url` and `sha256`, SHALL load once, and the packa
 ### Requirement: Package vocabularies and the project's add up
 
 The `vocab` names of the packages and the project SHALL add up, the packages' first.  
-An empty `vocab` in the project SHALL drop the names the packages gave.
+A name that no package holds, or that two packages hold, SHALL be an error on its line in the file that names it.
 
 #### Scenario: Two lists
 
 - **WHEN** a package sets `vocab: [Team]` and the project sets `vocab: [Own]`
 - **THEN** hakkiri reads the vocabularies `Team` and `Own`
 
-#### Scenario: An empty list
+#### Scenario: A name no package holds
 
-- **WHEN** the project sets `vocab: []`
-- **THEN** hakkiri reads no vocabulary named by a package
+- **WHEN** a package's `.ctl/hakkiri.yaml` holds `vocab: [Nope]` on line 1 and no loaded package holds `config/vocabularies/Nope`
+- **THEN** hakkiri reports an error naming `Nope`, line 1 and the package, and exits 2
