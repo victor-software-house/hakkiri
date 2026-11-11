@@ -1,0 +1,40 @@
+name: Release
+
+# verctl's reusable release workflow, on every push to main and on demand.
+# It plans every version commit not yet fully released and publishes each at
+# that commit: a tag and a GitHub Release with no registry upload
+# (publisher: none), then the tarballs .ctl/ver.yaml declares, each built
+# natively on its own hosted runner. Then it opens or updates the Version PR
+# on verctl/release/main.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One release run at a time. A newer run waits instead of cancelling one that
+# may be publishing; it plans every unreleased version commit, so the queued
+# run covers what any skipped one would have. The "-caller" part keeps this
+# group apart from the called workflow's own group.
+concurrency:
+  group: ${{ github.workflow }}-caller-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  release:
+    permissions:
+      contents: write # tags, Releases, assets, and verctl/release/main without the App
+      pull-requests: write # the Version PR without the App
+      id-token: write # every job of the reusable workflow requests it
+    uses: victor-software-house/verctl/.github/workflows/release.yml@bc30ea6f0924edd8554ef5444280d9ca52dd1851 # v0.8.0
+    with:
+      mise-version: 2026.11.5
+      mise-env: ci
+      # Nothing goes to crates.io, so there is no docs.rs page to wait for.
+      docs: false
+    # The App token opens the Version PR so that its CI starts; a PR opened
+    # with GITHUB_TOKEN starts no workflow.
+    secrets:
+      app-client-id: ${{ secrets.CHANGESET_VERSION_APP_CLIENT_ID }}
+      app-private-key: ${{ secrets.CHANGESET_VERSION_APP_PRIVATE_KEY }}

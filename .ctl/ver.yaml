@@ -1,0 +1,48 @@
+# Cargo.lock carries the version too, so a bump leaves it stale. `after`
+# regenerates it and `stage` puts it on the Version PR commit.
+prepare:
+  after: [cargo, update, --workspace]
+  stage: [Cargo.lock]
+
+# publish = false in Cargo.toml: the release is a tag, a GitHub Release, and
+# its tarballs, with no registry upload.
+packages:
+  - name: hakkiri
+    path: Cargo.toml
+    publisher: none
+
+# One key per host binary; the name is the job, the tarball, and the platform.
+# darwin-arm64 and linux-x64 are built-in records, so the runner labels (the
+# free macos-latest and ubuntu-latest), os, arch, and triple come from verctl.
+# Each builds natively with the runner's own C compiler, which tree-sitter's
+# grammars need, so nothing is cross-compiled. The linux-x64 build links glibc.
+assets:
+  darwin-arm64: {}
+  linux-x64: {}
+
+# Hand-written version spellings outside Cargo.toml. Each is named once and
+# listed by the file that carries it; too few or too many stop the release.
+patterns:
+  install:
+    match: "mise use github:victor-software-house/hakkiri@{version}"
+    whole_line: true
+    occurrences: once
+  skill:
+    match: "version: {version}"
+    whole_line: true
+    occurrences: once
+
+pins:
+  - file: README.md
+    package: hakkiri
+    patterns: [install]
+  - file: skills/hakkiri/SKILL.md
+    package: hakkiri
+    patterns: [skill]
+
+# Maintainers and Apps a changelog never credits.
+changelog:
+  internal_authors:
+    - any-victor
+    - "github-actions[bot]"
+    - "vsh-changeset-version[bot]"

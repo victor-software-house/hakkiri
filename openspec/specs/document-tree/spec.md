@@ -19,8 +19,9 @@ The node-segments spec states which ranges make the text of a node and how the s
 
 ### Requirement: Markdown nodes carry Vale scope names
 
-hakkiri SHALL give each Markdown node the scope the design's table names.  
-The table covers paragraphs, headings, block quotes, list items, table rows and cells, links, code spans, strong and emphasis text, and image alt text.
+hakkiri SHALL give each Markdown node the scope the [design's table][tree-4] names.  
+The table covers paragraphs, headings, block quotes, list items, table rows and cells, links, code spans, strong and emphasis text, and image alt text.  
+The text of an HTML block adds table and figure captions, the content of a `data` element as `meta`, and the description of a page.
 
 #### Scenario: A nested list
 
@@ -34,13 +35,19 @@ The table covers paragraphs, headings, block quotes, list items, table rows and 
 
 ### Requirement: Code and markup are not prose
 
-Fenced code, raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.  
-Inside a prose node, the node-segments spec makes such syntax a gap in the text.
+Fenced code, the tags of raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.  
+Inside a prose node, the node-segments spec makes such syntax a gap in the text.  
+The text inside an HTML block is prose, and the html-block-text spec states which text and under which scope.
 
 #### Scenario: A URL in a fenced block
 
 - **WHEN** a Markdown file holds a fenced block with `curl https://example.com`
 - **THEN** no prose node holds `https://example.com`, and the `raw` node of the file does
+
+#### Scenario: A tag and its text in an HTML block
+
+- **WHEN** a Markdown file holds an HTML block `<div class="note">Read this.</div>`
+- **THEN** the tree holds a `paragraph` node for `Read this.` and no prose node for `<div class="note">`
 
 ### Requirement: MDX keeps prose and leaves code out
 
@@ -198,3 +205,5 @@ A thematic break, a link definition and any other HTML block SHALL leave it free
 
 - **WHEN** a Markdown file holds a quote whose first child is the HTML block `<?php echo "<div>"; ?>` and whose second child is the paragraph `After the block.`
 - **THEN** the tree holds a `paragraph` node for `After the block.` that is not first in its quote
+
+[tree-4]: ../../changes/archive/2026-11-10-document-tree/design.md#4-scopes-from-mdast-nodes
