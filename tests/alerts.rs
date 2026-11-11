@@ -133,6 +133,85 @@ fn a_percent_sign() -> TestResult {
     Ok(())
 }
 
+/// The messages of the alerts that the `sequence` rule with `message` gives
+/// for `tokens` in the Markdown `source`.
+fn sequence_messages(
+    message: &str,
+    tokens: &str,
+    source: &str,
+) -> Result<Vec<String>, Box<dyn Error>> {
+    let rule = format!("extends: sequence\nmessage: \"{message}\"\ntokens: {tokens}\n");
+    Ok(markdown(&rule, source)?
+        .into_iter()
+        .map(|alert| alert.message)
+        .collect())
+}
+
+#[test]
+fn values_taken_by_number() -> TestResult {
+    assert_eq!(
+        sequence_messages(
+            "'%[2]s' follows '%[1]s'.",
+            "[{pattern: your}, {pattern: self}]",
+            "Do it your self.",
+        )?,
+        ["'self' follows 'your'."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_plain_verb_after_an_indexed_one() -> TestResult {
+    assert_eq!(
+        sequence_messages(
+            "%[2]s %s %[1]s %s.",
+            "[{pattern: red}, {pattern: green}, {pattern: blue}]",
+            "Paint it red green blue today.",
+        )?,
+        ["green blue red green."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_value_used_twice() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: \"'%[1]s' twice: '%[1]s'.\"\ntokens: [very]\n",
+        "It is very good.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.message.as_str()).collect::<Vec<_>>(),
+        ["'very' twice: 'very'."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_verb_with_no_value() -> TestResult {
+    assert_eq!(
+        sequence_messages(
+            "[%[3]s][%[0]s][%s]",
+            "[{pattern: red}, {pattern: green}]",
+            "Paint it red green today.",
+        )?,
+        ["[][][]"]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_bracket_that_is_no_verb_stays_as_written() -> TestResult {
+    assert_eq!(
+        sequence_messages(
+            "%[x]s %[1]d %[1 %[ %",
+            "[{pattern: red}]",
+            "Paint it red today.",
+        )?,
+        ["%[x]s %[1]d %[1 %[ %"]
+    );
+    Ok(())
+}
+
 #[test]
 fn a_match_across_markup_ends_at_its_last_character() -> TestResult {
     let found = markdown(

@@ -1,0 +1,36 @@
+# Only people say, tell, know, want or ask. This reads the part of speech, so any noun before such a verb counts.
+# Nouns for people and agents pass, and so does a symbol or word the tagger reads as a noun, such as 'okay' or 'cannot'.
+# ThingsSpeak matches the pronouns it, both and which.
+extends: sequence
+message: "'%[1]s %[2]s' gives a thing speech or thought: name what it holds, shows, marks or matches."
+level: error
+ignorecase: true
+exceptions:
+  - '(?i)\b(?:operator|operators|user|users|engineer|engineers|developer|developers|author|authors|reviewer|reviewers|maintainer|maintainers|owner|owners|team|teams|person|people|human|humans|writer|writers|reader|readers|lead|colleague|colleagues|customer|customers|contributor|contributors|member|members|manager|managers|admin|admins|agent|agents|model|models|assistant|claude|everyone|someone|nobody|anyone|researcher|researchers|company|vendor|committee|group|student|students|speaker|speakers|responder|responders|friend|friends|okay|cannot)\b'
+tokens:
+  - tag: NN|NNS
+    pattern: '[A-Za-z][\w-]*'
+  - pattern: says?|said|tells?|told|knows?|knew|thinks?|thought|wants?|agrees?|asks?|asked|believes?|hopes?|understands?|insists?
+tests:
+  - name: flags a noun for a thing that speaks or thinks
+    input: |
+      The state says it is not done. The adapter knows its names.
+
+      A request asks for the rows, and the docs say so.
+    contains:
+      - "'state says'"
+      - "'adapter knows'"
+      - "'request asks'"
+      - "'docs say'"
+  - name: leaves people, agents and literal verbs alone
+    input: >
+      The operator said to keep it. Our team wants a fix, and the reviewer
+      asked why. The agent thinks the build fails. The file holds the rows,
+      and the log shows the wait in `run.log` for PR #12.
+    want: ''
+  - name: leaves a person noun and a symbol alone
+    input: |
+      If a student tells me they are lost, I start again.
+
+      - ❌ Want to cut the size
+    want: ''

@@ -661,3 +661,22 @@ fn json_lists_an_uncovered_rule_as_an_object_with_files_only_for_a_shared_name()
     );
     Ok(())
 }
+
+/// `ProseStyle` v0.0.14 `NounStack` and `ThingsSpeakNoun` write their messages
+/// with `%[1]s` and `%[2]s`, and each rule's own cases look for the filled
+/// text.
+#[test]
+fn the_cases_of_two_rules_with_indexed_verbs_pass() -> TestResult {
+    let suite = Suite::new("test-indexed");
+    let root = suite.scenario("indexed");
+    let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/sequence-verbs/rules");
+    for name in ["NounStack", "ThingsSpeakNoun"] {
+        let rule = std::fs::read_to_string(fixture.join(format!("{name}.yml")))?;
+        root.file(format!("styles/ProseStyle/{name}.yml"), &rule);
+    }
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["2 files, 6 passed, 0 failed"]);
+    Ok(())
+}

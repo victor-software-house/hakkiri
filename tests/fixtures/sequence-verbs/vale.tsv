@@ -1,0 +1,11 @@
+Seq.NounStack	The session lake store path is long.	session lake store path	Noun stack 'session lake store path': put a verb or a preposition between the nouns.
+Seq.NounStack	Four more nouns follow: build cache key hash value is next.	build cache key hash	Noun stack 'build cache key hash': put a verb or a preposition between the nouns.
+Seq.NounStack	Four more nouns follow: build cache key hash value is next.	cache key hash value	Noun stack 'cache key hash value': put a verb or a preposition between the nouns.
+Seq.ThingsSpeakNoun	The state says it is not done.	state says	'state says' gives a thing speech or thought: name what it holds, shows, marks or matches.
+Seq.ThingsSpeakNoun	The adapter knows its names.	adapter knows	'adapter knows' gives a thing speech or thought: name what it holds, shows, marks or matches.
+Seq.ThingsSpeakNoun	A request asks for the rows, and the docs say so.	request asks	'request asks' gives a thing speech or thought: name what it holds, shows, marks or matches.
+Seq.ThingsSpeakNoun	A request asks for the rows, and the docs say so.	docs say	'docs say' gives a thing speech or thought: name what it holds, shows, marks or matches.
+Seq.Swapped	Do it your self.	your self	'self' follows 'your'.
+Seq.Continued	Paint it red green blue today.	red green blue	green blue red green.
+Seq.Mixed	Paint it red green blue today.	red green	red, red and green.
+Seq.Mixed	Paint it red green today.	red green	red, red and green.

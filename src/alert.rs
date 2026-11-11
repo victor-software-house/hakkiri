@@ -12,7 +12,7 @@ pub struct Alert {
     pub rule: String,
     /// The level of the alert.
     pub level: Level,
-    /// The rule's message with its `%s` filled.
+    /// The rule's message with its `%s` and `%[n]s` filled.
     pub message: String,
     /// The rule's description with its `%s` filled, empty when the rule has
     /// none.
@@ -33,36 +33,57 @@ pub struct Alert {
     pub action: Option<Action>,
 }
 
-/// Fills the `%s` of `template` with `values`, in order.
+/// Fills the `%s` and the indexed `%[n]s` of `template` with `values`, in
+/// order.
 ///
-/// `%%` is `%`. A `%s` with no value left is nothing, and a value left over is
-/// dropped. A `%` before any other character stays as written. A line break
-/// in a value is one space.
+/// `%[n]s` takes the `n`th value, counting from 1, and a `%s` after it takes
+/// the value that follows, as Go's `fmt` does and as Vale's messages rely on.
+/// `%%` is `%`. A `%s` or `%[n]s` with no value to take is nothing, and a value
+/// left over is dropped. A `%` before any other character stays as written. A
+/// line break in a value is one space.
 #[must_use]
 pub fn fill(template: &str, values: &[&str]) -> String {
     let mut out = String::with_capacity(template.len());
-    let mut values = values.iter();
-    let mut chars = template.chars().peekable();
-    while let Some(c) = chars.next() {
-        if c != '%' {
-            out.push(c);
+    let mut next = 0;
+    let mut rest = template;
+    while let Some(at) = rest.find('%') {
+        out.push_str(&rest[..at]);
+        rest = &rest[at + 1..];
+        let Some((index, after)) = verb(rest) else {
+            out.push('%');
+            if let Some(after) = rest.strip_prefix('%') {
+                rest = after;
+            }
             continue;
+        };
+        let position = index.map_or(Some(next), |number| number.checked_sub(1));
+        if let Some(position) = position {
+            next = position.saturating_add(1);
         }
-        match chars.peek() {
-            Some('%') => {
-                chars.next();
-                out.push('%');
-            }
-            Some('s') => {
-                chars.next();
-                if let Some(value) = values.next() {
-                    out.extend(value.chars().map(|v| if v == '\n' { ' ' } else { v }));
-                }
-            }
-            _ => out.push('%'),
+        if let Some(value) = position.and_then(|position| values.get(position)) {
+            out.extend(value.chars().map(|v| if v == '\n' { ' ' } else { v }));
         }
+        rest = after;
     }
+    out.push_str(rest);
     out
+}
+
+/// The verb `text`, the text after a `%`, starts, and the text after the verb.
+///
+/// A plain `s` has no number. `[n]s` has `n` in digits, and a number too large
+/// for `usize` reads as the largest, so it names no value.
+fn verb(text: &str) -> Option<(Option<usize>, &str)> {
+    if let Some(after) = text.strip_prefix('s') {
+        return Some((None, after));
+    }
+    let inside = text.strip_prefix('[')?;
+    let (number, tail) = inside.split_once(']')?;
+    if number.is_empty() || !number.bytes().all(|byte| byte.is_ascii_digit()) {
+        return None;
+    }
+    let after = tail.strip_prefix('s')?;
+    Some((Some(number.parse().unwrap_or(usize::MAX)), after))
 }
 
 /// Where the bytes of one file lie as lines and columns.

@@ -1,0 +1,26 @@
+# Four nouns in a row hide how they relate. Add a verb or a preposition.
+# Agent docs hit this 1.4 times as often as human design docs, so the evidence is thin.
+# Each noun is a lowercase word: a title-case heading, a table pipe or an arrow the tagger reads as a noun passes.
+# Source: Microsoft Writing Style Guide, "Writing tips for a global audience", "Avoid modifier stacks."
+extends: sequence
+message: "Noun stack '%[1]s %[2]s %[3]s %[4]s': put a verb or a preposition between the nouns."
+level: warning
+tokens:
+  - tag: NN|NNS
+    pattern: '[a-z][a-z-]*'
+    min: 4
+tests:
+  - name: flags four nouns in a row
+    input: The session lake store path is long.
+    contains: "'session lake store path'"
+  - name: leaves three nouns, and code spans, alone
+    input: >
+      The store path of the session lake is long. Run `cargo test` in
+      `crates/a-store/src/lib.rs` for PR #123 at commit `ee9f207`.
+    want: ''
+  - name: leaves title case and table symbols alone
+    input: |
+      Birds See Different Complementary Colors.
+
+      Read the Threads / Messages / Runs pages.
+    want: ''

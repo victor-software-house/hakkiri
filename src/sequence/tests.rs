@@ -47,9 +47,12 @@ fn alerts(name: &str, text: &str, sentence: &str) -> Result<Vec<(String, String)
         .collect())
 }
 
-#[test]
-fn walks_the_tokens_as_vale_does() -> TestResult {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/sequence");
+/// The texts of the fixture `directory` that have an alert, and what differs
+/// from Vale's rows in it.
+fn compare(directory: &str) -> Result<(usize, Vec<String>), Box<dyn Error>> {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures")
+        .join(directory);
     let inputs = fs::read_to_string(root.join("inputs.txt"))?;
     let fixture = fs::read_to_string(root.join("vale.tsv"))?;
     let mut expected: HashMap<(&str, &str), Vec<(String, String)>> = HashMap::new();
@@ -89,7 +92,25 @@ fn walks_the_tokens_as_vale_does() -> TestResult {
             }
         }
     }
+    Ok((with_alerts, wrong))
+}
+
+#[test]
+fn walks_the_tokens_as_vale_does() -> TestResult {
+    let (with_alerts, wrong) = compare("sequence")?;
     assert!(with_alerts > 150, "{with_alerts} texts with an alert");
+    assert_eq!(wrong, Vec::<String>::new());
+    Ok(())
+}
+
+/// The rules of `tests/fixtures/sequence-verbs` fill indexed verbs in the
+/// message: two `ProseStyle` rules from v0.0.14, and three that take the values
+/// out of order, after an index and mixed with plain `%s`. Vale gives each
+/// message through Go's `Sprintf`, so the rows are the messages it prints.
+#[test]
+fn fills_indexed_verbs_as_vale_does() -> TestResult {
+    let (with_alerts, wrong) = compare("sequence-verbs")?;
+    assert_eq!(with_alerts, 9, "{with_alerts} texts with an alert");
     assert_eq!(wrong, Vec::<String>::new());
     Ok(())
 }
