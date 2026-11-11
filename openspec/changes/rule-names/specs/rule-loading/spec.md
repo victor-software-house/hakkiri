@@ -20,7 +20,7 @@ A file named `*.test.yml` holds cases and is no rule.
 ### Requirement: A rule is named by its path
 
 hakkiri SHALL name a rule by its style folder, each folder between it and the file, and the file name up to its first dot, joined by dots, as Vale does.  
-A name with `[` or `]` SHALL be refused.  
+A name with `[` or `]` SHALL be refused when a glob lists the style.  
 `check`, `test` and `test --coverage` SHALL give a file one name.
 
 #### Scenario: A dotted file name
@@ -40,14 +40,20 @@ A name with `[` or `]` SHALL be refused.
 
 #### Scenario: A bracket in a name
 
-- **WHEN** the style folder `Team` holds `Weird[max].yml`
+- **WHEN** the style folder `Team` holds `Weird[max].yml`, and a glob lists `Team`
 - **THEN** hakkiri refuses it with an error that names the file and the rule name `Team.Weird[max]`
 
 ### Requirement: Two files with one name are refused
 
-hakkiri SHALL refuse a style folder in which two rule files give one rule name, with an error that names the rule and both files.
+hakkiri SHALL refuse a style folder in which two rule files give one rule name, when a glob lists the style, with an error that names the rule and both files.  
+A style no glob lists SHALL load with no error, as in Vale.
 
 #### Scenario: Terms.yml and Terms.custom.yml
 
-- **WHEN** the style folder `Team` holds `Terms.yml` and `Terms.custom.yml`
+- **WHEN** the style folder `Team` holds `Terms.yml` and `Terms.custom.yml`, and a glob lists `Team`
 - **THEN** hakkiri exits with a failure status, and the error names `Team.Terms`, `Terms.yml` and `Terms.custom.yml`
+
+#### Scenario: A clash or a bracket in a style no glob lists
+
+- **WHEN** the style folder `Team` holds `Terms.yml` and `Terms.custom.yml`, or `Weird[max].yml`, and no glob lists `Team`
+- **THEN** hakkiri lints with the other styles and exits as it would without `Team`
