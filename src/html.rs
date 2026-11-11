@@ -601,7 +601,7 @@ pub(crate) enum Place {
     List,
     /// A block quote: a `blockquote` is open.
     Blockquote,
-    /// A heading of this depth, 1 to 6.
+    /// A heading of this depth, 0 to 9.
     Heading(u8),
     /// A table header cell: a `th` is open.
     Header,
@@ -613,9 +613,6 @@ pub(crate) enum Place {
     FigureCaption,
     /// A `data` element is open.
     Meta,
-    /// A heading of a depth that does not exist, such as `h7`, which Vale
-    /// reads as a heading and hakkiri has no scope for: the text is not read.
-    Skipped,
 }
 
 impl Place {
@@ -634,10 +631,7 @@ impl Place {
                 "caption" => Self::TableCaption,
                 "figcaption" => Self::FigureCaption,
                 other => match other.as_bytes() {
-                    [b'h', depth @ b'0'..=b'9'] => match depth {
-                        b'1'..=b'6' => Self::Heading(depth - b'0'),
-                        _ => Self::Skipped,
-                    },
+                    [b'h', depth @ b'0'..=b'9'] => Self::Heading(depth - b'0'),
                     _ => continue,
                 },
             };
@@ -715,6 +709,39 @@ pub(crate) struct Walk {
 /// The whitespace Vale trims from a token's text.
 const fn is_blank_char(c: char) -> bool {
     matches!(c, ' ' | '\n' | '\r' | '\t' | '\x0c' | '\x0b')
+}
+
+/// The part of `raw` between its blank ends, where a reference that stands for
+/// blank text, such as `&#32;`, is blank too: Vale reads the references of a
+/// text before it trims it.
+fn trim_blank(raw: &str) -> Range<usize> {
+    let references = entity::references(raw, false);
+    let blank = |text: &str| text.chars().all(is_blank_char);
+    let mut start = 0;
+    let mut end = raw.len();
+    while start < end {
+        let rest = raw.get(start..end).unwrap_or_default();
+        let at = end - rest.trim_start_matches(is_blank_char).len();
+        let next = references
+            .iter()
+            .find(|(range, text)| range.start == at && range.end <= end && blank(text));
+        start = next.map_or(at, |(range, _)| range.end);
+        if next.is_none() {
+            break;
+        }
+    }
+    while end > start {
+        let rest = raw.get(start..end).unwrap_or_default();
+        let at = start + rest.trim_end_matches(is_blank_char).len();
+        let previous = references
+            .iter()
+            .find(|(range, text)| range.end == at && range.start >= start && blank(text));
+        end = previous.map_or(at, |(range, _)| range.start);
+        if previous.is_none() {
+            break;
+        }
+    }
+    start..end
 }
 
 /// The separator the source put at an end of a text: a line feed for a line
@@ -1157,10 +1184,9 @@ impl Walker {
         } else {
             body.chars().next_back()
         };
-        let start = range.end - raw.trim_start_matches(is_blank_char).len();
-        let end = start + raw.trim_matches(is_blank_char).len();
+        let kept = trim_blank(raw);
         self.pieces.push(Piece {
-            range: start..end,
+            range: range.start + kept.start..range.start + kept.end,
             // The text of a code span reads as `x`, and not as `*`.
             reading: Reading {
                 masked: reading.masked && !code,

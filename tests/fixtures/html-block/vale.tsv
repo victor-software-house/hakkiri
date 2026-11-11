@@ -1,6 +1,15 @@
 Scope.amp	entities.md	1	26	26	&
 Scope.amp	entity-tokens.md	1	11	11	&
 Scope.amp	entity-tokens.md	3	13	13	&
+Scope.amp	plaintext.md	2	7	7	&
+Scope.amp	plaintext.md	3	1	1	&
+Scope.amp	raw-references.md	10	7	7	&
+Scope.amp	raw-references.md	18	9	9	&
+Scope.amp	raw-references.md	2	7	7	&
+Scope.amp	raw-references.md	22	6	6	&
+Scope.amp	raw-references.md	26	5	5	&
+Scope.amp	raw-references.md	30	7	7	&
+Scope.amp	raw-references.md	6	6	6	&
 Scope.amp	references.md	1	10	10	&
 Scope.amp	references.md	17	12	12	&
 Scope.amp	references.md	19	8	8	&
@@ -82,6 +91,11 @@ Scope.dump-text	comments.md	1	13	70	marker after bang comment marker after comme
 Scope.dump-text	end-of-file.md	1	4	36	marker without newline at the end
 Scope.dump-text	entity-tokens.md	1	4	28	marker & marker here.
 Scope.dump-text	entity-tokens.md	3	6	29	marker & marker too.
+Scope.dump-text	heading-depths.md	10	1	12	marker eight
+Scope.dump-text	heading-depths.md	14	1	11	marker nine
+Scope.dump-text	heading-depths.md	18	1	10	marker six
+Scope.dump-text	heading-depths.md	2	1	12	marker seven
+Scope.dump-text	heading-depths.md	6	1	11	marker zero
 Scope.dump-text	headings-and-tables.md	1	5	13	marker h1
 Scope.dump-text	headings-and-tables.md	2	5	13	marker h3
 Scope.dump-text	headings-and-tables.md	3	17	26	marker cap
@@ -179,6 +193,7 @@ Scope.dump-text	other-block-tags.md	3	27	35	marker dd
 Scope.dump-text	other-block-tags.md	3	9	17	marker dt
 Scope.dump-text	other-block-tags.md	5	9	21	marker center
 Scope.dump-text	other-block-tags.md	7	21	34	marker caption
+Scope.dump-text	plaintext.md	2	1	55	alpha & plaintext marker\n&amp; plaintext marker
 Scope.dump-text	pre.md	5	1	12	Para marker.
 Scope.dump-text	promoted-blocks.md	1	4	46	a marker x b marker
 Scope.dump-text	promoted-blocks.md	11	6	8	a b
@@ -193,6 +208,13 @@ Scope.dump-text	promoted-blocks.md	9	8	18	marker head
 Scope.dump-text	quote-lines.md	2	3	45	marker one marker two marker three
 Scope.dump-text	quote-lines.md	6	3	26	Quoted marker paragraph.
 Scope.dump-text	quote-lines.md	8	13	39	marker nested in quote item
+Scope.dump-text	raw-references.md	10	1	18	gamma & marker
+Scope.dump-text	raw-references.md	18	1	20	epsilon & marker
+Scope.dump-text	raw-references.md	2	1	18	alpha & marker
+Scope.dump-text	raw-references.md	22	1	17	zeta & marker
+Scope.dump-text	raw-references.md	26	1	16	eta & marker
+Scope.dump-text	raw-references.md	30	1	22	theta &amp; marker
+Scope.dump-text	raw-references.md	6	1	17	beta & marker
 Scope.dump-text	raw-text-same-line.md	1	18	33	marker same line
 Scope.dump-text	raw-text-same-line.md	3	18	33	marker same line
 Scope.dump-text	raw-text-same-line.md	5	19	37	marker after script
@@ -201,6 +223,11 @@ Scope.dump-text	raw-text-tags.md	13	6	11	marker
 Scope.dump-text	raw-text-tags.md	15	10	15	marker
 Scope.dump-text	raw-text-tags.md	17	11	16	marker
 Scope.dump-text	raw-text-tags.md	9	11	16	marker
+Scope.dump-text	reference-spaces.md	1	4	8	alpha
+Scope.dump-text	reference-spaces.md	11	4	32	zeta y marker
+Scope.dump-text	reference-spaces.md	3	9	19	beta marker
+Scope.dump-text	reference-spaces.md	5	4	28	gamma x marker
+Scope.dump-text	reference-spaces.md	7	4	28	delta x marker
 Scope.dump-text	references.md	1	4	19	alpha & beta
 Scope.dump-text	references.md	13	4	17	lambda mu
 Scope.dump-text	references.md	15	4	22	nu ¬anentity; xi
@@ -288,13 +315,25 @@ Scope.existence-emphasis	promoted-blocks.md	15	13	18	marker
 Scope.existence-heading	block-scopes.md	13	5	10	marker
 Scope.existence-heading	captions-data-meta.md	37	1	6	marker
 Scope.existence-heading	captions-data-meta.md	41	1	6	marker
+Scope.existence-heading	heading-depths.md	10	1	6	marker
+Scope.existence-heading	heading-depths.md	14	1	6	marker
+Scope.existence-heading	heading-depths.md	18	1	6	marker
+Scope.existence-heading	heading-depths.md	2	1	6	marker
+Scope.existence-heading	heading-depths.md	6	1	6	marker
 Scope.existence-heading	headings-and-tables.md	1	5	10	marker
 Scope.existence-heading	headings-and-tables.md	2	5	10	marker
 Scope.existence-heading	references.md	37	16	21	marker
 Scope.existence-heading-h2	block-scopes.md	13	5	10	marker
+Scope.existence-heading-h7	captions-data-meta.md	37	1	6	marker
+Scope.existence-heading-h7	heading-depths.md	2	1	6	marker
 Scope.existence-heading-not-blockquote	block-scopes.md	13	5	10	marker
 Scope.existence-heading-not-blockquote	captions-data-meta.md	37	1	6	marker
 Scope.existence-heading-not-blockquote	captions-data-meta.md	41	1	6	marker
+Scope.existence-heading-not-blockquote	heading-depths.md	10	1	6	marker
+Scope.existence-heading-not-blockquote	heading-depths.md	14	1	6	marker
+Scope.existence-heading-not-blockquote	heading-depths.md	18	1	6	marker
+Scope.existence-heading-not-blockquote	heading-depths.md	2	1	6	marker
+Scope.existence-heading-not-blockquote	heading-depths.md	6	1	6	marker
 Scope.existence-heading-not-blockquote	headings-and-tables.md	1	5	10	marker
 Scope.existence-heading-not-blockquote	headings-and-tables.md	2	5	10	marker
 Scope.existence-heading-not-blockquote	references.md	37	16	21	marker
@@ -325,6 +364,11 @@ Scope.existence-list-or-heading	block-scopes.md	10	5	10	marker
 Scope.existence-list-or-heading	block-scopes.md	13	5	10	marker
 Scope.existence-list-or-heading	captions-data-meta.md	37	1	6	marker
 Scope.existence-list-or-heading	captions-data-meta.md	41	1	6	marker
+Scope.existence-list-or-heading	heading-depths.md	10	1	6	marker
+Scope.existence-list-or-heading	heading-depths.md	14	1	6	marker
+Scope.existence-list-or-heading	heading-depths.md	18	1	6	marker
+Scope.existence-list-or-heading	heading-depths.md	2	1	6	marker
+Scope.existence-list-or-heading	heading-depths.md	6	1	6	marker
 Scope.existence-list-or-heading	headings-and-tables.md	1	5	10	marker
 Scope.existence-list-or-heading	headings-and-tables.md	2	5	10	marker
 Scope.existence-list-or-heading	in-item-and-quote.md	1	8	13	marker
@@ -421,6 +465,8 @@ Scope.existence-paragraph	other-block-tags.md	1	43	48	marker
 Scope.existence-paragraph	other-block-tags.md	3	27	32	marker
 Scope.existence-paragraph	other-block-tags.md	3	9	14	marker
 Scope.existence-paragraph	other-block-tags.md	5	9	14	marker
+Scope.existence-paragraph	plaintext.md	2	23	28	marker
+Scope.existence-paragraph	plaintext.md	3	21	26	marker
 Scope.existence-paragraph	pre.md	5	6	11	marker
 Scope.existence-paragraph	promoted-blocks.md	1	17	22	marker
 Scope.existence-paragraph	promoted-blocks.md	1	41	46	marker
@@ -431,6 +477,13 @@ Scope.existence-paragraph	promoted-blocks.md	7	15	20	marker
 Scope.existence-paragraph	promoted-blocks.md	7	31	36	marker
 Scope.existence-paragraph	promoted-blocks.md	9	8	13	marker
 Scope.existence-paragraph	quote-lines.md	6	10	15	marker
+Scope.existence-paragraph	raw-references.md	10	13	18	marker
+Scope.existence-paragraph	raw-references.md	18	15	20	marker
+Scope.existence-paragraph	raw-references.md	2	13	18	marker
+Scope.existence-paragraph	raw-references.md	22	12	17	marker
+Scope.existence-paragraph	raw-references.md	26	11	16	marker
+Scope.existence-paragraph	raw-references.md	30	17	22	marker
+Scope.existence-paragraph	raw-references.md	6	12	17	marker
 Scope.existence-paragraph	raw-text-same-line.md	1	18	23	marker
 Scope.existence-paragraph	raw-text-same-line.md	3	18	23	marker
 Scope.existence-paragraph	raw-text-same-line.md	5	19	24	marker
@@ -439,6 +492,10 @@ Scope.existence-paragraph	raw-text-tags.md	13	6	11	marker
 Scope.existence-paragraph	raw-text-tags.md	15	10	15	marker
 Scope.existence-paragraph	raw-text-tags.md	17	11	16	marker
 Scope.existence-paragraph	raw-text-tags.md	9	11	16	marker
+Scope.existence-paragraph	reference-spaces.md	11	27	32	marker
+Scope.existence-paragraph	reference-spaces.md	3	14	19	marker
+Scope.existence-paragraph	reference-spaces.md	5	23	28	marker
+Scope.existence-paragraph	reference-spaces.md	7	23	28	marker
 Scope.existence-paragraph	references.md	11	13	18	marker
 Scope.existence-paragraph	references.md	27	13	18	marker
 Scope.existence-paragraph	references.md	29	15	20	marker
@@ -550,6 +607,8 @@ Scope.existence-paragraph-not-list	other-block-tags.md	1	43	48	marker
 Scope.existence-paragraph-not-list	other-block-tags.md	3	27	32	marker
 Scope.existence-paragraph-not-list	other-block-tags.md	3	9	14	marker
 Scope.existence-paragraph-not-list	other-block-tags.md	5	9	14	marker
+Scope.existence-paragraph-not-list	plaintext.md	2	23	28	marker
+Scope.existence-paragraph-not-list	plaintext.md	3	21	26	marker
 Scope.existence-paragraph-not-list	pre.md	5	6	11	marker
 Scope.existence-paragraph-not-list	promoted-blocks.md	1	17	22	marker
 Scope.existence-paragraph-not-list	promoted-blocks.md	1	41	46	marker
@@ -560,6 +619,13 @@ Scope.existence-paragraph-not-list	promoted-blocks.md	7	15	20	marker
 Scope.existence-paragraph-not-list	promoted-blocks.md	7	31	36	marker
 Scope.existence-paragraph-not-list	promoted-blocks.md	9	8	13	marker
 Scope.existence-paragraph-not-list	quote-lines.md	6	10	15	marker
+Scope.existence-paragraph-not-list	raw-references.md	10	13	18	marker
+Scope.existence-paragraph-not-list	raw-references.md	18	15	20	marker
+Scope.existence-paragraph-not-list	raw-references.md	2	13	18	marker
+Scope.existence-paragraph-not-list	raw-references.md	22	12	17	marker
+Scope.existence-paragraph-not-list	raw-references.md	26	11	16	marker
+Scope.existence-paragraph-not-list	raw-references.md	30	17	22	marker
+Scope.existence-paragraph-not-list	raw-references.md	6	12	17	marker
 Scope.existence-paragraph-not-list	raw-text-same-line.md	1	18	23	marker
 Scope.existence-paragraph-not-list	raw-text-same-line.md	3	18	23	marker
 Scope.existence-paragraph-not-list	raw-text-same-line.md	5	19	24	marker
@@ -568,6 +634,10 @@ Scope.existence-paragraph-not-list	raw-text-tags.md	13	6	11	marker
 Scope.existence-paragraph-not-list	raw-text-tags.md	15	10	15	marker
 Scope.existence-paragraph-not-list	raw-text-tags.md	17	11	16	marker
 Scope.existence-paragraph-not-list	raw-text-tags.md	9	11	16	marker
+Scope.existence-paragraph-not-list	reference-spaces.md	11	27	32	marker
+Scope.existence-paragraph-not-list	reference-spaces.md	3	14	19	marker
+Scope.existence-paragraph-not-list	reference-spaces.md	5	23	28	marker
+Scope.existence-paragraph-not-list	reference-spaces.md	7	23	28	marker
 Scope.existence-paragraph-not-list	references.md	11	13	18	marker
 Scope.existence-paragraph-not-list	references.md	27	13	18	marker
 Scope.existence-paragraph-not-list	references.md	29	15	20	marker
@@ -637,6 +707,11 @@ Scope.existence-sentence	entity-tokens.md	1	17	22	marker
 Scope.existence-sentence	entity-tokens.md	1	4	9	marker
 Scope.existence-sentence	entity-tokens.md	3	19	24	marker
 Scope.existence-sentence	entity-tokens.md	3	6	11	marker
+Scope.existence-sentence	heading-depths.md	10	1	6	marker
+Scope.existence-sentence	heading-depths.md	14	1	6	marker
+Scope.existence-sentence	heading-depths.md	18	1	6	marker
+Scope.existence-sentence	heading-depths.md	2	1	6	marker
+Scope.existence-sentence	heading-depths.md	6	1	6	marker
 Scope.existence-sentence	headings-and-tables.md	1	5	10	marker
 Scope.existence-sentence	headings-and-tables.md	2	5	10	marker
 Scope.existence-sentence	headings-and-tables.md	3	17	22	marker
@@ -707,6 +782,8 @@ Scope.existence-sentence	other-block-tags.md	3	27	32	marker
 Scope.existence-sentence	other-block-tags.md	3	9	14	marker
 Scope.existence-sentence	other-block-tags.md	5	9	14	marker
 Scope.existence-sentence	other-block-tags.md	7	21	26	marker
+Scope.existence-sentence	plaintext.md	2	23	28	marker
+Scope.existence-sentence	plaintext.md	3	21	26	marker
 Scope.existence-sentence	pre.md	5	6	11	marker
 Scope.existence-sentence	promoted-blocks.md	1	17	22	marker
 Scope.existence-sentence	promoted-blocks.md	1	41	46	marker
@@ -721,6 +798,13 @@ Scope.existence-sentence	quote-lines.md	3	21	26	marker
 Scope.existence-sentence	quote-lines.md	3	6	11	marker
 Scope.existence-sentence	quote-lines.md	6	10	15	marker
 Scope.existence-sentence	quote-lines.md	8	13	18	marker
+Scope.existence-sentence	raw-references.md	10	13	18	marker
+Scope.existence-sentence	raw-references.md	18	15	20	marker
+Scope.existence-sentence	raw-references.md	2	13	18	marker
+Scope.existence-sentence	raw-references.md	22	12	17	marker
+Scope.existence-sentence	raw-references.md	26	11	16	marker
+Scope.existence-sentence	raw-references.md	30	17	22	marker
+Scope.existence-sentence	raw-references.md	6	12	17	marker
 Scope.existence-sentence	raw-text-same-line.md	1	18	23	marker
 Scope.existence-sentence	raw-text-same-line.md	3	18	23	marker
 Scope.existence-sentence	raw-text-same-line.md	5	19	24	marker
@@ -729,6 +813,10 @@ Scope.existence-sentence	raw-text-tags.md	13	6	11	marker
 Scope.existence-sentence	raw-text-tags.md	15	10	15	marker
 Scope.existence-sentence	raw-text-tags.md	17	11	16	marker
 Scope.existence-sentence	raw-text-tags.md	9	11	16	marker
+Scope.existence-sentence	reference-spaces.md	11	27	32	marker
+Scope.existence-sentence	reference-spaces.md	3	14	19	marker
+Scope.existence-sentence	reference-spaces.md	5	23	28	marker
+Scope.existence-sentence	reference-spaces.md	7	23	28	marker
 Scope.existence-sentence	references.md	11	13	18	marker
 Scope.existence-sentence	references.md	27	13	18	marker
 Scope.existence-sentence	references.md	29	15	20	marker
@@ -783,6 +871,11 @@ Scope.existence-sentence-dot-list	references.md	57	19	24	marker
 Scope.existence-sentence-heading	block-scopes.md	13	5	10	marker
 Scope.existence-sentence-heading	captions-data-meta.md	37	1	6	marker
 Scope.existence-sentence-heading	captions-data-meta.md	41	1	6	marker
+Scope.existence-sentence-heading	heading-depths.md	10	1	6	marker
+Scope.existence-sentence-heading	heading-depths.md	14	1	6	marker
+Scope.existence-sentence-heading	heading-depths.md	18	1	6	marker
+Scope.existence-sentence-heading	heading-depths.md	2	1	6	marker
+Scope.existence-sentence-heading	heading-depths.md	6	1	6	marker
 Scope.existence-sentence-heading	headings-and-tables.md	1	5	10	marker
 Scope.existence-sentence-heading	headings-and-tables.md	2	5	10	marker
 Scope.existence-sentence-heading	references.md	37	16	21	marker
@@ -847,6 +940,11 @@ Scope.existence-sentence-not-blockquote	entity-tokens.md	1	17	22	marker
 Scope.existence-sentence-not-blockquote	entity-tokens.md	1	4	9	marker
 Scope.existence-sentence-not-blockquote	entity-tokens.md	3	19	24	marker
 Scope.existence-sentence-not-blockquote	entity-tokens.md	3	6	11	marker
+Scope.existence-sentence-not-blockquote	heading-depths.md	10	1	6	marker
+Scope.existence-sentence-not-blockquote	heading-depths.md	14	1	6	marker
+Scope.existence-sentence-not-blockquote	heading-depths.md	18	1	6	marker
+Scope.existence-sentence-not-blockquote	heading-depths.md	2	1	6	marker
+Scope.existence-sentence-not-blockquote	heading-depths.md	6	1	6	marker
 Scope.existence-sentence-not-blockquote	headings-and-tables.md	1	5	10	marker
 Scope.existence-sentence-not-blockquote	headings-and-tables.md	2	5	10	marker
 Scope.existence-sentence-not-blockquote	headings-and-tables.md	3	17	22	marker
@@ -914,6 +1012,8 @@ Scope.existence-sentence-not-blockquote	other-block-tags.md	3	27	32	marker
 Scope.existence-sentence-not-blockquote	other-block-tags.md	3	9	14	marker
 Scope.existence-sentence-not-blockquote	other-block-tags.md	5	9	14	marker
 Scope.existence-sentence-not-blockquote	other-block-tags.md	7	21	26	marker
+Scope.existence-sentence-not-blockquote	plaintext.md	2	23	28	marker
+Scope.existence-sentence-not-blockquote	plaintext.md	3	21	26	marker
 Scope.existence-sentence-not-blockquote	pre.md	5	6	11	marker
 Scope.existence-sentence-not-blockquote	promoted-blocks.md	1	17	22	marker
 Scope.existence-sentence-not-blockquote	promoted-blocks.md	1	41	46	marker
@@ -924,6 +1024,13 @@ Scope.existence-sentence-not-blockquote	promoted-blocks.md	7	15	20	marker
 Scope.existence-sentence-not-blockquote	promoted-blocks.md	7	31	36	marker
 Scope.existence-sentence-not-blockquote	promoted-blocks.md	9	8	13	marker
 Scope.existence-sentence-not-blockquote	quote-lines.md	6	10	15	marker
+Scope.existence-sentence-not-blockquote	raw-references.md	10	13	18	marker
+Scope.existence-sentence-not-blockquote	raw-references.md	18	15	20	marker
+Scope.existence-sentence-not-blockquote	raw-references.md	2	13	18	marker
+Scope.existence-sentence-not-blockquote	raw-references.md	22	12	17	marker
+Scope.existence-sentence-not-blockquote	raw-references.md	26	11	16	marker
+Scope.existence-sentence-not-blockquote	raw-references.md	30	17	22	marker
+Scope.existence-sentence-not-blockquote	raw-references.md	6	12	17	marker
 Scope.existence-sentence-not-blockquote	raw-text-same-line.md	1	18	23	marker
 Scope.existence-sentence-not-blockquote	raw-text-same-line.md	3	18	23	marker
 Scope.existence-sentence-not-blockquote	raw-text-same-line.md	5	19	24	marker
@@ -932,6 +1039,10 @@ Scope.existence-sentence-not-blockquote	raw-text-tags.md	13	6	11	marker
 Scope.existence-sentence-not-blockquote	raw-text-tags.md	15	10	15	marker
 Scope.existence-sentence-not-blockquote	raw-text-tags.md	17	11	16	marker
 Scope.existence-sentence-not-blockquote	raw-text-tags.md	9	11	16	marker
+Scope.existence-sentence-not-blockquote	reference-spaces.md	11	27	32	marker
+Scope.existence-sentence-not-blockquote	reference-spaces.md	3	14	19	marker
+Scope.existence-sentence-not-blockquote	reference-spaces.md	5	23	28	marker
+Scope.existence-sentence-not-blockquote	reference-spaces.md	7	23	28	marker
 Scope.existence-sentence-not-blockquote	references.md	11	13	18	marker
 Scope.existence-sentence-not-blockquote	references.md	27	13	18	marker
 Scope.existence-sentence-not-blockquote	references.md	29	15	20	marker
@@ -1070,6 +1181,8 @@ Scope.existence-sentence-not-heading	other-block-tags.md	3	27	32	marker
 Scope.existence-sentence-not-heading	other-block-tags.md	3	9	14	marker
 Scope.existence-sentence-not-heading	other-block-tags.md	5	9	14	marker
 Scope.existence-sentence-not-heading	other-block-tags.md	7	21	26	marker
+Scope.existence-sentence-not-heading	plaintext.md	2	23	28	marker
+Scope.existence-sentence-not-heading	plaintext.md	3	21	26	marker
 Scope.existence-sentence-not-heading	pre.md	5	6	11	marker
 Scope.existence-sentence-not-heading	promoted-blocks.md	1	17	22	marker
 Scope.existence-sentence-not-heading	promoted-blocks.md	1	41	46	marker
@@ -1084,6 +1197,13 @@ Scope.existence-sentence-not-heading	quote-lines.md	3	21	26	marker
 Scope.existence-sentence-not-heading	quote-lines.md	3	6	11	marker
 Scope.existence-sentence-not-heading	quote-lines.md	6	10	15	marker
 Scope.existence-sentence-not-heading	quote-lines.md	8	13	18	marker
+Scope.existence-sentence-not-heading	raw-references.md	10	13	18	marker
+Scope.existence-sentence-not-heading	raw-references.md	18	15	20	marker
+Scope.existence-sentence-not-heading	raw-references.md	2	13	18	marker
+Scope.existence-sentence-not-heading	raw-references.md	22	12	17	marker
+Scope.existence-sentence-not-heading	raw-references.md	26	11	16	marker
+Scope.existence-sentence-not-heading	raw-references.md	30	17	22	marker
+Scope.existence-sentence-not-heading	raw-references.md	6	12	17	marker
 Scope.existence-sentence-not-heading	raw-text-same-line.md	1	18	23	marker
 Scope.existence-sentence-not-heading	raw-text-same-line.md	3	18	23	marker
 Scope.existence-sentence-not-heading	raw-text-same-line.md	5	19	24	marker
@@ -1092,6 +1212,10 @@ Scope.existence-sentence-not-heading	raw-text-tags.md	13	6	11	marker
 Scope.existence-sentence-not-heading	raw-text-tags.md	15	10	15	marker
 Scope.existence-sentence-not-heading	raw-text-tags.md	17	11	16	marker
 Scope.existence-sentence-not-heading	raw-text-tags.md	9	11	16	marker
+Scope.existence-sentence-not-heading	reference-spaces.md	11	27	32	marker
+Scope.existence-sentence-not-heading	reference-spaces.md	3	14	19	marker
+Scope.existence-sentence-not-heading	reference-spaces.md	5	23	28	marker
+Scope.existence-sentence-not-heading	reference-spaces.md	7	23	28	marker
 Scope.existence-sentence-not-heading	references.md	11	13	18	marker
 Scope.existence-sentence-not-heading	references.md	27	13	18	marker
 Scope.existence-sentence-not-heading	references.md	29	15	20	marker
@@ -1164,6 +1288,11 @@ Scope.existence-sentence-not-list	entity-tokens.md	1	17	22	marker
 Scope.existence-sentence-not-list	entity-tokens.md	1	4	9	marker
 Scope.existence-sentence-not-list	entity-tokens.md	3	19	24	marker
 Scope.existence-sentence-not-list	entity-tokens.md	3	6	11	marker
+Scope.existence-sentence-not-list	heading-depths.md	10	1	6	marker
+Scope.existence-sentence-not-list	heading-depths.md	14	1	6	marker
+Scope.existence-sentence-not-list	heading-depths.md	18	1	6	marker
+Scope.existence-sentence-not-list	heading-depths.md	2	1	6	marker
+Scope.existence-sentence-not-list	heading-depths.md	6	1	6	marker
 Scope.existence-sentence-not-list	headings-and-tables.md	1	5	10	marker
 Scope.existence-sentence-not-list	headings-and-tables.md	2	5	10	marker
 Scope.existence-sentence-not-list	headings-and-tables.md	3	17	22	marker
@@ -1226,6 +1355,8 @@ Scope.existence-sentence-not-list	other-block-tags.md	3	27	32	marker
 Scope.existence-sentence-not-list	other-block-tags.md	3	9	14	marker
 Scope.existence-sentence-not-list	other-block-tags.md	5	9	14	marker
 Scope.existence-sentence-not-list	other-block-tags.md	7	21	26	marker
+Scope.existence-sentence-not-list	plaintext.md	2	23	28	marker
+Scope.existence-sentence-not-list	plaintext.md	3	21	26	marker
 Scope.existence-sentence-not-list	pre.md	5	6	11	marker
 Scope.existence-sentence-not-list	promoted-blocks.md	1	17	22	marker
 Scope.existence-sentence-not-list	promoted-blocks.md	1	41	46	marker
@@ -1240,6 +1371,13 @@ Scope.existence-sentence-not-list	quote-lines.md	3	21	26	marker
 Scope.existence-sentence-not-list	quote-lines.md	3	6	11	marker
 Scope.existence-sentence-not-list	quote-lines.md	6	10	15	marker
 Scope.existence-sentence-not-list	quote-lines.md	8	13	18	marker
+Scope.existence-sentence-not-list	raw-references.md	10	13	18	marker
+Scope.existence-sentence-not-list	raw-references.md	18	15	20	marker
+Scope.existence-sentence-not-list	raw-references.md	2	13	18	marker
+Scope.existence-sentence-not-list	raw-references.md	22	12	17	marker
+Scope.existence-sentence-not-list	raw-references.md	26	11	16	marker
+Scope.existence-sentence-not-list	raw-references.md	30	17	22	marker
+Scope.existence-sentence-not-list	raw-references.md	6	12	17	marker
 Scope.existence-sentence-not-list	raw-text-same-line.md	1	18	23	marker
 Scope.existence-sentence-not-list	raw-text-same-line.md	3	18	23	marker
 Scope.existence-sentence-not-list	raw-text-same-line.md	5	19	24	marker
@@ -1248,6 +1386,10 @@ Scope.existence-sentence-not-list	raw-text-tags.md	13	6	11	marker
 Scope.existence-sentence-not-list	raw-text-tags.md	15	10	15	marker
 Scope.existence-sentence-not-list	raw-text-tags.md	17	11	16	marker
 Scope.existence-sentence-not-list	raw-text-tags.md	9	11	16	marker
+Scope.existence-sentence-not-list	reference-spaces.md	11	27	32	marker
+Scope.existence-sentence-not-list	reference-spaces.md	3	14	19	marker
+Scope.existence-sentence-not-list	reference-spaces.md	5	23	28	marker
+Scope.existence-sentence-not-list	reference-spaces.md	7	23	28	marker
 Scope.existence-sentence-not-list	references.md	11	13	18	marker
 Scope.existence-sentence-not-list	references.md	27	13	18	marker
 Scope.existence-sentence-not-list	references.md	29	15	20	marker
@@ -1315,6 +1457,11 @@ Scope.existence-sentence-not-table	entity-tokens.md	1	17	22	marker
 Scope.existence-sentence-not-table	entity-tokens.md	1	4	9	marker
 Scope.existence-sentence-not-table	entity-tokens.md	3	19	24	marker
 Scope.existence-sentence-not-table	entity-tokens.md	3	6	11	marker
+Scope.existence-sentence-not-table	heading-depths.md	10	1	6	marker
+Scope.existence-sentence-not-table	heading-depths.md	14	1	6	marker
+Scope.existence-sentence-not-table	heading-depths.md	18	1	6	marker
+Scope.existence-sentence-not-table	heading-depths.md	2	1	6	marker
+Scope.existence-sentence-not-table	heading-depths.md	6	1	6	marker
 Scope.existence-sentence-not-table	headings-and-tables.md	1	5	10	marker
 Scope.existence-sentence-not-table	headings-and-tables.md	2	5	10	marker
 Scope.existence-sentence-not-table	in-item-and-quote.md	1	8	13	marker
@@ -1383,6 +1530,8 @@ Scope.existence-sentence-not-table	other-block-tags.md	3	27	32	marker
 Scope.existence-sentence-not-table	other-block-tags.md	3	9	14	marker
 Scope.existence-sentence-not-table	other-block-tags.md	5	9	14	marker
 Scope.existence-sentence-not-table	other-block-tags.md	7	21	26	marker
+Scope.existence-sentence-not-table	plaintext.md	2	23	28	marker
+Scope.existence-sentence-not-table	plaintext.md	3	21	26	marker
 Scope.existence-sentence-not-table	pre.md	5	6	11	marker
 Scope.existence-sentence-not-table	promoted-blocks.md	1	17	22	marker
 Scope.existence-sentence-not-table	promoted-blocks.md	1	41	46	marker
@@ -1397,6 +1546,13 @@ Scope.existence-sentence-not-table	quote-lines.md	3	21	26	marker
 Scope.existence-sentence-not-table	quote-lines.md	3	6	11	marker
 Scope.existence-sentence-not-table	quote-lines.md	6	10	15	marker
 Scope.existence-sentence-not-table	quote-lines.md	8	13	18	marker
+Scope.existence-sentence-not-table	raw-references.md	10	13	18	marker
+Scope.existence-sentence-not-table	raw-references.md	18	15	20	marker
+Scope.existence-sentence-not-table	raw-references.md	2	13	18	marker
+Scope.existence-sentence-not-table	raw-references.md	22	12	17	marker
+Scope.existence-sentence-not-table	raw-references.md	26	11	16	marker
+Scope.existence-sentence-not-table	raw-references.md	30	17	22	marker
+Scope.existence-sentence-not-table	raw-references.md	6	12	17	marker
 Scope.existence-sentence-not-table	raw-text-same-line.md	1	18	23	marker
 Scope.existence-sentence-not-table	raw-text-same-line.md	3	18	23	marker
 Scope.existence-sentence-not-table	raw-text-same-line.md	5	19	24	marker
@@ -1405,6 +1561,10 @@ Scope.existence-sentence-not-table	raw-text-tags.md	13	6	11	marker
 Scope.existence-sentence-not-table	raw-text-tags.md	15	10	15	marker
 Scope.existence-sentence-not-table	raw-text-tags.md	17	11	16	marker
 Scope.existence-sentence-not-table	raw-text-tags.md	9	11	16	marker
+Scope.existence-sentence-not-table	reference-spaces.md	11	27	32	marker
+Scope.existence-sentence-not-table	reference-spaces.md	3	14	19	marker
+Scope.existence-sentence-not-table	reference-spaces.md	5	23	28	marker
+Scope.existence-sentence-not-table	reference-spaces.md	7	23	28	marker
 Scope.existence-sentence-not-table	references.md	11	13	18	marker
 Scope.existence-sentence-not-table	references.md	27	13	18	marker
 Scope.existence-sentence-not-table	references.md	29	15	20	marker
@@ -1528,6 +1688,11 @@ Scope.existence-text	entity-tokens.md	1	17	22	marker
 Scope.existence-text	entity-tokens.md	1	4	9	marker
 Scope.existence-text	entity-tokens.md	3	19	24	marker
 Scope.existence-text	entity-tokens.md	3	6	11	marker
+Scope.existence-text	heading-depths.md	10	1	6	marker
+Scope.existence-text	heading-depths.md	14	1	6	marker
+Scope.existence-text	heading-depths.md	18	1	6	marker
+Scope.existence-text	heading-depths.md	2	1	6	marker
+Scope.existence-text	heading-depths.md	6	1	6	marker
 Scope.existence-text	headings-and-tables.md	1	5	10	marker
 Scope.existence-text	headings-and-tables.md	2	5	10	marker
 Scope.existence-text	headings-and-tables.md	3	17	22	marker
@@ -1600,6 +1765,8 @@ Scope.existence-text	other-block-tags.md	3	27	32	marker
 Scope.existence-text	other-block-tags.md	3	9	14	marker
 Scope.existence-text	other-block-tags.md	5	9	14	marker
 Scope.existence-text	other-block-tags.md	7	21	26	marker
+Scope.existence-text	plaintext.md	2	23	28	marker
+Scope.existence-text	plaintext.md	3	21	26	marker
 Scope.existence-text	pre.md	5	6	11	marker
 Scope.existence-text	promoted-blocks.md	1	17	22	marker
 Scope.existence-text	promoted-blocks.md	1	41	46	marker
@@ -1614,6 +1781,13 @@ Scope.existence-text	quote-lines.md	3	21	26	marker
 Scope.existence-text	quote-lines.md	3	6	11	marker
 Scope.existence-text	quote-lines.md	6	10	15	marker
 Scope.existence-text	quote-lines.md	8	13	18	marker
+Scope.existence-text	raw-references.md	10	13	18	marker
+Scope.existence-text	raw-references.md	18	15	20	marker
+Scope.existence-text	raw-references.md	2	13	18	marker
+Scope.existence-text	raw-references.md	22	12	17	marker
+Scope.existence-text	raw-references.md	26	11	16	marker
+Scope.existence-text	raw-references.md	30	17	22	marker
+Scope.existence-text	raw-references.md	6	12	17	marker
 Scope.existence-text	raw-text-same-line.md	1	18	23	marker
 Scope.existence-text	raw-text-same-line.md	3	18	23	marker
 Scope.existence-text	raw-text-same-line.md	5	19	24	marker
@@ -1622,6 +1796,10 @@ Scope.existence-text	raw-text-tags.md	13	6	11	marker
 Scope.existence-text	raw-text-tags.md	15	10	15	marker
 Scope.existence-text	raw-text-tags.md	17	11	16	marker
 Scope.existence-text	raw-text-tags.md	9	11	16	marker
+Scope.existence-text	reference-spaces.md	11	27	32	marker
+Scope.existence-text	reference-spaces.md	3	14	19	marker
+Scope.existence-text	reference-spaces.md	5	23	28	marker
+Scope.existence-text	reference-spaces.md	7	23	28	marker
 Scope.existence-text	references.md	11	13	18	marker
 Scope.existence-text	references.md	27	13	18	marker
 Scope.existence-text	references.md	29	15	20	marker

@@ -520,7 +520,11 @@ impl Builder<'_> {
             | Scope::Heading3
             | Scope::Heading4
             | Scope::Heading5
-            | Scope::Heading6 => {
+            | Scope::Heading6
+            | Scope::Heading0
+            | Scope::Heading7
+            | Scope::Heading8
+            | Scope::Heading9 => {
                 let atx = self
                     .source
                     .get(span.clone())
@@ -555,6 +559,10 @@ impl Builder<'_> {
                 | Scope::Heading4
                 | Scope::Heading5
                 | Scope::Heading6
+                | Scope::Heading0
+                | Scope::Heading7
+                | Scope::Heading8
+                | Scope::Heading9
                 | Scope::TableHeader
                 | Scope::TableCell
         ) {
@@ -646,6 +654,10 @@ impl Builder<'_> {
             | Scope::Heading4
             | Scope::Heading5
             | Scope::Heading6
+            | Scope::Heading0
+            | Scope::Heading7
+            | Scope::Heading8
+            | Scope::Heading9
             | Scope::Blockquote
             | Scope::List
             | Scope::TableRow

@@ -133,14 +133,14 @@ A `<!--` in a `script` SHALL hide its end tag until a `-->`, and a `<script` aft
 - **WHEN** an HTML block holds `<script><!-- <script> </script> marker </script> after`
 - **THEN** a rule with `scope: paragraph` reports `after` and not `marker`
 
-### Requirement: Some elements are not read
+### Requirement: A heading of any depth Vale reads is read
 
-hakkiri SHALL NOT read the text of a heading of a depth outside 1 to 6.
+hakkiri SHALL read the text of an `h0` to `h9` element under the scope `heading.h0` to `heading.h9`, as Vale reads any element named `h` and a digit.
 
 #### Scenario: A heading of depth 7
 
 - **WHEN** an HTML block holds `<h7>`, a line `marker` and `</h7>`
-- **THEN** no rule reports `marker`
+- **THEN** a rule with `scope: heading.h7`, `scope: heading` or `scope: text` reports `marker`
 
 ### Requirement: A block that does not map back is not read
 

@@ -20,6 +20,14 @@ pub enum Scope {
     Heading5,
     /// A heading of depth 6.
     Heading6,
+    /// A heading of depth 0, which an HTML block can make with `<h0>`.
+    Heading0,
+    /// A heading of depth 7, which an HTML block can make with `<h7>`.
+    Heading7,
+    /// A heading of depth 8, which an HTML block can make with `<h8>`.
+    Heading8,
+    /// A heading of depth 9, which an HTML block can make with `<h9>`.
+    Heading9,
     /// A block quote.
     Blockquote,
     /// A list item.
@@ -63,7 +71,7 @@ pub enum Scope {
 
 impl Scope {
     /// Every scope.
-    pub const ALL: [Self; 26] = [
+    pub const ALL: [Self; 30] = [
         Self::Paragraph,
         Self::Heading1,
         Self::Heading2,
@@ -71,6 +79,10 @@ impl Scope {
         Self::Heading4,
         Self::Heading5,
         Self::Heading6,
+        Self::Heading0,
+        Self::Heading7,
+        Self::Heading8,
+        Self::Heading9,
         Self::Blockquote,
         Self::List,
         Self::TableRow,
@@ -103,6 +115,10 @@ impl Scope {
             Self::Heading4 => "heading.h4",
             Self::Heading5 => "heading.h5",
             Self::Heading6 => "heading.h6",
+            Self::Heading0 => "heading.h0",
+            Self::Heading7 => "heading.h7",
+            Self::Heading8 => "heading.h8",
+            Self::Heading9 => "heading.h9",
             Self::Blockquote => "blockquote",
             Self::List => "list",
             Self::TableRow => "table.row",
@@ -125,7 +141,7 @@ impl Scope {
         }
     }
 
-    /// The scope of a heading of `depth`, or `None` outside 1 to 6.
+    /// The scope of a heading of `depth`, or `None` above 9.
     pub(crate) const fn heading(depth: u8) -> Option<Self> {
         match depth {
             1 => Some(Self::Heading1),
@@ -134,7 +150,11 @@ impl Scope {
             4 => Some(Self::Heading4),
             5 => Some(Self::Heading5),
             6 => Some(Self::Heading6),
-            0 | 7..=u8::MAX => None,
+            0 => Some(Self::Heading0),
+            7 => Some(Self::Heading7),
+            8 => Some(Self::Heading8),
+            9 => Some(Self::Heading9),
+            10..=u8::MAX => None,
         }
     }
 }

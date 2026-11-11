@@ -108,7 +108,11 @@ pub fn summarize(tree: &Tree, source: &str) -> Result<Summary, SelectError> {
             Scope::Heading4 => summary.elements.headings[3] += 1,
             Scope::Heading5 => summary.elements.headings[4] += 1,
             Scope::Heading6 => summary.elements.headings[5] += 1,
-            Scope::Blockquote
+            Scope::Heading0
+            | Scope::Heading7
+            | Scope::Heading8
+            | Scope::Heading9
+            | Scope::Blockquote
             | Scope::List
             | Scope::TableRow
             | Scope::TableHeader

@@ -14,8 +14,9 @@ The operator also ruled that hakkiri gives at least Vale's result, and departs o
 
 ## Changes
 
-- The text of an HTML block becomes nodes of the tree, with the scope Vale gives it: `paragraph`, `list`, `blockquote`, a heading, `table.header`, `table.cell`, `table.caption`, `figure.caption` or `meta`.
+- The text of an HTML block becomes nodes of the tree, with the scope Vale gives it: `paragraph`, `list`, `blockquote`, a heading, `table.header`, `table.cell`, `table.caption`, `figure.caption` or `meta`.  
 - Four scopes are new: `table.caption`, `figure.caption`, `meta` and `description`, the content of a `meta` tag that describes the page.
+  Four more are the headings of depth 0 and 7 to 9, `heading.h0` and `heading.h7` to `heading.h9`, which Vale reads for an `h0` or an `h7` to `h9` element.
 - Alt text is read as `text` too, as Vale reads it, and so is a description.
 - Some text is left out: that of `script`, `style`, `noscript`, `iframe` and `pre`, and of an element with the class `code`, `pre` or `problematic`.
 - Some text reads as `*` for each character, as in Vale: that of `kbd` and `samp`.
@@ -45,7 +46,7 @@ The operator also ruled that hakkiri gives at least Vale's result, and departs o
   The check for whether an HTML block ends a run of tags reads that walk.
 - A new `src/entity.rs` and `data/entities/html5.tsv` read character references.
 - A new `src/html_text.rs` maps the walk back to the lines of the file, and the Markdown builder adds the nodes.
-- `Node` gains `reads`, a reading for each segment, and `Scope` gains four variants.
-- `tests/html_parity.rs` compares 39 rules over 45 inputs with Vale.
+- `Node` gains `reads`, a reading for each segment, and `Scope` gains eight variants.
+- `tests/html_parity.rs` compares 40 rules over 49 inputs with Vale.
 
 [ledger]: ../../../tasks.yaml

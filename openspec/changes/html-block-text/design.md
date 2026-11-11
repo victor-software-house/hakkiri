@@ -105,7 +105,7 @@ Vale gives `caption`, `figcaption`, `data` and a `meta` description the scopes `
 hakkiri adds the scopes `table.caption`, `figure.caption`, `meta` and `description`.  
 Alt text, a description and a caption are `text` too, and `meta` is not.  
 Alt text and a description are one block each, and no sentence splitter cuts them, as in Vale.  
-A heading of depth 7, which `h7` makes, has no scope and its text is not read.
+A heading `h0`, or `h7` to `h9`, reads as the scope `heading.h0` or `heading.h7` to `heading.h9`, since Vale takes any element named `h` and a digit for a heading.
 
 Alternative: keep `alt` apart from `text`.  
 Lost: Vale reports a word in alt text for every default rule, and hakkiri would not.
@@ -121,16 +121,14 @@ Lost: the `>` of a quote would read as text.
 ### Not ported
 
 - The `vale off` directive, and the selections and class scopes, which hakkiri has no rule syntax for.
-- Whitespace that a reference makes at the end of a text, such as `&#32;`, which Vale trims after unescaping.
-- The text of `xmp`, `noembed`, `noframes` and `plaintext`, which Vale does not unescape.
 - A text equal to the name of an element of a skipped class, which Vale counts as a tag.
 
 ## Risks / Trade-offs
 
-- [A block reads under the wrong scope or with the wrong join] → the probe holds 45 inputs, from lists and quotes to joins, masks, references, scripts and promoted blocks.  
+- [A block reads under the wrong scope or with the wrong join] → the probe holds 49 inputs, from lists and quotes to joins, masks, references, scripts and promoted blocks.  
   The parity test fails on any alert that differs and is not listed.
 - [The walk differs from Vale on input the probe lacks] → each flag of the walker mirrors a variable of Vale's, and the rows of `departures.tsv` are the only differences found.
-- [The tree type grows] → `Node` gains `reads`, and `Scope` gains four variants. hakkiri is not released, and it owns both types.
+- [The tree type grows] → `Node` gains `reads`, and `Scope` gains eight variants. hakkiri is not released, and it owns both types.
 
 [v-walk]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L60-L376
 [v-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L378-L420

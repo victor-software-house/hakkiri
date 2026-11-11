@@ -34,12 +34,12 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 
 #### Scenario: A reference is unescaped once
 
-- **WHEN** a paragraph holds `&amp;lt;`, or a code span holds `&amp;`
-- **THEN** hakkiri reads `&lt;` and `&amp;`, and Vale unescapes the text of each token twice, so it reads `<` and `&` ([html 5][html-5])
+- **WHEN** a paragraph holds `&amp;lt;` or `&amp;#32;`, or a code span holds `&amp;`
+- **THEN** hakkiri reads `&lt;`, `&#32;` and `&amp;`, and Vale unescapes the text of each token twice, so it reads `<`, a space and `&` ([html 5][html-5])
 
 #### Scenario: Vale loses a match beside a reference
 
-- **WHEN** a text holds a reference that Vale cannot find in the file once it is unescaped, such as `&#109;arker`, and a rule matches a word of it
+- **WHEN** a text holds a reference that Vale cannot find in the file once it is unescaped, such as `&#109;arker` or a final `&nbsp;`, and a rule matches a word of it
 - **THEN** hakkiri reports the match through its byte table, and Vale finds the words of the text in the file, so it gives no alert for a word it cannot find ([html 5][html-5])
 - **AND** Vale places another alert on the wrong line or column
 
@@ -52,11 +52,6 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 
 - **WHEN** a Markdown paragraph holds `a<b>marker</b>c`, `a <i>marker</i>` or an `a` element
 - **THEN** hakkiri joins and masks the text around the tags as Vale does, and gives no `strong`, `emphasis` or `link` node, where Vale gives each its scope (row [HKR-027][ledger], [html 4][html-4])
-
-#### Scenario: A heading of depth 7
-
-- **WHEN** an HTML block holds `<h7>`, a line `marker` and `</h7>`
-- **THEN** hakkiri reads no text, since it has no scope for the depth, and Vale reads a heading ([html 6][html-6])
 
 #### Scenario: A block of masked text only
 
@@ -72,7 +67,6 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 [html-3]: ../../../html-block-text/design.md#3-masked-text-reads-as-asterisks
 [html-4]: ../../../html-block-text/design.md#4-tags-join-the-text-around-them
 [html-5]: ../../../html-block-text/design.md#5-a-character-reference-reads-once
-[html-6]: ../../../html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
 [ledger]: ../../../../../tasks.yaml
 [case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
 [spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals

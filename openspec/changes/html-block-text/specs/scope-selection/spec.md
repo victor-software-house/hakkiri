@@ -52,3 +52,8 @@ An alert on a character that a reference gave SHALL point at the first byte of t
 
 - **WHEN** a paragraph holds `a &#38; b` and a rule matches `&`
 - **THEN** hakkiri reports the alert at the column of the `&` that starts `&#38;`
+
+#### Scenario: A reference that stands for a blank at an end of a text
+
+- **WHEN** an HTML block holds `<p>alpha&#32;</p>` and `<p>&#32;beta</p>`
+- **THEN** the paragraphs read `alpha` and `beta`, as Vale trims the blank that the reference gave

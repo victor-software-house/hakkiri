@@ -54,6 +54,10 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::TableHeader
         | Scope::TableCell
         | Scope::TableCaption
@@ -90,6 +94,10 @@ fn opens(parent: &Node, child: &Node) -> bool {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::TableHeader
         | Scope::TableCell
         | Scope::TableCaption
@@ -120,6 +128,10 @@ const fn is_prose(scope: Scope) -> bool {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::TableHeader
         | Scope::TableCell
         | Scope::TableCaption
@@ -157,6 +169,10 @@ const fn decodes(scope: Scope) -> Decode {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::Blockquote
         | Scope::List
         | Scope::TableRow
@@ -197,6 +213,10 @@ fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::TableHeader
         | Scope::TableCell
         | Scope::TableCaption
@@ -236,6 +256,10 @@ fn segments(node: &Node) -> Vec<Range<usize>> {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::Blockquote
         | Scope::List
         | Scope::TableRow
@@ -272,6 +296,10 @@ fn readings(node: &Node) -> Vec<Reading> {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::Blockquote
         | Scope::List
         | Scope::TableRow

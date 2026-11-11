@@ -4,9 +4,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 1. Probe Vale
 
-- [x] 1.1 Build Vale `66bbb85` in a throwaway Linux box, and run `existence` rules and `dump` rules over 45 inputs that hold HTML blocks and inline HTML.  
+- [x] 1.1 Build Vale `66bbb85` in a throwaway Linux box, and run `existence` rules and `dump` rules over 49 inputs that hold HTML blocks and inline HTML.  
   Verify `tests/fixtures/html-block/vale.tsv` holds the alerts, and that the probe covers references, `code`, `tt`, `kbd`, `samp`, `pre`, joins, captions, descriptions, alt text, scripts and promoted blocks.
-  - 2026-11-10 (UTC), Vale built from source in a throwaway Linux box gave 1,659 alert rows, kept in [2673f19][c-feat].  
+  - 2026-11-10 (UTC), Vale built from source in a throwaway Linux box gave 1,659 alert rows, kept in [2673f19][c-feat], and 1,837 with the inputs of task 2.6.  
     A `dump` rule matches the whole text of a block, so a row shows how Vale read it.  
     The probe found that a `quote` rule makes Vale parse the HTML again, so no rule of the probe has that scope.
 
@@ -28,9 +28,12 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 2.5 Match Vale on the probe, and list each difference.  
   Verify the `html_parity` test passes in CI, with the rows of `departures.tsv` as its only differences.
   - 2026-11-10 (UTC), the test passes in the same box run.  
-    `departures.tsv` holds 69 rows, for seven places.  
+    `departures.tsv` holds 52 rows, for six places.  
     They are a reference unescaped twice, a match Vale loses beside a reference, a `code` element, and inline HTML elements in a paragraph.  
-    The others are a heading of depth 7, a block of masked text only, and a script that never ends.
+    The others are a block of masked text only, and a script that never ends.
+
+- [x] 2.6 Read a heading of depth 0 or 7 to 9 under its own scope, and trim a reference that stands for a blank at an end of a text.  
+  Verify the `heading-depths`, `raw-references`, `plaintext` and `reference-spaces` inputs match Vale, apart from the rows of `departures.tsv`.
 
 ## 3. Record
 

@@ -151,7 +151,6 @@ impl Lines {
                 Node::from_segments(container, whole.segments.clone(), vec![inner])
                     .map(|node| node.with_reads(whole.reads.clone()))
             }
-            Place::Skipped => None,
         };
         node.map(|node| Node { first, ..node })
     }
