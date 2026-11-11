@@ -25,3 +25,13 @@ A rule file named as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHA
 
 - **WHEN** `styles/Team/Other.yaml` holds `extends` and `tests`
 - **THEN** `hakkiri test --coverage` reads no case from it and names no rule for it
+
+#### Scenario: A nested rule
+
+- **WHEN** the config has the package `styles` and a case loads `styles/Team/Sub/Bar.yml`
+- **THEN** the rule is `Team.Sub.Bar`, and with no package that holds the file it is `Sub.Bar`, since the folder that holds the file is its style
+
+#### Scenario: A dotted file name
+
+- **WHEN** a case loads `styles/Team/Foo.v2.yml`
+- **THEN** the rule is `Team.Foo`

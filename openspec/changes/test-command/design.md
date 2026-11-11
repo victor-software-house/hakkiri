@@ -47,7 +47,7 @@ This is Vale's form ([run][v-run]), so ProseStyle's `want` and `contains` string
 ### 4. An isolated case loads one rule
 
 A case in a rule's `tests`, or one with `rule`, loads that rule alone, from a path relative to its test file.
-It applies nothing from the config, reports an alert of any level, and applies no `level` or `off` from a glob.
+It reads no config, reports an alert of any level, and applies no `level` or `off` from a glob.
 The rule keeps its project name: its style folder, the folders under it and its file name up to the first dot, joined by dots, so `Foo.v2.yml` in `Team` is `Team.Foo` (change `rule-names`).
 The style loader and the `test` command derive the name in one function, so a coverage report and an alert agree.
 The name comes from the path made absolute, with symlinks left alone.

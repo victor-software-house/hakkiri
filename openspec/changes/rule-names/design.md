@@ -43,7 +43,7 @@ A file under no search path takes the folder that holds it ([isolated name][v-is
 `test` does the same with the packages of the project config, read only for this, and gives the style folder's parent to the rule as its package.
 
 Alternative: always take the folder that holds the file.
-Lost: `test` would name `Team/Sub/Bar.yml` as `Sub.Bar` and `check` as `Team.Sub.Bar`, so a coverage report and an alert would disagree.
+Lost: `test` would name `Team/Sub/Bar.yml` as `Sub.Bar` and `check` as `Team.Sub.Bar`, so a coverage report and an alert would name one rule two ways.
 
 ### 5. A bracket in a name is refused
 

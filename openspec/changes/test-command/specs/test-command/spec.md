@@ -74,13 +74,8 @@ A case's alerts SHALL be one line each, `line:column:Rule:message`, in order of 
 ### Requirement: An isolated case loads one rule
 
 A case in a rule's `tests`, and a case with `rule`, SHALL load that rule alone, from a path relative to its file.  
-It SHALL apply nothing from the project config, report an alert of any level, and name the rule as the style loader does, so `Team/Foo.v2.yml` is `Team.Foo`.  
+It SHALL read no config, report an alert of any level, and name the rule as the style loader does, so `Team/Foo.v2.yml` is `Team.Foo`.  
 Any other case SHALL lint `input` as a file named `input.<format>` through the project config.
-
-#### Scenario: The style folder of a nested rule
-
-- **WHEN** the config has the package `styles` and a case loads `styles/Team/Sub/Bar.yml`
-- **THEN** the rule is `Team.Sub.Bar`, and with no package that holds the file it is `Sub.Bar`, since the folder that holds the file is its style
 
 #### Scenario: A rule turned off in the config
 
@@ -105,7 +100,7 @@ It SHALL skip dot and underscore folders when it lists the rules.
 #### Scenario: A rule file with a dotted name
 
 - **WHEN** `styles/Team/Foo.v2.yml` flags a line that a case through the config lints, under `--coverage`
-- **THEN** hakkiri counts `Team.Foo.v2` as covered, the name the alert carries
+- **THEN** hakkiri counts `Team.Foo` as covered, the name the alert carries
 
 ### Requirement: The report and exit status say what happened
 

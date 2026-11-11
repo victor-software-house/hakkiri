@@ -4,7 +4,7 @@ Queue row: `HKR-032` in [tasks.yaml][ledger].
 
 ## Motivation
 
-hakkiri names a rule file differently from Vale, and `check` and `test` can disagree about which rule a file is.
+hakkiri names a rule file differently from Vale, and `check` and `test` can name one file differently.
 Vale cuts a file name at its first dot, so `Terms.custom.yml` in `Team` is `Team.Terms`, and hakkiri cuts at the last dot, so it is `Team.Terms.custom`.
 Vale loads the folders under a style and joins them into the name, so `Team/Sub/Bar.yml` is `Team.Sub.Bar`, and hakkiri reads only the files directly in the folder.
 `test` names a nested file by its own folder, `Sub.Bar`, where `check` would name it `Team.Sub.Bar` once nested folders load ([review thread][thread]).
