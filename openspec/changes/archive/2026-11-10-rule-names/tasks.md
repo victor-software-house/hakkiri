@@ -67,4 +67,4 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [ci60]: https://github.com/victor-software-house/hakkiri/actions/runs/42947844816
 [c-main]: https://github.com/victor-software-house/hakkiri/commit/4979c2aab5de774e24e5684cd9553720733588a0
 [ci-main]: https://github.com/victor-software-house/hakkiri/actions/runs/42948574268
-[test]: ../archive/2026-11-10-test-command/proposal.md
+[test]: ../2026-11-10-test-command/proposal.md

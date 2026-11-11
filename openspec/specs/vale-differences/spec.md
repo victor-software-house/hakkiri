@@ -287,38 +287,6 @@ hakkiri SHALL finish a run on each input below in bounded time and memory, where
 - **WHEN** a text holds a token of 20,000 marks
 - **THEN** hakkiri splits its prefixes, suffixes and contractions in one pass, and prose searches what is left again after each one it takes off, which takes quadratic time ([case 5][case-5])
 
-### Requirement: Known gaps are listed apart
-
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
-A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
-
-#### Scenario: Text inside an HTML block
-
-- **WHEN** a Markdown file holds prose inside an HTML block
-- **THEN** hakkiri reads none of it, and Vale lints it with the scope of its block
-- **AND** Vale also lints the text after a closed raw-text tag or a `--!>`
-- **AND** Vale's entity unescaping, masking of `code`, `tt`, `kbd` and `samp`, and handling of `pre` are not yet probed (row [HKR-021][ledger], [case 9][case-9])
-
-#### Scenario: The built-in spelling rule
-
-- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
-
-#### Scenario: Vocabularies
-
-- **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
-- **THEN** hakkiri loads the field and reads no vocabulary, and Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
-
-#### Scenario: The Markdown parser
-
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
-- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
-
-#### Scenario: A plain-text file
-
-- **WHEN** a glob matches a file that no language reads, such as `notes.txt`
-- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
-
 ### Requirement: A comment reads as Markdown
 
 hakkiri SHALL read every comment of a code file as Markdown, where Vale 3.26.0 reads it as plain lines unless a View names a markup format.
@@ -438,6 +406,81 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 - **WHEN** `Terms.yml` and `Terms.custom.yml` both give `Team.Terms`, and `test --coverage` finds that no case flags it
 - **THEN** hakkiri lists it once with both files, and Vale lists `Team.Terms` twice and names no file ([rule-names 4][rule-names-4])
 
+### Requirement: Known gaps are listed apart from the differences
+
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
+
+#### Scenario: The built-in spelling rule
+
+- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
+- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+
+#### Scenario: Vocabularies
+
+- **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
+- **THEN** hakkiri loads the field and reads no vocabulary, and Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
+
+#### Scenario: The Markdown parser
+
+- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
+
+#### Scenario: A plain-text file
+
+- **WHEN** a glob matches a file that no language reads, such as `notes.txt`
+- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
+
+#### Scenario: Comments that turn rules off and on
+
+- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
+- **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
+
+#### Scenario: A rule setting that enables one rule
+
+- **WHEN** a glob sets a rule of a style it does not list, such as `Team.Terms: warning`
+- **THEN** hakkiri runs nothing for it, since a rule runs only from a listed style, and Vale runs that rule at the level the setting names (row [HKR-033][ledger])
+
+### Requirement: HTML-block text differs from Vale in detail
+
+hakkiri SHALL read the text of an HTML block and the text around inline HTML as each scenario below says, where Vale 3.26.0 reads it otherwise.
+
+#### Scenario: A reference is unescaped once
+
+- **WHEN** a paragraph holds `&amp;lt;` or `&amp;#32;`, or a code span holds `&amp;`
+- **THEN** hakkiri reads `&lt;`, `&#32;` and `&amp;`, and Vale unescapes the text of each token twice, so it reads `<`, a space and `&` ([html 5][html-5])
+
+#### Scenario: Vale loses a match beside a reference
+
+- **WHEN** a text holds a reference that Vale cannot find in the file once it is unescaped, such as `&#109;arker` or a final `&nbsp;`, and a rule matches a word of it
+- **THEN** hakkiri reports the match through its byte table, and Vale finds the words of the text in the file, so it gives no alert for a word it cannot find ([html 5][html-5])
+- **AND** Vale places another alert on the wrong line or column
+
+#### Scenario: Vale loses the text around a blank alt
+
+- **WHEN** a paragraph holds `one marker <img src="x" alt=" "> end`
+- **THEN** hakkiri reads the paragraph as `one marker end`, and Vale gives no alert for that text, though it gives one when the alt text holds a word ([html 6][html-6])
+
+#### Scenario: A code element is a code span
+
+- **WHEN** an HTML block holds `a <code>x</code> b`
+- **THEN** hakkiri reads a code span of one word and reports no match over it, and Vale masks the text with asterisks and reports a match over them ([html 3][html-3])
+
+#### Scenario: Inline HTML in a paragraph has no element scope
+
+- **WHEN** a Markdown paragraph holds `a<b>marker</b>c`, `a <i>marker</i>` or an `a` element
+- **THEN** hakkiri joins and masks the text around the tags as Vale does, and gives no `strong`, `emphasis` or `link` node, where Vale gives each its scope (row [HKR-027][ledger], [html 4][html-4])
+
+#### Scenario: A block of masked text only
+
+- **WHEN** an HTML block holds `<p><kbd>x</kbd></p>`
+- **THEN** hakkiri reads `*`, and Vale reports nothing, since it cannot place text that is not in the file ([html 3][html-3])
+
+#### Scenario: A script that never ends
+
+- **WHEN** an HTML block holds `<script><!-- <script </script> marker`, and the next block holds `last marker`
+- **THEN** hakkiri reads the next block, since it tokenizes each HTML block alone, and Vale tokenizes the whole file as one stream, so the open script hides the rest of it ([html 1][html-1])
+
 [bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
 [bootstrap-5]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#5-rules-ship-as-versioned-packages
 [bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
@@ -468,6 +511,12 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 [format-7]: ../../changes/archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [format-8]: ../../changes/archive/2026-11-10-rule-format/design.md#8-every-comment-reads-as-markdown
 [format-9]: ../../changes/archive/2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
+[html-1]: ../../changes/archive/2026-11-10-html-block-text/design.md#1-one-walk-follows-vales
+[html-3]: ../../changes/archive/2026-11-10-html-block-text/design.md#3-masked-text-reads-as-asterisks
+[html-4]: ../../changes/archive/2026-11-10-html-block-text/design.md#4-tags-join-the-text-around-them
+[html-5]: ../../changes/archive/2026-11-10-html-block-text/design.md#5-a-character-reference-reads-once
+[html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
+[html-7]: ../../changes/archive/2026-11-10-html-block-text/design.md#not-ported
 [ledger]: ../../../tasks.yaml
 [pattern-1]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
 [pattern-2]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#2-consistency-matches-as-existence-does-one-pattern-per-pair
@@ -476,7 +525,7 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 [pattern-7]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#7-ignorecase-on-a-conditional-applies-to-both-patterns
 [pattern-8]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#8-a-score-listed-twice-counts-once
 [pattern-9]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
-[rule-names-4]: ../../changes/rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
+[rule-names-4]: ../../changes/archive/2026-11-10-rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
 [spelling-1]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#1-spelling-reads-words-as-vales-tokenizer-cuts-them
 [spelling-2]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
 [spelling-3]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses

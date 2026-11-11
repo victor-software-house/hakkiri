@@ -4,7 +4,7 @@
 
 **Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for HTML-block text closes, so the requirement is removed and added again below without that scenario.
 
-**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from the differences". Its three remaining scenarios are unchanged, and it adds two.
+**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from the differences". Its four remaining scenarios are unchanged, and it adds two.
 
 ## ADDED Requirements
 
@@ -27,6 +27,11 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 - **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
+
+#### Scenario: A plain-text file
+
+- **WHEN** a glob matches a file that no language reads, such as `notes.txt`
+- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
 
 #### Scenario: Comments that turn rules off and on
 
@@ -78,13 +83,14 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 - **WHEN** an HTML block holds `<script><!-- <script </script> marker`, and the next block holds `last marker`
 - **THEN** hakkiri reads the next block, since it tokenizes each HTML block alone, and Vale tokenizes the whole file as one stream, so the open script hides the rest of it ([html 1][html-1])
 
-[html-1]: ../../../html-block-text/design.md#1-one-walk-follows-vales
-[html-3]: ../../../html-block-text/design.md#3-masked-text-reads-as-asterisks
-[html-4]: ../../../html-block-text/design.md#4-tags-join-the-text-around-them
-[html-5]: ../../../html-block-text/design.md#5-a-character-reference-reads-once
-[html-6]: ../../../html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
-[html-7]: ../../../html-block-text/design.md#not-ported
-[ledger]: ../../../../../tasks.yaml
-[case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
-[spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
-[tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[html-1]: ../../design.md#1-one-walk-follows-vales
+[html-3]: ../../design.md#3-masked-text-reads-as-asterisks
+[html-4]: ../../design.md#4-tags-join-the-text-around-them
+[html-5]: ../../design.md#5-a-character-reference-reads-once
+[html-6]: ../../design.md#6-captions-data-and-descriptions-have-scopes
+[html-7]: ../../design.md#not-ported
+[ledger]: ../../../../../../tasks.yaml
+[case-1]: ../../../2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+[tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension

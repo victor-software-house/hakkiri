@@ -1,23 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-032
+active: HKR-033
 queue:
-  - id: HKR-032
-    title: Name and load rule files as Vale does
-    scope: rules
-    outcome: >-
-      A rule file is named by its path and loaded from its style folder as Vale does,
-      so check, test and coverage give a file one name.
-    blocked_by: []
-    acceptance:
-      - A dotted file name, a nested rule at two levels, two files with one name, and a nested rule under test --coverage give the names and errors Vale 66bbb85 gives on probes.
-      - check, test and test --coverage agree on every rule name.
-    plan: openspec/changes/rule-names/proposal.md
-    notes:
-      - '2026-11-10, hkr004-engine probed Vale 3.26.0: styles/Team/Terms.custom.yml is Team.Terms, and styles/Nest/Sub/Bar.yml is Nest.Sub.Bar in lint and in coverage. hakkiri cuts at the last dot and reads only the files directly in a style folder.'
-      - 2026-11-10, the operator decided hakkiri matches Vale and cuts at the first dot, and refuses two files that end up with one name (operator, 2026-11-10).
-
   - id: HKR-033
     title: Enable one rule with a rule setting
     scope: config
@@ -89,22 +74,6 @@ queue:
       - Every rule case and package case passes under hakkiri test.
       - An alert diff against Vale with ProseStyle 0.0.7 over our public repositories shows only the intended differences.
 
-  - id: HKR-021
-    title: Read the text inside HTML blocks as prose
-    scope: tree
-    outcome: Text inside an HTML block is linted as prose, with the scope Vale gives it.
-    notes:
-      - 2026-11-10, Vale lints the text of an HTML block with the scope of its block. hakkiri reads an HTML block as markup and lints none of it, so Vale gives alerts there that hakkiri does not.
-      - '2026-11-10, reading it needs three behaviours of Vale checked first, and none is checked yet: unescaping HTML entities, masking the text of code, tt, kbd and samp, and handling pre.'
-      - '2026-11-10, Vale lints the text after a closed raw-text tag on the same line, such as `<style></style > x` and `<style></style/> x`, and after `--!>` in a comment block. hakkiri keeps that text as HTML, from the CommonMark end condition of the block.'
-      - 2026-11-10, the operator decided hakkiri reads HTML-block text as prose as Vale does; it is a gap to close (operator, 2026-11-10).
-    blocked_by: []
-    acceptance:
-      - Text inside an HTML block gets the alerts Vale 66bbb85 gives it, with the scope Vale gives it, on a fixture probed against Vale.
-      - Entity unescaping, the masking of code, tt, kbd and samp text, and the handling of pre match Vale on probes.
-      - The text after a closed raw-text tag on the same line and after --!> in a comment block gets the alerts Vale gives it, or a departure records why not.
-    plan: openspec/changes/html-block-text/proposal.md
-
   - id: HKR-026
     title: Run Vale's built-in spelling rule
     scope: engine
@@ -170,6 +139,36 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-021
+    title: Read the text inside HTML blocks as prose
+    scope: tree
+    outcome: Text inside an HTML block is linted as prose, with the scope Vale gives it.
+    notes:
+      - 2026-11-10, Vale lints the text of an HTML block with the scope of its block. hakkiri reads an HTML block as markup and lints none of it, so Vale gives alerts there that hakkiri does not.
+      - '2026-11-10, reading it needs three behaviours of Vale checked first, and none is checked yet: unescaping HTML entities, masking the text of code, tt, kbd and samp, and handling pre.'
+      - '2026-11-10, Vale lints the text after a closed raw-text tag on the same line, such as `<style></style > x` and `<style></style/> x`, and after `--!>` in a comment block. hakkiri keeps that text as HTML, from the CommonMark end condition of the block.'
+      - 2026-11-10, the operator decided hakkiri reads HTML-block text as prose as Vale does; it is a gap to close (operator, 2026-11-10).
+    plan: openspec/changes/archive/2026-11-10-html-block-text/proposal.md
+    completed: 2026-11-11T02:59:14
+    evidence:
+      - openspec/changes/archive/2026-11-10-html-block-text/
+    disposition: completed
+
+  - id: HKR-032
+    title: Name and load rule files as Vale does
+    scope: rules
+    outcome: >-
+      A rule file is named by its path and loaded from its style folder as Vale does,
+      so check, test and coverage give a file one name.
+    plan: openspec/changes/archive/2026-11-10-rule-names/proposal.md
+    notes:
+      - '2026-11-10, hkr004-engine probed Vale 3.26.0: styles/Team/Terms.custom.yml is Team.Terms, and styles/Nest/Sub/Bar.yml is Nest.Sub.Bar in lint and in coverage. hakkiri cuts at the last dot and reads only the files directly in a style folder.'
+      - 2026-11-10, the operator decided hakkiri matches Vale and cuts at the first dot, and refuses two files that end up with one name (operator, 2026-11-10).
+    completed: 2026-11-11T02:59:14
+    evidence:
+      - openspec/changes/archive/2026-11-10-rule-names/
+    disposition: completed
+
   - id: HKR-028
     title: Ship the test command
     scope: cli
