@@ -15,6 +15,7 @@ queue:
       - The vale-differences scenario for a rule setting is removed.
     notes:
       - '2026-11-11, found while scoping when a clash is refused: with BasedOnStyles naming only Other, Vale 66bbb85 runs Team.Terms for the setting Team.Terms = YES, and at level error for Team.Terms = error. hakkiri runs a rule only from a style a glob lists, so the same setting changes nothing there. Vale gave no clash or bracket error for the style when it was enabled that way: a style with Terms.yml and Terms.custom.yml ran Terms.yml, and a style with a Weird[max].yml file ran its Terms rule.'
+    plan: openspec/changes/rule-setting/proposal.md
 
   - id: HKR-006
     title: Fetch and cache rule packages
