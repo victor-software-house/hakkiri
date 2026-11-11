@@ -1,0 +1,152 @@
+# BareURL for Rust: a bare URL in a comment shows the reader an address in
+# place of a name, and a URL in a string literal or macro body is data.
+# Raw scope sees the whole file, so the second lookbehind keeps a URL that
+# follows // on its line, follows /* on its line, or sits up to 50 lines
+# below a line that opens with /*. A /* opens a comment only before a space,
+# so a glob such as "src/*.rs" opens none. The bound keeps the lookbehind
+# from scanning back through the whole file. It reads a comment as runs of
+# characters other than *, so a line of thousands of characters stays within
+# regexp2's backtracking stack.
+# The rest matches BareURL: a link target, inline code or a reference
+# definition passes, the first lookbehind skips a URL in a fenced block of a
+# doc comment, and the code-span lookahead pairs backtick runs as BareURL
+# does. A fence in a doc comment cannot span a line of code, so the fence
+# lookbehind reads back only to the first line of the URL's comment block,
+# not to the top of the file. Rustdoc joins doc comments across a blank line,
+# so a blank line stays inside the block, and a URL on a line of code is never
+# inside a fence.
+extends: existence
+message: "Bare URL '%s': put the link on the words that name it."
+level: error
+scope: raw.rs
+nonword: true
+tokens:
+  - '(?=https?://)(?<!(?:\A|(?<=(?:\A|\n)(?![ \t]*(?://|\n))[^\n]*\n))(?:(?:(?![ \t]*//[/!]?[ \t]*(?:```|~~~))[ \t]*(?://[^\n]*)?\n)*(?:[ \t]*//[/!]?[ \t]*(?:```|~~~)[^\n]*\n)(?:(?![ \t]*//[/!]?[ \t]*(?:```|~~~))[ \t]*(?://[^\n]*)?\n)*(?:[ \t]*//[/!]?[ \t]*(?:```|~~~)[^\n]*\n))*(?:(?![ \t]*//[/!]?[ \t]*(?:```|~~~))[ \t]*(?://[^\n]*)?\n)*(?:[ \t]*//[/!]?[ \t]*(?:```|~~~)[^\n]*\n)(?:(?![ \t]*//[/!]?[ \t]*(?:```|~~~))[ \t]*(?://[^\n]*)?\n)*[ \t]*//[^\n]*)(?<=(?<![:/])//[^\n]*|(?<!\S)/\*[*!]?[ \t][^\n*]*(?:\*(?!/)[^\n*]*)*|(?:\A|\n)[ \t]*/\*[*!]?(?=\s)[^\n*]*(?:\*(?!/)[^\n*]*)*\n(?:[^\n*]*(?:\*(?!/)[^\n*]*)*\n){0,50}[^\n*]*(?:\*(?!/)[^\n*]*)*)(?!(?<=(?:\A|\n)(?:(?:[^`\n]|\\`|(?<![`\\])`(?!`)(?![^\n]*?(?<!`)`(?!`))|(?<![`\\])``(?!`)(?![^\n]*?(?<!`)``(?!`))|(?<![`\\])```(?!`)(?![^\n]*?(?<!`)```(?!`))|(?<!`)`{4,}(?!`))|(?:(?<![`\\])`(?!`)(?:[^`\n]|(?<!`)`{2,}(?!`))*(?<!`)`(?!`)|(?<![`\\])``(?!`)(?:[^`\n]|(?<!`)`{1,1}(?!`)|(?<!`)`{3,}(?!`))*(?<!`)``(?!`)|(?<![`\\])```(?!`)(?:[^`\n]|(?<!`)`{1,2}(?!`)|(?<!`)`{4,}(?!`))*(?<!`)```(?!`)))*(?<![`\\])`(?!`)(?:[^`\n]|(?<!`)`{2,}(?!`))*)(?=[^\n]*?(?<!`)`(?!`))|(?<=(?:\A|\n)(?:(?:[^`\n]|\\`|(?<![`\\])`(?!`)(?![^\n]*?(?<!`)`(?!`))|(?<![`\\])``(?!`)(?![^\n]*?(?<!`)``(?!`))|(?<![`\\])```(?!`)(?![^\n]*?(?<!`)```(?!`))|(?<!`)`{4,}(?!`))|(?:(?<![`\\])`(?!`)(?:[^`\n]|(?<!`)`{2,}(?!`))*(?<!`)`(?!`)|(?<![`\\])``(?!`)(?:[^`\n]|(?<!`)`{1,1}(?!`)|(?<!`)`{3,}(?!`))*(?<!`)``(?!`)|(?<![`\\])```(?!`)(?:[^`\n]|(?<!`)`{1,2}(?!`)|(?<!`)`{4,}(?!`))*(?<!`)```(?!`)))*(?<![`\\])``(?!`)(?:[^`\n]|(?<!`)`{1,1}(?!`)|(?<!`)`{3,}(?!`))*)(?=[^\n]*?(?<!`)``(?!`))|(?<=(?:\A|\n)(?:(?:[^`\n]|\\`|(?<![`\\])`(?!`)(?![^\n]*?(?<!`)`(?!`))|(?<![`\\])``(?!`)(?![^\n]*?(?<!`)``(?!`))|(?<![`\\])```(?!`)(?![^\n]*?(?<!`)```(?!`))|(?<!`)`{4,}(?!`))|(?:(?<![`\\])`(?!`)(?:[^`\n]|(?<!`)`{2,}(?!`))*(?<!`)`(?!`)|(?<![`\\])``(?!`)(?:[^`\n]|(?<!`)`{1,1}(?!`)|(?<!`)`{3,}(?!`))*(?<!`)``(?!`)|(?<![`\\])```(?!`)(?:[^`\n]|(?<!`)`{1,2}(?!`)|(?<!`)`{4,}(?!`))*(?<!`)```(?!`)))*(?<![`\\])```(?!`)(?:[^`\n]|(?<!`)`{1,2}(?!`)|(?<!`)`{4,}(?!`))*)(?=[^\n]*?(?<!`)```(?!`)))(?<![\(`/"=:])(?<!\]: )(?<!= )https?://[\w./?=&%#~:+-]+'
+tests:
+  - name: flags a bare URL in each kind of comment
+    format: rs
+    input: |
+      //! Crate docs at https://crate.example here.
+      //! An autolink <https://auto.example>.
+
+      /// Doc comment https://doc.example here.
+      fn f() {
+          // Line comment https://line.example
+          let d = 1; // trailing https://trailing.example
+          /* Block comment https://block.example */
+          /*
+           * Spans lines https://lines.example
+           */
+      }
+
+      /** Block doc https://blockdoc.example */
+      fn g() {}
+    contains:
+      - "'https://crate.example'"
+      - "'https://auto.example'"
+      - "'https://doc.example'"
+      - "'https://line.example'"
+      - "'https://trailing.example'"
+      - "'https://block.example'"
+      - "'https://lines.example'"
+      - "'https://blockdoc.example'"
+  - name: leaves links, definitions, code and fenced blocks in comments alone
+    format: rs
+    input: |
+      /// See [the page](https://ok.example) and `https://code.example`.
+      ///
+      /// [ref]: https://def.example
+      ///
+      /// ```sh
+      /// curl -fsSL https://mise.run | sh
+      /// ```
+      ///
+      /// Then read [the docs][ref].
+      fn f() {}
+    want: ''
+  - name: flags a bare URL after a closed fence in a doc comment
+    format: rs
+    input: |
+      /// ```sh
+      /// curl https://inside.example
+      /// ```
+      ///
+      /// Then read https://after.example now.
+      fn f() {}
+    contains:
+      - "'https://after.example'"
+    absent:
+      - "inside.example"
+  - name: ends a doc comment's fence at the next line of code
+    about: A fence cannot span code, so an unclosed fence in one comment block does not hide a URL in the next.
+    format: rs
+    input: |
+      /// ```sh
+      /// curl https://inside.example
+      fn f() {}
+
+      /// Read https://nextblock.example now.
+      fn g() {}
+    contains:
+      - "'https://nextblock.example'"
+    absent:
+      - "inside.example"
+  - name: keeps a doc comment's fence open across a blank line
+    about: Rustdoc joins doc comments across a blank line, so the fence is still open.
+    format: rs
+    input: |
+      /// ```sh
+
+      /// curl https://blankinside.example
+      /// ```
+      fn f() {}
+    want: ''
+  - name: flags a URL on a line of code below an unclosed fence
+    format: rs
+    input: |
+      /// ```sh
+      /// curl https://inside.example
+      let a = 1; // see https://codeline.example
+    contains:
+      - "'https://codeline.example'"
+    absent:
+      - "inside.example"
+  - name: leaves string literals, raw strings and macro bodies alone
+    about: The three shapes verctl reported, from a formatdoc! output, an indoc! error sample and an indoc! YAML fixture.
+    format: rs
+    input: |
+      fn expected() -> String {
+          formatdoc! {"
+              Published to the registry.
+                base: https://example.test/v1
+          "}
+      }
+
+      const SAMPLE: &str = indoc! {"
+          error: the registry at https://crates.io refused the upload
+      "};
+
+      const FIXTURE: &str = indoc! {r#"
+          registries:
+            internal:
+              index: sparse+https://registry.example.com/index/
+      "#};
+
+      const GLOB: &str = "src/*.rs";
+      const AFTER_GLOB: &str = "see https://afterglob.example";
+      const PLAIN: &str = "https://plain.example";
+      const RAW: &str = r#"see https://raw.example"#;
+      const URLS: [&str; 2] = ["https://one.example", "file:///tmp https://two.example"];
+    want: ''
+  - name: runs on Rust files only
+    about: The scope raw.rs keeps Markdown to BareURL.
+    input: |
+      // https://markdown.example
+    want: ''
+  - name: leaves a URL inside a code span of a comment alone
+    format: rs
+    input: |
+      /// Run `curl https://span.example/x` first.
+      // Then ``GET https://double.example`` too.
+      fn f() {}
+    want: ''

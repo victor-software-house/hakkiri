@@ -680,3 +680,21 @@ fn the_cases_of_two_rules_with_indexed_verbs_pass() -> TestResult {
     assert_eq!(result.lines(), ["2 files, 6 passed, 0 failed"]);
     Ok(())
 }
+
+/// `ProseStyle` v0.0.14 `BareURLInComment` reads the whole Rust file as `raw`,
+/// and its own case expects a fence in a doc comment to stay open across a
+/// blank line.
+#[test]
+fn the_cases_of_a_rule_that_reads_a_fence_across_a_blank_line_pass() -> TestResult {
+    let suite = Suite::new("test-bare-url-comment");
+    let root = suite.scenario("bare-url-comment");
+    let rule = std::fs::read_to_string(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/bare-url-comment/BareURLInComment.yml"),
+    )?;
+    root.file("styles/ProseStyle/BareURLInComment.yml", &rule);
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 9 passed, 0 failed"]);
+    Ok(())
+}

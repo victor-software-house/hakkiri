@@ -81,6 +81,8 @@ queue:
       - "The ProseStyle v0.0.14 BareURLInComment case 'keeps a doc comment's fence open across a blank line' passes: hakkiri reports no URL inside the fence."
     notes:
       - '2026-11-11, found by the ProseStyle port: hakkiri reports a URL inside the fence that Vale skips; the cause is not yet traced.'
+      - '2026-11-11, traced: comments::groups joined line comments only when exactly one line break lay between them, so a blank line between two doc lines cut the comment in two and the fence opened before it was gone. Vale joins the same way, but its raw scope reads the whole file. Doc line comments now join across blank lines, as rustdoc reads them.'
+    plan: openspec/changes/doc-fence/proposal.md
 
   - id: HKR-047
     title: End an alert where a multi-line match ends

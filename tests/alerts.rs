@@ -217,6 +217,30 @@ fn a_bracket_that_is_no_verb_stays_as_written() -> TestResult {
     Ok(())
 }
 
+/// The lines of the Rust file `source` where a `text` rule flags `curl`, which
+/// is every `curl` that is prose and none that sits in a fenced block.
+fn curl_lines(source: &str) -> Result<Vec<usize>, Box<dyn Error>> {
+    let rule = "extends: existence\nmessage: m\nscope: text\ntokens: [curl]\n";
+    let found = alerts(&[("Team.Text", rule)], "a.rs", source)?;
+    Ok(found.iter().map(|alert| alert.line).collect())
+}
+
+#[test]
+fn a_fence_in_doc_comments_stays_open_across_a_blank_line() -> TestResult {
+    let lines = curl_lines("/// ```sh\n\n/// curl it\n/// ```\nfn f() {}\n")?;
+    assert_eq!(lines, Vec::<usize>::new());
+    Ok(())
+}
+
+#[test]
+fn a_fence_does_not_cross_a_line_of_code_or_a_plain_comment() -> TestResult {
+    let lines = curl_lines("/// ```sh\n/// curl a\nfn f() {}\n\n/// curl b\nfn g() {}\n")?;
+    assert_eq!(lines, [5]);
+    let lines = curl_lines("// ```sh\n\n// curl c\n// ```\nfn h() {}\n")?;
+    assert_eq!(lines, [3]);
+    Ok(())
+}
+
 #[test]
 fn a_match_across_markup_ends_at_its_last_character() -> TestResult {
     let found = markdown(

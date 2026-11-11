@@ -102,6 +102,11 @@ impl Marker {
     const fn is_line(self) -> bool {
         matches!(self, Self::Line | Self::OuterDocLine | Self::InnerDocLine)
     }
+
+    /// Whether rustdoc reads a run of these across blank lines as one text.
+    const fn is_doc_line(self) -> bool {
+        matches!(self, Self::OuterDocLine | Self::InnerDocLine)
+    }
 }
 
 /// One comment, or several adjacent line comments of the same marker.
@@ -154,7 +159,9 @@ fn find(dialect: Dialect, source: &str) -> Result<Vec<(Range<usize>, Marker)>, E
 }
 
 /// Joins each run of adjacent line comments that share a marker, as rustdoc
-/// does.
+/// does. Doc line comments join across blank lines too, since rustdoc reads
+/// the lines of one item's doc comments as one text, so a fence opened before
+/// a blank line stays open after it.
 fn groups(source: &str, comments: &[(Range<usize>, Marker)]) -> Vec<Group> {
     let mut groups: Vec<Group> = Vec::new();
     for (range, marker) in comments {
@@ -164,7 +171,7 @@ fn groups(source: &str, comments: &[(Range<usize>, Marker)]) -> Vec<Group> {
                 && group.comments.last().is_some_and(|previous| {
                     let gap = source.get(previous.end..range.start).unwrap_or_default();
                     gap.trim().is_empty()
-                        && gap.matches('\n').count() == 1
+                        && (marker.is_doc_line() || gap.matches('\n').count() == 1)
                         && starts_line(source, previous.start)
                 })
         });
