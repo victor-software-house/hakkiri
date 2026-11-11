@@ -1,5 +1,12 @@
 # Changelog
 
+## hakkiri 0.0.4
+
+### Added
+
+- A project names vocabularies in `vocab`, at the top level and in a glob of `files`, and hakkiri reads each from `config/vocabularies/<name>/` in a package.
+  The accepted terms hold back matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules, as in Vale, and a glob's list does so for the files it matches ([`5023925`](https://github.com/victor-software-house/hakkiri/commit/5023925ee456344843e79f56f9879fa3576c7a72)).
+
 ## hakkiri 0.0.3
 
 ### Added
