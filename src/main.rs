@@ -17,6 +17,12 @@ use crate::report::{Instructions, Output};
 /// The operator contract, read at build time.
 const INSTRUCTIONS: &str = include_str!("instructions.md");
 
+/// musl's own allocator makes a parallel `check` about eight times slower, so
+/// the musl build, the `linux-x64` release, allocates with mimalloc.
+#[cfg(target_env = "musl")]
+#[global_allocator]
+static ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 fn main() -> ExitCode {
     App::<Cli>::new("hakkiri")
         .view(|cli| cli.format.view(cli.color.color()))

@@ -28,6 +28,7 @@ An editor server follows in the second release.
 ## Install
 
 A release is a GitHub Release with a tarball and a checksum for `linux-x64` and `darwin-arm64`.  
+The `linux-x64` binary is static, so it needs no system loader, NixOS included.  
 mise installs it with the `github:` backend, pinned to the version:
 
 ```sh

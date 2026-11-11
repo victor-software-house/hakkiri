@@ -101,6 +101,12 @@ tree-sitter-javascript = "0.25.0"
 tree-sitter-rust = "0.24.2"
 tree-sitter-typescript = "0.23.2"
 
+# musl's allocator takes a lock that threads fight over, and a parallel `check`
+# runs about eight times slower with it, so the musl build links mimalloc.
+# No other build does.
+[target.'cfg(target_env = "musl")'.dependencies]
+mimalloc = { version = "0.1.52", default-features = false }
+
 [dev-dependencies]
 ctl-core = { version = "0.7.0", default-features = false, features = [
   "fixture",

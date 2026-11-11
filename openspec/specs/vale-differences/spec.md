@@ -406,41 +406,6 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 - **WHEN** `Terms.yml` and `Terms.custom.yml` both give `Team.Terms`, and `test --coverage` finds that no case flags it
 - **THEN** hakkiri lists it once with both files, and Vale lists `Team.Terms` twice and names no file ([rule-names 4][rule-names-4])
 
-### Requirement: Known gaps are listed apart from the differences
-
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
-A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
-
-#### Scenario: The built-in spelling rule
-
-- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
-
-#### Scenario: Vocabularies
-
-- **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
-- **THEN** hakkiri loads the field and reads no vocabulary, and Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
-
-#### Scenario: The Markdown parser
-
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
-- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
-
-#### Scenario: A plain-text file
-
-- **WHEN** a glob matches a file that no language reads, such as `notes.txt`
-- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
-
-#### Scenario: Comments that turn rules off and on
-
-- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
-- **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
-
-#### Scenario: A rule setting that enables one rule
-
-- **WHEN** a glob sets a rule of a style it does not list, such as `Team.Terms: warning`
-- **THEN** hakkiri runs nothing for it, since a rule runs only from a listed style, and Vale runs that rule at the level the setting names (row [HKR-033][ledger])
-
 ### Requirement: HTML-block text differs from Vale in detail
 
 hakkiri SHALL read the text of an HTML block and the text around inline HTML as each scenario below says, where Vale 3.26.0 reads it otherwise.
@@ -480,6 +445,55 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 
 - **WHEN** an HTML block holds `<script><!-- <script </script> marker`, and the next block holds `last marker`
 - **THEN** hakkiri reads the next block, since it tokenizes each HTML block alone, and Vale tokenizes the whole file as one stream, so the open script hides the rest of it ([html 1][html-1])
+
+### Requirement: Known gaps are listed apart from the intended differences
+
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
+
+#### Scenario: The built-in spelling rule
+
+- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
+- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+
+#### Scenario: Vocabularies
+
+- **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
+- **THEN** hakkiri loads the field and reads no vocabulary, and Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
+
+#### Scenario: The Markdown parser
+
+- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
+
+#### Scenario: A plain-text file
+
+- **WHEN** a glob matches a file that no language reads, such as `notes.txt`
+- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
+
+#### Scenario: Comments that turn rules off and on
+
+- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
+- **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
+
+### Requirement: A rule setting is spelled as hakkiri's config spells it
+
+hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and SHALL refuse a rule key that names no rule and a value that is none of those words or a level.
+
+#### Scenario: A rule turned on at its own level
+
+- **WHEN** a glob turns a rule on without naming a level
+- **THEN** it sets the rule to `on`, where Vale writes `YES` ([rule-setting 7][rule-setting-7])
+
+#### Scenario: A key that names no rule
+
+- **WHEN** a glob holds `Team.Nope: warning` and no loaded style holds a rule `Team.Nope`
+- **THEN** hakkiri refuses it with the line of the key, and Vale ignores `Team.Nope = YES` ([rule-setting 7][rule-setting-7])
+
+#### Scenario: A word that is no level
+
+- **WHEN** a glob sets a rule to `yes`
+- **THEN** hakkiri refuses it with the line, and Vale warns that `yes` is not `YES`, `NO`, `UNSET` or a level, and switches the rule off ([rule-setting 7][rule-setting-7])
 
 [bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
 [bootstrap-5]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#5-rules-ship-as-versioned-packages
@@ -526,6 +540,7 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 [pattern-8]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#8-a-score-listed-twice-counts-once
 [pattern-9]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
 [rule-names-4]: ../../changes/archive/2026-11-10-rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
+[rule-setting-7]: ../../changes/archive/2026-11-11-rule-setting/design.md#7-what-stays-different
 [spelling-1]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#1-spelling-reads-words-as-vales-tokenizer-cuts-them
 [spelling-2]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
 [spelling-3]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses

@@ -57,10 +57,10 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 - **WHEN** a glob sets a rule to `yes`
 - **THEN** hakkiri refuses it with the line, and Vale warns that `yes` is not `YES`, `NO`, `UNSET` or a level, and switches the rule off ([rule-setting 7][rule-setting-7])
 
-[ledger]: ../../../../../tasks.yaml
-[spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
-[case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
-[tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
-[check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
-[html-7]: ../../../archive/2026-11-10-html-block-text/design.md#not-ported
+[ledger]: ../../../../../../tasks.yaml
+[spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+[case-1]: ../../../2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
+[html-7]: ../../../2026-11-10-html-block-text/design.md#not-ported
 [rule-setting-7]: ../../design.md#7-what-stays-different
