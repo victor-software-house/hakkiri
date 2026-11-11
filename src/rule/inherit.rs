@@ -158,6 +158,14 @@ fn parse(file: &str, text: &str) -> Result<Fields, LoadProblem> {
 /// The rule file `name` is: its first segment is a style folder of a package,
 /// and every segment after it is a path component.
 fn resolve(name: &str, search: &[PathBuf]) -> Result<PathBuf, String> {
+    if name
+        .split('.')
+        .any(|part| part.is_empty() || part.contains(['/', '\\', ':', '\0']))
+    {
+        return Err(format!(
+            "`{name}` is not a rule name: write the style, a dot, then the rule, such as `Std.Rule`, with no slash, colon or empty part between the dots"
+        ));
+    }
     let mut parts = name.split('.');
     let style = parts.next().unwrap_or_default();
     let relative = parts.collect::<Vec<_>>().join("/");
