@@ -1,7 +1,7 @@
 //! Tests for the term shown in the case of the text it replaced: the cases of
 //! `recaseToTerm` in Vale.
 
-use super::recase_to_term;
+use super::{lowercase_literals, recase_to_term};
 
 #[test]
 fn a_plain_term_is_shown_as_it_is() {
@@ -33,4 +33,16 @@ fn a_pattern_no_finite_set_stands_for_is_shown_as_written() {
 #[test]
 fn more_than_sixty_four_spellings_fall_back_to_the_literal_characters() {
     assert_eq!(recase_to_term("a?b?c?d?e?f?g?", "ABCDEFG"), "abcdefg");
+}
+
+#[test]
+fn only_the_literal_text_is_lowercased() {
+    assert_eq!(lowercase_literals("GitHub"), "github");
+    assert_eq!(lowercase_literals("Data\\Wset"), "data\\Wset");
+    assert_eq!(lowercase_literals("Foo\\.Bar"), "foo\\.bar");
+    assert_eq!(lowercase_literals("A\\p{Lu}B"), "a\\p{Lu}b");
+    assert_eq!(lowercase_literals("(?P<Word>Ab)C"), "(?P<Word>ab)c");
+    assert_eq!(lowercase_literals("(?<Word>Ab)"), "(?<Word>ab)");
+    assert_eq!(lowercase_literals("(?<=Ab)C"), "(?<=ab)c");
+    assert_eq!(lowercase_literals("Ab\\"), "ab\\");
 }

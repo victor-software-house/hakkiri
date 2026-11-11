@@ -157,8 +157,9 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
             result.out,
             result.err
         );
-        let ours = rows_of(&result.out)?;
-        let vale = vale_rows(name)?;
+        let mut ours = rows_of(&result.out)?;
+        let mut vale = vale_rows(name)?;
+        leave_out_the_escape_difference(&mut vale, &mut ours);
         let only_vale: Vec<_> = vale.difference(&ours).collect();
         let only_ours: Vec<_> = ours.difference(&vale).collect();
         assert!(
@@ -167,6 +168,28 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
         );
     }
     Ok(())
+}
+
+/// The message for `DATA SET` under the accepted term `data\\Wset`.
+const ESCAPE_MESSAGE: &str = "Use 'data\\Wset' instead of 'DATA SET'.";
+
+/// Takes out the rows that differ because of an escape in a term.
+///
+/// Vale lowercases the whole pattern of `data\\Wset`, so `\\W` turns into
+/// `\\w`: it flags `dataxset` and leaves `DATA SET` alone.
+/// hakkiri lowercases only the literal text, so `\\W` stays a non-word
+/// character: it flags `DATA SET`, which is not written as the term is, and
+/// leaves `dataxset` alone.
+/// Each config that gives one of the two must give the other.
+fn leave_out_the_escape_difference(vale: &mut BTreeSet<Row>, ours: &mut BTreeSet<Row>) {
+    let before = (vale.len(), ours.len());
+    vale.retain(|row| row.7 != "dataxset");
+    ours.retain(|row| row.6 != ESCAPE_MESSAGE);
+    let removed = (before.0 - vale.len(), before.1 - ours.len());
+    assert_eq!(
+        removed.0, removed.1,
+        "Vale and hakkiri differ by one row each"
+    );
 }
 
 /// `text/t5.md` wraps `mea Culpa` and `Bad Word` across a line break, and each

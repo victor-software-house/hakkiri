@@ -14,6 +14,62 @@ mod tests;
 /// spelled several ways.
 const MAX_EXPANSIONS: usize = 64;
 
+/// `term` with the literal text of the pattern lowercased and the rest as
+/// written: an escape such as `\W`, `\p{Lu}` or `\x{41}`, and the name of a
+/// capture group.
+///
+/// Vale lowercases the whole pattern, so `\W` becomes `\w` and the term means
+/// something else. hakkiri leaves the escapes alone.
+pub(crate) fn lowercase_literals(term: &str) -> String {
+    let mut out = String::with_capacity(term.len());
+    let mut chars = term.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            '\\' => {
+                out.push(c);
+                let Some(escaped) = chars.next() else { break };
+                out.push(escaped);
+                if matches!(escaped, 'p' | 'P' | 'x' | 'u' | 'U') && chars.peek() == Some(&'{') {
+                    for inner in chars.by_ref() {
+                        out.push(inner);
+                        if inner == '}' {
+                            break;
+                        }
+                    }
+                }
+            }
+            '(' => {
+                out.push(c);
+                // `(?P<Name>` and `(?<Name>` name a group.
+                let rest: String = chars.clone().take(4).collect();
+                let skip = if rest.starts_with("?P<") {
+                    3
+                } else if rest.starts_with("?<")
+                    && !rest.starts_with("?<=")
+                    && !rest.starts_with("?<!")
+                {
+                    2
+                } else {
+                    0
+                };
+                if skip > 0 {
+                    for inner in chars.by_ref().take(skip) {
+                        out.push(inner);
+                    }
+                    for inner in chars.by_ref() {
+                        out.push(inner);
+                        if inner == '>' {
+                            break;
+                        }
+                    }
+                }
+            }
+            _ => out.extend(c.to_lowercase()),
+        }
+    }
+    out
+}
+
 /// `term` in the spelling that equals `observed` without regard to case, when
 /// one of the spellings the term lists does, and `term` itself otherwise.
 ///

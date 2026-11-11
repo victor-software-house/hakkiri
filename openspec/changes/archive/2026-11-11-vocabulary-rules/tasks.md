@@ -8,7 +8,7 @@ This change follows [`vocabularies`][vocabularies], which reads the lists and na
 - [x] 1.1 Probe Vale at `66bbb85` for a term whose pattern holds `\W`, and record the probe cases of the requirements with Vale's alerts in `tests/fixtures/vocabulary-rules/vale.tsv`.  
   Verify the file holds the alerts of every scenario of `Terms` and `Avoid`, with the Vale commit named in it.  
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/vocabulary-rules` with the nine configs in `vale/`, and gave 152 alerts.  
-  Nothing in them contradicts the plan: the design lists what they add, including that Vale lowercases a term's escapes, so `data\Wset` flags `dataxset`.
+  Nothing in them contradicts the plan: the design lists what they add, including that Vale lowercases a term's escapes, so `data\Wset` flags `dataxset`, where hakkiri flags `DATA SET`.
 - [x] 1.2 Build `Vale.Terms` and `Vale.Avoid` in a style `Vale`, with Vale's messages, levels, boundaries and recasing of the shown term.  
   Verify `tests/vocabulary_rules.rs` fails before the change and passes after it, against the alerts recorded in task 1.1.  
   Evidence, 2026-11-11 (UTC): `every_config_gives_the_alerts_vale_gives` failed on the source before the change, and passes after it for the nine configs.  
@@ -28,6 +28,10 @@ This change follows [`vocabularies`][vocabularies], which reads the lists and na
 
 ## 3. Integration
 
-- [ ] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+- [x] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+  Evidence, 2026-11-11 (UTC): [PR 92][pr-92] sits in a stack, where only the Kody check ran on its head, with 0 open findings.  
+  The box gate passed on the rebased tree, 601 tests, and again on the tree of this archive after the escape change, and the Mac gate passed on both.  
+  No other check has run on this change alone.
 
-[vocabularies]: ../archive/2026-11-11-vocabularies/tasks.md
+[vocabularies]: ../2026-11-11-vocabularies/tasks.md
+[pr-92]: https://github.com/victor-software-house/hakkiri/pull/92

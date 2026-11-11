@@ -1,4 +1,12 @@
-## ADDED Requirements
+# vocabulary-rules Specification
+
+## Purpose
+
+`Vale.Terms` and `Vale.Avoid` are the rules a vocabulary builds, in a built-in style `Vale`.  
+`Terms` reports an accepted term written in another case, and `Avoid` reports a rejected term.  
+A vocabulary that a glob names builds the same rules for that glob's files.
+
+## Requirements
 
 ### Requirement: Terms reports an accepted term written in another case
 
@@ -31,8 +39,8 @@ hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the named v
 
 #### Scenario: An escape in a term
 
-- **WHEN** `data\Wset` is accepted and the text is `A data set, data-set and dataxset.`
-- **THEN** the only alert is ``Use 'data\Wset' instead of 'dataxset'.``, because the lowercased pattern reads `\W` as `\w`, as in Vale
+- **WHEN** `data\Wset` is accepted and the text is `A data set, data-set, dataxset and DATA SET.`
+- **THEN** the only alert is ``Use 'data\Wset' instead of 'DATA SET'.``, because hakkiri lowercases the literal text of the term and leaves `\W` a non-word character
 
 #### Scenario: A phrase that wraps
 

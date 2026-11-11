@@ -36,4 +36,4 @@ A project that moves from Vale to hakkiri has no way to say the same, so it eith
 - No new dependency.
 
 [ledger]: ../../../tasks.yaml
-[vocabulary-rules]: ../vocabulary-rules/proposal.md
+[vocabulary-rules]: ../archive/2026-11-11-vocabulary-rules/proposal.md

@@ -34,6 +34,6 @@ The [vale-differences spec][differences] lists the missing rules as a known gap.
 - Changed: the rule builders, the config loader, `src/instructions.md`, the skill, `AGENTS.md` and `README.md`.
 - No new dependency.
 
-[ledger]: ../../../tasks.yaml
-[vocabularies]: ../archive/2026-11-11-vocabularies/proposal.md
-[differences]: ../../specs/vale-differences/spec.md
+[ledger]: ../../../../tasks.yaml
+[vocabularies]: ../2026-11-11-vocabularies/proposal.md
+[differences]: ../../../specs/vale-differences/spec.md

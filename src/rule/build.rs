@@ -23,6 +23,7 @@ use crate::pattern::{Pattern, PatternError};
 use crate::scope::Selector;
 use crate::sequence::{sentence_scope, upos};
 use crate::strcase::{Sentence, Style, Title, WORD};
+use crate::term::lowercase_literals;
 
 /// Where a rule came from, for the errors that name it.
 #[derive(Clone, Copy, Debug)]
@@ -1136,7 +1137,7 @@ pub(super) fn terms_rule(name: &str, terms: &[String]) -> Result<Rule, LoadError
     let source = vocabulary_source(name);
     let mut swaps: Vec<Swap> = Vec::new();
     for term in terms {
-        let key = format!(r"(?<!\w){}(?!\w)", term_pattern(&term.to_lowercase()));
+        let key = format!(r"(?<!\w){}(?!\w)", term_pattern(&lowercase_literals(term)));
         match swaps.iter_mut().find(|swap| swap.key == key) {
             Some(swap) => swap.value.clone_from(term),
             None => swaps.push(Swap {

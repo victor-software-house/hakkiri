@@ -71,20 +71,26 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 ### Requirement: Vocabulary rules differ from Vale's in these ways
 
-hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from the scenario below.
+hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from the scenarios below.
+
+#### Scenario: An escape in a term
+
+- **WHEN** `data\Wset` is accepted and the text is `A data set, data-set, dataxset and DATA SET.`
+- **THEN** hakkiri flags `DATA SET`, since it lowercases the literal text of the term and keeps `\W`, and Vale flags `dataxset`, since it lowercases the escape to `\w` ([vocabulary-rules 1][vocabulary-rules-1])
 
 #### Scenario: The style Vale with no term
 
 - **WHEN** a glob lists `styles: [Vale]` and no named vocabulary holds a term
 - **THEN** hakkiri refuses the config, where Vale runs `Vale.Spelling` and `Vale.Repetition` from that style (rows [HKR-026][ledger] and [HKR-038][ledger], [vocabulary-rules 4][vocabulary-rules-4])
 
-[check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
-[engine-14]: ../../../archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
-[html-7]: ../../../archive/2026-11-10-html-block-text/design.md#not-ported
-[ledger]: ../../../../../tasks.yaml
-[spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
-[styles-4]: ../../../archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
-[test-2]: ../../../archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
-[tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
-[vocabularies-8]: ../../../archive/2026-11-11-vocabularies/design.md#8-what-stays-different
+[check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
+[engine-14]: ../../../2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
+[html-7]: ../../../2026-11-10-html-block-text/design.md#not-ported
+[ledger]: ../../../../../../tasks.yaml
+[spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+[styles-4]: ../../../2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
+[test-2]: ../../../2026-11-10-test-command/design.md#2-a-case-is-a-small-record
+[tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[vocabularies-8]: ../../../2026-11-11-vocabularies/design.md#8-what-stays-different
+[vocabulary-rules-1]: ../../design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
 [vocabulary-rules-4]: ../../design.md#4-the-style-vale-needs-a-vocabulary-term
