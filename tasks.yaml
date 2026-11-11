@@ -15,6 +15,21 @@ queue:
       - JSON output holds no ESC byte with CLICOLOR_FORCE=1.
     plan: openspec/changes/test-command/proposal.md
 
+  - id: HKR-032
+    title: Name and load rule files as Vale does
+    scope: rules
+    outcome: >-
+      A rule file is named by its path and loaded from its style folder as Vale does,
+      so check, test and coverage give a file one name.
+    blocked_by: []
+    acceptance:
+      - A dotted file name, a nested rule at two levels, two files with one name, and a nested rule under test --coverage give the names and errors Vale 66bbb85 gives on probes.
+      - check, test and test --coverage agree on every rule name.
+    plan: openspec/changes/rule-names/proposal.md
+    notes:
+      - '2026-11-10, hkr004-engine probed Vale 3.26.0: styles/Team/Terms.custom.yml is Team.Terms, and styles/Nest/Sub/Bar.yml is Nest.Sub.Bar in lint and in coverage. hakkiri cuts at the last dot and reads only the files directly in a style folder.'
+      - 2026-11-10, the operator decided hakkiri matches Vale and cuts at the first dot, and refuses two files that end up with one name (operator, 2026-11-10).
+
   - id: HKR-029
     title: Release hakkiri through verctl
     scope: release
