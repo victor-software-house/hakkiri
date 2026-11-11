@@ -45,6 +45,11 @@ fn place(alert: &Alert) -> (usize, usize, usize) {
     (alert.line, alert.first_column, alert.last_column)
 }
 
+/// The line and column of the last character of an alert's match.
+fn end(alert: &Alert) -> (usize, usize) {
+    (alert.last_line, alert.last_column)
+}
+
 #[test]
 fn a_word_in_a_sentence() -> TestResult {
     let found = alerts(
@@ -223,6 +228,7 @@ fn a_match_across_markup_ends_at_its_last_character() -> TestResult {
     };
     assert_eq!(alert.matched, "very easy");
     assert_eq!(place(alert), (1, 3, 13));
+    assert_eq!(end(alert), (1, 13));
     Ok(())
 }
 
@@ -233,6 +239,7 @@ fn a_match_that_ends_in_a_wide_character() -> TestResult {
         "Un café.",
     )?;
     assert_eq!(found.iter().map(place).collect::<Vec<_>>(), [(1, 4, 7)]);
+    assert_eq!(found.iter().map(end).collect::<Vec<_>>(), [(1, 7)]);
     Ok(())
 }
 
@@ -243,6 +250,7 @@ fn a_zero_width_match_ends_where_it_starts() -> TestResult {
         "abc",
     )?;
     assert_eq!(found.iter().map(place).collect::<Vec<_>>(), [(1, 2, 2)]);
+    assert_eq!(found.iter().map(end).collect::<Vec<_>>(), [(1, 2)]);
     Ok(())
 }
 
@@ -257,7 +265,37 @@ fn a_match_across_a_line_break() -> TestResult {
     };
     assert_eq!(alert.message, "'very good'");
     assert_eq!(alert.matched, "very\ngood");
-    assert_eq!(place(alert), (1, 7, 11));
+    assert_eq!((alert.line, alert.first_column), (1, 7));
+    assert_eq!(end(alert), (2, 4));
+    Ok(())
+}
+
+#[test]
+fn a_match_across_a_line_break_and_markup() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: ['very good']\n",
+        "It is **very\ngood** here.",
+    )?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(alert.matched, "very\ngood");
+    assert_eq!((alert.line, alert.first_column), (1, 9));
+    assert_eq!(end(alert), (2, 4));
+    Ok(())
+}
+
+#[test]
+fn a_match_across_three_lines() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: ['a b c']\n",
+        "x a\nb\nc y",
+    )?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!((alert.line, alert.first_column), (1, 3));
+    assert_eq!(end(alert), (3, 1));
     Ok(())
 }
 

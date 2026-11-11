@@ -23,9 +23,11 @@ pub struct Alert {
     pub line: usize,
     /// The 1-based column, in characters, where the match starts.
     pub first_column: usize,
-    /// The 1-based column, in characters, of the last character of the match
-    /// in the file, or of the end of the first line when the match goes on to
-    /// the next.
+    /// The 1-based line of the last character of the match, which is `line`
+    /// when the match stays on it.
+    pub last_line: usize,
+    /// The 1-based column, in characters, of the last character of the match in
+    /// the file, on `last_line`.
     pub last_column: usize,
     /// The text that matched.
     pub matched: String,
@@ -147,17 +149,6 @@ impl<'a> Locator<'a> {
         (line, self.cursor.columns + 1)
     }
 
-    /// The column of the last character of `line`, counting its line feed.
-    fn line_end(&self, line: usize) -> usize {
-        let start = line
-            .checked_sub(1)
-            .and_then(|index| self.starts.get(index))
-            .copied()
-            .unwrap_or_default();
-        let end = self.starts.get(line).copied().unwrap_or(self.source.len());
-        self.characters(start..end)
-    }
-
     /// The characters that start inside the bytes `range` of the source.
     fn characters(&self, range: Range<usize>) -> usize {
         self.source.as_bytes().get(range).map_or(0, |bytes| {
@@ -213,12 +204,12 @@ impl<'a> Locator<'a> {
         (message, description): (String, String),
     ) -> Alert {
         let (line, first_column) = self.place(offset);
-        let last_column = last.map_or(first_column, |last| {
+        let (last_line, last_column) = last.map_or((line, first_column), |last| {
             let (last_line, column) = self.place(last);
-            if last_line > line {
-                self.line_end(line)
+            if last_line == line {
+                (line, column.max(first_column))
             } else {
-                column.max(first_column)
+                (last_line, column)
             }
         });
         Alert {
@@ -229,6 +220,7 @@ impl<'a> Locator<'a> {
             link: rule.link.clone(),
             line,
             first_column,
+            last_line,
             last_column,
             matched: matched.to_owned(),
             action: rule.action.clone(),
@@ -253,6 +245,7 @@ impl<'a> Locator<'a> {
             link: String::new(),
             line,
             first_column,
+            last_line: line,
             last_column: first_column,
             matched: String::new(),
             action: None,

@@ -71,7 +71,9 @@ A failure prints as `failed <path>: <message>` after the alerts.
 Pretty output holds no colour, because tools read these lines.
 `--format json` prints one object:
 
-- `alerts`: each with `path`, `line`, `column`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.
+- `alerts`: each with `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
+  `line` and `column` name the first character of the match and `end_line` and `end_column` its last, so a match that wraps a line ends on a later line.  
+  Columns count characters.
 - `failures`: each with `path` or `config`, and `message`.
 - `files`: how many files were linted.
 

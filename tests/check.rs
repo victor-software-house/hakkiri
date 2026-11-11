@@ -196,6 +196,7 @@ fn json_holds_no_escape_byte_under_forced_colour() -> TestResult {
         assert_eq!(alerts[0]["path"], "a.md");
         assert_eq!(alerts[0]["line"], 1);
         assert_eq!(alerts[0]["column"], 9);
+        assert_eq!(alerts[0]["end_line"], 1);
         assert_eq!(alerts[0]["end_column"], 12);
         assert_eq!(alerts[0]["level"], "warning");
         assert_eq!(alerts[0]["rule"], "Team.Filler");

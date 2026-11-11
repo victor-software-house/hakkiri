@@ -10,9 +10,11 @@
 //! --output=JSON text`, with `Vale.Spelling` and `Vale.Repetition` turned off,
 //! which hakkiri has no rule for yet.
 //!
-//! A match that spans lines ends on its first line in hakkiri, where Vale
-//! counts every character of it from the first column. The last column of such
-//! a row is left out of the comparison.
+//! A match that spans lines ends where its last character is in hakkiri, as
+//! `end_line` and `end_column`. Vale prints the first column plus the number of
+//! characters of the match, line breaks included, which can pass the end of the
+//! line. The comparison maps hakkiri's end to Vale's count for such a match,
+//! and compares the single-line ends as they are.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -89,16 +91,11 @@ fn vale_rows(name: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
         };
         if config == name {
             let matched = matched.replace("\\n", "\n");
-            let last = if matched.contains('\n') {
-                0
-            } else {
-                last.parse()?
-            };
             rows.insert((
                 file.to_owned(),
                 line.parse()?,
                 first.parse()?,
-                last,
+                last.parse()?,
                 level.to_owned(),
                 rule.to_owned(),
                 message.to_owned(),
@@ -122,15 +119,16 @@ fn rows_of(out: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
                 .unwrap_or_default()
         };
         let matched = text("match");
-        let last = if matched.contains('\n') {
-            0
-        } else {
+        let (line, first) = (number("line"), number("column"));
+        let last = if number("end_line") == line {
             number("end_column")
+        } else {
+            (first + matched.chars().count()).saturating_sub(1)
         };
         rows.insert((
             text("path"),
-            number("line"),
-            number("column"),
+            line,
+            first,
             last,
             text("level"),
             text("rule"),
@@ -168,6 +166,43 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
             "{name}: only Vale gave {only_vale:#?}, only hakkiri gave {only_ours:#?}"
         );
     }
+    Ok(())
+}
+
+/// `text/t5.md` wraps `mea Culpa` and `Bad Word` across a line break, and each
+/// alert names the line and column of the match's last character.
+#[test]
+fn a_match_across_lines_ends_at_its_last_character() -> TestResult {
+    let suite = Suite::new("vocabulary-rules-end");
+    let root = project(&suite, "end")?;
+    copy_into(&root, &fixture().join(".ctl"), Path::new(".ctl"))?;
+    let result = run(
+        root.path(),
+        &[
+            "check",
+            "--config",
+            ".ctl/rules.yaml",
+            "--format",
+            "json",
+            "text/t5.md",
+        ],
+        &[],
+    )?;
+    let json: Value = serde_json::from_str(&result.out)?;
+    let ends: Vec<[u64; 4]> = json["alerts"]
+        .as_array()
+        .ok_or("no alerts array")?
+        .iter()
+        .filter(|alert| {
+            alert["match"]
+                .as_str()
+                .is_some_and(|text| text.contains('\n'))
+        })
+        .map(|alert| {
+            ["line", "column", "end_line", "end_column"].map(|key| alert[key].as_u64().unwrap_or(0))
+        })
+        .collect();
+    assert_eq!(ends, [[1, 5, 2, 5], [2, 17, 3, 4]], "{}", result.out);
     Ok(())
 }
 
