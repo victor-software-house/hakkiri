@@ -53,6 +53,8 @@ struct Finder<'a> {
     current: Option<PathBuf>,
     warnings: Vec<String>,
     seen: HashSet<String>,
+    /// The named files already warned about.
+    warned: HashSet<String>,
     jobs: Vec<Job<'a>>,
     failures: Vec<Failure>,
 }
@@ -96,15 +98,18 @@ impl Finder<'_> {
         let Some(relative) = self.project.relative(file) else {
             return;
         };
-        if !self.seen.insert(relative.clone()) {
-            return;
-        }
+        let first = self.seen.insert(relative.clone());
         let Some(plan) = self.project.plan(&relative) else {
-            if named && !self.project.selects(&relative) {
+            // A walk may reach the file before the command line names it, so
+            // the warning has its own set.
+            if named && !self.project.selects(&relative) && self.warned.insert(relative) {
                 self.unmatched(&path);
             }
             return;
         };
+        if !first {
+            return;
+        }
         let extension = file
             .extension()
             .map(|extension| extension.to_string_lossy().into_owned())
@@ -159,7 +164,11 @@ impl Finder<'_> {
                     }
                 }
                 Err(error) => {
-                    let at = if let ignore::Error::WithPath { path, .. } = &error {
+                    let mut inner = &error;
+                    while let ignore::Error::WithDepth { err, .. } = inner {
+                        inner = err;
+                    }
+                    let at = if let ignore::Error::WithPath { path, .. } = inner {
                         path.as_path()
                     } else {
                         directory
@@ -202,6 +211,7 @@ pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf], options: Options
         current: std::env::current_dir().ok(),
         warnings: Vec::new(),
         seen: HashSet::new(),
+        warned: HashSet::new(),
         jobs: Vec::new(),
         failures: Vec::new(),
     };

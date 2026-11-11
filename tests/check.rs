@@ -1397,3 +1397,52 @@ fn a_walk_in_a_git_worktree_skips_what_the_main_exclude_file_ignores() -> TestRe
     );
     Ok(())
 }
+
+#[test]
+fn a_named_file_that_a_walk_reached_first_still_draws_the_warning() -> TestResult {
+    let suite = Suite::new("check-on-unmatched-walked");
+    let root = unmatched(&suite, "walked-first", DOCS_ONLY);
+    let result = run(
+        root.path(),
+        &["check", "--on-unmatched", "error", ".", "README.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .out
+            .contains("failed README.md: no glob selects it, so it is not linted"),
+        "{}",
+        result.out
+    );
+    Ok(())
+}
+
+#[cfg(unix)]
+#[test]
+fn an_unreadable_folder_is_a_failure_that_names_it() -> TestResult {
+    use std::fs::Permissions;
+    use std::os::unix::fs::PermissionsExt;
+
+    let suite = Suite::new("check-unreadable");
+    let root = project(&suite, "unreadable", CONFIG);
+    root.file("docs/a.md", "Fine.\n");
+    let locked = root.path().join("docs/locked");
+    std::fs::create_dir_all(&locked)?;
+    std::fs::set_permissions(&locked, Permissions::from_mode(0o000))?;
+    // A caller that ignores permissions, such as root, reads the folder.
+    let readable = std::fs::read_dir(&locked).is_ok();
+    let result = run(root.path(), &["check", "docs"], &[]);
+    std::fs::set_permissions(&locked, Permissions::from_mode(0o755))?;
+    if readable {
+        return Ok(());
+    }
+    let result = result?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result.out.contains("failed docs/locked:"),
+        "the failure names the folder: {}",
+        result.out
+    );
+    Ok(())
+}

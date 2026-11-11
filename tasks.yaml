@@ -55,6 +55,7 @@ queue:
     notes:
       - '2026-11-11, operator decision: git-ignored files are skipped by default, everything stays configurable in the config file and overridable by flags and variables as ctl-core allows, and the names are gitignore and on_unmatched. The ignore crate is the authorized new dependency for the walk.'
       - 2026-11-11, the templates lint:prose task passes every tracked file because Vale walks git-ignored folders while a build writes them; with this row it runs a bare hakkiri check.
+    plan: openspec/changes/gitignore-walk/proposal.md
 
   - id: HKR-045
     title: Fill indexed verbs in messages
