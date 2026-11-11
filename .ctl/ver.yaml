@@ -17,8 +17,9 @@ packages:
 # Each builds natively with the runner's own C compiler, which tree-sitter's
 # grammars need, so nothing is cross-compiled. linux-x64 overrides only the
 # triple: a static musl binary starts on a machine with no glibc loader, such
-# as NixOS without nix-ld. A declared prepare replaces verctl's stock one, so
-# the release:prepare task adds the Rust target and, for musl, musl-tools.
+# as NixOS without nix-ld. The musl C compiler is the zig that mise installs,
+# which mise.toml hands to cc-rs. A declared prepare replaces verctl's
+# stock one, so the release:prepare task adds the Rust target.
 assets:
   prepare: [mise, run, "release:prepare", "{triple}"]
   darwin-arm64: {}

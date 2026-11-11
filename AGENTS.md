@@ -48,7 +48,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    `.github/workflows/release.yml` calls verctl's reusable release workflow, and `.ctl/ver.yaml` declares the package with `publisher: none`, so a release is a tag, a GitHub Release and two tarballs with their checksums.  
    Each tarball builds natively on a free GitHub-hosted runner: `linux-x64` on `ubuntu-latest`, and `darwin-arm64` on `macos-latest`.  
    The `linux-x64` binary is a static musl build (operator, 2026-11-11), so it starts on a machine with no glibc loader, NixOS without nix-ld included.  
-   `mise run release:prepare` installs `musl-tools` and the Rust target before that build.  
+   `mise run release:prepare` installs the Rust target before that build, and the C compiler for it is the `zig` that `mise.toml` pins, set as `CC_x86_64_unknown_linux_musl` in `mise.toml`, so no apt package is installed.  
    The musl build links mimalloc as its global allocator (operator, 2026-11-11), because musl's own allocator makes a parallel `check` about eight times slower.  
    No other build links it.  
    Each change that ships behaviour adds a `.changeset/` fragment; merging the Version PR is the release.  
