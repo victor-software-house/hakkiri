@@ -17,6 +17,7 @@ mod error;
 pub mod formula;
 mod html;
 mod html_text;
+mod ignore;
 mod jsdoc;
 mod language;
 mod markdown;
@@ -39,6 +40,7 @@ pub mod words;
 
 pub use error::Error;
 pub use language::Language;
+use pattern::Pattern;
 pub use tree::{Join, Node, Reading, Scope, Tree};
 
 /// Parses `source`, the text of a file in `language`, into its document tree.
@@ -54,9 +56,36 @@ pub use tree::{Join, Node, Reading, Scope, Tree};
 /// Returns an [`Error`] when an MDX file has a syntax error, or when the
 /// grammar of a source language cannot load or cannot parse the file.
 pub fn parse(language: Language, source: &str) -> Result<Tree, Error> {
+    parse_ignoring(language, source, &[], &[])
+}
+
+/// Parses `source` as [`parse`] does, with the text that the block and token
+/// patterns match left out of the prose.
+///
+/// A Markdown or MDX file is read as Vale reads it under `BlockIgnores` and
+/// `TokenIgnores`.
+/// Each match of a `blocks` pattern becomes a fenced code block that holds its
+/// first group, and each match of a `tokens` pattern becomes a code span that
+/// holds it.
+/// The patterns run in order, block patterns first, each over the text the one
+/// before it left.
+/// Every span of the tree is in `source`.
+/// A source file has no such text, and its tree is the one [`parse`] gives.
+///
+/// # Errors
+///
+/// Returns an [`Error`] when an MDX file has a syntax error, when the grammar
+/// of a source language cannot load or cannot parse the file, or when a
+/// pattern that backtracks gives up on the file.
+pub fn parse_ignoring(
+    language: Language,
+    source: &str,
+    blocks: &[&Pattern],
+    tokens: &[&Pattern],
+) -> Result<Tree, Error> {
     let (roots, code_blocks) = match language {
-        Language::Markdown => markdown::document(source, markdown::Flavor::Markdown)?,
-        Language::Mdx => markdown::document(source, markdown::Flavor::Mdx)?,
+        Language::Markdown => ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?,
+        Language::Mdx => ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?,
         Language::Rust => (comments::roots(comments::Dialect::Rust, source)?, 0),
         Language::TypeScript => (comments::roots(comments::Dialect::TypeScript, source)?, 0),
         Language::Tsx => (comments::roots(comments::Dialect::Tsx, source)?, 0),

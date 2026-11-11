@@ -10,7 +10,7 @@ use std::{fs, io, thread};
 use hakkiri::alert::Alert;
 use hakkiri::engine::lint_accepting;
 use hakkiri::rule::{Level, Unrunnable};
-use hakkiri::{Tree, parse};
+use hakkiri::{Tree, parse_ignoring};
 
 use crate::cli::CheckArgs;
 use crate::config::{self, DEFAULT, Plan};
@@ -83,7 +83,13 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
 /// The alerts of one file, at the levels the config sets, or why it gave none.
 fn lint_file(job: &Job<'_>) -> Result<Vec<Alert>, String> {
     let source = fs::read_to_string(&job.file).map_err(|error| error.to_string())?;
-    let tree = parse(job.language, &source).map_err(|error| error.to_string())?;
+    let tree = parse_ignoring(
+        job.language,
+        &source,
+        &job.plan.block_ignores,
+        &job.plan.token_ignores,
+    )
+    .map_err(|error| error.to_string())?;
     lint_planned(&job.plan, &tree, &source, &job.extension)
 }
 

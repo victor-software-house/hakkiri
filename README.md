@@ -24,6 +24,7 @@ An editor server follows in the second release.
 - A project pins rule packages by version and hash in `.ctl/hakkiri.yaml`; hakkiri fetches and caches them.
 - A package may ship its own settings in `.ctl/hakkiri.yaml`, which apply before the project's and yield to them.
 - A package's vocabularies hold back the matches of the words a project accepts, at the top level or for a glob, and build the rules `Vale.Terms` and `Vale.Avoid`.
+- A glob can hide the text its block and token patterns match from the prose rules in Markdown and MDX, as Vale's `BlockIgnores` and `TokenIgnores` do.
 - Files are checked in parallel.
 
 ## Install

@@ -1,0 +1,18 @@
+Intro with {{ very_var }} and a very plain word.
+
+A paragraph with @@very + really@@ math and a really long tail, then {{ really }} again.
+
+# Heading with {{ very }} token and very word
+
+- List item {{ really }} and very.
+- Second @@x@@ item.
+
+> Quote {{ very }} very.
+
+| Name | Value |
+|:-----|:------|
+| {{ very }} | really |
+
+A [link {{ very }} text](https://example.com/very) and **bold {{ really }}** words.
+
+Spaced {{ x }} out and {{ y }}{{ z }} joined.

@@ -1,0 +1,6 @@
+extends: existence
+message: "Code '%s'"
+level: warning
+scope: code
+tokens:
+  - 'very'

@@ -1,0 +1,8 @@
+packages:
+  - path: styles
+files:
+  'text/*.{md,mdx}':
+    styles: [Team]
+  'text/*.rs':
+    styles: [Team]
+    Team.Sentence: off

@@ -186,7 +186,7 @@ pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
 }
 
 /// The prose nodes of `source` and its number of code blocks.
-fn build(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
+pub(crate) fn build(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
     let root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
     let builder = Builder {
         source,

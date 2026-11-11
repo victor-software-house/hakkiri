@@ -137,6 +137,12 @@ files:
   A fault in the file is an error that names the package, the file and the line.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.
+- `block_ignores` and `token_ignores` list patterns in a glob of `files`, as Vale's `BlockIgnores` and `TokenIgnores` do, and a package's settings file can hold them too.
+  In a Markdown or MDX file, each match of a block pattern is read as a fenced code block that holds its first group, and each match of a token pattern as a code span that holds it. No rule that reads prose reports text inside them.
+  A `scope: raw` rule still reads the file as written, and a `scope: code` rule reads each ignored token.
+  The patterns run in order, block patterns first, each over the text the one before it left. A pattern with no group drops its match from the text, and a match of no bytes changes nothing.
+  A file takes the patterns of every glob that matches it, a package's first, so a project adds to a package. A source file takes none, since Vale applies none to a comment.
+  A pattern that does not compile is an error on its line.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.
 - A rule name, such as `ProseStyle.BareURL`, sets that rule's level to `suggestion`, `warning` or `error`, turns it `on` at the level of its rule file, or turns it `off`.
   A level or `on` also runs the rule when no glob lists its style, as `Team.Terms: warning` does, and `off` on such a rule changes nothing.

@@ -1,0 +1,6 @@
+extends: existence
+message: "Sentence '%s'"
+level: warning
+scope: sentence
+tokens:
+  - 'really'

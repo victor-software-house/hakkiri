@@ -1,0 +1,9 @@
+packages:
+  - path: styles
+files:
+  'text/*.mdx':
+    styles: [Team]
+    block_ignores:
+      - "(?s)(BEGIN.*?END)"
+    token_ignores:
+      - "(\\[\\[.*?\\]\\])"

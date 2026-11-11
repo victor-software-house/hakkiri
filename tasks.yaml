@@ -55,6 +55,7 @@ queue:
     notes:
       - "2026-11-11, operator decision: hakkiri matches Vale here, under Vale's own names in the config's casing. OpenSpec 1.16.0 and 1.17.0 refuse a proposal without the headings Why and What Changes, and ProseStyle.ChattyHeadings flags both at the error level; six repositories skip the two lines with BlockIgnores today, and one uses TokenIgnores."
       - 2026-11-11, the ProseStyle package carries the proposal entry, so the template and the consumers write none (lead decision).
+    plan: openspec/changes/block-token-ignores/proposal.md
 
   - id: HKR-044
     title: Choose which files a run reads

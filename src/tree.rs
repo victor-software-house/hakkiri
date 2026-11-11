@@ -365,30 +365,39 @@ impl Node {
     pub(crate) fn map_segments(&mut self, map: &impl Fn(Range<usize>) -> Vec<Range<usize>>) {
         let mut pending = vec![self];
         while let Some(node) = pending.pop() {
-            let mut segments = Vec::new();
-            let mut reads = Vec::new();
-            for (index, segment) in node.segments.iter().enumerate() {
-                let reading = node.reading(index);
-                for (part, range) in map(segment.clone()).into_iter().enumerate() {
-                    segments.push(range);
-                    // The text that follows a part of a segment was joined to
-                    // it by the segment's own text.
-                    reads.push(Reading {
-                        before: if part == 0 { reading.before } else { Join::Gap },
-                        ..reading
-                    });
-                }
-            }
-            node.reads = if node.reads.is_empty() {
-                Vec::new()
-            } else {
-                reads
-            };
-            node.segments = segments;
-            if let (Some(first), Some(last)) = (node.segments.first(), node.segments.last()) {
-                node.span = first.start..last.end;
-            }
+            node.remap(map);
             pending.extend(node.children.iter_mut());
+        }
+    }
+
+    /// Replaces the segments and the span of this node alone. `map` gives the
+    /// segments of a range from its current place.
+    ///
+    /// A node whose segments all map to nothing is left with none, and keeps
+    /// its old span.
+    pub(crate) fn remap(&mut self, map: &impl Fn(Range<usize>) -> Vec<Range<usize>>) {
+        let mut segments = Vec::new();
+        let mut reads = Vec::new();
+        for (index, segment) in self.segments.iter().enumerate() {
+            let reading = self.reading(index);
+            for (part, range) in map(segment.clone()).into_iter().enumerate() {
+                segments.push(range);
+                // The text that follows a part of a segment was joined to
+                // it by the segment's own text.
+                reads.push(Reading {
+                    before: if part == 0 { reading.before } else { Join::Gap },
+                    ..reading
+                });
+            }
+        }
+        self.reads = if self.reads.is_empty() {
+            Vec::new()
+        } else {
+            reads
+        };
+        self.segments = segments;
+        if let (Some(first), Some(last)) = (self.segments.first(), self.segments.last()) {
+            self.span = first.start..last.end;
         }
     }
 }

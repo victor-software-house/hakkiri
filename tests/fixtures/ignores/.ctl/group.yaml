@@ -1,0 +1,7 @@
+packages:
+  - path: styles
+files:
+  'text/*.md':
+    styles: [Team]
+    block_ignores:
+      - "(?s)(BEGIN.*?END)"

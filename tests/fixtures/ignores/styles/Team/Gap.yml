@@ -1,0 +1,7 @@
+extends: existence
+message: "Gap '%s'"
+level: warning
+scope: text
+nonword: true
+tokens:
+  - '\s\s'

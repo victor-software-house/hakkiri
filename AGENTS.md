@@ -38,6 +38,9 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A package may hold vocabularies in `config/vocabularies/<name>/`, which the `vocab` key names at the top level and in a glob of `files` (operator, 2026-11-11).  
    The top level reaches every check that reads accepted terms, and a glob's list reaches the files it matches, as Vale's `Vocab` does.  
    The lists build `Vale.Terms` and `Vale.Avoid` in a built-in style `Vale`, and a glob's vocabulary builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` for its files.  
+   A glob's `block_ignores` and `token_ignores` hide what their patterns match from the prose rules, as Vale's `BlockIgnores` and `TokenIgnores` do (row `HKR-043`).  
+   hakkiri rewrites a Markdown or MDX file as Vale does, parses the result, and gives every node the bytes of the file it came from, so alerts point at the file as written.  
+   A source file takes none, since Vale reads a comment as plain lines.  
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
    Vale matches the path as given; the departure is in the `vale-differences` spec.
 6. **Exit status.**

@@ -1,0 +1,9 @@
+import X from 'x'
+
+Intro very [[ really ]] text.
+
+BEGIN
+very
+END
+
+Tail really.

@@ -1,0 +1,5 @@
+---
+title: front {{ x }}
+---
+
+Body very text {{ very }}.

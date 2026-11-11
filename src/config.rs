@@ -16,6 +16,7 @@ use std::{fmt, fs, io};
 use ctl_core::input::Input;
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
+use hakkiri::pattern::Pattern;
 use hakkiri::rule::{
     Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style, vocabulary_rules,
 };
@@ -220,6 +221,11 @@ struct Glob {
     /// Whether the glob wrote an empty `vocab` list, which drops the lists of
     /// the earlier globs of the same text.
     clears_vocab: bool,
+    /// The patterns whose matches are hidden as blocks from the files the glob
+    /// matches.
+    block_ignores: Vec<Pattern>,
+    /// The patterns whose matches are hidden as inline text.
+    token_ignores: Vec<Pattern>,
     choices: Vec<(String, Choice)>,
 }
 
@@ -258,6 +264,11 @@ pub(crate) struct Plan<'a> {
     /// The exceptions of the vocabularies that the globs matching the file
     /// name, one for each, in the order the globs are written.
     pub(crate) accepted: Vec<&'a Exceptions>,
+    /// The block patterns of the globs matching the file, in the order the
+    /// globs are written.
+    pub(crate) block_ignores: Vec<&'a Pattern>,
+    /// The token patterns of the globs matching the file, in the same order.
+    pub(crate) token_ignores: Vec<&'a Pattern>,
 }
 
 impl Project {
@@ -322,8 +333,12 @@ impl Project {
         let mut switches: HashMap<String, bool> = HashMap::new();
         let mut set_levels: HashMap<&str, Level> = HashMap::new();
         let mut named: Vec<&str> = Vec::new();
+        let mut block_ignores: Vec<&Pattern> = Vec::new();
+        let mut token_ignores: Vec<&Pattern> = Vec::new();
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
             matched = true;
+            block_ignores.extend(&glob.block_ignores);
+            token_ignores.extend(&glob.token_ignores);
             for name in &glob.vocab {
                 if !named.contains(&name.as_str()) {
                     named.push(name);
@@ -408,6 +423,8 @@ impl Project {
             levels,
             unrunnable,
             accepted,
+            block_ignores,
+            token_ignores,
         })
     }
 }
@@ -921,6 +938,8 @@ fn read_globs(
         let inner = line.map_or(1, |line| line + 1);
         let mut listed = None;
         let mut vocabularies = None;
+        let mut block_ignores = Vec::new();
+        let mut token_ignores = Vec::new();
         let mut choices = Vec::new();
         for (key, setting) in settings.0 {
             let at = key_line(text, &key, inner);
@@ -943,6 +962,15 @@ fn read_globs(
                 ("vocab", Setting::List(list)) => vocabularies = Some(list),
                 ("vocab", Setting::Word(_)) => {
                     faults.add(at, "vocab", "is a list of vocabulary names".to_owned());
+                }
+                ("block_ignores", Setting::List(list)) => {
+                    block_ignores = compile_all(&list, at, "block_ignores", faults);
+                }
+                ("token_ignores", Setting::List(list)) => {
+                    token_ignores = compile_all(&list, at, "token_ignores", faults);
+                }
+                ("block_ignores" | "token_ignores", Setting::Word(_)) => {
+                    faults.add(at, &key, "is a list of patterns".to_owned());
                 }
                 (_, setting) if !known.contains(key.as_str()) => {
                     let message = if matches!(setting, Setting::List(_)) {
@@ -973,10 +1001,31 @@ fn read_globs(
             styles: listed,
             clears_vocab: vocabularies.as_ref().is_some_and(Vec::is_empty),
             vocab: vocabularies.unwrap_or_default(),
+            block_ignores,
+            token_ignores,
             choices,
         });
     }
     globs
+}
+
+/// The patterns `list` holds, compiled, and a fault on line `at` of the key
+/// `key` for each that does not compile.
+fn compile_all(
+    list: &[String],
+    at: Option<usize>,
+    key: &str,
+    faults: &mut Faults<'_>,
+) -> Vec<Pattern> {
+    list.iter()
+        .filter_map(|source| match Pattern::new(source) {
+            Ok(pattern) => Some(pattern),
+            Err(error) => {
+                faults.add(at, key, error.to_string());
+                None
+            }
+        })
+        .collect()
 }
 
 /// Refuses the faults in the rule names of each style a glob lists, as Vale
