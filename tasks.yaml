@@ -312,6 +312,20 @@ queue:
       - "2026-11-11, found by the ProseStyle port: v0.0.14 LongSentence is an occurrence rule whose token (?:\\b\\w+\\b|\\*+) counts Vale's mask of a code span, a run of asterisks. hakkiri has no mask and an occurrence counts no match that overlaps a code span, so it counts 3 words in Run `a`, `b`, `c` and `one two three` today, where Vale counts 7."
       - '2026-11-11, decision: the engine stays as the match-checks spec states, since a metric words rule counts each code span once. The rule moves to a metric words form, with its message and cases, in the prose-style package.'
     plan: openspec/changes/code-span-words/proposal.md
+
+  - id: HKR-052
+    title: Tag a sentence as the Vale release ProseStyle is tested on tags it
+    scope: tagger
+    outcome: >-
+      hakkiri's English tags agree with the tags of Vale 3.26.0 on the sentences of
+      the ProseStyle cases, so NounStack, ThingsSpeakNoun and the harness case pass.
+    blocked_by: []
+    acceptance:
+      - The ProseStyle v0.0.14 cases of NounStack, ThingsSpeakNoun and 'harness as a noun passes' give under hakkiri the alerts they give under Vale 3.26.0.
+      - A test holds the tags that prose v3.2.2 gives six sentences, among them 'The freshness harness reads stdout.', and fails on the source before the change.
+    notes:
+      - "2026-11-11, found by the ProseStyle port: hakkiri's tagger is faithful to prose at b33e60d, the version Vale 66bbb85 builds on, and gives the tags a Go program on that version gives. Vale 3.26.0 ships prose v3.2.2, whose model is older (3,411,804 bytes, the bytes feature template, MIT) and tags 'reads' in 'The freshness harness reads stdout.' as VBZ, where the b33e60d model (1,877,993 bytes, UD English EWT, CC BY-SA 4.0, the runes template) gives NNS."
+      - '2026-11-11, on 1,296 sentences of our documents the two models give a different tag for 3,395 of 18,431 tokens, 18.4%. The most common changes from the older to the newer are JJ to NN (545), NNS to VBZ (405) and VBZ to NNS (128). Two ways to close it: ship the v3.2.2 model, with the bytes template that hakkiri does not read yet, or keep the model and accept the difference in the vale-differences spec.'
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary
