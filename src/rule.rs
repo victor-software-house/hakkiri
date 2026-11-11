@@ -948,11 +948,18 @@ pub fn read_style(folder: &Path, search: &[PathBuf]) -> Result<Style, LoadError>
             })
             .and_then(|text| Rule::from_text_searching(&name, &file, &text, package, search));
         match read {
-            Ok(rule) => match rules.iter().position(|earlier| earlier.name == rule.name) {
-                Some(at) => rules[at] = rule,
-                None => rules.push(rule),
-            },
+            Ok(rule) => {
+                // The later file wins, as in Vale: it replaces an earlier
+                // rule of the name, runnable or not.
+                unrunnable.retain(|earlier: &Unrunnable| earlier.name != rule.name);
+                match rules.iter().position(|earlier| earlier.name == rule.name) {
+                    Some(at) => rules[at] = rule,
+                    None => rules.push(rule),
+                }
+            }
             Err(error) if error.is_unrunnable() => {
+                rules.retain(|earlier| earlier.name != name);
+                unrunnable.retain(|earlier| earlier.name != name);
                 unrunnable.extend(error.problems.into_iter().map(|problem| Unrunnable {
                     name: name.clone(),
                     file: problem.file,
