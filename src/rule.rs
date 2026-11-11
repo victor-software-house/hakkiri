@@ -14,7 +14,8 @@ mod field;
 mod package;
 mod schema;
 
-use std::path::Path;
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 use std::{error, fmt, fs};
 
 use ctl_core::input::{Input, InputError};
@@ -653,34 +654,97 @@ fn at_tab(mut error: InputError, text: &str) -> LoadError {
     LoadError::from(error)
 }
 
-/// The name the rule in `file` has: the folder that holds it, a dot, and the
-/// file name without its extension, so `Team/Foo.v2.yml` is `Team.Foo.v2`.
+/// The name the rule in `file` has in the style folder `style`: the folder's
+/// name, then each folder between it and the file, then the file name up to
+/// its first dot, all joined by dots.
+/// So `Team/Foo.yml` is `Team.Foo`, `Team/Terms.custom.yml` is `Team.Terms`,
+/// and `Team/Sub/Bar.yml` is `Team.Sub.Bar`, as Vale names them.
 ///
 /// [`load_style`] names its rules this way, and so does every caller that
-/// must agree with it. `None` when the file has no folder name or its names
-/// are not UTF-8.
-#[must_use]
-pub fn rule_name(file: &Path) -> Option<String> {
-    let style = file.parent()?.file_name()?.to_str()?;
-    let stem = file.file_stem()?.to_str()?;
-    Some(format!("{style}.{stem}"))
-}
-
-/// Loads every `.yml` file directly inside the style folder `folder`.
-///
-/// A rule is named by the folder, a dot, and its file name without the
-/// extension. Every other file in the folder is ignored.
-/// The folder's parent is the rule's package.
-/// The rules come in file name order.
+/// must agree with it.
 ///
 /// # Errors
 ///
-/// Returns a [`LoadError`] with the problems of every rule file, or with the
-/// failure to read the folder.
+/// Returns why `file` has no name: it is not in `style`, a name is not
+/// UTF-8, or the name holds a bracket, which Vale keeps for the settings of a
+/// rule.
+pub fn rule_name(style: &Path, file: &Path) -> Result<String, String> {
+    let folder = style
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or("the style folder has no name")?;
+    let relative = file
+        .strip_prefix(style)
+        .ok()
+        .ok_or("the rule is not in the style folder")?;
+    let mut parts = Vec::new();
+    for part in relative.components() {
+        parts.push(part.as_os_str().to_str().ok_or("a name is not UTF-8")?);
+    }
+    let last = parts.pop().ok_or("the rule has no file name")?;
+    parts.push(last.split('.').next().unwrap_or(last));
+    let name = format!("{folder}.{}", parts.join("."));
+    if name.contains(['[', ']']) {
+        return Err(format!(
+            "`{name}` has a bracket, which a rule name cannot hold"
+        ));
+    }
+    Ok(name)
+}
+
+/// Whether `path` is a rule file: a file with the extension `yml` that is no
+/// `*.test.yml` file of cases.
+fn is_rule_file(path: &Path) -> bool {
+    let is_test = path
+        .file_stem()
+        .map(Path::new)
+        .and_then(Path::extension)
+        .is_some_and(|extension| extension == "test");
+    path.extension().is_some_and(|extension| extension == "yml") && !is_test && path.is_file()
+}
+
+/// The rule files under `folder`, in the order Vale walks them: each folder's
+/// entries by name, a subfolder where it sits, and no folder whose name starts
+/// with `.` or `_`.
+/// A `*.test.yml` file holds cases and is no rule.
+fn rule_files(folder: &Path, files: &mut Vec<PathBuf>) -> Result<(), (PathBuf, std::io::Error)> {
+    let fail = |error| (folder.to_path_buf(), error);
+    let mut entries = fs::read_dir(folder)
+        .map_err(fail)?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(fail)?;
+    entries.sort_by_key(fs::DirEntry::file_name);
+    for entry in entries {
+        let path = entry.path();
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if entry.file_type().map_err(fail)?.is_dir() {
+            if !name.starts_with(['.', '_']) {
+                rule_files(&path, files)?;
+            }
+        } else if is_rule_file(&path) {
+            files.push(path);
+        }
+    }
+    Ok(())
+}
+
+/// Loads every rule file under the style folder `folder`.
+///
+/// A rule is named as [`rule_name`] names it, so a file in a subfolder joins
+/// the folders to its name.
+/// A folder that starts with `.` or `_`, a `*.test.yml` file and every other
+/// file are ignored.
+/// The folder's parent is the rule's package.
+/// The rules come in the order of the walk.
+///
+/// # Errors
+///
+/// Returns a [`LoadError`] with the problems of every rule file, with the
+/// failure to read a folder, or with two files that give one rule name.
 pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
-    let unread = |message: String| LoadError {
+    let unread = |file: &Path, message: String| LoadError {
         problems: vec![LoadProblem {
-            file: folder.display().to_string(),
+            file: file.display().to_string(),
             line: None,
             column: None,
             field: String::new(),
@@ -688,23 +752,17 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
         }],
     };
     if folder.file_name().and_then(|name| name.to_str()).is_none() {
-        return Err(unread("the style folder has no name".to_owned()));
+        return Err(unread(folder, "the style folder has no name".to_owned()));
     }
     let package = folder
         .parent()
         .filter(|parent| !parent.as_os_str().is_empty())
         .unwrap_or_else(|| Path::new("."));
-    let entries = fs::read_dir(folder).map_err(|error| unread(error.to_string()))?;
     let mut files = Vec::new();
-    for entry in entries {
-        let path = entry.map_err(|error| unread(error.to_string()))?.path();
-        if path.is_file() && path.extension().is_some_and(|extension| extension == "yml") {
-            files.push(path);
-        }
-    }
-    files.sort();
+    rule_files(folder, &mut files).map_err(|(at, error)| unread(&at, error.to_string()))?;
     let mut rules = Vec::new();
     let mut problems = Vec::new();
+    let mut named: HashMap<String, PathBuf> = HashMap::new();
     for path in files {
         let file = path.display().to_string();
         let failed = |message: String| LoadError {
@@ -716,9 +774,16 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
                 message,
             }],
         };
-        let rule = rule_name(&path)
-            .ok_or_else(|| failed("the file name is not UTF-8".to_owned()))
+        let rule = rule_name(folder, &path)
+            .map_err(failed)
             .and_then(|name| {
+                if let Some(first) = named.get(&name) {
+                    return Err(failed(format!(
+                        "the rule `{name}` is also the name of `{}`: a rule name ends at the first dot of its file name, so rename one file",
+                        first.display()
+                    )));
+                }
+                named.insert(name.clone(), path.clone());
                 let text = fs::read_to_string(&path).map_err(|error| failed(error.to_string()))?;
                 Rule::from_text_in(&name, &file, &text, package)
             });

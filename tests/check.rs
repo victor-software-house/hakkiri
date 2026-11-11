@@ -794,6 +794,81 @@ fn a_rule_name_sets_the_level() -> TestResult {
 }
 
 #[test]
+fn a_rule_name_ends_at_the_first_dot_of_its_file_name() -> TestResult {
+    let suite = Suite::new("check-first-dot");
+    let root = suite.scenario("first-dot");
+    root.file("styles/Team/Terms.custom.yml", FILLER);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Terms: Remove 'very'.",
+            "1 alert in 1 file",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_rule_in_a_folder_under_a_style_is_named_by_every_folder() -> TestResult {
+    let suite = Suite::new("check-nested");
+    let root = suite.scenario("nested");
+    root.file("styles/Team/Sub/Bar.yml", FILLER);
+    root.file("styles/Team/Sub/Deep/Baz.yml", HARSH);
+    root.file(
+        "styles/Team/Sub/Bar.test.yml",
+        "- name: cases\n  input: very\n  contains: Team.Sub.Bar\n",
+    );
+    root.file("styles/Team/_draft/Old.yml", "not: a rule\n");
+    root.file("styles/Team/.hidden/Old.yml", "not: a rule\n");
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file("a.md", "This is very terrible.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Sub.Bar: Remove 'very'.",
+            "a.md:1:14: error Team.Sub.Deep.Baz: Never 'terrible'.",
+            "2 alerts in 1 file",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn two_files_with_one_rule_name_are_refused() -> TestResult {
+    let suite = Suite::new("check-clash");
+    let root = suite.scenario("clash");
+    root.file("styles/Team/Terms.yml", FILLER);
+    root.file("styles/Team/Terms.custom.yml", HARSH);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}", result.out);
+    for part in ["Team.Terms", "Terms.yml", "Terms.custom.yml"] {
+        assert!(result.err.contains(part), "{part}: {}", result.err);
+    }
+    Ok(())
+}
+
+#[test]
+fn a_rule_name_with_a_bracket_is_refused() -> TestResult {
+    let suite = Suite::new("check-bracket");
+    let root = suite.scenario("bracket");
+    root.file("styles/Team/Weird[max].yml", FILLER);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}", result.out);
+    assert!(result.err.contains("Team.Weird[max]"), "{}", result.err);
+    Ok(())
+}
+
+#[test]
 fn a_misspelled_rule_name_is_refused() -> TestResult {
     let suite = Suite::new("check-misspelled");
     let root = project(

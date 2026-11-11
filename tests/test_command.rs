@@ -305,11 +305,28 @@ fn a_rule_file_with_a_dotted_name_is_named_as_the_style_loader_names_it() -> Tes
     root.file(".ctl/hakkiri.yaml", CONFIG);
     root.file(
         "through.test.yml",
-        "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Foo.v2\n",
+        "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Foo\n  absent: Team.Foo.v2\n",
     );
     let result = run(root.path(), &["test", "--coverage"], &[])?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
     assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed, 0 uncovered"]);
+    Ok(())
+}
+
+#[test]
+fn a_nested_rule_file_is_named_by_every_folder_under_its_style() -> TestResult {
+    let suite = Suite::new("test-nested");
+    let root = suite.scenario("nested");
+    root.file("styles/Team/Sub/Deep/Bar.yml", HEDGE);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file(
+        "through.test.yml",
+        "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Sub.Deep.Bar\n\
+         - name: alone\n  rule: styles/Team/Sub/Deep/Bar.yml\n  input: Say perhaps later.\n  contains: Team.Sub.Deep.Bar\n",
+    );
+    let result = run(root.path(), &["test", "--coverage"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 2 passed, 0 failed, 0 uncovered"]);
     Ok(())
 }
 
@@ -361,7 +378,7 @@ fn a_symlinked_style_folder_is_named_by_its_link() -> TestResult {
     std::os::unix::fs::symlink("../shared/TeamStyle", root.path().join("styles/Team"))?;
     root.file(
         "through.test.yml",
-        "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Foo\n",
+        "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Foo\n  absent: Team.Foo.v2\n",
     );
     let result = run(
         root.path(),

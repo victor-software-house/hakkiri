@@ -45,7 +45,9 @@ hakkiri test --format json
 - A case sees its alerts as lines, `line:column:Rule:message`. `want` equals them after both are trimmed, and an empty `want` means no alerts.
 - A case in a rule file, and a case with `rule` (a path relative to its test file), loads that rule alone: no config, every level.
   Any other case lints `input` as `input.<format>` through the project config.
-- A rule is named by its style folder as the path gives it, so a style folder that is a symlink keeps the name of the link, and `Foo.yml` run from inside `Team` is `Team.Foo`.
+- A rule is named by its style folder, the folders under it and its file name up to the first dot, joined by dots: `Team/Sub/Bar.yml` is `Team.Sub.Bar`, and `Team/Terms.custom.yml` is `Team.Terms`.
+  `test` finds the style folder from the packages of the config, and from the folder that holds the file when no package holds it.
+  The style folder is named as the path gives it, so a style folder that is a symlink keeps the name of the link, and `Foo.yml` run from inside `Team` is `Team.Foo`.
 - A path is a file or a directory. A walk skips dot folders other than the one named, and `node_modules`. It reads a `.yml` file that is not a test file only when it holds `extends` and `tests`.
 - `--coverage` lists the rule files under the paths and fails when a rule flags nothing in any case.
 - A failed case prints as `failed <file>: <name>`, its reason, its `about`, and the alerts it got, with a `-` and `+` diff against `want`. The last line counts the files, the cases that passed and the cases that failed.
@@ -109,7 +111,8 @@ files:
 - The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every `path` and glob is relative to the project root, the folder that holds `.ctl`, and a file outside it matches no glob. A path given outside the root draws a warning on standard error, and a run where no path lies under the root exits 2.
 - A key the config does not define is an error that names the key and its line.
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
-- `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule. Two folders that hold one style name are refused.
+- `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule, in the folder or under it. A folder that starts with `.` or `_` and a `*.test.yml` file are skipped.
+  Two folders that hold one style name are refused, and so are two files that give one rule name.
   A `url` entry is not downloaded yet.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.

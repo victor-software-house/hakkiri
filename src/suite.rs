@@ -46,9 +46,12 @@ pub(crate) fn test(args: &TestArgs) -> Tests {
     let uncovered = if args.coverage {
         let (rule_files, rule_failures) = find(&args.paths, &skips_inert, &is_rule_file);
         failures.extend(rule_failures);
-        rule_files
+        let names: Vec<String> = rule_files
             .iter()
-            .filter_map(|file| rule_name(file))
+            .filter_map(|file| runner.style_of(file).ok().map(|(name, _)| name))
+            .collect();
+        names
+            .into_iter()
             .filter(|name| !runner.fired.contains(name))
             .collect()
     } else {
@@ -190,16 +193,6 @@ fn absolute(file: &Path) -> Option<PathBuf> {
     Some(clean)
 }
 
-/// The folder that holds `file`'s style folder, as the style loader finds it.
-fn package_of(file: &Path) -> Option<PathBuf> {
-    Some(absolute(file)?.parent()?.parent()?.to_path_buf())
-}
-
-/// The name the style loader gives the rule in `file`.
-fn rule_name(file: &Path) -> Option<String> {
-    rule::rule_name(&absolute(file)?)
-}
-
 /// Where a case runs.
 enum Setup<'a> {
     /// Against this rule alone.
@@ -250,10 +243,7 @@ impl Runner {
         if !has_key(&text, "extends:") || !has_key(&text, "tests:") {
             return Ok(());
         }
-        let name =
-            rule_name(file).ok_or_else(|| unread("the rule has no style folder".to_owned()))?;
-        let package =
-            package_of(file).ok_or_else(|| unread("the rule has no package".to_owned()))?;
+        let (name, package) = self.style_of(file).map_err(unread)?;
         let rule = Rule::from_text_in(&name, &shown, &text, &package)
             .map_err(|error| unread(one_line(&error)))?;
         let cases = rule.tests.clone();
@@ -348,13 +338,71 @@ impl Runner {
             .map_err(Clone::clone)
     }
 
+    /// The packages of the project config, which name a rule file by the style
+    /// folder it sits in. None when there is no readable config.
+    fn packages(&mut self) -> Vec<PathBuf> {
+        self.project()
+            .map(|project| project.packages.clone())
+            .unwrap_or_default()
+    }
+
+    /// The name and the package of the rule at `file`, as the style loader
+    /// gives them.
+    ///
+    /// Under a package of the project config, the style is the first folder
+    /// below the package, and the folders after it join the name.
+    /// Elsewhere the style is the folder that holds the file, as Vale names an
+    /// isolated rule.
+    /// The path is made absolute with symlinks left alone, so a style folder
+    /// that is a link keeps the name of the link.
+    ///
+    /// # Errors
+    ///
+    /// Returns why the rule has no name.
+    fn style_of(&mut self, file: &Path) -> Result<(String, PathBuf), String> {
+        let packages = self.packages();
+        let absolute = absolute(file).ok_or("the path cannot be made absolute")?;
+        let candidates = [Some(absolute.clone()), fs::canonicalize(file).ok()];
+        for candidate in candidates.iter().flatten() {
+            for package in &packages {
+                let Ok(relative) = candidate.strip_prefix(package) else {
+                    continue;
+                };
+                let mut parts = relative.components();
+                if let (Some(first), Some(_)) = (parts.next(), parts.next()) {
+                    let style = package.join(first);
+                    return Ok((rule::rule_name(&style, candidate)?, package.clone()));
+                }
+            }
+        }
+        let style = absolute.parent().ok_or("the rule has no style folder")?;
+        let package = style.parent().ok_or("the rule has no package")?;
+        Ok((rule::rule_name(style, &absolute)?, package.to_path_buf()))
+    }
+
     /// The rule file at `path`, read once.
     fn rule_at(&mut self, path: &Path) -> Result<&Rule, String> {
+        if !self.rules.contains_key(path) {
+            let read = self.read_rule(path);
+            self.rules.insert(path.to_path_buf(), read);
+        }
         self.rules
-            .entry(path.to_path_buf())
-            .or_insert_with(|| read_rule(path))
+            .get(path)
+            .ok_or_else(|| format!("{}: the rule was not kept", plain(path)))?
             .as_ref()
             .map_err(Clone::clone)
+    }
+
+    /// Reads the rule file at `path`.
+    fn read_rule(&mut self, path: &Path) -> Result<Rule, String> {
+        let shown = plain(path);
+        let folded =
+            absolute(path).ok_or_else(|| format!("{shown}: the path has no absolute form"))?;
+        let text = fs::read_to_string(&folded).map_err(|error| format!("{shown}: {error}"))?;
+        let (name, package) = self
+            .style_of(path)
+            .map_err(|message| format!("{shown}: {message}"))?;
+        Rule::from_text_in(&name, &shown, &text, &package).map_err(|error| one_line(&error))
     }
 }
 
@@ -362,14 +410,4 @@ impl Runner {
 fn lint_alone(rule: &Rule, tree: &hakkiri::Tree, case: &TestCase) -> Result<Vec<Alert>, String> {
     hakkiri::engine::lint(&[rule], tree, &case.input, &case.format)
         .map_err(|error| error.to_string())
-}
-
-/// Reads the rule file at `path`.
-fn read_rule(path: &Path) -> Result<Rule, String> {
-    let shown = plain(path);
-    let folded = absolute(path).ok_or_else(|| format!("{shown}: the path has no absolute form"))?;
-    let text = fs::read_to_string(&folded).map_err(|error| format!("{shown}: {error}"))?;
-    let name = rule_name(path).ok_or_else(|| format!("{shown}: the rule has no style folder"))?;
-    let package = package_of(path).ok_or_else(|| format!("{shown}: the rule has no package"))?;
-    Rule::from_text_in(&name, &shown, &text, &package).map_err(|error| one_line(&error))
 }
