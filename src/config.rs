@@ -1,5 +1,5 @@
 //! The project config, `.ctl/hakkiri.yaml`: the packages a project loads, the
-//! lowest level it reports, and the styles and rule levels of each set of
+//! lowest level it reports, and the styles and rule settings of each set of
 //! files.
 //!
 //! [`load`] reads the file once, loads every style folder of every package, and
@@ -182,7 +182,8 @@ pub(crate) struct Project {
 /// The rules that run on one file, and the levels the config sets for some.
 #[derive(Debug)]
 pub(crate) struct Plan<'a> {
-    /// The rules to run, in the order their styles are listed.
+    /// The rules to run: those of the listed styles in the order listed, then
+    /// those a config enables by name in the order their styles load.
     pub(crate) rules: Vec<&'a Rule>,
     /// The level an alert of a rule takes, by rule name.
     pub(crate) levels: HashMap<&'a str, Level>,
@@ -233,6 +234,13 @@ impl Project {
 
     /// The rules for `path`, written relative to the project root with `/`
     /// separators, or `None` when no glob matches it or it has no rule to run.
+    ///
+    /// The globs that match apply in the order written, a later one winning for
+    /// the same key.
+    /// A `styles` list replaces the earlier one, and an empty list also drops
+    /// every rule setting before it, as Vale's empty `BasedOnStyles` does.
+    /// A rule runs when a listed style holds it and the config does not turn it
+    /// off, or when the config sets its level, whatever style holds it.
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
         let mut matched = false;
         let mut styles: &[String] = &[];
@@ -241,6 +249,9 @@ impl Project {
             matched = true;
             if let Some(listed) = &glob.styles {
                 styles = listed;
+                if listed.is_empty() {
+                    choices.clear();
+                }
             }
             for (name, choice) in &glob.choices {
                 choices.insert(name.as_str(), *choice);
@@ -251,11 +262,13 @@ impl Project {
         }
         let mut rules = Vec::new();
         let mut levels = HashMap::new();
+        let mut listed = HashSet::new();
         for index in styles
             .iter()
             .filter_map(|style| self.styles.get(style))
             .flatten()
         {
+            listed.insert(*index);
             let rule = self.rules.get(*index)?;
             match choices.get(rule.name.as_str()) {
                 Some(Choice::Off) => {}
@@ -264,6 +277,15 @@ impl Project {
                     rules.push(rule);
                 }
                 None => rules.push(rule),
+            }
+        }
+        for (index, rule) in self.rules.iter().enumerate() {
+            if listed.contains(&index) {
+                continue;
+            }
+            if let Some(Choice::Level(level)) = choices.get(rule.name.as_str()) {
+                levels.insert(rule.name.as_str(), *level);
+                rules.push(rule);
             }
         }
         (!rules.is_empty()).then_some(Plan { rules, levels })
