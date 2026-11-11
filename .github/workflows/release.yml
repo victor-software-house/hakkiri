@@ -29,7 +29,7 @@ jobs:
       id-token: write # every job of the reusable workflow requests it
     uses: victor-software-house/verctl/.github/workflows/release.yml@bc30ea6f0924edd8554ef5444280d9ca52dd1851 # v0.8.0
     with:
-      mise-version: 2026.11.5
+      mise-version: 2026.11.6
       mise-env: ci
       # Nothing goes to crates.io, so there is no docs.rs page to wait for.
       docs: false
