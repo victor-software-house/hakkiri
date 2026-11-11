@@ -35,5 +35,5 @@ The [vale-differences spec][differences] lists the missing rules as a known gap.
 - No new dependency.
 
 [ledger]: ../../../tasks.yaml
-[vocabularies]: ../vocabularies/proposal.md
+[vocabularies]: ../archive/2026-11-11-vocabularies/proposal.md
 [differences]: ../../specs/vale-differences/spec.md

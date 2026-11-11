@@ -44,7 +44,10 @@ This change follows [`project-config`][config], which holds the grammar of the c
 
 ## 4. Integration
 
-- [ ] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+- [x] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+  Evidence, 2026-11-11 (UTC): [the CI run of PR 83][ci-pr83] passed, and so did [the CI run on main][ci-main] after the merge.
 
-[config]: ../../specs/project-config/spec.md
-[fetch]: ../archive/2026-11-11-package-fetch/proposal.md
+[config]: ../../../specs/project-config/spec.md
+[fetch]: ../2026-11-11-package-fetch/proposal.md
+[ci-pr83]: https://github.com/victor-software-house/hakkiri/actions/runs/43050983662
+[ci-main]: https://github.com/victor-software-house/hakkiri/actions/runs/43052149554

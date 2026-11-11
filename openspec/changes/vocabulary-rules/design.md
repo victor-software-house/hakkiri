@@ -69,7 +69,7 @@ It stays an error when no named vocabulary holds a term, and `HKR-026` and `HKR-
 Alternative: a style `Vale` that is always present and holds no rule.
 It lost because an empty style hides a wrong vocabulary name: the config would load and lint nothing.
 
-[vocabularies]: ../vocabularies/design.md
+[vocabularies]: ../archive/2026-11-11-vocabularies/design.md
 [v-load-rules]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/manager.go#L559-L628
 [v-recase]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/substitution.go#L453-L464
 [v-default-rules]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L133-L154

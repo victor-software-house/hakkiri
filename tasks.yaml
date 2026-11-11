@@ -1,24 +1,25 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-019
+active: HKR-040
 queue:
-  - id: HKR-019
-    title: Read vocabularies
+  - id: HKR-040
+    title: Read a package's settings
     scope: config
     outcome: >-
-      A project selects vocabularies whose accepted terms reach every check that reads them.
+      A package ships a settings file in hakkiri's own YAML format, and hakkiri
+      merges it under the project's config, as Vale merges a package's .vale.ini. The
+      project overrides the package.
     blocked_by: []
     acceptance:
-      - A project's config names vocabularies, and each is read from a package's accept.txt and reject.txt.
-      - Accepted terms reach capitalization's vocab exceptions, added before the (?-i) rewrite, and the spelling check's accepted words.
-      - A glob's vocab list adds its accepted terms to the files the glob matches, in the existence, repetition, spelling and substitution checks, in tests against Vale's recorded alerts.
+      - A package's settings file is read and merged under the project's config, and a setting in the project wins, in a test.
+      - A rule the package sets off stays off until the project turns it on, in a test.
+      - The package's vocab reaches the checks that read vocabularies, in a test.
+      - A project's styles list adds to a package's under the same glob and replaces it under another glob that matches the same files, in a test.
+      - A package's packages are fetched like the project's, each pinned by url and sha256, once per hash, and a chain over 10 packages is an error, in tests.
+    plan: openspec/changes/package-settings/proposal.md
     notes:
-      - "2026-11-10, Vale adds the accepted terms to a capitalization rule's exceptions when its vocab is true, which is the default: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L52-L70."
-      - 2026-11-10, the case-and-sequence-checks change leaves capitalization's vocab with no effect, and the spelling check of the spelling-and-affix-checks change (task 1.1) reads accepted words from this row.
-      - 2026-11-11, the rules Vale.Terms and Vale.Avoid, and the rules named for a glob's vocabularies, moved to HKR-042, because the spec of both went over the word budget of a change.
-      - "2026-11-11, operator decision: the key is vocab, at the top level and in a glob of files, and a glob's list adds to the files it matches."
-    plan: openspec/changes/vocabularies/proposal.md
+      - "2026-11-11, operator decisions: the file is .ctl/hakkiri.yaml in the package folder; styles add up under the same glob text and a project list under another glob replaces the package's, with no warning; a package's packages are fetched, pinned by url and sha256, with a depth limit of 10 (Vale sets none). A cycle cannot occur, since a zip cannot hold its own hash."
 
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary
@@ -27,8 +28,7 @@ queue:
       The built-in style Vale holds Terms, which reports an accepted term written in
       another case, and Avoid, which reports a rejected term, with Vale's messages and
       levels.
-    blocked_by:
-      - HKR-019
+    blocked_by: []
     acceptance:
       - Accepted and rejected terms give the alerts that Vale's generated Vale.Terms and Vale.Avoid rules give, in tests against Vale's recorded alerts.
       - A glob that lists the style Vale, or sets Vale.Terms or Vale.Avoid by name, runs the rules at the level it sets, in a test.
@@ -41,31 +41,11 @@ queue:
     outcome: >-
       A vocabulary folder may hold vocab.yml, whose accept and reject entries take
       the options regex, ignorecase and flags, as in Vale.
-    blocked_by:
-      - HKR-019
+    blocked_by: []
     acceptance:
       - A vocab.yml entry that is a term, or a term mapped to regex, ignorecase or flags, is read as Vale reads it, in tests against Vale's alerts.
       - An entry Vale refuses is refused with the file and the line, in a test for each fault.
-    plan: openspec/changes/vocabularies/proposal.md
-
-  - id: HKR-040
-    title: Read a package's settings
-    scope: config
-    outcome: >-
-      A package ships a settings file in hakkiri's own YAML format, and hakkiri
-      merges it under the project's config, as Vale merges a package's .vale.ini. The
-      project overrides the package.
-    blocked_by:
-      - HKR-019
-    acceptance:
-      - A package's settings file is read and merged under the project's config, and a setting in the project wins, in a test.
-      - A rule the package sets off stays off until the project turns it on, in a test.
-      - The package's vocab reaches the checks that read vocabularies, in a test.
-      - A project's styles list adds to a package's under the same glob and replaces it under another glob that matches the same files, in a test.
-      - A package's packages are fetched like the project's, each pinned by url and sha256, once per hash, and a chain over 10 packages is an error, in tests.
-    plan: openspec/changes/package-settings/proposal.md
-    notes:
-      - "2026-11-11, operator decisions: the file is .ctl/hakkiri.yaml in the package folder; styles add up under the same glob text and a project list under another glob replaces the package's, with no warning; a package's packages are fetched, pinned by url and sha256, with a depth limit of 10 (Vale sets none). A cycle cannot occur, since a zip cannot hold its own hash."
+    plan: openspec/changes/archive/2026-11-11-vocabularies/proposal.md
 
   - id: HKR-008
     title: Run ProseStyle on hakkiri
@@ -219,6 +199,23 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-019
+    title: Read vocabularies
+    scope: config
+    outcome: >-
+      A project selects vocabularies whose accepted terms reach every check that reads them.
+    notes:
+      - "2026-11-10, Vale adds the accepted terms to a capitalization rule's exceptions when its vocab is true, which is the default: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L52-L70."
+      - 2026-11-10, the case-and-sequence-checks change leaves capitalization's vocab with no effect, and the spelling check of the spelling-and-affix-checks change (task 1.1) reads accepted words from this row.
+      - 2026-11-11, the rules Vale.Terms and Vale.Avoid, and the rules named for a glob's vocabularies, moved to HKR-042, because the spec of both went over the word budget of a change.
+      - "2026-11-11, operator decision: the key is vocab, at the top level and in a glob of files, and a glob's list adds to the files it matches."
+    plan: openspec/changes/archive/2026-11-11-vocabularies/proposal.md
+    completed: 2026-11-11T16:09:37
+    evidence:
+      - openspec/changes/archive/2026-11-11-vocabularies/
+      - PR 83 reads the vocabularies of a package from the vocab key at the top level and in a glob, holds back the matches the accepted terms name, and matches Vale at 66bbb85 over five configs; its CI and the CI on main passed, and the evidence is on each task.
+    disposition: completed
+
   - id: HKR-007
     title: Load Vale styles as they are
     scope: rules
@@ -256,6 +253,8 @@ archive:
       - openspec/changes/archive/2026-11-11-musl-release/
       - 'PR 69 built linux-x64 as a static musl binary with mimalloc, and Version PR 72 released it as 0.0.2: the release run built it on ubuntu-latest, file reports static-pie, it starts in a root with no loader where the glibc 0.0.1 binary does not, and a check takes as long as the glibc build; the musl-release change is archived.'
     disposition: completed
+    notes:
+      - 2026-11-11, the zig-built musl binary (PR 85) ran --version, check and test --coverage in a chroot with no glibc and no loader. A real NixOS machine with nix-ld off is still not tested.
 
   - id: HKR-033
     title: Enable one rule with a rule setting

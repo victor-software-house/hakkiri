@@ -410,8 +410,13 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: Vocabularies
 
-- **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
-- **THEN** hakkiri loads the field and reads no vocabulary, and Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
+- **WHEN** a section of a Vale config sets `Vocab`, or the top level names a vocabulary
+- **THEN** hakkiri holds back the matches the accepted terms name, and builds no `Vale.Terms`, `Vale.Avoid`, `Vale.<Name>.Terms` or `Vale.<Name>.Avoid`, which Vale runs for the project or the section (row [HKR-042][ledger], [vocabulary-rules 1][vocabulary-rules-1])
+
+#### Scenario: A YAML vocabulary
+
+- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
+- **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 7][vocabularies-7])
 
 #### Scenario: The Markdown parser
 
@@ -446,7 +451,8 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A doc selector or a View
 
 - **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`, refuses the case field, and Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
+  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 #### Scenario: A Vale configuration file
 
@@ -476,6 +482,83 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 
 - **WHEN** a glob sets a rule to `yes`
 - **THEN** hakkiri refuses it with the line, and Vale warns that `yes` is not `YES`, `NO`, `UNSET` or a level, and switches the rule off ([rule-setting 7][rule-setting-7])
+
+### Requirement: Rule files differ from Vale in what they select
+
+hakkiri SHALL load or select as each scenario below says, where Vale 3.26.0 does otherwise.
+
+#### Scenario: A table row is a scope
+
+- **WHEN** a rule has `scope: table.row` and a row holds the matched text
+- **THEN** hakkiri selects the text of the row, and Vale loads the rule and selects nothing, since no block has a `row` part ([format 9][format-9])
+
+#### Scenario: A scope no node holds
+
+- **WHEN** a rule has `scope: nonsense`
+- **THEN** hakkiri refuses it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
+
+#### Scenario: A metric counts tokens
+
+- **WHEN** a `metric` rule sets `tokens: [";"]` and the formula `occurrences / words * 1000`
+- **THEN** hakkiri measures the rate of the matches, and Vale refuses `tokens` as an invalid key and `occurrences` as an unresolved reference ([format 4][format-4], [engine 11][engine-11])
+
+### Requirement: Configuration is hakkiri's own, and Vale styles load as they are
+
+hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.vale.ini`, and SHALL load a Vale style folder as it is.
+
+#### Scenario: A Vale configuration
+
+- **WHEN** a project holds a `.vale.ini` and no `.ctl/hakkiri.yaml`
+- **THEN** hakkiri reads no setting from it, and Vale reads it ([bootstrap 1][bootstrap-1], row [HKR-035][ledger])
+
+#### Scenario: A rule is turned off
+
+- **WHEN** a glob in the project config turns a rule off
+- **THEN** it sets the rule to `off`, where Vale writes `NO` ([format 6][format-6])
+
+#### Scenario: A package is fetched on use
+
+- **WHEN** a project pins a package by `url` and `sha256`
+- **THEN** hakkiri fetches it on the first run, checks the hash and keeps it in a cache folder outside the project, where Vale needs `vale sync`, accepts any zip and copies the styles into `StylesPath` ([package-fetch 1][package-fetch-1])
+
+#### Scenario: A package that was changed
+
+- **WHEN** a pinned package's download does not match its `sha256`
+- **THEN** hakkiri refuses it and names the `url` and both hashes, where Vale installs a changed zip with no complaint ([package-fetch 3][package-fetch-3])
+
+#### Scenario: A Vale style folder
+
+- **WHEN** a package holds a Vale style folder, such as Voices, Std or Readability
+- **THEN** hakkiri loads it with no conversion, as Vale does, apart from the rules the Known gaps list ([styles 1][styles-1])
+
+### Requirement: Vocabularies differ from Vale's in these ways
+
+hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
+
+#### Scenario: A term that is not a pattern
+
+- **WHEN** a list holds a term such as `C(` that is not a valid pattern
+- **THEN** hakkiri reports an error that names the file and line, where Vale stops with a pattern error that has no line ([vocabularies 4][vocabularies-4])
+
+#### Scenario: A term that Vale's engines refuse
+
+- **WHEN** a list holds `C++`
+- **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and holds back `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
+
+#### Scenario: Two packages with one vocabulary
+
+- **WHEN** two packages each hold a vocabulary `Team`
+- **THEN** hakkiri refuses the config and names both, where Vale takes the first search path, or the last package after `vale sync` ([vocabularies 3][vocabularies-3])
+
+#### Scenario: The per-user styles folder
+
+- **WHEN** a vocabulary is in no package of the project
+- **THEN** hakkiri reports it unknown, where Vale also searches its per-user styles folder ([vocabularies 3][vocabularies-3])
+
+#### Scenario: An unknown vocabulary
+
+- **WHEN** the config names a vocabulary that no package holds
+- **THEN** hakkiri names the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
 
 [bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
 [bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
@@ -535,51 +618,7 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 [test-5]: ../../changes/archive/2026-11-10-test-command/design.md#5-finding-cases
 [test-7]: ../../changes/archive/2026-11-10-test-command/design.md#7-the-report-and-the-exit-status
 [tree-1]: ../../changes/archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
-
-### Requirement: Rule files differ from Vale in what they select
-
-hakkiri SHALL load or select as each scenario below says, where Vale 3.26.0 does otherwise.
-
-#### Scenario: A table row is a scope
-
-- **WHEN** a rule has `scope: table.row` and a row holds the matched text
-- **THEN** hakkiri selects the text of the row, and Vale loads the rule and selects nothing, since no block has a `row` part ([format 9][format-9])
-
-#### Scenario: A scope no node holds
-
-- **WHEN** a rule has `scope: nonsense`
-- **THEN** hakkiri refuses it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
-
-#### Scenario: A metric counts tokens
-
-- **WHEN** a `metric` rule sets `tokens: [";"]` and the formula `occurrences / words * 1000`
-- **THEN** hakkiri measures the rate of the matches, and Vale refuses `tokens` as an invalid key and `occurrences` as an unresolved reference ([format 4][format-4], [engine 11][engine-11])
-
-### Requirement: Configuration is hakkiri's own, and Vale styles load as they are
-
-hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.vale.ini`, and SHALL load a Vale style folder as it is.
-
-#### Scenario: A Vale configuration
-
-- **WHEN** a project holds a `.vale.ini` and no `.ctl/hakkiri.yaml`
-- **THEN** hakkiri reads no setting from it, and Vale reads it ([bootstrap 1][bootstrap-1], row [HKR-035][ledger])
-
-#### Scenario: A rule is turned off
-
-- **WHEN** a glob in the project config turns a rule off
-- **THEN** it sets the rule to `off`, where Vale writes `NO` ([format 6][format-6])
-
-#### Scenario: A package is fetched on use
-
-- **WHEN** a project pins a package by `url` and `sha256`
-- **THEN** hakkiri fetches it on the first run, checks the hash and keeps it in a cache folder outside the project, where Vale needs `vale sync`, accepts any zip and copies the styles into `StylesPath` ([package-fetch 1][package-fetch-1])
-
-#### Scenario: A package that was changed
-
-- **WHEN** a pinned package's download does not match its `sha256`
-- **THEN** hakkiri refuses it and names the `url` and both hashes, where Vale installs a changed zip with no complaint ([package-fetch 3][package-fetch-3])
-
-#### Scenario: A Vale style folder
-
-- **WHEN** a package holds a Vale style folder, such as Voices, Std or Readability
-- **THEN** hakkiri loads it with no conversion, as Vale does, apart from the rules the Known gaps list ([styles 1][styles-1])
+[vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
+[vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
+[vocabularies-7]: ../../changes/archive/2026-11-11-vocabularies/design.md#7-what-stays-different
+[vocabulary-rules-1]: ../../changes/vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale

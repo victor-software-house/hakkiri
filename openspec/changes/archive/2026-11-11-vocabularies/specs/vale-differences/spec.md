@@ -100,10 +100,10 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [vocabularies-3]: ../../design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../design.md#4-a-line-of-a-list-is-a-pattern
 [vocabularies-7]: ../../design.md#7-what-stays-different
-[vocabulary-rules-1]: ../../../vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
-[ledger]: ../../../../../tasks.yaml
-[spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
-[tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
-[check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
-[test-2]: ../../../archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
-[bootstrap-8]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
+[vocabulary-rules-1]: ../../../../vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
+[ledger]: ../../../../../../tasks.yaml
+[spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+[tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
+[test-2]: ../../../2026-11-10-test-command/design.md#2-a-case-is-a-small-record
+[bootstrap-8]: ../../../2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
