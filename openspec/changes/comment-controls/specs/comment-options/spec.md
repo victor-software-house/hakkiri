@@ -36,9 +36,9 @@ A level for a style, and any other word, SHALL be no comment.
 - **WHEN** the config sets the rule to `suggestion` and a comment before the text sets it to `error`
 - **THEN** the alert is an error
 
-### Requirement: Source files and MDX files hold no comment control
+### Requirement: Source files hold no comment control
 
-A glob that matches a source file or an MDX file SHALL leave the text of its comments as it is, whatever HTML comment they hold.
+A glob that matches a source file SHALL leave the text of its comments as it is, whatever HTML comment they hold.
 
 #### Scenario: A Rust doc comment
 

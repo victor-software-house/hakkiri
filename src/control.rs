@@ -20,11 +20,11 @@
 //!
 //! Vale reads each comment at two moments.
 //! The text of a Markdown file after `off` is left out of its blocks, which
-//! [`cut`] does.
+//! `cut` does.
 //! A rule is gated per block, by the toggles that a comment inside the element
-//! of the block sets before the element ends ([`Controls::gated`]).
+//! of the block sets before the element ends (`Controls::gated`).
 //! An alert is hidden when its place lies between the comment that turned its
-//! rule off and the one that turned it on ([`Controls::hides`]).
+//! rule off and the one that turned it on (`Controls::hides`).
 //!
 //! [Vale]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go
 

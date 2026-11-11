@@ -16,6 +16,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify `hakkiri_comments_reach_as_vale_comments_do` passes, and the two tests of a level pass.  
   Evidence, 2026-11-11 (UTC): the files of the fixture with each Vale comment written as hakkiri writes it give the same alerts by line, rule and text.  
   A level holds until the rule is named again, and wins over a level of the config.
+- [x] 1.4 Read the `{/* … */}` comments of an MDX file as the HTML comments of a Markdown file.  
+  Verify the parity test passes over the MDX file of the fixture, in Vale's form and in hakkiri's.  
+  Evidence, 2026-11-11 (UTC): Vale 66bbb85 gave 46 alerts over `c10.mdx`, and the 350 rows of the fixture match.
 
 ## 2. The surfaces
 

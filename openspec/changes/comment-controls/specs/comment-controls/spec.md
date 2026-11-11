@@ -96,3 +96,33 @@ A paragraph in a tight list item SHALL end with the item.
 
 - **WHEN** a rule has `scope: raw`, and a file ends inside an `off`
 - **THEN** it reports nothing in the file, and with a comment that turns its style off it reports nothing between the comments
+
+### Requirement: An MDX file's braces comments are comments
+
+In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}`, as a block of its own or inside a line of text, SHALL turn rules off and on as the HTML comment does, with every form of the HTML comment.  
+The text SHALL be exactly `{/*` and `*/}` around the comment, so `{ /* vale off */ }` and `{/* Vale Off */}` are text.
+
+#### Scenario: A block of its own
+
+- **WHEN** `{/* vale off */}` and `{/* vale on */}` surround a paragraph with `very really good.`
+- **THEN** it draws no alert, and the paragraphs before and after it do
+
+#### Scenario: Inside a line of text
+
+- **WHEN** a paragraph reads `one very {/* vale off */} two very {/* vale on */} three very`
+- **THEN** a rule that flags `very` reports `one` and `three`
+
+#### Scenario: A rule, the blanks and three lines
+
+- **WHEN** the comments are `{/* vale Team.Words = NO */}`, `{/*vale off*/}` and `{/*` with `vale off` and `*/}` on the next two lines
+- **THEN** each acts as its HTML form does
+
+#### Scenario: A tight list item
+
+- **WHEN** `{/* vale off */}` is indented under the text of a tight list item
+- **THEN** the rules read nothing in that item, as for the HTML comment
+
+#### Scenario: Spaces inside the braces
+
+- **WHEN** a line reads `{ /* vale off */ }`
+- **THEN** it turns nothing off

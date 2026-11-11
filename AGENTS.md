@@ -41,7 +41,8 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A glob's `block_ignores` and `token_ignores` hide what their patterns match from the prose rules, as Vale's `BlockIgnores` and `TokenIgnores` do (row `HKR-043`).  
    hakkiri rewrites a Markdown or MDX file as Vale does, parses the result, and gives every node the bytes of the file it came from, so alerts point at the file as written.  
    A source file takes them in the Markdown of each comment, where Vale applies none.  
-   An HTML comment of a Markdown file turns rules off and on with Vale's reach: `hakkiri off` and `on`, `hakkiri Style.Rule: off` and `on`, a level, and Vale's own forms (row `HKR-031`, operator, 2026-11-11).  
+   An HTML comment of a Markdown file, or a `{/* */}` comment of an MDX file, turns rules off and on with Vale's reach (row `HKR-031`, operator, 2026-11-11).  
+   The forms are `hakkiri off` and `on`, `hakkiri Style.Rule: off` and `on`, a level, and Vale's own.  
    `src/control.rs` reads the comments, leaves the text between `off` and `on` out of the tree, gates each block when its element ends, and drops an alert that lies between two comments.  
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
    Vale matches the path as given; the departure is in the `vale-differences` spec.

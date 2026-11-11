@@ -73,11 +73,6 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 - **WHEN** a Markdown file holds `<!-- hakkiri Team.Words: warning -->` or `<!-- hakkiri Team.Words: off -->`
 - **THEN** hakkiri sets the level of the rule from there on, or turns it off, and Vale reads neither form
 
-#### Scenario: An MDX file
-
-- **WHEN** an MDX file holds `{/* vale off */}`
-- **THEN** hakkiri reads no comment control, and Vale reads it as an HTML comment ([comment-controls 4][comment-controls-4])
-
 #### Scenario: A source file
 
 - **WHEN** a doc comment of a Rust, TypeScript or JavaScript file holds an HTML comment that turns rules off
@@ -90,7 +85,7 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 
 [check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
 [comment-controls-3]: ../../design.md#3-a-style-comment-reads-the-styles-of-the-rules
-[comment-controls-4]: ../../design.md#4-only-a-markdown-file-holds-comments-that-turn-rules-off
+[comment-controls-4]: ../../design.md#4-a-source-file-holds-no-comment-control
 [engine-14]: ../../../archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
 [ledger]: ../../../../../tasks.yaml
 [spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals

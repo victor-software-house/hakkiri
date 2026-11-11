@@ -449,8 +449,9 @@ pub struct Tree {
     /// The number of fenced and indented code blocks in a Markdown or MDX
     /// file, and 0 for a source file.
     pub code_blocks: usize,
-    /// The HTML comments of a Markdown file, in file order, which may turn
-    /// rules off and on. A source file and an MDX file give none.
+    /// The HTML comments of a Markdown file and the `{/* … */}` comments of an
+    /// MDX file, in file order, which may turn rules off and on. A source file
+    /// gives none.
     pub comments: Vec<Comment>,
 }
 

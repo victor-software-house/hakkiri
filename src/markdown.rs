@@ -209,10 +209,9 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
         code_blocks: Cell::new(0),
     };
     let nodes = builder.visit(&root, Scope::TableCell).nodes;
-    let comments = if matches!(flavor, Flavor::Markdown) {
-        html_comments(&root, source)
-    } else {
-        Vec::new()
+    let comments = match flavor {
+        Flavor::Markdown | Flavor::Mdx => comments_of(&root, source),
+        Flavor::Comment => Vec::new(),
     };
     Ok(Built {
         nodes,
@@ -221,9 +220,11 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     })
 }
 
-/// The HTML comments below `root`, in file order: those of an HTML block and
-/// of inline HTML, and none of a code block or a code span.
-fn html_comments(root: &Mdast, source: &str) -> Vec<Comment> {
+/// The comments below `root`, in file order: the HTML comments of an HTML
+/// block and of inline HTML, and the `{/* … */}` comments of an MDX file, as a
+/// flow expression or in a line of text. A code block and a code span hold
+/// none.
+fn comments_of(root: &Mdast, source: &str) -> Vec<Comment> {
     let mut found = Vec::new();
     let mut pending = vec![root];
     while let Some(node) = pending.pop() {
@@ -243,6 +244,18 @@ fn html_comments(root: &Mdast, source: &str) -> Vec<Comment> {
                     text: inner.trim().to_owned(),
                 });
             }
+        }
+        if let Mdast::MdxFlowExpression(_) | Mdast::MdxTextExpression(_) = node
+            && let Some(span) = span_of(node)
+            && let Some(written) = source.get(span.clone())
+            && let Some(inner) = written
+                .strip_prefix("{/*")
+                .and_then(|rest| rest.strip_suffix("*/}"))
+        {
+            found.push(Comment {
+                at: span.start,
+                text: inner.trim().to_owned(),
+            });
         }
         if let Some(children) = node.children() {
             pending.extend(children.iter().rev());

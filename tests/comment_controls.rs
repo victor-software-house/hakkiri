@@ -1,8 +1,8 @@
 //! Comment controls: the scenarios of the comment-controls change.
 //!
 //! `tests/fixtures/comment-controls` holds one package of four rules
-//! (`styles`), eight Markdown files (`text`, with `.fixture` after the
-//! extension), and one config for each tool: `vale/all.ini` and
+//! (`styles`), nine Markdown files and one MDX file (`text`, with `.fixture`
+//! after the extension), and one config for each tool: `vale/all.ini` and
 //! `.ctl/all.yaml`.
 //! Each paragraph of a file holds `very`, `really` and `good`, which three
 //! rules flag, so the alerts that a comment leaves show which of them it
@@ -154,29 +154,32 @@ fn project<'a>(suite: &'a Suite, name: &str, hakkiri: bool) -> Result<Root<'a>, 
     Ok(root)
 }
 
-/// `text` with each comment that Vale reads written as hakkiri writes it.
+/// `text` with each comment that Vale reads written as hakkiri writes it, in
+/// the HTML form of a Markdown file and the `{/* */}` form of an MDX file.
 fn hakkiri_form(text: &str) -> String {
     let mut lines: Vec<String> = text
         .lines()
         .map(|line| {
             let mut line = line.to_owned();
-            for (vale, hakkiri) in [
-                ("<!-- vale off -->", "<!-- hakkiri off -->"),
-                ("<!-- vale on -->", "<!-- hakkiri on -->"),
-            ] {
-                line = line.replace(vale, hakkiri);
-            }
-            for (word, ours) in [
-                (" = NO -->", ": off -->"),
-                (" = YES -->", ": on -->"),
-                (" = off -->", ": off -->"),
-                (" = on -->", ": on -->"),
-            ] {
-                if line.starts_with("<!-- vale ") && line.ends_with(word) && !line.contains('[') {
-                    line = format!(
-                        "<!-- hakkiri {}{ours}",
-                        &line["<!-- vale ".len()..line.len() - word.len()]
+            for (open, close) in [("<!-- ", " -->"), ("{/* ", " */}")] {
+                for word in ["off", "on"] {
+                    line = line.replace(
+                        &format!("{open}vale {word}{close}"),
+                        &format!("{open}hakkiri {word}{close}"),
                     );
+                }
+                for (word, ours) in [
+                    (" = NO", ": off"),
+                    (" = YES", ": on"),
+                    (" = off", ": off"),
+                    (" = on", ": on"),
+                ] {
+                    let start = format!("{open}vale ");
+                    let end = format!("{word}{close}");
+                    if line.starts_with(&start) && line.ends_with(&end) && !line.contains('[') {
+                        let key = &line[start.len()..line.len() - end.len()];
+                        line = format!("{open}hakkiri {key}{ours}{close}");
+                    }
                 }
             }
             line

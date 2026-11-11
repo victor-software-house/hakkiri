@@ -15,7 +15,7 @@ Goals:
 
 Non-goals:
 
-- Comments of an MDX file or of a source file, and the other markup formats Vale reads.
+- Comments of a source file, and the other markup formats Vale reads.
 
 ## Decisions
 
@@ -51,11 +51,10 @@ The comment of an HTML block inside a block quote or a list is found in the sour
 `vale styles = Other` turns off the styles the file is based on, except `Other`.
 hakkiri has no list of base styles for a file at that point, so it reads the styles of the rules the config runs on the file, which are the same ones.
 
-### 4. Only a Markdown file holds comments that turn rules off
+### 4. A source file holds no comment control
 
 Vale reads a source file's comment as plain lines unless a View names a markup format ([lintComment][v-comment]), so an HTML comment in a doc comment turns nothing off there.
 hakkiri reads those comments as Markdown, and turns nothing off either, to match.
-Vale reads `{/* vale off */}` in an MDX file, which hakkiri does not yet.
 
 ### 5. hakkiri's forms are the config's words
 
@@ -67,6 +66,16 @@ A word that is not one of these is no comment, as in Vale, so a typo is silent.
 Alternative: a level for a whole style.
 It lost because the config sets levels per rule only.
 
+### 6. An MDX file reads comments in braces
+
+Vale renders a `{/* … */}` comment of an MDX file, as a flow expression or inside a line of text, as an HTML comment ([mdx.go][v-mdx]).
+The probe of 2026-11-11 over one MDX file and 46 alerts showed it read as the HTML form is.
+The forms probed are `off` and `on`, a rule, an inline comment, a comment in a tight list item and a comment over three lines.
+`{ /* vale off */ }` with a space inside the braces and `{/* Vale Off */}` are text.
+hakkiri reads the comment from the MDX expression nodes of the parser, and takes the text between `{/*` and `*/}` without the blanks at its ends.
+A gap where hakkiri does less than Vale is fixed, so no difference is recorded.
+
 [v-walk]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L242
 [v-file]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L758
 [v-comment]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code_ts.go#L199
+[v-mdx]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/mdx.go#L1117-L1170

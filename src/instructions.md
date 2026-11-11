@@ -151,7 +151,8 @@ files:
   Vale's forms work too: `<!-- vale off -->`, `<!-- vale on -->`, `<!-- vale Style.Rule = NO -->` and `YES` (or `off` and `on`), `<!-- vale Style = NO -->`, `<!-- vale Style.Rule["a","b"] = NO -->` for the matches `a` and `b`, and `<!-- vale styles = A, B -->` to run only those styles.
   A comment acts on what follows it. A comment in the middle of a paragraph, a list item, a heading or a table cell turns the rule off for that whole element.
   An alert between the comment that turns a rule off and the one that turns it on is left out.
-  The words must be exactly as shown, with the spaces around `:` and `=`, and case matters. A comment in a code block or a code span is text. MDX files and source files read no comment control.
+  The words must be exactly as shown, with the spaces around `:` and `=`, and case matters. A comment in a code block or a code span is text.
+  An MDX file reads `{/* hakkiri off */}` and `{/* vale off */}` in the same way, as a block of its own or inside a line, and a source file reads no comment control.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.
 - A rule name, such as `ProseStyle.BareURL`, sets that rule's level to `suggestion`, `warning` or `error`, turns it `on` at the level of its rule file, or turns it `off`.
   A level or `on` also runs the rule when no glob lists its style, as `Team.Terms: warning` does, and `off` on such a rule changes nothing.

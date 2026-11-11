@@ -1,5 +1,5 @@
 packages:
   - path: styles
 files:
-  'text/*.md':
+  'text/*.{md,mdx}':
     styles: [Team, Other]
