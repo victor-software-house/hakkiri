@@ -728,7 +728,29 @@ fn rule_files(folder: &Path, files: &mut Vec<PathBuf>) -> Result<(), (PathBuf, s
     Ok(())
 }
 
-/// Loads every rule file under the style folder `folder`.
+/// A style folder read: its rules, and the faults in the names of its files.
+#[derive(Debug)]
+pub struct Style {
+    /// The rules, in the order of the walk.
+    pub rules: Vec<Rule>,
+    /// A file whose rule name holds a bracket, or that gives the name of an
+    /// earlier file. Such a file gives no rule.
+    /// Vale refuses these only for a style a glob enables, so a caller decides
+    /// whether they are errors.
+    pub names: Vec<LoadProblem>,
+}
+
+fn problem(file: &str, message: String) -> LoadProblem {
+    LoadProblem {
+        file: file.to_owned(),
+        line: None,
+        column: None,
+        field: String::new(),
+        message,
+    }
+}
+
+/// Reads every rule file under the style folder `folder`.
 ///
 /// A rule is named as [`rule_name`] names it, so a file in a subfolder joins
 /// the folders to its name.
@@ -739,17 +761,12 @@ fn rule_files(folder: &Path, files: &mut Vec<PathBuf>) -> Result<(), (PathBuf, s
 ///
 /// # Errors
 ///
-/// Returns a [`LoadError`] with the problems of every rule file, with the
-/// failure to read a folder, or with two files that give one rule name.
-pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
+/// Returns a [`LoadError`] with the problems of every rule file, or with the
+/// failure to read a folder.
+/// A fault in a name is not one: [`Style::names`] holds it.
+pub fn read_style(folder: &Path) -> Result<Style, LoadError> {
     let unread = |file: &Path, message: String| LoadError {
-        problems: vec![LoadProblem {
-            file: file.display().to_string(),
-            line: None,
-            column: None,
-            field: String::new(),
-            message,
-        }],
+        problems: vec![problem(&file.display().to_string(), message)],
     };
     if folder.file_name().and_then(|name| name.to_str()).is_none() {
         return Err(unread(folder, "the style folder has no name".to_owned()));
@@ -761,40 +778,60 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
     let mut files = Vec::new();
     rule_files(folder, &mut files).map_err(|(at, error)| unread(&at, error.to_string()))?;
     let mut rules = Vec::new();
+    let mut names = Vec::new();
     let mut problems = Vec::new();
-    let mut named: HashMap<String, PathBuf> = HashMap::new();
+    let mut by_name: HashMap<String, PathBuf> = HashMap::new();
     for path in files {
         let file = path.display().to_string();
-        let failed = |message: String| LoadError {
-            problems: vec![LoadProblem {
-                file: file.clone(),
-                line: None,
-                column: None,
-                field: String::new(),
-                message,
-            }],
+        let name = match rule_name(folder, &path) {
+            Ok(name) => name,
+            Err(message) => {
+                names.push(problem(&file, message));
+                continue;
+            }
         };
-        let rule = rule_name(folder, &path)
-            .map_err(failed)
-            .and_then(|name| {
-                if let Some(first) = named.get(&name) {
-                    return Err(failed(format!(
-                        "the rule `{name}` is also the name of `{}`: a rule name ends at the first dot of its file name, so rename one file",
-                        first.display()
-                    )));
-                }
-                named.insert(name.clone(), path.clone());
-                let text = fs::read_to_string(&path).map_err(|error| failed(error.to_string()))?;
-                Rule::from_text_in(&name, &file, &text, package)
-            });
-        match rule {
+        if let Some(first) = by_name.get(&name) {
+            names.push(problem(
+                &file,
+                format!(
+                    "the rule `{name}` is also the name of `{}`: a rule name ends at the first dot of its file name, so rename one file",
+                    first.display()
+                ),
+            ));
+            continue;
+        }
+        by_name.insert(name.clone(), path.clone());
+        let read = fs::read_to_string(&path)
+            .map_err(|error| LoadError {
+                problems: vec![problem(&file, error.to_string())],
+            })
+            .and_then(|text| Rule::from_text_in(&name, &file, &text, package));
+        match read {
             Ok(rule) => rules.push(rule),
             Err(error) => problems.extend(error.problems),
         }
     }
     if problems.is_empty() {
-        Ok(rules)
+        Ok(Style { rules, names })
     } else {
         Err(LoadError { problems })
+    }
+}
+
+/// Loads every rule file under the style folder `folder`, as [`read_style`]
+/// reads them, and refuses a fault in a name.
+///
+/// # Errors
+///
+/// Returns a [`LoadError`] with the problems of every rule file, with the
+/// failure to read a folder, or with the faults in the names.
+pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
+    let style = read_style(folder)?;
+    if style.names.is_empty() {
+        Ok(style.rules)
+    } else {
+        Err(LoadError {
+            problems: style.names,
+        })
     }
 }

@@ -868,6 +868,50 @@ fn a_rule_name_with_a_bracket_is_refused() -> TestResult {
     Ok(())
 }
 
+/// A config that lists only `Other`, so no glob enables `Team`.
+const UNUSED_TEAM: &str = "packages:\n  - path: styles\nfiles:\n  '*.md':\n    styles: [Other]\n";
+
+#[test]
+fn a_name_clash_in_a_style_no_glob_lists_is_not_refused() -> TestResult {
+    let suite = Suite::new("check-clash-unused");
+    let root = suite.scenario("clash-unused");
+    root.file("styles/Team/Terms.yml", FILLER);
+    root.file("styles/Team/Terms.custom.yml", HARSH);
+    root.file("styles/Other/Filler.yml", FILLER);
+    root.file(".ctl/hakkiri.yaml", UNUSED_TEAM);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Other.Filler: Remove 'very'.",
+            "1 alert in 1 file"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_bracket_in_a_style_no_glob_lists_is_not_refused() -> TestResult {
+    let suite = Suite::new("check-bracket-unused");
+    let root = suite.scenario("bracket-unused");
+    root.file("styles/Team/Weird[max].yml", FILLER);
+    root.file("styles/Other/Filler.yml", FILLER);
+    root.file(".ctl/hakkiri.yaml", UNUSED_TEAM);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Other.Filler: Remove 'very'.",
+            "1 alert in 1 file"
+        ]
+    );
+    Ok(())
+}
+
 #[test]
 fn a_misspelled_rule_name_is_refused() -> TestResult {
     let suite = Suite::new("check-misspelled");
