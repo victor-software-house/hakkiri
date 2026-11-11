@@ -143,7 +143,7 @@ files:
   In a Markdown or MDX file, each match of a block pattern is read as a fenced code block that holds its first group, and each match of a token pattern as a code span that holds it. No rule that reads prose reports text inside them.
   A `scope: raw` rule still reads the file as written, and a `scope: code` rule reads each ignored token.
   The patterns run in order, block patterns first, each over the text the one before it left. A pattern with no group drops its match from the text, and a match of no bytes changes nothing.
-  A file takes the patterns of every glob that matches it, a package's first, so a project adds to a package. A source file takes none, since Vale applies none to a comment.
+  A file takes the patterns of every glob that matches it, a package's first, so a project adds to a package. A source file takes them too, in the Markdown of each comment, where Vale applies none.
   A pattern that does not compile is an error on its line.
 - An HTML comment in a Markdown file turns rules off and on, as Vale's comments do.
   `<!-- hakkiri off -->` and `<!-- hakkiri on -->` leave out the text between them. `<!-- hakkiri Style.Rule: off -->` and `<!-- hakkiri Style.Rule: on -->` turn one rule off and on, and `<!-- hakkiri Style: off -->` and `on` a style.

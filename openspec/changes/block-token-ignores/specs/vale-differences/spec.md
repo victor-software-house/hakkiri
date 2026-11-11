@@ -37,9 +37,30 @@ hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart
 #### Scenario: A source file
 
 - **WHEN** a glob that matches a Rust, TypeScript or JavaScript file lists a block or token pattern
-- **THEN** hakkiri applies none, and Vale applies none either, since it reads a comment as plain lines ([block-token-ignores 3][block-token-ignores-3])
+- **THEN** hakkiri applies it to the Markdown of each comment, and Vale applies none, since it reads a comment as plain lines ([block-token-ignores 3][block-token-ignores-3])
+
+### Requirement: Math, front matter and comment sentences are read otherwise than Vale reads them
+
+hakkiri SHALL list here the places where it reads a file otherwise than Vale at 66bbb85, found while probing the ignores and the comment controls.
+
+#### Scenario: Math in a Markdown file
+
+- **WHEN** a paragraph holds `$very + really$` and a `code` rule flags `very`
+- **THEN** hakkiri reads the span as text, so a text rule flags it and a code rule does not, and Vale reads it as a code span (row [HKR-048][ledger], [block-token-ignores 5][block-token-ignores-5])
+
+#### Scenario: Front matter values
+
+- **WHEN** a front matter block holds `title: very front` and a text rule flags `very`
+- **THEN** hakkiri skips the block and reports nothing, and Vale reports `very` in the value (row [HKR-049][ledger], [block-token-ignores 5][block-token-ignores-5])
+
+#### Scenario: A sentence rule in a comment
+
+- **WHEN** a doc comment of a source file holds one sentence and a rule has `scope: sentence`
+- **THEN** hakkiri runs the rule on the sentence, and Vale runs it on none, since it reads the comment as plain lines ([block-token-ignores 5][block-token-ignores-5])
 
 [block-token-ignores-2]: ../../design.md#2-what-a-match-turns-into-is-what-vale-gives
-[block-token-ignores-3]: ../../design.md#3-source-files-take-no-ignore
+[block-token-ignores-3]: ../../design.md#3-a-source-files-comments-take-the-patterns
 [block-token-ignores-4]: ../../design.md#4-patterns-are-checked-when-the-config-loads
 [block-token-ignores-not-ported]: ../../design.md#not-ported
+[block-token-ignores-5]: ../../design.md#5-three-reads-that-differ-from-vales
+[ledger]: ../../../../../tasks.yaml

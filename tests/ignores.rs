@@ -133,6 +133,22 @@ fn rows_of(out: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
     Ok(rows)
 }
 
+/// Takes out of Vale's rows the two alerts that the patterns of the `rust`
+/// config hide in hakkiri: Vale applies no pattern to a comment of a source
+/// file, and hakkiri applies them to the Markdown of the comment.
+/// The first `very` is between `BEGIN` and `END` in a `//!` comment, and the
+/// second word, `really`, is in `{{ really }}` in a `///` comment.
+fn hide_in_comments(vale: &mut BTreeSet<Row>) {
+    let before = vale.len();
+    vale.retain(|row| {
+        let hidden = row.0 == "text/t6.rs"
+            && row.5 == "Team.Words"
+            && matches!((row.1, row.7.as_str()), (3, "very") | (7, "really"));
+        !hidden
+    });
+    assert_eq!(before - vale.len(), 2, "Vale gives both alerts");
+}
+
 #[test]
 fn every_config_gives_the_alerts_vale_gives() -> TestResult {
     let suite = Suite::new("ignores-parity");
@@ -154,7 +170,10 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
             result.err
         );
         let ours = rows_of(&result.out)?;
-        let vale = vale_rows(name)?;
+        let mut vale = vale_rows(name)?;
+        if name == "rust" {
+            hide_in_comments(&mut vale);
+        }
         let only_vale: Vec<_> = vale.difference(&ours).collect();
         let only_ours: Vec<_> = ours.difference(&vale).collect();
         assert!(
@@ -307,6 +326,42 @@ fn a_code_span_after_a_block_with_no_group_is_placed_where_it_is() -> TestResult
     assert_eq!(
         result.lines().first(),
         Some(&"a.md:7:12: warning Team.Code: Code 'very'."),
+        "{}",
+        result.out
+    );
+    Ok(())
+}
+
+#[test]
+fn a_source_comment_takes_the_patterns_and_the_code_is_never_read() -> TestResult {
+    let suite = Suite::new("ignores-source");
+    let root = small(
+        &suite,
+        "source",
+        "packages:\n  - path: styles\nfiles:\n  '*.rs':\n    styles: [Team]\n    token_ignores: ['({{.*?}})']\n",
+    );
+    root.file(
+        "a.rs",
+        "/// Fine {{ very }} and good.\nfn main() {\n    let _s = \"{{ very }}\";\n}\n",
+    );
+    root.file(
+        "b.rs",
+        "/// Fine very and good.\nfn main() {\n    let _s = \"{{ very }}\";\n}\n",
+    );
+    let result = run(root.path(), &["check", "a.rs", "b.rs"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    let lines: Vec<&str> = result
+        .lines()
+        .into_iter()
+        .filter(|line| line.contains(" Team."))
+        .collect();
+    assert_eq!(
+        lines,
+        [
+            "a.rs:1:25: warning Team.Plain: Drop 'good'.",
+            "b.rs:1:10: warning Team.Filler: Remove 'very'.",
+            "b.rs:1:19: warning Team.Plain: Drop 'good'.",
+        ],
         "{}",
         result.out
     );

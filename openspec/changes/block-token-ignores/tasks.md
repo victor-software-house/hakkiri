@@ -16,6 +16,11 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 1.3 Check each pattern when the config loads, and add the patterns of every matching glob in the order written.  
   Verify the scenarios on a pattern that does not compile, a word for a list, a package and the project, and two globs pass.  
   Evidence, 2026-11-11 (UTC): `an_invalid_pattern_is_an_error_on_its_key`, `a_word_where_a_list_of_patterns_belongs_is_an_error`, `a_packages_ignores_and_the_projects_add_up` and the `twoglobs` config pass.
+- [x] 1.4 Apply the patterns to the Markdown of each comment of a source file, which Vale does not do.  
+  Verify the `rust` config of `tests/ignores.rs` gives Vale's alerts less the two the patterns hide.  
+  Evidence, 2026-11-11 (UTC): in a box, hakkiri hides `very` between `BEGIN` and `END` in `//!` lines and `really` in `{{ really }}` in a `///` comment, and the rest of the 709 alerts match Vale's.  
+  The new test of a doc comment and a string failed on the source before the change.  
+  The full suite, 658 tests, passed in a box with `cargo fmt`, `clippy -D warnings` on the host and musl targets, `cargo deny` and `cargo machete`.
 
 ## 2. The surfaces
 

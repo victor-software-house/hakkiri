@@ -90,7 +90,7 @@ plain	text/t6.rs	3	5	8	warning	Team.Words	Words 'very'	very
 plain	text/t6.rs	5	11	16	warning	Team.Words	Words 'really'	really
 plain	text/t6.rs	7	9	12	warning	Team.Raw	Raw 'very'	very
 plain	text/t6.rs	7	9	12	warning	Team.Words	Words 'very'	very
-plain	text/t6.rs	7	51	56	warning	Team.Words	Words 'really'	really
+plain	text/t6.rs	7	54	59	warning	Team.Words	Words 'really'	really
 plain	text/t6.rs	10	10	13	warning	Team.Raw	Raw 'very'	very
 plain	text/t6.rs	10	10	13	warning	Team.Words	Words 'very'	very
 plain	text/t7.md	1	22	25	warning	Team.Raw	Raw 'very'	very
@@ -543,7 +543,7 @@ rust	text/t6.rs	3	5	8	warning	Team.Words	Words 'very'	very
 rust	text/t6.rs	5	11	16	warning	Team.Words	Words 'really'	really
 rust	text/t6.rs	7	9	12	warning	Team.Raw	Raw 'very'	very
 rust	text/t6.rs	7	9	12	warning	Team.Words	Words 'very'	very
-rust	text/t6.rs	7	51	56	warning	Team.Words	Words 'really'	really
+rust	text/t6.rs	7	54	59	warning	Team.Words	Words 'really'	really
 rust	text/t6.rs	10	10	13	warning	Team.Raw	Raw 'very'	very
 rust	text/t6.rs	10	10	13	warning	Team.Words	Words 'very'	very
 mdx	text/t8.mdx	3	7	10	warning	Team.Raw	Raw 'very'	very

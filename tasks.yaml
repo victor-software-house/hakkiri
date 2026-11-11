@@ -256,6 +256,28 @@ queue:
       - HKR-009
     acceptance:
       - Every adopted project passes CI on hakkiri.
+
+  - id: HKR-048
+    title: Read inline math as code
+    scope: markdown
+    outcome: >-
+      A dollar-delimited math span in a Markdown file is no prose, as in Vale, where
+      a code rule reads it and a text rule does not.
+    blocked_by: []
+    acceptance:
+      - Text and sentence rules report nothing inside a $…$ span, and a code rule reports it, with the alerts Vale 66bbb85 gives on the probe file in tests/fixtures/markup-differences.
+    notes:
+      - '2026-11-11, found while probing comment controls: Vale reads $very + really$ as a code span, and hakkiri reads it as text, so a text rule flags it. The probe is tests/fixtures/markup-differences/text/m1.md.'
+
+  - id: HKR-049
+    title: Lint front matter values
+    scope: markdown
+    outcome: The values in a Markdown file's front matter are linted as text, as Vale does.
+    blocked_by: []
+    acceptance:
+      - A text rule reports a word in a front matter value, with the alerts Vale 66bbb85 gives on the probe file in tests/fixtures/markup-differences.
+    notes:
+      - '2026-11-11, found while probing comment controls: Vale flags the word very in the title value of a front matter block, and hakkiri skips the whole block. The probe is tests/fixtures/markup-differences/text/m2.md. Which keys Vale lints is not measured yet.'
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary

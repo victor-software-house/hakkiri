@@ -93,11 +93,22 @@ Every alert of a file that holds ignored text SHALL carry the line, the columns 
 - **WHEN** a glob holds `block_ignores: ['(?s)BEGIN.*?END']` and a code span `very` follows the match on line 7
 - **THEN** a `code` rule reports it at line 7 column 12
 
-### Requirement: Source files read no ignore
+### Requirement: A source file's comments take the patterns
 
-A glob that matches a source file SHALL leave its comments as they are, whatever its `block_ignores` and `token_ignores` hold.
+A glob that matches a source file SHALL apply its `block_ignores` and `token_ignores` to the Markdown of each comment, as it does to a Markdown file.  
+The text of a comment is read with its markers and shared indentation removed.
 
-#### Scenario: A Rust file
+#### Scenario: A token in a doc comment
 
-- **WHEN** a glob that matches `t6.rs` holds `token_ignores: ['(Why this module is unsafe)']`, and a doc comment holds that text and `very`
-- **THEN** the alerts are those of the file under the same glob with no ignore
+- **WHEN** a glob that matches `t6.rs` holds `token_ignores: ['({{.*?}})']`, and a `///` comment holds `{{ really }}`
+- **THEN** a rule that flags `really` reports nothing in the token
+
+#### Scenario: A block over comment lines
+
+- **WHEN** `//!` lines read `BEGIN`, `very` and `END`, and the glob holds `block_ignores: ['(?s)(BEGIN.*?END)']`
+- **THEN** a rule that flags `very` reports nothing in the block, and reports `very` in the lines around it
+
+#### Scenario: Code outside the comments
+
+- **WHEN** a source file holds a string `"{{ very }}"` in code, and a glob holds that token pattern
+- **THEN** the rules read no string, as without the pattern

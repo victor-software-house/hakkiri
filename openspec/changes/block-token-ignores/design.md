@@ -44,16 +44,26 @@ The probe of Vale at `66bbb85` (2026-11-11) found these:
 - A `scope: raw` rule still reads the file as written, and a `scope: code` rule reads each ignored token, since it is a code span.
 - Vale does not apply the patterns to a Rust, TypeScript or JavaScript file: it reads a comment as plain lines unless a View names a markup format ([lintComment][v-comment]).
 
-### 3. Source files take no ignore
+### 3. A source file's comments take the patterns
 
-hakkiri reads a comment as Markdown ([comments][comment-md]), which Vale does not.
-Applying the patterns to that Markdown would give a project an effect that Vale does not give it, and the queue row sets Vale's behaviour as the goal.
-So a pattern in a glob that matches a source file changes nothing, as in Vale.
+Vale reads a comment of a source file as plain lines unless a View names a markup format, and applies no pattern to it ([lintComment][v-comment]).
+So `TokenIgnores` on a Rust file does nothing in Vale, though one consumer sets it there and expects it to work.
+hakkiri reads a comment as Markdown ([comments][comment-md]), so it applies the patterns to that Markdown, as to a Markdown file.
+It does not copy the flaw.
+The rewrite runs on the text of each comment with its markers removed, and the places of the nodes go back through the comment's own map to the file.
 
 ### 4. Patterns are checked when the config loads
 
 A pattern that does not compile is an error with the key and its line, where Vale reports it when it lints a file the section matches.
 The globs that match a file add their patterns in the order written, where Vale applies the sections in the order of a Go map, which is random.
+
+### 5. Three reads that differ from Vale's
+
+The probe of the comment controls showed three more places where hakkiri reads a file otherwise than Vale (2026-11-11, `tests/fixtures/markup-differences`):
+
+- Vale reads `$very + really$` as a code span, so a `code` rule flags `very` and a text rule does not. hakkiri reads it as text, which is worse, and `HKR-048` queues it.
+- Vale flags `very` in the value of `title: very front` in a front matter block. hakkiri skips the block, which misses what Vale reports, and `HKR-049` queues it. Which keys Vale lints is not measured.
+- Vale runs no `sentence` rule on a comment of a source file, and hakkiri does, since it reads the comment as Markdown. That finds more, so no row is queued.
 
 ### Not ported
 

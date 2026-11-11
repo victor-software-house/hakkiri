@@ -16,8 +16,8 @@ A project that moves from Vale to hakkiri has no way to say the same, so it eith
 - In a Markdown or MDX file, each match of a block pattern is read as a fenced code block that holds the first group of the match, as Vale reads it.
 - Each match of a token pattern is read as a code span that holds the first group.
 - The patterns of every glob that matches a file apply, a package's first and then the project's, so a project adds to a package.
-- A source file gives its comments to the rules as before, since Vale applies no ignore to a comment it reads as plain lines.
-- The differences from Vale go in the `vale-differences` spec.
+- The Markdown of a source file's comment takes the patterns too, where Vale applies none to a comment it reads as plain lines.
+- The differences from Vale go in the `vale-differences` spec, three more that the probe found among them: math, front matter values and a sentence rule in a comment.
 
 ## Capabilities
 

@@ -71,7 +71,7 @@ pub fn parse(language: Language, source: &str) -> Result<Tree, Error> {
 /// The patterns run in order, block patterns first, each over the text the one
 /// before it left.
 /// Every span of the tree is in `source`.
-/// A source file has no such text, and its tree is the one [`parse`] gives.
+/// The Markdown of each comment of a source file is rewritten the same way.
 ///
 /// # Errors
 ///
@@ -88,22 +88,22 @@ pub fn parse_ignoring(
         Language::Markdown => ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?,
         Language::Mdx => ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?,
         Language::Rust => (
-            comments::roots(comments::Dialect::Rust, source)?,
+            comments::roots(comments::Dialect::Rust, source, blocks, tokens)?,
             0,
             Vec::new(),
         ),
         Language::TypeScript => (
-            comments::roots(comments::Dialect::TypeScript, source)?,
+            comments::roots(comments::Dialect::TypeScript, source, blocks, tokens)?,
             0,
             Vec::new(),
         ),
         Language::Tsx => (
-            comments::roots(comments::Dialect::Tsx, source)?,
+            comments::roots(comments::Dialect::Tsx, source, blocks, tokens)?,
             0,
             Vec::new(),
         ),
         Language::JavaScript => (
-            comments::roots(comments::Dialect::JavaScript, source)?,
+            comments::roots(comments::Dialect::JavaScript, source, blocks, tokens)?,
             0,
             Vec::new(),
         ),

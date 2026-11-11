@@ -10,9 +10,10 @@ use std::ops::Range;
 use tree_sitter::{Language as Grammar, Parser, Query, QueryCursor, StreamingIterator};
 
 use crate::error::Error;
-use crate::jsdoc;
 use crate::markdown::{self, Flavor};
-use crate::tree::{Node, Scope};
+use crate::pattern::Pattern;
+use crate::tree::{Node, Scope, remap_nodes};
+use crate::{ignore, jsdoc};
 
 /// The grammar that finds the comments of a file.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -112,10 +113,18 @@ struct Group {
 }
 
 /// The `raw` roots of a source file: one per comment group.
-pub(crate) fn roots(dialect: Dialect, source: &str) -> Result<Vec<Node>, Error> {
+///
+/// The Markdown of each comment is rewritten under `blocks` and `tokens`, as
+/// [`crate::ignore`] explains for a file.
+pub(crate) fn roots(
+    dialect: Dialect,
+    source: &str,
+    blocks: &[&Pattern],
+    tokens: &[&Pattern],
+) -> Result<Vec<Node>, Error> {
     groups(source, &find(dialect, source)?)
         .iter()
-        .map(|group| root(dialect, source, group))
+        .map(|group| root(dialect, source, group, blocks, tokens))
         .collect()
 }
 
@@ -179,7 +188,13 @@ fn starts_line(source: &str, offset: usize) -> bool {
 }
 
 /// The `raw` root of one group: the comment node over the Markdown of its text.
-fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
+fn root(
+    dialect: Dialect,
+    source: &str,
+    group: &Group,
+    blocks: &[&Pattern],
+    tokens: &[&Pattern],
+) -> Result<Node, Error> {
     let stripped = strip(source, &lines(source, group));
     let segments = if dialect != Dialect::Rust && group.marker == Marker::DocBlock {
         jsdoc::prose(&stripped.text)
@@ -189,13 +204,33 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
     let mut children = Vec::new();
     for segment in segments {
         let text = stripped.text.get(segment.clone()).unwrap_or_default();
-        let mut nodes = markdown::blocks(text, Flavor::Comment)?;
-        for node in &mut nodes {
-            node.map_segments(&|span| {
-                stripped.segments(span.start + segment.start..span.end + segment.start)
-            });
+        if blocks.is_empty() && tokens.is_empty() {
+            let mut nodes = markdown::blocks(text, Flavor::Comment)?;
+            for node in &mut nodes {
+                node.map_segments(&|span| {
+                    stripped.segments(span.start + segment.start..span.end + segment.start)
+                });
+            }
+            children.extend(nodes);
+        } else {
+            let changed = ignore::rewrite(text, blocks, tokens).map_err(Error::Ignore)?;
+            let mut nodes = markdown::blocks(changed.text(), Flavor::Comment)?;
+            remap_nodes(
+                &mut nodes,
+                &|span| {
+                    changed
+                        .origin(span)
+                        .into_iter()
+                        .flat_map(|place| {
+                            stripped
+                                .segments(place.start + segment.start..place.end + segment.start)
+                        })
+                        .collect()
+                },
+                &Some,
+            );
+            children.extend(nodes);
         }
-        children.extend(nodes);
     }
     let start = group.comments.first().map_or(0, |comment| comment.start);
     let end = group.comments.last().map_or(0, |comment| comment.end);

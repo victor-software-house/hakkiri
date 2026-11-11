@@ -4,7 +4,7 @@
 //! END
 //! After really.
 
-/// Doc very with (Why this module is unsafe) and really.
+/// Doc very with (Why this module is unsafe) and {{ really }}.
 pub fn f() {}
 
 // plain very (Why this module is unsafe) comment
