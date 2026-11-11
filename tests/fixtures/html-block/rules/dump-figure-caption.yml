@@ -1,0 +1,5 @@
+extends: existence
+message: "%s"
+scope: figure.caption
+raw:
+  - "(?s).+"

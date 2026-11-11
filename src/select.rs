@@ -5,8 +5,8 @@ use std::{error, fmt};
 
 use crate::scope::{Inline, Selector};
 use crate::splitter::{FormatError, Model};
-use crate::text::{Replace, Text};
-use crate::tree::{Node, Scope, Tree};
+use crate::text::{Decode, Parts, Replace, Text};
+use crate::tree::{Node, Reading, Scope, Tree};
 
 /// One piece of text a rule reads.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -54,8 +54,14 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::TableHeader
-        | Scope::TableCell => Some(scope.name()),
+        | Scope::TableCell
+        | Scope::TableCaption
+        | Scope::FigureCaption => Some(scope.name()),
         Scope::Paragraph
         | Scope::TableRow
         | Scope::Link
@@ -63,6 +69,8 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Description
+        | Scope::Meta
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -86,13 +94,21 @@ fn opens(parent: &Node, child: &Node) -> bool {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::TableHeader
         | Scope::TableCell
+        | Scope::TableCaption
+        | Scope::FigureCaption
         | Scope::Link
         | Scope::Code
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Description
+        | Scope::Meta
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -101,10 +117,89 @@ fn opens(parent: &Node, child: &Node) -> bool {
     }
 }
 
+/// Whether a node is prose, which the sentence splitter cuts: Vale reads the
+/// alt text of an image and the description of a page as one block.
+const fn is_prose(scope: Scope) -> bool {
+    match scope {
+        Scope::Paragraph
+        | Scope::Heading1
+        | Scope::Heading2
+        | Scope::Heading3
+        | Scope::Heading4
+        | Scope::Heading5
+        | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
+        | Scope::TableHeader
+        | Scope::TableCell
+        | Scope::TableCaption
+        | Scope::FigureCaption => true,
+        Scope::Blockquote
+        | Scope::List
+        | Scope::TableRow
+        | Scope::Link
+        | Scope::Code
+        | Scope::Strong
+        | Scope::Emphasis
+        | Scope::Alt
+        | Scope::Description
+        | Scope::Meta
+        | Scope::Raw
+        | Scope::CommentLine
+        | Scope::CommentBlock
+        | Scope::CommentDocLine
+        | Scope::CommentDocBlock => false,
+    }
+}
+
+/// How the text of a node reads its character references, as the text of a
+/// Markdown or HTML element does in Vale.
+///
+/// A code span and the text of a file or a comment read as written.
+/// The alt text of an image and the description of a page are the values of
+/// attributes.
+const fn decodes(scope: Scope) -> Decode {
+    match scope {
+        Scope::Paragraph
+        | Scope::Heading1
+        | Scope::Heading2
+        | Scope::Heading3
+        | Scope::Heading4
+        | Scope::Heading5
+        | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
+        | Scope::Blockquote
+        | Scope::List
+        | Scope::TableRow
+        | Scope::TableHeader
+        | Scope::TableCell
+        | Scope::TableCaption
+        | Scope::FigureCaption
+        | Scope::Link
+        | Scope::Strong
+        | Scope::Emphasis
+        | Scope::Meta => Decode::Text,
+        Scope::Alt | Scope::Description => Decode::Attribute,
+        Scope::Code
+        | Scope::Raw
+        | Scope::CommentLine
+        | Scope::CommentBlock
+        | Scope::CommentDocLine
+        | Scope::CommentDocBlock => Decode::No,
+    }
+}
+
 /// The scope names a node holds.
 ///
 /// `text` marks the prose leaves, which a list item or a block quote is read
 /// through: the two hold no scope of their own.
+/// The alt text of an image and the description of a page are text too, and
+/// `meta` is not.
 /// A block of text has one scope, as in Vale ([`select`] explains which).
 /// `chain` is that scope when an element around the node gives it, and a
 /// paragraph with none is a `paragraph`.
@@ -118,14 +213,21 @@ fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::TableHeader
-        | Scope::TableCell => vec![chain.unwrap_or_else(|| scope.name()), "text"],
+        | Scope::TableCell
+        | Scope::TableCaption
+        | Scope::FigureCaption => vec![chain.unwrap_or_else(|| scope.name()), "text"],
+        Scope::Alt | Scope::Description => vec![scope.name(), "text"],
         Scope::TableRow
         | Scope::Link
         | Scope::Code
         | Scope::Strong
         | Scope::Emphasis
-        | Scope::Alt
+        | Scope::Meta
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -154,17 +256,65 @@ fn segments(node: &Node) -> Vec<Range<usize>> {
         | Scope::Heading4
         | Scope::Heading5
         | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
         | Scope::Blockquote
         | Scope::List
         | Scope::TableRow
         | Scope::TableHeader
         | Scope::TableCell
+        | Scope::TableCaption
+        | Scope::FigureCaption
         | Scope::Link
         | Scope::Code
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Description
+        | Scope::Meta
         | Scope::Raw => node.segments.clone(),
+    }
+}
+
+/// How each segment of `segments(node)` reads.
+fn readings(node: &Node) -> Vec<Reading> {
+    match node.scope {
+        Scope::CommentLine
+        | Scope::CommentBlock
+        | Scope::CommentDocLine
+        | Scope::CommentDocBlock => node
+            .children
+            .iter()
+            .flat_map(|child| (0..child.segments.len()).map(|index| child.reading(index)))
+            .collect(),
+        Scope::Paragraph
+        | Scope::Heading1
+        | Scope::Heading2
+        | Scope::Heading3
+        | Scope::Heading4
+        | Scope::Heading5
+        | Scope::Heading6
+        | Scope::Heading0
+        | Scope::Heading7
+        | Scope::Heading8
+        | Scope::Heading9
+        | Scope::Blockquote
+        | Scope::List
+        | Scope::TableRow
+        | Scope::TableHeader
+        | Scope::TableCell
+        | Scope::TableCaption
+        | Scope::FigureCaption
+        | Scope::Link
+        | Scope::Code
+        | Scope::Strong
+        | Scope::Emphasis
+        | Scope::Alt
+        | Scope::Description
+        | Scope::Meta
+        | Scope::Raw => node.reads.clone(),
     }
 }
 
@@ -238,7 +388,7 @@ pub fn select(
         let chain = chain.or_else(|| named_scope(node.scope));
         let held = names(node.scope, chain);
         let own = selector.reads(&held, extension, false);
-        let prose = held.contains(&"text");
+        let prose = is_prose(node.scope);
         let sentences = if prose && model.is_some() {
             let mut with_sentence = vec!["sentence"];
             with_sentence.extend(&held);
@@ -248,12 +398,24 @@ pub fn select(
         };
         if own.is_some() || sentences.is_some() {
             let rows = node.rows();
+            let segments = segments(node);
+            let reads = readings(node);
             let text_for = |blank: &[Inline]| {
-                if node.scope == Scope::Raw {
-                    Text::build(source, &segments(node), &rows, &[])
+                let replacements = if node.scope == Scope::Raw {
+                    Vec::new()
                 } else {
-                    Text::build(source, &segments(node), &rows, &replacements(node, blank))
-                }
+                    replacements(node, blank)
+                };
+                Text::build(
+                    source,
+                    &Parts {
+                        segments: &segments,
+                        reads: &reads,
+                        rows: &rows,
+                        replacements: &replacements,
+                        decode: decodes(node.scope),
+                    },
+                )
                 .ok_or(SelectError::Segment(node.scope))
             };
             let own_text = match &own {

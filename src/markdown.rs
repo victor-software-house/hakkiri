@@ -245,6 +245,9 @@ struct Visited {
     /// MDX syntax inside the node that is not prose: JSX tags, expressions and
     /// ESM.
     cuts: Vec<Range<usize>>,
+    /// The inline HTML inside the node, each tag or comment one span. They are
+    /// cuts too: the text around them is read as Vale reads it.
+    tags: Vec<Range<usize>>,
 }
 
 impl Visited {
@@ -252,12 +255,21 @@ impl Visited {
         Self {
             nodes: Vec::new(),
             cuts: span.into_iter().collect(),
+            tags: Vec::new(),
+        }
+    }
+
+    fn tag(span: Option<Range<usize>>) -> Self {
+        Self {
+            tags: span.clone().into_iter().collect(),
+            ..Self::cut(span)
         }
     }
 
     fn append(mut self, other: Self) -> Self {
         self.nodes.extend(other.nodes);
         self.cuts.extend(other.cuts);
+        self.tags.extend(other.tags);
         self
     }
 }
@@ -372,7 +384,14 @@ impl Builder<'_> {
                 return Visited::default();
             };
             if let Some((child, cell, first)) = top.next_child() {
-                match self.step(child) {
+                let step = if let Mdast::Html(html) = child
+                    && Self::holds_blocks(top.node)
+                {
+                    Step::Done(self.html_block(child, &html.value, first))
+                } else {
+                    self.step(child)
+                };
+                match step {
                     Step::Done(visited) => {
                         top.inner = std::mem::take(&mut top.inner).append(visited);
                     }
@@ -391,6 +410,32 @@ impl Builder<'_> {
                 None => return visited,
             }
         }
+    }
+
+    /// Whether the children of `node` are blocks, so that an HTML node among
+    /// them is an HTML block and not an inline tag.
+    const fn holds_blocks(node: &Mdast) -> bool {
+        matches!(
+            node,
+            Mdast::Root(_)
+                | Mdast::Blockquote(_)
+                | Mdast::ListItem(_)
+                | Mdast::FootnoteDefinition(_)
+                | Mdast::MdxJsxFlowElement(_)
+        )
+    }
+
+    /// An HTML block: a gap in the nodes around it, and the nodes for the text
+    /// Vale reads in it.
+    fn html_block(&self, node: &Mdast, value: &str, first: bool) -> Visited {
+        let span = span_of(node);
+        let mut visited = Visited::cut(span.clone());
+        if let Some(span) = span
+            && let Some(nodes) = crate::html_text::nodes(self.source, &span, value, first)
+        {
+            visited.nodes = nodes;
+        }
+        visited
     }
 
     fn step(&self, node: &Mdast) -> Step {
@@ -414,13 +459,13 @@ impl Builder<'_> {
                 self.code_blocks.set(self.code_blocks.get() + 1);
                 Step::Done(Visited::cut(span_of(node)))
             }
+            Mdast::Html(_) => Step::Done(Visited::tag(span_of(node))),
             Mdast::MdxjsEsm(_)
             | Mdast::MdxFlowExpression(_)
             | Mdast::MdxTextExpression(_)
             | Mdast::Toml(_)
             | Mdast::Yaml(_)
             | Mdast::InlineMath(_)
-            | Mdast::Html(_)
             | Mdast::Math(_)
             | Mdast::Definition(_) => Step::Done(Visited::cut(span_of(node))),
             Mdast::Root(_)
@@ -461,6 +506,7 @@ impl Builder<'_> {
         let Visited {
             nodes: children,
             mut cuts,
+            tags,
         } = inner;
         cuts.extend(own);
         let segments = match scope {
@@ -474,7 +520,11 @@ impl Builder<'_> {
             | Scope::Heading3
             | Scope::Heading4
             | Scope::Heading5
-            | Scope::Heading6 => {
+            | Scope::Heading6
+            | Scope::Heading0
+            | Scope::Heading7
+            | Scope::Heading8
+            | Scope::Heading9 => {
                 let atx = self
                     .source
                     .get(span.clone())
@@ -484,28 +534,69 @@ impl Builder<'_> {
             Scope::Paragraph
             | Scope::TableHeader
             | Scope::TableCell
+            | Scope::TableCaption
+            | Scope::FigureCaption
             | Scope::Link
             | Scope::Code
             | Scope::Strong
             | Scope::Emphasis
             | Scope::Alt
+            | Scope::Description
+            | Scope::Meta
             | Scope::Raw
             | Scope::CommentLine
             | Scope::CommentBlock
             | Scope::CommentDocLine
             | Scope::CommentDocBlock => self.lines_of(&span, &cuts),
         };
+        let mut segments = segments;
+        let reads = if matches!(
+            scope,
+            Scope::Paragraph
+                | Scope::Heading1
+                | Scope::Heading2
+                | Scope::Heading3
+                | Scope::Heading4
+                | Scope::Heading5
+                | Scope::Heading6
+                | Scope::Heading0
+                | Scope::Heading7
+                | Scope::Heading8
+                | Scope::Heading9
+                | Scope::TableHeader
+                | Scope::TableCell
+        ) {
+            let (kept, reads) = crate::html::inline_reads(self.source, span.start, segments, &tags);
+            segments = kept;
+            reads
+        } else if matches!(scope, Scope::TableRow | Scope::Blockquote | Scope::List) {
+            children
+                .iter()
+                .flat_map(|child| (0..child.segments.len()).map(|index| child.reading(index)))
+                .collect()
+        } else {
+            Vec::new()
+        };
         // A node with no text gives way to the nodes below it.
         let nodes = if segments.is_empty() {
             children
         } else {
             Node::from_segments(scope, segments, children)
-                .map(|node| Node { first, ..node })
+                .map(|node| Node {
+                    first,
+                    ..node.with_reads(reads)
+                })
                 .into_iter()
                 .collect()
         };
         cuts.extend(up);
-        Visited { nodes, cuts }
+        // The tags of an inline element belong to the paragraph around it.
+        let tags = if matches!(scope, Scope::Link | Scope::Strong | Scope::Emphasis) {
+            tags
+        } else {
+            Vec::new()
+        };
+        Visited { nodes, cuts, tags }
     }
 
     /// The syntax of an inline node that is not its text.
@@ -563,12 +654,20 @@ impl Builder<'_> {
             | Scope::Heading4
             | Scope::Heading5
             | Scope::Heading6
+            | Scope::Heading0
+            | Scope::Heading7
+            | Scope::Heading8
+            | Scope::Heading9
             | Scope::Blockquote
             | Scope::List
             | Scope::TableRow
             | Scope::TableHeader
             | Scope::TableCell
+            | Scope::TableCaption
+            | Scope::FigureCaption
             | Scope::Alt
+            | Scope::Description
+            | Scope::Meta
             | Scope::Raw
             | Scope::CommentLine
             | Scope::CommentBlock
@@ -793,6 +892,7 @@ impl Builder<'_> {
                 .into_iter()
                 .collect(),
             cuts: span_of(node).into_iter().collect(),
+            tags: Vec::new(),
         }
     }
 }

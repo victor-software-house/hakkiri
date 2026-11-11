@@ -1,0 +1,15 @@
+<p>a <a href="u">marker link</a> b</p>
+
+<p>a <b>marker b</b> c</p>
+
+<p>a <strong>marker strong</strong> c</p>
+
+<p>a <i>marker i</i> c</p>
+
+<p>a <em>marker em</em> c</p>
+
+<p>a <q>marker q</q> c</p>
+
+<p>a <del>marker del</del> c</p>
+
+<p>a <b>bold <i>marker nested</i></b> c</p>

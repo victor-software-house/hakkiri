@@ -36,8 +36,28 @@ pub(crate) struct Cli {
 pub(crate) enum Command {
     /// Lint files and directories under the project config.
     Check(CheckArgs),
+    /// Run the test cases of rule files and of `*.test.yml` files.
+    Test(TestArgs),
     /// Print the installed-version operator contract.
     Instructions,
+}
+
+/// Arguments of `hakkiri test`.
+#[derive(Args, Debug)]
+pub(crate) struct TestArgs {
+    /// Rule files, test files and directories that hold them. Defaults to the
+    /// current directory.
+    #[arg(value_hint = clap::ValueHint::AnyPath)]
+    pub(crate) paths: Vec<PathBuf>,
+
+    /// The project config, read only by a case that runs through it. Defaults
+    /// to `.ctl/hakkiri.yaml`.
+    #[arg(long, value_hint = clap::ValueHint::FilePath)]
+    pub(crate) config: Option<PathBuf>,
+
+    /// Fail when a rule under the paths flags nothing in any case.
+    #[arg(long)]
+    pub(crate) coverage: bool,
 }
 
 /// Arguments of `hakkiri check`.

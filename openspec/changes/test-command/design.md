@@ -48,7 +48,12 @@ This is Vale's form ([run][v-run]), so ProseStyle's `want` and `contains` string
 
 A case in a rule's `tests`, or one with `rule`, loads that rule alone, from a path relative to its test file.
 It reads no config, reports an alert of any level, and applies no `level` or `off` from a glob.
-The rule keeps its project name: the folder it sits in, a dot, and its file name without `.yml`.
+The rule keeps its project name: its style folder, the folders under it and its file name up to the first dot, joined by dots, so `Foo.v2.yml` in `Team` is `Team.Foo` (change `rule-names`).
+The style loader and the `test` command derive the name in one function, so a coverage report and an alert agree.
+The name comes from the path made absolute, with symlinks left alone.
+Vale does the same: `vale test styles/Team/Foo.yml` names the rule `Team.Foo` when `styles/Team` is a symlink, and `Foo.yml` or `./Foo.yml` run from inside `Team` does too.
+The fold is lexical on purpose, as Go's `filepath.Abs` is, and the rule's text, name and package all come from the folded path.
+In a probe, a case with `rule: via/../Team/Foo.yml` through a symlink read `Team/Foo.yml` beside the case file, not the symlink target's parent.
 Any other case lints `input` as a file named `input.<format>` in the current directory, through the whole config, so its globs, styles and levels apply.
 Vale isolates the same way ([isolate][v-isolate]).
 
@@ -56,6 +61,7 @@ Vale isolates the same way ([isolate][v-isolate]).
 
 An argument is a file, read as given, or a directory, walked in sorted order, and no argument means the current directory.
 The walk skips a dot directory except the root it was given, as Vale does ([find][v-find]).
+It skips `node_modules` too, through the same test as the `check` walk, so one list of skipped folders serves both.
 A `*.test.yml` file is read as cases, and any other `.yml` file only when it holds `extends` and `tests`, so `test` can walk a repository that holds other YAML.
 No case found is an error.
 
@@ -93,7 +99,7 @@ The runner is sequential.
 - [Two sources of cases double the discovery rules] → One walk finds both, and a scenario covers each source.
 - [A case without a rule runs through the whole config, so a config change moves its result] → That is its purpose; an isolated case does not move.
 
-[check-design]: ../check-command/design.md
+[check-design]: ../archive/2026-11-10-check-command/design.md
 [rule-files]: ../../specs/rule-files/spec.md
 [prose-style-rules]: ../archive/2026-11-10-rule-format/prose-style-rules.md
 [v-load]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/testsuite/suite.go#L117-L167

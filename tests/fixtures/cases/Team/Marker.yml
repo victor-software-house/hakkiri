@@ -1,0 +1,15 @@
+extends: existence
+message: "Resolve '%s'."
+level: suggestion
+scope: text.comment
+tokens:
+  - marker
+tests:
+  - name: a comment in Rust
+    input: "// A marker here."
+    format: rs
+    contains: Team.Marker
+  - name: prose is not a comment
+    input: A marker here.
+    want: ''
+    format: md

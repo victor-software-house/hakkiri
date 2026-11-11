@@ -9,6 +9,7 @@ extend-exclude = [
   "tests/fixtures/capitalization/vale.tsv",
   "tests/fixtures/spelling-parity",
   "tests/fixtures/tagger/treebank.tsv",
+  "data/entities/html5.tsv",
 ]
 
 # Word endings in the syllable rules of `src/readability.rs`.

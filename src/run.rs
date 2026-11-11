@@ -8,11 +8,11 @@ use std::{fs, io, thread};
 
 use hakkiri::alert::Alert;
 use hakkiri::engine::lint;
-use hakkiri::parse;
 use hakkiri::rule::Level;
+use hakkiri::{Tree, parse};
 
 use crate::cli::CheckArgs;
-use crate::config::{self, DEFAULT};
+use crate::config::{self, DEFAULT, Plan};
 use crate::files::{Job, find};
 use crate::report::{Check, Failure, Row};
 
@@ -75,10 +75,20 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
 fn lint_file(job: &Job<'_>) -> Result<Vec<Alert>, String> {
     let source = fs::read_to_string(&job.file).map_err(|error| error.to_string())?;
     let tree = parse(job.language, &source).map_err(|error| error.to_string())?;
+    lint_planned(&job.plan, &tree, &source, &job.extension)
+}
+
+/// The alerts of `source` under `plan`, at the levels the config sets.
+pub(crate) fn lint_planned(
+    plan: &Plan<'_>,
+    tree: &Tree,
+    source: &str,
+    extension: &str,
+) -> Result<Vec<Alert>, String> {
     let mut alerts =
-        lint(&job.plan.rules, &tree, &source, &job.extension).map_err(|error| error.to_string())?;
+        lint(&plan.rules, tree, source, extension).map_err(|error| error.to_string())?;
     for alert in &mut alerts {
-        if let Some(level) = job.plan.levels.get(alert.rule.as_str()) {
+        if let Some(level) = plan.levels.get(alert.rule.as_str()) {
             alert.level = *level;
         }
     }

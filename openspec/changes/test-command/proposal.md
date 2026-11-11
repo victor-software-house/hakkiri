@@ -20,6 +20,7 @@ The rule-files spec already says how a case reads and passes, but the loader ref
 ### New Capabilities
 
 - `test-command`: which cases `test` finds, how each runs, and how the report and the exit status read.
+- `test-rule-names`: how `test` names a rule and reads its text from the path it was given.
 
 ### Modified Capabilities
 
@@ -32,5 +33,5 @@ The rule-files spec already says how a case reads and passes, but the loader ref
 - `src/instructions.md` and `skills/hakkiri/SKILL.md` gain the command.
 
 [ledger]: ../../../tasks.yaml
-[check]: ../check-command/proposal.md
+[check]: ../archive/2026-11-10-check-command/proposal.md
 [release]: ../release-lane/proposal.md

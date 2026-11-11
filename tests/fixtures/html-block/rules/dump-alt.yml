@@ -1,0 +1,5 @@
+extends: existence
+message: "%s"
+scope: alt
+raw:
+  - "(?s).+"

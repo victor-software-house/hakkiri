@@ -1,0 +1,43 @@
+<p>a<br>marker<br/>b</p>
+
+<p>a<b>marker</b>c</p>
+
+<p>a <b>marker</b> c</p>
+
+<p>a<b>marker</b> c</p>
+
+<p>a <b>marker</b>c</p>
+
+<p>(<b>marker</b>)</p>
+
+<p>x—<b>marker</b></p>
+
+<p>a<span>marker</span>,</p>
+
+<p>a<b>marker</b>.</p>
+
+<p>a<!-- c -->marker</p>
+
+<p>a <!-- c -->marker</p>
+
+<p>a<!-- c --> marker</p>
+
+<p>a<wbr>marker<wbr>b</p>
+
+<p>a<img src="x">marker</p>
+
+<p>a<br>
+marker</p>
+
+<p>a
+<br>marker</p>
+
+<p>a&nbsp;<b>marker</b></p>
+
+<p>a<b>marker</b><i>b</i>c</p>
+
+<p>one<br><br>two</p>
+
+<p><b>marker</b>c</p>
+
+<p><b>marker</b> c</p>

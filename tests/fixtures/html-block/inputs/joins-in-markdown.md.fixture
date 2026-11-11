@@ -1,0 +1,19 @@
+a<br>marker<br/>b
+
+a<b>marker</b>c
+
+a<span>marker</span> c
+
+a <i>marker</i>
+
+a *b*<br>c
+
+a<br>
+marker
+
+x <kbd>marker</kbd>y
+
+a<!-- c -->marker
+
+a<br/>marker<br/>
+b<br>c
