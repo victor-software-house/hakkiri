@@ -1,6 +1,6 @@
 # Design
 
-## How Vale 3.26.0 merges a package's `.vale.ini`
+## Vale 3.26.0 and a package's `.vale.ini`
 
 Read at Vale commit `66bbb85`, and probed with a build of that commit (section "Probes").
 
@@ -9,7 +9,9 @@ Read at Vale commit `66bbb85`, and probed with a build of that commit (section "
 2. It copies the package's `.vale.ini` to `StylesPath/.vale-config/<index>-<Name>.ini`, where the index is the package's place in `Packages` ([line 170][v-copy]).
    Every sync starts by deleting that folder ([lines 26 to 30][v-clean]).
 3. If the package's `.vale.ini` holds `Packages`, `sync` installs those too ([lines 155 to 164][v-nested]).
-4. At lint time Vale reads the fragments first, sorted by file name as text, then the user-level config, then the project's ([ReadPipeline][v-pipeline]; [pipeConfig][v-pipe]; the sort is [one line][v-sort]; the user-level file is added at [line 203][v-user] and the project's at [line 234][v-project]).
+4. At lint time Vale reads the fragments first, sorted by file name as text, then the user-level config, then the project's.
+   The code is in [ReadPipeline][v-pipeline] and [pipeConfig][v-pipe].
+   The sort is [one line][v-sort], the user-level file is added at [line 203][v-user] and the project's at [line 234][v-project].
 5. The sources merge key by key.
    The first source holds the key and each later value is added to it as a shadow ([shadowMerge][v-shadow]).
    How a key then resolves depends on the code that reads it:
@@ -18,7 +20,7 @@ Read at Vale commit `66bbb85`, and probed with a build of that commit (section "
    - `MinAlertLevel` reads the last value ([line 413][v-min]);
    - `WordTemplate` and the `[formats]` entries read the first value, so a package beats the project ([line 434][v-wt], [line 672][v-formats]).
 6. A package's `StylesPath` is dropped on load ([expandPaths][v-expand], line 472).
-7. A key Vale does not know is a warning, not an error ([line 654][v-unknown]).
+7. A key Vale does not know draws a warning and no error ([line 654][v-unknown]).
 8. A file's sections are visited in the order written and a later section's `BasedOnStyles` replaces the styles of an earlier one.
    When a project section replaces what a package section turned on, Vale warns once ([buildFile][v-build], [warnDroppedStyles][v-warn]).
    Sections with the same name merge before that, so their `BasedOnStyles` add up.
@@ -59,22 +61,35 @@ Candidates:
 |:--|:--|:--|:--|
 | A | `.ctl/hakkiri.yaml` | the project's own path; Vale reads a package's `.vale.ini` under the project's name; the schema and the error text are the same | a package holds a `.ctl` folder |
 | B | `hakkiri.yaml` | one file at the top of the package | a second name for the same schema |
-| C | `settings.yaml` | plain | a second name, and it says nothing of hakkiri |
+| C | `settings.yaml` | plain | a second name, with no mark of hakkiri |
 
-The specs write A, provisional.
-The operator names it.
+The operator chose A (operator, 2026-11-11).
+B and C lost because a second name for one schema costs a second page in the help text and the skill.
 
-### 3. Which keys a package may set
+### 3. Which keys a package may set, and nested packages
 
-`files`, `level` and `vocab`, the keys of the project config except `packages`.
+`files`, `level`, `vocab` and `packages`, the keys of the project config.
 Vale applies a package's file as a project's, with only `StylesPath` dropped, so a package may set anything there.
 
-A package that holds `packages` is an error.
-Vale installs the nested packages, but a nested `url` needs a base for relative `path` entries and a place in the order, and no package needs it yet.
+A package's `packages` are fetched, as Vale installs them, and the operator chose that (operator, 2026-11-11).
+Each entry holds a `url` and a `sha256`, as the project's does.
+A `path` entry in a package's file is an error: a path in a fetched package would name a folder of the person's machine, and the package author cannot know it.
 
-Alternative: install nested packages.
-It would give a package a fetch of its own and a second cache entry no project listed.
-It stays a row of its own if a package asks for it.
+Vale sets no limit and no cycle check.
+`installPkg` calls `readPkg` for each name in the package's `Packages` and nothing records what is on the way ([sync.go][v-nested]); a search of `cmd/vale` for depth, cycle, visited and recursion finds no guard.
+Two packages that name each other therefore never end.
+This is read from the source, and was not run.
+hakkiri refuses a package that is its own ancestor, with an error that names the chain, and a chain more than 10 packages deep.
+The 10 matches the limit hakkiri sets on a chain of rules that extend each other, which Vale also sets at 10; it is the Vale figure for the nearest case and is open to change.
+
+A package named twice, by the project and by another package or by two packages, loads once, at the place of its first use.
+Two entries are the same package when they hold the same `url` and `sha256`.
+That is not a cycle.
+
+Order: the nested packages of a package come before it, in the order written, so a package's own settings override those of the packages it lists.
+
+Alternative: refuse nested packages.
+It lost to the operator's ruling, and a package such as ProseStyle can name the packages it builds on.
 
 ### 4. A `styles` list under a glob the package also writes
 
@@ -86,7 +101,7 @@ Candidates:
 | B | Under the same glob text the two lists add up, as Vale merges sections of one name; under another glob the later list replaces | `PkgA` and `Own` |
 
 The probes show Vale doing B (cases "Package alone" and "Another section name").
-The specs write B.
+The operator chose B, with no warning (operator, 2026-11-11).
 A is the smaller rule, and the existing replacement rule would apply as it stands, but a project that adds one style would then drop every package style without a word.
 Vale's warning for that case is not copied (see `vale-differences`).
 

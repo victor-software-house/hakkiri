@@ -61,7 +61,11 @@ queue:
       - A package's settings file is read and merged under the project's config, and a setting in the project wins, in a test.
       - A rule the package sets off stays off until the project turns it on, in a test.
       - The package's vocab reaches the checks that read vocabularies, in a test.
+      - A package's packages are fetched like the project's, each pinned by url and sha256, and a cycle and a chain over 10 packages are errors, in tests.
+      - A project's styles list adds to a package's under the same glob and replaces it under another glob that matches the same files, in a test.
     plan: openspec/changes/package-settings/proposal.md
+    notes:
+      - "2026-11-11, operator decisions: the file is .ctl/hakkiri.yaml in the package; styles add up under the same glob text and a project list under another glob replaces the package's, with no warning; a package's packages are fetched, pinned by url and sha256, with a cycle refused and a depth limit of 10 (Vale sets none)."
 
   - id: HKR-008
     title: Run ProseStyle on hakkiri

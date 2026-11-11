@@ -74,14 +74,9 @@ A `styles` list under another glob SHALL replace the earlier list, as for any tw
 
 ### Requirement: A package's settings file holds the keys of a project config
 
-A package's settings file SHALL hold `files`, `level` and `vocab`.  
-A key it holds that the project config does not define, and a `packages` key, SHALL be an error that names the key, its line and the package.  
+A package's settings file SHALL hold `files`, `level`, `vocab` and `packages`.  
+A key it holds that the project config does not define SHALL be an error that names the key, its line and the package.  
 A rule setting that names no loaded rule SHALL be an error, as in the project's config.
-
-#### Scenario: A nested package
-
-- **WHEN** a package's `.ctl/hakkiri.yaml` holds `packages: [{path: other}]` on line 1
-- **THEN** hakkiri reports an error naming `packages`, line 1 and the package, and exits 2
 
 #### Scenario: A key in Vale's spelling
 
@@ -92,6 +87,43 @@ A rule setting that names no loaded rule SHALL be an error, as in the project's 
 
 - **WHEN** a package's file sets `Team.Nope: warning` and no loaded style holds `Team.Nope`
 - **THEN** hakkiri reports an error naming the key and the line
+
+### Requirement: A package may list packages
+
+A package's `packages` SHALL be fetched like the project's, each entry holding a `url` and a `sha256`.  
+A `path` entry in a package's file SHALL be an error.  
+A package that is its own ancestor SHALL be an error that names the chain, and a chain more than 10 packages deep SHALL be an error.  
+A package named twice, by its `url` and `sha256`, SHALL load once, and the packages a package lists SHALL come before it, in the order written.
+
+#### Scenario: A nested package
+
+- **WHEN** a package's `.ctl/hakkiri.yaml` holds `packages: [{url: https://x.example/base.zip, sha256: <hash>}]` and the zip holds `styles/Base/Filler.yml`
+- **THEN** hakkiri fetches and caches `base.zip` as for a project entry, and a glob that lists `Base` runs `Base.Filler`
+
+#### Scenario: A nested path
+
+- **WHEN** a package's file holds `packages: [{path: ../base}]` on line 2
+- **THEN** hakkiri reports an error naming `path`, line 2 and the package, and exits 2
+
+#### Scenario: A cycle
+
+- **WHEN** the package `a` lists `b` and `b` lists `a`
+- **THEN** hakkiri reports an error that names `a`, `b` and `a` again, and exits 2
+
+#### Scenario: Too deep
+
+- **WHEN** each of 11 packages lists the next, and the project lists the first
+- **THEN** hakkiri reports an error that names the limit of 10, and exits 2
+
+#### Scenario: One package named twice
+
+- **WHEN** the project and a package both list the same `url` and `sha256`
+- **THEN** hakkiri loads it once, with no error for a duplicate style
+
+#### Scenario: Settings in order
+
+- **WHEN** the package `top` lists `base`, both set `Team.Filler` to a level, and the project lists `top`
+- **THEN** the level of `top` applies
 
 ### Requirement: Package vocabularies and the project's add up
 

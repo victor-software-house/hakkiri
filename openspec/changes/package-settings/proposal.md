@@ -17,20 +17,21 @@ The operator decided that a package ships a settings file in hakkiri's own YAML 
 - A package may hold a settings file in the format of `.ctl/hakkiri.yaml`.
   hakkiri reads it for each loaded package and applies it before the project's own settings.
 - The project wins over a package, and a later package wins over an earlier one.
-- A package file holds `files`, `level` and `vocab`.
-  `packages` and any other key is an error that names the key, the line and the file.
+- A package file holds `files`, `level`, `vocab` and `packages`.
+  Any other key is an error that names the key, the line and the package.
+- A package's `packages` are fetched like the project's, each pinned by `url` and `sha256`.
+  A cycle, and a chain more than 10 packages deep, is an error.
 - The settings of a package that ships a rule `off` leave it off until the project turns it on.
 - The `vale-differences` spec records where this differs from how Vale 3.26.0 merges a package's `.vale.ini`.
 - A patch changeset ships the feature.
 
-## Decisions for the operator
+## Decisions
 
-The design lists each with its candidates.
-The specs follow the first candidate, which is provisional until the operator rules.
+The operator ruled on 2026-11-11, and the design records each with its alternatives.
 
-1. **The file's name and place in the package.** `.ctl/hakkiri.yaml`, `hakkiri.yaml` or `settings.yaml`.
-2. **A project `styles` list under the glob the package also writes.** Add to the package's list as Vale does, or replace it.
-3. **A package that lists `packages`.** Refuse it now, or install the nested packages as Vale does.
+1. **The file** is `.ctl/hakkiri.yaml` inside the package (operator, 2026-11-11).
+2. **Styles** add up under the same glob text and the project's list replaces the package's under another glob that matches the same files, as in Vale, with no warning (operator, 2026-11-11).
+3. **Nested packages** are fetched, as Vale does, pinned by `url` and `sha256`, with a cycle refused and a depth limit (operator, 2026-11-11).
 
 ## Capabilities
 
