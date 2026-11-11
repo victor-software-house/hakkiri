@@ -43,6 +43,8 @@ It differs by requiring the hash, by fetching on the first run instead of in a `
 
 ### 2. The cache folder is named by the hash
 
+The operator chose an own folder store over a crate (operator, 2026-11-11).
+
 `<cache>/<sha256>/` holds the unpacked package whole, as the zip laid it out, such as `<cache>/<sha256>/ProseStyle/styles/ProseStyle/`.
 The same bytes are unpacked once whatever `url` served them, and a new pin is a new folder.
 A run that finds the folder reads it and makes no request.
@@ -72,16 +74,33 @@ Lost: it costs a walk of the package on each run, and the cache folder belongs t
 
 ### 4. The cache folder is an option
 
+The operator chose the name `--cache-dir` (operator, 2026-11-11), as `uv` calls it.
 `--cache-dir` takes a folder, and `HAKKIRI_CACHE_DIR` sets it, as every option has a variable.
 Its default is `~/Library/Caches/hakkiri` on macOS and `$XDG_CACHE_HOME/hakkiri` or `~/.cache/hakkiri` elsewhere, and an unset or relative base is ignored.
 With no usable base the run is an error that names the option.
 
 ### 5. The client
 
-`ureq` makes the request and follows redirects with bundled root certificates, so it needs no system store, which a static musl binary lacks.
-`zip` reads the archive, and `sha2` hashes the body.
-The three add 1.4 MB to the musl binary, 11% of 12.8 MB, and `deny.toml` gains the ISC and CDLA-Permissive-2.0 licences.
+`ureq` makes the request and follows redirects with bundled root certificates, so it needs no system store, which a static musl binary lacks (operator, 2026-11-11).
+`zip` reads the archive without its compressors, and `sha2` hashes the body.
+`deny.toml` gains the ISC licence for `ring`, `rustls-webpki` and `untrusted`, and CDLA-Permissive-2.0 for `webpki-roots`, through `copier update --data deny_licenses`.
 
+Sizes, from builds under the repository's own `[profile.release]`: `opt-level = "s"`, `lto = "fat"`, `codegen-units = 1`, `panic = "abort"` and `strip = "symbols"`.
+The rustc flags of the final crate show each setting.
+Each is `cargo build --release --locked --target x86_64-unknown-linux-musl` with mimalloc, in `ubuntu:24.04`.
+
+| Build | Binary | Delta | Crates |
+|:--|:--|:--|:--|
+| main, before this change | 12,781,136 | | 120 |
+| `ureq`, `zip` and `sha2`, this change | 14,186,128 | +1.41 MB (+11.0%) | 182 |
+| `reqwest` 0.13.5 async with tokio, as verctl declares it, `zip` and `sha2` | 15,390,608 | +2.61 MB (+20.4%) | 341 |
+| `reqwest` 0.13.5 `blocking`, `zip` and `sha2` | 15,415,184 | +2.63 MB (+20.6%) | 346 |
+
+The `reqwest` rows measure a probe that downloads and unpacks one zip, and the `ureq` row measures the shipped code.
+verctl is the one of our crates that uses an HTTP client, and its `reqwest` costs twice what `ureq` does, with tokio and hyper.
+
+Alternative: `reqwest`, as verctl uses it.
+Lost: +2.6 MB and an async runtime in a CLI that has none.
 Alternative: `minreq` adds 2.0 MB and needs more licences.
 Alternative: `curl` as a child process needs curl on every machine.
 

@@ -31,7 +31,7 @@ None.
 
 ## Impact
 
-- New dependencies, if the operator approves them: `ureq` for the download, `zip` to unpack it and `sha2` for the hash.
+- New dependencies, approved by the operator (operator, 2026-11-11): `ureq` for the download, `zip` to unpack it and `sha2` for the hash, which add 1.41 MB to the musl binary.
 - New: `src/package.rs`, `tests/package_fetch.rs` and its fixtures. Changed: `src/config.rs`, the CLI, `Cargo.toml`, `deny.toml`, the skill and `AGENTS.md`.
 
 [ledger]: ../../../tasks.yaml
