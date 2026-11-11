@@ -1,0 +1,37 @@
+J1 very really good.
+
+<!-- vale Team.Words["very"] = NO -->
+
+J2 very really good.
+
+<!-- vale Team.Words["very"] = YES -->
+
+J3 very really good.
+
+<!-- vale Team.Words["really","very"] = NO -->
+
+J4 very really good.
+
+<!-- vale Team.Words["really","very"] = YES -->
+
+J5 very really good.
+
+<!-- vale styles = Other -->
+
+J6 very really good.
+
+<!-- vale styles = Team, Other -->
+
+J7 very really good.
+
+<!-- vale style = Team -->
+
+J8 very really good.
+
+<!-- vale styles = -->
+
+J9 very really good.
+
+<!-- vale styles = Team, Other -->
+
+J10 very really good.

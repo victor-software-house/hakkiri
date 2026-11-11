@@ -22,7 +22,7 @@ use std::ops::Range;
 use crate::error::Error;
 use crate::markdown::{self, Flavor};
 use crate::pattern::{FirstGroup, Pattern, SearchError};
-use crate::tree::{Node, Scope};
+use crate::tree::{Comment, Node, Scope, remap_nodes};
 
 /// What a block pattern's match turns into, on each side of its first group.
 const BLOCK: (&str, &str) = ("\n```\n", "\n```\n");
@@ -198,21 +198,9 @@ pub(crate) fn rewrite(
 ///
 /// A node whose text the rewrite added gives way to its children.
 pub(crate) fn restore(nodes: &mut Vec<Node>, changed: &Changed) {
-    let map = |span: Range<usize>| changed.origin(span);
-    let mut pending: Vec<&mut Vec<Node>> = vec![nodes];
-    while let Some(level) = pending.pop() {
-        let mut at = 0;
-        while let Some(node) = level.get_mut(at) {
-            node.remap(&map);
-            if node.segments.is_empty() {
-                let children = std::mem::take(&mut node.children);
-                level.splice(at..=at, children);
-            } else {
-                at += 1;
-            }
-        }
-        pending.extend(level.iter_mut().map(|node| &mut node.children));
-    }
+    remap_nodes(nodes, &|span| changed.origin(span), &|at| {
+        changed.origin(at..at).first().map(|place| place.start)
+    });
 }
 
 /// The tree of a whole Markdown or MDX file that the patterns rewrote: one
@@ -227,15 +215,25 @@ pub(crate) fn document(
     flavor: Flavor,
     blocks: &[&Pattern],
     tokens: &[&Pattern],
-) -> Result<(Vec<Node>, usize), Error> {
+) -> Result<(Vec<Node>, usize, Vec<Comment>), Error> {
     if blocks.is_empty() && tokens.is_empty() {
         return markdown::document(source, flavor);
     }
     let changed = rewrite(source, blocks, tokens).map_err(Error::Ignore)?;
-    let (mut nodes, code_blocks) = markdown::build(changed.text(), flavor)?;
-    restore(&mut nodes, &changed);
+    let mut built = markdown::build(changed.text(), flavor)?;
+    restore(&mut built.nodes, &changed);
+    // A comment the rewrite added or hid is no comment of the file.
+    let comments = built
+        .comments
+        .into_iter()
+        .filter_map(|comment| {
+            let at = changed.origin(comment.at..comment.at + 1).first()?.start;
+            Some(Comment { at, ..comment })
+        })
+        .collect();
     Ok((
-        vec![Node::new(Scope::Raw, 0..source.len(), nodes)],
-        code_blocks,
+        vec![Node::new(Scope::Raw, 0..source.len(), built.nodes)],
+        built.code_blocks,
+        comments,
     ))
 }

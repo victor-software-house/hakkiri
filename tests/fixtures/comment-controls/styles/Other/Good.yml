@@ -1,0 +1,6 @@
+extends: existence
+message: "Good '%s'"
+level: warning
+scope: text
+tokens:
+  - 'good'

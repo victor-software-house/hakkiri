@@ -10,6 +10,7 @@ mod capitalization;
 mod case;
 mod check;
 mod comments;
+pub mod control;
 pub mod dictionary;
 pub mod engine;
 mod entity;
@@ -41,7 +42,7 @@ pub mod words;
 pub use error::Error;
 pub use language::Language;
 use pattern::Pattern;
-pub use tree::{Join, Node, Reading, Scope, Tree};
+pub use tree::{Comment, Join, Node, Reading, Scope, Tree};
 
 /// Parses `source`, the text of a file in `language`, into its document tree.
 ///
@@ -83,13 +84,38 @@ pub fn parse_ignoring(
     blocks: &[&Pattern],
     tokens: &[&Pattern],
 ) -> Result<Tree, Error> {
-    let (roots, code_blocks) = match language {
+    let (roots, code_blocks, comments) = match language {
         Language::Markdown => ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?,
         Language::Mdx => ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?,
-        Language::Rust => (comments::roots(comments::Dialect::Rust, source)?, 0),
-        Language::TypeScript => (comments::roots(comments::Dialect::TypeScript, source)?, 0),
-        Language::Tsx => (comments::roots(comments::Dialect::Tsx, source)?, 0),
-        Language::JavaScript => (comments::roots(comments::Dialect::JavaScript, source)?, 0),
+        Language::Rust => (
+            comments::roots(comments::Dialect::Rust, source)?,
+            0,
+            Vec::new(),
+        ),
+        Language::TypeScript => (
+            comments::roots(comments::Dialect::TypeScript, source)?,
+            0,
+            Vec::new(),
+        ),
+        Language::Tsx => (
+            comments::roots(comments::Dialect::Tsx, source)?,
+            0,
+            Vec::new(),
+        ),
+        Language::JavaScript => (
+            comments::roots(comments::Dialect::JavaScript, source)?,
+            0,
+            Vec::new(),
+        ),
     };
-    Ok(Tree { roots, code_blocks })
+    let mut roots = roots;
+    // The text after a comment that turns every rule off is no one's prose.
+    if let Some(root) = roots.first_mut() {
+        control::cut(&mut root.children, &comments, source.len());
+    }
+    Ok(Tree {
+        roots,
+        code_blocks,
+        comments,
+    })
 }

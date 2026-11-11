@@ -145,6 +145,13 @@ files:
   The patterns run in order, block patterns first, each over the text the one before it left. A pattern with no group drops its match from the text, and a match of no bytes changes nothing.
   A file takes the patterns of every glob that matches it, a package's first, so a project adds to a package. A source file takes none, since Vale applies none to a comment.
   A pattern that does not compile is an error on its line.
+- An HTML comment in a Markdown file turns rules off and on, as Vale's comments do.
+  `<!-- hakkiri off -->` and `<!-- hakkiri on -->` leave out the text between them. `<!-- hakkiri Style.Rule: off -->` and `<!-- hakkiri Style.Rule: on -->` turn one rule off and on, and `<!-- hakkiri Style: off -->` and `on` a style.
+  `<!-- hakkiri Style.Rule: suggestion -->`, `warning` or `error` gives the alerts of that rule after it that level, over a level the config sets, until a later comment names the rule. `on` returns the level of the config.
+  Vale's forms work too: `<!-- vale off -->`, `<!-- vale on -->`, `<!-- vale Style.Rule = NO -->` and `YES` (or `off` and `on`), `<!-- vale Style = NO -->`, `<!-- vale Style.Rule["a","b"] = NO -->` for the matches `a` and `b`, and `<!-- vale styles = A, B -->` to run only those styles.
+  A comment acts on what follows it. A comment in the middle of a paragraph, a list item, a heading or a table cell turns the rule off for that whole element.
+  An alert between the comment that turns a rule off and the one that turns it on is left out.
+  The words must be exactly as shown, with the spaces around `:` and `=`, and case matters. A comment in a code block or a code span is text. MDX files and source files read no comment control.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.
 - A rule name, such as `ProseStyle.BareURL`, sets that rule's level to `suggestion`, `warning` or `error`, turns it `on` at the level of its rule file, or turns it `off`.
   A level or `on` also runs the rule when no glob lists its style, as `Team.Terms: warning` does, and `off` on such a rule changes nothing.

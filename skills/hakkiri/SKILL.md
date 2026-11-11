@@ -90,5 +90,6 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 3. `test` exits 1 with `failed <file>: <name>`: the rule or the case is wrong. With `uncovered <Rule>`, add a case that makes the rule flag something.
 4. Exit 1: fix the alerts, or lower the rule's level under `files` when the rule is too strict for those files.
 5. An alert that looks wrong is a rule fault. Set the rule `off` for those files in the config, and say why in the pull request.
+   To skip one stretch of a Markdown file, put `<!-- hakkiri Style.Rule: off -->` before it and `<!-- hakkiri Style.Rule: on -->` after it. `<!-- hakkiri off -->` and `<!-- hakkiri on -->` skip every rule.
 
 The config keys are in `hakkiri instructions`.

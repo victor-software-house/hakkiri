@@ -1,0 +1,6 @@
+extends: existence
+message: "Head '%s'"
+level: warning
+scope: heading
+tokens:
+  - 'Head'

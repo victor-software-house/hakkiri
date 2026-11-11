@@ -17,6 +17,8 @@ pub struct Block {
     pub sentence: bool,
     /// The text, and where each byte of it lies in the file.
     pub text: Text,
+    /// The byte where the element that holds the text ends.
+    pub closes: usize,
 }
 
 /// Why a selection failed.
@@ -429,6 +431,7 @@ pub fn select(
                     scope: node.scope,
                     sentence: false,
                     text: text.clone(),
+                    closes: node.closes,
                 });
             }
             if let (Some(blank), Some(model)) = (&sentences, model) {
@@ -442,6 +445,7 @@ pub fn select(
                             scope: node.scope,
                             sentence: true,
                             text,
+                            closes: node.closes,
                         });
                     }
                 }

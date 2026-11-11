@@ -8,7 +8,7 @@ use markdown::{Constructs, MdxSignal, ParseOptions};
 use tree_sitter::{InputEdit, Node as SyntaxNode, Parser, Point, Tree};
 
 use crate::error::Error;
-use crate::tree::{Node, Scope};
+use crate::tree::{Comment, Node, Scope};
 
 /// Which constructs the parser reads.
 #[derive(Clone, Copy, Debug)]
@@ -170,30 +170,85 @@ fn first_error(root: SyntaxNode<'_>) -> SyntaxNode<'_> {
     }
 }
 
+/// What the parse of a Markdown or MDX text gives.
+pub(crate) struct Built {
+    /// The prose nodes.
+    pub(crate) nodes: Vec<Node>,
+    /// The fenced and indented code blocks.
+    pub(crate) code_blocks: usize,
+    /// The HTML comments of a Markdown file, in file order.
+    pub(crate) comments: Vec<Comment>,
+}
+
 /// The tree of a whole Markdown or MDX file: one `raw` root over the prose
-/// nodes, and the number of its fenced and indented code blocks.
-pub(crate) fn document(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
-    let (children, code_blocks) = build(source, flavor)?;
+/// nodes, the number of its fenced and indented code blocks, and its HTML
+/// comments.
+pub(crate) fn document(
+    source: &str,
+    flavor: Flavor,
+) -> Result<(Vec<Node>, usize, Vec<Comment>), Error> {
+    let built = build(source, flavor)?;
     Ok((
-        vec![Node::new(Scope::Raw, 0..source.len(), children)],
-        code_blocks,
+        vec![Node::new(Scope::Raw, 0..source.len(), built.nodes)],
+        built.code_blocks,
+        built.comments,
     ))
 }
 
 /// The prose nodes of `source`, with spans in `source`.
 pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
-    Ok(build(source, flavor)?.0)
+    Ok(build(source, flavor)?.nodes)
 }
 
-/// The prose nodes of `source` and its number of code blocks.
-pub(crate) fn build(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
+/// The prose nodes of `source`, its number of code blocks, and the HTML
+/// comments of a Markdown file.
+pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     let root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
     let builder = Builder {
         source,
         code_blocks: Cell::new(0),
     };
     let nodes = builder.visit(&root, Scope::TableCell).nodes;
-    Ok((nodes, builder.code_blocks.get()))
+    let comments = if matches!(flavor, Flavor::Markdown) {
+        html_comments(&root, source)
+    } else {
+        Vec::new()
+    };
+    Ok(Built {
+        nodes,
+        code_blocks: builder.code_blocks.get(),
+        comments,
+    })
+}
+
+/// The HTML comments below `root`, in file order: those of an HTML block and
+/// of inline HTML, and none of a code block or a code span.
+fn html_comments(root: &Mdast, source: &str) -> Vec<Comment> {
+    let mut found = Vec::new();
+    let mut pending = vec![root];
+    while let Some(node) = pending.pop() {
+        if let Mdast::Html(_) = node
+            && let Some(span) = span_of(node)
+            && let Some(html) = source.get(span.clone())
+        {
+            for range in crate::html::comments(html) {
+                let written = html.get(range.clone()).unwrap_or_default();
+                let inner = written.strip_prefix("<!--").unwrap_or(written);
+                let inner = inner
+                    .strip_suffix("-->")
+                    .or_else(|| inner.strip_suffix("--!>"))
+                    .unwrap_or(inner);
+                found.push(Comment {
+                    at: span.start + range.start,
+                    text: inner.trim().to_owned(),
+                });
+            }
+        }
+        if let Some(children) = node.children() {
+            pending.extend(children.iter().rev());
+        }
+    }
+    found
 }
 
 /// Whether a block leaves the first place free: a thematic break, a link
@@ -490,6 +545,22 @@ impl Builder<'_> {
         }
     }
 
+    /// Makes each paragraph of the tight list item `node` close with the item.
+    ///
+    /// A tight item has no `p` around its text, so Vale reads the text when
+    /// the item closes, and a comment indented under the text reaches it.
+    fn close_tight_item(node: &Mdast, children: &mut [Node], element_end: usize) {
+        if let Mdast::ListItem(item) = node
+            && !item.spread
+        {
+            for child in children {
+                if child.scope == Scope::Paragraph {
+                    child.closes = element_end;
+                }
+            }
+        }
+    }
+
     /// A node of `scope` over `node`, holding the nodes in `inner`.
     ///
     /// Syntax that is not prose and sits inside the node is a gap between its
@@ -503,11 +574,13 @@ impl Builder<'_> {
             return inner;
         };
         let Markup { span, own, up } = self.markup(node, scope, span);
+        let element_end = span_of(node).map_or(span.end, |element| element.end);
         let Visited {
-            nodes: children,
+            nodes: mut children,
             mut cuts,
             tags,
         } = inner;
+        Self::close_tight_item(node, &mut children, element_end);
         cuts.extend(own);
         let segments = match scope {
             // A container reads as the content inside it.
@@ -584,6 +657,7 @@ impl Builder<'_> {
             Node::from_segments(scope, segments, children)
                 .map(|node| Node {
                     first,
+                    closes: element_end,
                     ..node.with_reads(reads)
                 })
                 .into_iter()

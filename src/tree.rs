@@ -220,6 +220,12 @@ pub struct Node {
     /// table row around it, ahead of any fenced block, thematic break or other
     /// element that holds no prose.
     pub first: bool,
+    /// The byte where the element that holds the node's text ends.
+    ///
+    /// A comment inside the element, after the text, is before this byte.
+    /// It is the end of the node's span unless the element goes on, as a
+    /// paragraph in a tight list item does with the item.
+    pub closes: usize,
 }
 
 impl Node {
@@ -229,6 +235,7 @@ impl Node {
             scope,
             segments: vec![span.clone()],
             reads: Vec::new(),
+            closes: span.end,
             span,
             children,
             first: false,
@@ -244,6 +251,7 @@ impl Node {
         let span = segments.first()?.start..segments.last()?.end;
         Some(Self {
             scope,
+            closes: span.end,
             span,
             segments,
             reads: Vec::new(),
@@ -402,6 +410,36 @@ impl Node {
     }
 }
 
+/// Replaces the segments and the span of each of `nodes` and of the nodes below
+/// them, and the byte each node closes at.
+///
+/// `map` gives the segments of a range from its current place, and `place`
+/// the new byte for a byte, or `None` when it has none.
+/// A node whose segments all map to nothing gives way to its children.
+///
+/// The walk keeps its own stack, so the depth of the tree costs no call stack.
+pub(crate) fn remap_nodes(
+    nodes: &mut Vec<Node>,
+    map: &impl Fn(Range<usize>) -> Vec<Range<usize>>,
+    place: &impl Fn(usize) -> Option<usize>,
+) {
+    let mut pending: Vec<&mut Vec<Node>> = vec![nodes];
+    while let Some(level) = pending.pop() {
+        let mut at = 0;
+        while let Some(node) = level.get_mut(at) {
+            node.remap(map);
+            node.closes = place(node.closes).unwrap_or(node.span.end);
+            if node.segments.is_empty() {
+                let children = std::mem::take(&mut node.children);
+                level.splice(at..=at, children);
+            } else {
+                at += 1;
+            }
+        }
+        pending.extend(level.iter_mut().map(|node| &mut node.children));
+    }
+}
+
 /// The tree of one file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Tree {
@@ -411,4 +449,17 @@ pub struct Tree {
     /// The number of fenced and indented code blocks in a Markdown or MDX
     /// file, and 0 for a source file.
     pub code_blocks: usize,
+    /// The HTML comments of a Markdown file, in file order, which may turn
+    /// rules off and on. A source file and an MDX file give none.
+    pub comments: Vec<Comment>,
+}
+
+/// One HTML comment of a Markdown file.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Comment {
+    /// The byte of the file where the comment starts.
+    pub at: usize,
+    /// What is between `<!--` and the end of the comment, without the blanks
+    /// at its ends.
+    pub text: String,
 }

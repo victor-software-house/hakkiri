@@ -28,6 +28,9 @@
 //!
 //! [tokenizer]: https://github.com/golang/net/blob/v0.62.0/html/token.go
 
+#[cfg(test)]
+mod tests;
+
 use std::collections::HashMap;
 use std::ops::Range;
 
@@ -112,8 +115,9 @@ enum Token {
     Start(Tag),
     SelfClosing(Tag),
     End(Tag),
-    /// A comment, a declaration, a processing instruction or `</>`.
-    Comment,
+    /// A comment, a declaration, a processing instruction or `</>`, and its
+    /// bytes.
+    Comment(Range<usize>),
     /// The end of the input, or a tag that it ends.
     Eof,
 }
@@ -220,7 +224,7 @@ impl<'a> Tokenizer<'a> {
             if c == b'/' {
                 let Some(c) = self.read() else { break };
                 if c == b'>' {
-                    return Token::Comment;
+                    return Token::Comment(lt..self.at);
                 }
                 if c.is_ascii_alphabetic() {
                     let tag = self.read_tag(false);
@@ -232,7 +236,7 @@ impl<'a> Tokenizer<'a> {
                 }
                 self.back();
                 self.read_until_close_angle();
-                return Token::Comment;
+                return Token::Comment(lt..self.at);
             }
             if c == b'!' {
                 self.read_markup_declaration();
@@ -240,7 +244,7 @@ impl<'a> Tokenizer<'a> {
                 self.back();
                 self.read_until_close_angle();
             }
-            return Token::Comment;
+            return Token::Comment(lt..self.at);
         }
         if start < self.at {
             return Token::Text(start..self.at);
@@ -826,7 +830,7 @@ impl Spacer {
                 INLINE_TAGS.contains(&tag.name.as_str()) || VOID_TAGS.contains(&tag.name.as_str())
             }
             Token::End(tag) | Token::SelfClosing(tag) => INLINE_TAGS.contains(&tag.name.as_str()),
-            Token::Comment => true,
+            Token::Comment(_) => true,
             Token::Text(_) | Token::Eof => false,
         }
     }
@@ -852,7 +856,7 @@ impl Spacer {
                     self.self_closing_inline();
                 }
             }
-            Token::Comment => self.comment(),
+            Token::Comment(_) => self.comment(),
             Token::Text(_) | Token::Eof => {}
         }
     }
@@ -984,6 +988,33 @@ pub(crate) fn walk(html: &str) -> Walk {
     walker.walk
 }
 
+/// The comments in `html`, as the byte range of each from `<!--` to the end
+/// of its last `>`.
+///
+/// A declaration, a processing instruction and `</>` are not comments.
+pub(crate) fn comments(html: &str) -> Vec<Range<usize>> {
+    let mut tokenizer = Tokenizer::new(html);
+    let mut found = Vec::new();
+    loop {
+        match tokenizer.read_token() {
+            Token::Eof => break,
+            Token::Comment(range)
+                if html
+                    .get(range.clone())
+                    .is_some_and(|text| text.starts_with("<!--")) =>
+            {
+                found.push(range);
+            }
+            Token::Text(_)
+            | Token::Start(_)
+            | Token::SelfClosing(_)
+            | Token::End(_)
+            | Token::Comment(_) => {}
+        }
+    }
+    found
+}
+
 /// Whether the HTML in `html` ends the run of tags a block of text is read
 /// under.
 pub(crate) fn resets_scope(html: &str) -> bool {
@@ -995,7 +1026,7 @@ impl Walker {
         match token {
             Token::Eof => self.flush(),
             Token::Text(range) => self.text(html, range),
-            Token::Comment => {
+            Token::Comment(_) => {
                 self.spacer.comment();
                 self.previous_skipped = false;
                 self.previous_href.clear();

@@ -135,6 +135,7 @@ queue:
     notes:
       - '2026-11-10, found while reading HTML-block text: hakkiri has no comment control, so a vale off comment turns nothing off and the text after it is linted.'
       - '2026-11-11, operator decision: hakkiri reads both the vale and the hakkiri comments, prefers its own, and its own use the words of .ctl/hakkiri.yaml. The consumers use only the per-rule form today: 58 tags in one private repository, 4 in nishiki, 2 in hakkiri and 2 in prose-style; the rollout pull requests rewrite them to the hakkiri form.'
+    plan: openspec/changes/comment-controls/proposal.md
 
   - id: HKR-009
     title: Switch the template to hakkiri

@@ -1,0 +1,41 @@
+I1 very really good.
+
+<div>
+I2 very really good.
+<!-- vale off -->
+I3 very really good.
+<!-- vale on -->
+I4 very really good.
+</div>
+
+I5 very really good.
+
+<p>I6 very <!-- vale off --> I7 very <!-- vale on --> I8 very really good.</p>
+
+I9 very really good.
+
+<div>
+
+I10 very really good.
+
+<!-- vale Team.Words = NO -->
+
+I11 very really good.
+
+</div>
+
+I12 very really good.
+
+<!-- vale Team.Words = YES -->
+
+I13 very really good.
+
+<table><tr><td>I14 very really good</td>
+<!-- vale off -->
+<td>I15 very really good</td></tr></table>
+
+I16 very really good.
+
+<!-- vale on -->
+
+I17 very really good.

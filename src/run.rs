@@ -8,6 +8,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{fs, io, thread};
 
 use hakkiri::alert::Alert;
+use hakkiri::control::apply_levels;
 use hakkiri::engine::lint_accepting;
 use hakkiri::rule::{Level, Unrunnable};
 use hakkiri::{Tree, parse_ignoring};
@@ -107,6 +108,7 @@ pub(crate) fn lint_planned(
             alert.level = *level;
         }
     }
+    apply_levels(tree, source, &mut alerts);
     Ok(alerts)
 }
 

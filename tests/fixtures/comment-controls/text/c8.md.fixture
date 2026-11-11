@@ -1,0 +1,38 @@
+L1 very really good.
+
+```text
+<!-- vale off -->
+```
+
+L2 very really good.
+
+    <!-- vale off -->
+
+L3 very really good.
+
+Use `<!-- vale off -->` in text.
+
+L4 very really good.
+
+\<!-- vale off -->
+
+L5 very really good.
+
+<!-- vale off
+-->
+
+L6 very really good.
+
+<!-- vale on -->
+
+<!-- vale off --><!-- vale on -->
+
+L7 very really good.
+
+<!-- note: vale off -->
+
+L8 very really good.
+
+<!-- vale off -->
+<!-- vale on -->
+L9 very really good.

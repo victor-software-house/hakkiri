@@ -206,6 +206,7 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
         reads: Vec::new(),
         children,
         first: false,
+        closes: end,
     };
     Ok(Node {
         scope: Scope::Raw,
@@ -214,6 +215,7 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
         reads: Vec::new(),
         children: vec![comment],
         first: false,
+        closes: end,
     })
 }
 
