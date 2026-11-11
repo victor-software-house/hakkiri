@@ -39,6 +39,8 @@ queue:
       - A glob that lists the style Vale, or sets Vale.Terms or Vale.Avoid by name, runs the rules at the level it sets, in a test.
       - A glob's vocabulary builds Vale.<Name>.Terms and Vale.<Name>.Avoid, which run on the files of that glob with no style or setting, in a test.
     plan: openspec/changes/vocabulary-rules/proposal.md
+    notes:
+      - "2026-11-11, lead decision: Vale lowercases a term pattern with its escapes, so \\W turns into \\w and data\\Wset flags dataxset; hakkiri lowercases only the literal text and records it as an intended difference, since Vale's form changes what the pattern means."
 
   - id: HKR-043
     title: Skip blocks and tokens by pattern
@@ -68,6 +70,42 @@ queue:
     notes:
       - '2026-11-11, operator decision: git-ignored files are skipped by default, everything stays configurable in the config file and overridable by flags and variables as ctl-core allows, and the names are gitignore and on_unmatched. The ignore crate is the authorized new dependency for the walk.'
       - 2026-11-11, the templates lint:prose task passes every tracked file because Vale walks git-ignored folders while a build writes them; with this row it runs a bare hakkiri check.
+
+  - id: HKR-045
+    title: Fill indexed verbs in messages
+    scope: engine
+    outcome: >-
+      A rule message fills Go's indexed verbs such as %[1]s and %[2]s, as Vale's
+      messages do.
+    blocked_by: []
+    acceptance:
+      - The cases of ProseStyle v0.0.14 NounStack and ThingsSpeakNoun pass, with the message Vale 66bbb85 prints for the same match.
+    notes:
+      - '2026-11-11, found by the ProseStyle port: hakkiri prints %[1]s %[2]s unfilled in a sequence rule message, and hakkiri main has no support for indexed verbs.'
+
+  - id: HKR-046
+    title: Keep a fence open across a blank doc-comment line
+    scope: tree
+    outcome: >-
+      A fenced block in a Rust doc comment stays code across a blank comment line, as
+      Markdown reads it.
+    blocked_by: []
+    acceptance:
+      - "The ProseStyle v0.0.14 BareURLInComment case 'keeps a doc comment's fence open across a blank line' passes: hakkiri reports no URL inside the fence."
+    notes:
+      - '2026-11-11, found by the ProseStyle port: hakkiri reports a URL inside the fence that Vale skips; the cause is not yet traced.'
+
+  - id: HKR-047
+    title: End an alert where a multi-line match ends
+    scope: engine
+    outcome: >-
+      An alert for a match that spans lines ends at the last character of the match,
+      as the alerts spec states.
+    blocked_by: []
+    acceptance:
+      - A match that spans two lines reports the end line and column of its last character, with a test, and the vocabulary-rules comparison checks that column too.
+    notes:
+      - '2026-11-11, found by HKR-042: hakkiri ends such a match on its first line, against its own alerts spec, and Vale counts every character.'
 
   - id: HKR-030
     title: Read files by extension, with plain text by default
