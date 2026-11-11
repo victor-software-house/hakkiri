@@ -1,22 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-033
+active: HKR-034
 queue:
-  - id: HKR-033
-    title: Enable one rule with a rule setting
-    scope: config
-    outcome: >-
-      A glob that sets a rule of a style it does not list runs that rule at the level
-      it names, as a rule setting does in Vale.
-    blocked_by: []
-    acceptance:
-      - A probe of Vale 66bbb85 with a rule setting under a glob and no listing of its style gives the alerts hakkiri gives, in a test.
-      - The vale-differences scenario for a rule setting is removed.
-    notes:
-      - '2026-11-11, found while scoping when a clash is refused: with BasedOnStyles naming only Other, Vale 66bbb85 runs Team.Terms for the setting Team.Terms = YES, and at level error for Team.Terms = error. hakkiri runs a rule only from a style a glob lists, so the same setting changes nothing there. Vale gave no clash or bracket error for the style when it was enabled that way: a style with Terms.yml and Terms.custom.yml ran Terms.yml, and a style with a Weird[max].yml file ran its Terms rule.'
-    plan: openspec/changes/rule-setting/proposal.md
-
   - id: HKR-034
     title: Release a static musl linux-x64 binary
     scope: release
@@ -141,6 +127,20 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-033
+    title: Enable one rule with a rule setting
+    scope: config
+    outcome: >-
+      A glob that sets a rule of a style it does not list runs that rule at the level
+      it names, as a rule setting does in Vale.
+    notes:
+      - '2026-11-11, found while scoping when a clash is refused: with BasedOnStyles naming only Other, Vale 66bbb85 runs Team.Terms for the setting Team.Terms = YES, and at level error for Team.Terms = error. hakkiri runs a rule only from a style a glob lists, so the same setting changes nothing there. Vale gave no clash or bracket error for the style when it was enabled that way: a style with Terms.yml and Terms.custom.yml ran Terms.yml, and a style with a Weird[max].yml file ran its Terms rule.'
+    plan: openspec/changes/archive/2026-11-11-rule-setting/proposal.md
+    completed: 2026-11-11T03:58:43
+    evidence:
+      - openspec/changes/archive/2026-11-11-rule-setting/
+    disposition: completed
+
   - id: HKR-029
     title: Release hakkiri through verctl
     scope: release

@@ -39,5 +39,5 @@ None.
 
 - `plan` in `src/config.rs` and `read_style` in `src/rule.rs` change. `check` and `test` both take their rules from `plan`. No new dependency.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
 [v-merge]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L185-L211

@@ -75,4 +75,4 @@ These differences go in `vale-differences`.
 
 [v-merge]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L185-L211
 [plan]: https://github.com/victor-software-house/hakkiri/blob/bf04395ce723dbdcc2536b0fe099746f3d90d6ea/src/config.rs#L234
-[rule-names-3]: ../archive/2026-11-10-rule-names/design.md#3-two-files-with-one-name-are-refused
+[rule-names-3]: ../2026-11-10-rule-names/design.md#3-two-files-with-one-name-are-refused
