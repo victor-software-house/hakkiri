@@ -22,15 +22,15 @@ concurrency:
 jobs:
   verify:
     if: ${{ !github.event.pull_request.draft }}
-    # The shared jobs that install tools download through the release mirror
-    # with the organization's ci login. They still ask for id-token: write,
-    # the mise action's fallback, so the caller grants it.
+    # The shared jobs that install tools download through the release mirror:
+    # they exchange the job's OIDC token for a session token, with the
+    # organization's mirror key, so the caller grants id-token: write.
     permissions:
       actions: read
       contents: read
       id-token: write
       pull-requests: read
-    uses: victor-software-house/actions/.github/workflows/rust-ci.yml@e6e13c808cce87ac8f1faf59cfaf2bab34bda7aa # main, 2026-11-11
+    uses: victor-software-house/actions/.github/workflows/rust-ci.yml@4168002fe58fd0b310bd2b65f9db2262fc0e21d3 # main, 2026-11-11
     with:
       mise-version: 2026.11.6
       advisories: true
@@ -42,4 +42,4 @@ jobs:
       cache-volume: false
     secrets:
       RELEASE_MIRROR_URL: ${{ secrets.RELEASE_MIRROR_URL }}
-      RELEASE_MIRROR_CI_PASSWORD: ${{ secrets.RELEASE_MIRROR_CI_PASSWORD }}
+      RELEASE_MIRROR_CI_KEY: ${{ secrets.RELEASE_MIRROR_CI_KEY }}
