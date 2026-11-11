@@ -27,6 +27,12 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 2.4 Refuse a name clash or a bracket only for a style a glob lists, as Vale does for an enabled style, and lint an unused style with no error.  
   Verify the `check` tests for an unused style with a clash and with a bracket fail on the loader of [3e368a0][c-prior] and pass on the new one, and the tests for a listed style still pass.
   - 2026-11-11 (UTC), both unused-style tests failed with exit status 2 on that loader, and pass in [eae1653][c-lazy], in a throwaway Linux box.
+- [x] 2.5 Find the package of a rule as the folder above it whose real path is one of the config's, and list a name that two rule files share once, with both files.  
+  Verify the tests for a linked project root and for an uncovered shared name fail on the loader of [ffba7c2][c-gap] and pass on the new one.  
+  The tests for a covered shared name and for a clash in a style a later glob lists pass on both.
+  - 2026-11-11 (UTC), the linked-root test failed with `uncovered Sub.Bar` and the shared-name test listed `Team.Terms` twice on that loader, in a throwaway Linux box.  
+    Both pass in [a19b4de][c-link].  
+    Vale `66bbb85` gave no error for two files with one name in `vale test`, and listed an unflagged name twice.
 
 ## 3. Record
 
@@ -47,3 +53,5 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-prior]: https://github.com/victor-software-house/hakkiri/commit/3e368a0cf0793030a21d33e10c884956f7a72bd1
 [c-lazy]: https://github.com/victor-software-house/hakkiri/commit/eae16539ebdb1c6b9b7e1123a2ac57ac951d17a2
 [c-docs]: https://github.com/victor-software-house/hakkiri/commit/eeafcb035627fee88eea11feb2232f123292868a
+[c-gap]: https://github.com/victor-software-house/hakkiri/commit/ffba7c2fb7e099cafd2c1117ec3f350f39651678
+[c-link]: https://github.com/victor-software-house/hakkiri/commit/a19b4de4b4f5773413d7483d8a78daf6b5baacf9
