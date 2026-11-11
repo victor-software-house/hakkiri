@@ -28,7 +28,7 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 
 #### Scenario: A walk from another folder
 
-- **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ..` runs in `other/` and the package folder `styles/` holds `notes.md`
+- **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ..` runs in `other/` and the package folder `styles/` holds `Team/notes.md`
 - **THEN** hakkiri lints `docs/a.md` and not `styles/Team/notes.md`
 
 ### Requirement: A language is read by extension
