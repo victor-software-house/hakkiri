@@ -1,14 +1,21 @@
-## ADDED Requirements
+# release Specification
+
+## Purpose
+
+A release of hakkiri is a tag, a GitHub Release and one tarball for each platform a consumer locks, built by verctl's release workflow, and mise installs it from a pinned version with the checksum its lock records.
+
+## Requirements
 
 ### Requirement: A release is a tag, a Release and two tarballs
 
-A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`, each with its `.sha256`.  
+A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.  
+GitHub records each tarball's SHA-256 digest, which a lock reads.  
 It SHALL publish nothing to crates.io.
 
 #### Scenario: The first release
 
 - **WHEN** the Version PR that moves `Cargo.toml` from `0.0.0` to `0.0.1` merges
-- **THEN** the repository has the tag `v0.0.1` and a Release that holds the two tarballs and their checksums, and crates.io has no `hakkiri` crate
+- **THEN** the repository has the tag `v0.0.1` and a Release that holds the two tarballs, and crates.io has no `hakkiri` crate
 
 #### Scenario: A platform missing
 

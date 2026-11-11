@@ -12,7 +12,9 @@ The first release is `0.0.1`, as every new project's is.
 ## Changes
 
 - A release workflow that calls verctl's reusable release workflow, and a `.ctl/ver.yaml` that declares the package with `publisher: none` and the assets.
-- Each release is a tag, a GitHub Release and one tarball for each platform a consumer locks, `linux-x64` and `darwin-arm64`, each with its checksum and each built natively on a free GitHub-hosted runner (`ubuntu-latest`, `macos-latest`).
+- Each release is a tag, a GitHub Release and one tarball for each platform a consumer locks, `linux-x64` and `darwin-arm64`.  
+  GitHub records each tarball's SHA-256 digest.  
+  Each tarball is built natively on a free GitHub-hosted runner (`ubuntu-latest`, `macos-latest`).
 - The skill and the README name the released version, kept current by version pins.
 - One changeset fragment ships `check` and `test` as `0.0.1`.
 - Proof that mise installs the release on both platforms.
@@ -33,6 +35,6 @@ None.
 - New: `.github/workflows/release.yml`, `.ctl/ver.yaml`, `.changeset/`, and a verctl pin in `mise.toml` with its lock.
 - The release run needs the organization's App secrets, which the repository already reads.
 
-[ledger]: ../../../tasks.yaml
-[check]: ../archive/2026-11-10-check-command/proposal.md
-[test]: ../archive/2026-11-10-test-command/proposal.md
+[ledger]: ../../../../tasks.yaml
+[check]: ../2026-11-10-check-command/proposal.md
+[test]: ../2026-11-10-test-command/proposal.md
