@@ -328,8 +328,8 @@ hakkiri SHALL keep each fetched package in the folder `<cache>/<sha256>/`, and S
 
 Each rule hakkiri cannot run that the config runs on a linted file SHALL make the run exit 2, with a `failed` line that names the rule, its file and the setting that leaves it out.  
 A rule is run when its style is listed and no setting turns it `off`, or when a level or `on` turns it on.  
-A rule in a style no glob lists SHALL be ignored.  
-`off` SHALL leave it out, and a level or `on` SHALL NOT make it run.
+A rule in a style no glob lists, and that no level or `on` names, SHALL be ignored.  
+`off` SHALL leave it out, and a level or `on` SHALL NOT make it work: the run still fails for it.
 
 #### Scenario: A script rule in a listed style
 
