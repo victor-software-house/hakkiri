@@ -12,6 +12,7 @@ queue:
     blocked_by: []
     acceptance:
       - Tests cover the first fetch, a cache hit and a hash mismatch.
+    plan: openspec/changes/package-fetch/proposal.md
 
   - id: HKR-019
     title: Read vocabularies
