@@ -1,11 +1,13 @@
 //! Block and token ignores: the scenarios of the block-token-ignores change.
 //!
-//! `tests/fixtures/ignores` holds one package of six rules (`styles`), eight
+//! `tests/fixtures/ignores` holds one package of seven rules (`styles`), nine
 //! text files (`text`, with `.fixture` after the extension), and ten configs
 //! for each tool: `vale/<name>.ini` and `.ctl/<name>.yaml`.
 //! `vale.tsv` holds one row for each alert Vale gave on the files under each
 //! config: the config, the file, the line, the first and last column, the
 //! level, the rule, the message and the matched text.
+//! `t9.md` holds matches that wrap a line beside ignored text: a token ignore
+//! before one, a block ignore around another.
 //! The rows come from Vale at `66bbb85`, with the Rust grammar built from the
 //! same commit, run from the fixture folder as `vale --config=vale/<name>.ini
 //! --output=JSON text`.

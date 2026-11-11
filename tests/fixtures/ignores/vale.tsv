@@ -707,3 +707,22 @@ twoglobs	text/t7.md	10	14	19	warning	Team.Sentence	Sentence 'really'	really
 twoglobs	text/t7.md	10	14	19	warning	Team.Words	Words 'really'	really
 twoglobs	text/t7.md	15	6	11	warning	Team.Sentence	Sentence 'really'	really
 twoglobs	text/t7.md	15	6	11	warning	Team.Words	Words 'really'	really
+plain	text/t9.md	1	16	24	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+plain	text/t9.md	2	26	34	warning	Team.Wrap	Wrap 'red green'	red\ngreen
+plain	text/t9.md	6	1	9	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+heads	text/t9.md	1	16	24	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+heads	text/t9.md	2	26	34	warning	Team.Wrap	Wrap 'red green'	red\ngreen
+heads	text/t9.md	6	1	9	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+tokens	text/t9.md	1	16	24	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+tokens	text/t9.md	2	26	34	warning	Team.Wrap	Wrap 'red green'	red\ngreen
+tokens	text/t9.md	6	1	9	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+blocks	text/t9.md	1	16	24	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+blocks	text/t9.md	2	26	34	warning	Team.Wrap	Wrap 'red green'	red\ngreen
+group	text/t9.md	1	16	24	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+group	text/t9.md	2	26	34	warning	Team.Wrap	Wrap 'red green'	red\ngreen
+both	text/t9.md	1	16	24	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+both	text/t9.md	2	26	34	warning	Team.Wrap	Wrap 'red green'	red\ngreen
+global	text/t9.md	1	16	24	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+global	text/t9.md	2	26	34	warning	Team.Wrap	Wrap 'red green'	red\ngreen
+twoglobs	text/t9.md	1	16	24	warning	Team.Wrap	Wrap 'mea culpa'	mea\nculpa
+twoglobs	text/t9.md	2	26	34	warning	Team.Wrap	Wrap 'red green'	red\ngreen
