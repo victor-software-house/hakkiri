@@ -8,6 +8,7 @@
 use std::collections::BTreeSet;
 use std::fmt::Write as _;
 use std::fs::{self, File};
+use std::hash::{BuildHasher as _, Hasher as _, RandomState};
 use std::io::{self, Cursor, Read};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -131,9 +132,10 @@ fn hex(bytes: &[u8]) -> String {
     })
 }
 
-/// Checks the zip in `body`, unpacks it into a folder beside `folder`, and
-/// renames that folder to `folder`. A run that fetches at the same time may
-/// win the rename, and then its folder is the one used.
+/// Checks the zip in `body`, unpacks it into a new folder of its own in
+/// `cache`, and renames that folder to `folder`. A run that fetches at the same
+/// time may win the rename, and then its folder is the one used. Only the
+/// folder this run made is ever removed.
 fn install(cache: &Path, folder: &Path, url: &str, body: Vec<u8>) -> Result<(), String> {
     let mut archive = ZipArchive::new(Cursor::new(body))
         .map_err(|error| format!("`{url}` is not a zip: {error}"))?;
@@ -144,8 +146,7 @@ fn install(cache: &Path, folder: &Path, url: &str, body: Vec<u8>) -> Result<(), 
             cache.display()
         )
     })?;
-    let staging = cache.join(format!(".unpacking-{}", process::id()));
-    let _ = fs::remove_dir_all(&staging);
+    let staging = staging_folder(cache)?;
     if let Err(fault) = unpack(&mut archive, &staging, url) {
         let _ = fs::remove_dir_all(&staging);
         return Err(fault);
@@ -162,6 +163,27 @@ fn install(cache: &Path, folder: &Path, url: &str, body: Vec<u8>) -> Result<(), 
                 "cannot move the package into `{}`: {error}",
                 folder.display()
             ))
+        }
+    }
+}
+
+/// Creates an empty folder in `cache` under a name that no other run holds: the
+/// process id and a random number, so two runs with one process id, such as
+/// containers that share a cache, still differ. `create_dir` fails when the
+/// name exists, so a folder another run made is never reused.
+fn staging_folder(cache: &Path) -> Result<PathBuf, String> {
+    loop {
+        let random = RandomState::new().build_hasher().finish();
+        let staging = cache.join(format!(".unpacking-{}-{random:016x}", process::id()));
+        match fs::create_dir(&staging) {
+            Ok(()) => return Ok(staging),
+            Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {}
+            Err(error) => {
+                return Err(format!(
+                    "cannot create a folder in the cache folder `{}`: {error}",
+                    cache.display()
+                ));
+            }
         }
     }
 }
@@ -247,3 +269,6 @@ fn package_folder(folder: &Path) -> io::Result<PathBuf> {
         folder.to_path_buf()
     })
 }
+
+#[cfg(test)]
+mod tests;

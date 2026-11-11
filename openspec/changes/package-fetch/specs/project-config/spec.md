@@ -105,6 +105,11 @@ hakkiri SHALL keep each fetched package in the folder `<cache>/<sha256>/`, and S
 - **WHEN** two runs use one package and one cache folder
 - **THEN** the server sees one request
 
+#### Scenario: Two runs fetch at once
+
+- **WHEN** two runs fetch one package into one cache folder at the same moment, even with one process id
+- **THEN** both succeed, the folder `<cache>/<sha256>/` holds one complete package, and the cache holds no unpacking folder
+
 #### Scenario: A cached package with the server gone
 
 - **WHEN** a package is cached and its server no longer answers

@@ -16,6 +16,8 @@ This change follows [`project-config`][config], which holds the grammar of a `ur
   Verify the scenarios for the variable, the option and the default folder pass, and `hakkiri test` loads a fetched package.
 - [ ] 1.4 Skip a folder named `config` when listing a package's styles, as Vale does, and bound a download by its lookup, connect, header and body phases, not by one global timeout.  
   Verify the scenario for a folder of settings passes, and a 32 MiB body has 300 seconds to arrive.
+- [ ] 1.5 Unpack each fetch into a folder it creates under a unique name and removes only that folder, so runs that share a cache and a process id cannot wipe each other.  
+  Verify `package::tests::two_installs_of_one_package_at_once_leave_one_complete_folder` fails before the change and passes after it.
 
 ## 2. The dependencies
 

@@ -50,6 +50,9 @@ The same bytes are unpacked once whatever `url` served them, and a new pin is a 
 A run that finds the folder reads it and makes no request.
 The download is unpacked into a temporary folder in the cache and renamed into place, so a run that stops half way leaves no partial folder.
 Two runs that fetch together both unpack, one rename wins, and the other run discards its copy.
+Each run unpacks into a new folder whose name holds its process id and a random number.
+It makes the folder with `create_dir`, so a name in use fails, and it removes only that folder.
+Runs that share a cache and a process id, such as containers on one cache volume, never touch each other's copy.
 Rule files stay on disk, so an error about a rule names a real path.
 
 Alternative: store each package as a JSON value in `unixd-cache`.
