@@ -32,5 +32,5 @@ The rule-files spec already says how a case reads and passes, but the loader ref
 - `src/instructions.md` and `skills/hakkiri/SKILL.md` gain the command.
 
 [ledger]: ../../../tasks.yaml
-[check]: ../check-command/proposal.md
+[check]: ../archive/2026-11-10-check-command/proposal.md
 [release]: ../release-lane/proposal.md

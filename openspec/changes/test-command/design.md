@@ -93,7 +93,7 @@ The runner is sequential.
 - [Two sources of cases double the discovery rules] → One walk finds both, and a scenario covers each source.
 - [A case without a rule runs through the whole config, so a config change moves its result] → That is its purpose; an isolated case does not move.
 
-[check-design]: ../check-command/design.md
+[check-design]: ../archive/2026-11-10-check-command/design.md
 [rule-files]: ../../specs/rule-files/spec.md
 [prose-style-rules]: ../archive/2026-11-10-rule-format/prose-style-rules.md
 [v-load]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/testsuite/suite.go#L117-L167

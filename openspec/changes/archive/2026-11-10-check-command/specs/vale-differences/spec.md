@@ -72,13 +72,13 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 - **WHEN** a glob matches a file that no language reads, such as `notes.txt`
 - **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
 
-[ledger]: ../../../../../tasks.yaml
+[ledger]: ../../../../../../tasks.yaml
 [check-1]: ../../design.md#1-one-binary-on-ctl-cores-app
 [check-3]: ../../design.md#3-globs-and-paths-are-relative-to-the-project-root
 [check-5]: ../../design.md#5-a-language-is-read-by-extension
 [check-7]: ../../design.md#7-output-is-a-line-per-alert-or-json
 [check-8]: ../../design.md#8-exit-status-follows-vales-with-a-level-flag
-[case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
-[case-9]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
-[spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
-[tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[case-1]: ../../../2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[case-9]: ../../../2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+[tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx

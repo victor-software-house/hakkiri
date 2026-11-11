@@ -179,9 +179,9 @@ Lost: it needs `minijinja` and a surface build for one command, and the text sta
 - [Exit 2 for a broken setup differs from ctl-core's default] → The scenarios and the skill state the three codes, and a test runs each.
 - [The count line is an extra line] → A caller that parses lines reads `--format json`; the exit status says clean or not.
 
-[format]: ../archive/2026-11-10-rule-format/design.md
-[bootstrap]: ../archive/2026-11-09-bootstrap-hakkiri/design.md
-[ledger]: ../../../tasks.yaml
+[format]: ../2026-11-10-rule-format/design.md
+[bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md
+[ledger]: ../../../../tasks.yaml
 [v-match]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/lint.go#L892-L913
 [v-walk]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/lint.go#L283-L333
 [v-ignore]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/util.go#L14-L16

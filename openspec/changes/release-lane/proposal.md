@@ -34,5 +34,5 @@ None.
 - The release run needs the organization's App secrets, which the repository already reads.
 
 [ledger]: ../../../tasks.yaml
-[check]: ../check-command/proposal.md
+[check]: ../archive/2026-11-10-check-command/proposal.md
 [test]: ../test-command/proposal.md

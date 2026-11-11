@@ -1,27 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-005
+active: HKR-028
 queue:
-  - id: HKR-005
-    title: Ship the check command
-    scope: cli
-    outcome: >-
-      hakkiri check lints files in parallel under .ctl/hakkiri.yaml, prints a line per alert or JSON, and exits by level.
-    blocked_by: []
-    acceptance:
-      - Integration tests cover line and JSON output, exit status by level, and .ctl/hakkiri.yaml globs and levels.
-      - JSON output holds no ESC byte with CLICOLOR_FORCE=1.
-    plan: openspec/changes/check-command/proposal.md
-
   - id: HKR-028
     title: Ship the test command
     scope: cli
     outcome: >-
       hakkiri test runs the cases of rule files and test files, and fails when a rule
       fires in no case.
-    blocked_by:
-      - HKR-005
+    blocked_by: []
     acceptance:
       - Integration tests cover the cases of a rule file and of a test file, an isolated and a project run, coverage, and exit status by outcome.
       - JSON output holds no ESC byte with CLICOLOR_FORCE=1.
@@ -32,7 +20,6 @@ queue:
     scope: release
     outcome: A verctl Version PR publishes a release of hakkiri, and mise installs it.
     blocked_by:
-      - HKR-005
       - HKR-028
     acceptance:
       - A verctl Version PR publishes 0.0.1 as a tag and a GitHub Release with a linux-x64 and a darwin-arm64 tarball and their checksums, and no crates.io crate.
@@ -45,8 +32,7 @@ queue:
     outcome: >-
       A project pins rule packages by version and hash, and check fetches them with
       no sync step.
-    blocked_by:
-      - HKR-005
+    blocked_by: []
     acceptance:
       - Tests cover the first fetch, a cache hit and a hash mismatch.
 
@@ -57,7 +43,6 @@ queue:
       A project selects vocabularies whose accepted and rejected terms reach every
       check that reads them.
     blocked_by:
-      - HKR-005
       - HKR-006
     acceptance:
       - A project's config names vocabularies, and each is read from a package's accept.txt and reject.txt.
@@ -72,8 +57,7 @@ queue:
     scope: import
     outcome: >-
       hakkiri import vale converts every Vale rule type except script into the format.
-    blocked_by:
-      - HKR-005
+    blocked_by: []
     acceptance:
       - Each converted Voices, Std and Readability rule passes the cases from its own Vale file.
 
@@ -130,8 +114,7 @@ queue:
     title: Lint plain-text files
     scope: engine
     outcome: A file that no language reads is linted as plain text, as Vale lints it.
-    blocked_by:
-      - HKR-005
+    blocked_by: []
     acceptance:
       - A file with another extension, such as notes.txt, that a files glob matches is linted as plain text, and the vale-differences scenario for it is removed.
 
@@ -156,6 +139,18 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-005
+    title: Ship the check command
+    scope: cli
+    outcome: >-
+      hakkiri check lints files in parallel under .ctl/hakkiri.yaml, prints a line per alert or JSON, and exits by level.
+    plan: openspec/changes/archive/2026-11-10-check-command/proposal.md
+    completed: 2026-11-11T00:02:31
+    evidence:
+      - openspec/changes/archive/2026-11-10-check-command/
+      - PR 52 merged hakkiri check at 0e14935, with its CI run green on 9b0ff1d; the check-command change is archived.
+    disposition: completed
+
   - id: HKR-025
     title: List the format and configuration differences from Vale
     scope: docs

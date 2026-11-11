@@ -39,4 +39,4 @@ This change adds to the binary that [`check-command`][check] creates.
 
 - Archive this change after the pull request merges, then archive `HKR-028` with `qctl close-from-openspec`.
 
-[check]: ../check-command/proposal.md
+[check]: ../archive/2026-11-10-check-command/proposal.md

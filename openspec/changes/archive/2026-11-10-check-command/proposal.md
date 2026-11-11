@@ -39,6 +39,6 @@ A project also needs its styles from somewhere before packages arrive in `HKR-00
 - `README.md`, `AGENTS.md`, `src/instructions.md` and `skills/hakkiri/SKILL.md` move with the code.
 - New rows `HKR-028` (`test`), `HKR-029` (release) and `HKR-030` (plain-text files).
 
-[ledger]: ../../../tasks.yaml
-[test]: ../test-command/proposal.md
-[release]: ../release-lane/proposal.md
+[ledger]: ../../../../tasks.yaml
+[test]: ../../test-command/proposal.md
+[release]: ../../release-lane/proposal.md
