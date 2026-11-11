@@ -1,8 +1,8 @@
 //! Tests for the case check: a comparison with Vale.
 //!
 //! `tests/fixtures/capitalization/vale.tsv` holds a configuration name, a text,
-//! the text as the rule's converter writes it, and `1` when Vale says the text
-//! passes or `0` when not. The rows come from Vale at `66bbb85` run in Go: its
+//! the text as the rule's converter writes it, and `1` when Vale passes the
+//! text or `0` when not. The rows come from Vale at `66bbb85` run in Go: its
 //! `title` and `sentence` functions, with the converters of prose `b33e60d`
 //! and the exceptions as Vale's `updateExceptions` leaves them. The texts are
 //! hand-written headings and every 40th short sentence of "The Adventures of

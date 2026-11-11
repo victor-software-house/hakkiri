@@ -360,7 +360,7 @@ hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.2
 
 #### Scenario: A level flag in place of two
 
-- **WHEN** a caller wants a nonzero exit for warnings
+- **WHEN** a caller needs a nonzero exit for warnings
 - **THEN** hakkiri takes `--fail-level warning`, and Vale takes `--minAlertLevel` to hide alerts and `--no-exit` to keep the exit 0 ([check 8][check-8])
 
 #### Scenario: Flags hakkiri does not have

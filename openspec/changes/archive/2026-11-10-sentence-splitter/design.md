@@ -67,7 +67,7 @@ Alternative: Punkt alone. Lost: the Golden Rules score stays near Vale's.
 
 The model is trained on four sources (operator, 2026-11-10):
 
-- The Markdown of the owner's public repositories: public, not a fork, not archived, at most 10 MB, each pinned by commit.
+- The Markdown of the owner's public repositories: public, neither a fork nor archived, at most 10 MB, each pinned by commit.
 - The Markdown files of Common Pile's `stackv2`, kept where the record's `path` ends in `.md` or `.markdown` and every license in its `metadata.license` is on the Blue Oak list ([dataset card][stackv2], [Common Pile][common-pile]).  
   Markdown spreads over many of its 764 shards, mixed with code; the task reads a pinned prefix of one shard that is dense with it.
 - The Python Enhancement Proposals of Common Pile's `python_enhancement_proposals`, in the public domain ([dataset card][peps]).
@@ -96,7 +96,7 @@ The binary embeds it with `include_str!` and parses it once per process.
 
 Alternative: generate Rust source with the tables. Lost: a large generated file, slower to build.
 
-### 5. Evaluation against gold boundaries, not against Vale
+### 5. Evaluation against gold boundaries instead of Vale
 
 The committed evaluation set holds:
 
@@ -130,5 +130,5 @@ Alternative: agreement with Vale as the score. Lost: Vale's own mistakes would c
 [common-pile]: https://arxiv.org/abs/2506.05209
 [stackv2]: https://huggingface.co/datasets/common-pile/stackv2
 [peps]: https://huggingface.co/datasets/common-pile/python_enhancement_proposals
-[nupunkt-guide]: https://github.com/alea-institute/nupunkt/blob/main/docs/training-guide.md
+[nupunkt-guide]: https://github.com/alea-institute/nupunkt/blob/1e0b9d9ab77e7ce7f8473e7cce7e6bf4723a4583/docs/training-guide.md
 [masc]: https://anc.org/data/masc/about/

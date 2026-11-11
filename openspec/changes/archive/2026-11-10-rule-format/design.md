@@ -35,7 +35,7 @@ YAML 1.1 readers turn `yes`, `no`, `on` and `off` into booleans; hakkiri reads 1
 
 Alternatives, each written as the same four rules and parsed with its own reader:
 
-- KDL 2.0. Lost: it has no list syntax, so only a schema tells an empty or one-item list apart. Version 2 is from 2024-12.
+- KDL 2.0. Lost: it has no list syntax, so only a schema separates an empty list from a one-item list. Version 2 is from 2024-12.
 - TOML 1.1. Lost: a multi-line inline table needs 1.1, which Python 3.14's reader rejected, and test cases repeat `[[rules.tests]]` headers.
 - HCL. Lost: no raw strings, so every pattern doubles its backslashes, and `${` or `%{` in a message starts interpolation.
 - Pkl and CUE. Lost: programming languages for a data file; an untyped empty list in Pkl evaluated to an object.

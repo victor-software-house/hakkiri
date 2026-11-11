@@ -1,6 +1,6 @@
 //! The dictionaries a `spelling` rule reads, and the words it accepts besides.
 //!
-//! A port of `Checker` in [Vale]'s `spell` package at `66bbb85`, which asks
+//! A port of `Checker` in [Vale]'s `spell` package at `66bbb85`, which queries
 //! each dictionary in turn.
 //!
 //! [Vale]: https://github.com/vale-cli/vale/tree/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell

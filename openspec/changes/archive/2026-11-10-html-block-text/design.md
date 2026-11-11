@@ -43,7 +43,7 @@ The check for a reset reads the same walk, so the two cannot diverge.
 Alternative: scan the text with a second, simpler reader.  
 Lost: two readers of one tokenizer diverge, and the first already differed on raw-text tags.
 
-### 2. The scope is the outermost element, as Vale reads it
+### 2. The scope is the outermost element, as in Vale
 
 [`lintScope`][v-scope] takes the first tag in the history that is `li`, `blockquote`, `th`, `td`, a heading, `caption` or `figcaption`, so the outermost one wins.  
 A `data` element anywhere in the history gives the scope `meta`.  
@@ -120,7 +120,7 @@ Lost: the `>` of a quote would read as text.
 
 ### Not ported
 
-- The `vale off` and `vale on` comments (row HKR-031), and the selections and class scopes, which hakkiri has no rule syntax for.
+- The `vale off` and `vale on` comments (row [HKR-031][hkr-031]), and the selections and class scopes, which hakkiri has no rule syntax for.
 - A text equal to the name of an element of a skipped class, which Vale counts as a tag.
 
 ## Risks / Trade-offs
@@ -140,3 +140,4 @@ Lost: the `>` of a quote would read as text.
 [case-9]: ../2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
 [format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [hkr-027]: ../../../../tasks.yaml
+[hkr-031]: ../../../../tasks.yaml

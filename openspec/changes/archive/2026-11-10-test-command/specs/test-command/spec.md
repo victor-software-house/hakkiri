@@ -102,7 +102,7 @@ It SHALL skip dot and underscore folders when it lists the rules.
 - **WHEN** `styles/Team/Foo.v2.yml` flags a line that a case through the config lints, under `--coverage`
 - **THEN** hakkiri counts `Team.Foo` as covered, the name the alert carries
 
-### Requirement: The report and exit status say what happened
+### Requirement: The report and exit status show what happened
 
 hakkiri SHALL print, for each failed case, its file, name and reason, and the alerts it got, and then a count line.  
 `--format json` SHALL print `passed`, `failed`, `files`, `results`, `uncovered` and `failures`.  

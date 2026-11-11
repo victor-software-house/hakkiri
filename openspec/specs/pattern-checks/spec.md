@@ -25,7 +25,7 @@ That alert SHALL sit at the last match of the pair in the node.
 
 ### Requirement: consistency checks each pair alone
 
-Each pair of `either` SHALL be checked on its own, and an alert SHALL carry the rule's name, not the name of the pair.
+Each pair of `either` SHALL be checked on its own, and an alert SHALL carry the rule's name instead of the name of the pair.
 
 #### Scenario: Two pairs, one mixed
 

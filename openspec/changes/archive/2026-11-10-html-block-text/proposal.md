@@ -23,7 +23,7 @@ The operator also ruled that hakkiri gives at least Vale's result, and departs o
 - The text of `code` and `tt` is a code span, and `a`, `strong`, `b`, `em`, `i` and `img` give a link, strong text, emphasis and alt text.
 - An inline or void tag joins the text around it as Vale joins it, in an HTML block and in a Markdown paragraph.
 - A character reference reads as its character in a paragraph, heading, cell, caption, link, strong text, emphasis, alt text and description, as `golang.org/x/net/html` reads it.
-- The text after a closed raw-text tag on the same line, and after `--!>`, is read, and a `<!--` in a `script` hides its end tag as HTML5 says.
+- The text after a closed raw-text tag on the same line, and after `--!>`, is read, and a `<!--` in a `script` hides its end tag, as the HTML5 standard defines.
 - A block element that opens inside an inline one reads as inline.
 - Each difference that is left is a scenario of `vale-differences`, probed against Vale `66bbb85` on a fixture.
 

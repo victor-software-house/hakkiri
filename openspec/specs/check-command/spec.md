@@ -81,14 +81,14 @@ The lines SHALL hold no colour and no frame, and two runs over the same files SH
 
 `--format json` SHALL print one object with `alerts`, `failures` and `files`.  
 Each alert SHALL hold `path`, `line`, `column`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
-The output SHALL hold no ESC byte, whatever the colour variables say.
+The output SHALL hold no ESC byte, whatever the colour variables hold.
 
 #### Scenario: JSON with colour forced
 
 - **WHEN** `hakkiri check --format json` runs with `CLICOLOR_FORCE=1` and a file draws an alert
 - **THEN** the output parses as JSON with one alert, and holds no ESC byte
 
-### Requirement: The exit status says what happened
+### Requirement: The exit status shows what happened
 
 hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed, and otherwise 1 when a reported alert reaches `--fail-level`, and otherwise 0.  
 `--fail-level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `error` when unset.  

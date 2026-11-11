@@ -3,7 +3,7 @@
 ## Context
 
 The [`vale-differences` design][first-design] sets how the list is built: one scenario for each difference, with a link to its decision, and only what is true now.  
-This change adds the part that comes from the [pattern-and-readability][pattern], [case-and-sequence][case] and [spelling-and-affix][spelling] designs.
+This change adds the part that comes from the [`pattern-and-readability`][pattern], [case-and-sequence][case] and [spelling-and-affix][spelling] designs.
 
 ## Goals / Non-Goals
 

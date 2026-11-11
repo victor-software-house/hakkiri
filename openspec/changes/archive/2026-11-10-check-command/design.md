@@ -55,7 +55,7 @@ A file is resolved by its folders, and keeps its own name: a symlink `docs/a.md`
 Vale does the same, because its walk takes a symlink to a file as a file and matches the path it reached.
 A `files` glob matches the path relative to the root, with `/` separators.
 `docs/**` therefore matches `docs/a.md` however it is named: `docs`, `./docs`, `docs/../docs`, `../proj/docs` or the absolute path.
-A path outside the root matches no glob, so it is not linted, and the run says so.
+A path outside the root matches no glob, so it is not linted, and the run reports it.
 Each path given that is outside the root, and does not hold it, draws a warning on standard error.
 When no path given lies under the root or holds it, the run reports a failure and exits 2, so a wrong `--config` is not a clean run.
 A `packages` `path` that does not exist is a config error, so a package not yet fetched (`HKR-006`) is not skipped or matched by its written path.
@@ -91,7 +91,7 @@ Lost: the project-config spec reads the config from the current directory, and a
 
 A `packages` entry holds a `path` to a directory whose subfolders are styles, each with one `.yml` file per rule.
 The style name is the subfolder, and `styles: [ProseStyle]` in a glob selects it.
-`HKR-006` adds the entry that holds `url` and `sha256`, which unpacks to the same shape; until then an entry with a `url` is refused with a message that says so.
+`HKR-006` adds the entry that holds `url` and `sha256`, which unpacks to the same shape; until then an entry with a `url` is refused with a message that reports it as unsupported.
 Two entries that hold one style name are refused, and the error names both.
 
 A local path is needed beyond this change: a style repository runs `hakkiri test` over its own folder.
@@ -105,7 +105,7 @@ Lost: it adds a second place that holds styles beside `packages`, and a project 
 A directory walk skips any other file with no message, so a `'*'` glob does not fail on an image.
 A file named as an argument that no language reads is an error that names it.
 
-Vale reads any other file as plain text, so this is a known gap, not a difference ([row `HKR-030`][ledger]).
+Vale reads any other file as plain text, so this is a known gap instead of a difference ([row `HKR-030`][ledger]).
 
 ### 6. Files lint in parallel, output stays ordered
 
@@ -156,7 +156,7 @@ The four crates below are approved, and no other crate is added (operator, 2026-
 
 | Crate | Why | Alternative lost |
 |:--|:--|:--|
-| `clap` 4, `derive` and `env` | The derive macros expand to `clap::` paths, so a program names it, as ctl-core's prelude says. ctl-core's `app` feature pulls it in, so the graph gains no crate. | None. |
+| `clap` 4, `derive` and `env` | The derive macros expand to `clap::` paths, so a program names it, as ctl-core's prelude shows. ctl-core's `app` feature pulls it in, so the graph gains no crate. | None. |
 | `anyhow` | `App::run` takes a handler that returns `anyhow::Result`; ctl-core does not re-export it, and its `app` feature pulls it in. | A local error type that implements the same trait. |
 | `globset` | `files` globs need `**` and `{a,b}`, and its `*` crosses `/` by default. | A hand-written matcher. |
 | `serde_json`, dev only | Tests read the JSON output. | Comparing strings. |
@@ -177,7 +177,7 @@ Lost: it needs `minijinja` and a surface build for one command, and the text sta
 
 - [A walk of a large tree reads every file name once] → A glob match runs one compiled set; a project that needs less lists its files, as the task does.
 - [Exit 2 for a broken setup differs from ctl-core's default] → The scenarios and the skill state the three codes, and a test runs each.
-- [The count line is an extra line] → A caller that parses lines reads `--format json`; the exit status says clean or not.
+- [The count line is an extra line] → A caller that parses lines reads `--format json`; the exit status shows clean or not.
 
 [format]: ../2026-11-10-rule-format/design.md
 [bootstrap]: ../2026-11-09-bootstrap-hakkiri/design.md

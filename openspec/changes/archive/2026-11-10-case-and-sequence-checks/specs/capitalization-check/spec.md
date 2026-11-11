@@ -23,7 +23,7 @@ In its message, the first `%s` SHALL read as the text and the second as the conv
 With `match: $sentence`, a word in capitals of two letters or more SHALL keep its case.  
 Of the other words, the first SHALL start with a capital and the rest SHALL be in lower case.
 
-The text SHALL pass when its first word passes and enough words agree with the converted text.  
+The text SHALL pass when its first word passes and enough words match the converted text.  
 The share that agrees SHALL be at least `threshold`, 0.8 by default.
 
 #### Scenario: An acronym

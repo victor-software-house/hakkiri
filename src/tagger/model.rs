@@ -283,7 +283,7 @@ impl Model {
         self.blob.get(start..end)
     }
 
-    /// What the model's metadata says under `key`.
+    /// What the model's metadata holds under `key`.
     #[must_use]
     pub(super) fn meta(&self, key: &str) -> Option<&str> {
         self.meta.get(key).map(String::as_str)

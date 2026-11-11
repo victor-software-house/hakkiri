@@ -270,7 +270,8 @@ impl<'a> Tokenizer<'a> {
     /// not consumed.
     ///
     /// A `<!--` hides the end tag until a `-->`, and a `<script` after it
-    /// hides it again until the end tag of that script, as HTML5 says.
+    /// hides it again until the end tag of that script, as the HTML5 standard
+    /// defines.
     fn read_script(&mut self) {
         let mut state = Script::Data;
         loop {

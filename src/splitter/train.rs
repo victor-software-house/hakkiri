@@ -269,7 +269,7 @@ fn read_capitalization(documents: &[&str], abbreviations: &HashSet<String>) -> C
         for token in tokens(document) {
             let note = token.first_look(abbreviations);
             // A blank line is a good sign of a sentence break, unless an
-            // abbreviation came just before it.
+            // abbreviation came immediately before it.
             if token.gap == Gap::Paragraph && position != Position::Unknown {
                 position = Position::Initial;
             }

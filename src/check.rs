@@ -26,8 +26,8 @@ pub(crate) struct Hit {
     pub(crate) values: Vec<String>,
     /// Whether the message reads `%d` as `%s`.
     pub(crate) numbered: bool,
-    /// The message to use in place of the rule's, when the check knows more
-    /// than the rule's message does.
+    /// The message to use in place of the rule's, when the check has more
+    /// detail than the rule's message does.
     pub(crate) message: Option<String>,
 }
 
@@ -526,8 +526,8 @@ fn run_repetition(repetition: &Repetition, text: &Text) -> Result<Vec<Hit>, Sear
 
 /// One hit that spans `text` when it is not in the case the rule names.
 ///
-/// The message reads the text, and then the text in the case the rule asks
-/// for.
+/// The message reads the text, and then the text in the case the rule
+/// requires.
 fn run_capitalization(capitalization: &Capitalization, text: &Text) -> Vec<Hit> {
     let content = text.as_str();
     let (expected, matched) = evaluate(capitalization, content);

@@ -278,7 +278,7 @@ impl Token<'_> {
             && self.word.chars().all(|c| !c.is_alphanumeric())
     }
 
-    /// Whether the token is a word or a number, not only punctuation.
+    /// Whether the token is a word or a number instead of punctuation.
     ///
     /// A number counts: its type, [`NUMBER`], is made of letters.
     pub(super) fn is_non_punctuation(&self) -> bool {

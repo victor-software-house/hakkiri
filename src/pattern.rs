@@ -39,7 +39,7 @@ enum Engine {
 pub struct PatternError {
     /// The pattern as written.
     pub pattern: String,
-    /// What the engine says is wrong with it.
+    /// What the engine reports as wrong with it.
     pub message: String,
 }
 

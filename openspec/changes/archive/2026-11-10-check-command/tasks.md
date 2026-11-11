@@ -26,7 +26,7 @@ Only the binary size measurement in task 1.2 runs on a box, because CI cannot.
   Verify the scenarios of the `project-config` spec for the file, the unknown key and `level` pass as integration tests.  
   Evidence, 2026-11-10 (UTC): `a_broken_config_stops_the_run` (unknown key, line 3), `a_missing_config_stops_the_run` and `a_level_hides_the_lower_alerts` pass in [the CI run][ci52].
 - [x] 2.2 Read `packages` entries with a `path`, load each style folder, and refuse an entry with both `path` and `url`, and two folders that hold one style name.  
-  Verify the three local package scenarios (a local folder, an entry with both, one style in two folders) and the config-from-another-folder scenario pass, and that `HAKKIRI_CONFIG` names a config.  
+  Verify the three local package scenarios (a local folder, an entry with both, one style in two folders) and the scenario of a config from another folder pass, and that `HAKKIRI_CONFIG` names a config.  
   The two download scenarios (a matching package, one that does not match) need `HKR-006` and are covered there.  
   Evidence, 2026-11-10 (UTC): `a_package_path_is_read_from_the_root`, `a_package_entry_with_a_path_and_a_url_is_refused`, `one_style_in_two_folders_is_refused` and `the_variable_names_the_config` pass in [the CI run][ci52].  
   The two download scenarios wait for `HKR-006`.

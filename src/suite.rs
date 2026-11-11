@@ -108,8 +108,8 @@ fn skips_inert(name: &str) -> bool {
 /// could not be read.
 ///
 /// A file is taken as given. A walk skips a folder when it is a dot folder,
-/// when `inert` says so, or when `check`'s walk skips it, except the folder it
-/// was given, and keeps a file when `keep` says so.
+/// when `inert` returns true, or when `check`'s walk skips it, except the
+/// folder it was given, and keeps a file when `keep` returns true.
 fn find(
     paths: &[PathBuf],
     inert: &dyn Fn(&str) -> bool,
