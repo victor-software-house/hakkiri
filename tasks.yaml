@@ -99,13 +99,14 @@ queue:
     title: End an alert where a multi-line match ends
     scope: engine
     outcome: >-
-      An alert for a match that spans lines ends at the last character of the match,
-      as the alerts spec states.
+      An alert for a match that spans lines names the line and column of the match's last character.
     blocked_by: []
     acceptance:
-      - A match that spans two lines reports the end line and column of its last character, with a test, and the vocabulary-rules comparison checks that column too.
+      - The JSON alert carries end_line and end_column of the last character of the match, also for a match on one line, and a test covers a match across a line wrap and one across markup.
+      - The alerts spec and the instructions state it, vale-differences records that Vale prints the first column plus the match length, which can pass the end of the line, and the vocabulary-rules comparison checks the end through that mapping.
     notes:
-      - '2026-11-11, found by HKR-042: hakkiri ends such a match on its first line, against its own alerts spec, and Vale counts every character.'
+      - "2026-11-11, operator decision: the true end, with a new end_line field in the JSON. hakkiri never copies a flaw of Vale's to match it; Vale's count can point past the end of the line, and hakkiri's alerts spec stopped at the end of the first line."
+      - 2026-11-11, the pretty line keeps path:line:column, so tools that parse it are unaffected.
 
   - id: HKR-030
     title: Read files by extension, with plain text by default
