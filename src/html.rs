@@ -1141,7 +1141,7 @@ impl Walker {
         match tag.name.as_str() {
             "img" => {
                 if let Some((range, Some(alt))) = value("alt")
-                    && alt.bytes().any(|c| !is_blank(c))
+                    && !alt.is_empty()
                 {
                     self.walk.alts.push(range);
                 }

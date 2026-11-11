@@ -48,6 +48,11 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 - **THEN** hakkiri reports the match through its byte table, and Vale finds the words of the text in the file, so it gives no alert for a word it cannot find ([html 5][html-5])
 - **AND** Vale places another alert on the wrong line or column
 
+#### Scenario: Vale loses the text around a blank alt
+
+- **WHEN** a paragraph holds `one marker <img src="x" alt=" "> end`
+- **THEN** hakkiri reads the paragraph as `one marker end`, and Vale gives no alert for that text, though it gives one when the alt text holds a word ([html 6][html-6])
+
 #### Scenario: A code element is a code span
 
 - **WHEN** an HTML block holds `a <code>x</code> b`
@@ -72,6 +77,7 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 [html-3]: ../../../html-block-text/design.md#3-masked-text-reads-as-asterisks
 [html-4]: ../../../html-block-text/design.md#4-tags-join-the-text-around-them
 [html-5]: ../../../html-block-text/design.md#5-a-character-reference-reads-once
+[html-6]: ../../../html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
 [html-7]: ../../../html-block-text/design.md#not-ported
 [ledger]: ../../../../../tasks.yaml
 [case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters

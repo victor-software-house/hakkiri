@@ -62,3 +62,8 @@ An alert on a character that a reference gave SHALL point at the first byte of t
 
 - **WHEN** an HTML block holds `<p>alpha&#32;</p>` and `<p>&#32;beta</p>`
 - **THEN** the paragraphs read `alpha` and `beta`, as Vale trims the blank that the reference gave
+
+#### Scenario: Alt text that is only whitespace
+
+- **WHEN** an HTML block holds `<img src="x" alt=" ">`, or a Markdown paragraph holds `![ ](x.png)`
+- **THEN** a rule with `scope: alt` reads the whitespace, as Vale does

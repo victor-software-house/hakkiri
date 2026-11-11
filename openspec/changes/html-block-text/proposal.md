@@ -48,6 +48,6 @@ The operator also ruled that hakkiri gives at least Vale's result, and departs o
 - A new `src/entity.rs` and `data/entities/html5.tsv` read character references.
 - A new `src/html_text.rs` maps the walk back to the lines of the file, and the Markdown builder adds the nodes.
 - `Node` gains `reads`, a reading for each segment, and `Scope` gains eight variants.
-- `tests/html_parity.rs` compares 41 rules over 51 inputs with Vale.
+- `tests/html_parity.rs` compares 41 rules over 52 inputs with Vale.
 
 [ledger]: ../../../tasks.yaml

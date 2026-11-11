@@ -31,6 +31,10 @@ Scope.amp	references.md	9	9	9	&
 Scope.amp	short-references.md	19	15	15	&
 Scope.amp	short-references.md	19	23	23	&
 Scope.amp	short-references.md	19	8	8	&
+Scope.dump-alt	blank-alt.md	1	8	8	 
+Scope.dump-alt	blank-alt.md	3	4	4	\t
+Scope.dump-alt	blank-alt.md	5	22	24	   
+Scope.dump-alt	blank-alt.md	7	8	8	 
 Scope.dump-alt	captions-data-meta.md	28	29	39	marker alt2
 Scope.dump-alt	captions-data-meta.md	30	3	13	marker alt3
 Scope.dump-alt	captions-data-meta.md	8	19	28	marker alt
@@ -56,6 +60,12 @@ Scope.dump-meta	meta-and-data.md	3	22	32	marker data
 Scope.dump-table-caption	captions-data-meta.md	2	10	19	marker cap
 Scope.dump-table-caption	captions-data-meta.md	32	15	33	marker bare caption
 Scope.dump-table-caption	headings-and-tables.md	3	17	26	marker cap
+Scope.dump-text	blank-alt.md	1	8	8	 
+Scope.dump-text	blank-alt.md	11	1	12	three marker
+Scope.dump-text	blank-alt.md	3	4	4	\t
+Scope.dump-text	blank-alt.md	5	22	24	   
+Scope.dump-text	blank-alt.md	7	25	34	two marker
+Scope.dump-text	blank-alt.md	7	8	8	 
 Scope.dump-text	blank-lines.md	3	1	32	marker markdown paragraph in div
 Scope.dump-text	blank-lines.md	7	6	16	marker text
 Scope.dump-text	blank-lines.md	9	1	21	marker next paragraph
@@ -403,6 +413,9 @@ Scope.existence-list-or-heading	nested-list.md	1	59	64	marker
 Scope.existence-list-or-heading	nested-list.md	1	9	14	marker
 Scope.existence-list-or-heading	references.md	37	16	21	marker
 Scope.existence-list-or-heading	references.md	57	19	24	marker
+Scope.existence-paragraph	blank-alt.md	11	7	12	marker
+Scope.existence-paragraph	blank-alt.md	3	8	13	marker
+Scope.existence-paragraph	blank-alt.md	7	29	34	marker
 Scope.existence-paragraph	blank-lines.md	3	1	6	marker
 Scope.existence-paragraph	blank-lines.md	7	6	11	marker
 Scope.existence-paragraph	blank-lines.md	9	1	6	marker
@@ -561,6 +574,9 @@ Scope.existence-paragraph	vertical-tab.md	2	20	25	marker
 Scope.existence-paragraph	vertical-tab.md	21	18	23	marker
 Scope.existence-paragraph	vertical-tab.md	22	7	12	marker
 Scope.existence-paragraph	vertical-tab.md	7	24	29	marker
+Scope.existence-paragraph-not-list	blank-alt.md	11	7	12	marker
+Scope.existence-paragraph-not-list	blank-alt.md	3	8	13	marker
+Scope.existence-paragraph-not-list	blank-alt.md	7	29	34	marker
 Scope.existence-paragraph-not-list	blank-lines.md	3	1	6	marker
 Scope.existence-paragraph-not-list	blank-lines.md	7	6	11	marker
 Scope.existence-paragraph-not-list	blank-lines.md	9	1	6	marker
@@ -719,6 +735,9 @@ Scope.existence-paragraph-not-list	vertical-tab.md	2	20	25	marker
 Scope.existence-paragraph-not-list	vertical-tab.md	21	18	23	marker
 Scope.existence-paragraph-not-list	vertical-tab.md	22	7	12	marker
 Scope.existence-paragraph-not-list	vertical-tab.md	7	24	29	marker
+Scope.existence-sentence	blank-alt.md	11	7	12	marker
+Scope.existence-sentence	blank-alt.md	3	8	13	marker
+Scope.existence-sentence	blank-alt.md	7	29	34	marker
 Scope.existence-sentence	blank-lines.md	3	1	6	marker
 Scope.existence-sentence	blank-lines.md	7	6	11	marker
 Scope.existence-sentence	blank-lines.md	9	1	6	marker
@@ -969,6 +988,9 @@ Scope.existence-sentence-list-not-blockquote	nested-list.md	1	27	32	marker
 Scope.existence-sentence-list-not-blockquote	nested-list.md	1	59	64	marker
 Scope.existence-sentence-list-not-blockquote	nested-list.md	1	9	14	marker
 Scope.existence-sentence-list-not-blockquote	references.md	57	19	24	marker
+Scope.existence-sentence-not-blockquote	blank-alt.md	11	7	12	marker
+Scope.existence-sentence-not-blockquote	blank-alt.md	3	8	13	marker
+Scope.existence-sentence-not-blockquote	blank-alt.md	7	29	34	marker
 Scope.existence-sentence-not-blockquote	blank-lines.md	3	1	6	marker
 Scope.existence-sentence-not-blockquote	blank-lines.md	7	6	11	marker
 Scope.existence-sentence-not-blockquote	blank-lines.md	9	1	6	marker
@@ -1160,6 +1182,9 @@ Scope.existence-sentence-not-blockquote	vertical-tab.md	2	20	25	marker
 Scope.existence-sentence-not-blockquote	vertical-tab.md	21	18	23	marker
 Scope.existence-sentence-not-blockquote	vertical-tab.md	22	7	12	marker
 Scope.existence-sentence-not-blockquote	vertical-tab.md	7	24	29	marker
+Scope.existence-sentence-not-heading	blank-alt.md	11	7	12	marker
+Scope.existence-sentence-not-heading	blank-alt.md	3	8	13	marker
+Scope.existence-sentence-not-heading	blank-alt.md	7	29	34	marker
 Scope.existence-sentence-not-heading	blank-lines.md	3	1	6	marker
 Scope.existence-sentence-not-heading	blank-lines.md	7	6	11	marker
 Scope.existence-sentence-not-heading	blank-lines.md	9	1	6	marker
@@ -1349,6 +1374,9 @@ Scope.existence-sentence-not-heading	vertical-tab.md	2	20	25	marker
 Scope.existence-sentence-not-heading	vertical-tab.md	21	18	23	marker
 Scope.existence-sentence-not-heading	vertical-tab.md	22	7	12	marker
 Scope.existence-sentence-not-heading	vertical-tab.md	7	24	29	marker
+Scope.existence-sentence-not-list	blank-alt.md	11	7	12	marker
+Scope.existence-sentence-not-list	blank-alt.md	3	8	13	marker
+Scope.existence-sentence-not-list	blank-alt.md	7	29	34	marker
 Scope.existence-sentence-not-list	blank-lines.md	3	1	6	marker
 Scope.existence-sentence-not-list	blank-lines.md	7	6	11	marker
 Scope.existence-sentence-not-list	blank-lines.md	9	1	6	marker
@@ -1539,6 +1567,9 @@ Scope.existence-sentence-not-list	vertical-tab.md	2	20	25	marker
 Scope.existence-sentence-not-list	vertical-tab.md	21	18	23	marker
 Scope.existence-sentence-not-list	vertical-tab.md	22	7	12	marker
 Scope.existence-sentence-not-list	vertical-tab.md	7	24	29	marker
+Scope.existence-sentence-not-table	blank-alt.md	11	7	12	marker
+Scope.existence-sentence-not-table	blank-alt.md	3	8	13	marker
+Scope.existence-sentence-not-table	blank-alt.md	7	29	34	marker
 Scope.existence-sentence-not-table	blank-lines.md	3	1	6	marker
 Scope.existence-sentence-not-table	blank-lines.md	7	6	11	marker
 Scope.existence-sentence-not-table	blank-lines.md	9	1	6	marker
@@ -1775,6 +1806,9 @@ Scope.existence-table-cell	references.md	41	18	23	marker
 Scope.existence-table-header	block-scopes.md	18	9	14	marker
 Scope.existence-table-header	captions-data-meta.md	3	11	16	marker
 Scope.existence-table-header	references.md	39	16	21	marker
+Scope.existence-text	blank-alt.md	11	7	12	marker
+Scope.existence-text	blank-alt.md	3	8	13	marker
+Scope.existence-text	blank-alt.md	7	29	34	marker
 Scope.existence-text	blank-lines.md	3	1	6	marker
 Scope.existence-text	blank-lines.md	7	6	11	marker
 Scope.existence-text	blank-lines.md	9	1	6	marker
