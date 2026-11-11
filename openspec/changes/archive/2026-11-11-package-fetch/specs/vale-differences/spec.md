@@ -26,5 +26,5 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml` and take Vale styles on
 
 [package-fetch-1]: ../../design.md#1-vales-sync-is-the-reference-for-the-source
 [package-fetch-3]: ../../design.md#3-the-checks-a-download-passes
-[bootstrap-1]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
-[format-6]: ../../../archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
+[bootstrap-1]: ../../../2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
+[format-6]: ../../../2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys

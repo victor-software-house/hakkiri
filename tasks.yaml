@@ -1,35 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-006
+active: HKR-007
 queue:
-  - id: HKR-006
-    title: Fetch and cache rule packages
-    scope: packages
-    outcome: >-
-      A project pins rule packages by version and hash, and check fetches them with
-      no sync step.
-    blocked_by: []
-    acceptance:
-      - Tests cover the first fetch, a cache hit and a hash mismatch.
-    plan: openspec/changes/package-fetch/proposal.md
-
-  - id: HKR-019
-    title: Read vocabularies
-    scope: config
-    outcome: >-
-      A project selects vocabularies whose accepted and rejected terms reach every
-      check that reads them.
-    blocked_by:
-      - HKR-006
-    acceptance:
-      - A project's config names vocabularies, and each is read from a package's accept.txt and reject.txt.
-      - Accepted terms reach capitalization's vocab exceptions, added before the (?-i) rewrite, and the spelling check's accepted words.
-      - Accepted and rejected terms give the alerts that Vale's generated Vale.Terms and Vale.Avoid rules give.
-    notes:
-      - "2026-11-10, Vale adds the accepted terms to a capitalization rule's exceptions when its vocab is true, which is the default: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L52-L70."
-      - 2026-11-10, the case-and-sequence-checks change leaves capitalization's vocab with no effect, and the spelling check of the spelling-and-affix-checks change (task 1.1) reads accepted words from this row.
-
   - id: HKR-007
     title: Load Vale styles as they are
     scope: rules
@@ -44,6 +17,21 @@ queue:
     notes:
       - '2026-11-11, operator decision: hakkiri reads a Vale style as it is, so the rule-file converter this row first named is not built. The .vale.ini import keeps the name hakkiri import vale and is HKR-035.'
 
+  - id: HKR-019
+    title: Read vocabularies
+    scope: config
+    outcome: >-
+      A project selects vocabularies whose accepted and rejected terms reach every
+      check that reads them.
+    blocked_by: []
+    acceptance:
+      - A project's config names vocabularies, and each is read from a package's accept.txt and reject.txt.
+      - Accepted terms reach capitalization's vocab exceptions, added before the (?-i) rewrite, and the spelling check's accepted words.
+      - Accepted and rejected terms give the alerts that Vale's generated Vale.Terms and Vale.Avoid rules give.
+    notes:
+      - "2026-11-10, Vale adds the accepted terms to a capitalization rule's exceptions when its vocab is true, which is the default: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/capitalization.go#L52-L70."
+      - 2026-11-10, the case-and-sequence-checks change leaves capitalization's vocab with no effect, and the spelling check of the spelling-and-affix-checks change (task 1.1) reads accepted words from this row.
+
   - id: HKR-008
     title: Run ProseStyle on hakkiri
     scope: prose-style
@@ -51,7 +39,6 @@ queue:
       prose-style publishes a hakkiri package with its own rules, the converted
       upstream styles and the rate rules.
     blocked_by:
-      - HKR-006
       - HKR-007
     acceptance:
       - Every rule case and package case passes under hakkiri test.
@@ -178,6 +165,18 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-006
+    title: Fetch and cache rule packages
+    scope: packages
+    outcome: >-
+      A project pins rule packages by version and hash, and check fetches them with
+      no sync step.
+    plan: openspec/changes/archive/2026-11-11-package-fetch/proposal.md
+    completed: 2026-11-11T14:18:40
+    evidence:
+      - openspec/changes/archive/2026-11-11-package-fetch/
+    disposition: completed
+
   - id: HKR-034
     title: Release a static musl linux-x64 binary
     scope: release

@@ -341,8 +341,13 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml` and take Vale styles on
 
 #### Scenario: A package is fetched on use
 
-- **WHEN** a project pins a package by version and hash
-- **THEN** hakkiri fetches and caches it with no separate sync step, where Vale needs `vale sync` ([bootstrap 5][bootstrap-5])
+- **WHEN** a project pins a package by `url` and `sha256`
+- **THEN** hakkiri fetches it on the first run, checks the hash and keeps it in a cache folder outside the project, where Vale needs `vale sync`, accepts any zip and copies the styles into `StylesPath` ([package-fetch 1][package-fetch-1])
+
+#### Scenario: A package that was changed
+
+- **WHEN** a pinned package's download does not match its `sha256`
+- **THEN** hakkiri refuses it and names the `url` and both hashes, where Vale installs a changed zip with no complaint ([package-fetch 3][package-fetch-3])
 
 ### Requirement: The command line differs from Vale's
 
@@ -496,7 +501,6 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 - **THEN** hakkiri refuses it with the line, and Vale warns that `yes` is not `YES`, `NO`, `UNSET` or a level, and switches the rule off ([rule-setting 7][rule-setting-7])
 
 [bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
-[bootstrap-5]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#5-rules-ship-as-versioned-packages
 [bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
 [case-1]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
 [case-3]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
@@ -532,6 +536,8 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 [html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
 [html-7]: ../../changes/archive/2026-11-10-html-block-text/design.md#not-ported
 [ledger]: ../../../tasks.yaml
+[package-fetch-1]: ../../changes/archive/2026-11-11-package-fetch/design.md#1-vales-sync-is-the-reference-for-the-source
+[package-fetch-3]: ../../changes/archive/2026-11-11-package-fetch/design.md#3-the-checks-a-download-passes
 [pattern-1]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
 [pattern-2]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#2-consistency-matches-as-existence-does-one-pattern-per-pair
 [pattern-3]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#3-conditional-has-two-modes-chosen-by-the-second-pattern
