@@ -332,17 +332,23 @@ impl Runner {
     /// The alerts `case` gets under `setup`, or why it could not run.
     fn lint(&mut self, case: &TestCase, setup: Setup<'_>) -> Result<Vec<Alert>, String> {
         let name = format!("input.{}", case.format);
-        let language = Language::from_path(Path::new(&name))
-            .ok_or_else(|| format!("no language reads the format `{}`", case.format))?;
-        let tree = parse(language, &case.input).map_err(|error| error.to_string())?;
+        // A format no reader reads is plain text, as for a file `check`
+        // selects.
+        let by_extension = Language::from_path(Path::new(&name)).unwrap_or(Language::Text);
         match setup {
-            Setup::Rule(rule) => lint_alone(rule, &tree, case),
+            Setup::Rule(rule) => {
+                let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
+                lint_alone(rule, &tree, case)
+            }
             Setup::File(path) => {
+                let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
                 let rule = self.rule_at(&path)?;
                 lint_alone(rule, &tree, case)
             }
             Setup::Project => {
                 let project = self.project()?;
+                let language = project.mapped_language(&name).unwrap_or(by_extension);
+                let tree = parse(language, &case.input).map_err(|error| error.to_string())?;
                 let Some(plan) = project.plan(&name) else {
                     return Ok(Vec::new());
                 };

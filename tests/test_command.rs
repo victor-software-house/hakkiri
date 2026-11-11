@@ -698,3 +698,54 @@ fn the_cases_of_a_rule_that_reads_a_fence_across_a_blank_line_pass() -> TestResu
     assert_eq!(result.lines(), ["1 file, 9 passed, 0 failed"]);
     Ok(())
 }
+
+/// A rule that warns on `very`, with a case in plain text.
+const FILLER_TEXT: &str = "\
+extends: existence
+message: \"Remove '%s'.\"
+level: warning
+tokens: [very]
+tests:
+  - name: flags very in plain text
+    format: txt
+    input: This is very good.
+    want: \"1:9:Team.Filler:Remove 'very'.\"
+";
+
+#[test]
+fn a_case_in_a_format_no_extension_names_reads_as_plain_text() -> TestResult {
+    let suite = Suite::new("test-plain");
+    let root = suite.scenario("plain");
+    root.file("styles/Team/Filler.yml", FILLER_TEXT);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  '*.txt': {styles: [Team]}\n",
+    );
+    root.file(
+        "through.test.yml",
+        "- name: through the config\n  format: txt\n  input: A very day.\n  want: \"1:3:Team.Filler:Remove 'very'.\"\n",
+    );
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["2 files, 2 passed, 0 failed"]);
+    Ok(())
+}
+
+#[test]
+fn a_formats_entry_picks_the_reader_of_a_case() -> TestResult {
+    let suite = Suite::new("test-formats");
+    let root = suite.scenario("formats");
+    root.file("styles/Team/Filler.yml", FILLER);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "formats:\n  cfg: md\npackages:\n  - path: styles\nfiles:\n  '*.cfg': {styles: [Team]}\n",
+    );
+    root.file(
+        "through.test.yml",
+        "- name: a fence is code\n  format: cfg\n  input: |\n    ```\n    very\n    ```\n  want: ''\n",
+    );
+    let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"]);
+    Ok(())
+}

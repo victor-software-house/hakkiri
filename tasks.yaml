@@ -111,6 +111,20 @@ queue:
       - '2026-11-11, operator decision: a text file a glob or a name lists is read; plain text is the default, extensions can be remapped as in Vale, and the default can be turned off.'
     plan: openspec/changes/plain-text-files/proposal.md
 
+  - id: HKR-050
+    title: Read a test case's format with no reader as plain text
+    scope: test
+    outcome: >-
+      A test case whose format no extension names, such as txt, lints its input as
+      plain text, and a formats entry picks the reader of a case's format.
+    blocked_by: []
+    acceptance:
+      - A case with format txt, in a rule's tests and in a test file, lints its input as plain text, and a test for each fails on the source before the change.
+      - A formats entry of the config decides the reader of a case that runs through the config, and the test-command spec says so.
+    plan: openspec/changes/test-plain-text/proposal.md
+    notes:
+      - '2026-11-11, found by the ProseStyle port: hakkiri test refused a case with format txt before HKR-030 and after it, so the package case that a text file is not prose could not run.'
+
   - id: HKR-031
     title: Turn rules off and on with comments
     scope: engine
