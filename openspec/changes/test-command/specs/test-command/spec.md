@@ -74,8 +74,13 @@ A case's alerts SHALL be one line each, `line:column:Rule:message`, in order of 
 ### Requirement: An isolated case loads one rule
 
 A case in a rule's `tests`, and a case with `rule`, SHALL load that rule alone, from a path relative to its file.  
-It SHALL read no config, report an alert of any level, and name the rule by its folder and its file name without the extension, as the style loader does, so `Team/Foo.v2.yml` is `Team.Foo.v2`.  
+It SHALL apply nothing from the project config, report an alert of any level, and name the rule as the style loader does, so `Team/Foo.v2.yml` is `Team.Foo`.  
 Any other case SHALL lint `input` as a file named `input.<format>` through the project config.
+
+#### Scenario: The style folder of a nested rule
+
+- **WHEN** the config has the package `styles` and a case loads `styles/Team/Sub/Bar.yml`
+- **THEN** the rule is `Team.Sub.Bar`, and with no package that holds the file it is `Sub.Bar`, since the folder that holds the file is its style
 
 #### Scenario: A rule turned off in the config
 
