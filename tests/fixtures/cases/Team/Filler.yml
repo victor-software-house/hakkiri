@@ -1,0 +1,18 @@
+extends: existence
+message: "Remove '%s'."
+level: warning
+ignorecase: true
+tokens:
+  - very
+  - basically
+tests:
+  - name: flags filler
+    about: A word from the list is reported with its position.
+    input: This is very good.
+    want: "1:9:Team.Filler:Remove 'very'."
+  - name: ignores the case
+    input: Basically it works.
+    contains: Team.Filler
+  - name: clean prose
+    input: It works.
+    want: ''

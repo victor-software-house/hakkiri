@@ -7,6 +7,7 @@ mod config;
 mod files;
 mod report;
 mod run;
+mod suite;
 
 use ctl_core::prelude::{App, ExitCode};
 
@@ -22,6 +23,7 @@ fn main() -> ExitCode {
         .run(|cli| {
             Ok::<_, anyhow::Error>(match cli.command {
                 Command::Check(args) => Output::Check(run::check(&args)),
+                Command::Test(args) => Output::Test(suite::test(&args)),
                 Command::Instructions => Output::Instructions(Instructions {
                     markdown: INSTRUCTIONS.to_owned(),
                 }),
