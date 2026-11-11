@@ -84,7 +84,9 @@ Lost: `a<b>x</b>c` reads `a xc` in Vale, and a gap rule gives `a x c`.
 
 ### 5. A character reference reads once
 
-`src/entity.rs` ports the unescaping of `golang.org/x/net/html` at v0.62.0: named references from its table, those without a `;` that HTML allows, decimal and hexadecimal ones with the table for `0x80` to `0x9F`, and the stricter rule for an attribute value.  
+`src/entity.rs` ports the unescaping of `golang.org/x/net/html` at v0.62.0.  
+It reads named references from its table, and those without a `;` that HTML allows.  
+It reads decimal and hexadecimal ones, with the table for `0x80` to `0x9F`, and it has the stricter rule for an attribute value.  
 `data/entities/html5.tsv` holds the table of that version.  
 A paragraph, heading, cell, caption, link, strong text, emphasis, alt text and description read it, and a code span, a comment and `raw` do not.  
 An alert on a character that a reference gave points at the first byte of the reference.  
@@ -125,7 +127,8 @@ Lost: the `>` of a quote would read as text.
 
 ## Risks / Trade-offs
 
-- [A block reads under the wrong scope or with the wrong join] → the probe holds 45 inputs, from lists and quotes to joins, masks, references, scripts and promoted blocks, and the parity test fails on any alert that differs and is not listed.
+- [A block reads under the wrong scope or with the wrong join] → the probe holds 45 inputs, from lists and quotes to joins, masks, references, scripts and promoted blocks.  
+  The parity test fails on any alert that differs and is not listed.
 - [The walk differs from Vale on input the probe lacks] → each flag of the walker mirrors a variable of Vale's, and the rows of `departures.tsv` are the only differences found.
 - [The tree type grows] → `Node` gains `reads`, and `Scope` gains four variants. hakkiri is not released, and it owns both types.
 

@@ -40,7 +40,8 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 #### Scenario: Vale loses a match beside a reference
 
 - **WHEN** a text holds a reference that Vale cannot find in the file once it is unescaped, such as `&#109;arker`, and a rule matches a word of it
-- **THEN** hakkiri reports the match through its byte table, and Vale finds the words of the text in the file, so it gives no alert for a word it cannot find and places another on the wrong line or column ([html 5][html-5])
+- **THEN** hakkiri reports the match through its byte table, and Vale finds the words of the text in the file, so it gives no alert for a word it cannot find ([html 5][html-5])
+- **AND** Vale places another alert on the wrong line or column
 
 #### Scenario: A code element is a code span
 

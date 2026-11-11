@@ -9,10 +9,11 @@
 //!
 //! A `dump-` rule matches the whole text of a block, which shows how the block
 //! reads.
-//! Vale places such an alert where it finds the words of the text in the file,
-//! and a text that holds a masked word, a decoded reference or a joined tag is
-//! not in the file, so the test compares only the file and the text of a
-//! `dump-` alert, and not its place.
+//! Vale places such an alert where it finds the words of the text in the file.
+//! A text that holds a masked word, a decoded reference or a joined tag is not
+//! in the file.
+//! So the test compares the file and the text of a `dump-` alert, and not its
+//! place.
 //! A line feed or a tab in the text is written `\n` or `\t`, as `jq` writes it.
 //!
 //! `departures.tsv` holds one row for each alert that only one side gave, led
