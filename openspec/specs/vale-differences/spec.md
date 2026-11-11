@@ -416,7 +416,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A YAML vocabulary
 
 - **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
-- **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 7][vocabularies-7])
+- **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
 
 #### Scenario: The Markdown parser
 
@@ -578,7 +578,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [engine-12]: ../../changes/archive/2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
 [engine-14]: ../../changes/archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
 [engine-16]: ../../changes/archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
-[engine-17]: ../../changes/archive/2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-its-scope-item
+[engine-17]: ../../changes/archive/2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-the-scope-item
 [engine-18]: ../../changes/archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
 [engine-3]: ../../changes/archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
 [engine-7]: ../../changes/archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
@@ -611,7 +611,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [spelling-3]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses
 [spelling-4]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
 [spelling-goals]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
-[splitter-5]: ../../changes/archive/2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-not-against-vale
+[splitter-5]: ../../changes/archive/2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-instead-of-vale
 [styles-1]: ../../changes/archive/2026-11-11-vale-styles/design.md#1-the-loader-resolves-inheritance
 [styles-4]: ../../changes/archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
 [test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
@@ -620,5 +620,5 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [tree-1]: ../../changes/archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
 [vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
-[vocabularies-7]: ../../changes/archive/2026-11-11-vocabularies/design.md#7-what-stays-different
+[vocabularies-8]: ../../changes/archive/2026-11-11-vocabularies/design.md#8-what-stays-different
 [vocabulary-rules-1]: ../../changes/vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale

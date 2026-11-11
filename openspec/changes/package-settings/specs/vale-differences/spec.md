@@ -40,7 +40,7 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 - **THEN** hakkiri prints nothing, and Vale warns once that the section replaces the styles of the package ([package settings 4][settings-4])
 
 [settings-2]: ../../design.md#2-the-files-name-and-place-in-the-package
-[settings-3]: ../../design.md#3-which-keys-a-package-may-set
+[settings-3]: ../../design.md#3-which-keys-a-package-may-set-and-nested-packages
 [settings-4]: ../../design.md#4-a-styles-list-under-a-glob-the-package-also-writes
 [settings-5]: ../../design.md#5-scalars-the-project-wins
 [settings-6]: ../../design.md#6-order-across-packages
