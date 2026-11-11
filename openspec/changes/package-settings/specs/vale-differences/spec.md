@@ -7,7 +7,7 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 #### Scenario: The file and its place
 
 - **WHEN** a package holds `.ctl/hakkiri.yaml`
-- **THEN** hakkiri reads it from the package folder, and Vale copies the package's `.vale.ini` to `StylesPath/.vale-config/<index>-<Name>.ini` at `vale sync` ([package settings 2][settings-2])
+- **THEN** hakkiri reads it from the package's top folder, beside `styles`, and Vale copies the package's `.vale.ini` to `StylesPath/.vale-config/<index>-<Name>.ini` at `vale sync` ([package settings 2][settings-2])
 
 #### Scenario: A scalar in a package
 

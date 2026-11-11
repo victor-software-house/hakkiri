@@ -483,8 +483,8 @@ struct Held {
 
 /// The folder that holds the `.ctl` folder of the config file `config`, or the
 /// folder of `config` when it is not in a `.ctl` folder, with symlinks
-/// resolved, and the file itself with symlinks resolved.
-fn project_root(config: &Path) -> io::Result<(PathBuf, PathBuf)> {
+/// resolved.
+fn project_root(config: &Path) -> io::Result<PathBuf> {
     let real = fs::canonicalize(config)?;
     let folder = real
         .parent()
@@ -493,7 +493,7 @@ fn project_root(config: &Path) -> io::Result<(PathBuf, PathBuf)> {
         Some(name) if name == ".ctl" => folder.parent().unwrap_or(folder),
         _ => folder,
     };
-    Ok((root.to_path_buf(), real))
+    Ok(root.to_path_buf())
 }
 
 /// One config file whose settings apply: a package's, or the project's.
@@ -513,9 +513,6 @@ struct Layer {
 struct Walk<'a> {
     root: &'a Path,
     cache_dir: Option<&'a Path>,
-    /// The project's config file with symlinks resolved, which a package
-    /// folder that holds it must not read again as settings.
-    config: PathBuf,
     /// The package folders, in load order.
     found: Vec<Found>,
     /// The settings files of the packages, in load order.
@@ -529,11 +526,10 @@ struct Walk<'a> {
 }
 
 impl<'a> Walk<'a> {
-    fn new(root: &'a Path, cache_dir: Option<&'a Path>, config: PathBuf) -> Self {
+    fn new(root: &'a Path, cache_dir: Option<&'a Path>) -> Self {
         Self {
             root,
             cache_dir,
-            config,
             found: Vec::new(),
             layers: Vec::new(),
             packages: Vec::new(),
@@ -595,13 +591,19 @@ impl<'a> Walk<'a> {
                     continue;
                 }
             };
+            let is_download = hash.is_some();
             if !self
                 .done
                 .insert(hash.unwrap_or_else(|| real.display().to_string()))
             {
                 continue;
             }
-            self.settings(&real, &written, depth);
+            let top = if is_download {
+                written.clone()
+            } else {
+                written.parent().map(Path::to_path_buf).unwrap_or_default()
+            };
+            self.settings(&real, &top, depth);
             self.packages.push(real);
             self.found.push(Found {
                 origin: file.to_owned(),
@@ -614,14 +616,31 @@ impl<'a> Walk<'a> {
         self.problems.extend(faults.problems);
     }
 
-    /// Reads the settings file of the package folder `folder`, when it holds
-    /// one, and walks the packages it lists.
-    fn settings(&mut self, folder: &Path, written: &Path, depth: usize) {
-        let path = folder.join(DEFAULT);
-        if !path.is_file() || fs::canonicalize(&path).is_ok_and(|real| real == self.config) {
+    /// The folder that holds the package whose styles folder is `styles`: its
+    /// parent, when `styles` is named `styles`.
+    ///
+    /// The project's own config is not a package's: its `.ctl` folder sits in
+    /// the project root, so a parent that is the project root, or holds it, is
+    /// no package top.
+    fn top_of(&self, styles: &Path) -> Option<PathBuf> {
+        let top = styles.parent()?;
+        (styles.file_name()? == "styles" && top != self.root && !self.root.starts_with(top))
+            .then(|| top.to_path_buf())
+    }
+
+    /// Reads the settings file of the package whose styles folder is `styles`,
+    /// when its top folder holds one, and walks the packages it lists.
+    ///
+    /// `shown` is the top folder as the config writes it.
+    fn settings(&mut self, styles: &Path, shown: &Path, depth: usize) {
+        let Some(top) = self.top_of(styles) else {
+            return;
+        };
+        let path = top.join(DEFAULT);
+        if !path.is_file() {
             return;
         }
-        let name = written.join(DEFAULT).display().to_string();
+        let name = shown.join(DEFAULT).display().to_string();
         let text = match fs::read_to_string(&path) {
             Ok(text) => text,
             Err(error) => {
@@ -652,9 +671,9 @@ impl<'a> Walk<'a> {
 /// package pinned by `url` is fetched into `cache_dir`, or into the per-user
 /// cache folder when there is none, unless that folder already holds it.
 ///
-/// A package folder that holds `.ctl/hakkiri.yaml` ships settings in the format
-/// of the config: they apply ahead of the project's, and the packages that file
-/// lists are fetched as the project's are.
+/// A package whose top folder holds `.ctl/hakkiri.yaml` ships settings in the
+/// format of the config: they apply ahead of the project's, and the packages
+/// that file lists are fetched as the project's are.
 ///
 /// # Errors
 ///
@@ -671,8 +690,8 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         file: input.name(),
         problems: Vec::new(),
     };
-    let (root, config) = match project_root(path) {
-        Ok(found) => found,
+    let root = match project_root(path) {
+        Ok(root) => root,
         Err(error) => {
             faults.add(None, "config", format!("`{}`: {error}", path.display()));
             return Err(LoadError {
@@ -680,7 +699,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
             });
         }
     };
-    let mut walk = Walk::new(&root, cache_dir, config);
+    let mut walk = Walk::new(&root, cache_dir);
     walk.entries(&raw.packages, text, input.name(), 0);
     faults.problems.append(&mut walk.problems);
     let mut layers = walk.layers;

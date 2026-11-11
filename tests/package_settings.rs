@@ -42,11 +42,12 @@ fn very(file: &str, level: &str) -> String {
 }
 
 /// A project of one text file, `a.md`, whose config is `config`, with the style
-/// `Team` in the package folder `pkg` and the style `Other` in `own`.
+/// `Team` in the package `pkg` and the style `Other` in `own`, each a `styles`
+/// folder beside the `.ctl` folder of its settings.
 fn project<'a>(suite: &'a Suite, name: &str, config: &str) -> Root<'a> {
     let root = suite.scenario(name);
-    root.file("pkg/Team/Filler.yml", FILLER);
-    root.file("own/Other/Plain.yml", PLAIN);
+    root.file("pkg/styles/Team/Filler.yml", FILLER);
+    root.file("own/styles/Other/Plain.yml", PLAIN);
     root.file(".ctl/hakkiri.yaml", config);
     root.file("a.md", TEXT);
     root
@@ -75,7 +76,7 @@ fn check(root: &Root<'_>) -> Result<(i32, Vec<String>, String), Box<dyn Error>> 
 #[test]
 fn a_package_turns_a_style_on() -> TestResult {
     let suite = Suite::new("package-settings-on");
-    let root = project(&suite, "on", "packages:\n  - path: pkg\n");
+    let root = project(&suite, "on", "packages:\n  - path: pkg/styles\n");
     root.file(
         "pkg/.ctl/hakkiri.yaml",
         "files:\n  '*.md': {styles: [Team]}\n",
@@ -89,7 +90,7 @@ fn a_package_turns_a_style_on() -> TestResult {
 #[test]
 fn a_package_with_no_settings_file_lints_no_file() -> TestResult {
     let suite = Suite::new("package-settings-none");
-    let root = project(&suite, "none", "packages:\n  - path: pkg\n");
+    let root = project(&suite, "none", "packages:\n  - path: pkg/styles\n");
     let (code, lines, err) = check(&root)?;
     assert_eq!(code, 0, "{err}");
     assert!(
@@ -105,7 +106,7 @@ fn the_project_turns_off_a_rule_a_package_runs() -> TestResult {
     let root = project(
         &suite,
         "off",
-        "packages:\n  - path: pkg\nfiles:\n  'a.md': {Team.Filler: off}\n",
+        "packages:\n  - path: pkg/styles\nfiles:\n  'a.md': {Team.Filler: off}\n",
     );
     root.file(
         "pkg/.ctl/hakkiri.yaml",
@@ -125,7 +126,7 @@ fn a_rule_a_package_ships_off_stays_off_until_the_project_turns_it_on() -> TestR
     let root = project(
         &suite,
         "off",
-        "packages:\n  - path: pkg\nfiles:\n  '*.md': {styles: [Team]}\n",
+        "packages:\n  - path: pkg/styles\nfiles:\n  '*.md': {styles: [Team]}\n",
     );
     root.file("pkg/.ctl/hakkiri.yaml", settings);
     let (code, lines, err) = check(&root)?;
@@ -138,7 +139,7 @@ fn a_rule_a_package_ships_off_stays_off_until_the_project_turns_it_on() -> TestR
     let root = project(
         &suite,
         "on",
-        "packages:\n  - path: pkg\nfiles:\n  '*.md': {styles: [Team], Team.Filler: on}\n",
+        "packages:\n  - path: pkg/styles\nfiles:\n  '*.md': {styles: [Team], Team.Filler: on}\n",
     );
     root.file("pkg/.ctl/hakkiri.yaml", settings);
     let (code, lines, err) = check(&root)?;
@@ -152,7 +153,7 @@ fn the_projects_level_wins_and_the_packages_applies_when_the_project_has_none() 
     let suite = Suite::new("package-settings-level");
     let settings = "level: error\nfiles:\n  '*.md': {styles: [Team]}\n";
 
-    let root = project(&suite, "package", "packages:\n  - path: pkg\n");
+    let root = project(&suite, "package", "packages:\n  - path: pkg/styles\n");
     root.file("pkg/.ctl/hakkiri.yaml", settings);
     let (code, lines, err) = check(&root)?;
     assert_eq!(code, 0, "{err}");
@@ -164,7 +165,7 @@ fn the_projects_level_wins_and_the_packages_applies_when_the_project_has_none() 
     let root = project(
         &suite,
         "project",
-        "level: suggestion\npackages:\n  - path: pkg\n",
+        "level: suggestion\npackages:\n  - path: pkg/styles\n",
     );
     root.file("pkg/.ctl/hakkiri.yaml", settings);
     let (_, lines, err) = check(&root)?;
@@ -186,10 +187,12 @@ fn a_later_package_wins_over_an_earlier_one() -> TestResult {
         let packages = indented(
             &order
                 .split(", ")
-                .map(|folder| format!("- path: {folder}"))
+                .map(|folder| format!("- path: {folder}/styles"))
                 .collect::<Vec<_>>(),
         );
         let root = project(&suite, name, &format!("packages:\n{packages}"));
+        root.file("a/styles/.keep", "");
+        root.file("b/styles/.keep", "");
         root.file(
             "a/.ctl/hakkiri.yaml",
             "files:\n  '*.md': {Team.Filler: error}\n",
@@ -222,7 +225,7 @@ fn styles_add_up_under_the_same_glob_and_replace_under_another() -> TestResult {
     let root = project(
         &suite,
         "same",
-        "packages:\n  - path: pkg\n  - path: own\nfiles:\n  '*.md': {styles: [Other]}\n",
+        "packages:\n  - path: pkg/styles\n  - path: own/styles\nfiles:\n  '*.md': {styles: [Other]}\n",
     );
     root.file("pkg/.ctl/hakkiri.yaml", settings);
     let (_, lines, err) = check(&root)?;
@@ -231,7 +234,7 @@ fn styles_add_up_under_the_same_glob_and_replace_under_another() -> TestResult {
     let root = project(
         &suite,
         "other",
-        "packages:\n  - path: pkg\n  - path: own\nfiles:\n  '*.{md,txt}': {styles: [Other]}\n",
+        "packages:\n  - path: pkg/styles\n  - path: own/styles\nfiles:\n  '*.{md,txt}': {styles: [Other]}\n",
     );
     root.file("pkg/.ctl/hakkiri.yaml", settings);
     let (_, lines, err) = check(&root)?;
@@ -247,7 +250,7 @@ fn styles_add_up_under_the_same_glob_and_replace_under_another() -> TestResult {
     let root = project(
         &suite,
         "empty",
-        "packages:\n  - path: pkg\n  - path: own\nfiles:\n  '*.md': {styles: []}\n",
+        "packages:\n  - path: pkg/styles\n  - path: own/styles\nfiles:\n  '*.md': {styles: []}\n",
     );
     root.file("pkg/.ctl/hakkiri.yaml", settings);
     let (_, lines, err) = check(&root)?;
@@ -265,20 +268,23 @@ const TERMS: &str = "extends: existence\nmessage: \"Remove '%s'.\"\nlevel: warni
 fn the_vocabularies_of_a_package_and_the_project_add_up() -> TestResult {
     let suite = Suite::new("package-settings-vocab");
     let package = |root: &Root<'_>| {
-        root.file("pkg/Team/Filler.yml", TERMS);
-        root.file("pkg/config/vocabularies/Docs/accept.txt", "GitHub\n");
+        root.file("pkg/styles/Team/Filler.yml", TERMS);
+        root.file("pkg/styles/config/vocabularies/Docs/accept.txt", "GitHub\n");
         root.file(
             "pkg/.ctl/hakkiri.yaml",
             "vocab: [Docs]\nfiles:\n  '*.md': {styles: [Team]}\n",
         );
-        root.file("own/config/vocabularies/Own/accept.txt", "Kubernetes\n");
+        root.file(
+            "own/styles/config/vocabularies/Own/accept.txt",
+            "Kubernetes\n",
+        );
         root.file("a.md", "Use GitHub and Kubernetes here.\n");
     };
 
     let root = project(
         &suite,
         "package",
-        "packages:\n  - path: pkg\n  - path: own\n",
+        "packages:\n  - path: pkg/styles\n  - path: own/styles\n",
     );
     package(&root);
     let (code, lines, err) = check(&root)?;
@@ -294,7 +300,7 @@ fn the_vocabularies_of_a_package_and_the_project_add_up() -> TestResult {
     let root = project(
         &suite,
         "both",
-        "vocab: [Own]\npackages:\n  - path: pkg\n  - path: own\n",
+        "vocab: [Own]\npackages:\n  - path: pkg/styles\n  - path: own/styles\n",
     );
     package(&root);
     let (code, lines, err) = check(&root)?;
@@ -309,7 +315,7 @@ fn the_vocabularies_of_a_package_and_the_project_add_up() -> TestResult {
 #[test]
 fn a_vocabulary_a_package_names_that_no_package_holds_is_an_error() -> TestResult {
     let suite = Suite::new("package-settings-vocab-unknown");
-    let root = project(&suite, "unknown", "packages:\n  - path: pkg\n");
+    let root = project(&suite, "unknown", "packages:\n  - path: pkg/styles\n");
     root.file("pkg/.ctl/hakkiri.yaml", "vocab: [Nope]\n");
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
@@ -326,7 +332,7 @@ fn a_vocabulary_a_package_names_that_no_package_holds_is_an_error() -> TestResul
 #[test]
 fn a_key_hakkiri_does_not_define_in_a_package_file_names_the_line_and_the_package() -> TestResult {
     let suite = Suite::new("package-settings-unknown");
-    let root = project(&suite, "unknown", "packages:\n  - path: pkg\n");
+    let root = project(&suite, "unknown", "packages:\n  - path: pkg/styles\n");
     root.file(
         "pkg/.ctl/hakkiri.yaml",
         "level: warning\nMinAlertLevel: warning\n",
@@ -346,7 +352,7 @@ fn a_key_hakkiri_does_not_define_in_a_package_file_names_the_line_and_the_packag
 #[test]
 fn a_rule_setting_in_a_package_file_that_names_no_rule_is_an_error() -> TestResult {
     let suite = Suite::new("package-settings-no-rule");
-    let root = project(&suite, "norule", "packages:\n  - path: pkg\n");
+    let root = project(&suite, "norule", "packages:\n  - path: pkg/styles\n");
     root.file(
         "pkg/.ctl/hakkiri.yaml",
         "files:\n  '*.md':\n    styles: [Team]\n    Team.Nope: warning\n",
@@ -366,7 +372,7 @@ fn a_rule_setting_in_a_package_file_that_names_no_rule_is_an_error() -> TestResu
 #[test]
 fn a_package_that_lists_a_path_is_an_error() -> TestResult {
     let suite = Suite::new("package-settings-nested-path");
-    let root = project(&suite, "nested", "packages:\n  - path: pkg\n");
+    let root = project(&suite, "nested", "packages:\n  - path: pkg/styles\n");
     root.file("pkg/.ctl/hakkiri.yaml", "packages:\n  - path: ../own\n");
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
@@ -381,13 +387,50 @@ fn a_package_that_lists_a_path_is_an_error() -> TestResult {
 }
 
 #[test]
-fn a_package_folder_that_holds_the_project_config_does_not_read_it_twice() -> TestResult {
+fn the_project_config_is_not_a_package_top_when_the_styles_sit_in_the_root() -> TestResult {
     let suite = Suite::new("package-settings-self");
     let root = suite.scenario("self");
-    root.file("Team/Filler.yml", FILLER);
+    root.file("styles/Team/Filler.yml", FILLER);
     root.file(
         ".ctl/hakkiri.yaml",
-        "packages:\n  - path: .\nfiles:\n  '*.md': {styles: [Team]}\n",
+        "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Team]}\n",
+    );
+    root.file("a.md", TEXT);
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert_eq!(lines, [very("a.md", "warning"), "1 alert in 1 file".into()]);
+    Ok(())
+}
+
+#[test]
+fn another_config_in_the_root_is_not_a_package_top_either() -> TestResult {
+    let suite = Suite::new("package-settings-other-config");
+    let root = suite.scenario("other");
+    root.file("styles/Team/Filler.yml", FILLER);
+    root.file(
+        "cfg.yaml",
+        "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Team]}\n",
+    );
+    root.file(".ctl/hakkiri.yaml", "NotAKey: 1\n");
+    root.file("a.md", TEXT);
+    let result = run(root.path(), &["check", "--config", "cfg.yaml"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [very("a.md", "warning").as_str(), "1 alert in 1 file"]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_styles_folder_with_another_name_has_no_top() -> TestResult {
+    let suite = Suite::new("package-settings-name");
+    let root = suite.scenario("name");
+    root.file("pkg/rules/Team/Filler.yml", FILLER);
+    root.file("pkg/.ctl/hakkiri.yaml", "NotAKey: 1\n");
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: pkg/rules\nfiles:\n  '*.md': {styles: [Team]}\n",
     );
     root.file("a.md", TEXT);
     let (code, lines, err) = check(&root)?;
@@ -490,12 +533,13 @@ fn answer(mut stream: TcpStream, routes: &Routes) -> std::io::Result<()> {
     stream.flush()
 }
 
-/// A zip with the top folder `Pkg` and, under `Pkg/styles`, each of `files`.
+/// A zip with the top folder `Pkg`, a `styles` folder, and each of `files`
+/// under `Pkg`.
 fn package_zip(files: &[(&str, &str)]) -> Result<Vec<u8>, Box<dyn Error>> {
     let mut writer = zip::ZipWriter::new(Cursor::new(Vec::new()));
-    for (name, text) in files {
+    for (name, text) in std::iter::once(&("styles/.keep", "")).chain(files) {
         writer.start_file(
-            format!("Pkg/styles/{name}"),
+            format!("Pkg/{name}"),
             zip::write::SimpleFileOptions::default(),
         )?;
         writer.write_all(text.as_bytes())?;
@@ -551,7 +595,7 @@ fn listing<'a>(suite: &'a Suite, name: &str, entries: &[&str]) -> Root<'a> {
 fn a_package_a_package_lists_is_fetched_and_its_styles_run() -> TestResult {
     let suite = Suite::new("package-settings-fetched");
     let server = Server::start()?;
-    let base = serve(&server, "/base.zip", &[("Team/Filler.yml", FILLER)])?;
+    let base = serve(&server, "/base.zip", &[("styles/Team/Filler.yml", FILLER)])?;
     let settings = format!("packages:\n  {base}\nfiles:\n  '*.md': {{styles: [Team]}}\n");
     let top = serve(&server, "/top.zip", &[(".ctl/hakkiri.yaml", &settings)])?;
     let root = listing(&suite, "project", &[&top]);
@@ -572,7 +616,7 @@ fn the_settings_of_a_package_override_those_of_the_packages_it_lists() -> TestRe
         &server,
         "/base.zip",
         &[
-            ("Team/Filler.yml", FILLER),
+            ("styles/Team/Filler.yml", FILLER),
             (
                 ".ctl/hakkiri.yaml",
                 "files:\n  '*.md': {styles: [Team], Team.Filler: error}\n",
@@ -599,7 +643,7 @@ fn a_package_named_twice_loads_once() -> TestResult {
         &server,
         "/base.zip",
         &[
-            ("Team/Filler.yml", FILLER),
+            ("styles/Team/Filler.yml", FILLER),
             (".ctl/hakkiri.yaml", "files:\n  '*.md': {styles: [Team]}\n"),
         ],
     )?;
@@ -628,7 +672,7 @@ fn chain<'a>(
         server,
         &format!("/p{length}.zip"),
         &[
-            ("Team/Filler.yml", FILLER),
+            ("styles/Team/Filler.yml", FILLER),
             (".ctl/hakkiri.yaml", "files:\n  '*.md': {styles: [Team]}\n"),
         ],
     )?;

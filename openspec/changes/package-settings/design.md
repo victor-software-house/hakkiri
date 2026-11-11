@@ -68,10 +68,20 @@ B and C lost because a second name for one schema costs a second page in the hel
 
 ### 3. Which keys a package may set, and nested packages
 
-`files`, `level`, `vocab` and `packages`, the keys of the project config, in `.ctl/hakkiri.yaml` inside the package folder.
-The package folder is the folder of styles: the `path` of a project entry, or the `styles` folder of a fetched zip's top folder.
-It sits beside the `config` folder that holds a package's vocabularies, and a folder that starts with `.` is no style, so the file hides from the style walk.
-A package folder that holds the project's own config file, as `path: .` does, does not read it a second time.
+`files`, `level`, `vocab` and `packages`, the keys of the project config, in `.ctl/hakkiri.yaml` in the top folder of the package.
+The top folder is the one that holds `styles`, where Vale keeps a package's `.vale.ini`.
+The operator chose the file from a preview that showed it there (operator, 2026-11-11).
+`config/vocabularies` stays inside `styles`, where Vale keeps it.
+
+hakkiri knows a package by its styles folder, since a `path` entry names one.
+The top folder is therefore the parent of a folder called `styles`: for a fetched zip, the one top folder of the zip.
+A zip whose top folder is itself a style has no folder called `styles`, so it has no top, and it cannot hold a settings file: a `.ctl` folder beside the style would be a second top folder, which the fetch refuses.
+
+For a `path` entry the parent of the folder is a top only when the folder is called `styles` and the parent is neither the project root nor a folder that holds it.
+This tells a package's file from the project's.
+The project's own `.ctl/hakkiri.yaml` sits in the project root, so `path: styles` in a project that keeps its styles in the root has the root as its parent, and the root is never a top.
+The same holds when `--config` names another file and the root holds a different `.ctl/hakkiri.yaml`, and when `path: ..` or a folder above the root would lead to the project.
+A folder with another name, such as `rules`, has no top, since a `path` names no package top.
 Vale applies a package's file as a project's, with only `StylesPath` dropped, so a package may set anything there.
 
 A package's `packages` are fetched, as Vale installs them, and the operator chose that (operator, 2026-11-11).
@@ -94,6 +104,9 @@ A package named twice, by the project and by another package or by two packages,
 Two entries are the same package when they hold the same `sha256`, whatever the `url`, and two `path` entries when they name the same folder.
 
 Order: the nested packages of a package come before it, in the order written, so a package's own settings override those of the packages it lists.
+
+Alternative for the file's place: inside the styles folder, which is where `config` sits.
+It lost because the operator chose the path from a preview that showed the top, and Vale keeps a package's `.vale.ini` there.
 
 Alternative: refuse nested packages.
 It lost to the operator's ruling, and a package such as ProseStyle can name the packages it builds on.

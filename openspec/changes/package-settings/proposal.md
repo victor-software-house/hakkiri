@@ -37,7 +37,7 @@ The operator ruled on 2026-11-11, and the design records each with its alternati
 
 ### New Capabilities
 
-None.
+- `package-settings`: where a package's settings file sits, the packages a package lists, and its vocabularies.
 
 ### Modified Capabilities
 
