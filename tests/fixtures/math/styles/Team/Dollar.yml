@@ -1,0 +1,7 @@
+extends: existence
+message: "Dollar '%s'"
+level: warning
+scope: code
+nonword: true
+tokens:
+  - '\$'

@@ -1,0 +1,34 @@
+Inline $very + really$ math with very.
+
+Money $5 and $10 very today.
+
+Glued US$5 and CA$10 very.
+
+A lone $5 very here.
+
+Space $ very$ after the opener very.
+
+Wrapped $g_i = very
+really$ across very.
+
+Escaped \$5 very and \$10 very.
+
+The bound $a < b$ very.
+
+Code span `$very$` very.
+
+Emphasis inside $a *very* b$ here very.
+
+Two $a$ and $b very$ spans very.
+
+Digit after $a$5 very then $b$ very.
+
+# Heading with $very$ math very
+
+| Cell | Other |
+|:--|:--|
+| $very$ cell very | plain very |
+
+A start $x$ end join.
+
+A start $x very$end join.

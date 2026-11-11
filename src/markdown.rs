@@ -8,6 +8,7 @@ use markdown::{Constructs, MdxSignal, ParseOptions};
 use tree_sitter::{InputEdit, Node as SyntaxNode, Parser, Point, Tree};
 
 use crate::error::Error;
+use crate::math;
 use crate::tree::{Comment, Node, Scope};
 
 /// Which constructs the parser reads.
@@ -203,12 +204,30 @@ pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
 /// The prose nodes of `source`, its number of code blocks, and the HTML
 /// comments of a Markdown file.
 pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
-    let root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
+    let mut root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
+    // Vale reads math as code, which markdown-rs reads by other rules, so the
+    // text is parsed again with each math span marked as code.
+    let masked;
+    let mut spans = Vec::new();
+    let source = if matches!(flavor, Flavor::Comment) {
+        source
+    } else {
+        let math = math::find(&root, source, matches!(flavor, Flavor::Mdx));
+        if math.is_empty() {
+            source
+        } else {
+            masked = math::mask(source, &math);
+            root = markdown::to_mdast(&masked, &flavor.options()).map_err(Error::Mdx)?;
+            spans = math.inline;
+            &masked
+        }
+    };
     let builder = Builder {
         source,
         code_blocks: Cell::new(0),
     };
-    let nodes = builder.visit(&root, Scope::TableCell).nodes;
+    let mut nodes = builder.visit(&root, Scope::TableCell).nodes;
+    math::include_delimiters(&mut nodes, &spans);
     let comments = match flavor {
         Flavor::Markdown | Flavor::Mdx => comments_of(&root, source),
         Flavor::Comment => Vec::new(),

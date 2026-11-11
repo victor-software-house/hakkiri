@@ -268,6 +268,7 @@ queue:
       - Text and sentence rules report nothing inside a $…$ span, and a code rule reports it, with the alerts Vale 66bbb85 gives on the probe file in tests/fixtures/markup-differences.
     notes:
       - '2026-11-11, found while probing comment controls: Vale reads $very + really$ as a code span, and hakkiri reads it as text, so a text rule flags it. The probe is tests/fixtures/markup-differences/text/m1.md.'
+    plan: openspec/changes/math-code/proposal.md
 
   - id: HKR-049
     title: Lint front matter values

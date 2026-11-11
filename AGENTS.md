@@ -44,6 +44,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    An HTML comment of a Markdown file, or a `{/* */}` comment of an MDX file, turns rules off and on with Vale's reach (row `HKR-031`, operator, 2026-11-11).  
    The forms are `hakkiri off` and `on`, `hakkiri Style.Rule: off` and `on`, a level, and Vale's own.  
    `src/control.rs` reads the comments, leaves the text between `off` and `on` out of the tree, gates each block when its element ends, and drops an alert that lies between two comments.  
+   Math reads as code by Pandoc's rules, as in Vale: `src/math.rs` finds each `$…$` span and `$$…$$` block, masks the file at the same length, and parses it again (row `HKR-048`).  
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
    Vale matches the path as given; the departure is in the `vale-differences` spec.
 6. **Exit status.**

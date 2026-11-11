@@ -17,7 +17,7 @@ A project that moves from Vale to hakkiri has no way to say the same, so it eith
 - Each match of a token pattern is read as a code span that holds the first group.
 - The patterns of every glob that matches a file apply, a package's first and then the project's, so a project adds to a package.
 - The Markdown of a source file's comment takes the patterns too, where Vale applies none to a comment it reads as plain lines.
-- The differences from Vale go in the `vale-differences` spec, three more that the probe found among them: math, front matter values and a sentence rule in a comment.
+- The differences from Vale go in the `vale-differences` spec, two more that the probe found among them: front matter values and a sentence rule in a comment.
 
 ## Capabilities
 

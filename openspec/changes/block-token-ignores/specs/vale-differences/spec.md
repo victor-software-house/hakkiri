@@ -39,14 +39,9 @@ hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart
 - **WHEN** a glob that matches a Rust, TypeScript or JavaScript file lists a block or token pattern
 - **THEN** hakkiri applies it to the Markdown of each comment, and Vale applies none, since it reads a comment as plain lines ([block-token-ignores 3][block-token-ignores-3])
 
-### Requirement: Math, front matter and comment sentences are read otherwise than Vale reads them
+### Requirement: Front matter and comment sentences are read otherwise than Vale reads them
 
 hakkiri SHALL list here the places where it reads a file otherwise than Vale at 66bbb85, found while probing the ignores and the comment controls.
-
-#### Scenario: Math in a Markdown file
-
-- **WHEN** a paragraph holds `$very + really$` and a `code` rule flags `very`
-- **THEN** hakkiri reads the span as text, so a text rule flags it and a code rule does not, and Vale reads it as a code span (row [HKR-048][ledger], [block-token-ignores 5][block-token-ignores-5])
 
 #### Scenario: Front matter values
 

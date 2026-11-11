@@ -22,6 +22,7 @@ mod ignore;
 mod jsdoc;
 mod language;
 mod markdown;
+mod math;
 mod metric;
 pub mod pattern;
 pub mod readability;

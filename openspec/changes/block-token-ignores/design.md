@@ -59,9 +59,9 @@ The globs that match a file add their patterns in the order written, where Vale 
 
 ### 5. Three reads that differ from Vale's
 
-The probe of the comment controls showed three more places where hakkiri reads a file otherwise than Vale (2026-11-11, `tests/fixtures/markup-differences`):
+The probe of the comment controls showed three more places where hakkiri read a file otherwise than Vale (2026-11-11, `tests/fixtures/markup-differences`):
 
-- Vale reads `$very + really$` as a code span, so a `code` rule flags `very` and a text rule does not. hakkiri reads it as text, which is worse, and `HKR-048` queues it.
+- Vale reads `$very + really$` as a code span, so a `code` rule flags `very` and a text rule does not. hakkiri read it as text, which was worse, and the `math-code` change of `HKR-048` fixes it.
 - Vale flags `very` in the value of `title: very front` in a front matter block. hakkiri skips the block, which misses what Vale reports, and `HKR-049` queues it. Which keys Vale lints is not measured.
 - Vale runs no `sentence` rule on a comment of a source file, and hakkiri does, since it reads the comment as Markdown. That finds more, so no row is queued.
 

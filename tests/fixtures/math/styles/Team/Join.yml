@@ -1,0 +1,6 @@
+extends: existence
+message: "Join '%s'"
+level: warning
+scope: text
+tokens:
+  - 'start\s+end'
