@@ -63,6 +63,11 @@ pub(crate) struct Memory {
 /// The matches `check` finds in `text`, the next block of a file whose earlier
 /// blocks `memory` holds and whose extension, without the dot, is `extension`.
 ///
+/// `accepted` holds the exceptions of the vocabularies the file's globs name.
+/// An `existence`, `repetition`, `spelling` or `substitution` rule holds back
+/// the matches they name, besides its own exceptions, whatever it sets for
+/// `vocab` and `nonword`.
+///
 /// # Errors
 ///
 /// Returns a [`SearchError`] when a pattern gives up on the text.
@@ -71,26 +76,27 @@ pub(crate) fn run(
     text: &Text,
     memory: &mut Memory,
     extension: &str,
+    accepted: &[&Exceptions],
 ) -> Result<Vec<Hit>, SearchError> {
     match check {
-        Check::Existence(existence) => run_existence(existence, text),
-        Check::Substitution(substitution) => run_substitution(substitution, text),
+        Check::Existence(existence) => run_existence(existence, text, accepted),
+        Check::Substitution(substitution) => run_substitution(substitution, text, accepted),
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
         Check::Metric(metric) => run_metric(metric, text),
         Check::Consistency(consistency) => run_consistency(consistency, text, memory),
         Check::Conditional(conditional) => run_conditional(conditional, text, memory),
-        Check::Repetition(repetition) => run_repetition(repetition, text),
+        Check::Repetition(repetition) => run_repetition(repetition, text, accepted),
         Check::Readability(readability) => Ok(run_readability(readability, text)),
         Check::Capitalization(capitalization) => Ok(run_capitalization(capitalization, text)),
         Check::Sequence(sequence) => run_sequence(sequence, text),
-        Check::Spelling(spelling) => Ok(run_spelling(spelling, text, extension)),
+        Check::Spelling(spelling) => Ok(run_spelling(spelling, text, extension, accepted)),
     }
 }
 
 /// The spans of the multi-word exceptions in a text, ready to ask whether a
 /// range lies inside one.
 #[derive(Debug, Default)]
-struct PhraseSpans {
+pub(crate) struct PhraseSpans {
     /// The start of each span, in order.
     starts: Vec<usize>,
     /// For each span, the furthest end among it and the spans before it.
@@ -159,12 +165,46 @@ fn excepted(
     Ok(phrases.hold(range))
 }
 
+/// The spans of the multi-word terms of each of a file's accepted exceptions in
+/// `content`, when `found` holds a match to check them against.
+pub(crate) fn accepted_spans(
+    accepted: &[&Exceptions],
+    content: &str,
+    found: bool,
+) -> Result<Vec<PhraseSpans>, SearchError> {
+    accepted
+        .iter()
+        .map(|exceptions| phrase_spans(exceptions, content, found))
+        .collect()
+}
+
+/// Whether one of a file's accepted exceptions holds back the match `range`,
+/// which reads `observed`.
+pub(crate) fn accepted_hold(
+    accepted: &[&Exceptions],
+    spans: &[PhraseSpans],
+    range: &Range<usize>,
+    observed: &str,
+) -> Result<bool, SearchError> {
+    for (exceptions, phrases) in accepted.iter().zip(spans) {
+        if excepted(exceptions, phrases, range, observed)? {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
 /// Each match of the tokens that no exception holds back and no code span
 /// overlaps.
-fn run_existence(existence: &Existence, text: &Text) -> Result<Vec<Hit>, SearchError> {
+fn run_existence(
+    existence: &Existence,
+    text: &Text,
+    accepted: &[&Exceptions],
+) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
     let found = existence.pattern.find_all(content)?;
     let phrases = phrase_spans(&existence.exceptions, content, !found.is_empty())?;
+    let held = accepted_spans(accepted, content, !found.is_empty())?;
     let mut hits = Vec::new();
     for range in found {
         if text.overlaps_code(&range) {
@@ -173,7 +213,9 @@ fn run_existence(existence: &Existence, text: &Text) -> Result<Vec<Hit>, SearchE
         let Some(matched) = content.get(range.clone()) else {
             continue;
         };
-        if excepted(&existence.exceptions, &phrases, &range, matched.trim())? {
+        if excepted(&existence.exceptions, &phrases, &range, matched.trim())?
+            || accepted_hold(accepted, &held, &range, matched.trim())?
+        {
             continue;
         }
         hits.push(Hit {
@@ -187,10 +229,15 @@ fn run_existence(existence: &Existence, text: &Text) -> Result<Vec<Hit>, SearchE
 }
 
 /// Each match of a swap key that is not already in the form of its value.
-fn run_substitution(substitution: &Substitution, text: &Text) -> Result<Vec<Hit>, SearchError> {
+fn run_substitution(
+    substitution: &Substitution,
+    text: &Text,
+    accepted: &[&Exceptions],
+) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
     let found = substitution.pattern.find_groups(content, Swap::GROUP)?;
     let phrases = phrase_spans(&substitution.exceptions, content, !found.is_empty())?;
+    let held = accepted_spans(accepted, content, !found.is_empty())?;
     let mut forms = HashMap::new();
     let mut hits = Vec::new();
     for (index, range) in found {
@@ -211,6 +258,7 @@ fn run_substitution(substitution: &Substitution, text: &Text) -> Result<Vec<Hit>
         }
         if in_form(&mut forms, &expected, observed)?
             || excepted(&substitution.exceptions, &phrases, &range, observed)?
+            || accepted_hold(accepted, &held, &range, observed)?
         {
             continue;
         }
@@ -465,7 +513,11 @@ fn same(repetition: &Repetition, before: &str, current: &str) -> bool {
 /// repeat that spans more than one sentence, or that an exception holds back,
 /// is no hit. A match that overlaps a code span is no match, and it breaks the
 /// chain: the match after it has nothing before it to repeat.
-fn run_repetition(repetition: &Repetition, text: &Text) -> Result<Vec<Hit>, SearchError> {
+fn run_repetition(
+    repetition: &Repetition,
+    text: &Text,
+    accepted: &[&Exceptions],
+) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
     let found = repetition.pattern.find_all(content)?;
     // The sentence model is embedded and loads; without it no span could be
@@ -474,6 +526,7 @@ fn run_repetition(repetition: &Repetition, text: &Text) -> Result<Vec<Hit>, Sear
         return Ok(Vec::new());
     };
     let mut phrases: Option<PhraseSpans> = None;
+    let mut accepted_held: Option<Vec<PhraseSpans>> = None;
     let mut hits = Vec::new();
     let mut before: Option<(usize, &str)> = None;
     let mut count = 0_usize;
@@ -508,7 +561,13 @@ fn run_repetition(repetition: &Repetition, text: &Text) -> Result<Vec<Hit>, Sear
                     Some(held) => held,
                     None => phrases.insert(phrase_spans(&repetition.exceptions, content, true)?),
                 };
-                if !excepted(&repetition.exceptions, held, &span, spanned)? {
+                let accepted_phrases = match &accepted_held {
+                    Some(held) => held,
+                    None => accepted_held.insert(accepted_spans(accepted, content, true)?),
+                };
+                if !excepted(&repetition.exceptions, held, &span, spanned)?
+                    && !accepted_hold(accepted, accepted_phrases, &span, spanned)?
+                {
                     hits.push(Hit {
                         message: None,
                         range: span,

@@ -1,0 +1,5 @@
+extends: existence
+message: "Remove '%s'."
+level: warning
+tokens: [really, GitHub, harness, mea, culpa, kubectl, API, Zebra]
+vocab: false

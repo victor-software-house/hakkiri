@@ -79,6 +79,7 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 1. Exit 2 with a config error: the message names the file, the line and the key. Fix the config first, because no file was linted.
    A message that names a package `url` means the download failed a check: the server did not answer, the zip does not match its `sha256`, or it is not a package.
    Check the `url` and the `sha256`, and set `--cache-dir` when the default cache folder is read-only.
+   A message that names a `vocab` entry means no package holds that vocabulary, two packages hold it, or a term in its lists is not a pattern.
    A folder named `.unpacking-` and a suffix in the cache is left by a killed run: delete it when no hakkiri run is using the cache.
 2. Exit 2 with `failed <path>`: that file could not be read or parsed. The other files were linted.
    Exit 2 with `no path given lies under the project root`: the config names another root than the files you gave. Check `--config` and `HAKKIRI_CONFIG`.

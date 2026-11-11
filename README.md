@@ -22,6 +22,7 @@ An editor server follows in the second release.
 - Each source language has a profile that knows where its prose lives and in what syntax: Markdown in every comment, plus TSDoc and JSDoc tags.  
   String literals are never read as prose.
 - A project pins rule packages by version and hash in `.ctl/hakkiri.yaml`; hakkiri fetches and caches them.
+- A package's vocabularies hold back the matches of the words a project accepts, at the top level or for a glob.
 - Files are checked in parallel.
 
 ## Install

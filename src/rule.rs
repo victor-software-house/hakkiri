@@ -33,7 +33,7 @@ use self::schema::{
 };
 use crate::dictionary::Speller;
 use crate::formula::Formula;
-use crate::pattern::Pattern;
+use crate::pattern::{Pattern, PatternError};
 use crate::scope::Selector;
 use crate::strcase::{Sentence, Title};
 
@@ -148,6 +148,18 @@ pub struct Exceptions {
     /// The `exceptions` of more than one word, each as a pattern of its own: a
     /// match inside a match of one is held back.
     pub phrases: Vec<Pattern>,
+}
+
+impl Exceptions {
+    /// The exceptions that hold back a match of one of `terms`, each a plain
+    /// term or a pattern, as a rule's `exceptions` do.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`PatternError`] when a term is not a pattern.
+    pub fn of(terms: &[String]) -> Result<Self, PatternError> {
+        build::exceptions_of(terms)
+    }
 }
 
 /// An `existence` rule.
@@ -481,6 +493,12 @@ pub struct Spelling {
     pub speller: Speller,
     /// The `filters`: a word that one matches is skipped.
     pub filters: Vec<Pattern>,
+    /// The accepted terms of the project's vocabularies as whole words matched
+    /// without regard to case: a word that matches is skipped.
+    pub accepted: Option<Pattern>,
+    /// The multi-word accepted terms, which are masked before the words are
+    /// read.
+    pub masks: Option<Pattern>,
     /// Whether the built-in filters skip names and codes: the rule does not set
     /// `custom`.
     pub standard: bool,
@@ -582,7 +600,7 @@ impl Rule {
     /// the wrong kind, and a feature hakkiri does not run. A pattern that does
     /// not compile is refused, and so is a pattern with nothing to match.
     pub fn from_text(name: &str, file: &str, text: &str) -> Result<Self, LoadError> {
-        Self::read(name, file, text, None, &[])
+        Self::read(name, file, text, None, &[], &[])
     }
 
     /// Reads one rule from the text of its file, in the package `package`.
@@ -602,7 +620,14 @@ impl Rule {
         text: &str,
         package: &Path,
     ) -> Result<Self, LoadError> {
-        Self::read(name, file, text, Some(package), &[package.to_path_buf()])
+        Self::read(
+            name,
+            file,
+            text,
+            Some(package),
+            &[package.to_path_buf()],
+            &[],
+        )
     }
 
     /// Reads one rule from the text of its file, in the package `package`,
@@ -623,14 +648,17 @@ impl Rule {
     /// They are also an edit of a field the parent lacks, and a `Vale.` parent.
     /// A rule read through a parent names no line, since the merged text has
     /// none.
+    /// `accepted` holds the accepted terms of the project's vocabularies, which
+    /// the checks that read them take as exceptions.
     pub fn from_text_searching(
         name: &str,
         file: &str,
         text: &str,
         package: &Path,
         search: &[PathBuf],
+        accepted: &[String],
     ) -> Result<Self, LoadError> {
-        Self::read(name, file, text, Some(package), search)
+        Self::read(name, file, text, Some(package), search, accepted)
     }
 
     fn read(
@@ -639,6 +667,7 @@ impl Rule {
         text: &str,
         package: Option<&Path>,
         search: &[PathBuf],
+        accepted: &[String],
     ) -> Result<Self, LoadError> {
         let input = Input::new(file, text);
         let probe: Probe = input.load().map_err(|error| at_tab(error, text))?;
@@ -648,9 +677,9 @@ impl Rule {
             let probe: Probe = input
                 .load()
                 .map_err(|error| unplaced(LoadError::from(error)))?;
-            return Self::build(name, file, package, &probe, &input).map_err(unplaced);
+            return Self::build(name, file, package, accepted, &probe, &input).map_err(unplaced);
         }
-        Self::build(name, file, package, &probe, &input)
+        Self::build(name, file, package, accepted, &probe, &input)
     }
 
     /// The rule `probe` and `input` hold, once its `extends` is a check type.
@@ -658,6 +687,7 @@ impl Rule {
         name: &str,
         file: &str,
         package: Option<&Path>,
+        accepted: &[String],
         probe: &Probe,
         input: &Input,
     ) -> Result<Self, LoadError> {
@@ -665,6 +695,7 @@ impl Rule {
             name,
             file,
             package,
+            accepted,
         };
         if let Some(reason) = unrunnable(probe, input)? {
             return Err(LoadError {
@@ -897,6 +928,8 @@ fn problem(file: &str, message: String) -> LoadProblem {
 /// A rule whose `extends` names another rule looks it up in the package
 /// folders `search`.
 /// The rules come in the order of the walk.
+/// `accepted` holds the accepted terms of the project's vocabularies, which the
+/// checks that read them take as exceptions.
 ///
 /// # Errors
 ///
@@ -904,7 +937,11 @@ fn problem(file: &str, message: String) -> LoadProblem {
 /// failure to read a folder.
 /// A fault in a name is not one: [`Style::names`] holds it, and a rule that
 /// hakkiri cannot run is not one: [`Style::unrunnable`] holds it.
-pub fn read_style(folder: &Path, search: &[PathBuf]) -> Result<Style, LoadError> {
+pub fn read_style(
+    folder: &Path,
+    search: &[PathBuf],
+    accepted: &[String],
+) -> Result<Style, LoadError> {
     let unread = |file: &Path, message: String| LoadError {
         problems: vec![problem(&file.display().to_string(), message)],
     };
@@ -946,7 +983,9 @@ pub fn read_style(folder: &Path, search: &[PathBuf]) -> Result<Style, LoadError>
             .map_err(|error| LoadError {
                 problems: vec![problem(&file, error.to_string())],
             })
-            .and_then(|text| Rule::from_text_searching(&name, &file, &text, package, search));
+            .and_then(|text| {
+                Rule::from_text_searching(&name, &file, &text, package, search, accepted)
+            });
         match read {
             Ok(rule) => {
                 // The later file wins, as in Vale: it replaces an earlier
@@ -993,7 +1032,7 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
         .parent()
         .filter(|parent| !parent.as_os_str().is_empty())
         .unwrap_or_else(|| Path::new("."));
-    let style = read_style(folder, &[package.to_path_buf()])?;
+    let style = read_style(folder, &[package.to_path_buf()], &[])?;
     let mut problems = style.names;
     problems.extend(style.unrunnable.into_iter().map(|rule| LoadProblem {
         file: rule.file,

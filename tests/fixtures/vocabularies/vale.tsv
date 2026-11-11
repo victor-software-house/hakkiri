@@ -1,0 +1,293 @@
+none	text/f1.md	1	5	10	warning	Team.Filler	Remove 'GitHub'.	GitHub
+none	text/f1.md	1	5	10	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+none	text/f1.md	1	5	10	warning	Team.Raw	Raw 'GitHub'.	GitHub
+none	text/f1.md	1	16	22	warning	Team.Filler	Remove 'harness'.	harness
+none	text/f1.md	1	16	22	warning	Team.Filler0	Remove 'harness'.	harness
+none	text/f1.md	1	16	22	warning	Team.Swap	Use 'use' instead of 'harness'.	harness
+none	text/f1.md	1	16	22	warning	Team.Swap0	Use 'use' instead of 'harness'.	harness
+none	text/f1.md	1	29	31	warning	Team.Filler	Remove 'mea'.	mea
+none	text/f1.md	1	29	31	warning	Team.Filler0	Remove 'mea'.	mea
+none	text/f1.md	1	29	31	error	Team.Spell	Did you really mean 'mea'?	mea
+none	text/f1.md	1	33	37	warning	Team.Filler	Remove 'culpa'.	culpa
+none	text/f1.md	1	33	37	warning	Team.Filler0	Remove 'culpa'.	culpa
+none	text/f1.md	1	51	53	warning	Team.Filler	Remove 'mea'.	mea
+none	text/f1.md	1	51	53	warning	Team.Filler0	Remove 'mea'.	mea
+none	text/f1.md	1	51	53	error	Team.Spell	Did you really mean 'mea'?	mea
+none	text/f1.md	1	62	68	warning	Team.Odd	Odd 'Nodexjs'.	Nodexjs
+none	text/f1.md	1	62	68	error	Team.Spell	Did you really mean 'Nodexjs'?	Nodexjs
+none	text/f1.md	1	87	95	error	Team.Spell	Did you really mean 'nocomment'?	nocomment
+none	text/f1.md	3	1	6	warning	Team.Filler	Remove 'GitHub'.	GitHub
+none	text/f1.md	3	1	6	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+none	text/f1.md	3	1	6	warning	Team.Raw	Raw 'GitHub'.	GitHub
+none	text/f1.md	3	21	25	warning	Team.Filler	Remove 'Zebra'.	Zebra
+none	text/f1.md	3	21	25	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+none	text/f2.md	1	8	14	warning	Team.Filler	Remove 'kubectl'.	kubectl
+none	text/f2.md	1	8	14	warning	Team.Filler0	Remove 'kubectl'.	kubectl
+none	text/f2.md	1	8	22	warning	Team.Repeat	'kubectl' is repeated!	kubectl kubectl
+none	text/f2.md	1	8	22	warning	Team.Repeat0	'kubectl' is repeated!	kubectl kubectl
+none	text/f2.md	1	16	22	warning	Team.Filler	Remove 'kubectl'.	kubectl
+none	text/f2.md	1	16	22	warning	Team.Filler0	Remove 'kubectl'.	kubectl
+none	text/f2.md	1	28	36	warning	Team.Repeat	'that' is repeated!	that that
+none	text/f2.md	1	28	36	warning	Team.Repeat0	'that' is repeated!	that that
+none	text/f2.md	1	42	47	warning	Team.Filler	Remove 'GitHub'.	GitHub
+none	text/f2.md	1	42	47	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+none	text/f2.md	1	42	47	warning	Team.Raw	Raw 'GitHub'.	GitHub
+none	text/f2.md	1	42	54	warning	Team.Repeat	'GitHub' is repeated!	GitHub GitHub
+none	text/f2.md	1	42	54	warning	Team.Repeat0	'GitHub' is repeated!	GitHub GitHub
+none	text/f2.md	1	49	54	warning	Team.Filler	Remove 'GitHub'.	GitHub
+none	text/f2.md	1	49	54	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+none	text/f2.md	1	49	54	warning	Team.Raw	Raw 'GitHub'.	GitHub
+none	text/f3.md	1	4	10	warning	Team.Filler	Remove 'harness'.	harness
+none	text/f3.md	1	4	10	warning	Team.Filler0	Remove 'harness'.	harness
+none	text/f3.md	1	4	10	warning	Team.Swap	Use 'use' instead of 'harness'.	harness
+none	text/f3.md	1	4	10	warning	Team.Swap0	Use 'use' instead of 'harness'.	harness
+none	text/f3.md	1	16	22	warning	Team.Cond	'HARNESS' has no definition.	HARNESS
+none	text/f3.md	1	16	22	warning	Team.Cond0	'HARNESS' has no definition.	HARNESS
+none	text/f3.md	1	16	22	warning	Team.Swap	Use 'use' instead of 'HARNESS'.	HARNESS
+none	text/f3.md	1	16	22	warning	Team.Swap0	Use 'use' instead of 'HARNESS'.	HARNESS
+none	text/f3.md	1	31	39	warning	Team.Swap	Use 'use' instead of 'harnesses'.	harnesses
+none	text/f3.md	1	31	39	warning	Team.Swap0	Use 'use' instead of 'harnesses'.	harnesses
+none	text/f3.md	1	49	51	error	Team.Spell	Did you really mean 'teh'?	teh
+none	text/f3.md	1	49	51	warning	Team.Swap	Use 'the' instead of 'teh'.	teh
+none	text/f3.md	1	49	51	warning	Team.Swap0	Use 'the' instead of 'teh'.	teh
+none	text/f4.md	1	5	7	warning	Team.Cond	'SDK' has no definition.	SDK
+none	text/f4.md	1	5	7	warning	Team.Cond0	'SDK' has no definition.	SDK
+none	text/f4.md	1	17	19	warning	Team.Cond	'API' has no definition.	API
+none	text/f4.md	1	17	19	warning	Team.Cond0	'API' has no definition.	API
+none	text/f4.md	1	17	19	warning	Team.Filler	Remove 'API'.	API
+none	text/f4.md	1	17	19	warning	Team.Filler0	Remove 'API'.	API
+none	text/f5.md	1	3	39	warning	Team.Sentence	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+none	text/f5.md	1	3	39	warning	Team.Sentence0	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+none	text/f5.md	1	3	39	warning	Team.SentenceOwn	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+none	text/f5.md	3	3	30	warning	Team.Sentence	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+none	text/f5.md	3	3	30	warning	Team.Sentence0	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+none	text/f5.md	5	3	34	warning	Team.Sentence	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+none	text/f5.md	5	3	34	warning	Team.Sentence0	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+none	text/f6.md	1	5	11	warning	Team.Filler	Remove 'kubectl'.	kubectl
+none	text/f6.md	1	5	11	warning	Team.Filler0	Remove 'kubectl'.	kubectl
+none	text/f6.md	1	17	23	error	Team.Spell	Did you really mean 'kubectx'?	kubectx
+none	text/f6.md	1	34	36	warning	Team.Filler	Remove 'mea'.	mea
+none	text/f6.md	1	34	36	warning	Team.Filler0	Remove 'mea'.	mea
+none	text/f6.md	1	34	36	error	Team.Spell	Did you really mean 'mea'?	mea
+none	text/f6.md	1	38	42	warning	Team.Filler	Remove 'culpa'.	culpa
+none	text/f6.md	1	38	42	warning	Team.Filler0	Remove 'culpa'.	culpa
+none	text/f6.md	1	56	58	warning	Team.Filler	Remove 'mea'.	mea
+none	text/f6.md	1	56	58	warning	Team.Filler0	Remove 'mea'.	mea
+none	text/f6.md	1	56	58	error	Team.Spell	Did you really mean 'mea'?	mea
+none	text/f6.md	1	67	73	warning	Team.Cond	'KUBECTL' has no definition.	KUBECTL
+none	text/f6.md	1	67	73	warning	Team.Cond0	'KUBECTL' has no definition.	KUBECTL
+none	text/f6.md	1	81	85	error	Team.Spell	Did you really mean 'Zorbl'?	Zorbl
+none	text/f6.md	1	88	92	error	Team.Spell	Did you really mean 'zorbl'?	zorbl
+none	text/f6.md	1	98	102	warning	Team.Cond	'ZORBL' has no definition.	ZORBL
+none	text/f6.md	1	98	102	warning	Team.Cond0	'ZORBL' has no definition.	ZORBL
+none	text/f7.md	1	8	12	warning	Team.Filler	Remove 'Zebra'.	Zebra
+none	text/f7.md	1	8	12	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+none	text/f7.md	1	18	23	warning	Team.Filler	Remove 'GitHub'.	GitHub
+none	text/f7.md	1	18	23	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+none	text/f7.md	1	18	23	warning	Team.Raw	Raw 'GitHub'.	GitHub
+none	text/f8.md	1	5	7	warning	Team.Filler	Remove 'mea'.	mea
+none	text/f8.md	1	5	7	warning	Team.Filler0	Remove 'mea'.	mea
+none	text/f8.md	1	5	7	error	Team.Spell	Did you really mean 'mea'?	mea
+none	text/f8.md	2	1	5	warning	Team.Filler	Remove 'culpa'.	culpa
+none	text/f8.md	2	1	5	warning	Team.Filler0	Remove 'culpa'.	culpa
+none	text/f8.md	2	20	22	warning	Team.Filler	Remove 'mea'.	mea
+none	text/f8.md	2	20	22	warning	Team.Filler0	Remove 'mea'.	mea
+none	text/f8.md	2	20	22	error	Team.Spell	Did you really mean 'mea'?	mea
+top	text/f1.md	1	5	10	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+top	text/f1.md	1	5	10	warning	Team.Raw	Raw 'GitHub'.	GitHub
+top	text/f1.md	1	16	22	warning	Team.Filler0	Remove 'harness'.	harness
+top	text/f1.md	1	16	22	warning	Team.Swap0	Use 'use' instead of 'harness'.	harness
+top	text/f1.md	1	29	31	warning	Team.Filler0	Remove 'mea'.	mea
+top	text/f1.md	1	33	37	warning	Team.Filler0	Remove 'culpa'.	culpa
+top	text/f1.md	1	51	53	warning	Team.Filler	Remove 'mea'.	mea
+top	text/f1.md	1	51	53	warning	Team.Filler0	Remove 'mea'.	mea
+top	text/f1.md	1	51	53	error	Team.Spell	Did you really mean 'mea'?	mea
+top	text/f1.md	1	62	68	warning	Team.Odd	Odd 'Nodexjs'.	Nodexjs
+top	text/f1.md	1	62	68	error	Team.Spell	Did you really mean 'Nodexjs'?	Nodexjs
+top	text/f1.md	1	87	95	error	Team.Spell	Did you really mean 'nocomment'?	nocomment
+top	text/f1.md	3	1	6	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+top	text/f1.md	3	1	6	warning	Team.Raw	Raw 'GitHub'.	GitHub
+top	text/f1.md	3	21	25	warning	Team.Filler	Remove 'Zebra'.	Zebra
+top	text/f1.md	3	21	25	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+top	text/f2.md	1	8	14	warning	Team.Filler0	Remove 'kubectl'.	kubectl
+top	text/f2.md	1	8	22	warning	Team.Repeat0	'kubectl' is repeated!	kubectl kubectl
+top	text/f2.md	1	16	22	warning	Team.Filler0	Remove 'kubectl'.	kubectl
+top	text/f2.md	1	28	36	warning	Team.Repeat	'that' is repeated!	that that
+top	text/f2.md	1	28	36	warning	Team.Repeat0	'that' is repeated!	that that
+top	text/f2.md	1	42	47	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+top	text/f2.md	1	42	47	warning	Team.Raw	Raw 'GitHub'.	GitHub
+top	text/f2.md	1	42	54	warning	Team.Repeat0	'GitHub' is repeated!	GitHub GitHub
+top	text/f2.md	1	49	54	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+top	text/f2.md	1	49	54	warning	Team.Raw	Raw 'GitHub'.	GitHub
+top	text/f3.md	1	4	10	warning	Team.Filler0	Remove 'harness'.	harness
+top	text/f3.md	1	4	10	warning	Team.Swap0	Use 'use' instead of 'harness'.	harness
+top	text/f3.md	1	16	22	warning	Team.Cond	'HARNESS' has no definition.	HARNESS
+top	text/f3.md	1	16	22	warning	Team.Cond0	'HARNESS' has no definition.	HARNESS
+top	text/f3.md	1	16	22	warning	Team.Swap	Use 'use' instead of 'HARNESS'.	HARNESS
+top	text/f3.md	1	16	22	warning	Team.Swap0	Use 'use' instead of 'HARNESS'.	HARNESS
+top	text/f3.md	1	31	39	warning	Team.Swap0	Use 'use' instead of 'harnesses'.	harnesses
+top	text/f3.md	1	49	51	error	Team.Spell	Did you really mean 'teh'?	teh
+top	text/f3.md	1	49	51	warning	Team.Swap	Use 'the' instead of 'teh'.	teh
+top	text/f3.md	1	49	51	warning	Team.Swap0	Use 'the' instead of 'teh'.	teh
+top	text/f4.md	1	5	7	warning	Team.Cond	'SDK' has no definition.	SDK
+top	text/f4.md	1	5	7	warning	Team.Cond0	'SDK' has no definition.	SDK
+top	text/f4.md	1	17	19	warning	Team.Cond0	'API' has no definition.	API
+top	text/f4.md	1	17	19	warning	Team.Filler0	Remove 'API'.	API
+top	text/f5.md	1	3	39	warning	Team.Sentence0	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+top	text/f5.md	3	3	30	warning	Team.Sentence	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+top	text/f5.md	3	3	30	warning	Team.Sentence0	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+top	text/f5.md	5	3	34	warning	Team.Sentence0	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+top	text/f6.md	1	5	11	warning	Team.Filler0	Remove 'kubectl'.	kubectl
+top	text/f6.md	1	17	23	error	Team.Spell	Did you really mean 'kubectx'?	kubectx
+top	text/f6.md	1	34	36	warning	Team.Filler0	Remove 'mea'.	mea
+top	text/f6.md	1	38	42	warning	Team.Filler0	Remove 'culpa'.	culpa
+top	text/f6.md	1	56	58	warning	Team.Filler	Remove 'mea'.	mea
+top	text/f6.md	1	56	58	warning	Team.Filler0	Remove 'mea'.	mea
+top	text/f6.md	1	56	58	error	Team.Spell	Did you really mean 'mea'?	mea
+top	text/f6.md	1	67	73	warning	Team.Cond	'KUBECTL' has no definition.	KUBECTL
+top	text/f6.md	1	67	73	warning	Team.Cond0	'KUBECTL' has no definition.	KUBECTL
+top	text/f6.md	1	98	102	warning	Team.Cond	'ZORBL' has no definition.	ZORBL
+top	text/f6.md	1	98	102	warning	Team.Cond0	'ZORBL' has no definition.	ZORBL
+top	text/f7.md	1	8	12	warning	Team.Filler	Remove 'Zebra'.	Zebra
+top	text/f7.md	1	8	12	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+top	text/f7.md	1	18	23	warning	Team.Filler0	Remove 'GitHub'.	GitHub
+top	text/f7.md	1	18	23	warning	Team.Raw	Raw 'GitHub'.	GitHub
+top	text/f8.md	1	5	7	warning	Team.Filler0	Remove 'mea'.	mea
+top	text/f8.md	2	1	5	warning	Team.Filler0	Remove 'culpa'.	culpa
+top	text/f8.md	2	20	22	warning	Team.Filler	Remove 'mea'.	mea
+top	text/f8.md	2	20	22	warning	Team.Filler0	Remove 'mea'.	mea
+top	text/f8.md	2	20	22	error	Team.Spell	Did you really mean 'mea'?	mea
+glob	text/f1.md	1	51	53	warning	Team.Filler	Remove 'mea'.	mea
+glob	text/f1.md	1	51	53	warning	Team.Filler0	Remove 'mea'.	mea
+glob	text/f1.md	1	51	53	error	Team.Spell	Did you really mean 'mea'?	mea
+glob	text/f1.md	1	62	68	warning	Team.Odd	Odd 'Nodexjs'.	Nodexjs
+glob	text/f1.md	1	62	68	error	Team.Spell	Did you really mean 'Nodexjs'?	Nodexjs
+glob	text/f1.md	1	87	95	error	Team.Spell	Did you really mean 'nocomment'?	nocomment
+glob	text/f1.md	3	21	25	warning	Team.Filler	Remove 'Zebra'.	Zebra
+glob	text/f1.md	3	21	25	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+glob	text/f2.md	1	28	36	warning	Team.Repeat	'that' is repeated!	that that
+glob	text/f2.md	1	28	36	warning	Team.Repeat0	'that' is repeated!	that that
+glob	text/f3.md	1	16	22	warning	Team.Cond	'HARNESS' has no definition.	HARNESS
+glob	text/f3.md	1	16	22	warning	Team.Cond0	'HARNESS' has no definition.	HARNESS
+glob	text/f3.md	1	16	22	warning	Team.Swap	Use 'use' instead of 'HARNESS'.	HARNESS
+glob	text/f3.md	1	16	22	warning	Team.Swap0	Use 'use' instead of 'HARNESS'.	HARNESS
+glob	text/f3.md	1	16	22	error	Vale.Team.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+glob	text/f3.md	1	49	51	error	Team.Spell	Did you really mean 'teh'?	teh
+glob	text/f3.md	1	49	51	warning	Team.Swap	Use 'the' instead of 'teh'.	teh
+glob	text/f3.md	1	49	51	warning	Team.Swap0	Use 'the' instead of 'teh'.	teh
+glob	text/f4.md	1	5	7	warning	Team.Cond	'SDK' has no definition.	SDK
+glob	text/f4.md	1	5	7	warning	Team.Cond0	'SDK' has no definition.	SDK
+glob	text/f4.md	1	17	19	warning	Team.Cond	'API' has no definition.	API
+glob	text/f4.md	1	17	19	warning	Team.Cond0	'API' has no definition.	API
+glob	text/f5.md	1	3	39	warning	Team.Sentence	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+glob	text/f5.md	1	3	39	warning	Team.Sentence0	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+glob	text/f5.md	1	3	39	warning	Team.SentenceOwn	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+glob	text/f5.md	3	3	30	warning	Team.Sentence	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+glob	text/f5.md	3	3	30	warning	Team.Sentence0	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+glob	text/f5.md	5	3	34	warning	Team.Sentence	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+glob	text/f5.md	5	3	34	warning	Team.Sentence0	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+glob	text/f6.md	1	17	23	error	Team.Spell	Did you really mean 'kubectx'?	kubectx
+glob	text/f6.md	1	56	58	warning	Team.Filler	Remove 'mea'.	mea
+glob	text/f6.md	1	56	58	warning	Team.Filler0	Remove 'mea'.	mea
+glob	text/f6.md	1	56	58	error	Team.Spell	Did you really mean 'mea'?	mea
+glob	text/f6.md	1	67	73	warning	Team.Cond	'KUBECTL' has no definition.	KUBECTL
+glob	text/f6.md	1	67	73	warning	Team.Cond0	'KUBECTL' has no definition.	KUBECTL
+glob	text/f6.md	1	67	73	error	Vale.Team.Terms	Use 'kubectl' instead of 'KUBECTL'.	KUBECTL
+glob	text/f6.md	1	81	85	error	Team.Spell	Did you really mean 'Zorbl'?	Zorbl
+glob	text/f6.md	1	81	85	error	Vale.Team.Terms	Use 'zorbl' instead of 'Zorbl'.	Zorbl
+glob	text/f6.md	1	98	102	warning	Team.Cond	'ZORBL' has no definition.	ZORBL
+glob	text/f6.md	1	98	102	warning	Team.Cond0	'ZORBL' has no definition.	ZORBL
+glob	text/f6.md	1	98	102	error	Vale.Team.Terms	Use 'zorbl' instead of 'ZORBL'.	ZORBL
+glob	text/f7.md	1	8	12	warning	Team.Filler	Remove 'Zebra'.	Zebra
+glob	text/f7.md	1	8	12	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+glob	text/f8.md	2	20	22	warning	Team.Filler	Remove 'mea'.	mea
+glob	text/f8.md	2	20	22	warning	Team.Filler0	Remove 'mea'.	mea
+glob	text/f8.md	2	20	22	error	Team.Spell	Did you really mean 'mea'?	mea
+union	text/f1.md	1	51	53	warning	Team.Filler	Remove 'mea'.	mea
+union	text/f1.md	1	51	53	warning	Team.Filler0	Remove 'mea'.	mea
+union	text/f1.md	1	51	53	error	Team.Spell	Did you really mean 'mea'?	mea
+union	text/f1.md	1	62	68	warning	Team.Odd	Odd 'Nodexjs'.	Nodexjs
+union	text/f1.md	1	62	68	error	Team.Spell	Did you really mean 'Nodexjs'?	Nodexjs
+union	text/f1.md	1	87	95	error	Team.Spell	Did you really mean 'nocomment'?	nocomment
+union	text/f1.md	3	21	25	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+union	text/f2.md	1	28	36	warning	Team.Repeat	'that' is repeated!	that that
+union	text/f2.md	1	28	36	warning	Team.Repeat0	'that' is repeated!	that that
+union	text/f3.md	1	16	22	warning	Team.Cond	'HARNESS' has no definition.	HARNESS
+union	text/f3.md	1	16	22	warning	Team.Cond0	'HARNESS' has no definition.	HARNESS
+union	text/f3.md	1	16	22	warning	Team.Swap	Use 'use' instead of 'HARNESS'.	HARNESS
+union	text/f3.md	1	16	22	warning	Team.Swap0	Use 'use' instead of 'HARNESS'.	HARNESS
+union	text/f3.md	1	16	22	error	Vale.Team.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+union	text/f3.md	1	49	51	error	Team.Spell	Did you really mean 'teh'?	teh
+union	text/f3.md	1	49	51	warning	Team.Swap	Use 'the' instead of 'teh'.	teh
+union	text/f3.md	1	49	51	warning	Team.Swap0	Use 'the' instead of 'teh'.	teh
+union	text/f4.md	1	5	7	warning	Team.Cond	'SDK' has no definition.	SDK
+union	text/f4.md	1	5	7	warning	Team.Cond0	'SDK' has no definition.	SDK
+union	text/f4.md	1	17	19	warning	Team.Cond	'API' has no definition.	API
+union	text/f4.md	1	17	19	warning	Team.Cond0	'API' has no definition.	API
+union	text/f5.md	1	3	39	warning	Team.Sentence	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+union	text/f5.md	1	3	39	warning	Team.Sentence0	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+union	text/f5.md	1	3	39	warning	Team.SentenceOwn	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+union	text/f5.md	3	3	30	warning	Team.Sentence	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+union	text/f5.md	3	3	30	warning	Team.Sentence0	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+union	text/f5.md	5	3	34	warning	Team.Sentence	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+union	text/f5.md	5	3	34	warning	Team.Sentence0	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+union	text/f6.md	1	17	23	error	Team.Spell	Did you really mean 'kubectx'?	kubectx
+union	text/f6.md	1	56	58	warning	Team.Filler	Remove 'mea'.	mea
+union	text/f6.md	1	56	58	warning	Team.Filler0	Remove 'mea'.	mea
+union	text/f6.md	1	56	58	error	Team.Spell	Did you really mean 'mea'?	mea
+union	text/f6.md	1	67	73	warning	Team.Cond	'KUBECTL' has no definition.	KUBECTL
+union	text/f6.md	1	67	73	warning	Team.Cond0	'KUBECTL' has no definition.	KUBECTL
+union	text/f6.md	1	67	73	error	Vale.Team.Terms	Use 'kubectl' instead of 'KUBECTL'.	KUBECTL
+union	text/f6.md	1	81	85	error	Team.Spell	Did you really mean 'Zorbl'?	Zorbl
+union	text/f6.md	1	81	85	error	Vale.Team.Terms	Use 'zorbl' instead of 'Zorbl'.	Zorbl
+union	text/f6.md	1	98	102	warning	Team.Cond	'ZORBL' has no definition.	ZORBL
+union	text/f6.md	1	98	102	warning	Team.Cond0	'ZORBL' has no definition.	ZORBL
+union	text/f6.md	1	98	102	error	Vale.Team.Terms	Use 'zorbl' instead of 'ZORBL'.	ZORBL
+union	text/f7.md	1	8	12	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+union	text/f8.md	2	20	22	warning	Team.Filler	Remove 'mea'.	mea
+union	text/f8.md	2	20	22	warning	Team.Filler0	Remove 'mea'.	mea
+union	text/f8.md	2	20	22	error	Team.Spell	Did you really mean 'mea'?	mea
+two	text/f1.md	1	51	53	warning	Team.Filler	Remove 'mea'.	mea
+two	text/f1.md	1	51	53	warning	Team.Filler0	Remove 'mea'.	mea
+two	text/f1.md	1	51	53	error	Team.Spell	Did you really mean 'mea'?	mea
+two	text/f1.md	1	62	68	warning	Team.Odd	Odd 'Nodexjs'.	Nodexjs
+two	text/f1.md	1	62	68	error	Team.Spell	Did you really mean 'Nodexjs'?	Nodexjs
+two	text/f1.md	1	87	95	error	Team.Spell	Did you really mean 'nocomment'?	nocomment
+two	text/f2.md	1	28	36	warning	Team.Repeat	'that' is repeated!	that that
+two	text/f2.md	1	28	36	warning	Team.Repeat0	'that' is repeated!	that that
+two	text/f3.md	1	16	22	warning	Team.Cond	'HARNESS' has no definition.	HARNESS
+two	text/f3.md	1	16	22	warning	Team.Cond0	'HARNESS' has no definition.	HARNESS
+two	text/f3.md	1	16	22	warning	Team.Swap	Use 'use' instead of 'HARNESS'.	HARNESS
+two	text/f3.md	1	16	22	warning	Team.Swap0	Use 'use' instead of 'HARNESS'.	HARNESS
+two	text/f3.md	1	16	22	error	Vale.Team.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+two	text/f3.md	1	49	51	error	Team.Spell	Did you really mean 'teh'?	teh
+two	text/f3.md	1	49	51	warning	Team.Swap	Use 'the' instead of 'teh'.	teh
+two	text/f3.md	1	49	51	warning	Team.Swap0	Use 'the' instead of 'teh'.	teh
+two	text/f4.md	1	5	7	warning	Team.Cond	'SDK' has no definition.	SDK
+two	text/f4.md	1	5	7	warning	Team.Cond0	'SDK' has no definition.	SDK
+two	text/f4.md	1	17	19	warning	Team.Cond	'API' has no definition.	API
+two	text/f4.md	1	17	19	warning	Team.Cond0	'API' has no definition.	API
+two	text/f5.md	1	3	39	warning	Team.Sentence	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+two	text/f5.md	1	3	39	warning	Team.Sentence0	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+two	text/f5.md	1	3	39	warning	Team.SentenceOwn	'Using Kubernetes with Terraform today' should be in sentence case	Using Kubernetes with Terraform today
+two	text/f5.md	3	3	30	warning	Team.Sentence	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+two	text/f5.md	3	3	30	warning	Team.Sentence0	'Using Rust with Docker today' should be in sentence case	Using Rust with Docker today
+two	text/f5.md	5	3	34	warning	Team.Sentence	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+two	text/f5.md	5	3	34	warning	Team.Sentence0	'Using Kubernetes with Rust today' should be in sentence case	Using Kubernetes with Rust today
+two	text/f6.md	1	17	23	error	Team.Spell	Did you really mean 'kubectx'?	kubectx
+two	text/f6.md	1	56	58	warning	Team.Filler	Remove 'mea'.	mea
+two	text/f6.md	1	56	58	warning	Team.Filler0	Remove 'mea'.	mea
+two	text/f6.md	1	56	58	error	Team.Spell	Did you really mean 'mea'?	mea
+two	text/f6.md	1	67	73	warning	Team.Cond	'KUBECTL' has no definition.	KUBECTL
+two	text/f6.md	1	67	73	warning	Team.Cond0	'KUBECTL' has no definition.	KUBECTL
+two	text/f6.md	1	67	73	error	Vale.Team.Terms	Use 'kubectl' instead of 'KUBECTL'.	KUBECTL
+two	text/f6.md	1	81	85	error	Team.Spell	Did you really mean 'Zorbl'?	Zorbl
+two	text/f6.md	1	81	85	error	Vale.Team.Terms	Use 'zorbl' instead of 'Zorbl'.	Zorbl
+two	text/f6.md	1	98	102	warning	Team.Cond	'ZORBL' has no definition.	ZORBL
+two	text/f6.md	1	98	102	warning	Team.Cond0	'ZORBL' has no definition.	ZORBL
+two	text/f6.md	1	98	102	error	Vale.Team.Terms	Use 'zorbl' instead of 'ZORBL'.	ZORBL
+two	text/f7.md	1	8	12	warning	Team.Filler	Remove 'Zebra'.	Zebra
+two	text/f7.md	1	8	12	warning	Team.Filler0	Remove 'Zebra'.	Zebra
+two	text/f8.md	2	20	22	warning	Team.Filler	Remove 'mea'.	mea
+two	text/f8.md	2	20	22	warning	Team.Filler0	Remove 'mea'.	mea
+two	text/f8.md	2	20	22	error	Team.Spell	Did you really mean 'mea'?	mea
