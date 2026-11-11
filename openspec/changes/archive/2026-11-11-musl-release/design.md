@@ -73,5 +73,5 @@ After `0.0.2` ships, the same proof runs on the released tarball, and the timing
 - [The first musl build of the release job runs in the release run, because PR CI builds no asset] → A box build in the runner's image, `ubuntu:24.04`, proved the same commands first. A failed run is reported with its log and not retried by hand.
 - [`musl-tools` comes from the runner image's package index] → The task installs it on each run, and a failed install stops the build.
 
-[lane]: ../archive/2026-11-11-release-lane/design.md
+[lane]: ../2026-11-11-release-lane/design.md
 [v-readme]: https://github.com/victor-software-house/verctl/blob/bc30ea6f0924edd8554ef5444280d9ca52dd1851/README.md
