@@ -32,6 +32,11 @@ It SHALL refuse two entries that hold a style of one name, and the error SHALL n
 - **WHEN** `packages` holds `{path: a}` and `{path: b}` and both hold a folder `Team`
 - **THEN** hakkiri reports an error naming `a/Team` and `b/Team`, and exits with a failure status
 
+#### Scenario: A folder of settings
+
+- **WHEN** a package's `styles` folder holds `config/vocabularies/Team/accept.txt` beside the style `Team`
+- **THEN** `config` is no style, a glob that lists `config` is an error, and two packages that each hold a `config` folder load together
+
 #### Scenario: A hash of the wrong shape
 
 - **WHEN** an entry holds `sha256: abc123`

@@ -596,8 +596,13 @@ fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
     }
 }
 
+/// The folder of a package's styles that holds Vale's vocabularies and other
+/// settings, which is no style.
+const SETTINGS_FOLDER: &str = "config";
+
 /// The style folders of the package folder `package`, in name order: each
-/// folder inside it whose name does not begin with a dot.
+/// folder inside it whose name does not begin with a dot, except
+/// [`SETTINGS_FOLDER`].
 fn style_folders(package: &Path, line: Option<usize>, faults: &mut Faults<'_>) -> Vec<PathBuf> {
     let entries = match fs::read_dir(package) {
         Ok(entries) => entries,
@@ -611,9 +616,10 @@ fn style_folders(package: &Path, line: Option<usize>, faults: &mut Faults<'_>) -
         .map(|entry| entry.path())
         .filter(|path| {
             path.is_dir()
-                && path
-                    .file_name()
-                    .is_some_and(|name| !name.to_string_lossy().starts_with('.'))
+                && path.file_name().is_some_and(|name| {
+                    let name = name.to_string_lossy();
+                    !name.starts_with('.') && name != SETTINGS_FOLDER
+                })
         })
         .collect();
     folders.sort();

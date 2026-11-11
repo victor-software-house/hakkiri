@@ -36,6 +36,13 @@ const BARE_SHA256: &str = "b558c3748c056d21d89795c2ae42b36b714a9df0c6b964ef2c946
 const ONLY: &[u8] = include_bytes!("fixtures/packages/Only.zip");
 const ONLY_SHA256: &str = "b21447815726d5e21fe2fb72aca781c09c914b1d0e819a53a566f545790f3e7b";
 
+/// Two packages that each keep a vocabulary under `styles/config`, beside one
+/// style named for the package.
+const ALPHA: &[u8] = include_bytes!("fixtures/packages/Alpha.zip");
+const ALPHA_SHA256: &str = "c46cffdaaab0d6eb0d5adbf8cb2a6dc2315662540a84aa083c0a39e8e47618ec";
+const BETA: &[u8] = include_bytes!("fixtures/packages/Beta.zip");
+const BETA_SHA256: &str = "760e55c4f7412703ffedd42fec9108ce1327fa8a2bcec167381188f7d36f9a11";
+
 /// A hash no fixture has.
 const WRONG_SHA256: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -388,6 +395,67 @@ fn a_style_only_package_loads_its_top_folder_as_a_style() -> TestResult {
             "a.md:1:9: warning Team.Filler: Remove 'very'.",
             "1 alert in 1 file"
         ]
+    );
+    Ok(())
+}
+
+/// A project that pins `packages` and lints `a.md` with the styles `styles`.
+fn vocabulary_project<'a>(suite: &'a Suite, name: &str, packages: &str, styles: &str) -> Root<'a> {
+    let root = suite.scenario(name);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        format!("packages:\n{packages}files:\n  '*.md': {{styles: [{styles}]}}\n"),
+    );
+    root.file("a.md", "This is very good.\n");
+    root
+}
+
+#[test]
+fn a_vocabulary_folder_is_no_style_so_two_packages_with_one_load_together() -> TestResult {
+    let suite = Suite::new("package-vocabularies");
+    let server = Server::start(vec![
+        ("/Alpha.zip", Route::Body(ALPHA.to_vec())),
+        ("/Beta.zip", Route::Body(BETA.to_vec())),
+    ])?;
+    let packages = format!(
+        "{}{}",
+        entry(&server.url("/Alpha.zip"), ALPHA_SHA256),
+        entry(&server.url("/Beta.zip"), BETA_SHA256)
+    );
+    let root = vocabulary_project(&suite, "vocabularies", &packages, "Alpha, Beta");
+    let cache = cache_folder(&suite, "vocabularies-cache");
+    let result = hakkiri(&root, cache.path(), &["check"])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Alpha.Filler: Remove 'very'.",
+            "a.md:1:14: warning Beta.Filler: Remove 'good'.",
+            "2 alerts in 1 file"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_vocabulary_folder_cannot_be_listed_as_a_style() -> TestResult {
+    let suite = Suite::new("package-vocabulary-style");
+    let server = Server::start(vec![("/Alpha.zip", Route::Body(ALPHA.to_vec()))])?;
+    let root = vocabulary_project(
+        &suite,
+        "vocabulary-style",
+        &entry(&server.url("/Alpha.zip"), ALPHA_SHA256),
+        "config",
+    );
+    let cache = cache_folder(&suite, "vocabulary-style-cache");
+    let result = hakkiri(&root, cache.path(), &["check"])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .err
+            .contains("`config` is not a style in any package"),
+        "{}",
+        result.err
     );
     Ok(())
 }

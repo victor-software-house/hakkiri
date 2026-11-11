@@ -22,8 +22,14 @@ const MAX_DOWNLOAD: u64 = 32 * 1024 * 1024;
 /// The most a package may hold once unpacked, 128 MiB.
 const MAX_UNPACKED: u64 = 128 * 1024 * 1024;
 
-/// How long one fetch may take, redirects included.
-const TIMEOUT: Duration = Duration::from_secs(30);
+/// How long each phase before the body may take: the name lookup, the
+/// connection to the server, and its response headers. Each redirect starts
+/// them again.
+const BEFORE_BODY_TIMEOUT: Duration = Duration::from_secs(30);
+
+/// How long reading the body may take once the headers are in: 300 seconds,
+/// which lets a 32 MiB package finish at about 110 KB/s.
+const BODY_TIMEOUT: Duration = Duration::from_secs(300);
 
 /// A zip that has passed the checks that need no file written.
 type Archive = ZipArchive<Cursor<Vec<u8>>>;
@@ -83,11 +89,15 @@ fn absolute_variable(name: &str) -> Option<PathBuf> {
         .filter(|path| path.is_absolute())
 }
 
-/// Downloads `url`, which fails when it answers an error status, takes over
-/// [`TIMEOUT`], or holds over [`MAX_DOWNLOAD`] bytes.
+/// Downloads `url`, which fails when it answers an error status, outlasts
+/// [`BEFORE_BODY_TIMEOUT`] or [`BODY_TIMEOUT`], or holds over
+/// [`MAX_DOWNLOAD`] bytes.
 fn download(url: &str) -> Result<Vec<u8>, String> {
     let config = ureq::Agent::config_builder()
-        .timeout_global(Some(TIMEOUT))
+        .timeout_resolve(Some(BEFORE_BODY_TIMEOUT))
+        .timeout_connect(Some(BEFORE_BODY_TIMEOUT))
+        .timeout_recv_response(Some(BEFORE_BODY_TIMEOUT))
+        .timeout_recv_body(Some(BODY_TIMEOUT))
         .build();
     let agent = ureq::Agent::new_with_config(config);
     let mut response = agent

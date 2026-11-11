@@ -14,6 +14,8 @@ This change follows [`project-config`][config], which holds the grammar of a `ur
   Verify the scenarios for a hash of the wrong shape and for a url that is not http pass, and the existing refusals of an entry with both and of a `url` with no `sha256` still pass.
 - [ ] 1.3 Add `--cache-dir` and `HAKKIRI_CACHE_DIR` to `check` and `test`, with the per-user default.  
   Verify the scenarios for the variable, the option and the default folder pass, and `hakkiri test` loads a fetched package.
+- [ ] 1.4 Skip a folder named `config` when listing a package's styles, as Vale does, and bound a download by its lookup, connect, header and body phases, not by one global timeout.  
+  Verify the scenario for a folder of settings passes, and a 32 MiB body has 300 seconds to arrive.
 
 ## 2. The dependencies
 
