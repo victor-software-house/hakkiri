@@ -34,4 +34,4 @@ The rule-files spec already says how a case reads and passes, but the loader ref
 
 [ledger]: ../../../../tasks.yaml
 [check]: ../2026-11-10-check-command/proposal.md
-[release]: ../../release-lane/proposal.md
+[release]: ../2026-11-11-release-lane/proposal.md
