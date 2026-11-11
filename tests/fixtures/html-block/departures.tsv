@@ -1,0 +1,54 @@
+vale	Scope.amp	entities.md	1	26	26	&
+vale	Scope.dump-code	references.md	0	0	0	sixteen & marker
+vale	Scope.dump-text	masks.md	0	0	0	* a
+vale	Scope.dump-text	masks.md	0	0	0	a * b
+vale	Scope.dump-text	references.md	0	0	0	****************
+vale	Scope.dump-text	references.md	0	0	0	< marker
+vale	Scope.existence-code	references.md	49	38	43	marker
+vale	Scope.existence-emphasis	joins-in-markdown.md	7	6	11	marker
+vale	Scope.existence-emphasis	promoted-blocks.md	15	13	18	marker
+vale	Scope.existence-link	promoted-blocks.md	5	16	21	marker
+vale	Scope.existence-link	references.md	43	13	18	marker
+vale	Scope.existence-strong	joins-in-markdown.md	3	5	10	marker
+vale	Scope.existence-strong	promoted-blocks.md	9	8	13	marker
+hakkiri	Scope.amp	entities.md	1	4	4	&
+hakkiri	Scope.amp	entities.md	1	69	69	&
+hakkiri	Scope.amp	reference-spaces.md	13	8	8	&
+hakkiri	Scope.amp	references.md	11	4	4	&
+hakkiri	Scope.amp	references.md	45	11	11	&
+hakkiri	Scope.amp	references.md	49	32	32	&
+hakkiri	Scope.dump-code	references.md	0	0	0	sixteen &amp; marker
+hakkiri	Scope.dump-text	blank-alt.md	0	0	0	one marker end
+hakkiri	Scope.dump-text	entities.md	0	0	0	&marker <marker> marker x marker marker &amp;marker
+hakkiri	Scope.dump-text	masks.md	0	0	0	*
+hakkiri	Scope.dump-text	reference-spaces.md	0	0	0	epsilon 
+hakkiri	Scope.dump-text	reference-spaces.md	0	0	0	eta &#32;
+hakkiri	Scope.dump-text	references.md	0	0	0	&lt; marker
+hakkiri	Scope.dump-text	script-escape-six.md	0	0	0	last marker
+hakkiri	Scope.existence-code	references.md	47	16	21	marker
+hakkiri	Scope.existence-link	references.md	43	17	22	marker
+hakkiri	Scope.existence-paragraph	entities.md	1	45	55	marker
+hakkiri	Scope.existence-paragraph	entities.md	1	57	67	marker
+hakkiri	Scope.existence-paragraph	script-escape-six.md	3	9	14	marker
+hakkiri	Scope.existence-paragraph-not-list	entities.md	1	45	55	marker
+hakkiri	Scope.existence-paragraph-not-list	entities.md	1	57	67	marker
+hakkiri	Scope.existence-paragraph-not-list	script-escape-six.md	3	9	14	marker
+hakkiri	Scope.existence-sentence	entities.md	1	45	55	marker
+hakkiri	Scope.existence-sentence	entities.md	1	57	67	marker
+hakkiri	Scope.existence-sentence	script-escape-six.md	3	9	14	marker
+hakkiri	Scope.existence-sentence-not-blockquote	entities.md	1	45	55	marker
+hakkiri	Scope.existence-sentence-not-blockquote	entities.md	1	57	67	marker
+hakkiri	Scope.existence-sentence-not-blockquote	script-escape-six.md	3	9	14	marker
+hakkiri	Scope.existence-sentence-not-heading	entities.md	1	45	55	marker
+hakkiri	Scope.existence-sentence-not-heading	entities.md	1	57	67	marker
+hakkiri	Scope.existence-sentence-not-heading	script-escape-six.md	3	9	14	marker
+hakkiri	Scope.existence-sentence-not-list	entities.md	1	45	55	marker
+hakkiri	Scope.existence-sentence-not-list	entities.md	1	57	67	marker
+hakkiri	Scope.existence-sentence-not-list	script-escape-six.md	3	9	14	marker
+hakkiri	Scope.existence-sentence-not-table	entities.md	1	45	55	marker
+hakkiri	Scope.existence-sentence-not-table	entities.md	1	57	67	marker
+hakkiri	Scope.existence-sentence-not-table	script-escape-six.md	3	9	14	marker
+hakkiri	Scope.existence-text	entities.md	1	45	55	marker
+hakkiri	Scope.existence-text	entities.md	1	57	67	marker
+hakkiri	Scope.existence-text	script-escape-six.md	3	9	14	marker
+hakkiri	Scope.numeric	reference-spaces.md	13	8	16	&#32;

@@ -1,0 +1,19 @@
+<p>one &#5 end marker</p>
+
+<p>two &#5; end marker</p>
+
+<p>three &#55 end marker</p>
+
+<p>four &#xA end marker</p>
+
+<p>five &#x5 end marker</p>
+
+<p>six &#12 end marker</p>
+
+<p>seven &#5</p>
+
+<p>eight &#xA</p>
+
+<p>nine &#9 marker &#xd marker &#8 end</p>
+
+<p>ten &# end &#x end &#xg end marker</p>

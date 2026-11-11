@@ -34,5 +34,5 @@ This change follows [`check-command`][check] and [`test-command`][test], so the 
 
 - Archive this change after the first release, then archive `HKR-029` with `qctl close-from-openspec`.
 
-[check]: ../check-command/proposal.md
+[check]: ../archive/2026-11-10-check-command/proposal.md
 [test]: ../test-command/proposal.md

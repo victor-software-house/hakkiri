@@ -1,0 +1,5 @@
+<div class="note">marker in class</div>
+
+<div id="x">marker in id</div>
+
+<p class="a b">marker in classes</p>

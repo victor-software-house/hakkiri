@@ -1,0 +1,13 @@
+extends: existence
+message: "Be direct: '%s'."
+level: warning
+ignorecase: true
+tokens:
+  - perhaps
+tests:
+  - name: flags a hedge
+    input: Perhaps it works.
+    contains:
+      - Team.Hedge
+      - Be direct
+    absent: Team.Filler

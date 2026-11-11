@@ -1,0 +1,17 @@
+<p>a <span><div>marker x</div></span> b marker</p>
+
+<span><div>one</div>marker two</span>
+
+<a href="x"><p>marker in a</p></a> after
+
+<p>a<br>b<div>marker c</div>d marker</p>
+
+<b><h2>marker head</h2></b>
+
+<div>a<br>b</div>
+
+<ul><li>a<br>b<ul><li>nested marker</li></ul>c</li></ul>
+
+<em><ul><li>marker item</li></ul></em>
+
+<p><em>a</em><div>marker</div></p>

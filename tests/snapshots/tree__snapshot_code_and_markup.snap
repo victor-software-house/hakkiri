@@ -4,4 +4,5 @@ expression: "load(\"code-and-markup.md\")? .render()"
 ---
 raw 0..169 [0..169] "---\ntitle: A title\n---\n\nRun this:\n\n```sh\ncurl https://example.com\n```\n\n<div class=\"raw\">https://html.example</div>\n\n[ref]: https://definition.example\n\nAfter the markup.\n"
   paragraph 24..33 [24..33] "Run this:"
+  paragraph 88..108 [88..108] "https://html.example"
   paragraph 151..168 [151..168] "After the markup."

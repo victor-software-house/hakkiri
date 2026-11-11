@@ -25,6 +25,8 @@ This change adds to the binary that [`check-command`][check] creates.
   Verify the scenarios for a failed case, a case that cannot run and JSON with colour forced pass, through the shared helper that clears the colour variables.
 - [ ] 3.3 Run `hakkiri test --coverage` over a fixture style folder of three rules that carry cases in the form ProseStyle uses, including `want: ''` and `format: rs`.  
   Verify a test passes every case and names no rule, and ProseStyle's own cases are left to `HKR-008`.
+- [ ] 3.4 Name a rule from its absolute path with symlinks left alone, and read its text from that path.  
+  Verify the scenarios of `test-rule-names` pass.
 
 ## 4. The bundle
 
@@ -39,4 +41,4 @@ This change adds to the binary that [`check-command`][check] creates.
 
 - Archive this change after the pull request merges, then archive `HKR-028` with `qctl close-from-openspec`.
 
-[check]: ../check-command/proposal.md
+[check]: ../archive/2026-11-10-check-command/proposal.md

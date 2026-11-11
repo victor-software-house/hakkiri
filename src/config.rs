@@ -6,7 +6,7 @@
 //! refuses what it cannot run, with the file and line of the fault.
 //! [`Project::plan`] then says which rules run on a file.
 
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
 use std::{fmt, fs, io};
@@ -14,7 +14,7 @@ use std::{fmt, fs, io};
 use ctl_core::input::Input;
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
-use hakkiri::rule::{Level, LoadError, LoadProblem, Rule, load_style};
+use hakkiri::rule::{Level, LoadError, LoadProblem, Rule, read_style};
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 
@@ -316,6 +316,9 @@ struct Loaded {
     styles: BTreeMap<String, Vec<usize>>,
     /// The real path of each package folder.
     packages: Vec<PathBuf>,
+    /// The faults in the rule names of each style, which are errors only once
+    /// a glob enables the style.
+    names: BTreeMap<String, Vec<LoadProblem>>,
 }
 
 /// The folder that holds the `.ctl` folder of the config file `config`, or the
@@ -413,13 +416,16 @@ fn load_packages(entries: &[Entry], root: &Path, text: &str, faults: &mut Faults
                 );
                 continue;
             }
-            match load_style(&style) {
-                Ok(rules) => {
+            match read_style(&style) {
+                Ok(read) => {
                     let first = loaded.rules.len();
-                    loaded.rules.extend(rules);
+                    loaded.rules.extend(read.rules);
                     loaded
                         .styles
                         .insert(name.clone(), (first..loaded.rules.len()).collect());
+                    if !read.names.is_empty() {
+                        loaded.names.insert(name.clone(), read.names);
+                    }
                 }
                 Err(error) => faults.problems.extend(error.problems),
             }
@@ -497,7 +503,23 @@ fn read_globs(
             choices,
         });
     }
+    refuse_names(&globs, loaded, faults);
     globs
+}
+
+/// Refuses the faults in the rule names of each style a glob lists, as Vale
+/// refuses them for a style a config enables.
+/// A style no glob lists lints with no error.
+fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
+    let mut enabled: BTreeSet<&str> = BTreeSet::new();
+    for glob in globs {
+        enabled.extend(glob.styles.iter().flatten().map(String::as_str));
+    }
+    for style in enabled {
+        if let Some(problems) = loaded.names.get(style) {
+            faults.problems.extend(problems.iter().cloned());
+        }
+    }
 }
 
 /// The style folders of the package folder `package`, in name order: each

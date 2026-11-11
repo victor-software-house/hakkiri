@@ -32,7 +32,11 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    `hakkiri check` exits as Vale does: 2 when the config, a rule or a file failed, then 1 when a reported alert reaches `--fail-level` (default `error`), then 0.  
    `--fail-level` takes the place of Vale's `--no-exit`.  
    The pretty output is a line per alert with no colour and no frame, because tools read it.
-7. **Release scope.**
+7. **Test cases.**
+   A rule file holds its cases under `tests`, and a `*.test.yml` file is a list of them. `check` loads cases and never runs them.  
+   `hakkiri test` loads one rule alone for a case in a rule file or a case with `rule`, and lints any other case through the project config.  
+   `--coverage` fails for a rule that flags nothing in any case.
+8. **Release scope.**
    Release 1 is the CLI: `check` and `test`, run from a mise task, CI and a pre-commit hook.  
    Release 2 is the language server, on the same per-file engine.
 

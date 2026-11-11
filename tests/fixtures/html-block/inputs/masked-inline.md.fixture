@@ -1,0 +1,11 @@
+<div>a <code>marker</code> b</div>
+
+<div>a <kbd>marker</kbd> b</div>
+
+<div>a <samp>marker</samp> b</div>
+
+<div>a <tt>marker</tt> b</div>
+
+<div>a <var>marker</var> b</div>
+
+<div>a <em>marker</em> b</div>

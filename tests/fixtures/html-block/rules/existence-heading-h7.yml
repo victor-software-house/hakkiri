@@ -1,0 +1,5 @@
+extends: existence
+message: "found '%s'"
+scope: 'heading.h7'
+tokens:
+  - marker

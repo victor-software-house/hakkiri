@@ -1,0 +1,30 @@
+Intro paragraph.
+
+<div>
+Text in a div, over two lines
+with <b>strong</b> and <a href="u">a link</a>.
+</div>
+
+<ul>
+<li>One item</li>
+<li>Two <code>items</code></li>
+</ul>
+
+<h2>A heading</h2>
+
+<table>
+<tr><th>Head</th><td>Cell <kbd>Ctrl</kbd> text</td></tr>
+</table>
+
+<pre>Code text</pre>
+
+<script>var skipped = 1;</script>
+
+<p><img alt="Alt text" src="x.png"> After the image.</p>
+
+- <div>Item with a div</div>
+
+> <p>Quoted
+> paragraph</p>
+
+<!-- A comment --> After the comment.

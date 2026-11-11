@@ -10,68 +10,14 @@
 )]
 
 use std::error::Error;
-use std::path::Path;
-use std::process::Command;
 
+mod common;
+
+use common::run;
 use ctl_core::fixture::{Root, Suite};
 use serde_json::Value;
 
 type TestResult = Result<(), Box<dyn Error>>;
-
-/// The variables a caller's shell may set that change what hakkiri prints.
-/// Agent shells export `CLICOLOR_FORCE=1` and `FORCE_COLOR=3`.
-const CALLER_ENV: [&str; 5] = [
-    "CLICOLOR",
-    "CLICOLOR_FORCE",
-    "FORCE_COLOR",
-    "NO_COLOR",
-    "COLORTERM",
-];
-
-/// The hakkiri binary with none of [`CALLER_ENV`] and no `HAKKIRI_*` variable,
-/// so a test sees the same output in an agent shell, a terminal and CI. A test
-/// about colour or a variable sets its own back on top.
-fn binary() -> Command {
-    let mut command = Command::new(env!("CARGO_BIN_EXE_hakkiri"));
-    for name in CALLER_ENV {
-        command.env_remove(name);
-    }
-    for (name, _) in std::env::vars_os() {
-        if name.to_string_lossy().starts_with("HAKKIRI_") {
-            command.env_remove(name);
-        }
-    }
-    command
-}
-
-/// What a run gave: its exit status and its two streams.
-#[derive(Debug)]
-struct Run {
-    code: i32,
-    out: String,
-    err: String,
-}
-
-impl Run {
-    /// The lines of standard output.
-    fn lines(&self) -> Vec<&str> {
-        self.out.lines().collect()
-    }
-}
-
-/// Runs hakkiri in `dir` with `args` and the variables `envs`.
-fn run(dir: &Path, args: &[&str], envs: &[(&str, &str)]) -> Result<Run, Box<dyn Error>> {
-    let output = binary()
-        .current_dir(dir)
-        .args(args)
-        .envs(envs.iter().copied())
-        .output()?;
-    Ok(Run {
-        code: output.status.code().ok_or("killed by a signal")?,
-        out: String::from_utf8(output.stdout)?,
-        err: String::from_utf8(output.stderr)?,
-    })
-}
 
 /// A rule that warns on `very`.
 const FILLER: &str =
@@ -844,6 +790,143 @@ fn a_rule_name_sets_the_level() -> TestResult {
             "1 alert in 1 file",
         ]
     );
+    Ok(())
+}
+
+#[test]
+fn a_rule_name_ends_at_the_first_dot_of_its_file_name() -> TestResult {
+    let suite = Suite::new("check-first-dot");
+    let root = suite.scenario("first-dot");
+    root.file("styles/Team/Terms.custom.yml", FILLER);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Terms: Remove 'very'.",
+            "1 alert in 1 file",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_rule_in_a_folder_under_a_style_is_named_by_every_folder() -> TestResult {
+    let suite = Suite::new("check-nested");
+    let root = suite.scenario("nested");
+    root.file("styles/Team/Sub/Bar.yml", FILLER);
+    root.file("styles/Team/Sub/Deep/Baz.yml", HARSH);
+    root.file(
+        "styles/Team/Sub/Bar.test.yml",
+        "- name: cases\n  input: very\n  contains: Team.Sub.Bar\n",
+    );
+    root.file("styles/Team/_draft/Old.yml", "not: a rule\n");
+    root.file("styles/Team/.hidden/Old.yml", "not: a rule\n");
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file("a.md", "This is very terrible.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Sub.Bar: Remove 'very'.",
+            "a.md:1:14: error Team.Sub.Deep.Baz: Never 'terrible'.",
+            "2 alerts in 1 file",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn two_files_with_one_rule_name_are_refused() -> TestResult {
+    let suite = Suite::new("check-clash");
+    let root = suite.scenario("clash");
+    root.file("styles/Team/Terms.yml", FILLER);
+    root.file("styles/Team/Terms.custom.yml", HARSH);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}", result.out);
+    for part in ["Team.Terms", "Terms.yml", "Terms.custom.yml"] {
+        assert!(result.err.contains(part), "{part}: {}", result.err);
+    }
+    Ok(())
+}
+
+#[test]
+fn a_rule_name_with_a_bracket_is_refused() -> TestResult {
+    let suite = Suite::new("check-bracket");
+    let root = suite.scenario("bracket");
+    root.file("styles/Team/Weird[max].yml", FILLER);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}", result.out);
+    assert!(result.err.contains("Team.Weird[max]"), "{}", result.err);
+    Ok(())
+}
+
+/// A config that lists only `Other`, so no glob enables `Team`.
+const UNUSED_TEAM: &str = "packages:\n  - path: styles\nfiles:\n  '*.md':\n    styles: [Other]\n";
+
+#[test]
+fn a_name_clash_in_a_style_no_glob_lists_is_not_refused() -> TestResult {
+    let suite = Suite::new("check-clash-unused");
+    let root = suite.scenario("clash-unused");
+    root.file("styles/Team/Terms.yml", FILLER);
+    root.file("styles/Team/Terms.custom.yml", HARSH);
+    root.file("styles/Other/Filler.yml", FILLER);
+    root.file(".ctl/hakkiri.yaml", UNUSED_TEAM);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Other.Filler: Remove 'very'.",
+            "1 alert in 1 file"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_bracket_in_a_style_no_glob_lists_is_not_refused() -> TestResult {
+    let suite = Suite::new("check-bracket-unused");
+    let root = suite.scenario("bracket-unused");
+    root.file("styles/Team/Weird[max].yml", FILLER);
+    root.file("styles/Other/Filler.yml", FILLER);
+    root.file(".ctl/hakkiri.yaml", UNUSED_TEAM);
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Other.Filler: Remove 'very'.",
+            "1 alert in 1 file"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_clash_is_refused_when_any_glob_lists_the_style() -> TestResult {
+    let suite = Suite::new("check-clash-later-glob");
+    let root = suite.scenario("clash-later-glob");
+    root.file("styles/Team/Terms.yml", FILLER);
+    root.file("styles/Team/Terms.custom.yml", HARSH);
+    root.file("styles/Other/Filler.yml", FILLER);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Other]}\n  '*.txt': {styles: [Team]}\n",
+    );
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}", result.out);
+    assert!(result.err.contains("Team.Terms"), "{}", result.err);
     Ok(())
 }
 

@@ -7,6 +7,7 @@
 use garde::Validate;
 use serde::Deserialize;
 
+use super::cases::{CaseFields, unique};
 use super::field::{Count, Flag, Number, Pairs, Text, Texts, valid};
 
 /// The check types of Vale 3.26.0 that hakkiri runs.
@@ -229,6 +230,9 @@ macro_rules! rule_fields {
             #[serde(default)]
             #[garde(custom(valid))]
             pub(super) matchcase: Flag,
+            #[serde(default)]
+            #[garde(dive, custom(unique))]
+            pub(super) tests: Vec<CaseFields>,
             $(
                 $(#[$field_meta])*
                 pub(super) $field: $ty,

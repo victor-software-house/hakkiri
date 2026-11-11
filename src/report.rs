@@ -14,6 +14,8 @@ use serde::Serialize;
 pub(crate) enum Output {
     /// `hakkiri check`.
     Check(Check),
+    /// `hakkiri test`.
+    Test(Tests),
     /// `hakkiri instructions`.
     Instructions(Instructions),
 }
@@ -22,6 +24,7 @@ impl Present for Output {
     fn present(&self) -> Document {
         match self {
             Self::Check(check) => check.present(),
+            Self::Test(tests) => tests.present(),
             Self::Instructions(instructions) => instructions.present(),
         }
     }
@@ -29,6 +32,7 @@ impl Present for Output {
     fn outcome(&self) -> Outcome {
         match self {
             Self::Check(check) => check.outcome(),
+            Self::Test(tests) => tests.outcome(),
             Self::Instructions(instructions) => instructions.outcome(),
         }
     }
@@ -36,6 +40,7 @@ impl Present for Output {
     fn exit_code(&self) -> u8 {
         match self {
             Self::Check(check) => check.exit_code(),
+            Self::Test(tests) => tests.exit_code(),
             Self::Instructions(instructions) => instructions.exit_code(),
         }
     }
@@ -255,6 +260,160 @@ impl Present for Check {
                     .iter()
                     .any(|row| row.severity >= self.fail_level),
             )
+        }
+    }
+}
+
+/// What running one case gave.
+#[derive(Debug, Serialize)]
+pub(crate) struct CaseResult {
+    pub(crate) file: String,
+    pub(crate) name: String,
+    pub(crate) passed: bool,
+    /// Why the case failed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) reason: Option<String>,
+    /// Why the case could not run.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) error: Option<String>,
+    /// The alerts the case got, one per line, when it failed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) got: Option<String>,
+    /// The output the case wanted, when it failed against one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) want: Option<String>,
+    /// The case's note for the reader.
+    #[serde(skip)]
+    pub(crate) about: String,
+}
+
+/// A rule no case makes flag anything.
+#[derive(Debug, Serialize)]
+pub(crate) struct Uncovered {
+    /// The rule name.
+    pub(crate) rule: String,
+    /// The rule files that give the name, only when more than one does.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) files: Vec<String>,
+}
+
+/// The result of `hakkiri test`.
+#[derive(Debug, Serialize)]
+pub(crate) struct Tests {
+    passed: usize,
+    failed: usize,
+    files: usize,
+    results: Vec<CaseResult>,
+    uncovered: Vec<Uncovered>,
+    failures: Vec<Failure>,
+    /// Whether the run checked coverage.
+    #[serde(skip)]
+    coverage: bool,
+}
+
+impl Tests {
+    /// A run over `files` files with the `results` of its cases.
+    pub(crate) fn new(
+        files: usize,
+        results: Vec<CaseResult>,
+        uncovered: Vec<Uncovered>,
+        mut failures: Vec<Failure>,
+        coverage: bool,
+    ) -> Self {
+        failures.sort_by(|a, b| a.subject().cmp(b.subject()));
+        let failed = results.iter().filter(|result| !result.passed).count();
+        Self {
+            passed: results.len() - failed,
+            failed,
+            files,
+            results,
+            uncovered,
+            failures,
+            coverage,
+        }
+    }
+
+    /// `3 files, 41 passed, 1 failed`, and the uncovered rules when coverage
+    /// ran.
+    fn count(&self) -> String {
+        let files = self.files;
+        let uncovered = if self.coverage {
+            format!(", {} uncovered", self.uncovered.len())
+        } else {
+            String::new()
+        };
+        format!(
+            "{files} file{}, {} passed, {} failed{uncovered}",
+            if files == 1 { "" } else { "s" },
+            self.passed,
+            self.failed
+        )
+    }
+}
+
+impl CaseResult {
+    /// The lines that say why the case failed or could not run.
+    fn lines(&self) -> Vec<String> {
+        if let Some(error) = &self.error {
+            return vec![format!(
+                "could not run {}: {}: {error}",
+                self.file, self.name
+            )];
+        }
+        let Some(reason) = &self.reason else {
+            return Vec::new();
+        };
+        let mut lines = vec![
+            format!("failed {}: {}", self.file, self.name),
+            format!("  {reason}"),
+        ];
+        if !self.about.is_empty() {
+            lines.push(format!("  about: {}", self.about));
+        }
+        let got = self.got.as_deref().unwrap_or_default().trim();
+        match &self.want {
+            Some(want) => {
+                lines.extend(want.trim().lines().map(|line| format!("  - {line}")));
+                lines.extend(got.lines().map(|line| format!("  + {line}")));
+            }
+            None if got.is_empty() => lines.push("  got: no alerts".to_owned()),
+            None => {
+                lines.push("  got:".to_owned());
+                lines.extend(got.lines().map(|line| format!("    {line}")));
+            }
+        }
+        lines
+    }
+}
+
+impl Present for Tests {
+    /// A block per failed case, a line per rule no case fires, and the count:
+    /// plain text, as the lines of `check` are.
+    fn present(&self) -> Document {
+        let mut lines: Vec<String> = self.results.iter().flat_map(CaseResult::lines).collect();
+        lines.extend(
+            self.failures
+                .iter()
+                .map(|failure| format!("failed {}: {}", failure.subject(), failure.message)),
+        );
+        lines.extend(self.uncovered.iter().map(|entry| {
+            let rule = &entry.rule;
+            if entry.files.is_empty() {
+                format!("uncovered {rule}: no case makes it flag anything")
+            } else {
+                let files = entry.files.join(", ");
+                format!("uncovered {rule} (named by {files}): no case makes it flag anything")
+            }
+        }));
+        lines.push(self.count());
+        Document::new().verbatim(lines.join("\n"))
+    }
+
+    fn exit_code(&self) -> u8 {
+        if !self.failures.is_empty() || self.results.iter().any(|result| result.error.is_some()) {
+            2
+        } else {
+            u8::from(self.failed > 0 || !self.uncovered.is_empty())
         }
     }
 }

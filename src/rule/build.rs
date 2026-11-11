@@ -15,7 +15,7 @@ use super::schema::{
 use super::{
     Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence,
     LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Sequence,
-    Spelling, Substitution, Swap, Token, affix, level_of, package,
+    Spelling, Substitution, Swap, TestCase, Token, affix, level_of, package,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -691,6 +691,7 @@ macro_rules! rule_of {
                 name: action.name.value().to_owned(),
                 params: action.params.values().to_vec(),
             }),
+            tests: fields.tests.iter().map(TestCase::from).collect(),
             check: $check,
         }
     }};

@@ -52,7 +52,7 @@ fn the_command_prints_the_instructions_file() -> TestResult {
 
 #[test]
 fn both_documents_name_every_flag_variable_and_exit_code() -> TestResult {
-    let help = output(&["check", "--help"])?;
+    let help = [output(&["check", "--help"])?, output(&["test", "--help"])?].join("\n");
     let names = Regex::new(r"--[a-z][a-z-]*|HAKKIRI_[A-Z_]+")?;
     let wanted: BTreeSet<&str> = names
         .find_iter(&help)
