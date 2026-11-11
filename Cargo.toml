@@ -73,8 +73,25 @@ mod_module_files = "deny"
 multiple_crate_versions = "allow"
 
 [dependencies]
-ctl-core = { version = "0.7.0", default-features = false, features = ["input"] }
+anyhow = "1.0.104"
+clap = { version = "4.6.7", default-features = false, features = [
+  # clap does not build without it.
+  "std",
+  # The `#[derive(Parser)]` grammar in `src/cli.rs`.
+  "derive",
+  # `env_prefix` binds each long option to a `HAKKIRI_*` variable.
+  "env",
+  # A parse error names the argument and its valid values.
+  "error-context",
+  # A parse error suggests the nearest flag or verb.
+  "suggestions",
+] }
+ctl-core = { version = "0.7.0", default-features = false, features = [
+  "app",
+  "input",
+] }
 fancy-regex = "0.20.1"
+globset = { version = "0.4.21", default-features = false }
 garde = { version = "0.23.0", default-features = false, features = ["derive"] }
 markdown = "1.0.0"
 regex = "1.13.1"
@@ -85,7 +102,11 @@ tree-sitter-rust = "0.24.2"
 tree-sitter-typescript = "0.23.2"
 
 [dev-dependencies]
+ctl-core = { version = "0.7.0", default-features = false, features = [
+  "fixture",
+] }
 insta = "1.49.0"
+serde_json = "1.0.154"
 
 # The smallest binary that keeps its speed. Against opt-level 3 with thin LTO,
 # a ctl CLI came out 35% smaller and 4% slower.

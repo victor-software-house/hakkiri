@@ -1,5 +1,7 @@
 //! The engine: one file's rules run over its tree, and the alerts they give.
 
+use std::borrow::Borrow;
+
 use crate::alert::{Alert, Locator, settle};
 use crate::check::{Memory, run, run_summary};
 use crate::metric::{Variables, variables};
@@ -10,6 +12,8 @@ use crate::tree::Tree;
 
 /// The alerts of `rules` in one file, sorted by line and then by column.
 ///
+/// `rules` is a slice of rules or of references to them, so a caller that picks
+/// a few of many rules for a file lends them without a copy.
 /// `tree` is the file's tree, `source` its text and `extension` its extension
 /// without the dot. Alerts at one place keep the order of their rules.
 /// A rule whose pattern gives up on a block reports one `error` alert at the
@@ -24,8 +28,8 @@ use crate::tree::Tree;
 /// # Errors
 ///
 /// Returns a [`SelectError`] when `tree` is not the tree of `source`.
-pub fn lint(
-    rules: &[Rule],
+pub fn lint<R: Borrow<Rule>>(
+    rules: &[R],
     tree: &Tree,
     source: &str,
     extension: &str,
@@ -34,6 +38,7 @@ pub fn lint(
     let mut alerts = Vec::new();
     let mut measured: Option<(Summary, Option<Variables>)> = None;
     for rule in rules {
+        let rule: &Rule = rule.borrow();
         if matches!(rule.check, Check::Metric(_) | Check::Readability(_))
             && rule.scope.measures_file()
         {

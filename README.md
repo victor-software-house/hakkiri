@@ -8,7 +8,9 @@ It is built to replace [Vale] in projects that use ProseStyle.
 
 ## Status
 
-Planned, not usable yet.  
+`hakkiri check` lints Markdown, MDX and source comments under `.ctl/hakkiri.yaml`, in parallel, and exits 2, 1 or 0 as Vale does.  
+A package is a local folder of styles for now.  
+The download pinned by hash, `hakkiri test` and the first release are not ready.  
 The first release lints what Vale lints today with ProseStyle 0.0.7.  
 It adds rules that count a habit per sentence or per number of words.  
 An editor server follows in the second release.
@@ -21,6 +23,17 @@ An editor server follows in the second release.
   String literals are never read as prose.
 - A project pins rule packages by version and hash in `.ctl/hakkiri.yaml`; hakkiri fetches and caches them.
 - Files are checked in parallel.
+
+## Use
+
+```sh
+hakkiri check
+hakkiri check docs README.md
+hakkiri check --format json
+hakkiri instructions
+```
+
+`hakkiri instructions` prints the operator contract: the config keys, the output, the exit status and the variables.  
 
 ## Documentation
 

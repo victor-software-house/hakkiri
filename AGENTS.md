@@ -2,7 +2,7 @@
 
 A prose linter for Markdown, MDX, and source comments, built on ctl-core.  
 This file is the development contract.  
-The operator contract will be `hakkiri instructions` and `skills/hakkiri/SKILL.md`.
+The operator contract is `hakkiri instructions` (`src/instructions.md`) and `skills/hakkiri/SKILL.md`.
 
 ## Decisions
 
@@ -24,8 +24,15 @@ The operator contract will be `hakkiri instructions` and `skills/hakkiri/SKILL.m
    A limit reached is an error alert for that file, never a panic.
 5. **Packages.**
    Rules ship as versioned packages that a project pins by version and hash.  
-   hakkiri fetches and caches them; there is no separate sync step.
-6. **Release scope.**
+   hakkiri fetches and caches them; there is no separate sync step.  
+   Until `HKR-006`, a package entry is a local `path` to a folder of style folders, and an entry with a `url` is refused.
+   Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
+   Vale matches the path as given; the departure is in the `vale-differences` spec.
+6. **Exit status.**
+   `hakkiri check` exits as Vale does: 2 when the config, a rule or a file failed, then 1 when a reported alert reaches `--fail-level` (default `error`), then 0.  
+   `--fail-level` takes the place of Vale's `--no-exit`.  
+   The pretty output is a line per alert with no colour and no frame, because tools read it.
+7. **Release scope.**
    Release 1 is the CLI: `check` and `test`, run from a mise task, CI and a pre-commit hook.  
    Release 2 is the language server, on the same per-file engine.
 
