@@ -67,7 +67,7 @@ It SHALL skip dot and underscore folders when it lists the rules.
 - **WHEN** `Team.Filler` and `Team.Hedge` each hold a case and only `Team.Filler` flags anything
 - **THEN** `hakkiri test --coverage` names `Team.Hedge`, and exits 1
 
-### Requirement: The report and exit status say what happened
+### Requirement: The report and exit status show what happened
 
 hakkiri SHALL print, for each failed case, its file, name and reason, and the alerts it got, and then a count line.  
 `--format json` SHALL print `passed`, `failed`, `results` and `uncovered`.  

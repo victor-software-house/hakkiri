@@ -3,11 +3,11 @@
 ## 1. Segments
 
 - [x] 1.1 Give each node segments, and join them into its text.  
-  Verify the paragraph-over-two-line-comments test passes in CI.
+  Verify the test of a paragraph over two line comments passes in CI.
   - 2026-11-10 (UTC), the test passes in a throwaway Linux box with `mise run test`, in [d315e7b][c-segments].  
     CI has not run yet (task 2.1).
 - [x] 1.2 Leave code, HTML, link definitions and MDX syntax as gaps between segments.  
-  Verify the HTML-in-a-paragraph and expression-in-a-paragraph tests pass in CI.
+  Verify the HTML-in-a-paragraph test and the test of an expression in a paragraph pass in CI.
   - 2026-11-10 (UTC), both tests pass in the same kind of box run, in [ae31a1a][c-gaps].
 - [x] 1.3 Make each Markdown line one segment, without the line ending, the indentation or the `>` markers.  
   Verify the quote-paragraph snapshot and test pass in CI.

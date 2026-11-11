@@ -3,7 +3,7 @@
 ## Purpose
 
 A `readability` rule averages one or more grade-level scores of the text it measures, and reports when the average is over its `grade`.  
-Its scores and counts are the ones the [metric check][metric] reads, so the two checks agree on the same text.
+Its scores and counts are the ones the [metric check][metric] reads, so the two checks give the same result on the same text.
 
 ## Requirements
 
@@ -27,7 +27,7 @@ A `%s` in its message SHALL read as the average with two decimals.
 - **WHEN** the rule has `metrics: [Flesch-Kincaid]` and `grade: 8`, and reads `The cat sat on the mat.`
 - **THEN** hakkiri reports no alert
 
-### Requirement: readability knows five scores
+### Requirement: readability has five scores
 
 The `metrics` list SHALL accept `Automated Readability`, `Coleman-Liau`, `Flesch-Kincaid`, `Gunning Fog` and `SMOG`, each computed as the metric variable of the same score.  
 hakkiri SHALL refuse a rule whose list is empty or names any other score, with an error that names the rule and the score.

@@ -97,7 +97,7 @@ Lost: two copies of each formula could drift, and the Flesch-Kincaid parity test
 
 ### 6. An unknown or empty metrics list is refused
 
-The [readability spec][readability] refuses a `metrics` list that is empty or names a score outside the five.  
+The [readability spec][readability] rejects a `metrics` list that is empty or names a score outside the five.  
 hakkiri gives a better result than Vale where Vale's is a defect (operator, 2026-11-10).
 
 Alternative: Vale's behaviour.  

@@ -191,7 +191,7 @@ pub struct Formula {
     kind: Kind,
 }
 
-/// What a formula gives, as far as its shape tells.
+/// What a formula gives, as far as its shape shows.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Kind {
     Number,

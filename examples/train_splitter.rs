@@ -31,7 +31,7 @@ struct Corpus {
     markdown: bool,
 }
 
-/// What the command line asks for.
+/// What the command line sets.
 struct Arguments {
     corpora: Vec<Corpus>,
     sources: PathBuf,

@@ -36,7 +36,7 @@ The sentence and title converters and their word lists are ported from prose's `
 Vale's agreement count is ported from its `title` and `sentence` functions ([variables.go][v-case]).
 
 In sentence case, a text fails when its first word fails.  
-Otherwise it passes when enough words agree: equal to the converted form, in capitals, or matching an exception.  
+Otherwise it passes when enough words pass: equal to the converted form, in capitals, or matching an exception.  
 The share that agrees must be at least `threshold`.
 
 Vale hands the converters its own `exceptions` list after [`updateExceptions`][v-update-exceptions] has sorted it and rewritten each term in place, as `(?-i)` and the term with its periods escaped.  
@@ -50,7 +50,7 @@ Three more points follow Vale or prose as they are:
 - A pattern that gives up on a text finds nothing, as prose's wrapper reads it.
 - An empty `match` is refused, since every text would pass it, and a `style` other than `AP` or `Chicago` is refused where Vale reads any other value as `AP`.
 
-One point is a gap, not a departure: `vocab` loads and has no effect.  
+One point is a gap instead of a departure: `vocab` loads and has no effect.  
 In Vale, `vocab` defaults to true, and `true` adds the project's accepted Vocab terms to the rule's exceptions, both in the exceptions pattern and in the list the converters read ([capitalization.go][v-capitalization-vocab]).  
 hakkiri has no project vocabulary yet, so a rule's exceptions are only its own.  
 When Vocab lands, `vocab` must add the accepted terms before `exceptions` is rewritten and sorted.
@@ -123,7 +123,7 @@ Vale tags each sentence with that tokenizer and the perceptron, so the port is t
 The model is trained on UD English EWT under CC BY-SA 4.0, and weighs 1.9 MB ([MODELS.md][p-models]).  
 It ships as its own data file with its notice.
 
-The port keeps prose's case and category tests where Go and Rust agree.  
+The port keeps prose's case and category tests where Go and Rust give the same result.  
 The shape of a word reads Rust's Unicode properties and not Go's categories, so a word of characters such as `²` can get another shape, and so another feature.  
 A test compares tokens and tags with prose's on 188 sentences.
 

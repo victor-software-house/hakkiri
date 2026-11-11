@@ -1,4 +1,4 @@
-//! Long inputs: the four check types of the pattern-and-readability-checks
+//! Long inputs: the four check types of the `pattern-and-readability-checks`
 //! change, `capitalization` and `sequence`, and `spelling` with `affix`, over
 //! a line of 50,000 characters and a file of 60,000 lines.
 //!

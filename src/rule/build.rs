@@ -824,7 +824,7 @@ fn sequence_token(
             )
         })?;
         // A tag Penn cannot tell apart also limits the words, unless the rule
-        // asked for a pattern, which is the more specific request.
+        // sets a pattern, which is the more specific request.
         if pattern.is_empty()
             && let Some(listed) = upos::word_pattern(universal)
         {

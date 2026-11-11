@@ -90,7 +90,7 @@ impl Tag {
 fn skip_type(line: &str, at: usize) -> usize {
     let rest = line.get(at..).unwrap_or_default();
     match closing(rest, '{', '}') {
-        // `{@link X}` is an inline tag, not a type.
+        // `{@link X}` is an inline tag and no type.
         Some(closed) if rest.starts_with('{') && !rest.starts_with("{@") => {
             skip_blanks(line, at + closed + 1)
         }

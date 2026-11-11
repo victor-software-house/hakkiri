@@ -75,7 +75,7 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
 ///
 /// The tree keeps only the prose of a document, so a fenced block, a thematic
 /// break or another element with none can sit before the first child.
-/// The parser knows each node's place, and the tree records it in `first`.
+/// The parser reports each node's place, and the tree records it in `first`.
 fn opens(parent: &Node, child: &Node) -> bool {
     match parent.scope {
         Scope::List | Scope::Blockquote | Scope::TableRow => child.first,

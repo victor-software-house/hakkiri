@@ -44,7 +44,7 @@ The corpus holds every tracked `.md` file except `CHANGELOG.md`, and the trainer
 | victor-software-house/pi-agent-browser | `43cccc85ee109cbc4405f58ebb518ebc3d0fc639` | MIT |
 | victor-software-house/pi-curated-themes | `ac8e0c8e890a8ee6ae926c6a195f16b9f0033bbb` | MIT |
 | victor-software-house/pi-cursor | `0155c9f7ec0abb7437442cbde198f444ee05589c` | MIT |
-| victor-software-house/pi-ghostty-theme-sync | `e608cdaf2076c29cb5474d70e9eada54a00bb802` | none |
+| `victor-software-house/pi-ghostty-theme-sync` | `e608cdaf2076c29cb5474d70e9eada54a00bb802` | none |
 | victor-software-house/pi-ghostty-themes | `701a0a864b0da1113ac9323a55920bb6b3ad2e1b` | MIT |
 | victor-software-house/pi-multicodex | `f80c63c8ff00ae29c1b8c88821c65b4d4ef9da81` | MIT |
 | victor-software-house/pi-openai-proxy | `deccaac16fb83cc0e2fffd661009877eeb9ceee3` | MIT |

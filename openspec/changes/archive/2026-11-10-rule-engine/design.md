@@ -45,7 +45,7 @@ Alternative: keep each rule as a map and read fields while linting, as Vale's `b
 `heading` selects `heading.h1` to `heading.h6`, and `text.comment` selects all four comment scopes.  
 Vale compares the set of dotted parts instead ([scope.go][v-contains]), so `h1` alone or `comment.text` would also match.
 
-Alternative: Vale's set test. Lost: the [rule-files spec][rule-files] refuses a name it does not define, and the set test accepts names no node holds. Every scope ProseStyle writes reads the same under both.
+Alternative: Vale's set test. Lost: the [rule-files spec][rule-files] rejects a name it does not define, and the set test accepts names no node holds. Every scope ProseStyle writes reads the same under both.
 
 ### 4. text and paragraph keep Vale's blocks
 
@@ -127,7 +127,7 @@ The variables are Vale's ([file.go][v-metrics], [metric.go][v-metric]), and the 
 Element counts come from the tree; `pre` reads the tree's code block count (the [document-tree delta][tree-delta]).  
 The condition runs as the result, printed with six decimals, followed by the condition, with `result` bound, as Vale builds it ([metric.go][v-condition]).
 
-Alternative: compare the unrounded result. Lost: a result just above a threshold would alert where Vale does not.
+Alternative: compare the unrounded result. Lost: a result slightly above a threshold would alert where Vale does not.
 
 ### 11. Metric tokens match as existence tokens
 
@@ -173,7 +173,7 @@ Alternatives:
 Syllables, complex words and the Dale-Chall list are ported from prose with its MIT notice (operator, 2026-11-10).  
 Syllables follow prose's port of the `syllable` JavaScript package ([syllables.go][p-syllables]).  
 A complex word drops one syllable for `es`, `ed` or `ing` ([summarize.go][p-complex]).  
-The Dale-Chall list is prose's 2,944 easy words, and each easy word counts once ([easy.go][p-easy], [readability.go][p-scores]).
+The Dale-Chall list is prose's 2,944 familiar words, and each familiar word counts once ([`easy.go`][p-easy], [readability.go][p-scores]).
 
 Alternatives: `syllarust`, `syllable` and `hyphenation` count syllables apart from prose, and `dale-chall` does not state its source list. Lost with each: Flesch-Kincaid would drift from Vale's for no gain.
 
@@ -197,13 +197,13 @@ Alternative: Vale's behaviour in each case.
 Lost: a word with an accent would read as two words, an alert would point at a bullet, and `1st` would swap to `First`.  
 A `$1` key would lose its alert across a line wrap, and a count would include code.
 
-The comments row is a choice, not a repair of a Vale defect (operator, 2026-11-10).  
+The comments row is a choice and repairs no Vale defect (operator, 2026-11-10).  
 The same holds at Vale 3.26.0 ([e2d4374][v-3-26-0]).  
 Alternative: match Vale's empty summary for a code file.  
 Lost: hakkiri measures comment prose by default, and the list of languages it reads will grow.  
 The [parity test][parity] asserts it on the 10 Rust inputs.
 
-### 17. An inline exclusion belongs to its scope item
+### 17. An inline exclusion belongs to the scope item
 
 `~link`, `~code`, `~strong` and `~emphasis` blank an element for the blocks that the item holding them selects, and for no other block.  
 With `scope: [heading, 'paragraph & ~link']`, a link in a heading still reads as text, and a link in a paragraph reads as spaces.  

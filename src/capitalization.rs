@@ -49,9 +49,9 @@ fn words<'a>(rule: &Capitalization, text: &'a str) -> Vec<&'a str> {
 /// Whether enough of the words of `text` agree with `expected`, its
 /// conversion: `expected` and whether the share is at least the threshold.
 ///
-/// A word agrees when it equals the converted word at its place, or an
+/// A word passes when it equals the converted word at its place, or an
 /// exception matches it, or, in title case, it is in capitals. A word past
-/// the last converted word agrees. In sentence case, a first word that is not
+/// the last converted word passes. In sentence case, a first word that is not
 /// as a title would write it ends the count at once.
 fn agree(rule: &Capitalization, text: &str, expected: &str, sentence: bool) -> (String, bool) {
     let converted = words(rule, expected);

@@ -3,7 +3,7 @@
 ## Context
 
 Each change that built a check recorded the places where hakkiri departs from Vale 3.26.0 in its own design.  
-The [format design][format-7] holds the first list, and the [rule-engine][engine], [pattern-and-readability][pattern], [case-and-sequence][case] and [spelling-and-affix][spelling] designs add to it.  
+The [format design][format-7] holds the first list, and the [rule-engine][engine], [`pattern-and-readability`][pattern], [case-and-sequence][case] and [spelling-and-affix][spelling] designs add to it.  
 The [bootstrap design][bootstrap] and the [sentence-splitter design][splitter] hold two more.
 
 ## Goals / Non-Goals

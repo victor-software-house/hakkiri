@@ -320,7 +320,7 @@ pub struct Readability {
     pub grade: f64,
 }
 
-/// The case a `capitalization` rule asks for.
+/// The case a `capitalization` rule requires.
 #[derive(Debug)]
 pub enum Case {
     /// `$title`, in one style.

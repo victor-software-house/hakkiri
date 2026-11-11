@@ -15,7 +15,7 @@ use regex::Regex;
 use crate::splitter::Model;
 use crate::words::words;
 
-/// The easy words of the Dale-Chall list, one per line.
+/// The familiar words of the Dale-Chall list, one per line.
 const EASY: &str = include_str!("../data/readability/easy-words.txt");
 
 static EASY_WORDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| EASY.lines().collect());
@@ -372,9 +372,9 @@ fn opens(text: &str, at: usize, opening: char) -> bool {
     }
 }
 
-/// The byte just past the mark `closer` that ends a quotation in `text`,
-/// searching from `from`. A curly single mark closes only when no letter
-/// follows it, since it is also an apostrophe.
+/// The byte immediately after the mark `closer` that ends a quotation in
+/// `text`, searching from `from`. A curly single mark closes only when no
+/// letter follows it, since it is also an apostrophe.
 fn closing(text: &str, closer: char, from: usize) -> Option<usize> {
     let rest = text.get(from..)?;
     rest.char_indices().find_map(|(offset, c)| {

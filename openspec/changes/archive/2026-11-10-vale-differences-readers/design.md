@@ -28,7 +28,7 @@ The last requirement of the spec holds them.
 
 Alternative: list only differences in what a rule reports. Lost: a long line that makes Vale panic is a difference a reader looks for.
 
-### 2. A number is quoted only as its design states it
+### 2. A number is quoted only as the design states the number
 
 A scenario gives a time or a size only where the design gives it: 31 ms for 16,667 words, 18 seconds for 8,000 words, and 13 seconds at a 6 GB limit.
 

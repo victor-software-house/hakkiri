@@ -15,7 +15,7 @@ Each claim links its source.
    `BareURL` rebuilds fenced blocks and code spans out of lookbehinds; that rule caused the backtracking panics and the 249 s run (section 3).  
    A linter that walks a Markdown tree offers that scope, and the rule becomes a token match.
 4. The Rust building blocks are mature for every part except sentence splitting and syllable counts (section 5).  
-   `fancy-regex` now accepts variable-length lookbehind and returns an error, not a panic, when it runs out of backtracking budget.
+   `fancy-regex` now accepts variable-length lookbehind and returns an error instead of a panic when it runs out of backtracking budget.
 5. Whether `fancy-regex` compiles the six ProseStyle patterns that use lookbehind, unchanged, is not verified.  
    That one test decides how cheap reading Vale rule YAML as it is would be.
 
@@ -85,7 +85,7 @@ Licences and dates from the GitHub API unless a LICENSE link is given.
 | [Vale][vale] | MIT, Go | active, one maintainer | YAML rule types plus Tengo scripts | runs the package today |
 | [vale-ls][vale-ls] | MIT, Rust | v0.6.0, 2026-10-01 | language server that calls Vale | editor front end for Vale only |
 | [Harper][harper] | Apache-2.0, Rust | v3.1.0, 2026-11-06 | built-in linters and the [Weir][weir] phrase DSL; no regex, scopes or metrics | grammar; style is not its goal ([discussion 1465][harper-1465]) |
-| [vale-cli/Harper][vale-harper] | Apache-2.0 | v0.1.0, 2026-08-05 | Harper rules compiled to Vale YAML | a Vale style, not a linter |
+| [vale-cli/Harper][vale-harper] | Apache-2.0 | v0.1.0, 2026-08-05 | Harper rules compiled to Vale YAML | a Vale style instead of a linter |
 | [textlint][textlint] | [MIT][textlint-lic], TypeScript | v15.8.0, 2026-08-01 | JavaScript functions over an AST; MDX plugin | rules are code and need Node |
 | [proselint][proselint] | BSD-3-Clause, Python | v0.16.0, 2025-11-14 | fixed checks | no user rules |
 | [write-good][write-good], [alex][alex] | MIT, JavaScript | last commits 2025 and 2024 | fixed word lists | no user rules |
@@ -115,7 +115,7 @@ Versions and licences from the crates.io API on 2026-11-09.
 | Crate | Licence | Latest | Notes |
 |:--|:--|:--|:--|
 | [regex][regex] | MIT or Apache-2.0 | 1.13.1 | linear time; no lookaround |
-| [fancy-regex][fancy] | MIT | 0.20.0, 2026-10-24 | variable-length lookbehind since 0.18 ([CHANGELOG][fancy-cl]); `backtrack_limit` returns [an error][fancy-err], not a panic |
+| [fancy-regex][fancy] | MIT | 0.20.0, 2026-10-24 | variable-length lookbehind since 0.18 ([CHANGELOG][fancy-cl]); `backtrack_limit` returns [an error][fancy-err] instead of a panic |
 | [aho-corasick][aho] | Unlicense or MIT | 1.1.5 | word lists |
 | [rayon][rayon], [ignore][ignore] | MIT or Apache-2.0; Unlicense or MIT | 1.12.0; 0.4.34 | parallel files; gitignore-aware walk |
 
@@ -181,7 +181,7 @@ These follow from the findings; [design.md][design] records how the operator set
 [weir]: https://writewithharper.com/docs/weir
 [vale-harper]: https://github.com/vale-cli/Harper
 [textlint]: https://github.com/textlint/textlint
-[textlint-lic]: https://github.com/textlint/textlint/blob/master/LICENSE
+[textlint-lic]: https://github.com/textlint/textlint/blob/4c916a878ee7ec60622ec795f5654e75f1cb4357/LICENSE
 [proselint]: https://github.com/amperser/proselint
 [write-good]: https://github.com/btford/write-good
 [alex]: https://github.com/get-alex/alex
@@ -194,11 +194,11 @@ These follow from the findings; [design.md][design] records how the operator set
 [pulldown]: https://github.com/pulldown-cmark/pulldown-cmark
 [ts]: https://github.com/tree-sitter/tree-sitter
 [ts-rust]: https://github.com/tree-sitter/tree-sitter-rust
-[ts-rust-nodes]: https://github.com/tree-sitter/tree-sitter-rust/blob/master/src/node-types.json
+[ts-rust-nodes]: https://github.com/tree-sitter/tree-sitter-rust/blob/77a3747266f4d621d0757825e6b11edcbf991ca5/src/node-types.json
 [ra-lexer]: https://crates.io/crates/ra_ap_rustc_lexer
 [regex]: https://github.com/rust-lang/regex
 [fancy]: https://github.com/fancy-regex/fancy-regex
-[fancy-cl]: https://github.com/fancy-regex/fancy-regex/blob/main/CHANGELOG.md
+[fancy-cl]: https://github.com/fancy-regex/fancy-regex/blob/a460c32089d11493e205ae085723bc80214e61d3/CHANGELOG.md
 [fancy-err]: https://docs.rs/fancy-regex/latest/fancy_regex/enum.RuntimeError.html
 [aho]: https://github.com/BurntSushi/aho-corasick
 [rayon]: https://github.com/rayon-rs/rayon

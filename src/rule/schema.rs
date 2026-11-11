@@ -1,6 +1,6 @@
 //! What a rule file may hold, one type per check.
 //!
-//! Each type refuses a field its check does not define, and validation then
+//! Each type rejects a field its check does not define, and validation then
 //! refuses a field of the wrong kind, a `level` Vale does not define, and the
 //! Vale features hakkiri does not run.
 

@@ -147,7 +147,7 @@ The prose-style change that adds these rules sets the final numbers.
 |:--|:--|:--|:--|
 | Semicolons | `Semicolons` | metric, `> 3` | agents 8.05, people at most 1.20 |
 | Colons inside a sentence | `InnerColons` | metric, `> 5` | agents 9.47, people at most 3.27 |
-| ", not the" contrasts | `NotTheContrast` | existence | agents 0.69, people at most 0.12 |
+| `, not the` contrasts | `NotTheContrast` | existence | agents 0.69, people at most 0.12 |
 | Three-item lists | `ThreeItemLists` | metric, `> 2` | agents 3.21, people at most 0.93 |
 | "so the" and "so it" | `SoThe` | existence | agents 1.54, people at most 0.38 |
 | Verbs that make things act | `ThingsAct` | existence | see the research's word table |

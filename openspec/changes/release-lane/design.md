@@ -3,7 +3,7 @@
 ## Context
 
 qctl and verctl release through verctl's [reusable workflow][v-readme], and rgbctl, a binary with no crates.io crate, is the nearest shape: a tag, a GitHub Release and tarballs.
-hakkiri's template answers say `published: false` and list the platforms `linux-x64` and `macos-arm64`.
+hakkiri's template answers hold `published: false` and list the platforms `linux-x64` and `macos-arm64`.
 Those two are what every consumer locks, and `mise lock` needs an asset for each platform it locks.
 The latest verctl release is 0.7.4, and the README of its main branch describes 0.8.0, so this design pins a released verctl and not main.
 

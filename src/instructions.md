@@ -92,5 +92,5 @@ files:
 ## Differences from Vale
 
 `hakkiri check` has no `--glob`, `--filter`, `--ext`, `--sort`, `--relative` or `--no-global`, and reads no standard input.
-It prints the level in each line, and its JSON is one object, not a map from path to alerts.
+It prints the level in each line, and its JSON is one object instead of a map from path to alerts.
 `--fail-level` takes the place of `--no-exit`.

@@ -1,5 +1,5 @@
 //! The `readability` check: the scenarios of the readability-check spec of the
-//! pattern-and-readability-checks change.
+//! `pattern-and-readability-checks` change.
 //!
 //! Each test loads one `readability` rule, lints one Markdown input, and
 //! checks the alerts.
