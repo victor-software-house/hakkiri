@@ -733,8 +733,8 @@ fn rule_files(folder: &Path, files: &mut Vec<PathBuf>) -> Result<(), (PathBuf, s
 pub struct Style {
     /// The rules, in the order of the walk.
     pub rules: Vec<Rule>,
-    /// A file whose rule name holds a bracket, or that gives the name of an
-    /// earlier file. Such a file gives no rule.
+    /// A file whose rule name holds a bracket, which gives no rule, or that
+    /// gives the name of an earlier file, whose rule it replaces as Vale does.
     /// Vale refuses these only for a style a glob enables, so a caller decides
     /// whether they are errors.
     pub names: Vec<LoadProblem>,
@@ -777,7 +777,7 @@ pub fn read_style(folder: &Path) -> Result<Style, LoadError> {
         .unwrap_or_else(|| Path::new("."));
     let mut files = Vec::new();
     rule_files(folder, &mut files).map_err(|(at, error)| unread(&at, error.to_string()))?;
-    let mut rules = Vec::new();
+    let mut rules: Vec<Rule> = Vec::new();
     let mut names = Vec::new();
     let mut problems = Vec::new();
     let mut by_name: HashMap<String, PathBuf> = HashMap::new();
@@ -798,16 +798,19 @@ pub fn read_style(folder: &Path) -> Result<Style, LoadError> {
                     first.display()
                 ),
             ));
-            continue;
+        } else {
+            by_name.insert(name.clone(), path.clone());
         }
-        by_name.insert(name.clone(), path.clone());
         let read = fs::read_to_string(&path)
             .map_err(|error| LoadError {
                 problems: vec![problem(&file, error.to_string())],
             })
             .and_then(|text| Rule::from_text_in(&name, &file, &text, package));
         match read {
-            Ok(rule) => rules.push(rule),
+            Ok(rule) => match rules.iter().position(|earlier| earlier.name == rule.name) {
+                Some(at) => rules[at] = rule,
+                None => rules.push(rule),
+            },
             Err(error) => problems.extend(error.problems),
         }
     }
