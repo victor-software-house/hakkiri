@@ -688,6 +688,26 @@ fn a_code_span_is_no_match() -> TestResult {
     Ok(())
 }
 
+#[test]
+fn an_occurrence_counts_no_code_span() -> TestResult {
+    let rule = |token: &str| {
+        format!("extends: occurrence\nmessage: \"%d\"\nscope: sentence\nmax: 2\ntoken: '{token}'\n")
+    };
+    let count = |token: &str, source: &str| -> Result<Vec<String>, Box<dyn Error>> {
+        Ok(markdown(&rule(token), source)?
+            .into_iter()
+            .map(|alert| alert.message)
+            .collect())
+    };
+    let first = "Run `a`, `b`, `c` and `one two three` today.\n";
+    let second = "Two words `four word span` more.\n";
+    for source in [first, second] {
+        assert_eq!(count(r"(?:\b\w+\b|\*+)", source)?, ["3"]);
+        assert_eq!(count(r"\b\w+\b", source)?, ["3"]);
+    }
+    Ok(())
+}
+
 /// The rule of `token` over `max` and `min`, counting what a message names.
 fn occurrence(token: &str, bound: &str) -> String {
     format!("extends: occurrence\nmessage: \"%d found\"\n{bound}\ntoken: {token}\n")
