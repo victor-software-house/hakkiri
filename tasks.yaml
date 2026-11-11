@@ -1,26 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-040
+active: HKR-042
 queue:
-  - id: HKR-040
-    title: Read a package's settings
-    scope: config
-    outcome: >-
-      A package ships a settings file in hakkiri's own YAML format, and hakkiri
-      merges it under the project's config, as Vale merges a package's .vale.ini. The
-      project overrides the package.
-    blocked_by: []
-    acceptance:
-      - A package's settings file is read and merged under the project's config, and a setting in the project wins, in a test.
-      - A rule the package sets off stays off until the project turns it on, in a test.
-      - The package's vocab reaches the checks that read vocabularies, in a test.
-      - A project's styles list adds to a package's under the same glob and replaces it under another glob that matches the same files, in a test.
-      - A package's packages are fetched like the project's, each pinned by url and sha256, once per hash, and a chain over 10 packages is an error, in tests.
-    plan: openspec/changes/package-settings/proposal.md
-    notes:
-      - "2026-11-11, operator decisions: the file is .ctl/hakkiri.yaml in the package folder; styles add up under the same glob text and a project list under another glob replaces the package's, with no warning; a package's packages are fetched, pinned by url and sha256, with a depth limit of 10 (Vale sets none). A cycle cannot occur, since a zip cannot hold its own hash."
-
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary
     scope: config
@@ -52,7 +34,7 @@ queue:
     scope: prose-style
     outcome: >-
       prose-style publishes a hakkiri package with its own rules, the native ports of the upstream rules worth keeping, and the rate rules.
-    blocked_by: [HKR-040]
+    blocked_by: []
     acceptance:
       - Every rule case and package case passes under hakkiri test.
       - An alert diff against Vale with ProseStyle v0.0.14 over our public repositories shows only the intended differences.
@@ -199,6 +181,21 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-040
+    title: Read a package's settings
+    scope: config
+    outcome: >-
+      A package ships a settings file in hakkiri's own YAML format, and hakkiri
+      merges it under the project's config, as Vale merges a package's .vale.ini. The
+      project overrides the package.
+    plan: openspec/changes/archive/2026-11-11-package-settings/proposal.md
+    notes:
+      - "2026-11-11, operator decisions: the file is .ctl/hakkiri.yaml in the package's top folder, beside styles; styles add up under the same glob text and a project list under another glob replaces the package's, with no warning; a package's packages are fetched, pinned by url and sha256, with a depth limit of 10 (Vale sets none). A cycle cannot occur, since a zip cannot hold its own hash. An empty vocab list clears the names before it, in a later package and, for a glob, among the lists of the same glob text."
+    completed: 2026-11-11T19:38:31
+    evidence:
+      - openspec/changes/archive/2026-11-11-package-settings/
+    disposition: completed
+
   - id: HKR-019
     title: Read vocabularies
     scope: config

@@ -28,8 +28,12 @@ The operator ruled on the three decisions of the [proposal][proposal] on 2026-11
 
 ## 3. Gate
 
-- [ ] 3.1 Pull request CI passes on the head of the pull request.  
+- [x] 3.1 Pull request CI passes on the head of the pull request.  
   Verify the checks of the head commit pass in the run on the pull request.
+  - 2026-11-11 (UTC), every check of [06a137b][c-head] passes in [the CI run of PR 87][r-87], and the stack merged as [a6d2487][c-main].
 
 [proposal]: proposal.md
 [c-base]: https://github.com/victor-software-house/hakkiri/commit/64baed3342e99474aff077b66f376b60a6e7db5e
+[c-head]: https://github.com/victor-software-house/hakkiri/commit/06a137b51459a51ab6cf4ade320ff0225f1c2c1f
+[c-main]: https://github.com/victor-software-house/hakkiri/commit/a6d24872dfa25347818fbba233470b1fdd650f3b
+[r-87]: https://github.com/victor-software-house/hakkiri/actions/runs/43056201410

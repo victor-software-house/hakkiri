@@ -560,6 +560,45 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 - **WHEN** the config names a vocabulary that no package holds
 - **THEN** hakkiri names the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
 
+### Requirement: Package settings differ from Vale's package configuration
+
+hakkiri SHALL read a package's settings as each scenario below says, where Vale 3.26.0 reads a package's `.vale.ini` otherwise.
+
+#### Scenario: The file and its place
+
+- **WHEN** a package holds `.ctl/hakkiri.yaml`
+- **THEN** hakkiri reads it from the package's top folder, beside `styles`, and Vale copies the package's `.vale.ini` to `StylesPath/.vale-config/<index>-<Name>.ini` at `vale sync` ([package settings 2][settings-2])
+
+#### Scenario: A scalar in a package
+
+- **WHEN** a package and the project both set `level`
+- **THEN** the project's value applies, and Vale lets a package win for the keys it reads first, such as `WordTemplate` and the `[formats]` entries ([package settings 5][settings-5])
+
+#### Scenario: An unknown key in a package
+
+- **WHEN** a package's settings file holds a key hakkiri does not define
+- **THEN** hakkiri refuses it with the line and the package, and Vale warns that the key is not a core option and ignores it ([package settings 7][settings-7])
+
+#### Scenario: A deep chain of packages
+
+- **WHEN** the chain of packages that list packages is more than 10 deep
+- **THEN** hakkiri refuses it, and Vale follows each `Packages` entry with no limit and no check for a loop ([package settings 3][settings-3])
+
+#### Scenario: A nested package pinned by path
+
+- **WHEN** a package's `packages` holds a `path` entry
+- **THEN** hakkiri refuses it, and Vale installs a local folder named there ([package settings 3][settings-3])
+
+#### Scenario: Ten or more packages
+
+- **WHEN** a project lists ten or more packages
+- **THEN** hakkiri applies them in the listed order, and Vale sorts their fragment files as text, so `10-` comes before `2-` ([package settings 6][settings-6])
+
+#### Scenario: A project section that replaces package styles
+
+- **WHEN** a project's section under another glob replaces the styles a package turned on
+- **THEN** hakkiri prints nothing, and Vale warns once that the section replaces the styles of the package ([package settings 4][settings-4])
+
 [bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
 [bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
 [case-1]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
@@ -606,6 +645,12 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [pattern-9]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
 [rule-names-4]: ../../changes/archive/2026-11-10-rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
 [rule-setting-7]: ../../changes/archive/2026-11-11-rule-setting/design.md#7-what-stays-different
+[settings-2]: ../../changes/archive/2026-11-11-package-settings/design.md#2-the-files-name-and-place-in-the-package
+[settings-3]: ../../changes/archive/2026-11-11-package-settings/design.md#3-which-keys-a-package-may-set-and-nested-packages
+[settings-4]: ../../changes/archive/2026-11-11-package-settings/design.md#4-a-styles-list-under-a-glob-the-package-also-writes
+[settings-5]: ../../changes/archive/2026-11-11-package-settings/design.md#5-scalars-the-project-wins
+[settings-6]: ../../changes/archive/2026-11-11-package-settings/design.md#6-order-across-packages
+[settings-7]: ../../changes/archive/2026-11-11-package-settings/design.md#7-errors-name-the-package-file
 [spelling-1]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#1-spelling-reads-words-as-vales-tokenizer-cuts-them
 [spelling-2]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
 [spelling-3]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses

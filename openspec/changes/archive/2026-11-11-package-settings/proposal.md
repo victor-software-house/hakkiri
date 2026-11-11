@@ -51,4 +51,4 @@ The operator ruled on 2026-11-11, and the design records each with its alternati
 - No new dependency.
 - The ProseStyle package gains `.ctl/hakkiri.yaml` and loses `.vale.ini`, in the prose-style repository (`HKR-008`).
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
