@@ -103,6 +103,11 @@ A rule read through a parent SHALL name no line.
 - **WHEN** a rule holds `extends: Vale.Terms`
 - **THEN** hakkiri reports that `Vale.Terms` is a built-in rule with no file to extend, and exits 2
 
+#### Scenario: A parent name that is a path
+
+- **WHEN** a rule holds `extends: /etc/x.y` or `extends: Std..Rule`
+- **THEN** hakkiri reports that it is not a rule name, says a rule name is a style, a dot and a rule such as `Std.Rule`, reads no file for it, and exits 2
+
 ### Requirement: A rule hakkiri cannot run loads no rule
 
 A rule that is valid Vale and that hakkiri cannot run, a rule that extends `script` or whose `scope` is a `doc()` selector, SHALL give no rule.  
@@ -123,3 +128,8 @@ The loader SHALL keep its name and its file, so a config can turn it `off`.
 
 - **WHEN** a rule extends a rule that extends `script`
 - **THEN** it is a rule hakkiri cannot run too
+
+#### Scenario: Two files for one rule
+
+- **WHEN** two files of a style give one rule name, and the later file is a rule hakkiri cannot run or the earlier one is
+- **THEN** the later file replaces the earlier one: the rule runs only if the later file is runnable, and fails the run only if it is not

@@ -303,6 +303,52 @@ fn a_chain_vale_refuses_is_refused() -> TestResult {
     Ok(())
 }
 
+/// Values of `extends` that are no rule name: a path, or a part left empty.
+const ESCAPES: [(&str, &str); 5] = [
+    ("slash", "/etc/x.y"),
+    ("dots", "Std..Rule"),
+    ("empty-style", ".Rule"),
+    ("parent", "Base..Parent"),
+    ("backslash", "Std\\Rule.Sub"),
+];
+
+#[test]
+fn an_extends_that_is_no_rule_name_is_refused_and_reads_nothing_outside() -> TestResult {
+    let suite = Suite::new("vale-escape");
+    for (name, extends) in ESCAPES {
+        let root = project(&suite, name, &format!("extends: '{extends}'\n"), KID);
+        let result = run(root.path(), &["check"], &[])?;
+        assert_eq!(result.code, 2, "{name}: {}", all(&result));
+        assert!(
+            all(&result).contains(&format!("`{extends}` is not a rule name")),
+            "{name}: {}",
+            all(&result)
+        );
+        assert!(
+            all(&result).contains("such as `Std.Rule`"),
+            "{name}: {}",
+            all(&result)
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn an_extends_that_names_a_file_outside_the_package_does_not_read_it() -> TestResult {
+    let suite = Suite::new("vale-outside");
+    let root = suite.scenario("outside");
+    root.file("outside/Out/Rule.yml", PARENT);
+    let outside = root.path().join("outside").join("Out");
+    let child = format!("extends: '{}.Rule'\n", outside.display());
+    root.file("styles/Kid/Child.yml", &child);
+    root.file(".ctl/hakkiri.yaml", KID);
+    root.file("a.md", TEXT);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}", all(&result));
+    assert!(!all(&result).contains("Parent: found"), "{}", all(&result));
+    Ok(())
+}
+
 #[test]
 fn a_chain_over_ten_rules_is_refused() -> TestResult {
     let suite = Suite::new("vale-deep");
@@ -433,6 +479,57 @@ fn a_level_or_on_does_not_make_a_rule_hakkiri_cannot_run_run() -> TestResult {
             all(&result)
         );
     }
+    Ok(())
+}
+
+/// The config that lists one style and turns on a rule of another.
+const CLASH: &str =
+    "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Other], Kid.Cannot: warning}\n";
+
+/// A runnable rule that flags a word of [`TEXT`].
+const RUNNABLE: &str = "extends: existence\nmessage: Runnable\nlevel: warning\ntokens: [alpha]\n";
+
+/// A project whose rule `Kid.Cannot` has two files, `Cannot.custom.yml` first
+/// and `Cannot.yml` after it.
+fn clash<'a>(suite: &'a Suite, name: &str, custom: &str, later: &str) -> Root<'a> {
+    let root = suite.scenario(name);
+    root.file("styles/Kid/Cannot.custom.yml", custom);
+    root.file("styles/Kid/Cannot.yml", later);
+    root.file(
+        "styles/Other/Plain.yml",
+        "extends: existence\nmessage: Plain\ntokens: [swapme]\n",
+    );
+    root.file(".ctl/hakkiri.yaml", CLASH);
+    root.file("a.md", TEXT);
+    root
+}
+
+#[test]
+fn a_later_file_that_hakkiri_cannot_run_replaces_an_earlier_runnable_rule() -> TestResult {
+    let suite = Suite::new("vale-clash-script-last");
+    let root = clash(&suite, "last", RUNNABLE, SCRIPT);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}", all(&result));
+    assert!(all(&result).contains("failed "), "{}", all(&result));
+    assert!(!all(&result).contains("Runnable"), "{}", all(&result));
+    Ok(())
+}
+
+#[test]
+fn a_later_runnable_file_replaces_an_earlier_rule_hakkiri_cannot_run() -> TestResult {
+    let suite = Suite::new("vale-clash-runnable-last");
+    let root = clash(&suite, "last", SCRIPT, RUNNABLE);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", all(&result));
+    assert!(!all(&result).contains("failed "), "{}", all(&result));
+    assert!(
+        result
+            .lines()
+            .iter()
+            .any(|line| line.contains("Kid.Cannot: Runnable")),
+        "{}",
+        all(&result)
+    );
     Ok(())
 }
 
