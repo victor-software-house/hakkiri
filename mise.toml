@@ -31,6 +31,9 @@ mr-boxington = "1.29.1"
 "github:EmbarkStudios/cargo-deny" = "0.20.2"
 "github:bnjbvr/cargo-machete" = "0.9.2"
 jq = "1.8.2"
+# The C compiler for the musl release build; see CC_x86_64_unknown_linux_musl
+# in mise.ci.toml.
+zig = "0.17.1"
 # The ver task (release workflow, check:versions) runs this verctl.
 "github:victor-software-house/verctl" = "0.8.0"
 
@@ -40,6 +43,9 @@ jq = "1.8.2"
 RUSTFMT_TOOLCHAIN = "+nightly-2026-11-01"
 # doc builds on the nightly, as docs.rs does.
 RUST_NIGHTLY = "nightly-2026-11-01"
+# cc-rs compiles the C of the dependencies for the musl release target with
+# this wrapper around zig, and only for that target.
+CC_x86_64_unknown_linux_musl = "{{ config_root }}/tools/zig-cc-musl"
 
 # The one gate, composed from the pieces this repository keeps. deny:advisories
 # and semver need the network, so they run as their own CI steps.
