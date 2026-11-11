@@ -33,6 +33,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   - 2026-11-11 (UTC), the linked-root test failed with `uncovered Sub.Bar` and the shared-name test listed `Team.Terms` twice on that loader, in a throwaway Linux box.  
     Both pass in [a19b4de][c-link].  
     Vale `66bbb85` gave no error for two files with one name in `vale test`, and listed an unflagged name twice.
+- [x] 2.6 Print an uncovered rule in JSON as an object with the rule name, and with `files` only when two rule files give the name.  
+  Verify the JSON test fails on the loader of [f7a7742][c-shared] and passes on the new one.  
+  - 2026-11-11 (UTC), it failed on the string entry in a throwaway Linux box, and passes in [97241a8][c-json].
 
 ## 3. Record
 
@@ -55,3 +58,5 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-docs]: https://github.com/victor-software-house/hakkiri/commit/eeafcb035627fee88eea11feb2232f123292868a
 [c-gap]: https://github.com/victor-software-house/hakkiri/commit/ffba7c2fb7e099cafd2c1117ec3f350f39651678
 [c-link]: https://github.com/victor-software-house/hakkiri/commit/a19b4de4b4f5773413d7483d8a78daf6b5baacf9
+[c-shared]: https://github.com/victor-software-house/hakkiri/commit/f7a77425a0a0c1a735458c342e46764c5597355b
+[c-json]: https://github.com/victor-software-house/hakkiri/commit/97241a82f24b89ef208e30792a6865f603a78cf1
