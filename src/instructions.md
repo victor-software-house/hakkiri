@@ -19,11 +19,15 @@ The project config, `.ctl/hakkiri.yaml`, says which rules run on which files.
 hakkiri check
 hakkiri check docs README.md
 hakkiri check --fail-level warning
+hakkiri check --no-gitignore
+hakkiri check --on-unmatched error README.md
 hakkiri check --format json
 ```
 
 - A path is a file or a directory. A directory is walked in sorted order, and with no path the current directory is walked.
 - A walk skips `node_modules`, `.git` and each folder a `packages` entry names. It skips files that no language reads, with no message.
+- A walk also skips what `.gitignore`, `.git/info/exclude` and the global git excludes ignore, as ripgrep does, inside a git repository. `--no-gitignore`, `--gitignore=false` or `gitignore: false` in the config reads those files too. A file named on the command line is never skipped for being ignored.
+- A file named on the command line that no glob selects draws a warning on standard error and is not linted. `--on-unmatched` or `on_unmatched` takes `warn`, the default, `error`, which fails the run with exit 2, or `ignore`. A file that a glob selects but whose styles hold no rule draws nothing, and nor does a file a walk found.
 - A file named on the command line that no language reads is a failure.
 - Languages come from the extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` and `.js`.
   Other files, plain text included, are not linted yet.
@@ -96,7 +100,9 @@ A broken config stops the run before any file lints, and prints to standard erro
 Every long option reads `HAKKIRI_<LONG>`: `HAKKIRI_CONFIG` names the config, `HAKKIRI_CACHE_DIR` names the folder that keeps fetched packages, `HAKKIRI_FAIL_LEVEL` sets the level, `HAKKIRI_COVERAGE` turns coverage on for `test`, and `HAKKIRI_FORMAT=json` asks for JSON.
 `HAKKIRI_COLOR` and `HAKKIRI_QUIET` set the shared flags `--color` and `--quiet`, and `--no-color` has no variable.
 Pretty output of `check` holds no colour, so `--color` changes nothing there. `--quiet` hides a successful pretty run.
+`HAKKIRI_GITIGNORE` takes `true` or `false`, so `HAKKIRI_GITIGNORE=false` reads the files git ignores, and `--no-gitignore` has no variable. `HAKKIRI_ON_UNMATCHED` takes `warn`, `error` or `ignore`.
 A flag on the command line wins over its variable, and an empty variable counts as unset.
+The config sets `fail_level`, `gitignore` and `on_unmatched` too, and the order is the flag, then the variable, then the config, then the default.
 
 ## The config
 
@@ -115,6 +121,7 @@ files:
 - The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every `path` and glob is relative to the project root, the folder that holds `.ctl`, and a file outside it matches no glob. A path given outside the root draws a warning on standard error, and a run where no path lies under the root exits 2.
 - A key the config does not define is an error that names the key and its line.
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
+- `fail_level`, `gitignore` and `on_unmatched` set the options of the same names for `check`. Only the project's config holds them, and a package's settings file that does is an error.
 - `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule, in the folder or under it. A folder that starts with `.` or `_` and a `*.test.yml` file are skipped, and so is a folder named `config`, where Vale keeps vocabularies and other settings.
   Two folders that hold one style name are refused. So are two files that give one rule name, and a name with a bracket, when a glob lists the style: a style no glob lists is not refused, as in Vale.
   A `url` entry holds the `url` of a zip, which starts with `https://` or `http://`, and its `sha256`, 64 lowercase hex digits. The first run downloads the zip, checks the hash, and unpacks it into the cache folder under that hash, and a later run reads it from there and asks for nothing.

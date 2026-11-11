@@ -25,11 +25,15 @@ This skill is the workflow and does not repeat the whole grammar.
 hakkiri check
 hakkiri check docs README.md
 hakkiri check --fail-level warning
+hakkiri check --no-gitignore
+hakkiri check --on-unmatched error README.md
 hakkiri check --format json
 ```
 
 With no path, `check` walks the current directory.
-A walk skips `node_modules`, `.git` and package folders, and skips files that no language reads.
+A walk skips `node_modules`, `.git` and package folders, files that no language reads, and what git ignores in a git repository.
+`--no-gitignore` reads the ignored files, and a file named on the command line is read whether git ignores it or not.
+A file named on the command line that no glob selects draws a warning, and `--on-unmatched error` fails the run for it.
 A file named on the command line that no language reads is a failure.
 
 ## Run the test cases
@@ -62,6 +66,7 @@ JSON never holds an escape byte.
 ## Flags and variables
 
 Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an empty variable counts as unset.
+`--fail-level`, `--gitignore` and `--on-unmatched` are also keys of the project config, `fail_level`, `gitignore` and `on_unmatched`, which the variable wins over.
 
 | Flag | Variable | Meaning |
 |:--|:--|:--|
@@ -69,6 +74,8 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 | `--config` | `HAKKIRI_CONFIG` | The config file, `.ctl/hakkiri.yaml` by default |
 | `--coverage` | `HAKKIRI_COVERAGE` | With `test`, fail when a rule flags nothing in any case |
 | `--fail-level` | `HAKKIRI_FAIL_LEVEL` | The lowest level that exits 1: `suggestion`, `warning` or `error` |
+| `--gitignore` | `HAKKIRI_GITIGNORE` | `true`, the default, or `false` to read what git ignores; `--no-gitignore` is the same as `--gitignore=false` and has no variable |
+| `--on-unmatched` | `HAKKIRI_ON_UNMATCHED` | What to do with a named file no glob selects: `warn`, the default, `error` or `ignore` |
 | `--format` | `HAKKIRI_FORMAT` | `pretty` or `json` |
 | `--color` | `HAKKIRI_COLOR` | `auto`, `always` or `never`; pretty output holds no colour |
 | `--quiet` | `HAKKIRI_QUIET` | Hide successful pretty output |

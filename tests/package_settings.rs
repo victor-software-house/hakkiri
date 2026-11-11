@@ -835,3 +835,22 @@ fn a_chain_of_eleven_packages_is_an_error() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn a_package_that_sets_a_run_option_is_an_error() -> TestResult {
+    let suite = Suite::new("package-settings-run-options");
+    let root = project(&suite, "run-options", "packages:\n  - path: pkg/styles\n");
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "files: {}\ngitignore: false\nfail_level: warning\non_unmatched: error\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    for (line, key) in [(2, "gitignore"), (3, "fail_level"), (4, "on_unmatched")] {
+        let want = format!(
+            "failed pkg/.ctl/hakkiri.yaml: line {line}: {key}: belongs to the project's config"
+        );
+        assert!(result.err.contains(&want), "{}", result.err);
+    }
+    Ok(())
+}

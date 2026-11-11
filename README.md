@@ -26,6 +26,7 @@ An editor server follows in the second release.
 - A package's vocabularies hold back the matches of the words a project accepts, at the top level or for a glob, and build the rules `Vale.Terms` and `Vale.Avoid`.
 - A glob can hide the text its block and token patterns match from the prose rules in Markdown and MDX, as Vale's `BlockIgnores` and `TokenIgnores` do.
 - An HTML comment in a Markdown file, such as `<!-- hakkiri Style.Rule: off -->`, or `{/* hakkiri Style.Rule: off */}` in an MDX file, turns rules off and on for the text after it, with Vale's reach, and Vale's own `<!-- vale off -->` comments work too.
+- A walk skips what git ignores, as ripgrep does, and a file named on the command line draws a warning when no glob selects it. The config, a flag and a variable each set both.
 - Files are checked in parallel.
 
 ## Install

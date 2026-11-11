@@ -23,6 +23,7 @@ use hakkiri::rule::{
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 
+use crate::cli::{FailLevel, OnUnmatched};
 use crate::package;
 use crate::vocabulary::{self, SETTINGS_FOLDER, Vocabulary};
 
@@ -116,6 +117,16 @@ struct Raw {
     #[serde(default)]
     #[garde(skip)]
     files: Ordered<Ordered<Setting>>,
+    /// The options of a run, which only the project's config sets.
+    #[serde(default)]
+    #[garde(skip)]
+    fail_level: Option<FailLevel>,
+    #[serde(default)]
+    #[garde(skip)]
+    gitignore: Option<bool>,
+    #[serde(default)]
+    #[garde(skip)]
+    on_unmatched: Option<OnUnmatched>,
 }
 
 /// One entry of `packages`.
@@ -243,6 +254,12 @@ pub(crate) struct Project {
     vocabularies: BTreeMap<String, Vocabulary>,
     /// The lowest level an alert reports at.
     pub(crate) level: Option<Level>,
+    /// The config's `fail_level`.
+    pub(crate) fail_level: Option<FailLevel>,
+    /// The config's `gitignore`.
+    pub(crate) gitignore: Option<bool>,
+    /// The config's `on_unmatched`.
+    pub(crate) on_unmatched: Option<OnUnmatched>,
     /// The package folders, which a walk leaves alone.
     pub(crate) packages: Vec<PathBuf>,
     /// The project root: the folder that holds the `.ctl` folder of the
@@ -271,6 +288,11 @@ pub(crate) struct Plan<'a> {
     pub(crate) token_ignores: Vec<&'a Pattern>,
 }
 
+/// Whether the resolved directory `real` is under `root` or holds it.
+pub(crate) fn leads_to(root: &Path, real: &Path) -> bool {
+    real.starts_with(root) || root.starts_with(real)
+}
+
 impl Project {
     /// The project root.
     pub(crate) fn root(&self) -> &Path {
@@ -280,7 +302,13 @@ impl Project {
     /// Whether the resolved directory `real` is under the project root or
     /// holds it, so a walk of it can reach a file under the root.
     pub(crate) fn leads_to_root(&self, real: &Path) -> bool {
-        real.starts_with(&self.root) || self.root.starts_with(real)
+        leads_to(&self.root, real)
+    }
+
+    /// Whether some glob matches `path`, written relative to the project root
+    /// with `/` separators, whatever rules the globs give it.
+    pub(crate) fn selects(&self, path: &str) -> bool {
+        self.globs.iter().any(|glob| glob.matcher.is_match(path))
     }
 
     /// Whether `argument` can lead to a file under the project root: a file
@@ -696,6 +724,24 @@ impl<'a> Walk<'a> {
                 return;
             }
         };
+        let mut faults = Faults {
+            file: &name,
+            problems: Vec::new(),
+        };
+        for (key, set) in [
+            ("fail_level", raw.fail_level.is_some()),
+            ("gitignore", raw.gitignore.is_some()),
+            ("on_unmatched", raw.on_unmatched.is_some()),
+        ] {
+            if set {
+                faults.add(
+                    key_line(&text, key, 1),
+                    key,
+                    "belongs to the project's config, not a package's settings".to_owned(),
+                );
+            }
+        }
+        self.problems.append(&mut faults.problems);
         self.entries(&raw.packages, &text, &name, depth + 1);
         self.layers.push(Layer { name, text, raw });
     }
@@ -719,6 +765,7 @@ impl<'a> Walk<'a> {
 pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, LoadError> {
     let input = Input::read(path).map_err(LoadError::from)?;
     let raw: Raw = input.load().map_err(LoadError::from)?;
+    let (fail_level, gitignore, on_unmatched) = (raw.fail_level, raw.gitignore, raw.on_unmatched);
     let text = input.text();
     let mut faults = Faults {
         file: input.name(),
@@ -788,6 +835,9 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         globs,
         vocabularies: loaded.vocabularies,
         level,
+        fail_level,
+        gitignore,
+        on_unmatched,
         packages: loaded.packages,
         root,
     })

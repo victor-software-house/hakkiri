@@ -7,8 +7,10 @@ use std::fs;
 use std::path::{Component, Path, PathBuf};
 
 use hakkiri::Language;
+use ignore::WalkBuilder;
 
-use crate::config::{Plan, Project};
+use crate::cli::OnUnmatched;
+use crate::config::{Plan, Project, leads_to};
 use crate::report::Failure;
 
 /// The folders a walk never enters.
@@ -35,10 +37,21 @@ pub(crate) struct Job<'a> {
     pub(crate) plan: Plan<'a>,
 }
 
+/// How a run chooses its files.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct Options {
+    /// Whether a walk skips what git ignores.
+    pub(crate) gitignore: bool,
+    /// What to do with a named file that no glob selects.
+    pub(crate) on_unmatched: OnUnmatched,
+}
+
 /// What a walk finds, in the order it finds it.
 struct Finder<'a> {
     project: &'a Project,
+    options: Options,
     current: Option<PathBuf>,
+    warnings: Vec<String>,
     seen: HashSet<String>,
     jobs: Vec<Job<'a>>,
     failures: Vec<Failure>,
@@ -83,12 +96,15 @@ impl Finder<'_> {
         let Some(relative) = self.project.relative(file) else {
             return;
         };
-        let Some(plan) = self.project.plan(&relative) else {
-            return;
-        };
-        if !self.seen.insert(relative) {
+        if !self.seen.insert(relative.clone()) {
             return;
         }
+        let Some(plan) = self.project.plan(&relative) else {
+            if named && !self.project.selects(&relative) {
+                self.unmatched(&path);
+            }
+            return;
+        };
         let extension = file
             .extension()
             .map(|extension| extension.to_string_lossy().into_owned())
@@ -102,44 +118,67 @@ impl Finder<'_> {
         });
     }
 
-    /// Walks the directory `directory` in name order.
-    fn walk(&mut self, directory: &Path) {
-        let entries = match fs::read_dir(directory) {
-            Ok(entries) => entries,
-            Err(error) => {
-                let path = display(directory, self.current.as_deref());
-                self.failures.push(Failure::file(&path, error.to_string()));
-                return;
-            }
-        };
-        let mut paths: Vec<PathBuf> = entries
-            .filter_map(Result::ok)
-            .map(|entry| entry.path())
-            .collect();
-        paths.sort();
-        for path in paths {
-            let Ok(kind) = fs::symlink_metadata(&path).map(|meta| meta.file_type()) else {
-                continue;
-            };
-            if kind.is_dir() {
-                if !self.skips(&path) {
-                    self.walk(&path);
-                }
-            } else if kind.is_file() || path.is_file() {
-                self.file(&path, false);
-            }
+    /// Says what a run does with the named file `path`, which no glob selects.
+    fn unmatched(&mut self, path: &str) {
+        let message = "no glob selects it, so it is not linted";
+        match self.options.on_unmatched {
+            OnUnmatched::Warn => self.warnings.push(format!("{path}: {message}")),
+            OnUnmatched::Error => self.failures.push(Failure::file(path, message)),
+            OnUnmatched::Ignore => {}
         }
     }
 
-    /// Whether a walk leaves the directory `path` alone: `node_modules`,
-    /// `.git`, a folder of a package, or a folder that is neither under the
-    /// project root nor on the way to it.
-    fn skips(&self, path: &Path) -> bool {
-        path.file_name().is_some_and(is_skipped)
-            || fs::canonicalize(path).is_ok_and(|real| {
-                self.project.packages.contains(&real) || !self.project.leads_to_root(&real)
+    /// Walks the directory `directory` in name order, leaving alone what
+    /// [`Finder::skips`] names and, unless the run reads them, the files and
+    /// folders that `.gitignore`, `.git/info/exclude` and the global git
+    /// excludes ignore.
+    fn walk(&mut self, directory: &Path) {
+        let root = self.project.root().to_path_buf();
+        let packages = self.project.packages.clone();
+        let git = self.options.gitignore;
+        let walker = WalkBuilder::new(directory)
+            .hidden(false)
+            .ignore(false)
+            .parents(git)
+            .git_ignore(git)
+            .git_global(git)
+            .git_exclude(git)
+            .sort_by_file_path(Path::cmp)
+            .filter_entry(move |entry| {
+                entry.depth() == 0
+                    || !entry.file_type().is_some_and(|kind| kind.is_dir())
+                    || !skips(&root, &packages, entry.path())
             })
+            .build();
+        for entry in walker {
+            match entry {
+                Ok(entry) => {
+                    let path = entry.path();
+                    if entry.file_type().is_some_and(|kind| kind.is_file()) || path.is_file() {
+                        self.file(path, false);
+                    }
+                }
+                Err(error) => {
+                    let at = if let ignore::Error::WithPath { path, .. } = &error {
+                        path.as_path()
+                    } else {
+                        directory
+                    };
+                    let shown = display(at, self.current.as_deref());
+                    self.failures.push(Failure::file(&shown, error.to_string()));
+                }
+            }
+        }
     }
+}
+
+/// Whether a walk leaves the directory `path` alone: `node_modules`, `.git`, a
+/// folder of a package, or a folder that is neither under the project `root`
+/// nor on the way to it.
+fn skips(root: &Path, packages: &[PathBuf], path: &Path) -> bool {
+    path.file_name().is_some_and(is_skipped)
+        || fs::canonicalize(path)
+            .is_ok_and(|real| packages.contains(&real) || !leads_to(root, &real))
 }
 
 /// What a search found.
@@ -156,10 +195,12 @@ pub(crate) struct Found<'a> {
 
 /// The files to lint for `paths`, or for the current directory when it is
 /// empty.
-pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf]) -> Found<'a> {
+pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf], options: Options) -> Found<'a> {
     let mut finder = Finder {
         project,
+        options,
         current: std::env::current_dir().ok(),
+        warnings: Vec::new(),
         seen: HashSet::new(),
         jobs: Vec::new(),
         failures: Vec::new(),
@@ -169,11 +210,10 @@ pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf]) -> Found<'a> {
     } else {
         paths.to_vec()
     };
-    let mut warnings = Vec::new();
     let mut reached = false;
     for root in roots {
         match fs::metadata(&root) {
-            Ok(meta) if !project.reaches(&root, meta.is_dir()) => warnings.push(format!(
+            Ok(meta) if !project.reaches(&root, meta.is_dir()) => finder.warnings.push(format!(
                 "{}: outside the project root, so no glob matches it and it is not linted",
                 display(&root, finder.current.as_deref())
             )),
@@ -197,7 +237,7 @@ pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf]) -> Found<'a> {
     Found {
         jobs: finder.jobs,
         failures: finder.failures,
-        warnings,
+        warnings: finder.warnings,
         reached,
     }
 }

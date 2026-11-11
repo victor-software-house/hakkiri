@@ -15,7 +15,7 @@ use hakkiri::{Tree, parse_ignoring};
 
 use crate::cli::CheckArgs;
 use crate::config::{self, DEFAULT, Plan};
-use crate::files::{Job, find};
+use crate::files::{Job, Options, find};
 use crate::report::{Check, Failure, Row};
 
 /// The stack of a lint thread: as much as the main thread has, because a deep
@@ -24,13 +24,23 @@ const STACK: usize = 8 * 1024 * 1024;
 
 /// Runs `check`.
 pub(crate) fn check(args: &CheckArgs) -> Check {
-    let fail_level = Level::from(args.fail_level);
     let config = args.config.as_deref().unwrap_or_else(|| Path::new(DEFAULT));
     let project = match config::load(config, args.cache_dir.as_deref()) {
         Ok(project) => project,
-        Err(error) => return Check::stopped(&error, fail_level),
+        Err(error) => {
+            let level = args.fail_level.unwrap_or_default();
+            return Check::stopped(&error, Level::from(level));
+        }
     };
-    let found = find(&project, &args.paths);
+    let fail_level = Level::from(args.fail_level.or(project.fail_level).unwrap_or_default());
+    let options = Options {
+        gitignore: args.gitignore(project.gitignore),
+        on_unmatched: args
+            .on_unmatched
+            .or(project.on_unmatched)
+            .unwrap_or_default(),
+    };
+    let found = find(&project, &args.paths, options);
     for warning in &found.warnings {
         eprintln!("warning {warning}");
     }

@@ -1014,3 +1014,332 @@ fn a_run_over_many_files_prints_the_same_text_twice() -> TestResult {
     assert_eq!(alerts, sorted.as_slice());
     Ok(())
 }
+
+/// A project in a git repository: `.git` marks the root, and `.gitignore`
+/// ignores `build/` and `draft.md`.
+fn repository<'a>(suite: &'a Suite, name: &str, config: &str) -> Root<'a> {
+    let root = project(suite, name, config);
+    root.file(".git/HEAD", "ref: refs/heads/main\n");
+    root.file(".gitignore", "build/\ndraft.md\n");
+    root.file("a.md", "This is very good.\n");
+    root.file("draft.md", "This is very good.\n");
+    root.file("build/b.md", "This is very good.\n");
+    root
+}
+
+/// The one line of a run that lints `a.md` alone.
+const ONLY_A: [&str; 2] = [
+    "a.md:1:9: warning Team.Filler: Remove 'very'.",
+    "1 alert in 1 file",
+];
+
+/// The lines of a run that lints `a.md`, `build/b.md` and `draft.md`.
+const ALL_THREE: [&str; 4] = [
+    "a.md:1:9: warning Team.Filler: Remove 'very'.",
+    "build/b.md:1:9: warning Team.Filler: Remove 'very'.",
+    "draft.md:1:9: warning Team.Filler: Remove 'very'.",
+    "3 alerts in 3 files",
+];
+
+#[test]
+fn a_walk_skips_what_gitignore_ignores() -> TestResult {
+    let suite = Suite::new("check-gitignore");
+    let root = repository(&suite, "ignored", CONFIG);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(result.lines(), ONLY_A);
+    Ok(())
+}
+
+#[test]
+fn a_walk_skips_what_the_exclude_file_ignores() -> TestResult {
+    let suite = Suite::new("check-exclude");
+    let root = repository(&suite, "exclude", CONFIG);
+    root.file(".gitignore", "");
+    root.file(".git/info/exclude", "build/\ndraft.md\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.lines(), ONLY_A);
+    Ok(())
+}
+
+#[test]
+fn a_walk_skips_what_the_global_excludes_ignore() -> TestResult {
+    let suite = Suite::new("check-global");
+    let root = repository(&suite, "global", CONFIG);
+    root.file(".gitignore", "");
+    let home = suite.scenario("home");
+    home.file(".config/git/ignore", "build/\ndraft.md\n");
+    let home_path = home.path().to_string_lossy().into_owned();
+    let config_path = home.path().join(".config").to_string_lossy().into_owned();
+    let result = run(
+        root.path(),
+        &["check"],
+        &[("HOME", &home_path), ("XDG_CONFIG_HOME", &config_path)],
+    )?;
+    assert_eq!(result.lines(), ONLY_A);
+    Ok(())
+}
+
+#[test]
+fn a_nested_gitignore_applies_below_its_folder() -> TestResult {
+    let suite = Suite::new("check-nested-gitignore");
+    let root = repository(&suite, "nested-ignore", CONFIG);
+    root.file(".gitignore", "");
+    root.file("docs/.gitignore", "skip.md\n");
+    root.file("docs/skip.md", "This is very good.\n");
+    root.file("docs/keep.md", "This is very good.\n");
+    root.file("skip.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "build/b.md:1:9: warning Team.Filler: Remove 'very'.",
+            "docs/keep.md:1:9: warning Team.Filler: Remove 'very'.",
+            "draft.md:1:9: warning Team.Filler: Remove 'very'.",
+            "skip.md:1:9: warning Team.Filler: Remove 'very'.",
+            "5 alerts in 5 files",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_named_file_is_not_filtered_by_gitignore() -> TestResult {
+    let suite = Suite::new("check-named-ignored");
+    let root = repository(&suite, "named", CONFIG);
+    let result = run(root.path(), &["check", "draft.md", "build/b.md"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "build/b.md:1:9: warning Team.Filler: Remove 'very'.",
+            "draft.md:1:9: warning Team.Filler: Remove 'very'.",
+            "2 alerts in 2 files",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn gitignore_false_reads_the_ignored_files() -> TestResult {
+    let suite = Suite::new("check-gitignore-off");
+    let root = repository(
+        &suite,
+        "off",
+        "gitignore: false\npackages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Team]}\n",
+    );
+    let from_config = run(root.path(), &["check"], &[])?;
+    assert_eq!(from_config.lines(), ALL_THREE);
+    let on = repository(&suite, "off-flag", CONFIG);
+    let from_flag = run(on.path(), &["check", "--no-gitignore"], &[])?;
+    assert_eq!(from_flag.lines(), ALL_THREE);
+    let from_variable = run(on.path(), &["check"], &[("HAKKIRI_GITIGNORE", "false")])?;
+    assert_eq!(from_variable.lines(), ALL_THREE);
+    let from_value = run(on.path(), &["check", "--gitignore=false"], &[])?;
+    assert_eq!(from_value.lines(), ALL_THREE);
+    Ok(())
+}
+
+#[test]
+fn the_flag_then_the_variable_then_the_config_decide_gitignore() -> TestResult {
+    let suite = Suite::new("check-gitignore-order");
+    let off = "gitignore: false\npackages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Team]}\n";
+    let root = repository(&suite, "order", off);
+    let variable = run(root.path(), &["check"], &[("HAKKIRI_GITIGNORE", "true")])?;
+    assert_eq!(variable.lines(), ONLY_A, "the variable beats the config");
+    let flag = run(
+        root.path(),
+        &["check", "--gitignore=true"],
+        &[("HAKKIRI_GITIGNORE", "false")],
+    )?;
+    assert_eq!(flag.lines(), ONLY_A, "the flag beats the variable");
+    let negated = run(
+        root.path(),
+        &["check", "--no-gitignore"],
+        &[("HAKKIRI_GITIGNORE", "true")],
+    )?;
+    assert_eq!(
+        negated.lines(),
+        ALL_THREE,
+        "--no-gitignore beats the variable"
+    );
+    Ok(())
+}
+
+#[test]
+fn a_config_value_that_is_not_a_boolean_is_refused() -> TestResult {
+    let suite = Suite::new("check-gitignore-bad");
+    let root = repository(&suite, "bad", "gitignore: maybe\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .err
+            .contains("failed .ctl/hakkiri.yaml: line 1: invalid boolean"),
+        "{}",
+        result.err
+    );
+    Ok(())
+}
+
+/// A config whose one glob is `docs/*.md`, so `README.md` has no glob.
+const DOCS_ONLY: &str = "packages:\n  - path: styles\nfiles:\n  'docs/*.md': {styles: [Team]}\n";
+
+const README_WARNING: &str = "warning README.md: no glob selects it, so it is not linted\n";
+
+fn unmatched<'a>(suite: &'a Suite, name: &str, config: &str) -> Root<'a> {
+    let root = project(suite, name, config);
+    root.file("README.md", "This is very good.\n");
+    root.file("docs/a.md", "This is very good.\n");
+    root
+}
+
+#[test]
+fn a_named_file_no_glob_selects_draws_a_warning() -> TestResult {
+    let suite = Suite::new("check-on-unmatched");
+    let root = unmatched(&suite, "warn", DOCS_ONLY);
+    let result = run(root.path(), &["check", "README.md", "docs"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "docs/a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file",
+        ]
+    );
+    assert_eq!(result.err, README_WARNING);
+    Ok(())
+}
+
+#[test]
+fn a_file_found_by_a_walk_that_no_glob_selects_draws_no_warning() -> TestResult {
+    let suite = Suite::new("check-walk-unmatched");
+    let root = unmatched(&suite, "walked", DOCS_ONLY);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.err, "");
+    Ok(())
+}
+
+#[test]
+fn a_file_named_twice_draws_one_warning() -> TestResult {
+    let suite = Suite::new("check-on-unmatched-twice");
+    let root = unmatched(&suite, "twice", DOCS_ONLY);
+    let result = run(root.path(), &["check", "README.md", "./README.md"], &[])?;
+    assert_eq!(result.err, README_WARNING);
+    Ok(())
+}
+
+#[test]
+fn on_unmatched_error_fails_the_run() -> TestResult {
+    let suite = Suite::new("check-on-unmatched-error");
+    let root = unmatched(&suite, "error", DOCS_ONLY);
+    let result = run(
+        root.path(),
+        &["check", "--on-unmatched", "error", "README.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .out
+            .contains("failed README.md: no glob selects it, so it is not linted"),
+        "{}",
+        result.out
+    );
+    Ok(())
+}
+
+#[test]
+fn on_unmatched_ignore_says_nothing() -> TestResult {
+    let suite = Suite::new("check-on-unmatched-ignore");
+    let root = unmatched(&suite, "ignore", DOCS_ONLY);
+    let result = run(
+        root.path(),
+        &["check", "--on-unmatched", "ignore", "README.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(result.err, "");
+    Ok(())
+}
+
+#[test]
+fn the_flag_then_the_variable_then_the_config_decide_on_unmatched() -> TestResult {
+    let suite = Suite::new("check-on-unmatched-order");
+    let config = format!("on_unmatched: error\n{DOCS_ONLY}");
+    let root = unmatched(&suite, "order", &config);
+    let from_config = run(root.path(), &["check", "README.md"], &[])?;
+    assert_eq!(from_config.code, 2, "{}", from_config.err);
+    let variable = run(
+        root.path(),
+        &["check", "README.md"],
+        &[("HAKKIRI_ON_UNMATCHED", "ignore")],
+    )?;
+    assert_eq!(variable.code, 0, "the variable beats the config");
+    assert_eq!(variable.err, "");
+    let flag = run(
+        root.path(),
+        &["check", "--on-unmatched", "warn", "README.md"],
+        &[("HAKKIRI_ON_UNMATCHED", "ignore")],
+    )?;
+    assert_eq!(flag.code, 0, "{}", flag.err);
+    assert_eq!(flag.err, README_WARNING, "the flag beats the variable");
+    Ok(())
+}
+
+#[test]
+fn a_file_a_glob_selects_with_no_rule_to_run_draws_no_warning() -> TestResult {
+    let suite = Suite::new("check-on-unmatched-empty");
+    let root = project(
+        &suite,
+        "empty",
+        "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Team]}\n  CHANGELOG.md: {styles: []}\n",
+    );
+    root.file("CHANGELOG.md", "This is very good.\n");
+    let result = run(root.path(), &["check", "CHANGELOG.md"], &[])?;
+    assert_eq!(result.err, "");
+    Ok(())
+}
+
+#[test]
+fn an_unknown_on_unmatched_word_is_refused() -> TestResult {
+    let suite = Suite::new("check-on-unmatched-bad");
+    let root = project(&suite, "bad", "on_unmatched: loud\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(result.err.contains("loud"), "{}", result.err);
+    let flag = run(root.path(), &["check", "--on-unmatched", "loud"], &[])?;
+    assert_eq!(flag.code, 2, "{}{}", flag.out, flag.err);
+    Ok(())
+}
+
+#[test]
+fn the_flag_then_the_variable_then_the_config_decide_the_fail_level() -> TestResult {
+    let suite = Suite::new("check-fail-level-order");
+    let config = format!("fail_level: warning\n{CONFIG}");
+    let root = project(&suite, "order", &config);
+    root.file("a.md", "This is very good.\n");
+    let from_config = run(root.path(), &["check"], &[])?;
+    assert_eq!(from_config.code, 1, "{}", from_config.err);
+    let variable = run(root.path(), &["check"], &[("HAKKIRI_FAIL_LEVEL", "error")])?;
+    assert_eq!(variable.code, 0, "the variable beats the config");
+    let flag = run(
+        root.path(),
+        &["check", "--fail-level", "warning"],
+        &[("HAKKIRI_FAIL_LEVEL", "error")],
+    )?;
+    assert_eq!(flag.code, 1, "the flag beats the variable");
+    Ok(())
+}
+
+#[test]
+fn an_unknown_fail_level_in_the_config_is_refused() -> TestResult {
+    let suite = Suite::new("check-fail-level-bad");
+    let root = project(&suite, "bad", "fail_level: loud\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(result.err.contains("loud"), "{}", result.err);
+    Ok(())
+}

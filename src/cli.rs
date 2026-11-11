@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use ctl_core::{ColorLong, EnvPrefix, FormatLong};
 use hakkiri::rule::Level;
+use serde::Deserialize;
 
 /// The whole command line. Every long option also reads `HAKKIRI_<LONG>`, such
 /// as `HAKKIRI_CONFIG` or `HAKKIRI_FORMAT`; the command line wins over the
@@ -82,19 +83,69 @@ pub(crate) struct CheckArgs {
     #[arg(long, value_hint = clap::ValueHint::DirPath)]
     pub(crate) cache_dir: Option<PathBuf>,
 
-    /// The lowest level of an alert that makes the run exit 1.
-    #[arg(long, value_enum, default_value_t = FailLevel::Error)]
-    pub(crate) fail_level: FailLevel,
+    /// The lowest level of an alert that makes the run exit 1. Defaults to the
+    /// config's `fail_level`, then to `error`.
+    #[arg(long, value_enum)]
+    pub(crate) fail_level: Option<FailLevel>,
+
+    /// Whether a walk skips what git ignores: `--gitignore=false` reads it.
+    /// Defaults to the config's `gitignore`, then to `true`.
+    #[arg(
+        long,
+        value_name = "BOOL",
+        num_args = 0..=1,
+        require_equals = true,
+        default_missing_value = "true",
+        conflicts_with = "no_gitignore"
+    )]
+    pub(crate) gitignore: Option<bool>,
+
+    /// Read the files git ignores: the same as `--gitignore=false`.
+    #[arg(long)]
+    pub(crate) no_gitignore: bool,
+
+    /// What to do with a file named on the command line that no glob selects.
+    /// Defaults to the config's `on_unmatched`, then to `warn`.
+    #[arg(long, value_enum)]
+    pub(crate) on_unmatched: Option<OnUnmatched>,
 }
 
-/// The levels `--fail-level` takes.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
+impl CheckArgs {
+    /// Whether a walk skips what git ignores: `--no-gitignore`, else
+    /// `--gitignore`, which also reads its variable, else the config's value,
+    /// else yes.
+    pub(crate) fn gitignore(&self, config: Option<bool>) -> bool {
+        if self.no_gitignore {
+            false
+        } else {
+            self.gitignore.or(config).unwrap_or(true)
+        }
+    }
+}
+
+/// What a run does with a file named on the command line that no glob selects.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, ValueEnum)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum OnUnmatched {
+    /// Print a warning and go on.
+    #[default]
+    Warn,
+    /// Fail the run: exit 2.
+    Error,
+    /// Say nothing.
+    Ignore,
+}
+
+/// The levels `--fail-level` takes, and the config's `fail_level`.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, ValueEnum)]
+#[serde(rename_all = "lowercase")]
 pub(crate) enum FailLevel {
     /// Any alert fails the run.
     Suggestion,
     /// A warning or an error fails the run.
     Warning,
     /// Only an error fails the run.
+    #[default]
     Error,
 }
 
