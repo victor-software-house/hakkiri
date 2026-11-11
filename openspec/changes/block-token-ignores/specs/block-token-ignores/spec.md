@@ -112,3 +112,12 @@ The text of a comment is read with its markers and shared indentation removed.
 
 - **WHEN** a source file holds a string `"{{ very }}"` in code, and a glob holds that token pattern
 - **THEN** the rules read no string, as without the pattern
+
+### Requirement: A test case reads the ignores as a file does
+
+`hakkiri test` SHALL read a case that runs through the project config with the block and token ignores of the globs that match the case's format, as `hakkiri check` reads a file of that format.
+
+#### Scenario: An ignored block in a case
+
+- **WHEN** a glob for `*.md` ignores the text between `BEGIN` and `END`, and a case through the config holds `very` between them
+- **THEN** the rule that flags `very` reports nothing for the case, as for a file with the same text

@@ -44,6 +44,17 @@ const CONFIG: &str = "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [T
 const CONFIG_OFF: &str =
     "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Team], Team.Filler: off}\n";
 
+/// A project config that hides the text between `BEGIN` and `END` from `*.md`.
+const CONFIG_IGNORING: &str = "\
+packages:
+  - path: styles
+files:
+  '*.md':
+    styles: [Team]
+    block_ignores:
+      - \"(?s)BEGIN(.*?)END\"
+";
+
 /// A project whose style `Team` holds a rule with two cases.
 fn styled<'a>(suite: &'a Suite, name: &str) -> Root<'a> {
     let root = suite.scenario(name);
@@ -255,6 +266,24 @@ fn a_case_through_the_config_lints_with_its_styles() -> TestResult {
         "through.test.yml",
         "- name: through the config\n  input: A very day.\n  contains: Team.Filler\n",
     );
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["2 files, 3 passed, 0 failed"]);
+    Ok(())
+}
+
+#[test]
+fn a_case_through_the_config_reads_the_text_the_config_ignores() -> TestResult {
+    let suite = Suite::new("test-ignoring");
+    let root = styled(&suite, "ignoring");
+    root.file(".ctl/hakkiri.yaml", CONFIG_IGNORING);
+    root.file(
+        "through.test.yml",
+        "- name: an ignored block\n  input: \"BEGIN\\nA very day.\\nEND\\n\"\n  want: ''\n",
+    );
+    root.file("doc.md", "BEGIN\nA very day.\nEND\n");
+    let checked = run(root.path(), &["check", "doc.md"], &[])?;
+    assert_eq!(checked.code, 0, "{}{}", checked.out, checked.err);
     let result = run(root.path(), &["test"], &[])?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
     assert_eq!(result.lines(), ["2 files, 3 passed, 0 failed"]);

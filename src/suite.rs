@@ -7,7 +7,7 @@ use std::path::{Component, Path, PathBuf};
 
 use hakkiri::alert::Alert;
 use hakkiri::rule::{self, LoadError, Rule, TestCase, alert_lines, cases_from_text};
-use hakkiri::{Language, parse};
+use hakkiri::{Language, parse, parse_ignoring};
 
 use crate::cli::{OnUnknown, TestArgs};
 use crate::config::{self, DEFAULT, Project};
@@ -363,7 +363,13 @@ impl Runner {
                         }
                     },
                 };
-                let tree = parse(language, &case.input).map_err(|error| error.to_string())?;
+                let tree = parse_ignoring(
+                    language,
+                    &case.input,
+                    &plan.block_ignores,
+                    &plan.token_ignores,
+                )
+                .map_err(|error| error.to_string())?;
                 if !plan.unrunnable.is_empty() {
                     let names: Vec<&str> = plan
                         .unrunnable
