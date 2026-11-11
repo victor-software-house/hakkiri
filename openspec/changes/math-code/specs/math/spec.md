@@ -123,5 +123,5 @@ The search for the closing `$` of a span and for the end of an HTML tag SHALL ta
 
 #### Scenario: A hundred thousand unclosed openers
 
-- **WHEN** a paragraph holds `$a ` or `<a` a hundred thousand times with no closer
+- **WHEN** a paragraph holds `$a` and a space, or `<a`, a hundred thousand times with no closer
 - **THEN** the spans are found in seconds

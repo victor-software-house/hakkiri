@@ -18,8 +18,9 @@ use std::str::Chars;
 const MAX_EXPANSIONS: usize = 64;
 
 /// `term` with the literal text of the pattern lowercased and the rest as
-/// written: an escape such as `\W`, `\p{Lu}`, `\pL` or `\x{41}`, the name of a
-/// capture group and of a backreference to it, and a flag group such as
+/// written.
+/// The rest is an escape such as `\W`, `\p{Lu}`, `\pL` or `\x{41}`, the name of
+/// a capture group and of a backreference to it, and a flag group such as
 /// `(?U)`.
 ///
 /// Vale lowercases the whole pattern, so `\W` becomes `\w` and the term means
