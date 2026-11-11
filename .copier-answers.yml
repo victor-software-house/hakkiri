@@ -14,6 +14,10 @@ deny_licenses:
     reason: hakkiri's own license
 -   license: BSD-3-Clause
     reason: encoding_rs, through ctl-core's input feature
+-   license: ISC
+    reason: ring, rustls-webpki and untrusted, through ureq's rustls
+-   license: CDLA-Permissive-2.0
+    reason: webpki-roots, the root certificates of ureq's rustls
 deny_skip: []
 feature_sets: []
 generated_paths: []

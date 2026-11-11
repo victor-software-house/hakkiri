@@ -5,6 +5,7 @@
 mod cli;
 mod config;
 mod files;
+mod package;
 mod report;
 mod run;
 mod suite;

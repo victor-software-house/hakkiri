@@ -1,6 +1,7 @@
 //! `hakkiri check`: load the config, find the files, lint them on a pool of
 //! threads, and gather what they report.
 
+use std::collections::BTreeMap;
 use std::num::NonZeroUsize;
 use std::path::Path;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -8,7 +9,7 @@ use std::{fs, io, thread};
 
 use hakkiri::alert::Alert;
 use hakkiri::engine::lint;
-use hakkiri::rule::Level;
+use hakkiri::rule::{Level, Unrunnable};
 use hakkiri::{Tree, parse};
 
 use crate::cli::CheckArgs;
@@ -24,7 +25,7 @@ const STACK: usize = 8 * 1024 * 1024;
 pub(crate) fn check(args: &CheckArgs) -> Check {
     let fail_level = Level::from(args.fail_level);
     let config = args.config.as_deref().unwrap_or_else(|| Path::new(DEFAULT));
-    let project = match config::load(config) {
+    let project = match config::load(config, args.cache_dir.as_deref()) {
         Ok(project) => project,
         Err(error) => return Check::stopped(&error, fail_level),
     };
@@ -52,6 +53,14 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
             Vec::new()
         }
     };
+    // Each rule hakkiri cannot run fails the run once, however many files
+    // the config runs it on.
+    let held: BTreeMap<&str, &Unrunnable> = jobs
+        .iter()
+        .flat_map(|job| job.plan.unrunnable.iter().copied())
+        .map(|rule| (rule.name.as_str(), rule))
+        .collect();
+    failures.extend(held.into_values().map(Failure::unrunnable));
     let mut alerts = Vec::new();
     let mut linted = 0;
     for (job, outcome) in jobs.iter().zip(outcomes) {

@@ -3,14 +3,17 @@
 //! A style folder holds one `.yml` file per rule.
 //! [`load_style`] reads them all, and [`Rule::from_text`] reads one.
 //! Loading refuses a rule it cannot run: a field its check does not define, a
-//! value of the wrong kind, a pattern that does not compile, or a Vale
-//! feature hakkiri does not run.
+//! value of the wrong kind, or a pattern that does not compile.
+//! A rule that is valid Vale and that hakkiri does not run, a `script` rule or
+//! a `doc()` scope, is not a fault of the file: [`read_style`] reports it
+//! apart. A rule may extend another rule, as in Vale.
 //! Every error names the file, and the field and line when it has them.
 
 mod affix;
 mod build;
 mod cases;
 mod field;
+mod inherit;
 mod package;
 mod schema;
 
@@ -25,8 +28,8 @@ use self::build::Source;
 pub use self::cases::{TestCase, alert_lines, cases_from_text};
 use self::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
-    OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, SequenceFields, SpellingFields,
-    SubstitutionFields,
+    OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, ScopeProbe, SequenceFields,
+    SpellingFields, SubstitutionFields,
 };
 use crate::dictionary::Speller;
 use crate::formula::Formula;
@@ -499,6 +502,9 @@ pub struct LoadProblem {
     pub field: String,
     /// What a person changes to fix it.
     pub message: String,
+    /// Whether the rule is valid Vale that hakkiri cannot run, such as a
+    /// `script` rule. A config turns such a rule `off` to leave it out.
+    pub unrunnable: bool,
 }
 
 /// Why rules did not load: every problem found.
@@ -533,6 +539,15 @@ impl fmt::Display for LoadError {
 
 impl error::Error for LoadError {}
 
+impl LoadError {
+    /// Whether every problem is a rule that is valid Vale and that hakkiri
+    /// cannot run.
+    #[must_use]
+    pub fn is_unrunnable(&self) -> bool {
+        !self.problems.is_empty() && self.problems.iter().all(|problem| problem.unrunnable)
+    }
+}
+
 impl From<InputError> for LoadError {
     fn from(error: InputError) -> Self {
         Self {
@@ -545,6 +560,7 @@ impl From<InputError> for LoadError {
                     column: problem.column,
                     field: problem.field,
                     message: problem.message,
+                    unrunnable: false,
                 })
                 .collect(),
         }
@@ -566,7 +582,7 @@ impl Rule {
     /// the wrong kind, and a feature hakkiri does not run. A pattern that does
     /// not compile is refused, and so is a pattern with nothing to match.
     pub fn from_text(name: &str, file: &str, text: &str) -> Result<Self, LoadError> {
-        Self::read(name, file, text, None)
+        Self::read(name, file, text, None, &[])
     }
 
     /// Reads one rule from the text of its file, in the package `package`.
@@ -586,35 +602,138 @@ impl Rule {
         text: &str,
         package: &Path,
     ) -> Result<Self, LoadError> {
-        Self::read(name, file, text, Some(package))
+        Self::read(name, file, text, Some(package), &[package.to_path_buf()])
     }
 
-    fn read(name: &str, file: &str, text: &str, package: Option<&Path>) -> Result<Self, LoadError> {
+    /// Reads one rule from the text of its file, in the package `package`,
+    /// with a parent named by `extends` looked up in the package folders
+    /// `search`.
+    ///
+    /// A rule whose `extends` holds a dot starts from the rule it names and
+    /// lays its own fields on top, as Vale does: a bare key replaces, `key+`
+    /// adds to a list or a mapping, and `key-` removes from one.
+    /// The parent's `tests` do not carry over.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`LoadError`] for each fault [`Rule::from_text_in`] refuses.
+    /// It also returns each fault Vale refuses in a chain of rules.
+    /// They are a parent that is missing, a cycle, and a key written both bare
+    /// and with `+` or `-`.
+    /// They are also an edit of a field the parent lacks, and a `Vale.` parent.
+    /// A rule read through a parent names no line, since the merged text has
+    /// none.
+    pub fn from_text_searching(
+        name: &str,
+        file: &str,
+        text: &str,
+        package: &Path,
+        search: &[PathBuf],
+    ) -> Result<Self, LoadError> {
+        Self::read(name, file, text, Some(package), search)
+    }
+
+    fn read(
+        name: &str,
+        file: &str,
+        text: &str,
+        package: Option<&Path>,
+        search: &[PathBuf],
+    ) -> Result<Self, LoadError> {
         let input = Input::new(file, text);
         let probe: Probe = input.load().map_err(|error| at_tab(error, text))?;
+        if inherit::is_rule_ref(probe.extends.value()) {
+            let merged = inherit::merged(file, text, search)?;
+            let input = Input::new(file, merged);
+            let probe: Probe = input
+                .load()
+                .map_err(|error| unplaced(LoadError::from(error)))?;
+            return Self::build(name, file, package, &probe, &input).map_err(unplaced);
+        }
+        Self::build(name, file, package, &probe, &input)
+    }
+
+    /// The rule `probe` and `input` hold, once its `extends` is a check type.
+    fn build(
+        name: &str,
+        file: &str,
+        package: Option<&Path>,
+        probe: &Probe,
+        input: &Input,
+    ) -> Result<Self, LoadError> {
         let source = Source {
             name,
             file,
             package,
         };
+        if let Some(reason) = unrunnable(probe, input)? {
+            return Err(LoadError {
+                problems: vec![LoadProblem {
+                    file: file.to_owned(),
+                    line: None,
+                    column: None,
+                    field: reason.0.to_owned(),
+                    message: reason.1,
+                    unrunnable: true,
+                }],
+            });
+        }
         match probe.extends.value() {
-            "existence" => build::existence_rule(&source, &read::<ExistenceFields>(&input)?),
+            "existence" => build::existence_rule(&source, &read::<ExistenceFields>(input)?),
             "substitution" => {
-                build::substitution_rule(&source, &read::<SubstitutionFields>(&input)?)
+                build::substitution_rule(&source, &read::<SubstitutionFields>(input)?)
             }
-            "occurrence" => build::occurrence_rule(&source, &read::<OccurrenceFields>(&input)?),
-            "conditional" => build::conditional_rule(&source, &read::<ConditionalFields>(&input)?),
-            "consistency" => build::consistency_rule(&source, &read::<ConsistencyFields>(&input)?),
-            "repetition" => build::repetition_rule(&source, &read::<RepetitionFields>(&input)?),
-            "readability" => build::readability_rule(&source, &read::<ReadabilityFields>(&input)?),
+            "occurrence" => build::occurrence_rule(&source, &read::<OccurrenceFields>(input)?),
+            "conditional" => build::conditional_rule(&source, &read::<ConditionalFields>(input)?),
+            "consistency" => build::consistency_rule(&source, &read::<ConsistencyFields>(input)?),
+            "repetition" => build::repetition_rule(&source, &read::<RepetitionFields>(input)?),
+            "readability" => build::readability_rule(&source, &read::<ReadabilityFields>(input)?),
             "capitalization" => {
-                build::capitalization_rule(&source, &read::<CapitalizationFields>(&input)?)
+                build::capitalization_rule(&source, &read::<CapitalizationFields>(input)?)
             }
-            "sequence" => build::sequence_rule(&source, &read::<SequenceFields>(&input)?),
-            "spelling" => build::spelling_rule(&source, &read::<SpellingFields>(&input)?),
-            _ => build::metric_rule(&source, &read::<MetricFields>(&input)?),
+            "sequence" => build::sequence_rule(&source, &read::<SequenceFields>(input)?),
+            "spelling" => build::spelling_rule(&source, &read::<SpellingFields>(input)?),
+            _ => build::metric_rule(&source, &read::<MetricFields>(input)?),
         }
     }
+}
+
+/// Why a rule that is valid Vale cannot run here: the field it concerns and
+/// what hakkiri does not run.
+fn unrunnable(probe: &Probe, input: &Input) -> Result<Option<(&'static str, String)>, LoadError> {
+    if probe.extends.value() == "script" {
+        return Ok(Some((
+            "extends",
+            "`script` rules run a Tengo program, and hakkiri runs none".to_owned(),
+        )));
+    }
+    if input.text().contains("doc(") {
+        let scopes: ScopeProbe = read(input)?;
+        if let Some(scope) = scopes
+            .scope
+            .values()
+            .iter()
+            .find(|scope| scope.trim_start_matches('~').starts_with("doc("))
+        {
+            return Ok(Some((
+                "scope",
+                format!(
+                    "`{scope}` is a doc selector: it selects by CSS over rendered HTML, and hakkiri runs none"
+                ),
+            )));
+        }
+    }
+    Ok(None)
+}
+
+/// `error` with the lines and columns it names taken out, for a rule read
+/// from merged text, whose lines nobody wrote.
+fn unplaced(mut error: LoadError) -> LoadError {
+    for problem in &mut error.problems {
+        problem.line = None;
+        problem.column = None;
+    }
+    error
 }
 
 /// The fields of one rule file type, parsed and validated once.
@@ -738,6 +857,23 @@ pub struct Style {
     /// Vale refuses these only for a style a glob enables, so a caller decides
     /// whether they are errors.
     pub names: Vec<LoadProblem>,
+    /// The rules that are valid Vale and that hakkiri cannot run, such as a
+    /// `script` rule. They give no rule; a caller decides whether each is an
+    /// error.
+    pub unrunnable: Vec<Unrunnable>,
+}
+
+/// A rule that is valid Vale and that hakkiri cannot run.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Unrunnable {
+    /// The rule's name, such as `Readability.Polysyllables`.
+    pub name: String,
+    /// The rule file.
+    pub file: String,
+    /// The field that makes it so, such as `extends`.
+    pub field: String,
+    /// What hakkiri does not run.
+    pub message: String,
 }
 
 fn problem(file: &str, message: String) -> LoadProblem {
@@ -747,6 +883,7 @@ fn problem(file: &str, message: String) -> LoadProblem {
         column: None,
         field: String::new(),
         message,
+        unrunnable: false,
     }
 }
 
@@ -757,14 +894,17 @@ fn problem(file: &str, message: String) -> LoadProblem {
 /// A folder that starts with `.` or `_`, a `*.test.yml` file and every other
 /// file are ignored.
 /// The folder's parent is the rule's package.
+/// A rule whose `extends` names another rule looks it up in the package
+/// folders `search`.
 /// The rules come in the order of the walk.
 ///
 /// # Errors
 ///
 /// Returns a [`LoadError`] with the problems of every rule file, or with the
 /// failure to read a folder.
-/// A fault in a name is not one: [`Style::names`] holds it.
-pub fn read_style(folder: &Path) -> Result<Style, LoadError> {
+/// A fault in a name is not one: [`Style::names`] holds it, and a rule that
+/// hakkiri cannot run is not one: [`Style::unrunnable`] holds it.
+pub fn read_style(folder: &Path, search: &[PathBuf]) -> Result<Style, LoadError> {
     let unread = |file: &Path, message: String| LoadError {
         problems: vec![problem(&file.display().to_string(), message)],
     };
@@ -779,6 +919,7 @@ pub fn read_style(folder: &Path) -> Result<Style, LoadError> {
     rule_files(folder, &mut files).map_err(|(at, error)| unread(&at, error.to_string()))?;
     let mut rules: Vec<Rule> = Vec::new();
     let mut names = Vec::new();
+    let mut unrunnable = Vec::new();
     let mut problems = Vec::new();
     let mut by_name: HashMap<String, PathBuf> = HashMap::new();
     for path in files {
@@ -805,17 +946,36 @@ pub fn read_style(folder: &Path) -> Result<Style, LoadError> {
             .map_err(|error| LoadError {
                 problems: vec![problem(&file, error.to_string())],
             })
-            .and_then(|text| Rule::from_text_in(&name, &file, &text, package));
+            .and_then(|text| Rule::from_text_searching(&name, &file, &text, package, search));
         match read {
-            Ok(rule) => match rules.iter().position(|earlier| earlier.name == rule.name) {
-                Some(at) => rules[at] = rule,
-                None => rules.push(rule),
-            },
+            Ok(rule) => {
+                // The later file wins, as in Vale: it replaces an earlier
+                // rule of the name, runnable or not.
+                unrunnable.retain(|earlier: &Unrunnable| earlier.name != rule.name);
+                match rules.iter().position(|earlier| earlier.name == rule.name) {
+                    Some(at) => rules[at] = rule,
+                    None => rules.push(rule),
+                }
+            }
+            Err(error) if error.is_unrunnable() => {
+                rules.retain(|earlier| earlier.name != name);
+                unrunnable.retain(|earlier| earlier.name != name);
+                unrunnable.extend(error.problems.into_iter().map(|problem| Unrunnable {
+                    name: name.clone(),
+                    file: problem.file,
+                    field: problem.field,
+                    message: problem.message,
+                }));
+            }
             Err(error) => problems.extend(error.problems),
         }
     }
     if problems.is_empty() {
-        Ok(Style { rules, names })
+        Ok(Style {
+            rules,
+            names,
+            unrunnable,
+        })
     } else {
         Err(LoadError { problems })
     }
@@ -829,12 +989,23 @@ pub fn read_style(folder: &Path) -> Result<Style, LoadError> {
 /// Returns a [`LoadError`] with the problems of every rule file, with the
 /// failure to read a folder, or with the faults in the names.
 pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
-    let style = read_style(folder)?;
-    if style.names.is_empty() {
+    let package = folder
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+    let style = read_style(folder, &[package.to_path_buf()])?;
+    let mut problems = style.names;
+    problems.extend(style.unrunnable.into_iter().map(|rule| LoadProblem {
+        file: rule.file,
+        line: None,
+        column: None,
+        field: rule.field,
+        message: rule.message,
+        unrunnable: true,
+    }));
+    if problems.is_empty() {
         Ok(style.rules)
     } else {
-        Err(LoadError {
-            problems: style.names,
-        })
+        Err(LoadError { problems })
     }
 }

@@ -5,7 +5,7 @@ use std::path::Path;
 use ctl_core::view::Outcome;
 use ctl_core::{Document, Present};
 use hakkiri::alert::Alert;
-use hakkiri::rule::{Level, LoadError};
+use hakkiri::rule::{Level, LoadError, Unrunnable};
 use serde::Serialize;
 
 /// The result of a verb.
@@ -142,6 +142,19 @@ impl Failure {
                 }
             })
             .collect()
+    }
+
+    /// A rule hakkiri cannot run that the config lists: it holds no rule to run
+    /// and fails the run until the config turns it `off`.
+    pub(crate) fn unrunnable(rule: &Unrunnable) -> Self {
+        Self {
+            path: None,
+            config: Some(rule.file.clone()),
+            message: format!(
+                "{}: {}: {}: set `{}: off` under `files` to leave it out",
+                rule.name, rule.field, rule.message, rule.name
+            ),
+        }
     }
 
     /// A fault in the project root of the config file `config`.

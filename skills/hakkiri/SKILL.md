@@ -65,6 +65,7 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 
 | Flag | Variable | Meaning |
 |:--|:--|:--|
+| `--cache-dir` | `HAKKIRI_CACHE_DIR` | The folder that keeps fetched packages, the per-user cache folder `hakkiri` by default |
 | `--config` | `HAKKIRI_CONFIG` | The config file, `.ctl/hakkiri.yaml` by default |
 | `--coverage` | `HAKKIRI_COVERAGE` | With `test`, fail when a rule flags nothing in any case |
 | `--fail-level` | `HAKKIRI_FAIL_LEVEL` | The lowest level that exits 1: `suggestion`, `warning` or `error` |
@@ -76,8 +77,11 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 ## Fix a failing run
 
 1. Exit 2 with a config error: the message names the file, the line and the key. Fix the config first, because no file was linted.
+   A message that names a package `url` means the download failed a check: the server did not answer, the zip does not match its `sha256`, or it is not a package.
+   Check the `url` and the `sha256`, and set `--cache-dir` when the default cache folder is read-only.
 2. Exit 2 with `failed <path>`: that file could not be read or parsed. The other files were linted.
    Exit 2 with `no path given lies under the project root`: the config names another root than the files you gave. Check `--config` and `HAKKIRI_CONFIG`.
+   Exit 2 with a `failed` line that names a rule file and a rule: the rule is a Vale script rule or a `doc()` scope, which hakkiri cannot run. The rest of the style ran. Set the rule `off` under `files` to leave it out.
 3. `test` exits 1 with `failed <file>: <name>`: the rule or the case is wrong. With `uncovered <Rule>`, add a case that makes the rule flag something.
 4. Exit 1: fix the alerts, or lower the rule's level under `files` when the rule is too strict for those files.
 5. An alert that looks wrong is a rule fault. Set the rule `off` for those files in the config, and say why in the pull request.

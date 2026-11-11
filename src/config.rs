@@ -14,9 +14,11 @@ use std::{fmt, fs, io};
 use ctl_core::input::Input;
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
-use hakkiri::rule::{Level, LoadError, LoadProblem, Rule, read_style};
+use hakkiri::rule::{Level, LoadError, LoadProblem, Rule, Unrunnable, read_style};
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
+
+use crate::package;
 
 /// Where the config is when no flag or variable names another file.
 pub(crate) const DEFAULT: &str = ".ctl/hakkiri.yaml";
@@ -135,14 +137,29 @@ fn entry_ok(entry: &Entry, _: &()) -> garde::Result {
             "`sha256` belongs to a `url`, and this entry holds a `path`",
         )),
         (None, Some(_), None) => Err(garde::Error::new("a `url` needs its `sha256`")),
-        (None, Some(_), Some(_)) => Err(garde::Error::new(
-            "a package `url` is not downloaded yet: use a `path` to a folder of styles",
-        )),
+        (None, Some(url), Some(sha256)) => url_ok(url, sha256),
         (None, None, _) => Err(garde::Error::new(
             "an entry needs a `path` to a folder of styles",
         )),
         (Some(_), None, None) => Ok(()),
     }
+}
+
+/// Whether a package `url` and its `sha256` have the shape a fetch needs.
+fn url_ok(url: &str, sha256: &str) -> garde::Result {
+    if !(url.starts_with("https://") || url.starts_with("http://")) {
+        return Err(garde::Error::new(
+            "a package `url` starts with `https://` or `http://`",
+        ));
+    }
+    if sha256.len() != 64
+        || !sha256
+            .bytes()
+            .all(|byte| matches!(byte, b'0'..=b'9' | b'a'..=b'f'))
+    {
+        return Err(garde::Error::new("`sha256` is 64 lowercase hex digits"));
+    }
+    Ok(())
 }
 
 /// What a rule key under a glob does to the rule.
@@ -172,6 +189,8 @@ pub(crate) struct Project {
     rules: Vec<Rule>,
     /// Where each style's rules are in `rules`.
     styles: BTreeMap<String, Vec<usize>>,
+    /// The rules that are valid Vale and that hakkiri cannot run.
+    unrunnable: Vec<Held>,
     globs: Vec<Glob>,
     /// The lowest level an alert reports at.
     pub(crate) level: Option<Level>,
@@ -190,6 +209,9 @@ pub(crate) struct Plan<'a> {
     pub(crate) rules: Vec<&'a Rule>,
     /// The level an alert of a rule takes, by rule name.
     pub(crate) levels: HashMap<&'a str, Level>,
+    /// The rules the config runs on the file that hakkiri cannot run: each one
+    /// fails the run until the config turns it `off`.
+    pub(crate) unrunnable: Vec<&'a Unrunnable>,
 }
 
 impl Project {
@@ -246,6 +268,8 @@ impl Project {
     /// off, or when the config turns it on or sets its level, whatever style
     /// holds it. A level once set stays when a later glob turns the rule off or
     /// on, as in Vale.
+    /// A rule hakkiri cannot run is held to the same test, and each one that
+    /// passes it is in [`Plan::unrunnable`].
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
         let mut matched = false;
         let mut styles: &[String] = &[];
@@ -306,7 +330,24 @@ impl Project {
                 }
             }
         }
-        (!rules.is_empty()).then_some(Plan { rules, levels })
+        let unrunnable: Vec<&Unrunnable> = self
+            .unrunnable
+            .iter()
+            .filter(|held| {
+                let on = switches.get(held.rule.name.as_str());
+                if styles.contains(&held.style) {
+                    on != Some(&false)
+                } else {
+                    on == Some(&true)
+                }
+            })
+            .map(|held| &held.rule)
+            .collect();
+        (!rules.is_empty() || !unrunnable.is_empty()).then_some(Plan {
+            rules,
+            levels,
+            unrunnable,
+        })
     }
 }
 
@@ -343,6 +384,7 @@ impl Faults<'_> {
             column: None,
             field: field.to_owned(),
             message,
+            unrunnable: false,
         });
     }
 }
@@ -359,6 +401,24 @@ struct Loaded {
     /// The faults in the rule names of each style, which are errors only once
     /// a glob enables the style.
     names: BTreeMap<String, Vec<LoadProblem>>,
+    /// The rules that are valid Vale and that hakkiri cannot run, with the
+    /// style that holds each.
+    unrunnable: Vec<Held>,
+}
+
+/// A package folder that was found, and where its entry is written.
+struct Found {
+    written: PathBuf,
+    folder: PathBuf,
+    key: &'static str,
+    line: Option<usize>,
+}
+
+/// A rule hakkiri cannot run, and the style that holds it.
+#[derive(Debug)]
+struct Held {
+    style: String,
+    rule: Unrunnable,
 }
 
 /// The folder that holds the `.ctl` folder of the config file `config`, or the
@@ -376,7 +436,9 @@ fn project_root(config: &Path) -> io::Result<PathBuf> {
     Ok(root.to_path_buf())
 }
 
-/// Reads the config at `path`, and loads the style folders of its packages.
+/// Reads the config at `path`, and loads the style folders of its packages. A
+/// package pinned by `url` is fetched into `cache_dir`, or into the per-user
+/// cache folder when there is none, unless that folder already holds it.
 ///
 /// # Errors
 ///
@@ -384,7 +446,7 @@ fn project_root(config: &Path) -> io::Result<PathBuf> {
 /// A fault is a file that cannot be read, a key the config does not define, a
 /// package that cannot be read or that repeats a style, or a rule that does not
 /// load. It is also a glob, a style or a rule name that names nothing.
-pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
+pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, LoadError> {
     let input = Input::read(path).map_err(LoadError::from)?;
     let raw: Raw = input.load().map_err(LoadError::from)?;
     let text = input.text();
@@ -401,7 +463,7 @@ pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
             });
         }
     };
-    let loaded = load_packages(&raw.packages, &root, text, &mut faults);
+    let loaded = load_packages(&raw.packages, &root, text, cache_dir, &mut faults);
     let globs = read_globs(raw.files, text, &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
@@ -411,6 +473,7 @@ pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
     Ok(Project {
         rules: loaded.rules,
         styles: loaded.styles,
+        unrunnable: loaded.unrunnable,
         globs,
         level: raw.level.as_deref().and_then(level_named),
         packages: loaded.packages,
@@ -419,25 +482,56 @@ pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
 }
 
 /// Loads the style folders of each package `entries` names, each `path` read
-/// relative to `root`.
-fn load_packages(entries: &[Entry], root: &Path, text: &str, faults: &mut Faults<'_>) -> Loaded {
+/// relative to `root` and each `url` fetched into `cache_dir`.
+fn load_packages(
+    entries: &[Entry],
+    root: &Path,
+    text: &str,
+    cache_dir: Option<&Path>,
+    faults: &mut Faults<'_>,
+) -> Loaded {
     let mut loaded = Loaded::default();
     let mut folders: BTreeMap<String, PathBuf> = BTreeMap::new();
+    let mut found: Vec<Found> = Vec::new();
     let mut from = key_line(text, "packages", 1).unwrap_or(1);
     for entry in entries {
-        let Some(written) = entry.path.as_deref().map(Path::new) else {
-            continue;
-        };
-        let folder = root.join(written);
-        let line = key_line(text, "path", from);
+        let key = if entry.url.is_some() { "url" } else { "path" };
+        let line = key_line(text, key, from);
         from = line.map_or(from, |line| line + 1);
+        let (written, folder) = match (&entry.path, &entry.url, &entry.sha256) {
+            (Some(path), _, _) => (PathBuf::from(path), root.join(path)),
+            (None, Some(url), Some(sha256)) => match package::fetch(cache_dir, url, sha256) {
+                Ok(folder) => (PathBuf::from(url), folder),
+                Err(message) => {
+                    faults.add(line, key, message);
+                    continue;
+                }
+            },
+            (None, _, _) => continue,
+        };
         match fs::canonicalize(&folder) {
-            Ok(real) => loaded.packages.push(real),
-            Err(error) => {
-                faults.add(line, "path", format!("`{}`: {error}", written.display()));
-                continue;
+            Ok(real) => {
+                loaded.packages.push(real);
+                found.push(Found {
+                    written,
+                    folder,
+                    key,
+                    line,
+                });
             }
+            Err(error) => faults.add(line, key, format!("`{}`: {error}", written.display())),
         }
+    }
+    // A rule may extend a rule in any package, so every package is on the
+    // search path before the first style is read.
+    let search = loaded.packages.clone();
+    for Found {
+        written,
+        folder,
+        key,
+        line,
+    } in found
+    {
         for style in style_folders(&folder, line, faults) {
             let name = style
                 .file_name()
@@ -447,7 +541,7 @@ fn load_packages(entries: &[Entry], root: &Path, text: &str, faults: &mut Faults
             if let Some(first) = folders.get(&name) {
                 faults.add(
                     line,
-                    "path",
+                    key,
                     format!(
                         "the style `{name}` is in both `{}` and `{}`",
                         first.display(),
@@ -456,7 +550,7 @@ fn load_packages(entries: &[Entry], root: &Path, text: &str, faults: &mut Faults
                 );
                 continue;
             }
-            match read_style(&style) {
+            match read_style(&style, &search) {
                 Ok(read) => {
                     let first = loaded.rules.len();
                     loaded.rules.extend(read.rules);
@@ -466,6 +560,12 @@ fn load_packages(entries: &[Entry], root: &Path, text: &str, faults: &mut Faults
                     if !read.names.is_empty() {
                         loaded.names.insert(name.clone(), read.names);
                     }
+                    loaded
+                        .unrunnable
+                        .extend(read.unrunnable.into_iter().map(|rule| Held {
+                            style: name.clone(),
+                            rule,
+                        }));
                 }
                 Err(error) => faults.problems.extend(error.problems),
             }
@@ -483,7 +583,12 @@ fn read_globs(
     loaded: &Loaded,
     faults: &mut Faults<'_>,
 ) -> Vec<Glob> {
-    let known: HashSet<&str> = loaded.rules.iter().map(|rule| rule.name.as_str()).collect();
+    let known: HashSet<&str> = loaded
+        .rules
+        .iter()
+        .map(|rule| rule.name.as_str())
+        .chain(loaded.unrunnable.iter().map(|held| held.rule.name.as_str()))
+        .collect();
     let mut globs = Vec::new();
     for (pattern, settings) in files.0 {
         let line = key_line(text, &pattern, 1);
@@ -563,8 +668,13 @@ fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
     }
 }
 
+/// The folder of a package's styles that holds Vale's vocabularies and other
+/// settings, which is no style.
+const SETTINGS_FOLDER: &str = "config";
+
 /// The style folders of the package folder `package`, in name order: each
-/// folder inside it whose name does not begin with a dot.
+/// folder inside it whose name does not begin with a dot, except
+/// [`SETTINGS_FOLDER`].
 fn style_folders(package: &Path, line: Option<usize>, faults: &mut Faults<'_>) -> Vec<PathBuf> {
     let entries = match fs::read_dir(package) {
         Ok(entries) => entries,
@@ -578,9 +688,10 @@ fn style_folders(package: &Path, line: Option<usize>, faults: &mut Faults<'_>) -
         .map(|entry| entry.path())
         .filter(|path| {
             path.is_dir()
-                && path
-                    .file_name()
-                    .is_some_and(|name| !name.to_string_lossy().starts_with('.'))
+                && path.file_name().is_some_and(|name| {
+                    let name = name.to_string_lossy();
+                    !name.starts_with('.') && name != SETTINGS_FOLDER
+                })
         })
         .collect();
     folders.sort();

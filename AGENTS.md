@@ -6,11 +6,13 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
 
 ## Decisions
 
-1. **Own format.**
-   hakkiri reads its own rule files and `.ctl/hakkiri.yaml`, not `.vale.ini` or Vale rule files.  
+1. **Vale rule files, own config.**
+   hakkiri reads Vale rule files as they are, and its own `.ctl/hakkiri.yaml`, not `.vale.ini`.  
    A rule selects text with Vale's `scope`: its lowercase dotted names, such as `sentence` and `text.comment.doc`, and its operators `~`, `&` and lists.  
    Its checks are Vale's check types except `script`; a rate is a `metric` whose formula reads `occurrences`.  
-   Vale styles enter only through `hakkiri import vale`, which a package build runs.
+   A Vale style folder loads with no conversion: a rule may extend another rule, as in Vale.  
+   A rule hakkiri cannot run, such as a `script` rule, is reported and the rest of its style runs, until the config turns it `off`.  
+   `hakkiri import vale` will convert a `.vale.ini` into the project config (row `HKR-035`).
 2. **Structure first.**
    A rule selects text by its scope in the document tree; a pattern only narrows that selection.  
    A rule that needs a regular expression to find whether text sits in code, a link or a comment shows a missing scope.
@@ -25,7 +27,10 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
 5. **Packages.**
    Rules ship as versioned packages that a project pins by version and hash.  
    hakkiri fetches and caches them; there is no separate sync step.  
-   Until `HKR-006`, a package entry is a local `path` to a folder of style folders, and an entry with a `url` is refused.
+   A package entry is a local `path` to a folder of style folders, or a `url` and its `sha256`.  
+   A `url` names a zip that hakkiri downloads on the first run, checks against the hash, and unpacks whole into `<cache>/<sha256>/`, where the per-user cache folder or `--cache-dir` is the cache.  
+   A later run reads that folder with no network.  
+   The zip is a Vale package kept as it lays out: one top folder that holds a `styles` folder or is a style, so `HKR-007` and `HKR-008` find its files where Vale puts them.
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
    Vale matches the path as given; the departure is in the `vale-differences` spec.
 6. **Exit status.**

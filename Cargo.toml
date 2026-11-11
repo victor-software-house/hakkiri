@@ -96,10 +96,19 @@ garde = { version = "0.23.0", default-features = false, features = ["derive"] }
 markdown = "1.0.0"
 regex = "1.13.1"
 serde = { version = "1.0.229", features = ["derive"] }
+# The checksum of a downloaded package.
+sha2 = "0.11.1"
 tree-sitter = "0.27.2"
 tree-sitter-javascript = "0.25.0"
 tree-sitter-rust = "0.24.2"
 tree-sitter-typescript = "0.23.2"
+# A package pinned by url is downloaded with rustls and the bundled root
+# certificates, which a static musl binary needs, and read as a zip without the
+# compressors.
+ureq = { version = "3.5.1", default-features = false, features = ["rustls"] }
+zip = { version = "9.5.1", default-features = false, features = [
+  "deflate-flate2-zlib-rs",
+] }
 
 # musl's allocator takes a lock that threads fight over, and a parallel `check`
 # runs about eight times slower with it, so the musl build links mimalloc.

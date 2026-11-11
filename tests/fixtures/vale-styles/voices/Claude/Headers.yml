@@ -1,0 +1,28 @@
+# From the Claude Fable 5.1 prompt: "Claude uses the minimum formatting needed
+# for clarity". Two headers is a reply with two parts; more is a document.
+extends: occurrence
+message: "Found %d headers. Claude uses the minimum formatting needed for clarity."
+link: https://platform.claude.com/docs/en/release-notes/system-prompts/claude-fable-5-1
+level: suggestion
+scope: raw
+token: '(?m)^#{1,6} '
+max: 2
+
+tests:
+  - name: fires
+    input: |
+      # One
+      
+      ## Two
+      
+      ## Three
+      
+      Text.
+    want: |
+      1:1:Claude.Headers:Found 3 headers. Claude uses the minimum formatting needed for clarity.
+  - name: clean
+    input: |
+      # One
+      
+      Text.
+    want: ""
