@@ -52,6 +52,8 @@ The rule keeps its project name: the folder it sits in, a dot, and its file name
 The style loader and the `test` command derive the name in one function, so a coverage report and an alert agree.
 The name comes from the path made absolute, with symlinks left alone.
 Vale does the same: `vale test styles/Team/Foo.yml` names the rule `Team.Foo` when `styles/Team` is a symlink, and `Foo.yml` or `./Foo.yml` run from inside `Team` does too.
+The fold is lexical on purpose, as Go's `filepath.Abs` is, and the rule's text, name and package all come from the folded path.
+In a probe, a case with `rule: via/../Team/Foo.yml` through a symlink read `Team/Foo.yml` beside the case file, not the symlink target's parent.
 Any other case lints `input` as a file named `input.<format>` in the current directory, through the whole config, so its globs, styles and levels apply.
 Vale isolates the same way ([isolate][v-isolate]).
 

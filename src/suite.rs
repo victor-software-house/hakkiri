@@ -171,8 +171,11 @@ fn is_rule_file(file: &Path) -> bool {
 /// `file` made absolute, with its `.` and `..` parts folded away and its
 /// symlinks left alone, as Go's `filepath.Abs` does for Vale.
 ///
-/// The style loader names a rule from the folder it was given, so a style
-/// folder that is a symlink keeps the name of the link.
+/// The fold ignores symlinks on purpose: `a/link/../b` is `a/b` even when
+/// `link` points elsewhere, where the operating system would step out of the
+/// link's target. A rule's text, name and package all come from this one path,
+/// so they name one file. The style loader names a rule from the folder it was
+/// given, so a style folder that is a symlink keeps the name of the link.
 fn absolute(file: &Path) -> Option<PathBuf> {
     let mut clean = PathBuf::new();
     for part in std::path::absolute(file).ok()?.components() {
@@ -235,13 +238,15 @@ impl Runner {
     fn file(&mut self, file: &Path) -> Result<(), Failure> {
         let shown = plain(file);
         let unread = |message: String| Failure::file(&shown, message);
+        let folded =
+            absolute(file).ok_or_else(|| unread("the path has no absolute form".to_owned()))?;
         if shown.ends_with(TEST_FILE) {
-            let text = fs::read_to_string(file).map_err(|error| unread(error.to_string()))?;
+            let text = fs::read_to_string(&folded).map_err(|error| unread(error.to_string()))?;
             let cases = cases_from_text(&shown, &text).map_err(|error| unread(one_line(&error)))?;
             self.run_all(file, &cases, None);
             return Ok(());
         }
-        let text = fs::read_to_string(file).map_err(|error| unread(error.to_string()))?;
+        let text = fs::read_to_string(&folded).map_err(|error| unread(error.to_string()))?;
         if !has_key(&text, "extends:") || !has_key(&text, "tests:") {
             return Ok(());
         }
@@ -362,7 +367,8 @@ fn lint_alone(rule: &Rule, tree: &hakkiri::Tree, case: &TestCase) -> Result<Vec<
 /// Reads the rule file at `path`.
 fn read_rule(path: &Path) -> Result<Rule, String> {
     let shown = plain(path);
-    let text = fs::read_to_string(path).map_err(|error| format!("{shown}: {error}"))?;
+    let folded = absolute(path).ok_or_else(|| format!("{shown}: the path has no absolute form"))?;
+    let text = fs::read_to_string(&folded).map_err(|error| format!("{shown}: {error}"))?;
     let name = rule_name(path).ok_or_else(|| format!("{shown}: the rule has no style folder"))?;
     let package = package_of(path).ok_or_else(|| format!("{shown}: the rule has no package"))?;
     Rule::from_text_in(&name, &shown, &text, &package).map_err(|error| one_line(&error))

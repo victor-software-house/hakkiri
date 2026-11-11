@@ -407,6 +407,45 @@ fn an_explicit_node_modules_folder_is_walked() -> TestResult {
     Ok(())
 }
 
+#[cfg(unix)]
+#[test]
+fn a_rule_path_through_a_symlink_and_back_out_is_read_from_the_folded_path() -> TestResult {
+    let suite = Suite::new("test-fold");
+    let root = suite.scenario("fold");
+    root.file(
+        "Team/Foo.yml",
+        "extends: existence\nmessage: \"Remove '%s'.\"\nlevel: warning\ntokens: [very]\n",
+    );
+    root.file(
+        "shared/elsewhere/Team/Foo.yml",
+        "extends: existence\nmessage: \"Be plain: '%s'.\"\nlevel: warning\ntokens: [truly]\n",
+    );
+    root.file("shared/elsewhere/deeper/.keep", "");
+    std::os::unix::fs::symlink("shared/elsewhere/deeper", root.path().join("via"))?;
+    root.file(
+        "fold.test.yml",
+        "- name: through the link and back\n  rule: via/../Team/Foo.yml\n  input: This is very good.\n  want: \"1:9:Team.Foo:Remove 'very'.\"\n",
+    );
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"]);
+    Ok(())
+}
+
+#[test]
+fn an_explicit_node_modules_root_is_walked() -> TestResult {
+    let suite = Suite::new("test-modules-root");
+    let root = styled(&suite, "modules-root");
+    root.file(
+        "node_modules/vendored.test.yml",
+        "- name: vendored\n  rule: ../styles/Team/Filler.yml\n  input: A very day.\n  contains: Team.Filler\n",
+    );
+    let result = run(root.path(), &["test", "node_modules"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"]);
+    Ok(())
+}
+
 #[test]
 fn json_holds_no_escape_byte_under_forced_colour() -> TestResult {
     let suite = Suite::new("test-json");
