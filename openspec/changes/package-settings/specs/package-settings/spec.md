@@ -61,12 +61,23 @@ A package named twice SHALL load once, by its `sha256` for a download and its fo
 ### Requirement: Package vocabularies and the project's add up
 
 The `vocab` names of the packages and the project SHALL add up, the packages' first.  
+A `vocab` written as an empty list SHALL drop the names before it, as Vale's `Vocab = NONE` does, and a missing key SHALL keep them.  
 A name that no package holds, or that two packages hold, SHALL be an error on its line in the file that names it.
 
 #### Scenario: Two lists
 
 - **WHEN** a package sets `vocab: [Team]` and the project sets `vocab: [Own]`
 - **THEN** hakkiri reads the vocabularies `Team` and `Own`
+
+#### Scenario: An empty list
+
+- **WHEN** a package sets `vocab: [Team]` and the project sets `vocab: []`
+- **THEN** hakkiri reads no vocabulary named by a package
+
+#### Scenario: A missing key
+
+- **WHEN** a package sets `vocab: [Team]` and the project sets no `vocab`
+- **THEN** hakkiri reads the vocabulary `Team`
 
 #### Scenario: A name no package holds
 

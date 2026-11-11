@@ -313,6 +313,36 @@ fn the_vocabularies_of_a_package_and_the_project_add_up() -> TestResult {
 }
 
 #[test]
+fn an_empty_vocab_list_drops_the_names_of_the_packages() -> TestResult {
+    let suite = Suite::new("package-settings-vocab-clear");
+    for (name, config, flagged) in [
+        ("missing", "packages:\n  - path: pkg/styles\n", false),
+        (
+            "empty",
+            "vocab: []\npackages:\n  - path: pkg/styles\n",
+            true,
+        ),
+    ] {
+        let root = project(&suite, name, config);
+        root.file("pkg/styles/Team/Filler.yml", TERMS);
+        root.file("pkg/styles/config/vocabularies/Docs/accept.txt", "GitHub\n");
+        root.file(
+            "pkg/.ctl/hakkiri.yaml",
+            "vocab: [Docs]\nfiles:\n  '*.md': {styles: [Team]}\n",
+        );
+        root.file("a.md", "Use GitHub here.\n");
+        let (code, lines, err) = check(&root)?;
+        assert_eq!(code, 0, "{name}: {err}");
+        assert_eq!(
+            lines.iter().any(|line| line.contains("Remove 'GitHub'")),
+            flagged,
+            "{name}: {lines:?}"
+        );
+    }
+    Ok(())
+}
+
+#[test]
 fn a_vocabulary_a_package_names_that_no_package_holds_is_an_error() -> TestResult {
     let suite = Suite::new("package-settings-vocab-unknown");
     let root = project(&suite, "unknown", "packages:\n  - path: pkg/styles\n");

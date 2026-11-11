@@ -108,8 +108,8 @@ struct Raw {
     #[garde(dive)]
     packages: Vec<Entry>,
     #[serde(default)]
-    #[garde(inner(custom(vocab_known)))]
-    vocab: Vec<String>,
+    #[garde(inner(inner(custom(vocab_known))))]
+    vocab: Option<Vec<String>>,
     #[serde(default)]
     #[garde(skip)]
     files: Ordered<Ordered<Setting>>,
@@ -960,18 +960,31 @@ struct Named {
     /// file that holds the key.
     all: Vec<(String, Option<usize>, String)>,
     /// The names of the top level, in order: those of each package's file and
-    /// then the project's.
+    /// then the project's. A written empty list drops the names before it.
     top: Vec<String>,
+    /// Every name a top level wrote, cleared or not, which the config check
+    /// reports on its own line.
+    written: Vec<String>,
 }
 
 impl Named {
     /// Adds the vocabularies `layer` names: its top-level list and the lists
     /// of its globs.
     fn add_layer(&mut self, layer: &Layer) {
-        for name in &layer.raw.vocab {
-            self.add(name, None, &layer.name);
-            if !self.top.contains(name) {
-                self.top.push(name.clone());
+        // A list that is written and empty clears the names before it, as
+        // Vale's `Vocab = NONE` does; a key that is absent keeps them.
+        if let Some(names) = &layer.raw.vocab {
+            if names.is_empty() {
+                self.top.clear();
+            }
+            for name in names {
+                self.add(name, None, &layer.name);
+                if !self.top.contains(name) {
+                    self.top.push(name.clone());
+                }
+                if !self.written.contains(name) {
+                    self.written.push(name.clone());
+                }
             }
         }
         let text = &layer.text;
@@ -1021,7 +1034,7 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
         );
         // A name of the top level is refused when the config is checked
         // again, on the line of its own entry.
-        let refused = !vocab.top.contains(name);
+        let refused = !vocab.written.contains(name);
         match holders.as_slice() {
             [] if refused => at.add(
                 *line,

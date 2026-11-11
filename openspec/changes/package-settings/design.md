@@ -146,7 +146,8 @@ The key is checked as the project's is, by the same type.
 ### 8. `vocab`
 
 The package vocabularies and the project's add up, in package order and then the project's.
-Vale's `NONE` clears the names before it; hakkiri has no such word for a list, and the operator's ruling on this change named none, so a project cannot drop a package's vocabulary.
+A `vocab` written as an empty list drops the names before it, as Vale's `Vocab = NONE` does, and a missing key keeps them.
+The field is an optional list for that: an empty list and a missing key must differ, and a plain list cannot tell them apart.
 A name is checked as the project's is, by the vocabulary check of `HKR-019`.
 
 ## Risks
