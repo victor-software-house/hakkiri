@@ -9,8 +9,10 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Evidence, 2026-11-11 (UTC): the alert tests do not compile against the old `Alert`, since they read `last_line`. Against the old source in a box, the JSON tests `json_holds_no_escape_byte_under_forced_colour` and `a_match_across_lines_ends_at_its_last_character` fail at run time, and all pass with the change.
 - [x] 1.2 Make `tests/vocabulary_rules.rs` compare the end of a wrapped match through Vale's count, and pin the true end of the two wrapped matches in its fixture.  
   Verify the comparison passes for the nine configs, with the wrapped rows included.  
-  Evidence, 2026-11-11 (UTC): `every_config_gives_the_alerts_vale_gives` passes in a box with the wrapped rows compared, and `a_match_across_lines_ends_at_its_last_character` pins `mea Culpa` to line 1, column 5 through line 2, column 5, and `Bad Word` to line 2, column 17 through line 3, column 4.  
-  `tests/ignores.rs` carries the old comment and still leaves wrapped rows out of its comparison, which a pull request outside this row changes.
+  Evidence, 2026-11-11 (UTC): `every_config_gives_the_alerts_vale_gives` passes in a box with the wrapped rows compared.  
+  `a_match_across_lines_ends_at_its_last_character` pins `mea Culpa` to line 1, column 5 through line 2, column 5.  
+  It pins `Bad Word` to line 2, column 17 through line 3, column 4.  
+  `tests/ignores.rs` compares its wrapped rows the same way.
 
 ## 2. The surfaces
 

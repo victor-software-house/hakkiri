@@ -10,9 +10,11 @@
 //! same commit, run from the fixture folder as `vale --config=vale/<name>.ini
 //! --output=JSON text`.
 //!
-//! A match that spans lines ends on its first line in hakkiri, where Vale
-//! counts every character of it from the first column. The last column of such
-//! a row is left out of the comparison.
+//! A match that spans lines ends where its last character is in hakkiri, as
+//! `end_line` and `end_column`. Vale prints the first column plus the number of
+//! characters of the match, line breaks included, which can pass the end of the
+//! line. The comparison maps hakkiri's end to Vale's count for such a match,
+//! and compares the single-line ends as they are.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -81,16 +83,11 @@ fn vale_rows(name: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
         };
         if config == name {
             let matched = matched.replace("\\n", "\n");
-            let last = if matched.contains('\n') {
-                0
-            } else {
-                last.parse()?
-            };
             rows.insert((
                 file.to_owned(),
                 line.parse()?,
                 first.parse()?,
-                last,
+                last.parse()?,
                 level.to_owned(),
                 rule.to_owned(),
                 message.to_owned(),
@@ -114,15 +111,16 @@ fn rows_of(out: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
                 .unwrap_or_default()
         };
         let matched = text("match");
-        let last = if matched.contains('\n') {
-            0
-        } else {
+        let (line, first) = (number("line"), number("column"));
+        let last = if number("end_line") == line {
             number("end_column")
+        } else {
+            (first + matched.chars().count()).saturating_sub(1)
         };
         rows.insert((
             text("path"),
-            number("line"),
-            number("column"),
+            line,
+            first,
             last,
             text("level"),
             text("rule"),

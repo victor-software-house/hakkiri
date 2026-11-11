@@ -67,6 +67,7 @@ queue:
       - The cases of ProseStyle v0.0.14 NounStack and ThingsSpeakNoun pass, with the message Vale 66bbb85 prints for the same match.
     notes:
       - '2026-11-11, found by the ProseStyle port: hakkiri prints %[1]s %[2]s unfilled in a sequence rule message, and hakkiri main has no support for indexed verbs.'
+    plan: openspec/changes/indexed-verbs/proposal.md
 
   - id: HKR-046
     title: Keep a fence open across a blank doc-comment line
@@ -92,6 +93,7 @@ queue:
     notes:
       - "2026-11-11, operator decision: the true end, with a new end_line field in the JSON. hakkiri never copies a flaw of Vale's to match it; Vale's count can point past the end of the line, and hakkiri's alerts spec stopped at the end of the first line."
       - 2026-11-11, the pretty line keeps path:line:column, so tools that parse it are unaffected.
+    plan: openspec/changes/match-end/proposal.md
 
   - id: HKR-030
     title: Read files by extension, with plain text by default
