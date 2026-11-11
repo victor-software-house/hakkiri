@@ -249,7 +249,6 @@ fn root(
         children,
         first: false,
         closes: end,
-        label: None,
     };
     Ok(Node {
         scope: Scope::Raw,
@@ -259,7 +258,6 @@ fn root(
         children: vec![comment],
         first: false,
         closes: end,
-        label: None,
     })
 }
 

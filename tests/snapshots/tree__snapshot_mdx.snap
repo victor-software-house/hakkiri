@@ -3,7 +3,6 @@ source: tests/tree.rs
 expression: "load(\"mdx.mdx\")? .render()"
 ---
 raw 0..237 [0..237] "---\ntitle: A page\n---\n\nimport X from './x'\n\nexport const meta = {}\n\n# Heading {meta.title}\n\n<Note title=\"t\">Read this.</Note>\n\nText with {expression} inside and <b>bold</b> too.\n\n<Callout>\n\nA paragraph inside.\n\n- A list item\n\n</Callout>\n"
-  frontmatter 11..17 [11..17] "A page"
   heading.h1 70..77 [70..77] "Heading"
   paragraph 108..118 [108..118] "Read this."
   paragraph 127..177 [127..137, 149..161, 164..168, 172..177] "Text with  inside and bold too."

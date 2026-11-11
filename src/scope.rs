@@ -148,15 +148,7 @@ impl Selector {
                     _ => vec![name],
                 };
                 for (index, name) in named_parts.iter().enumerate() {
-                    // A key of the front matter completes `frontmatter` and
-                    // `text.frontmatter`, so any name below them is one.
-                    let front = |prefix: &str| {
-                        name.strip_prefix(prefix)
-                            .is_some_and(|rest| rest.starts_with('.'))
-                    };
-                    let known = matches!(*name, "text" | "sentence" | "text.frontmatter")
-                        || front("frontmatter")
-                        || front("text.frontmatter")
+                    let known = matches!(*name, "text" | "sentence")
                         || NodeScope::ALL.iter().any(|scope| named(name, scope.name()));
                     if !known {
                         return Err(refuse("is not a scope hakkiri defines"));

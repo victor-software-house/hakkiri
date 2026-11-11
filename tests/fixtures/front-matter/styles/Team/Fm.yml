@@ -1,6 +1,0 @@
-extends: existence
-message: "Fm '%s'"
-level: warning
-scope: frontmatter
-tokens:
-  - 'very'

@@ -1,6 +1,0 @@
-packages:
-  - path: styles
-files:
-  'text/*.{md,mdx}':
-    styles: [Team]
-    token_ignores: ['{{.*?}}']

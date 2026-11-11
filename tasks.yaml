@@ -297,7 +297,6 @@ queue:
       - A text rule reports a word in a front matter value, with the alerts Vale 66bbb85 gives on the probe file in tests/fixtures/markup-differences.
     notes:
       - '2026-11-11, found while probing comment controls: Vale flags the word very in the title value of a front matter block, and hakkiri skips the whole block. The probe is tests/fixtures/markup-differences/text/m2.md. Which keys Vale lints is not measured yet.'
-    plan: openspec/changes/front-matter-values/proposal.md
 
   - id: HKR-051
     title: Count code spans in LongSentence under hakkiri

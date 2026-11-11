@@ -1,6 +1,0 @@
-extends: existence
-message: "FmTitle '%s'"
-level: warning
-scope: frontmatter.title
-tokens:
-  - 'very'

@@ -28,7 +28,6 @@ An editor server follows in the second release.
 - An HTML comment in a Markdown file, such as `<!-- hakkiri Style.Rule: off -->`, or `{/* hakkiri Style.Rule: off */}` in an MDX file, turns rules off and on for the text after it, with Vale's reach, and Vale's own `<!-- vale off -->` comments work too.
 - A walk skips what git ignores, as ripgrep does, and a file named on the command line draws a warning when no glob selects it. The config, a flag and a variable each set both.
 - Inline `$…$` and display `$$…$$` math reads as code in Markdown and MDX, by Pandoc's delimiter rules, as in Vale.
-- The string values of a Markdown file's YAML, TOML and JSON front matter are linted as text, with the scope of their key, as in Vale.
 - A file that no language reads is linted as plain text when a glob selects it, and `formats` maps an extension, a file name or a glob to a reader.
 - Files are checked in parallel.
 

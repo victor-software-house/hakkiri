@@ -228,13 +228,6 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     };
     let mut nodes = builder.visit(&root, Scope::TableCell).nodes;
     math::include_delimiters(&mut nodes, &spans);
-    if !matches!(flavor, Flavor::Comment) {
-        // JSON front matter is no construct of markdown-rs, so its values are
-        // read from the start of the file, ahead of the body.
-        let mut front = crate::frontmatter::json_nodes(source);
-        front.append(&mut nodes);
-        nodes = front;
-    }
     let comments = match flavor {
         Flavor::Markdown | Flavor::Mdx => comments_of(&root, source),
         Flavor::Comment => Vec::new(),
@@ -554,21 +547,11 @@ impl Builder<'_> {
                 Step::Done(Visited::cut(span_of(node)))
             }
             Mdast::Html(_) => Step::Done(Visited::tag(span_of(node))),
-            Mdast::Yaml(_) | Mdast::Toml(_) => {
-                let span = span_of(node);
-                let toml = matches!(node, Mdast::Toml(_));
-                let nodes = span
-                    .as_ref()
-                    .map(|span| crate::frontmatter::nodes(self.source, span, toml))
-                    .unwrap_or_default();
-                Step::Done(Visited {
-                    nodes,
-                    ..Visited::cut(span)
-                })
-            }
             Mdast::MdxjsEsm(_)
             | Mdast::MdxFlowExpression(_)
             | Mdast::MdxTextExpression(_)
+            | Mdast::Toml(_)
+            | Mdast::Yaml(_)
             | Mdast::InlineMath(_)
             | Mdast::Math(_)
             | Mdast::Definition(_) => Step::Done(Visited::cut(span_of(node))),
@@ -665,7 +648,6 @@ impl Builder<'_> {
             | Scope::Alt
             | Scope::Description
             | Scope::Meta
-            | Scope::FrontMatter
             | Scope::Raw
             | Scope::CommentLine
             | Scope::CommentBlock
@@ -792,7 +774,6 @@ impl Builder<'_> {
             | Scope::Alt
             | Scope::Description
             | Scope::Meta
-            | Scope::FrontMatter
             | Scope::Raw
             | Scope::CommentLine
             | Scope::CommentBlock

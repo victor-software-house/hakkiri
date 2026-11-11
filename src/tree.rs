@@ -67,13 +67,11 @@ pub enum Scope {
     CommentDocLine,
     /// A `/** */` comment, or a Rust `/*! */` comment.
     CommentDocBlock,
-    /// A string value of a Markdown file's front matter, such as the `title`.
-    FrontMatter,
 }
 
 impl Scope {
     /// Every scope.
-    pub const ALL: [Self; 31] = [
+    pub const ALL: [Self; 30] = [
         Self::Paragraph,
         Self::Heading1,
         Self::Heading2,
@@ -104,7 +102,6 @@ impl Scope {
         Self::CommentBlock,
         Self::CommentDocLine,
         Self::CommentDocBlock,
-        Self::FrontMatter,
     ];
 
     /// The lowercase dotted name a rule's `scope` uses, such as `heading.h1`.
@@ -141,7 +138,6 @@ impl Scope {
             Self::CommentBlock => "text.comment.block",
             Self::CommentDocLine => "text.comment.doc.line",
             Self::CommentDocBlock => "text.comment.doc.block",
-            Self::FrontMatter => "frontmatter",
         }
     }
 
@@ -224,9 +220,6 @@ pub struct Node {
     /// table row around it, ahead of any fenced block, thematic break or other
     /// element that holds no prose.
     pub first: bool,
-    /// What follows the scope name in the node's scope: the key of a front
-    /// matter value. Every other node has none.
-    pub label: Option<String>,
     /// The byte where the element that holds the node's text ends.
     ///
     /// A comment inside the element, after the text, is before this byte.
@@ -246,7 +239,6 @@ impl Node {
             span,
             children,
             first: false,
-            label: None,
         }
     }
 
@@ -265,7 +257,6 @@ impl Node {
             reads: Vec::new(),
             children,
             first: false,
-            label: None,
         })
     }
 

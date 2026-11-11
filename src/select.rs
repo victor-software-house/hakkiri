@@ -1,6 +1,5 @@
 //! Selection: the blocks of text a rule's scope reads in one file.
 
-use std::borrow::Cow;
 use std::ops::Range;
 use std::{error, fmt};
 
@@ -74,7 +73,6 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
         | Scope::Alt
         | Scope::Description
         | Scope::Meta
-        | Scope::FrontMatter
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -113,7 +111,6 @@ fn opens(parent: &Node, child: &Node) -> bool {
         | Scope::Alt
         | Scope::Description
         | Scope::Meta
-        | Scope::FrontMatter
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -151,7 +148,6 @@ const fn is_prose(scope: Scope) -> bool {
         | Scope::Alt
         | Scope::Description
         | Scope::Meta
-        | Scope::FrontMatter
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -193,7 +189,6 @@ const fn decodes(scope: Scope) -> Decode {
         Scope::Alt | Scope::Description => Decode::Attribute,
         Scope::Code
         | Scope::Raw
-        | Scope::FrontMatter
         | Scope::CommentLine
         | Scope::CommentBlock
         | Scope::CommentDocLine
@@ -210,11 +205,9 @@ const fn decodes(scope: Scope) -> Decode {
 /// A block of text has one scope, as in Vale ([`select`] explains which).
 /// `chain` is that scope when an element around the node gives it, and a
 /// paragraph with none is a `paragraph`.
-fn names(node: &Node, chain: Option<&'static str>) -> Vec<Cow<'static, str>> {
-    let scope = node.scope;
-    let held = |names: &[&'static str]| names.iter().copied().map(Cow::Borrowed).collect();
+fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
     match scope {
-        Scope::Paragraph => held(&[chain.unwrap_or("paragraph"), "text"]),
+        Scope::Paragraph => vec![chain.unwrap_or("paragraph"), "text"],
         Scope::Blockquote | Scope::List => Vec::new(),
         Scope::Heading1
         | Scope::Heading2
@@ -229,16 +222,8 @@ fn names(node: &Node, chain: Option<&'static str>) -> Vec<Cow<'static, str>> {
         | Scope::TableHeader
         | Scope::TableCell
         | Scope::TableCaption
-        | Scope::FigureCaption => held(&[chain.unwrap_or_else(|| scope.name()), "text"]),
-        Scope::Alt | Scope::Description => held(&[scope.name(), "text"]),
-        Scope::FrontMatter => {
-            let key = node.label.as_deref().unwrap_or_default();
-            vec![
-                Cow::Borrowed("text"),
-                Cow::Owned(format!("frontmatter.{key}")),
-                Cow::Owned(format!("text.frontmatter.{key}")),
-            ]
-        }
+        | Scope::FigureCaption => vec![chain.unwrap_or_else(|| scope.name()), "text"],
+        Scope::Alt | Scope::Description => vec![scope.name(), "text"],
         Scope::TableRow
         | Scope::Link
         | Scope::Code
@@ -249,7 +234,7 @@ fn names(node: &Node, chain: Option<&'static str>) -> Vec<Cow<'static, str>> {
         | Scope::CommentLine
         | Scope::CommentBlock
         | Scope::CommentDocLine
-        | Scope::CommentDocBlock => held(&[scope.name()]),
+        | Scope::CommentDocBlock => vec![scope.name()],
     }
 }
 
@@ -291,7 +276,6 @@ fn segments(node: &Node) -> Vec<Range<usize>> {
         | Scope::Alt
         | Scope::Description
         | Scope::Meta
-        | Scope::FrontMatter
         | Scope::Raw => node.segments.clone(),
     }
 }
@@ -332,7 +316,6 @@ fn readings(node: &Node) -> Vec<Reading> {
         | Scope::Alt
         | Scope::Description
         | Scope::Meta
-        | Scope::FrontMatter
         | Scope::Raw => node.reads.clone(),
     }
 }
@@ -405,8 +388,7 @@ pub fn select(
         .collect();
     while let Some(Step { node, chain }) = steps.pop() {
         let chain = chain.or_else(|| named_scope(node.scope));
-        let named = names(node, chain);
-        let held: Vec<&str> = named.iter().map(AsRef::as_ref).collect();
+        let held = names(node.scope, chain);
         let own = selector.reads(&held, extension, false);
         let prose = is_prose(node.scope);
         let sentences = if prose && model.is_some() {

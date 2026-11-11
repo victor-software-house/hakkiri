@@ -1,6 +1,0 @@
-extends: existence
-message: "Para '%s'"
-level: warning
-scope: paragraph
-tokens:
-  - 'very'
