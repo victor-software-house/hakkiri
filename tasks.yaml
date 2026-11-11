@@ -1,20 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-034
+active: HKR-006
 queue:
-  - id: HKR-034
-    title: Release a static musl linux-x64 binary
-    scope: release
-    outcome: >-
-      The linux-x64 release asset is a static musl binary that starts on a Linux
-      machine with no glibc loader, NixOS without nix-ld included.
-    blocked_by: []
-    acceptance:
-      - A verctl Version PR publishes 0.0.2 with a linux-x64 tarball that holds a statically linked x86_64-unknown-linux-musl binary, built on ubuntu-latest under the same asset name.
-      - The binary starts and lints a Markdown file in a root with no loader, and a parallel check takes at most twice as long as the glibc build.
-    plan: openspec/changes/musl-release/proposal.md
-
   - id: HKR-006
     title: Fetch and cache rule packages
     scope: packages
@@ -127,6 +115,19 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-034
+    title: Release a static musl linux-x64 binary
+    scope: release
+    outcome: >-
+      The linux-x64 release asset is a static musl binary that starts on a Linux
+      machine with no glibc loader, NixOS without nix-ld included.
+    plan: openspec/changes/archive/2026-11-11-musl-release/proposal.md
+    completed: 2026-11-11T04:18:27
+    evidence:
+      - openspec/changes/archive/2026-11-11-musl-release/
+      - 'PR 69 built linux-x64 as a static musl binary with mimalloc, and Version PR 72 released it as 0.0.2: the release run built it on ubuntu-latest, file reports static-pie, it starts in a root with no loader where the glibc 0.0.1 binary does not, and a check takes as long as the glibc build; the musl-release change is archived.'
+    disposition: completed
+
   - id: HKR-033
     title: Enable one rule with a rule setting
     scope: config

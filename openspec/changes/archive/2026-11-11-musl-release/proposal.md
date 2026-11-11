@@ -34,5 +34,5 @@ None.
 - New file: `mise-tasks/release/prepare.sh`. Changed: `.ctl/ver.yaml`, `Cargo.toml`, `Cargo.lock`, `src/main.rs`.
 - `darwin-arm64` is unchanged. qctl keeps its glibc build.
 
-[ledger]: ../../../tasks.yaml
-[lane]: ../archive/2026-11-11-release-lane/proposal.md
+[ledger]: ../../../../tasks.yaml
+[lane]: ../2026-11-11-release-lane/proposal.md
