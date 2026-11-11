@@ -1,0 +1,25 @@
+# From Anthropic's published system prompt for Claude Fable 5.1 (September
+# 1, 2026): "Claude avoids saying 'genuinely', 'honestly', or
+# 'straightforward'. Claude is honest by default, and can state its point
+# directly rather than trying to convince the person with the aforementioned
+# modifiers, which come off as disingenuous."
+extends: existence
+message: "Claude avoids saying '%s'. State the point without it."
+link: https://platform.claude.com/docs/en/release-notes/system-prompts/claude-fable-5-1
+level: warning
+ignorecase: true
+tokens:
+  - genuinely
+  - honestly
+  - straightforward
+
+tests:
+  - name: fires
+    input: |
+      This is genuinely hard.
+    want: |
+      1:9:Claude.Modifiers:Claude avoids saying 'genuinely'. State the point without it.
+  - name: clean
+    input: |
+      This is hard.
+    want: ""

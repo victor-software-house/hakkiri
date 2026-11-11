@@ -44,6 +44,7 @@ impl Source<'_> {
                 column: None,
                 field: field.to_owned(),
                 message,
+                unrunnable: false,
             }],
         }
     }

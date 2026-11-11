@@ -14,7 +14,7 @@ use std::{fmt, fs, io};
 use ctl_core::input::Input;
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
-use hakkiri::rule::{Level, LoadError, LoadProblem, Rule, read_style};
+use hakkiri::rule::{Level, LoadError, LoadProblem, Rule, Unrunnable, read_style};
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 
@@ -189,6 +189,8 @@ pub(crate) struct Project {
     rules: Vec<Rule>,
     /// Where each style's rules are in `rules`.
     styles: BTreeMap<String, Vec<usize>>,
+    /// The rules that are valid Vale and that hakkiri cannot run.
+    unrunnable: Vec<Held>,
     globs: Vec<Glob>,
     /// The lowest level an alert reports at.
     pub(crate) level: Option<Level>,
@@ -207,6 +209,9 @@ pub(crate) struct Plan<'a> {
     pub(crate) rules: Vec<&'a Rule>,
     /// The level an alert of a rule takes, by rule name.
     pub(crate) levels: HashMap<&'a str, Level>,
+    /// The rules the config runs on the file that hakkiri cannot run: each one
+    /// fails the run until the config turns it `off`.
+    pub(crate) unrunnable: Vec<&'a Unrunnable>,
 }
 
 impl Project {
@@ -263,6 +268,8 @@ impl Project {
     /// off, or when the config turns it on or sets its level, whatever style
     /// holds it. A level once set stays when a later glob turns the rule off or
     /// on, as in Vale.
+    /// A rule hakkiri cannot run is held to the same test, and each one that
+    /// passes it is in [`Plan::unrunnable`].
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
         let mut matched = false;
         let mut styles: &[String] = &[];
@@ -323,7 +330,24 @@ impl Project {
                 }
             }
         }
-        (!rules.is_empty()).then_some(Plan { rules, levels })
+        let unrunnable: Vec<&Unrunnable> = self
+            .unrunnable
+            .iter()
+            .filter(|held| {
+                let on = switches.get(held.rule.name.as_str());
+                if styles.contains(&held.style) {
+                    on != Some(&false)
+                } else {
+                    on == Some(&true)
+                }
+            })
+            .map(|held| &held.rule)
+            .collect();
+        (!rules.is_empty() || !unrunnable.is_empty()).then_some(Plan {
+            rules,
+            levels,
+            unrunnable,
+        })
     }
 }
 
@@ -360,6 +384,7 @@ impl Faults<'_> {
             column: None,
             field: field.to_owned(),
             message,
+            unrunnable: false,
         });
     }
 }
@@ -376,6 +401,16 @@ struct Loaded {
     /// The faults in the rule names of each style, which are errors only once
     /// a glob enables the style.
     names: BTreeMap<String, Vec<LoadProblem>>,
+    /// The rules that are valid Vale and that hakkiri cannot run, with the
+    /// style that holds each.
+    unrunnable: Vec<Held>,
+}
+
+/// A rule hakkiri cannot run, and the style that holds it.
+#[derive(Debug)]
+struct Held {
+    style: String,
+    rule: Unrunnable,
 }
 
 /// The folder that holds the `.ctl` folder of the config file `config`, or the
@@ -430,6 +465,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
     Ok(Project {
         rules: loaded.rules,
         styles: loaded.styles,
+        unrunnable: loaded.unrunnable,
         globs,
         level: raw.level.as_deref().and_then(level_named),
         packages: loaded.packages,
@@ -448,6 +484,13 @@ fn load_packages(
 ) -> Loaded {
     let mut loaded = Loaded::default();
     let mut folders: BTreeMap<String, PathBuf> = BTreeMap::new();
+    // A rule may extend a rule in any package, so every package is on the
+    // search path before the first style is read.
+    let search: Vec<PathBuf> = entries
+        .iter()
+        .filter_map(|entry| entry.path.as_deref())
+        .filter_map(|written| fs::canonicalize(root.join(written)).ok())
+        .collect();
     let mut from = key_line(text, "packages", 1).unwrap_or(1);
     for entry in entries {
         let key = if entry.url.is_some() { "url" } else { "path" };
@@ -489,7 +532,7 @@ fn load_packages(
                 );
                 continue;
             }
-            match read_style(&style) {
+            match read_style(&style, &search) {
                 Ok(read) => {
                     let first = loaded.rules.len();
                     loaded.rules.extend(read.rules);
@@ -499,6 +542,12 @@ fn load_packages(
                     if !read.names.is_empty() {
                         loaded.names.insert(name.clone(), read.names);
                     }
+                    loaded
+                        .unrunnable
+                        .extend(read.unrunnable.into_iter().map(|rule| Held {
+                            style: name.clone(),
+                            rule,
+                        }));
                 }
                 Err(error) => faults.problems.extend(error.problems),
             }
@@ -516,7 +565,12 @@ fn read_globs(
     loaded: &Loaded,
     faults: &mut Faults<'_>,
 ) -> Vec<Glob> {
-    let known: HashSet<&str> = loaded.rules.iter().map(|rule| rule.name.as_str()).collect();
+    let known: HashSet<&str> = loaded
+        .rules
+        .iter()
+        .map(|rule| rule.name.as_str())
+        .chain(loaded.unrunnable.iter().map(|held| held.rule.name.as_str()))
+        .collect();
     let mut globs = Vec::new();
     for (pattern, settings) in files.0 {
         let line = key_line(text, &pattern, 1);

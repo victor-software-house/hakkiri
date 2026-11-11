@@ -8,6 +8,7 @@ extend-exclude = [
   "tests/fixtures/dictionary/vale.tsv",
   "tests/fixtures/capitalization/vale.tsv",
   "tests/fixtures/spelling-parity",
+  "tests/fixtures/vale-styles",
   "tests/fixtures/tagger/treebank.tsv",
   "data/entities/html5.tsv",
 ]

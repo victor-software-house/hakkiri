@@ -1,0 +1,12 @@
+The files here are copies of three Vale styles, kept to prove that hakkiri loads a
+Vale style folder as it is. Each is MIT-licensed by Joseph Kato, and its licence
+travels with it. The Markdown briefs inside the styles are left out.
+
+voices/     jdkato/voices tag v0.2.0, folder Voices/styles of Voices.zip
+            sha256 3d03b911727a502c5a6c1e9ea5c040ebe115cde0f6f99176d116fd6893080ba9
+upstream/Std/
+            vale-cli/Std tag v0.2.0, Std.zip
+            sha256 8cd785a380f35ed0633e41f157efbb241c7585150552b6e101f5aa5b84576d45
+upstream/Readability/
+            vale-cli/Readability tag v0.2.0, Readability.zip
+            sha256 cf8790677bb2ef86458c1d1dbd6e646fd8063c0e9621f81141e5cd85e5e41f81

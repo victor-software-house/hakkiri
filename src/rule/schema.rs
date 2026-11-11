@@ -37,6 +37,15 @@ pub(super) struct Probe {
     pub(super) extends: Text,
 }
 
+/// The `scope` of a rule file, read apart to tell a doc selector from the
+/// rest.
+#[derive(Debug, Deserialize, Validate)]
+#[garde(allow_unvalidated)]
+pub(super) struct ScopeProbe {
+    #[serde(default)]
+    pub(super) scope: Texts,
+}
+
 #[expect(
     clippy::trivially_copy_pass_by_ref,
     reason = "garde calls a custom rule with a reference to its context."
@@ -44,12 +53,10 @@ pub(super) struct Probe {
 fn extends_ok(value: &Text, ctx: &()) -> garde::Result {
     valid(value, ctx)?;
     let name = value.value();
-    if RUNNABLE.contains(&name) {
+    // A rule name is an inheritance, read before the rule is. A `script` is
+    // valid Vale that hakkiri cannot run, which the loader reports apart.
+    if RUNNABLE.contains(&name) || name == "script" || super::inherit::is_rule_ref(name) {
         Ok(())
-    } else if name == "script" {
-        Err(garde::Error::new(
-            "`script` rules are not supported: hakkiri runs no scripts",
-        ))
     } else {
         Err(garde::Error::new(format!(
             "`{name}` is not a check type: use one of {}",
@@ -72,24 +79,6 @@ fn level_ok(value: &Text, ctx: &()) -> garde::Result {
             "`{name}` is not a level: use one of {}",
             LEVELS.join(", ")
         )))
-    }
-}
-
-#[expect(
-    clippy::trivially_copy_pass_by_ref,
-    reason = "garde calls a custom rule with a reference to its context."
-)]
-fn scope_ok(value: &Texts, ctx: &()) -> garde::Result {
-    valid(value, ctx)?;
-    match value
-        .values()
-        .iter()
-        .find(|scope| scope.trim_start_matches('~').starts_with("doc("))
-    {
-        Some(scope) => Err(garde::Error::new(format!(
-            "`{scope}` is a doc selector, which hakkiri does not support"
-        ))),
-        None => Ok(()),
     }
 }
 
@@ -213,7 +202,7 @@ macro_rules! rule_fields {
             #[garde(custom(level_ok))]
             pub(super) level: Text,
             #[serde(default)]
-            #[garde(custom(scope_ok))]
+            #[garde(custom(valid))]
             pub(super) scope: Texts,
             #[serde(default)]
             #[garde(custom(valid))]

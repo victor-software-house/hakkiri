@@ -235,6 +235,16 @@ fn one_line(error: &LoadError) -> String {
     error.to_string().replace('\n', "; ")
 }
 
+/// Why a rule's cases did not run: its load error, on one line, and for a rule
+/// hakkiri cannot run, a word that its cases did not run at all.
+fn not_run(error: &LoadError) -> String {
+    if error.is_unrunnable() {
+        format!("its cases did not run: {}", one_line(error))
+    } else {
+        one_line(error)
+    }
+}
+
 impl Runner {
     /// Reads the cases of `file` and runs each one.
     ///
@@ -257,8 +267,9 @@ impl Runner {
             return Ok(());
         }
         let (name, package) = self.style_of(file).map_err(unread)?;
-        let rule = Rule::from_text_in(&name, &shown, &text, &package)
-            .map_err(|error| unread(one_line(&error)))?;
+        let search = self.search(&package);
+        let rule = Rule::from_text_searching(&name, &shown, &text, &package, &search)
+            .map_err(|error| unread(not_run(&error)))?;
         let cases = rule.tests.clone();
         self.run_all(file, &cases, Some(&rule));
         Ok(())
@@ -335,6 +346,17 @@ impl Runner {
                 let Some(plan) = project.plan(&name) else {
                     return Ok(Vec::new());
                 };
+                if !plan.unrunnable.is_empty() {
+                    let names: Vec<&str> = plan
+                        .unrunnable
+                        .iter()
+                        .map(|rule| rule.name.as_str())
+                        .collect();
+                    return Err(format!(
+                        "the config runs a rule hakkiri cannot run, so this case did not run: {}",
+                        names.join(", ")
+                    ));
+                }
                 let mut alerts = lint_planned(&plan, &tree, &case.input, &case.format)?;
                 alerts.retain(|alert| project.level.is_none_or(|lowest| alert.level >= lowest));
                 Ok(alerts)
@@ -423,7 +445,19 @@ impl Runner {
         let (name, package) = self
             .style_of(path)
             .map_err(|message| format!("{shown}: {message}"))?;
-        Rule::from_text_in(&name, &shown, &text, &package).map_err(|error| one_line(&error))
+        let search = self.search(&package);
+        Rule::from_text_searching(&name, &shown, &text, &package, &search)
+            .map_err(|error| not_run(&error))
+    }
+
+    /// The package folders a rule looks its parent up in: those of the project
+    /// config, and the rule's own package when the config does not name it.
+    fn search(&mut self, package: &Path) -> Vec<PathBuf> {
+        let mut search = self.packages();
+        if !search.iter().any(|known| known == package) {
+            search.insert(0, package.to_path_buf());
+        }
+        search
     }
 }
 
