@@ -4,7 +4,7 @@
 
 **Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for HTML-block text closes, so the requirement is removed and added again below without that scenario.
 
-**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from the differences". Its three remaining scenarios are unchanged, and it adds a fourth.
+**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from the differences". Its three remaining scenarios are unchanged, and it adds two.
 
 ## ADDED Requirements
 
@@ -32,6 +32,11 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 - **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
 - **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
+
+#### Scenario: A rule setting that enables one rule
+
+- **WHEN** a glob sets a rule of a style it does not list, such as `Team.Terms: warning`
+- **THEN** hakkiri runs nothing for it, since a rule runs only from a listed style, and Vale runs that rule at the level the setting names (row [HKR-033][ledger])
 
 ### Requirement: HTML-block text differs from Vale in detail
 

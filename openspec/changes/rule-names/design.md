@@ -34,6 +34,7 @@ The same probe gave no error when no `BasedOnStyles` named the style, and linted
 hakkiri does the same.
 It reads the faults in the names of every style, and refuses those of a style a glob lists in `styles`.
 A rule key set under a glob does not enable a style, since hakkiri runs a rule only from a listed style.
+Vale enables the one rule with it (row HKR-033), and the same probe gave no clash or bracket error for a style enabled that way.
 
 Alternative: let the first file win, silently.
 Lost: a rule would vanish with no sign, and its tests would pass against the wrong file.
