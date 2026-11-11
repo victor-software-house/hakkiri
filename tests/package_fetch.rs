@@ -32,7 +32,9 @@ const TEAM_SHA256: &str = "69c6ce94db62052c9b383536874bed0f580bd03ab680876bdc34f
 const ESCAPE: &[u8] = include_bytes!("fixtures/packages/Escape.zip");
 const ESCAPE_SHA256: &str = "612cd8e55ade07150e50de33f1a654a0183c24c2614438c4d8c67f715ae6db52";
 const BARE: &[u8] = include_bytes!("fixtures/packages/Bare.zip");
-const BARE_SHA256: &str = "065cb51784d78f550ab32d413c94f1ef80fc34df11d660979bb530996e5f6650";
+const BARE_SHA256: &str = "b558c3748c056d21d89795c2ae42b36b714a9df0c6b964ef2c946eb6201219a0";
+const ONLY: &[u8] = include_bytes!("fixtures/packages/Only.zip");
+const ONLY_SHA256: &str = "b21447815726d5e21fe2fb72aca781c09c914b1d0e819a53a566f545790f3e7b";
 
 /// A hash no fixture has.
 const WRONG_SHA256: &str = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -211,9 +213,9 @@ fn the_first_run_fetches_the_package_and_lints_with_it() -> TestResult {
         cache
             .path()
             .join(TEAM_SHA256)
-            .join("styles/Team/Filler.yml")
+            .join("Team/styles/Team/Filler.yml")
             .is_file(),
-        "the cache holds the styles folder under the hash"
+        "the cache holds the package as the zip laid it out, under the hash"
     );
     Ok(())
 }
@@ -357,7 +359,7 @@ fn a_name_that_leaves_the_package_is_refused_and_writes_nothing_outside() -> Tes
 }
 
 #[test]
-fn a_package_with_no_styles_folder_is_an_error_that_names_the_url() -> TestResult {
+fn a_package_with_no_top_folder_is_an_error_that_names_the_url() -> TestResult {
     let suite = Suite::new("package-bare");
     let server = Server::start(vec![("/Bare.zip", Route::Body(BARE.to_vec()))])?;
     let url = server.url("/Bare.zip");
@@ -366,7 +368,30 @@ fn a_package_with_no_styles_folder_is_an_error_that_names_the_url() -> TestResul
     let result = hakkiri(&root, cache.path(), &["check"])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     assert!(result.err.contains(&url), "{}", result.err);
-    assert!(result.err.contains("`styles`"), "{}", result.err);
+    assert!(result.err.contains("one top folder"), "{}", result.err);
+    assert!(!cache.path().join(BARE_SHA256).exists());
+    Ok(())
+}
+
+#[test]
+fn a_style_only_package_loads_its_top_folder_as_a_style() -> TestResult {
+    let suite = Suite::new("package-style-only");
+    let server = Server::start(vec![("/Only.zip", Route::Body(ONLY.to_vec()))])?;
+    let root = project(
+        &suite,
+        "style-only",
+        &entry(&server.url("/Only.zip"), ONLY_SHA256),
+    );
+    let cache = cache_folder(&suite, "style-only-cache");
+    let result = hakkiri(&root, cache.path(), &["check"])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file"
+        ]
+    );
     Ok(())
 }
 
@@ -473,7 +498,7 @@ fn the_cache_folder_defaults_to_the_per_user_folder() -> TestResult {
     assert!(
         base.join("hakkiri")
             .join(TEAM_SHA256)
-            .join("styles")
+            .join("Team/styles")
             .is_dir(),
         "the package is under the per-user cache folder"
     );
@@ -493,6 +518,6 @@ fn the_cache_dir_option_moves_the_cache() -> TestResult {
     let folder = cache.path().to_str().ok_or("the cache path is not UTF-8")?;
     let result = run(root.path(), &["check", "--cache-dir", folder], &[])?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
-    assert!(cache.path().join(TEAM_SHA256).join("styles").is_dir());
+    assert!(cache.path().join(TEAM_SHA256).join("Team/styles").is_dir());
     Ok(())
 }

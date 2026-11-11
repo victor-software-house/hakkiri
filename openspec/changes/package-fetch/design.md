@@ -5,12 +5,15 @@
 A package is a folder of style folders.
 The `url` form already parses: the entry holds a `url` and a `sha256`, and `load_packages` in `src/config.rs` turns each entry into a folder of styles.
 prose-style publishes `ProseStyle.zip` with the layout `ProseStyle/.vale.ini` and `ProseStyle/styles/<Style>/*.yml`, with vocabularies under `styles/config`.
+That is a Vale package, and `HKR-007` makes the loader read Vale styles as they are, inheritance included.
+So a fetched package is a Vale package used without conversion.
 
 ## Goals / Non-Goals
 
 Goals:
 
 - A `url` entry loads like a `path` entry once its zip is in the cache.
+- The cache keeps the package whole, as the zip laid it out, so the loader and `HKR-008` find `.vale.ini`, `meta.json` and the vocabularies where Vale puts them.
 - A tampered or truncated download never reaches a rule.
 - A cached package lints with no network.
 
@@ -40,7 +43,8 @@ It differs by requiring the hash, by fetching on the first run instead of in a `
 
 ### 2. The cache folder is named by the hash
 
-`<cache>/<sha256>/` holds the unpacked package, so the same bytes are unpacked once whatever `url` served them, and a new pin is a new folder.
+`<cache>/<sha256>/` holds the unpacked package whole, as the zip laid it out, such as `<cache>/<sha256>/ProseStyle/styles/ProseStyle/`.
+The same bytes are unpacked once whatever `url` served them, and a new pin is a new folder.
 A run that finds the folder reads it and makes no request.
 The download is unpacked into a temporary folder in the cache and renamed into place, so a run that stops half way leaves no partial folder.
 Two runs that fetch together both unpack, one rename wins, and the other run discards its copy.
@@ -57,7 +61,8 @@ A download passes these checks in order:
 - The `url` starts with `https://` or `http://`.
 - The body is at most 32 MiB, and its SHA-256 equals the entry's.
 - The body is a zip, every name stays inside the package, and the unpacked size stays under 128 MiB.
-- The package holds a `styles` folder, at the root of the zip or under its one top folder, as in `ProseStyle.zip`.
+- The zip holds one top folder, as Vale's packages do.
+- That folder holds a `styles` folder, which is the package folder, or else it is itself a style, as in Vale's style-only packages, and the package folder is the unpacked zip.
 
 A `sha256` is 64 lowercase hex digits, and the config load reports a wrong shape with the entry's line.
 A fault names the `url`, and a mismatch also names the expected and the actual hash.

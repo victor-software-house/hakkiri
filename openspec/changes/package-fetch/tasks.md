@@ -9,8 +9,8 @@ This change follows [`project-config`][config], which holds the grammar of a `ur
   It fetches a `url` with a timeout and the 32 MiB limit, checks the SHA-256, unpacks into a temporary folder with the checks of design decision 3, finds `styles`, and renames the folder to `<cache>/<sha256>/`.  
   Verify `tests/package_fetch.rs` fails before the change and passes after it.  
   Its tests cover the first fetch, the cache hit, the offline hit and the offline miss.  
-  They also cover the hash mismatch, a 404, a redirect, a body that is not a zip, a name that leaves the package, a package with no `styles` folder and a body over the limit.
-- [ ] 1.2 Load a `url` entry in `load_packages` as the `styles` folder of its cache folder, and check the `url` scheme and the `sha256` shape in `entry_ok`.  
+  They also cover the hash mismatch, a 404, a redirect, a body that is not a zip, a name that leaves the package, a zip with no top folder, a style-only package and a body over the limit.
+- [ ] 1.2 Load a `url` entry in `load_packages` as the package folder its zip lays out, and check the `url` scheme and the `sha256` shape in `entry_ok`.  
   Verify the scenarios for a hash of the wrong shape and for a url that is not http pass, and the existing refusals of an entry with both and of a `url` with no `sha256` still pass.
 - [ ] 1.3 Add `--cache-dir` and `HAKKIRI_CACHE_DIR` to `check` and `test`, with the per-user default.  
   Verify the scenarios for the variable, the option and the default folder pass, and `hakkiri test` loads a fetched package.

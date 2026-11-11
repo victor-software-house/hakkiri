@@ -47,7 +47,8 @@ It SHALL refuse two entries that hold a style of one name, and the error SHALL n
 ### Requirement: A download is checked before it is read
 
 A body SHALL be at most 32 MiB and SHALL match the `sha256`.  
-It SHALL be a zip that names no file outside the package, unpacks to at most 128 MiB, and holds a `styles` folder at its root or under its one top folder.  
+It SHALL be a zip with one top folder that names no file outside the package and unpacks to at most 128 MiB.  
+The top folder SHALL be a style, or hold a `styles` folder of styles, as in a Vale package.  
 Each fault SHALL be an error that names the `url`, and a download that fails a check SHALL leave nothing in the cache.
 
 #### Scenario: A server answers 404
@@ -70,10 +71,20 @@ Each fault SHALL be an error that names the `url`, and a download that fails a c
 - **WHEN** a zip holds the entry `../escape.txt`
 - **THEN** hakkiri reports an error naming the `url` and the entry, writes no file outside the cache folder of that package, and caches nothing
 
-#### Scenario: A package with no styles folder
+#### Scenario: A zip with no top folder
 
-- **WHEN** a zip holds no `styles` folder
-- **THEN** hakkiri reports an error naming the `url` and the `styles` folder
+- **WHEN** a zip holds a file at its root and no folder
+- **THEN** hakkiri reports an error naming the `url` and saying a package holds one top folder, and caches nothing
+
+#### Scenario: A style-only package
+
+- **WHEN** a zip holds `Team/Filler.yml` and no `styles` folder
+- **THEN** a glob with `styles: [Team]` runs `Team.Filler`
+
+#### Scenario: A Vale package is kept whole
+
+- **WHEN** a package holds `Team/.vale.ini` and `Team/styles/Team/Filler.yml`
+- **THEN** the cache folder of its hash holds both files where the zip put them
 
 #### Scenario: A body over the limit
 
