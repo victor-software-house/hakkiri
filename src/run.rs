@@ -8,7 +8,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{fs, io, thread};
 
 use hakkiri::alert::Alert;
-use hakkiri::engine::lint;
+use hakkiri::engine::lint_accepting;
 use hakkiri::rule::{Level, Unrunnable};
 use hakkiri::{Tree, parse};
 
@@ -94,8 +94,8 @@ pub(crate) fn lint_planned(
     source: &str,
     extension: &str,
 ) -> Result<Vec<Alert>, String> {
-    let mut alerts =
-        lint(&plan.rules, tree, source, extension).map_err(|error| error.to_string())?;
+    let mut alerts = lint_accepting(&plan.rules, tree, source, extension, &plan.accepted)
+        .map_err(|error| error.to_string())?;
     for alert in &mut alerts {
         if let Some(level) = plan.levels.get(alert.rule.as_str()) {
             alert.level = *level;

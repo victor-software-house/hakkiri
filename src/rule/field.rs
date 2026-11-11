@@ -424,6 +424,14 @@ impl Flag {
         self.value
     }
 
+    /// A flag that is `true`, for a field that defaults to it when absent.
+    pub(super) const fn on() -> Self {
+        Self {
+            value: true,
+            problem: None,
+        }
+    }
+
     fn found(found: &str) -> Self {
         Self {
             value: false,

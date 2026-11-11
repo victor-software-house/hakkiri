@@ -109,6 +109,7 @@ In both, a run of whitespace matches any run of whitespace, so a phrase that wra
 
 A term that is not a valid pattern is an error that names the vocabulary file and the line.
 Vale reports the failure with no line of the vocabulary file, and `C++` stops every run (intended difference, so the error is one a person can find).
+hakkiri's regex dialect reads `C++` as a pattern with a possessive plus, so it holds back `C` and `CC` and stops nothing; a term is written `C\+\+` to mean the text.
 Alternative: escape every term unless it is marked as a pattern.
 It lost because Vale's vocabularies hold patterns that way (`harness(?:es)?` in ProseStyle), so an escaped term would stop matching.
 

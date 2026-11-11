@@ -9,6 +9,7 @@ mod package;
 mod report;
 mod run;
 mod suite;
+mod vocabulary;
 
 use ctl_core::prelude::{App, ExitCode};
 

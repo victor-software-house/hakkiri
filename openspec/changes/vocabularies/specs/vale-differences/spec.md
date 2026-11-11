@@ -74,8 +74,13 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 
 #### Scenario: A term that is not a pattern
 
-- **WHEN** a list holds a term such as `C++` that is not a valid pattern
+- **WHEN** a list holds a term such as `C(` that is not a valid pattern
 - **THEN** hakkiri reports an error that names the file and line, where Vale stops with a pattern error that has no line ([vocabularies 4][vocabularies-4])
+
+#### Scenario: A term that Vale's engines refuse
+
+- **WHEN** a list holds `C++`
+- **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and holds back `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
 
 #### Scenario: Two packages with one vocabulary
 
@@ -101,3 +106,4 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
 [check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
 [test-2]: ../../../archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
+[bootstrap-8]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit

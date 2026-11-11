@@ -14,11 +14,12 @@ use std::{fmt, fs, io};
 use ctl_core::input::Input;
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
-use hakkiri::rule::{Level, LoadError, LoadProblem, Rule, Unrunnable, read_style};
+use hakkiri::rule::{Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style};
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 
 use crate::package;
+use crate::vocabulary::{self, SETTINGS_FOLDER, Vocabulary};
 
 /// Where the config is when no flag or variable names another file.
 pub(crate) const DEFAULT: &str = ".ctl/hakkiri.yaml";
@@ -91,6 +92,9 @@ struct Raw {
     #[serde(default)]
     #[garde(dive)]
     packages: Vec<Entry>,
+    #[serde(default)]
+    #[garde(skip)]
+    vocab: Option<Setting>,
     #[serde(default)]
     #[garde(skip)]
     files: Ordered<Ordered<Setting>>,
@@ -179,6 +183,8 @@ enum Choice {
 struct Glob {
     matcher: GlobMatcher,
     styles: Option<Vec<String>>,
+    /// The vocabularies the glob names, for the files it matches.
+    vocab: Vec<String>,
     choices: Vec<(String, Choice)>,
 }
 
@@ -192,6 +198,8 @@ pub(crate) struct Project {
     /// The rules that are valid Vale and that hakkiri cannot run.
     unrunnable: Vec<Held>,
     globs: Vec<Glob>,
+    /// The vocabularies the config names, by name.
+    vocabularies: BTreeMap<String, Vocabulary>,
     /// The lowest level an alert reports at.
     pub(crate) level: Option<Level>,
     /// The package folders, which a walk leaves alone.
@@ -212,6 +220,9 @@ pub(crate) struct Plan<'a> {
     /// The rules the config runs on the file that hakkiri cannot run: each one
     /// fails the run until the config turns it `off`.
     pub(crate) unrunnable: Vec<&'a Unrunnable>,
+    /// The exceptions of the vocabularies that the globs matching the file
+    /// name, one for each, in the order the globs are written.
+    pub(crate) accepted: Vec<&'a Exceptions>,
 }
 
 impl Project {
@@ -275,8 +286,14 @@ impl Project {
         let mut styles: &[String] = &[];
         let mut switches: HashMap<&str, bool> = HashMap::new();
         let mut set_levels: HashMap<&str, Level> = HashMap::new();
+        let mut named: Vec<&str> = Vec::new();
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
             matched = true;
+            for name in &glob.vocab {
+                if !named.contains(&name.as_str()) {
+                    named.push(name);
+                }
+            }
             if let Some(listed) = &glob.styles {
                 styles = listed;
                 if listed.is_empty() {
@@ -343,10 +360,16 @@ impl Project {
             })
             .map(|held| &held.rule)
             .collect();
+        let accepted = named
+            .iter()
+            .filter_map(|name| self.vocabularies.get(*name))
+            .map(|vocabulary| &vocabulary.exceptions)
+            .collect();
         (!rules.is_empty() || !unrunnable.is_empty()).then_some(Plan {
             rules,
             levels,
             unrunnable,
+            accepted,
         })
     }
 }
@@ -404,6 +427,8 @@ struct Loaded {
     /// The rules that are valid Vale and that hakkiri cannot run, with the
     /// style that holds each.
     unrunnable: Vec<Held>,
+    /// The vocabularies the config names, by name.
+    vocabularies: BTreeMap<String, Vocabulary>,
 }
 
 /// A package folder that was found, and where its entry is written.
@@ -463,7 +488,8 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
             });
         }
     };
-    let loaded = load_packages(&raw.packages, &root, text, cache_dir, &mut faults);
+    let vocab = Named::of(&raw, text, &mut faults);
+    let loaded = load_packages(&raw.packages, &root, text, cache_dir, &vocab, &mut faults);
     let globs = read_globs(raw.files, text, &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
@@ -475,6 +501,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         styles: loaded.styles,
         unrunnable: loaded.unrunnable,
         globs,
+        vocabularies: loaded.vocabularies,
         level: raw.level.as_deref().and_then(level_named),
         packages: loaded.packages,
         root,
@@ -488,6 +515,7 @@ fn load_packages(
     root: &Path,
     text: &str,
     cache_dir: Option<&Path>,
+    vocab: &Named,
     faults: &mut Faults<'_>,
 ) -> Loaded {
     let mut loaded = Loaded::default();
@@ -525,6 +553,13 @@ fn load_packages(
     // A rule may extend a rule in any package, so every package is on the
     // search path before the first style is read.
     let search = loaded.packages.clone();
+    read_vocabularies(&found, vocab, &mut loaded, faults);
+    let accepted: Vec<String> = vocab
+        .top
+        .iter()
+        .filter_map(|name| loaded.vocabularies.get(name))
+        .flat_map(|vocabulary| vocabulary.accepted.iter().cloned())
+        .collect();
     for Found {
         written,
         folder,
@@ -550,7 +585,7 @@ fn load_packages(
                 );
                 continue;
             }
-            match read_style(&style, &search) {
+            match read_style(&style, &search, &accepted) {
                 Ok(read) => {
                     let first = loaded.rules.len();
                     loaded.rules.extend(read.rules);
@@ -601,6 +636,7 @@ fn read_globs(
         };
         let inner = line.map_or(1, |line| line + 1);
         let mut listed = None;
+        let mut vocabularies = Vec::new();
         let mut choices = Vec::new();
         for (key, setting) in settings.0 {
             let at = key_line(text, &key, inner);
@@ -619,6 +655,10 @@ fn read_globs(
                 }
                 ("styles", Setting::Word(_)) => {
                     faults.add(at, "styles", "is a list of style names".to_owned());
+                }
+                ("vocab", Setting::List(list)) => vocabularies = list,
+                ("vocab", Setting::Word(_)) => {
+                    faults.add(at, "vocab", "is a list of vocabulary names".to_owned());
                 }
                 (_, setting) if !known.contains(key.as_str()) => {
                     let message = if matches!(setting, Setting::List(_)) {
@@ -646,6 +686,7 @@ fn read_globs(
         globs.push(Glob {
             matcher,
             styles: listed,
+            vocab: vocabularies,
             choices,
         });
     }
@@ -668,13 +709,100 @@ fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
     }
 }
 
-/// The folder of a package's styles that holds Vale's vocabularies and other
-/// settings, which is no style.
-const SETTINGS_FOLDER: &str = "config";
+/// The vocabularies a config names: at its top level, and in the globs of
+/// `files`.
+struct Named {
+    /// Each name once, with the line of the key that first names it.
+    all: Vec<(String, Option<usize>)>,
+    /// The names of the top level, in order.
+    top: Vec<String>,
+}
+
+impl Named {
+    /// The vocabularies `raw` names, with a fault for a key that is no list.
+    fn of(raw: &Raw, text: &str, faults: &mut Faults<'_>) -> Self {
+        let mut all = Self {
+            all: Vec::new(),
+            top: Vec::new(),
+        };
+        let line = key_line(text, "vocab", 1);
+        match &raw.vocab {
+            Some(Setting::List(names)) => {
+                for name in names {
+                    all.add(name, line);
+                    all.top.push(name.clone());
+                }
+            }
+            Some(Setting::Word(_)) => {
+                faults.add(line, "vocab", "is a list of vocabulary names".to_owned());
+            }
+            None => {}
+        }
+        for (pattern, settings) in &raw.files.0 {
+            let inner = key_line(text, pattern, 1).map_or(1, |line| line + 1);
+            for (key, setting) in &settings.0 {
+                if let ("vocab", Setting::List(names)) = (key.as_str(), setting) {
+                    let at = key_line(text, "vocab", inner);
+                    for name in names {
+                        all.add(name, at);
+                    }
+                }
+            }
+        }
+        all
+    }
+
+    fn add(&mut self, name: &str, line: Option<usize>) {
+        if !self.all.iter().any(|(known, _)| known == name) {
+            self.all.push((name.to_owned(), line));
+        }
+    }
+}
+
+/// Reads each vocabulary `vocab` names from the package folders in `found`,
+/// and refuses a name no package holds and a name two packages hold.
+fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults: &mut Faults<'_>) {
+    for (name, line) in &vocab.all {
+        let holders: Vec<(PathBuf, PathBuf)> = found
+            .iter()
+            .filter_map(|package| {
+                let folder = vocabulary::find(&package.folder, name)?;
+                let shown = package
+                    .written
+                    .join(SETTINGS_FOLDER)
+                    .join("vocabularies")
+                    .join(name);
+                Some((folder, shown))
+            })
+            .collect();
+        match holders.as_slice() {
+            [] => faults.add(
+                *line,
+                "vocab",
+                format!("`{name}` is not a vocabulary in any package"),
+            ),
+            [(folder, shown)] => match vocabulary::read(folder, shown) {
+                Ok(read) => {
+                    loaded.vocabularies.insert(name.clone(), read);
+                }
+                Err(problems) => faults.problems.extend(problems),
+            },
+            [(_, first), (_, second), ..] => faults.add(
+                *line,
+                "vocab",
+                format!(
+                    "the vocabulary `{name}` is in both `{}` and `{}`",
+                    first.display(),
+                    second.display()
+                ),
+            ),
+        }
+    }
+}
 
 /// The style folders of the package folder `package`, in name order: each
 /// folder inside it whose name does not begin with a dot, except
-/// [`SETTINGS_FOLDER`].
+/// [`SETTINGS_FOLDER`], which holds Vale's vocabularies and other settings.
 fn style_folders(package: &Path, line: Option<usize>, faults: &mut Faults<'_>) -> Vec<PathBuf> {
     let entries = match fs::read_dir(package) {
         Ok(entries) => entries,

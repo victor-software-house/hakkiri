@@ -102,8 +102,10 @@ A flag on the command line wins over its variable, and an empty variable counts 
 level: suggestion
 packages:
   - path: styles
+vocab: [ProseStyle]
 files:
   '*.{md,mdx,rs}': {styles: [ProseStyle]}
+  'docs/**': {vocab: [Docs]}
   '*.rs': {ProseStyle.BareURL: off}
   CHANGELOG.md: {styles: []}
 ```
@@ -120,6 +122,11 @@ files:
   The cache folder is `--cache-dir`, or `hakkiri` in the per-user cache folder: `~/Library/Caches` on macOS, and `$XDG_CACHE_HOME` or `~/.cache` elsewhere.
   A killed run leaves a folder named `.unpacking-` and a suffix in the cache. Delete it when no hakkiri run is using the cache.
   A Vale style folder loads as it is. `extends: Style.Rule` names a parent rule in any loaded package, `key+` adds to a list or mapping of the parent, and `key-` removes from one.
+- `vocab` lists vocabularies by name, at the top level and in a glob of `files`. A vocabulary is the folder `config/vocabularies/<name>/` of a package.
+  hakkiri reads every `accept.txt` and `reject.txt` below it, one term to a line, and skips a blank line and a line that starts with `# `. A term is plain text, with literal periods, or a pattern.
+  The accepted terms of the top level hold back matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules. A rule with `vocab: false` reads none, and nor does an `existence` rule with `nonword`.
+  A glob's list holds back matches in `existence`, `repetition`, `spelling` and `substitution` rules in the files that glob matches, whatever the rule sets. A file takes the lists of every glob that matches it.
+  An unknown vocabulary, a name in two packages and a term that is not a pattern are errors. The rejected terms are read and checked, and no rule uses them yet.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.

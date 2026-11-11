@@ -268,7 +268,7 @@ impl Runner {
         }
         let (name, package) = self.style_of(file).map_err(unread)?;
         let search = self.search(&package);
-        let rule = Rule::from_text_searching(&name, &shown, &text, &package, &search)
+        let rule = Rule::from_text_searching(&name, &shown, &text, &package, &search, &[])
             .map_err(|error| unread(not_run(&error)))?;
         let cases = rule.tests.clone();
         self.run_all(file, &cases, Some(&rule));
@@ -446,7 +446,7 @@ impl Runner {
             .style_of(path)
             .map_err(|message| format!("{shown}: {message}"))?;
         let search = self.search(&package);
-        Rule::from_text_searching(&name, &shown, &text, &package, &search)
+        Rule::from_text_searching(&name, &shown, &text, &package, &search, &[])
             .map_err(|error| not_run(&error))
     }
 

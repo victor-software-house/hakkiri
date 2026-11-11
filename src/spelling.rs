@@ -5,13 +5,14 @@
 //!
 //! [Vale]: https://github.com/vale-cli/vale/tree/66bbb85a1a78a5b5497331e04d4033357caced4d/internal
 
+use std::borrow::Cow;
 use std::ops::Range;
 use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::check::Hit;
-use crate::rule::Spelling;
+use crate::check::{Hit, accepted_hold, accepted_spans};
+use crate::rule::{Exceptions, Spelling};
 use crate::text::Text;
 
 #[cfg(test)]
@@ -388,12 +389,50 @@ fn split_identifier(word: &str) -> Vec<Part<'_>> {
 }
 
 /// Whether one part of an identifier passes: a short one or one in capitals
-/// is not checked.
-fn part_passes(spelling: &Spelling, part: &str) -> bool {
+/// is not checked, and neither is one the dictionary or an accepted term holds.
+fn part_passes(spelling: &Spelling, part: &str, accepted: &[&Exceptions]) -> bool {
     let letters = part.chars().filter(|c| is(Category::Letter, *c)).count();
     letters < MIN_PART_LETTERS
         || crate::case::upper_str(part) == part
         || spelling.speller.spell(&spelling.speller.convert(part))
+        || accepts_word(spelling, part)
+        || accepted.iter().any(|exceptions| {
+            exceptions
+                .words
+                .as_ref()
+                .is_some_and(|words| words.is_match(part).unwrap_or(false))
+        })
+}
+
+/// Whether an accepted term of the project holds `word` back.
+fn accepts_word(spelling: &Spelling, word: &str) -> bool {
+    spelling
+        .accepted
+        .as_ref()
+        .is_some_and(|accepted| accepted.is_match(word).unwrap_or(false))
+}
+
+/// `content` with each accepted phrase blanked, so its words are not read one
+/// by one and the offsets of the other words stay where they were.
+fn masked<'a>(spelling: &Spelling, content: &'a str) -> Cow<'a, str> {
+    let Some(masks) = &spelling.masks else {
+        return Cow::Borrowed(content);
+    };
+    let Ok(found) = masks.find_all(content) else {
+        return Cow::Borrowed(content);
+    };
+    if found.is_empty() {
+        return Cow::Borrowed(content);
+    }
+    let mut out = String::with_capacity(content.len());
+    let mut at = 0;
+    for range in found {
+        out.push_str(content.get(at..range.start).unwrap_or_default());
+        out.extend(std::iter::repeat_n(' ', range.len()));
+        at = range.end;
+    }
+    out.push_str(content.get(at..).unwrap_or_default());
+    Cow::Owned(out)
 }
 
 /// The number of capitals in `text`.
@@ -434,9 +473,19 @@ fn explain(spelling: &Spelling, word: &str, found: &str, extension: &str) -> Opt
 ///
 /// A word that overlaps a code span is not read. With `split`, an
 /// identifier is reported by its misspelt parts, each at its own place.
-pub(crate) fn run(spelling: &Spelling, text: &Text, extension: &str) -> Vec<Hit> {
+/// A word an accepted term of the project holds back is not reported, and
+/// neither is one that an exception of `accepted`, the vocabularies of the
+/// file's globs, holds back.
+pub(crate) fn run(
+    spelling: &Spelling,
+    text: &Text,
+    extension: &str,
+    accepted: &[&Exceptions],
+) -> Vec<Hit> {
     let mut hits = Vec::new();
-    for word in tokenize(text.as_str()) {
+    let content = masked(spelling, text.as_str());
+    let held = accepted_spans(accepted, &content, true).unwrap_or_default();
+    for word in tokenize(&content) {
         if text.overlaps_code(&word.range) {
             continue;
         }
@@ -451,14 +500,17 @@ pub(crate) fn run(spelling: &Spelling, text: &Text, extension: &str) -> Vec<Hit>
         {
             continue;
         }
-        if spelling.speller.spell(&converted) {
+        if spelling.speller.spell(&converted)
+            || accepts_word(spelling, &converted)
+            || accepted_hold(accepted, &held, &word.range, &converted).unwrap_or(false)
+        {
             continue;
         }
         if spelling.split {
             let parts = split_identifier(&word.text);
             if parts.len() != 1 || parts.first().is_some_and(|part| part.text != word.text) {
                 for part in parts {
-                    if part_passes(spelling, part.text) {
+                    if part_passes(spelling, part.text, accepted) {
                         continue;
                     }
                     hits.push(Hit {

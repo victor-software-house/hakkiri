@@ -467,6 +467,41 @@ fn a_vocabulary_folder_cannot_be_listed_as_a_style() -> TestResult {
 }
 
 #[test]
+fn a_vocabulary_of_a_fetched_package_is_found() -> TestResult {
+    let suite = Suite::new("package-vocabulary-found");
+    let server = Server::start(vec![("/Alpha.zip", Route::Body(ALPHA.to_vec()))])?;
+    let root = vocabulary_project(
+        &suite,
+        "vocabulary-found",
+        &entry(&server.url("/Alpha.zip"), ALPHA_SHA256),
+        "Alpha",
+    );
+    let cache = cache_folder(&suite, "vocabulary-found-cache");
+    for (name, code) in [("Alpha", 0), ("Nope", 2)] {
+        root.file(
+            ".ctl/hakkiri.yaml",
+            format!(
+                "packages:\n{}vocab: [{name}]\nfiles:\n  '*.md': {{styles: [Alpha]}}\n",
+                entry(&server.url("/Alpha.zip"), ALPHA_SHA256)
+            ),
+        );
+        let result = hakkiri(&root, cache.path(), &["check"])?;
+        assert_eq!(result.code, code, "{name}: {}{}", result.out, result.err);
+        if name == "Nope" {
+            assert!(
+                result
+                    .err
+                    .contains("`Nope` is not a vocabulary in any package"),
+                "{}",
+                result.err
+            );
+        }
+    }
+    assert_eq!(server.hits(), 1, "the second run reads the cache");
+    Ok(())
+}
+
+#[test]
 fn a_hash_that_is_not_64_hex_digits_is_refused_with_its_line() -> TestResult {
     let suite = Suite::new("package-short-hash");
     let root = project(

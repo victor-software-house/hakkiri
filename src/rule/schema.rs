@@ -254,7 +254,7 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         nonword: Flag,
-        #[serde(default)]
+        #[serde(default = "Flag::on")]
         #[garde(custom(valid))]
         vocab: Flag,
     }
@@ -277,7 +277,7 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         nonword: Flag,
-        #[serde(default)]
+        #[serde(default = "Flag::on")]
         #[garde(custom(valid))]
         vocab: Flag,
         #[serde(default)]
@@ -358,7 +358,7 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         alpha: Flag,
-        #[serde(default)]
+        #[serde(default = "Flag::on")]
         #[garde(custom(valid))]
         vocab: Flag,
         #[serde(default)]
@@ -398,7 +398,7 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         ignorecase: Flag,
-        #[serde(default)]
+        #[serde(default = "Flag::on")]
         #[garde(custom(valid))]
         vocab: Flag,
     }
@@ -422,7 +422,7 @@ rule_fields! {
         #[serde(default)]
         #[garde(custom(valid))]
         threshold: Number,
-        #[serde(default)]
+        #[serde(default = "Flag::on")]
         #[garde(custom(valid))]
         vocab: Flag,
         #[serde(default)]

@@ -5,7 +5,7 @@ use std::borrow::Borrow;
 use crate::alert::{Alert, Locator, settle};
 use crate::check::{Memory, run, run_summary};
 use crate::metric::{Variables, variables};
-use crate::rule::{Check, Rule};
+use crate::rule::{Check, Exceptions, Rule};
 use crate::select::{SelectError, select};
 use crate::summary::{Summary, summarize};
 use crate::tree::Tree;
@@ -33,6 +33,29 @@ pub fn lint<R: Borrow<Rule>>(
     tree: &Tree,
     source: &str,
     extension: &str,
+) -> Result<Vec<Alert>, SelectError> {
+    lint_accepting(rules, tree, source, extension, &[])
+}
+
+/// The alerts of `rules` in one file, as [`lint`] gives them, with the
+/// vocabularies of the file's globs held back too.
+///
+/// `accepted` holds the [`Exceptions`] of each vocabulary a glob that matches
+/// the file names.
+/// An `existence`, `repetition`, `spelling` or `substitution` rule holds back
+/// each match they hold back, besides its own exceptions, whatever it sets for
+/// `vocab` and `nonword`.
+/// A `capitalization` or `conditional` rule reads none of them.
+///
+/// # Errors
+///
+/// Returns a [`SelectError`] when `tree` is not the tree of `source`.
+pub fn lint_accepting<R: Borrow<Rule>>(
+    rules: &[R],
+    tree: &Tree,
+    source: &str,
+    extension: &str,
+    accepted: &[&Exceptions],
 ) -> Result<Vec<Alert>, SelectError> {
     let mut locator = Locator::new(source);
     let mut alerts = Vec::new();
@@ -66,7 +89,7 @@ pub fn lint<R: Borrow<Rule>>(
         let mut failure = None;
         let mut memory = Memory::default();
         'blocks: for block in select(&rule.scope, tree, source, extension)? {
-            match run(&rule.check, &block.text, &mut memory, extension) {
+            match run(&rule.check, &block.text, &mut memory, extension, accepted) {
                 Ok(hits) => {
                     for hit in hits {
                         let messages = hit.messages(rule);

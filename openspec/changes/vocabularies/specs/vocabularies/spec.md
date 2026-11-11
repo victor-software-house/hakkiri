@@ -55,7 +55,7 @@ A run of whitespace in a term SHALL match any run of whitespace.
 
 #### Scenario: A term that is not a pattern
 
-- **WHEN** a list holds `C++` on line 3
+- **WHEN** a list holds `C(` on line 3
 - **THEN** hakkiri reports an error that names the file and line 3, and exits with a failure status, where Vale reports the pattern error with no line ([vocabularies 4][vocabularies-4])
 
 ### Requirement: Accepted terms hold back matches of the checks that read them

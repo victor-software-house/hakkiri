@@ -19,7 +19,7 @@ use super::{
 };
 use crate::formula::Formula;
 use crate::metric;
-use crate::pattern::Pattern;
+use crate::pattern::{Pattern, PatternError};
 use crate::scope::Selector;
 use crate::sequence::{sentence_scope, upos};
 use crate::strcase::{Sentence, Style, Title, WORD};
@@ -33,6 +33,9 @@ pub(super) struct Source<'a> {
     pub(super) file: &'a str,
     /// The package that holds the rule, when it was read in one.
     pub(super) package: Option<&'a Path>,
+    /// The accepted terms of the project's vocabularies, which a rule that
+    /// reads them takes as exceptions.
+    pub(super) accepted: &'a [String],
 }
 
 impl Source<'_> {
@@ -184,28 +187,50 @@ fn wrap_runs(text: &str) -> String {
 /// The phrases are the terms of more than one word, matched without regard to
 /// case, so a match inside one is held back too.
 fn exceptions(source: &Source<'_>, terms: &[String]) -> Result<Exceptions, LoadError> {
+    exceptions_with(terms, |pattern, parts| {
+        source.compile("exceptions", pattern, parts)
+    })
+}
+
+/// The exceptions of `terms`, with no rule to name in an error.
+pub(super) fn exceptions_of(terms: &[String]) -> Result<Exceptions, PatternError> {
+    exceptions_with(terms, |pattern, _| Pattern::new(pattern))
+}
+
+/// The exceptions of `terms`, each pattern compiled by `compile` from the
+/// pattern and the terms it is made of.
+fn exceptions_with<E>(
+    terms: &[String],
+    compile: impl Fn(&str, &[&str]) -> Result<Pattern, E>,
+) -> Result<Exceptions, E> {
     if terms.is_empty() {
         return Ok(Exceptions::default());
     }
     let alternatives = kept_words(terms);
     let parts: Vec<&str> = terms.iter().map(String::as_str).collect();
-    let words = source.compile(
-        "exceptions",
-        &template(true, false, &alternatives.join("|")),
-        &parts,
-    )?;
+    let words = compile(&template(true, false, &alternatives.join("|")), &parts)?;
     let phrases = terms
         .iter()
         .filter(|term| term.contains([' ', '\t']) || term.contains(r"\s"))
         .map(|term| {
             let pattern = format!(r"(?i)\b(?:{})\b", term_pattern(term));
-            source.compile("exceptions", &pattern, &[term.as_str()])
+            compile(&pattern, &[term.as_str()])
         })
         .collect::<Result<Vec<_>, _>>()?;
     Ok(Exceptions {
         words: Some(words),
         phrases,
     })
+}
+
+/// A rule's own `exceptions`, then the accepted terms when the rule reads
+/// them, before either is rewritten and sorted.
+fn with_accepted(source: &Source<'_>, own: &[String], reads: bool) -> Vec<String> {
+    let mut terms = own.to_vec();
+    if reads {
+        terms.extend(source.accepted.iter().cloned());
+    }
+    terms
 }
 
 /// The pattern an `existence` rule, or the tokens of a `metric` rule, match
@@ -261,7 +286,14 @@ fn existence(source: &Source<'_>, fields: &ExistenceFields) -> Result<Existence,
             nonword,
             fields.ignorecase.value(),
         )?,
-        exceptions: exceptions(source, fields.exceptions.values())?,
+        exceptions: exceptions(
+            source,
+            &with_accepted(
+                source,
+                fields.exceptions.values(),
+                fields.vocab.value() && !nonword,
+            ),
+        )?,
     })
 }
 
@@ -329,7 +361,10 @@ fn substitution(
         pattern: source.compile("swap", &pattern, &keys)?,
         swaps,
         expanders,
-        exceptions: exceptions(source, fields.exceptions.values())?,
+        exceptions: exceptions(
+            source,
+            &with_accepted(source, fields.exceptions.values(), fields.vocab.value()),
+        )?,
         capitalize: fields.capitalize.value(),
         ignorecase: fields.ignorecase.value(),
     })
@@ -482,7 +517,10 @@ fn conditional(source: &Source<'_>, fields: &ConditionalFields) -> Result<Condit
         second: compile("second", second)?,
         defines: has_capture_group(second),
         ignorecase,
-        exceptions: exceptions(source, fields.exceptions.values())?,
+        exceptions: exceptions(
+            source,
+            &with_accepted(source, fields.exceptions.values(), fields.vocab.value()),
+        )?,
     })
 }
 
@@ -536,7 +574,10 @@ fn repetition(source: &Source<'_>, fields: &RepetitionFields) -> Result<Repetiti
         } else {
             None
         },
-        exceptions: exceptions(source, fields.exceptions.values())?,
+        exceptions: exceptions(
+            source,
+            &with_accepted(source, fields.exceptions.values(), fields.vocab.value()),
+        )?,
     })
 }
 
@@ -637,9 +678,9 @@ fn capitalization(
             ),
         ));
     }
-    let terms = fields.exceptions.values();
-    let exceptions = exceptions(source, terms)?;
-    let kept = kept_words(terms);
+    let terms = with_accepted(source, fields.exceptions.values(), fields.vocab.value());
+    let exceptions = exceptions(source, &terms)?;
+    let kept = kept_words(&terms);
     let prefix = fields.prefix.value();
     if !prefix.is_empty() {
         source.compile("prefix", prefix, &[prefix])?;
@@ -989,12 +1030,51 @@ fn spelling(source: &Source<'_>, fields: &SpellingFields) -> Result<Spelling, Lo
         .iter()
         .map(|filter| source.compile("filters", filter, &[]))
         .collect::<Result<Vec<_>, _>>()?;
+    let (accepted, masks) = accepted_words(source)?;
     Ok(Spelling {
         speller: package::speller(source, fields)?,
         filters,
+        accepted,
+        masks,
         standard: !fields.custom.value(),
         split: fields.split.value(),
     })
+}
+
+/// The accepted terms as a `spelling` rule reads them, whatever the rule sets:
+/// whole words matched without regard to case, and the multi-word terms as
+/// phrases to mask before the words are read.
+fn accepted_words(source: &Source<'_>) -> Result<(Option<Pattern>, Option<Pattern>), LoadError> {
+    if source.accepted.is_empty() {
+        return Ok((None, None));
+    }
+    let words: Vec<String> = source
+        .accepted
+        .iter()
+        .map(|term| {
+            let pattern = term_pattern(term);
+            if pattern.starts_with(r"\b") || pattern.ends_with(r"\b") {
+                pattern
+            } else {
+                format!(r"\b{pattern}\b")
+            }
+        })
+        .collect();
+    let parts: Vec<&str> = source.accepted.iter().map(String::as_str).collect();
+    let accepted = source.compile("exceptions", &format!("(?i){}", words.join("|")), &parts)?;
+    let phrases: Vec<String> = source
+        .accepted
+        .iter()
+        .filter(|term| term.contains([' ', '\t']) || term.contains(r"\s"))
+        .map(|term| term_pattern(term))
+        .collect();
+    let masks = if phrases.is_empty() {
+        None
+    } else {
+        let pattern = format!(r"(?i)\b(?:{})\b", phrases.join("|"));
+        Some(source.compile("exceptions", &pattern, &parts)?)
+    };
+    Ok((Some(accepted), masks))
 }
 
 pub(super) fn spelling_rule(
