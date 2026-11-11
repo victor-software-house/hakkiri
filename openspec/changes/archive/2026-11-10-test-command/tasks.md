@@ -36,7 +36,7 @@ This change adds to the binary that [`check-command`][check] creates.
 - [x] 3.4 Name a rule from its absolute path with symlinks left alone, and read its text from that path.  
   Verify the scenarios of `test-rule-names` pass.  
   Evidence, 2026-11-11 (UTC): `a_rule_file_is_named_from_inside_its_style_folder`, `a_symlinked_style_folder_is_named_by_its_link`, `a_rule_path_through_a_symlink_and_back_out_is_read_from_the_folded_path` and `a_yaml_rule_file_is_neither_read_nor_covered` pass in [the main CI run][ci-main].  
-  [PR 60][pr60] later changed which name a dotted file name and a nested folder give, so the spec holds that rule, not the one [PR 59][pr59] first wrote.
+  [PR 60][pr60] later changed which name a dotted file name and a nested folder give, so the spec holds that rule in place of the one [PR 59][pr59] first wrote.
 
 ## 4. The bundle
 
