@@ -28,6 +28,9 @@ Scope.amp	references.md	55	10	10	&
 Scope.amp	references.md	57	13	13	&
 Scope.amp	references.md	7	8	8	&
 Scope.amp	references.md	9	9	9	&
+Scope.amp	short-references.md	19	15	15	&
+Scope.amp	short-references.md	19	23	23	&
+Scope.amp	short-references.md	19	8	8	&
 Scope.dump-alt	captions-data-meta.md	28	29	39	marker alt2
 Scope.dump-alt	captions-data-meta.md	30	3	13	marker alt3
 Scope.dump-alt	captions-data-meta.md	8	19	28	marker alt
@@ -35,6 +38,7 @@ Scope.dump-alt	lines-and-images.md	4	14	23	marker alt
 Scope.dump-alt	references.md	45	1	30	fifteen & marker
 Scope.dump-alt	references.md	49	1	49	seventeen & marker
 Scope.dump-alt	references.md	51	22	42	eighteen &copy=marker
+Scope.dump-alt	vertical-tab.md	15	16	16	
 Scope.dump-code	masked-inline.md	1	14	19	marker
 Scope.dump-code	masked-inline.md	7	12	17	marker
 Scope.dump-code	masks.md	14	12	12	x
@@ -269,6 +273,16 @@ Scope.dump-text	script-escape-three.md	1	25	36	marker three
 Scope.dump-text	script-escape-three.md	3	4	14	last marker
 Scope.dump-text	script-escape-two.md	1	54	62	after two
 Scope.dump-text	script-escape-two.md	3	4	14	last marker
+Scope.dump-text	short-references.md	1	4	21	one  end marker
+Scope.dump-text	short-references.md	11	4	22	six  end marker
+Scope.dump-text	short-references.md	13	1	16	seven 
+Scope.dump-text	short-references.md	15	4	8	eight
+Scope.dump-text	short-references.md	17	4	38	nine \t marker \r marker  end
+Scope.dump-text	short-references.md	19	4	37	ten &# end &#x end &#xg end marker
+Scope.dump-text	short-references.md	3	4	22	two  end marker
+Scope.dump-text	short-references.md	5	4	24	three 7 end marker
+Scope.dump-text	short-references.md	7	4	23	four \n end marker
+Scope.dump-text	short-references.md	9	4	23	five  end marker
 Scope.dump-text	skip-classes.md	3	1	60	****** marker after span
 Scope.dump-text	skip-classes.md	5	24	42	marker in highlight
 Scope.dump-text	spans.md	1	6	52	marker one marker two marker three
@@ -276,6 +290,14 @@ Scope.dump-text	tabs.md	2	2	11	marker tab
 Scope.dump-text	unclosed.md	1	6	20	marker unclosed
 Scope.dump-text	unclosed.md	3	1	22	Para after marker two.
 Scope.dump-text	unfinished-tag.md	1	6	18	marker before
+Scope.dump-text	vertical-tab.md	11	22	33	marker three
+Scope.dump-text	vertical-tab.md	15	16	16	
+Scope.dump-text	vertical-tab.md	15	5	15	marker four
+Scope.dump-text	vertical-tab.md	17	4	14	five marker
+Scope.dump-text	vertical-tab.md	2	20	29	marker one
+Scope.dump-text	vertical-tab.md	21	18	27	marker six
+Scope.dump-text	vertical-tab.md	22	1	12	seven marker
+Scope.dump-text	vertical-tab.md	7	24	33	marker two
 Scope.entity-amp	entity-tokens.md	1	4	22	marker & marker
 Scope.entity-amp	entity-tokens.md	3	6	24	marker & marker
 Scope.existence-alt	captions-data-meta.md	28	29	34	marker
@@ -514,6 +536,15 @@ Scope.existence-paragraph	script-escape-one.md	3	9	14	marker
 Scope.existence-paragraph	script-escape-three.md	1	25	30	marker
 Scope.existence-paragraph	script-escape-three.md	3	9	14	marker
 Scope.existence-paragraph	script-escape-two.md	3	9	14	marker
+Scope.existence-paragraph	short-references.md	1	16	21	marker
+Scope.existence-paragraph	short-references.md	11	17	22	marker
+Scope.existence-paragraph	short-references.md	17	13	18	marker
+Scope.existence-paragraph	short-references.md	17	25	30	marker
+Scope.existence-paragraph	short-references.md	19	32	37	marker
+Scope.existence-paragraph	short-references.md	3	17	22	marker
+Scope.existence-paragraph	short-references.md	5	19	24	marker
+Scope.existence-paragraph	short-references.md	7	18	23	marker
+Scope.existence-paragraph	short-references.md	9	18	23	marker
 Scope.existence-paragraph	skip-classes.md	3	38	43	marker
 Scope.existence-paragraph	skip-classes.md	5	24	29	marker
 Scope.existence-paragraph	spans.md	1	6	11	marker
@@ -523,6 +554,13 @@ Scope.existence-paragraph	tabs.md	2	2	7	marker
 Scope.existence-paragraph	unclosed.md	1	6	11	marker
 Scope.existence-paragraph	unclosed.md	3	12	17	marker
 Scope.existence-paragraph	unfinished-tag.md	1	6	11	marker
+Scope.existence-paragraph	vertical-tab.md	11	22	27	marker
+Scope.existence-paragraph	vertical-tab.md	15	5	10	marker
+Scope.existence-paragraph	vertical-tab.md	17	9	14	marker
+Scope.existence-paragraph	vertical-tab.md	2	20	25	marker
+Scope.existence-paragraph	vertical-tab.md	21	18	23	marker
+Scope.existence-paragraph	vertical-tab.md	22	7	12	marker
+Scope.existence-paragraph	vertical-tab.md	7	24	29	marker
 Scope.existence-paragraph-not-list	blank-lines.md	3	1	6	marker
 Scope.existence-paragraph-not-list	blank-lines.md	7	6	11	marker
 Scope.existence-paragraph-not-list	blank-lines.md	9	1	6	marker
@@ -656,6 +694,15 @@ Scope.existence-paragraph-not-list	script-escape-one.md	3	9	14	marker
 Scope.existence-paragraph-not-list	script-escape-three.md	1	25	30	marker
 Scope.existence-paragraph-not-list	script-escape-three.md	3	9	14	marker
 Scope.existence-paragraph-not-list	script-escape-two.md	3	9	14	marker
+Scope.existence-paragraph-not-list	short-references.md	1	16	21	marker
+Scope.existence-paragraph-not-list	short-references.md	11	17	22	marker
+Scope.existence-paragraph-not-list	short-references.md	17	13	18	marker
+Scope.existence-paragraph-not-list	short-references.md	17	25	30	marker
+Scope.existence-paragraph-not-list	short-references.md	19	32	37	marker
+Scope.existence-paragraph-not-list	short-references.md	3	17	22	marker
+Scope.existence-paragraph-not-list	short-references.md	5	19	24	marker
+Scope.existence-paragraph-not-list	short-references.md	7	18	23	marker
+Scope.existence-paragraph-not-list	short-references.md	9	18	23	marker
 Scope.existence-paragraph-not-list	skip-classes.md	3	38	43	marker
 Scope.existence-paragraph-not-list	skip-classes.md	5	24	29	marker
 Scope.existence-paragraph-not-list	spans.md	1	6	11	marker
@@ -665,6 +712,13 @@ Scope.existence-paragraph-not-list	tabs.md	2	2	7	marker
 Scope.existence-paragraph-not-list	unclosed.md	1	6	11	marker
 Scope.existence-paragraph-not-list	unclosed.md	3	12	17	marker
 Scope.existence-paragraph-not-list	unfinished-tag.md	1	6	11	marker
+Scope.existence-paragraph-not-list	vertical-tab.md	11	22	27	marker
+Scope.existence-paragraph-not-list	vertical-tab.md	15	5	10	marker
+Scope.existence-paragraph-not-list	vertical-tab.md	17	9	14	marker
+Scope.existence-paragraph-not-list	vertical-tab.md	2	20	25	marker
+Scope.existence-paragraph-not-list	vertical-tab.md	21	18	23	marker
+Scope.existence-paragraph-not-list	vertical-tab.md	22	7	12	marker
+Scope.existence-paragraph-not-list	vertical-tab.md	7	24	29	marker
 Scope.existence-sentence	blank-lines.md	3	1	6	marker
 Scope.existence-sentence	blank-lines.md	7	6	11	marker
 Scope.existence-sentence	blank-lines.md	9	1	6	marker
@@ -840,6 +894,15 @@ Scope.existence-sentence	script-escape-one.md	3	9	14	marker
 Scope.existence-sentence	script-escape-three.md	1	25	30	marker
 Scope.existence-sentence	script-escape-three.md	3	9	14	marker
 Scope.existence-sentence	script-escape-two.md	3	9	14	marker
+Scope.existence-sentence	short-references.md	1	16	21	marker
+Scope.existence-sentence	short-references.md	11	17	22	marker
+Scope.existence-sentence	short-references.md	17	13	18	marker
+Scope.existence-sentence	short-references.md	17	25	30	marker
+Scope.existence-sentence	short-references.md	19	32	37	marker
+Scope.existence-sentence	short-references.md	3	17	22	marker
+Scope.existence-sentence	short-references.md	5	19	24	marker
+Scope.existence-sentence	short-references.md	7	18	23	marker
+Scope.existence-sentence	short-references.md	9	18	23	marker
 Scope.existence-sentence	skip-classes.md	3	38	43	marker
 Scope.existence-sentence	skip-classes.md	5	24	29	marker
 Scope.existence-sentence	spans.md	1	6	11	marker
@@ -849,6 +912,13 @@ Scope.existence-sentence	tabs.md	2	2	7	marker
 Scope.existence-sentence	unclosed.md	1	6	11	marker
 Scope.existence-sentence	unclosed.md	3	12	17	marker
 Scope.existence-sentence	unfinished-tag.md	1	6	11	marker
+Scope.existence-sentence	vertical-tab.md	11	22	27	marker
+Scope.existence-sentence	vertical-tab.md	15	5	10	marker
+Scope.existence-sentence	vertical-tab.md	17	9	14	marker
+Scope.existence-sentence	vertical-tab.md	2	20	25	marker
+Scope.existence-sentence	vertical-tab.md	21	18	23	marker
+Scope.existence-sentence	vertical-tab.md	22	7	12	marker
+Scope.existence-sentence	vertical-tab.md	7	24	29	marker
 Scope.existence-sentence-blockquote	block-scopes.md	15	13	18	marker
 Scope.existence-sentence-blockquote	in-item-and-quote.md	4	6	11	marker
 Scope.existence-sentence-blockquote	in-item-and-quote.md	6	8	13	marker
@@ -1065,6 +1135,15 @@ Scope.existence-sentence-not-blockquote	script-escape-one.md	3	9	14	marker
 Scope.existence-sentence-not-blockquote	script-escape-three.md	1	25	30	marker
 Scope.existence-sentence-not-blockquote	script-escape-three.md	3	9	14	marker
 Scope.existence-sentence-not-blockquote	script-escape-two.md	3	9	14	marker
+Scope.existence-sentence-not-blockquote	short-references.md	1	16	21	marker
+Scope.existence-sentence-not-blockquote	short-references.md	11	17	22	marker
+Scope.existence-sentence-not-blockquote	short-references.md	17	13	18	marker
+Scope.existence-sentence-not-blockquote	short-references.md	17	25	30	marker
+Scope.existence-sentence-not-blockquote	short-references.md	19	32	37	marker
+Scope.existence-sentence-not-blockquote	short-references.md	3	17	22	marker
+Scope.existence-sentence-not-blockquote	short-references.md	5	19	24	marker
+Scope.existence-sentence-not-blockquote	short-references.md	7	18	23	marker
+Scope.existence-sentence-not-blockquote	short-references.md	9	18	23	marker
 Scope.existence-sentence-not-blockquote	skip-classes.md	3	38	43	marker
 Scope.existence-sentence-not-blockquote	skip-classes.md	5	24	29	marker
 Scope.existence-sentence-not-blockquote	spans.md	1	6	11	marker
@@ -1074,6 +1153,13 @@ Scope.existence-sentence-not-blockquote	tabs.md	2	2	7	marker
 Scope.existence-sentence-not-blockquote	unclosed.md	1	6	11	marker
 Scope.existence-sentence-not-blockquote	unclosed.md	3	12	17	marker
 Scope.existence-sentence-not-blockquote	unfinished-tag.md	1	6	11	marker
+Scope.existence-sentence-not-blockquote	vertical-tab.md	11	22	27	marker
+Scope.existence-sentence-not-blockquote	vertical-tab.md	15	5	10	marker
+Scope.existence-sentence-not-blockquote	vertical-tab.md	17	9	14	marker
+Scope.existence-sentence-not-blockquote	vertical-tab.md	2	20	25	marker
+Scope.existence-sentence-not-blockquote	vertical-tab.md	21	18	23	marker
+Scope.existence-sentence-not-blockquote	vertical-tab.md	22	7	12	marker
+Scope.existence-sentence-not-blockquote	vertical-tab.md	7	24	29	marker
 Scope.existence-sentence-not-heading	blank-lines.md	3	1	6	marker
 Scope.existence-sentence-not-heading	blank-lines.md	7	6	11	marker
 Scope.existence-sentence-not-heading	blank-lines.md	9	1	6	marker
@@ -1238,6 +1324,15 @@ Scope.existence-sentence-not-heading	script-escape-one.md	3	9	14	marker
 Scope.existence-sentence-not-heading	script-escape-three.md	1	25	30	marker
 Scope.existence-sentence-not-heading	script-escape-three.md	3	9	14	marker
 Scope.existence-sentence-not-heading	script-escape-two.md	3	9	14	marker
+Scope.existence-sentence-not-heading	short-references.md	1	16	21	marker
+Scope.existence-sentence-not-heading	short-references.md	11	17	22	marker
+Scope.existence-sentence-not-heading	short-references.md	17	13	18	marker
+Scope.existence-sentence-not-heading	short-references.md	17	25	30	marker
+Scope.existence-sentence-not-heading	short-references.md	19	32	37	marker
+Scope.existence-sentence-not-heading	short-references.md	3	17	22	marker
+Scope.existence-sentence-not-heading	short-references.md	5	19	24	marker
+Scope.existence-sentence-not-heading	short-references.md	7	18	23	marker
+Scope.existence-sentence-not-heading	short-references.md	9	18	23	marker
 Scope.existence-sentence-not-heading	skip-classes.md	3	38	43	marker
 Scope.existence-sentence-not-heading	skip-classes.md	5	24	29	marker
 Scope.existence-sentence-not-heading	spans.md	1	6	11	marker
@@ -1247,6 +1342,13 @@ Scope.existence-sentence-not-heading	tabs.md	2	2	7	marker
 Scope.existence-sentence-not-heading	unclosed.md	1	6	11	marker
 Scope.existence-sentence-not-heading	unclosed.md	3	12	17	marker
 Scope.existence-sentence-not-heading	unfinished-tag.md	1	6	11	marker
+Scope.existence-sentence-not-heading	vertical-tab.md	11	22	27	marker
+Scope.existence-sentence-not-heading	vertical-tab.md	15	5	10	marker
+Scope.existence-sentence-not-heading	vertical-tab.md	17	9	14	marker
+Scope.existence-sentence-not-heading	vertical-tab.md	2	20	25	marker
+Scope.existence-sentence-not-heading	vertical-tab.md	21	18	23	marker
+Scope.existence-sentence-not-heading	vertical-tab.md	22	7	12	marker
+Scope.existence-sentence-not-heading	vertical-tab.md	7	24	29	marker
 Scope.existence-sentence-not-list	blank-lines.md	3	1	6	marker
 Scope.existence-sentence-not-list	blank-lines.md	7	6	11	marker
 Scope.existence-sentence-not-list	blank-lines.md	9	1	6	marker
@@ -1412,6 +1514,15 @@ Scope.existence-sentence-not-list	script-escape-one.md	3	9	14	marker
 Scope.existence-sentence-not-list	script-escape-three.md	1	25	30	marker
 Scope.existence-sentence-not-list	script-escape-three.md	3	9	14	marker
 Scope.existence-sentence-not-list	script-escape-two.md	3	9	14	marker
+Scope.existence-sentence-not-list	short-references.md	1	16	21	marker
+Scope.existence-sentence-not-list	short-references.md	11	17	22	marker
+Scope.existence-sentence-not-list	short-references.md	17	13	18	marker
+Scope.existence-sentence-not-list	short-references.md	17	25	30	marker
+Scope.existence-sentence-not-list	short-references.md	19	32	37	marker
+Scope.existence-sentence-not-list	short-references.md	3	17	22	marker
+Scope.existence-sentence-not-list	short-references.md	5	19	24	marker
+Scope.existence-sentence-not-list	short-references.md	7	18	23	marker
+Scope.existence-sentence-not-list	short-references.md	9	18	23	marker
 Scope.existence-sentence-not-list	skip-classes.md	3	38	43	marker
 Scope.existence-sentence-not-list	skip-classes.md	5	24	29	marker
 Scope.existence-sentence-not-list	spans.md	1	6	11	marker
@@ -1421,6 +1532,13 @@ Scope.existence-sentence-not-list	tabs.md	2	2	7	marker
 Scope.existence-sentence-not-list	unclosed.md	1	6	11	marker
 Scope.existence-sentence-not-list	unclosed.md	3	12	17	marker
 Scope.existence-sentence-not-list	unfinished-tag.md	1	6	11	marker
+Scope.existence-sentence-not-list	vertical-tab.md	11	22	27	marker
+Scope.existence-sentence-not-list	vertical-tab.md	15	5	10	marker
+Scope.existence-sentence-not-list	vertical-tab.md	17	9	14	marker
+Scope.existence-sentence-not-list	vertical-tab.md	2	20	25	marker
+Scope.existence-sentence-not-list	vertical-tab.md	21	18	23	marker
+Scope.existence-sentence-not-list	vertical-tab.md	22	7	12	marker
+Scope.existence-sentence-not-list	vertical-tab.md	7	24	29	marker
 Scope.existence-sentence-not-table	blank-lines.md	3	1	6	marker
 Scope.existence-sentence-not-table	blank-lines.md	7	6	11	marker
 Scope.existence-sentence-not-table	blank-lines.md	9	1	6	marker
@@ -1586,6 +1704,15 @@ Scope.existence-sentence-not-table	script-escape-one.md	3	9	14	marker
 Scope.existence-sentence-not-table	script-escape-three.md	1	25	30	marker
 Scope.existence-sentence-not-table	script-escape-three.md	3	9	14	marker
 Scope.existence-sentence-not-table	script-escape-two.md	3	9	14	marker
+Scope.existence-sentence-not-table	short-references.md	1	16	21	marker
+Scope.existence-sentence-not-table	short-references.md	11	17	22	marker
+Scope.existence-sentence-not-table	short-references.md	17	13	18	marker
+Scope.existence-sentence-not-table	short-references.md	17	25	30	marker
+Scope.existence-sentence-not-table	short-references.md	19	32	37	marker
+Scope.existence-sentence-not-table	short-references.md	3	17	22	marker
+Scope.existence-sentence-not-table	short-references.md	5	19	24	marker
+Scope.existence-sentence-not-table	short-references.md	7	18	23	marker
+Scope.existence-sentence-not-table	short-references.md	9	18	23	marker
 Scope.existence-sentence-not-table	skip-classes.md	3	38	43	marker
 Scope.existence-sentence-not-table	skip-classes.md	5	24	29	marker
 Scope.existence-sentence-not-table	spans.md	1	6	11	marker
@@ -1595,6 +1722,13 @@ Scope.existence-sentence-not-table	tabs.md	2	2	7	marker
 Scope.existence-sentence-not-table	unclosed.md	1	6	11	marker
 Scope.existence-sentence-not-table	unclosed.md	3	12	17	marker
 Scope.existence-sentence-not-table	unfinished-tag.md	1	6	11	marker
+Scope.existence-sentence-not-table	vertical-tab.md	11	22	27	marker
+Scope.existence-sentence-not-table	vertical-tab.md	15	5	10	marker
+Scope.existence-sentence-not-table	vertical-tab.md	17	9	14	marker
+Scope.existence-sentence-not-table	vertical-tab.md	2	20	25	marker
+Scope.existence-sentence-not-table	vertical-tab.md	21	18	23	marker
+Scope.existence-sentence-not-table	vertical-tab.md	22	7	12	marker
+Scope.existence-sentence-not-table	vertical-tab.md	7	24	29	marker
 Scope.existence-sentence-table	block-scopes.md	18	27	32	marker
 Scope.existence-sentence-table	block-scopes.md	18	9	14	marker
 Scope.existence-sentence-table	captions-data-meta.md	2	10	15	marker
@@ -1826,6 +1960,15 @@ Scope.existence-text	script-escape-one.md	3	9	14	marker
 Scope.existence-text	script-escape-three.md	1	25	30	marker
 Scope.existence-text	script-escape-three.md	3	9	14	marker
 Scope.existence-text	script-escape-two.md	3	9	14	marker
+Scope.existence-text	short-references.md	1	16	21	marker
+Scope.existence-text	short-references.md	11	17	22	marker
+Scope.existence-text	short-references.md	17	13	18	marker
+Scope.existence-text	short-references.md	17	25	30	marker
+Scope.existence-text	short-references.md	19	32	37	marker
+Scope.existence-text	short-references.md	3	17	22	marker
+Scope.existence-text	short-references.md	5	19	24	marker
+Scope.existence-text	short-references.md	7	18	23	marker
+Scope.existence-text	short-references.md	9	18	23	marker
 Scope.existence-text	skip-classes.md	3	38	43	marker
 Scope.existence-text	skip-classes.md	5	24	29	marker
 Scope.existence-text	spans.md	1	6	11	marker
@@ -1835,3 +1978,12 @@ Scope.existence-text	tabs.md	2	2	7	marker
 Scope.existence-text	unclosed.md	1	6	11	marker
 Scope.existence-text	unclosed.md	3	12	17	marker
 Scope.existence-text	unfinished-tag.md	1	6	11	marker
+Scope.existence-text	vertical-tab.md	11	22	27	marker
+Scope.existence-text	vertical-tab.md	15	5	10	marker
+Scope.existence-text	vertical-tab.md	17	9	14	marker
+Scope.existence-text	vertical-tab.md	2	20	25	marker
+Scope.existence-text	vertical-tab.md	21	18	23	marker
+Scope.existence-text	vertical-tab.md	22	7	12	marker
+Scope.existence-text	vertical-tab.md	7	24	29	marker
+Scope.numeric	short-references.md	19	15	17	&#x
+Scope.numeric	short-references.md	19	23	26	&#xg

@@ -142,6 +142,21 @@ hakkiri SHALL read the text of an `h0` to `h9` element under the scope `heading.
 - **WHEN** an HTML block holds `<h7>`, a line `marker` and `</h7>`
 - **THEN** a rule with `scope: heading.h7`, `scope: heading` or `scope: text` reports `marker`
 
+### Requirement: A vertical tab is not whitespace inside a tag
+
+hakkiri SHALL end a tag name and an attribute only at a space, tab, line feed, form feed or carriage return, as the tokenizer of `golang.org/x/net/html` does.  
+The trimming of the text between tags SHALL trim a vertical tab too, as Vale does.
+
+#### Scenario: A vertical tab in a tag
+
+- **WHEN** an HTML block holds `<span`, a vertical tab and `class="code">marker</span>`
+- **THEN** the tag name holds the vertical tab and `class="code"`, so no attribute is read, and `marker` reads as text
+
+#### Scenario: A vertical tab around a text
+
+- **WHEN** an HTML block holds `<p>`, a vertical tab, `marker` and a vertical tab before `</p>`
+- **THEN** the paragraph reads `marker`
+
 ### Requirement: A block that does not map back is not read
 
 hakkiri SHALL read no text of an HTML block when a line of it does not end as the line of the file does.

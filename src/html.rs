@@ -72,8 +72,10 @@ const RAW_TEXT_TAGS: [&str; 10] = [
     "xmp",
 ];
 
+/// The whitespace the tokenizer skips: not a vertical tab, which only the
+/// trimming of a text counts (`is_blank_char`).
 const fn is_blank(c: u8) -> bool {
-    matches!(c, b' ' | b'\n' | b'\r' | b'\t' | 0x0c | 0x0b)
+    matches!(c, b' ' | b'\n' | b'\r' | b'\t' | 0x0c)
 }
 
 /// An attribute of a tag.

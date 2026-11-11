@@ -125,7 +125,7 @@ Lost: the `>` of a quote would read as text.
 
 ## Risks / Trade-offs
 
-- [A block reads under the wrong scope or with the wrong join] → the probe holds 49 inputs, from lists and quotes to joins, masks, references, scripts and promoted blocks.  
+- [A block reads under the wrong scope or with the wrong join] → the probe holds 51 inputs, from lists and quotes to joins, masks, references, scripts and promoted blocks.  
   The parity test fails on any alert that differs and is not listed.
 - [The walk differs from Vale on input the probe lacks] → each flag of the walker mirrors a variable of Vale's, and the rows of `departures.tsv` are the only differences found.
 - [The tree type grows] → `Node` gains `reads`, and `Scope` gains eight variants. hakkiri is not released, and it owns both types.

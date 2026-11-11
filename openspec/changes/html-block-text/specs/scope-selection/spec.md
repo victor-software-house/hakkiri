@@ -33,6 +33,11 @@ A code span, a comment and the `raw` text SHALL read as written.
 - **WHEN** a paragraph holds `a &copy b`
 - **THEN** the paragraph reads `a © b`
 
+#### Scenario: A numeric reference with one digit
+
+- **WHEN** a paragraph holds `a &#5 b`, `c &#5; d` and `e &#xA f`
+- **THEN** the references read as the characters U+0005, U+0005 and a line feed, as Vale reads them, and `&#`, `&#x` and `&#xg` stay as written
+
 #### Scenario: A reference in a code span
 
 - **WHEN** a code span holds `&amp;` and a rule with `scope: code` matches `&amp;`

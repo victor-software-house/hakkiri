@@ -1,0 +1,23 @@
+<div>
+<spanclass="code">marker one</span>
+<imgsrc="x"alt="marker alt">
+</div>
+
+<div>
+<span class="a"id="b">marker two</span>
+</div>
+
+<div>
+<span class=preid=x>marker three</span>
+</div>
+
+<div>
+<p>marker four</p>
+<img src="x" alt="">
+<p>five marker</p>
+</div>
+
+<div>
+<scripttype="x">marker six</script>
+seven marker
+</div>

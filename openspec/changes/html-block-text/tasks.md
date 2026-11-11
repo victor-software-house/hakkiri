@@ -4,7 +4,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 1. Probe Vale
 
-- [x] 1.1 Build Vale `66bbb85` in a throwaway Linux box, and run `existence` rules and `dump` rules over 49 inputs that hold HTML blocks and inline HTML.  
+- [x] 1.1 Build Vale `66bbb85` in a throwaway Linux box, and run `existence` rules and `dump` rules over 51 inputs that hold HTML blocks and inline HTML.  
   Verify `tests/fixtures/html-block/vale.tsv` holds the alerts, and that the probe covers references, `code`, `tt`, `kbd`, `samp`, `pre`, joins, captions, descriptions, alt text, scripts and promoted blocks.
   - 2026-11-10 (UTC), Vale built from source in a throwaway Linux box gave 1,659 alert rows, kept in [8e901f2][c-feat].  
     A `dump` rule matches the whole text of a block, so a row shows how Vale read it.  
