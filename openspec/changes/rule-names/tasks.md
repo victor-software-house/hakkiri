@@ -39,7 +39,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 3. Record
 
-- [x] 3.1 Update `src/instructions.md`, the `rule-loading` spec, and the unarchived `test-command` change.  
+- [x] 3.1 Update `src/instructions.md`, the `rule-loading` spec, and the [`test-command`][test] change, now archived.  
   Verify `openspec validate --all --strict` and the budget check pass.
   - 2026-11-11 (UTC), both pass on the Mac for the docs of [eeafcb0][c-docs] with two sentences split.
 
@@ -67,3 +67,4 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [ci60]: https://github.com/victor-software-house/hakkiri/actions/runs/42947844816
 [c-main]: https://github.com/victor-software-house/hakkiri/commit/4979c2aab5de774e24e5684cd9553720733588a0
 [ci-main]: https://github.com/victor-software-house/hakkiri/actions/runs/42948574268
+[test]: ../archive/2026-11-10-test-command/proposal.md
