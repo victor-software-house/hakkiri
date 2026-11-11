@@ -1,25 +1,27 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-040
+active: HKR-008
 queue:
-  - id: HKR-040
-    title: Read a package's settings
-    scope: config
+  - id: HKR-008
+    title: Run ProseStyle on hakkiri
+    scope: prose-style
     outcome: >-
-      A package ships a settings file in hakkiri's own YAML format, and hakkiri
-      merges it under the project's config, as Vale merges a package's .vale.ini. The
-      project overrides the package.
+      prose-style publishes a hakkiri package with its own rules, the native ports of the upstream rules worth keeping, and the rate rules.
     blocked_by: []
     acceptance:
-      - A package's settings file is read and merged under the project's config, and a setting in the project wins, in a test.
-      - A rule the package sets off stays off until the project turns it on, in a test.
-      - The package's vocab reaches the checks that read vocabularies, in a test.
-      - A project's styles list adds to a package's under the same glob and replaces it under another glob that matches the same files, in a test.
-      - A package's packages are fetched like the project's, each pinned by url and sha256, once per hash, and a chain over 10 packages is an error, in tests.
-    plan: openspec/changes/package-settings/proposal.md
+      - Every rule case and package case passes under hakkiri test.
+      - An alert diff against Vale with ProseStyle v0.0.14 over our public repositories shows only the intended differences.
+      - The 14 opt-in rules do not run until a project turns them on, in a test.
     notes:
-      - "2026-11-11, operator decisions: the file is .ctl/hakkiri.yaml in the package folder; styles add up under the same glob text and a project list under another glob replaces the package's, with no warning; a package's packages are fetched, pinned by url and sha256, with a depth limit of 10 (Vale sets none). A cycle cannot occur, since a zip cannot hold its own hash."
+      - '2026-11-11, operator decision: ProseStyle owns its rules. The 36 upstream rule files that ProseStyle.zip copies today (Voices, Direct, Readability, and the Abbreviations, DateTime, Grammar, Punctuation and Usage rules of Std) are reviewed one by one. Each valuable one becomes a native hakkiri rule in the one style ProseStyle, with tests, and the MIT sources are credited in a NOTICE. The rest are dropped with a reason. upstream.toml and the copying go.'
+      - '2026-11-11, operator decision: from its next release ProseStyle.zip is the hakkiri package. Vale projects stay pinned to v0.0.14, and the templates pin stays there until HKR-009. There is no second asset.'
+      - '2026-11-11, the six script rules of ProseStyle v0.0.14 (FlatRhythm, BareWorkItem, SameSentenceStart, HardBreak, SentencePerLine and PrepositionChain) port to native rules: five existence rules and one metric rule pass the 18 cases of the tag under hakkiri test in a probe. Readability.Polysyllables ports to one existence rule that gave the same 170,781 alerts as Vale 66bbb85 running the script over 238,342 words.'
+      - "2026-11-11, operator decision, ports: ProseStyle takes 17 upstream rules that always run. They are Banned, BinaryContrast, InflatedWords, Puffery, Recap, SuperficialAnalysis, ThroatClearing, WeakVerbs and Weasel of Voices, Hedging, Length and Preamble of Direct, FleschKincaid of Readability, and Latin, Spacing, GenderedPronouns and GenderedTerms of Std. Fourteen more ship off through the package settings, for a project to turn on: AutomatedReadability, ColemanLiau, FleschReadingEase, GunningFog, LIX, SMOG, Polysyllables (an existence rule that gave the same alerts as Vale's script over 238,342 words), PassiveVoice, OxfordComma, Contractions, FirstPersonPlural, FirstPersonSingular, DateFormat and TimeFormat. ProseStyle then holds 44 + 31 = 75 rules."
+      - "2026-11-11, operator decision, drops: ColonReveal, Ease, Acronyms (UndefinedAcronym covers it) and Ellipses (it flags the … that Emoji allows). Std's SentenceLength folds into Length."
+      - '2026-11-11, operator decision, renames: Banned becomes SlopWords, Recap RecapOpener, Weasel VagueAttribution, Latin LatinAbbreviation, Spacing SentenceSpacing, Length SentenceLength and FleschKincaid GradeLevel. Hedging and Preamble keep their names, and every other port keeps its upstream name.'
+      - "2026-11-11, operator decision, overlaps: no text draws two alerts for one fault. Drop 'harness the power' from StockPhrases, since SlopWords covers it, and make 'stands as a testament' draw only the Puffery alert. SentenceLength at 25 words as a suggestion beside LongSentence at 40 as an error stays by design."
+      - '2026-11-11, operator decision: the opt-in rules ship off through a package settings file, so this row waits for HKR-040.'
 
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary
@@ -46,26 +48,6 @@ queue:
       - A vocab.yml entry that is a term, or a term mapped to regex, ignorecase or flags, is read as Vale reads it, in tests against Vale's alerts.
       - An entry Vale refuses is refused with the file and the line, in a test for each fault.
     plan: openspec/changes/archive/2026-11-11-vocabularies/proposal.md
-
-  - id: HKR-008
-    title: Run ProseStyle on hakkiri
-    scope: prose-style
-    outcome: >-
-      prose-style publishes a hakkiri package with its own rules, the native ports of the upstream rules worth keeping, and the rate rules.
-    blocked_by: [HKR-040]
-    acceptance:
-      - Every rule case and package case passes under hakkiri test.
-      - An alert diff against Vale with ProseStyle v0.0.14 over our public repositories shows only the intended differences.
-      - The 14 opt-in rules do not run until a project turns them on, in a test.
-    notes:
-      - '2026-11-11, operator decision: ProseStyle owns its rules. The 36 upstream rule files that ProseStyle.zip copies today (Voices, Direct, Readability, and the Abbreviations, DateTime, Grammar, Punctuation and Usage rules of Std) are reviewed one by one. Each valuable one becomes a native hakkiri rule in the one style ProseStyle, with tests, and the MIT sources are credited in a NOTICE. The rest are dropped with a reason. upstream.toml and the copying go.'
-      - '2026-11-11, operator decision: from its next release ProseStyle.zip is the hakkiri package. Vale projects stay pinned to v0.0.14, and the templates pin stays there until HKR-009. There is no second asset.'
-      - '2026-11-11, the six script rules of ProseStyle v0.0.14 (FlatRhythm, BareWorkItem, SameSentenceStart, HardBreak, SentencePerLine and PrepositionChain) port to native rules: five existence rules and one metric rule pass the 18 cases of the tag under hakkiri test in a probe. Readability.Polysyllables ports to one existence rule that gave the same 170,781 alerts as Vale 66bbb85 running the script over 238,342 words.'
-      - "2026-11-11, operator decision, ports: ProseStyle takes 17 upstream rules that always run. They are Banned, BinaryContrast, InflatedWords, Puffery, Recap, SuperficialAnalysis, ThroatClearing, WeakVerbs and Weasel of Voices, Hedging, Length and Preamble of Direct, FleschKincaid of Readability, and Latin, Spacing, GenderedPronouns and GenderedTerms of Std. Fourteen more ship off through the package settings, for a project to turn on: AutomatedReadability, ColemanLiau, FleschReadingEase, GunningFog, LIX, SMOG, Polysyllables (an existence rule that gave the same alerts as Vale's script over 238,342 words), PassiveVoice, OxfordComma, Contractions, FirstPersonPlural, FirstPersonSingular, DateFormat and TimeFormat. ProseStyle then holds 44 + 31 = 75 rules."
-      - "2026-11-11, operator decision, drops: ColonReveal, Ease, Acronyms (UndefinedAcronym covers it) and Ellipses (it flags the … that Emoji allows). Std's SentenceLength folds into Length."
-      - '2026-11-11, operator decision, renames: Banned becomes SlopWords, Recap RecapOpener, Weasel VagueAttribution, Latin LatinAbbreviation, Spacing SentenceSpacing, Length SentenceLength and FleschKincaid GradeLevel. Hedging and Preamble keep their names, and every other port keeps its upstream name.'
-      - "2026-11-11, operator decision, overlaps: no text draws two alerts for one fault. Drop 'harness the power' from StockPhrases, since SlopWords covers it, and make 'stands as a testament' draw only the Puffery alert. SentenceLength at 25 words as a suggestion beside LongSentence at 40 as an error stays by design."
-      - '2026-11-11, operator decision: the opt-in rules ship off through a package settings file, so this row waits for HKR-040.'
 
   - id: HKR-017
     title: Read comments in more languages
@@ -199,6 +181,21 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-040
+    title: Read a package's settings
+    scope: config
+    outcome: >-
+      A package ships a settings file in hakkiri's own YAML format, and hakkiri
+      merges it under the project's config, as Vale merges a package's .vale.ini. The
+      project overrides the package.
+    plan: openspec/changes/archive/2026-11-11-package-settings/proposal.md
+    notes:
+      - "2026-11-11, operator decisions: the file is .ctl/hakkiri.yaml in the package's top folder, beside styles; styles add up under the same glob text and a project list under another glob replaces the package's, with no warning; a package's packages are fetched, pinned by url and sha256, with a depth limit of 10 (Vale sets none). A cycle cannot occur, since a zip cannot hold its own hash. An empty vocab list clears the names before it, in a later package and, for a glob, among the lists of the same glob text."
+    completed: 2026-11-11T19:38:31
+    evidence:
+      - openspec/changes/archive/2026-11-11-package-settings/
+    disposition: completed
+
   - id: HKR-019
     title: Read vocabularies
     scope: config

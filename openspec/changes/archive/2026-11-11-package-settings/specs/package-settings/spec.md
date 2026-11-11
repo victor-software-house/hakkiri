@@ -62,7 +62,7 @@ A package named twice SHALL load once, by its `sha256` for a download and its fo
 
 The `vocab` names of the packages and the project SHALL add up, the packages' first.  
 A `vocab` written as an empty list SHALL drop the names before it, as Vale's `Vocab = NONE` does, and a missing key SHALL keep them.  
-The same SHALL hold between two packages, where the later one wins, and for the `vocab` of a glob, which drops the names earlier globs gave the file.  
+The same SHALL hold between two packages, where the later one wins, and for the `vocab` of a glob, which drops only the lists of earlier configs for the same glob text.  
 A name that no package holds, or that two packages hold, SHALL be an error on its line in the file that names it.
 
 #### Scenario: Two lists
@@ -82,8 +82,13 @@ A name that no package holds, or that two packages hold, SHALL be an error on it
 
 #### Scenario: A glob's empty list
 
-- **WHEN** a package's glob `'*.md'` names `Team` and the project's glob `'a.md'` sets `vocab: []`
-- **THEN** `a.md` takes no vocabulary from the package's glob, and `b.md` still does
+- **WHEN** a package's globs `'*.md'` and `'a.md'` name `Docs` and `Own`, and the project's glob `'*.md'` sets `vocab: []`
+- **THEN** `a.md` and `b.md` take no vocabulary from the package's `'*.md'`, and `a.md` still takes `Own`
+
+#### Scenario: Another glob text
+
+- **WHEN** the project's glob is `'[ab].md'` with `vocab: []`, and the package's globs are those of the last scenario
+- **THEN** `a.md` and `b.md` still take `Docs`, and `a.md` still takes `Own`
 
 #### Scenario: A missing key
 

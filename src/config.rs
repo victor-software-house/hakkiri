@@ -213,9 +213,11 @@ struct Glob {
     pattern: String,
     matcher: GlobMatcher,
     styles: Option<Vec<String>>,
-    /// The vocabularies the glob names, for the files it matches. A written
-    /// empty list drops the names earlier globs gave the file.
-    vocab: Option<Vec<String>>,
+    /// The vocabularies the glob names, for the files it matches.
+    vocab: Vec<String>,
+    /// Whether the glob wrote an empty `vocab` list, which drops the lists of
+    /// the earlier globs of the same text.
+    clears_vocab: bool,
     choices: Vec<(String, Choice)>,
 }
 
@@ -320,14 +322,9 @@ impl Project {
         let mut named: Vec<&str> = Vec::new();
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
             matched = true;
-            if let Some(names) = &glob.vocab {
-                if names.is_empty() {
-                    named.clear();
-                }
-                for name in names {
-                    if !named.contains(&name.as_str()) {
-                        named.push(name);
-                    }
+            for name in &glob.vocab {
+                if !named.contains(&name.as_str()) {
+                    named.push(name);
                 }
             }
             if let Some(listed) = &glob.styles {
@@ -738,6 +735,11 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         };
         for mut glob in read_globs(layer.raw.files, &layer.text, &loaded, &mut at) {
             add_up(&mut glob, &mut listed);
+            if glob.clears_vocab {
+                for earlier in globs.iter_mut().filter(|g| g.pattern == glob.pattern) {
+                    earlier.vocab.clear();
+                }
+            }
             globs.push(glob);
         }
         faults.problems.append(&mut at.problems);
@@ -936,7 +938,8 @@ fn read_globs(
             pattern: pattern.clone(),
             matcher,
             styles: listed,
-            vocab: vocabularies,
+            clears_vocab: vocabularies.as_ref().is_some_and(Vec::is_empty),
+            vocab: vocabularies.unwrap_or_default(),
             choices,
         });
     }

@@ -9,7 +9,7 @@ The operator ruled on the three decisions of the [proposal][proposal] on 2026-11
 - [x] 1.1 Read `.ctl/hakkiri.yaml` of each loaded package with the schema of the project config, and name the package and the line in a fault, in `src/config.rs`.  
   Verify `tests/package_settings.rs` holds a test for each scenario of "A package may ship a settings file", "A package's settings file is in its top folder" and "A package's settings file holds the keys of a project config".  
   Each test fails on the code of main and passes with the change.
-  - 2026-11-11 (UTC), 18 of the 22 tests of `tests/package_settings.rs` failed on `src/` of [PR 83][c-base] in a throwaway Linux box, and all 22 pass with the change.  
+  - 2026-11-11 (UTC), 19 of the 23 tests of `tests/package_settings.rs` failed on `src/` of [PR 83][c-base] in a throwaway Linux box, and all 23 pass with the change.  
     The other four pass either way: a package with no settings file, and three that guard what is no package top, each failing when its rule is removed.
 - [x] 1.2 Fetch the packages a package lists, with the depth limit, once per `sha256`, in `src/config.rs`.  
   Verify the scenarios of "A package may list packages" each fail before and pass after, the nested fetch served by the local test server of `tests/package_fetch.rs`.
@@ -28,8 +28,12 @@ The operator ruled on the three decisions of the [proposal][proposal] on 2026-11
 
 ## 3. Gate
 
-- [ ] 3.1 Pull request CI passes on the head of the pull request.  
+- [x] 3.1 Pull request CI passes on the head of the pull request.  
   Verify the checks of the head commit pass in the run on the pull request.
+  - 2026-11-11 (UTC), every check of [06a137b][c-head] passes in [the CI run of PR 87][r-87], and the stack merged as [a6d2487][c-main].
 
 [proposal]: proposal.md
 [c-base]: https://github.com/victor-software-house/hakkiri/commit/64baed3342e99474aff077b66f376b60a6e7db5e
+[c-head]: https://github.com/victor-software-house/hakkiri/commit/06a137b51459a51ab6cf4ade320ff0225f1c2c1f
+[c-main]: https://github.com/victor-software-house/hakkiri/commit/a6d24872dfa25347818fbba233470b1fdd650f3b
+[r-87]: https://github.com/victor-software-house/hakkiri/actions/runs/43056201410
