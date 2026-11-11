@@ -31,7 +31,7 @@ A release is a GitHub Release with a tarball and a checksum for `linux-x64` and 
 mise installs it with the `github:` backend, pinned to the version:
 
 ```sh
-mise use github:victor-software-house/hakkiri@0.0.0
+mise use github:victor-software-house/hakkiri@0.0.1
 ```
 
 ## Use
