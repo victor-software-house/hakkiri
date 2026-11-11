@@ -8,7 +8,7 @@
 
 ### Requirement: Configuration and packages are hakkiri's own
 
-**Reason**: It says Vale styles enter only through `hakkiri import vale`, which is no longer so: hakkiri reads a Vale style folder as it is. The requirement is removed and added again below with the new text.
+**Reason**: It states that Vale styles enter only through `hakkiri import vale`, which is no longer so: hakkiri reads a Vale style folder as it is. The requirement is removed and added again below with the new text.
 
 **Migration**: Read "Configuration is hakkiri's own, and Vale styles load as they are".
 

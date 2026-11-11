@@ -57,7 +57,7 @@ queue:
       - Every rule case and package case passes under hakkiri test.
       - An alert diff against Vale with ProseStyle 0.0.7 over our public repositories shows only the intended differences.
     notes:
-      - 2026-11-11, ProseStyle holds five script rules (FlatRhythm, BareWorkItem, SameSentenceStart, HardBreak, SentencePerLine). This row ports them to native rules, since HKR-036 runs Tengo only later. The Readability style holds one script rule, Polysyllables, which the config turns off.
+      - '2026-11-11, ProseStyle v0.0.14 holds six script rules: FlatRhythm, BareWorkItem, SameSentenceStart, HardBreak, SentencePerLine and PrepositionChain. This row ports them to native rules, since HKR-036 runs Tengo only later. The Readability style holds one script rule, Polysyllables, which the config turns off.'
 
   - id: HKR-035
     title: Import a Vale config
@@ -112,7 +112,7 @@ queue:
       - The vale-differences scenario for a script rule is removed.
     notes:
       - '2026-11-11, size: no maintained Rust Tengo exists (crates.io has none; one repository, Laine-S/tengo-rs, holds a single commit and no release). An interpreter of the subset Vale scripts use is about 2,000 to 2,500 lines: := and =, if, for and for-in, func and closures, arrays, maps, slices, the ternary, import, len, append, float, about 25 text functions, and math. Vale gives a script the modules text, fmt and math, the variable scope, the result matches with begin, end and message, a 2 s limit, and a .tengo file under config/scripts.'
-      - HKR-008 ports ProseStyle's five scripts to native rules, so this row is not on its path.
+      - HKR-008 ports the six script rules of ProseStyle v0.0.14 to native rules, so this row is not on its path.
 
   - id: HKR-026
     title: Run Vale's built-in spelling rule

@@ -40,7 +40,7 @@ Lost: the first adds a dependency for output nobody reads, and the second duplic
 ### 3. A parent is found in any loaded package
 
 Vale looks a parent up on its search path, which holds every styles folder, and the parent need not be enabled.
-hakkiri puts every package folder of the config on the search path before it reads the first style, so `Direct.Length` finds `Std` whichever package holds it.
+hakkiri puts every package folder of the config on the search path before it reads the first style, a fetched package included, so `Direct.Length` finds `Std` whichever package holds it.
 The first segment of the name is a style folder, and the rest are folders and a file name.
 A `_` folder and a nested folder both resolve, as `GenZ._shared.Slang` needs.
 `hakkiri test` searches the packages of the config, and the rule's own package when the config does not name it.
@@ -75,7 +75,9 @@ Each such rule fails a run once, however many files the config runs it on.
 ### 5. `import vale` is for the `.vale.ini`
 
 With the loader reading Vale styles, a command for the rule files has nothing left to do.
-The name `hakkiri import vale` stays for converting the `.vale.ini` into `.ctl/hakkiri.yaml`, which is a row of its own with its command shape decided: `hakkiri import vale [SOURCE]`, Vale's upward lookup with no argument, the file `--config` names as output, `--force` to overwrite, and `--dry-run` to preview (operator, 2026-11-11).
+The name `hakkiri import vale` stays for converting the `.vale.ini` into `.ctl/hakkiri.yaml`, which is a row of its own.
+Its command shape is decided: `hakkiri import vale [SOURCE]`, with Vale's upward lookup when it has no argument.
+It writes the file `--config` names, refuses to overwrite it without `--force`, and previews with `--dry-run` (operator, 2026-11-11).
 
 ### 6. What hakkiri still does not run
 
@@ -83,7 +85,7 @@ Each is a Known gap with a row:
 
 | Vale feature | row | size | use found |
 |:--|:--|:--|:--|
-| `script` rules (Tengo) | `HKR-036` | about 2,000 to 2,500 lines for the subset Vale scripts use; no maintained Rust Tengo exists | 1 of 161 rule files in eight popular styles, and 5 of ProseStyle's own, which `HKR-008` ports to native rules |
+| `script` rules (Tengo) | `HKR-036` | about 2,000 to 2,500 lines for the subset Vale scripts use; no maintained Rust Tengo exists | 1 of 161 rule files in eight popular styles, and 6 of ProseStyle v0.0.14's own, which `HKR-008` ports to native rules |
 | a metric formula past arithmetic | `HKR-037` | about 150 lines | 0 of 10 formulas |
 | the built-in `Vale.Repetition` | `HKR-038` | one embedded rule | not measured |
 | `doc()` scopes and Views | `HKR-039` | large: Markdown rendered to HTML as Vale renders it, and a CSS selector engine | 0 |

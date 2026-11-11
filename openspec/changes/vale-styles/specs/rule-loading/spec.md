@@ -32,6 +32,11 @@ The parent's `tests` SHALL NOT carry over.
 - **WHEN** the config lists the packages `one` and `two`, `one/Kid/Child.yml` holds `extends: Base.Parent`, and `two/Base/Parent.yml` exists
 - **THEN** hakkiri finds the parent in `two`
 
+#### Scenario: A fetched package
+
+- **WHEN** the config pins a Vale package by `url` and `sha256`, and its rule `Direct.Length` extends `Std.Readability.SentenceLength`, which the same zip holds
+- **THEN** hakkiri reads the package from the cache and loads the rule
+
 #### Scenario: A chain of three
 
 - **WHEN** `Kid/Grand.yml` extends `Kid.Child`, which extends `Base.Parent`
