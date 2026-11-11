@@ -61,6 +61,7 @@ queue:
       - A package's settings file is read and merged under the project's config, and a setting in the project wins, in a test.
       - A rule the package sets off stays off until the project turns it on, in a test.
       - The package's vocab reaches the checks that read vocabularies, in a test.
+    plan: openspec/changes/package-settings/proposal.md
 
   - id: HKR-008
     title: Run ProseStyle on hakkiri
