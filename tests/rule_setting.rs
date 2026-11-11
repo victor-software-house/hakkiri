@@ -295,3 +295,89 @@ fn a_name_clash_in_a_style_enabled_only_by_rule_is_not_refused() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn on_runs_a_rule_of_a_style_no_glob_lists_at_the_level_of_its_rule_file() -> TestResult {
+    let suite = Suite::new("rule-setting-on");
+    let root = project(
+        &suite,
+        "on",
+        "  'a.md':\n    styles: [Other]\n    Team.Hint: on\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:23: suggestion Team.Hint: Say 'maybe' less.",
+            "a.md:1:29: warning Other.Bland: Plain 'bland'.",
+            "2 alerts in 1 file"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn on_turns_a_rule_back_on_after_off_at_the_level_of_its_rule_file() -> TestResult {
+    let suite = Suite::new("rule-setting-on-after-off-own");
+    let root = project(
+        &suite,
+        "on-after-off-own",
+        "  '*.md': {styles: [Team], Team.Harsh: off}\n  'a.md': {Team.Harsh: on}\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "a.md:1:14: error Team.Harsh: Never 'terrible'.",
+            "a.md:1:23: suggestion Team.Hint: Say 'maybe' less.",
+            "b.md:1:9: warning Team.Filler: Remove 'very'.",
+            "b.md:1:23: suggestion Team.Hint: Say 'maybe' less.",
+            "5 alerts in 2 files"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_level_set_before_stays_when_a_later_glob_turns_the_rule_off_and_on() -> TestResult {
+    let suite = Suite::new("rule-setting-level-stays");
+    let root = project(
+        &suite,
+        "level-stays",
+        "  '*.md': {Team.Hint: error}\n  'a.md': {Team.Hint: off}\n  'a?md': {Team.Hint: on}\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:23: error Team.Hint: Say 'maybe' less.",
+            "b.md:1:23: error Team.Hint: Say 'maybe' less.",
+            "2 alerts in 2 files"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_word_that_is_no_level_is_refused_with_its_line() -> TestResult {
+    let suite = Suite::new("rule-setting-no-level");
+    let root = project(
+        &suite,
+        "no-level",
+        "  'a.md':\n    styles: [Other]\n    Team.Hint: yes\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result.err.contains(
+            "line 6: Team.Hint: `yes` is not a level: use suggestion, warning or error, `on` or `off`"
+        ),
+        "{}",
+        result.err
+    );
+    Ok(())
+}

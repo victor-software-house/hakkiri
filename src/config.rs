@@ -75,7 +75,7 @@ impl<'de, V: Deserialize<'de>> Deserialize<'de> for Ordered<V> {
 enum Setting {
     /// A list of style names.
     List(Vec<String>),
-    /// A level, or `off`.
+    /// A level, `on` or `off`.
     Word(String),
 }
 
@@ -150,7 +150,10 @@ fn entry_ok(entry: &Entry, _: &()) -> garde::Result {
 enum Choice {
     /// The rule does not run.
     Off,
-    /// The rule's alerts take this level.
+    /// The rule runs, and its alerts keep the level of its rule file unless
+    /// a level was set before.
+    On,
+    /// The rule runs, and its alerts take this level.
     Level(Level),
 }
 
@@ -240,21 +243,36 @@ impl Project {
     /// A `styles` list replaces the earlier one, and an empty list also drops
     /// every rule setting before it, as Vale's empty `BasedOnStyles` does.
     /// A rule runs when a listed style holds it and the config does not turn it
-    /// off, or when the config sets its level, whatever style holds it.
+    /// off, or when the config turns it on or sets its level, whatever style
+    /// holds it. A level once set stays when a later glob turns the rule off or
+    /// on, as in Vale.
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
         let mut matched = false;
         let mut styles: &[String] = &[];
-        let mut choices: HashMap<&str, Choice> = HashMap::new();
+        let mut switches: HashMap<&str, bool> = HashMap::new();
+        let mut set_levels: HashMap<&str, Level> = HashMap::new();
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
             matched = true;
             if let Some(listed) = &glob.styles {
                 styles = listed;
                 if listed.is_empty() {
-                    choices.clear();
+                    switches.clear();
+                    set_levels.clear();
                 }
             }
             for (name, choice) in &glob.choices {
-                choices.insert(name.as_str(), *choice);
+                match choice {
+                    Choice::Off => {
+                        switches.insert(name.as_str(), false);
+                    }
+                    Choice::On => {
+                        switches.insert(name.as_str(), true);
+                    }
+                    Choice::Level(level) => {
+                        switches.insert(name.as_str(), true);
+                        set_levels.insert(name.as_str(), *level);
+                    }
+                }
             }
         }
         if !matched {
@@ -270,22 +288,22 @@ impl Project {
         {
             listed.insert(*index);
             let rule = self.rules.get(*index)?;
-            match choices.get(rule.name.as_str()) {
-                Some(Choice::Off) => {}
-                Some(Choice::Level(level)) => {
+            if switches.get(rule.name.as_str()) != Some(&false) {
+                rules.push(rule);
+                if let Some(level) = set_levels.get(rule.name.as_str()) {
                     levels.insert(rule.name.as_str(), *level);
-                    rules.push(rule);
                 }
-                None => rules.push(rule),
             }
         }
         for (index, rule) in self.rules.iter().enumerate() {
             if listed.contains(&index) {
                 continue;
             }
-            if let Some(Choice::Level(level)) = choices.get(rule.name.as_str()) {
-                levels.insert(rule.name.as_str(), *level);
+            if switches.get(rule.name.as_str()) == Some(&true) {
                 rules.push(rule);
+                if let Some(level) = set_levels.get(rule.name.as_str()) {
+                    levels.insert(rule.name.as_str(), *level);
+                }
             }
         }
         (!rules.is_empty()).then_some(Plan { rules, levels })
@@ -506,15 +524,16 @@ fn read_globs(
                     faults.add(at, &key, message.to_owned());
                 }
                 (_, Setting::List(_)) => {
-                    faults.add(at, &key, format!("is set to {LEVELS}, or `off`"));
+                    faults.add(at, &key, format!("is set to {LEVELS}, `on` or `off`"));
                 }
                 (_, Setting::Word(word)) => match (word.as_str(), level_named(&word)) {
                     ("off", _) => choices.push((key.clone(), Choice::Off)),
+                    ("on", _) => choices.push((key.clone(), Choice::On)),
                     (_, Some(level)) => choices.push((key.clone(), Choice::Level(level))),
                     (_, None) => faults.add(
                         at,
                         &key,
-                        format!("`{word}` is not a level: use {LEVELS}, or `off`"),
+                        format!("`{word}` is not a level: use {LEVELS}, `on` or `off`"),
                     ),
                 },
             }
