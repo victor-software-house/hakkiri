@@ -33,6 +33,10 @@ pub struct Alert {
     pub matched: String,
     /// The rule's `action`. Nothing applies it.
     pub action: Option<Action>,
+    /// Whether the alert reports a fault of the rule itself, such as a pattern
+    /// that gave up, and not a match. No level of a config or a comment
+    /// changes it, so a broken rule stays an error.
+    pub fault: bool,
 }
 
 /// Fills the `%s` and the indexed `%[n]s` of `template` with `values`, in
@@ -224,6 +228,7 @@ impl<'a> Locator<'a> {
             last_column,
             matched: matched.to_owned(),
             action: rule.action.clone(),
+            fault: false,
         }
     }
 
@@ -249,6 +254,7 @@ impl<'a> Locator<'a> {
             last_column: first_column,
             matched: String::new(),
             action: None,
+            fault: true,
         }
     }
 }

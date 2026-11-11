@@ -338,6 +338,37 @@ fn a_level_comment_wins_over_the_level_the_config_sets() -> TestResult {
     Ok(())
 }
 
+/// A rule whose pattern gives up on a long run of `a`: a fault of the rule.
+const SLOW: &str =
+    "extends: existence\nmessage: m\nlevel: warning\nnonword: true\ntokens: ['(a+)+(?=b)c']\n";
+
+#[test]
+fn a_level_leaves_a_rule_failure_an_error() -> TestResult {
+    let suite = Suite::new("comment-controls-fault");
+    let text = format!(
+        "<!-- hakkiri Team.Slow: suggestion -->\n\n{}\n",
+        "a".repeat(50_000)
+    );
+    let root = small(&suite, "fault", &text);
+    root.file("styles/Team/Slow.yml", SLOW);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  '*.md':\n    styles: [Team]\n    Team.Slow: suggestion\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    let failures: Vec<&str> = result
+        .lines()
+        .into_iter()
+        .filter(|line| line.contains(" Team.Slow: "))
+        .collect();
+    assert!(
+        matches!(failures.as_slice(), [line] if line.contains(": error Team.Slow: ")),
+        "{failures:?}"
+    );
+    Ok(())
+}
+
 #[test]
 fn a_comment_in_a_source_file_turns_nothing_off() -> TestResult {
     let suite = Suite::new("comment-controls-source");

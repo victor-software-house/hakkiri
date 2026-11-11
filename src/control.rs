@@ -433,7 +433,8 @@ pub(crate) fn cut(nodes: &mut Vec<Node>, comments: &[Comment], len: usize) {
 }
 
 /// Gives each alert the level that a comment of `tree` sets for its rule at
-/// its place, and leaves the others as they are.
+/// its place, and leaves the others as they are, and so a fault of a rule
+/// itself (`Alert::fault`).
 ///
 /// The comment is `hakkiri Style.Rule: suggestion`, `warning` or `error`, and
 /// it holds until a later comment names the rule.
@@ -443,7 +444,7 @@ pub fn apply_levels(tree: &Tree, source: &str, alerts: &mut [Alert]) {
         return;
     }
     let controls = Controls::new(&tree.comments, source, &[]);
-    for alert in alerts {
+    for alert in alerts.iter_mut().filter(|alert| !alert.fault) {
         if let Some(level) = controls.level(&alert.rule, (alert.line, alert.first_column)) {
             alert.level = level;
         }

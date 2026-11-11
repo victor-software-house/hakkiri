@@ -44,3 +44,12 @@ A glob that matches a source file SHALL leave the text of its comments as it is,
 
 - **WHEN** a doc comment holds `<!-- hakkiri off -->` and the lines after it hold `very`
 - **THEN** the alerts are those of the file with no comment
+
+### Requirement: A level leaves a rule failure an error
+
+A level from a comment or from the config SHALL NOT change an alert that reports a fault of the rule itself, such as a pattern that gave up on a text.
+
+#### Scenario: A pattern that gives up
+
+- **WHEN** a rule whose pattern gives up on the text has its level set to `suggestion` by a comment and by the config
+- **THEN** the alert is an error, and the run exits with status 1

@@ -114,7 +114,7 @@ pub(crate) fn lint_planned(
 ) -> Result<Vec<Alert>, String> {
     let mut alerts = lint_accepting(&plan.rules, tree, source, extension, &plan.accepted)
         .map_err(|error| error.to_string())?;
-    for alert in &mut alerts {
+    for alert in alerts.iter_mut().filter(|alert| !alert.fault) {
         if let Some(level) = plan.levels.get(alert.rule.as_str()) {
             alert.level = *level;
         }
