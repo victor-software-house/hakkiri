@@ -48,15 +48,6 @@ hakkiri SHALL run a rule whose `extends` is `existence`, `substitution`, `occurr
 - **WHEN** a rule has `extends: occurrence`, `message: "%d words"`, `scope: sentence`, `max: 3` and `token: \b(\w+)\b`, and the input is `One two three four five.`
 - **THEN** hakkiri reports one alert with the message `5 words`
 
-### Requirement: A script rule is refused
-
-hakkiri SHALL refuse a rule whose `extends` is `script`, report an error that names the rule file, and exit with a failure status.
-
-#### Scenario: A style ships a script rule
-
-- **WHEN** a style folder `Team` holds `Grade.yml` with `extends: script`
-- **THEN** hakkiri reports an error naming `Team/Grade.yml` and exits with a failure status
-
 ### Requirement: A scope names text with Vale's scope names
 
 A rule's `scope` SHALL take Vale 3.26.0's lowercase dotted scope names, such as `sentence`, `paragraph`, `heading.h1`, `list`, `blockquote`, `table.header` and `raw`.  
@@ -213,3 +204,13 @@ The `tokens` of a `metric` rule SHALL match as the `tokens` of an `existence` ru
 
 - **WHEN** the semicolon rule above has no `nonword` and reads `One; two; three four five six seven eight nine ten.`
 - **THEN** its formula reads `occurrences` as 0, and hakkiri reports no alert
+
+### Requirement: A script rule is reported, and the rest of its style runs
+
+hakkiri SHALL NOT run a rule whose `extends` is `script`.  
+It SHALL report it as a rule it cannot run, with an error that names the rule file, as the project-config spec fixes.
+
+#### Scenario: A style ships a script rule
+
+- **WHEN** a style folder `Team` holds `Grade.yml` with `extends: script` and a glob lists `Team`
+- **THEN** hakkiri reports an error naming `Team/Grade.yml` and exits 2, and the other rules of `Team` run

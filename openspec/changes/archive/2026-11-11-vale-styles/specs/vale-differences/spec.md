@@ -119,20 +119,20 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 - **WHEN** a rule holds an `action`
 - **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
 
-[ledger]: ../../../../../tasks.yaml
-[bootstrap-1]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
-[bootstrap-5]: ../../../archive/2026-11-09-bootstrap-hakkiri/design.md#5-rules-ship-as-versioned-packages
-[case-1]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
-[check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
-[engine-3]: ../../../archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
-[engine-11]: ../../../archive/2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
-[engine-14]: ../../../archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
-[format-4]: ../../../archive/2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
-[format-6]: ../../../archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
-[format-9]: ../../../archive/2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
-[html-7]: ../../../archive/2026-11-10-html-block-text/design.md#not-ported
-[spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+[ledger]: ../../../../../../tasks.yaml
+[bootstrap-1]: ../../../2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
+[bootstrap-5]: ../../../2026-11-09-bootstrap-hakkiri/design.md#5-rules-ship-as-versioned-packages
+[case-1]: ../../../2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
+[engine-3]: ../../../2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
+[engine-11]: ../../../2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
+[engine-14]: ../../../2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
+[format-4]: ../../../2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
+[format-6]: ../../../2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
+[format-9]: ../../../2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
+[html-7]: ../../../2026-11-10-html-block-text/design.md#not-ported
+[spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
 [styles-1]: ../../design.md#1-the-loader-resolves-inheritance
 [styles-4]: ../../design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
-[test-2]: ../../../archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
-[tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[test-2]: ../../../2026-11-10-test-command/design.md#2-a-case-is-a-small-record
+[tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
