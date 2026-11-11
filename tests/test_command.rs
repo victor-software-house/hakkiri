@@ -542,3 +542,79 @@ fn a_style_folder_of_three_rules_covers_every_rule() -> TestResult {
     assert_eq!(result.lines(), ["3 files, 6 passed, 0 failed, 0 uncovered"]);
     Ok(())
 }
+
+/// A rule on `token` whose one case expects no `Team.Terms` alert, so it
+/// passes and never fires.
+fn quiet(token: &str) -> String {
+    format!(
+        "extends: existence\nmessage: \"Remove '%s'.\"\nlevel: warning\ntokens: [{token}]\n\
+         tests:\n  - name: quiet\n    input: This is good.\n    absent: Team.Terms\n"
+    )
+}
+
+#[test]
+fn a_name_two_rule_files_share_is_covered_when_either_fires() -> TestResult {
+    let suite = Suite::new("test-shared-fires");
+    let root = suite.scenario("shared-fires");
+    root.file(
+        "styles/Team/Terms.yml",
+        FOO.replace("Team.Foo", "Team.Terms"),
+    );
+    root.file("styles/Team/Terms.custom.yml", quiet("simple"));
+    let result = run(root.path(), &["test", "--coverage", "styles"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["2 files, 2 passed, 0 failed, 0 uncovered"]);
+    Ok(())
+}
+
+#[test]
+fn a_name_two_rule_files_share_is_reported_once_with_both_files() -> TestResult {
+    let suite = Suite::new("test-shared-quiet");
+    let root = suite.scenario("shared-quiet");
+    root.file("styles/Team/Terms.yml", quiet("zzz"));
+    root.file("styles/Team/Terms.custom.yml", quiet("yyy"));
+    root.file(
+        "styles/Team/Other.yml",
+        FOO.replace("Team.Foo", "Team.Other"),
+    );
+    let result = run(root.path(), &["test", "--coverage", "styles"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "uncovered Team.Terms (named by styles/Team/Terms.custom.yml, styles/Team/Terms.yml): no case makes it flag anything",
+            "3 files, 3 passed, 0 failed, 1 uncovered"
+        ]
+    );
+    Ok(())
+}
+
+#[cfg(unix)]
+#[test]
+fn a_project_reached_through_a_link_names_a_nested_rule_as_check_does() -> TestResult {
+    let suite = Suite::new("test-link-root");
+    let base = suite.scenario("link-root");
+    base.file("real/shared/Team/Sub/Bar.yml", HEDGE);
+    base.file("real/.ctl/hakkiri.yaml", CONFIG);
+    base.file(
+        "real/through.test.yml",
+        "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Sub.Bar\n",
+    );
+    std::fs::create_dir_all(base.path().join("real/styles"))?;
+    std::os::unix::fs::symlink("../shared/Team", base.path().join("real/styles/Team"))?;
+    std::os::unix::fs::symlink("real", base.path().join("link"))?;
+    let rule = base.path().join("link/styles/Team/Sub/Bar.yml");
+    let result = run(
+        &base.path().join("real"),
+        &[
+            "test",
+            "--coverage",
+            "through.test.yml",
+            &rule.to_string_lossy(),
+        ],
+        &[],
+    )?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed, 0 uncovered"]);
+    Ok(())
+}

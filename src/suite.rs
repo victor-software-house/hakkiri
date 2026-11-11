@@ -46,13 +46,23 @@ pub(crate) fn test(args: &TestArgs) -> Tests {
     let uncovered = if args.coverage {
         let (rule_files, rule_failures) = find(&args.paths, &skips_inert, &is_rule_file);
         failures.extend(rule_failures);
-        let names: Vec<String> = rule_files
-            .iter()
-            .filter_map(|file| runner.style_of(file).ok().map(|(name, _)| name))
-            .collect();
-        names
+        let mut named: Vec<(String, Vec<String>)> = Vec::new();
+        for file in &rule_files {
+            let Ok((name, _)) = runner.style_of(file) else {
+                continue;
+            };
+            match named.iter_mut().find(|(known, _)| *known == name) {
+                Some((_, files)) => files.push(plain(file)),
+                None => named.push((name, vec![plain(file)])),
+            }
+        }
+        named
             .into_iter()
-            .filter(|name| !runner.fired.contains(name))
+            .filter(|(name, _)| !runner.fired.contains(name))
+            .map(|(name, files)| match files.as_slice() {
+                [_] => name,
+                _ => format!("{name} (named by {})", files.join(", ")),
+            })
             .collect()
     } else {
         Vec::new()
@@ -355,6 +365,9 @@ impl Runner {
     /// isolated rule.
     /// The path is made absolute with symlinks left alone, so a style folder
     /// that is a link keeps the name of the link.
+    /// A folder above the file is the package when its real path is one of the
+    /// config's, which are real paths, so a project reached through a link
+    /// names its rules as `check` does.
     ///
     /// # Errors
     ///
@@ -364,14 +377,17 @@ impl Runner {
         let absolute = absolute(file).ok_or("the path cannot be made absolute")?;
         let candidates = [Some(absolute.clone()), fs::canonicalize(file).ok()];
         for candidate in candidates.iter().flatten() {
-            for package in &packages {
+            for package in candidate.ancestors().skip(1) {
+                if !fs::canonicalize(package).is_ok_and(|real| packages.contains(&real)) {
+                    continue;
+                }
                 let Ok(relative) = candidate.strip_prefix(package) else {
                     continue;
                 };
                 let mut parts = relative.components();
                 if let (Some(first), Some(_)) = (parts.next(), parts.next()) {
                     let style = package.join(first);
-                    return Ok((rule::rule_name(&style, candidate)?, package.clone()));
+                    return Ok((rule::rule_name(&style, candidate)?, package.to_path_buf()));
                 }
             }
         }

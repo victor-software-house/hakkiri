@@ -35,3 +35,13 @@ A rule file named as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHA
 
 - **WHEN** a case loads `styles/Team/Foo.v2.yml`
 - **THEN** the rule is `Team.Foo`
+
+#### Scenario: A project reached through a link
+
+- **WHEN** the project root is reached through a symlink, a style folder is a symlink, and `test --coverage` runs on `link/styles/Team/Sub/Bar.yml`
+- **THEN** the rule is `Team.Sub.Bar`, as `check` names it, and not `Sub.Bar`
+
+#### Scenario: A name two rule files share
+
+- **WHEN** `Terms.yml` and `Terms.custom.yml` both give `Team.Terms`, and a case flags it through either file
+- **THEN** `test --coverage` counts the name as covered, as `vale test --coverage` does, and when no case flags it, lists it once with both files

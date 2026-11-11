@@ -44,6 +44,10 @@ Lost: a rule would vanish with no sign, and its tests would pass against the wro
 Vale names an isolated rule file from the search paths of the config: the style is the first folder under a search path that holds the file, and the folders after it join the name.
 A file under no search path takes the folder that holds it ([isolated name][v-isolated]).
 `test` does the same with the packages of the project config, read only for this, and gives the style folder's parent to the rule as its package.
+It finds the package as the folder above the file whose real path is one of the config's, so a project reached through a link is named as `check` names it.
+`test` loads an isolated rule alone, so two files with one name are no error there, as in `vale test`.
+A shared name counts as covered when a case flags it through either file, which a probe of `vale test --coverage` also showed.
+When no case flags it, `test` lists it once with both files, where Vale lists the name twice and names no file.
 
 Alternative: always take the folder that holds the file.
 Lost: `test` would name `Team/Sub/Bar.yml` as `Sub.Bar` and `check` as `Team.Sub.Bar`, so a coverage report and an alert would name one rule two ways.

@@ -913,6 +913,24 @@ fn a_bracket_in_a_style_no_glob_lists_is_not_refused() -> TestResult {
 }
 
 #[test]
+fn a_clash_is_refused_when_any_glob_lists_the_style() -> TestResult {
+    let suite = Suite::new("check-clash-later-glob");
+    let root = suite.scenario("clash-later-glob");
+    root.file("styles/Team/Terms.yml", FILLER);
+    root.file("styles/Team/Terms.custom.yml", HARSH);
+    root.file("styles/Other/Filler.yml", FILLER);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Other]}\n  '*.txt': {styles: [Team]}\n",
+    );
+    root.file("a.md", "This is very good.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}", result.out);
+    assert!(result.err.contains("Team.Terms"), "{}", result.err);
+    Ok(())
+}
+
+#[test]
 fn a_misspelled_rule_name_is_refused() -> TestResult {
     let suite = Suite::new("check-misspelled");
     let root = project(
