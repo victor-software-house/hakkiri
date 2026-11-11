@@ -32,6 +32,7 @@ The operator also ruled that hakkiri gives at least Vale's result, and departs o
 ### New Capabilities
 
 - `html-block-text`: which text of an HTML block hakkiri reads, under which scope, and how the tags join it.
+- `html-tokenizer`: which whitespace ends a tag name and an attribute.
 
 ### Modified Capabilities
 
