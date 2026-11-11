@@ -41,4 +41,4 @@ A project also needs its styles from somewhere before packages arrive in `HKR-00
 
 [ledger]: ../../../../tasks.yaml
 [test]: ../2026-11-10-test-command/proposal.md
-[release]: ../../release-lane/proposal.md
+[release]: ../2026-11-11-release-lane/proposal.md

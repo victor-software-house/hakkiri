@@ -1,18 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-029
+active: HKR-033
 queue:
-  - id: HKR-029
-    title: Release hakkiri through verctl
-    scope: release
-    outcome: A verctl Version PR publishes a release of hakkiri, and mise installs it.
-    blocked_by: []
-    acceptance:
-      - A verctl Version PR publishes 0.0.1 as a tag and a GitHub Release with a linux-x64 and a darwin-arm64 tarball and their checksums, and no crates.io crate.
-      - mise installs the release on a Mac and on Linux x86-64 from a pinned version and a locked checksum.
-    plan: openspec/changes/release-lane/proposal.md
-
   - id: HKR-033
     title: Enable one rule with a rule setting
     scope: config
@@ -126,7 +116,6 @@ queue:
       left.
     blocked_by:
       - HKR-008
-      - HKR-029
     acceptance:
       - The templates Template check passes, and one pilot project passes CI on its update.
 
@@ -139,6 +128,17 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-029
+    title: Release hakkiri through verctl
+    scope: release
+    outcome: A verctl Version PR publishes a release of hakkiri, and mise installs it.
+    plan: openspec/changes/archive/2026-11-11-release-lane/proposal.md
+    completed: 2026-11-11T03:26:05
+    evidence:
+      - openspec/changes/archive/2026-11-11-release-lane/
+      - 'PR 65 added the release lane and Version PR 66 released hakkiri 0.0.1 at c3f3b38: the release run published the tag v0.0.1 and a Release with the linux-x64 and darwin-arm64 tarballs, crates.io has no hakkiri crate, and mise installed it on a Mac and on NixOS; the release-lane change is archived.'
+    disposition: completed
+
   - id: HKR-021
     title: Read the text inside HTML blocks as prose
     scope: tree

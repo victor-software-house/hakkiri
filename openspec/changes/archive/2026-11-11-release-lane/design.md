@@ -58,7 +58,8 @@ Lost: hakkiri links tree-sitter's C grammars, so a musl build needs a musl C com
 ### 4. mise installs the asset
 
 A consumer pins `"github:victor-software-house/hakkiri" = "0.0.1"` and runs `mise lock` for `linux-x64` and `macos-arm64`, which records each asset's checksum.
-verctl attaches each tarball and its `.sha256`, and the `github:` backend picks the asset by platform name ([asset names][v-readme]).
+verctl attaches each tarball and nothing else.
+GitHub records each asset's SHA-256 digest, which `mise lock` reads, and the `github:` backend picks the asset by platform name ([asset names][v-readme]).
 The proof is an install in an empty folder on each platform: the pin, the lock, then `hakkiri --version` and a `check` of one file.
 
 ### 5. Two texts carry the version
