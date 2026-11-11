@@ -39,14 +39,14 @@ hakkiri keeps its single map, applied in glob order, and `styles` keeps replacin
 Alternative: clear the rule settings at every `styles` list.
 Lost: Vale keeps them for a non-empty list.
 
-### 4. An empty `styles` list drops the rule settings before it
+### 4. An empty `styles` list drops the earlier rule settings
 
 `BasedOnStyles =` in a later section ran nothing on the file, though an earlier section had turned `Team.Terms` on, and the rule settings of the same section applied after it ([the reset][v-merge]).
 hakkiri clears the map at an empty `styles` list, then applies that glob's own rule settings.
 Without this the existing rule that an empty list turns linting off would fail for a file with an enabled rule.
 
 Alternative: leave the map alone at an empty list.
-Lost: the enabled rule would still run, where the config says nothing runs.
+Lost: the enabled rule would still run, although an empty list turns linting off.
 
 ### 5. Two files with one name run the later one
 
