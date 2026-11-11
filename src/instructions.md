@@ -118,6 +118,7 @@ files:
   A download is an error that names the `url`, and nothing is cached, when it is over 32 MiB or does not match its hash.
   The same holds when it is not a zip, names a file outside the package, holds a link or has no single top folder.
   The cache folder is `--cache-dir`, or `hakkiri` in the per-user cache folder: `~/Library/Caches` on macOS, and `$XDG_CACHE_HOME` or `~/.cache` elsewhere.
+  A killed run leaves a folder named `.unpacking-` and a suffix in the cache. Delete it when no hakkiri run is using the cache.
   A Vale style folder loads as it is. `extends: Style.Rule` names a parent rule in any loaded package, `key+` adds to a list or mapping of the parent, and `key-` removes from one.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.

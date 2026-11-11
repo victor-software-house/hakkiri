@@ -296,54 +296,6 @@ hakkiri SHALL read every comment of a code file as Markdown, where Vale 3.26.0 r
 - **WHEN** a Rust file holds ``// Use `utilize` here.`` and an `existence` rule matches `utilize`
 - **THEN** hakkiri reads the span as code and reports nothing, and Vale reports `utilize` inside the backticks ([format 8][format-8])
 
-### Requirement: Rule files differ from Vale in what they accept or select
-
-hakkiri SHALL load, refuse or select as each scenario below says, where Vale 3.26.0 does otherwise.
-
-#### Scenario: A table row is a scope
-
-- **WHEN** a rule has `scope: table.row` and a row holds the matched text
-- **THEN** hakkiri selects the text of the row, and Vale loads the rule and selects nothing, since no block has a `row` part ([format 9][format-9])
-
-#### Scenario: A scope no node holds
-
-- **WHEN** a rule has `scope: nonsense`
-- **THEN** hakkiri refuses it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
-
-#### Scenario: A metric counts tokens
-
-- **WHEN** a `metric` rule sets `tokens: [";"]` and the formula `occurrences / words * 1000`
-- **THEN** hakkiri measures the rate of the matches, and Vale refuses `tokens` as an invalid key and `occurrences` as an unresolved reference ([format 4][format-4], [engine 11][engine-11])
-
-#### Scenario: A formula outside the listed syntax
-
-- **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
-- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 ([engine 14][engine-14])
-
-#### Scenario: A script rule
-
-- **WHEN** a rule has `extends: script`
-- **THEN** hakkiri refuses it, and Vale runs its Tengo program ([format 5][format-5])
-
-### Requirement: Configuration and packages are hakkiri's own
-
-hakkiri SHALL read its settings from `.ctl/hakkiri.yaml` and take Vale styles only through `hakkiri import vale`, where Vale reads `.vale.ini`.
-
-#### Scenario: A Vale configuration
-
-- **WHEN** a project holds a `.vale.ini` and no `.ctl/hakkiri.yaml`
-- **THEN** hakkiri reads no setting from it, and Vale reads it ([bootstrap 1][bootstrap-1])
-
-#### Scenario: A rule is turned off
-
-- **WHEN** a glob in the project config turns a rule off
-- **THEN** it sets the rule to `off`, where Vale writes `NO` ([format 6][format-6])
-
-#### Scenario: A package is fetched on use
-
-- **WHEN** a project pins a package by version and hash
-- **THEN** hakkiri fetches and caches it with no separate sync step, where Vale needs `vale sync` ([bootstrap 5][bootstrap-5])
-
 ### Requirement: The command line differs from Vale's
 
 hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.26.0 does otherwise.
@@ -476,6 +428,36 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 - **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
 - **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
 
+#### Scenario: A script rule
+
+- **WHEN** a rule has `extends: script`
+- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
+
+#### Scenario: A formula outside the listed syntax
+
+- **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
+- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
+
+#### Scenario: The built-in repetition rule
+
+- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
+- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
+
+#### Scenario: A doc selector or a View
+
+- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`, refuses the case field, and Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+
+#### Scenario: A Vale configuration file
+
+- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
+- **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
+
+#### Scenario: An action
+
+- **WHEN** a rule holds an `action`
+- **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
+
 ### Requirement: A rule setting is spelled as hakkiri's config spells it
 
 hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and SHALL refuse a rule key that names no rule and a value that is none of those words or a level.
@@ -496,7 +478,6 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 - **THEN** hakkiri refuses it with the line, and Vale warns that `yes` is not `YES`, `NO`, `UNSET` or a level, and switches the rule off ([rule-setting 7][rule-setting-7])
 
 [bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
-[bootstrap-5]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#5-rules-ship-as-versioned-packages
 [bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
 [case-1]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
 [case-3]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
@@ -520,7 +501,6 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 [engine-7]: ../../changes/archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
 [engine-8]: ../../changes/archive/2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
 [format-4]: ../../changes/archive/2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
-[format-5]: ../../changes/archive/2026-11-10-rule-format/design.md#5-release-1-implements-every-vale-check-type-but-script
 [format-6]: ../../changes/archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
 [format-7]: ../../changes/archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
 [format-8]: ../../changes/archive/2026-11-10-rule-format/design.md#8-every-comment-reads-as-markdown
@@ -532,6 +512,8 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 [html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
 [html-7]: ../../changes/archive/2026-11-10-html-block-text/design.md#not-ported
 [ledger]: ../../../tasks.yaml
+[package-fetch-1]: ../../changes/archive/2026-11-11-package-fetch/design.md#1-vales-sync-is-the-reference-for-the-source
+[package-fetch-3]: ../../changes/archive/2026-11-11-package-fetch/design.md#3-the-checks-a-download-passes
 [pattern-1]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
 [pattern-2]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#2-consistency-matches-as-existence-does-one-pattern-per-pair
 [pattern-3]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#3-conditional-has-two-modes-chosen-by-the-second-pattern
@@ -547,7 +529,57 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 [spelling-4]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
 [spelling-goals]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
 [splitter-5]: ../../changes/archive/2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-not-against-vale
+[styles-1]: ../../changes/archive/2026-11-11-vale-styles/design.md#1-the-loader-resolves-inheritance
+[styles-4]: ../../changes/archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
 [test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
 [test-5]: ../../changes/archive/2026-11-10-test-command/design.md#5-finding-cases
 [test-7]: ../../changes/archive/2026-11-10-test-command/design.md#7-the-report-and-the-exit-status
 [tree-1]: ../../changes/archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+
+### Requirement: Rule files differ from Vale in what they select
+
+hakkiri SHALL load or select as each scenario below says, where Vale 3.26.0 does otherwise.
+
+#### Scenario: A table row is a scope
+
+- **WHEN** a rule has `scope: table.row` and a row holds the matched text
+- **THEN** hakkiri selects the text of the row, and Vale loads the rule and selects nothing, since no block has a `row` part ([format 9][format-9])
+
+#### Scenario: A scope no node holds
+
+- **WHEN** a rule has `scope: nonsense`
+- **THEN** hakkiri refuses it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
+
+#### Scenario: A metric counts tokens
+
+- **WHEN** a `metric` rule sets `tokens: [";"]` and the formula `occurrences / words * 1000`
+- **THEN** hakkiri measures the rate of the matches, and Vale refuses `tokens` as an invalid key and `occurrences` as an unresolved reference ([format 4][format-4], [engine 11][engine-11])
+
+### Requirement: Configuration is hakkiri's own, and Vale styles load as they are
+
+hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.vale.ini`, and SHALL load a Vale style folder as it is.
+
+#### Scenario: A Vale configuration
+
+- **WHEN** a project holds a `.vale.ini` and no `.ctl/hakkiri.yaml`
+- **THEN** hakkiri reads no setting from it, and Vale reads it ([bootstrap 1][bootstrap-1], row [HKR-035][ledger])
+
+#### Scenario: A rule is turned off
+
+- **WHEN** a glob in the project config turns a rule off
+- **THEN** it sets the rule to `off`, where Vale writes `NO` ([format 6][format-6])
+
+#### Scenario: A package is fetched on use
+
+- **WHEN** a project pins a package by `url` and `sha256`
+- **THEN** hakkiri fetches it on the first run, checks the hash and keeps it in a cache folder outside the project, where Vale needs `vale sync`, accepts any zip and copies the styles into `StylesPath` ([package-fetch 1][package-fetch-1])
+
+#### Scenario: A package that was changed
+
+- **WHEN** a pinned package's download does not match its `sha256`
+- **THEN** hakkiri refuses it and names the `url` and both hashes, where Vale installs a changed zip with no complaint ([package-fetch 3][package-fetch-3])
+
+#### Scenario: A Vale style folder
+
+- **WHEN** a package holds a Vale style folder, such as Voices, Std or Readability
+- **THEN** hakkiri loads it with no conversion, as Vale does, apart from the rules the Known gaps list ([styles 1][styles-1])

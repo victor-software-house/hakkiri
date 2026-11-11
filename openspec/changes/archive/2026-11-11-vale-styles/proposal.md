@@ -50,4 +50,4 @@ None.
   `read_style` takes the package folders to search, and `Style` and `LoadProblem` carry the rules hakkiri cannot run.
   No new dependency.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
