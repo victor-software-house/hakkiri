@@ -17,7 +17,8 @@ This change follows [`project-config`][config], which holds the grammar of the c
 - [x] 1.3 Read `vocab` at the top level and in a glob, and read the packages, then the vocabularies, then the styles.  
   Verify the scenarios of the `project-config` delta pass, and a config with no `vocab` key loads as before.  
   Evidence, 2026-11-11 (UTC): the tests for an unknown name, two packages, a `vocab` that is no list, and a config with no key pass.  
-  `a_vocabulary_of_a_fetched_package_is_found` in `tests/package_fetch.rs` failed before the change and passes after it.
+  `a_vocabulary_of_a_fetched_package_is_found` in `tests/package_fetch.rs` failed before the change and passes after it.  
+  Kody's two findings added `a_bad_top_level_vocab_is_placed_on_its_own_line` and `each_accepted_term_matches_only_itself_in_spelling`, which failed on the earlier code and pass.
 
 ## 2. The checks
 

@@ -82,9 +82,18 @@ enum Setting {
     Word(String),
 }
 
+/// The folders of each vocabulary the config names, for the check that runs
+/// after the packages load. Before they load it is empty, and no vocabulary is
+/// refused.
+#[derive(Debug, Default)]
+struct Known {
+    holders: Option<BTreeMap<String, Vec<PathBuf>>>,
+}
+
 /// The file as written.
 #[derive(Debug, Deserialize, Validate)]
 #[serde(deny_unknown_fields)]
+#[garde(context(Known))]
 struct Raw {
     #[serde(default)]
     #[garde(custom(level_ok))]
@@ -93,8 +102,8 @@ struct Raw {
     #[garde(dive)]
     packages: Vec<Entry>,
     #[serde(default)]
-    #[garde(skip)]
-    vocab: Option<Setting>,
+    #[garde(inner(custom(vocab_known)))]
+    vocab: Vec<String>,
     #[serde(default)]
     #[garde(skip)]
     files: Ordered<Ordered<Setting>>,
@@ -103,6 +112,7 @@ struct Raw {
 /// One entry of `packages`.
 #[derive(Debug, Deserialize, Validate)]
 #[serde(deny_unknown_fields)]
+#[garde(context(Known))]
 #[garde(allow_unvalidated)]
 #[garde(custom(entry_ok))]
 struct Entry {
@@ -115,11 +125,7 @@ struct Entry {
     clippy::ref_option,
     reason = "garde calls a custom rule with a reference to the field."
 )]
-#[expect(
-    clippy::trivially_copy_pass_by_ref,
-    reason = "garde calls a custom rule with a reference to its context."
-)]
-fn level_ok(value: &Option<String>, _: &()) -> garde::Result {
+fn level_ok(value: &Option<String>, _: &Known) -> garde::Result {
     match value.as_deref() {
         Some(name) if level_named(name).is_none() => Err(garde::Error::new(format!(
             "`{name}` is not a level: use {LEVELS}"
@@ -128,11 +134,7 @@ fn level_ok(value: &Option<String>, _: &()) -> garde::Result {
     }
 }
 
-#[expect(
-    clippy::trivially_copy_pass_by_ref,
-    reason = "garde calls a custom rule with a reference to its context."
-)]
-fn entry_ok(entry: &Entry, _: &()) -> garde::Result {
+fn entry_ok(entry: &Entry, _: &Known) -> garde::Result {
     match (&entry.path, &entry.url, &entry.sha256) {
         (Some(_), Some(_), _) => Err(garde::Error::new(
             "an entry holds a `path` or a `url`, never both",
@@ -146,6 +148,25 @@ fn entry_ok(entry: &Entry, _: &()) -> garde::Result {
             "an entry needs a `path` to a folder of styles",
         )),
         (Some(_), None, None) => Ok(()),
+    }
+}
+
+/// Refuses a name of the top-level `vocab` that no package holds, or that two
+/// packages hold, once the packages are loaded.
+fn vocab_known(name: &str, known: &Known) -> garde::Result {
+    let Some(holders) = &known.holders else {
+        return Ok(());
+    };
+    match holders.get(name).map(Vec::as_slice) {
+        Some([_]) => Ok(()),
+        Some([first, second, ..]) => Err(garde::Error::new(format!(
+            "the vocabulary `{name}` is in both `{}` and `{}`",
+            first.display(),
+            second.display()
+        ))),
+        _ => Err(garde::Error::new(format!(
+            "`{name}` is not a vocabulary in any package"
+        ))),
     }
 }
 
@@ -429,6 +450,9 @@ struct Loaded {
     unrunnable: Vec<Held>,
     /// The vocabularies the config names, by name.
     vocabularies: BTreeMap<String, Vocabulary>,
+    /// The folders that hold each vocabulary the config names, as the config
+    /// writes them.
+    holders: BTreeMap<String, Vec<PathBuf>>,
 }
 
 /// A package folder that was found, and where its entry is written.
@@ -488,8 +512,14 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
             });
         }
     };
-    let vocab = Named::of(&raw, text, &mut faults);
+    let vocab = Named::of(&raw, text);
     let loaded = load_packages(&raw.packages, &root, text, cache_dir, &vocab, &mut faults);
+    let known = Known {
+        holders: Some(loaded.holders.clone()),
+    };
+    if let Err(error) = input.check(&raw, &known) {
+        faults.problems.extend(LoadError::from(error).problems);
+    }
     let globs = read_globs(raw.files, text, &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
@@ -719,24 +749,14 @@ struct Named {
 }
 
 impl Named {
-    /// The vocabularies `raw` names, with a fault for a key that is no list.
-    fn of(raw: &Raw, text: &str, faults: &mut Faults<'_>) -> Self {
+    /// The vocabularies `raw` names.
+    fn of(raw: &Raw, text: &str) -> Self {
         let mut all = Self {
             all: Vec::new(),
-            top: Vec::new(),
+            top: raw.vocab.clone(),
         };
-        let line = key_line(text, "vocab", 1);
-        match &raw.vocab {
-            Some(Setting::List(names)) => {
-                for name in names {
-                    all.add(name, line);
-                    all.top.push(name.clone());
-                }
-            }
-            Some(Setting::Word(_)) => {
-                faults.add(line, "vocab", "is a list of vocabulary names".to_owned());
-            }
-            None => {}
+        for name in &raw.vocab {
+            all.add(name, None);
         }
         for (pattern, settings) in &raw.files.0 {
             let inner = key_line(text, pattern, 1).map_or(1, |line| line + 1);
@@ -775,8 +795,15 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
                 Some((folder, shown))
             })
             .collect();
+        loaded.holders.insert(
+            name.clone(),
+            holders.iter().map(|(_, shown)| shown.clone()).collect(),
+        );
+        // A name of the top level is refused when the config is checked
+        // again, on the line of its own entry.
+        let refused = !vocab.top.contains(name);
         match holders.as_slice() {
-            [] => faults.add(
+            [] if refused => faults.add(
                 *line,
                 "vocab",
                 format!("`{name}` is not a vocabulary in any package"),
@@ -787,7 +814,7 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
                 }
                 Err(problems) => faults.problems.extend(problems),
             },
-            [(_, first), (_, second), ..] => faults.add(
+            [(_, first), (_, second), ..] if refused => faults.add(
                 *line,
                 "vocab",
                 format!(
@@ -796,6 +823,7 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
                     second.display()
                 ),
             ),
+            _ => {}
         }
     }
 }

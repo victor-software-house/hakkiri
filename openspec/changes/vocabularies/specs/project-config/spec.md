@@ -27,4 +27,4 @@ The project config SHALL name vocabularies by the name of their folder in a `voc
 #### Scenario: A vocab list that is not a list
 
 - **WHEN** `vocab` holds the word `Team` and not a list
-- **THEN** hakkiri reports an error that names `vocab` and its line, and exits with a failure status
+- **THEN** hakkiri reports an error on the line of `vocab`, and exits with a failure status

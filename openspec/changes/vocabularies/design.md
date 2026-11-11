@@ -89,6 +89,7 @@ hakkiri walks it and reads every `accept.txt` and `reject.txt` below it, as Vale
 It reads the accepted terms in the order the files walk and the vocabularies are named.
 
 An unknown name is an error on the key's line: `` `Nope` is not a vocabulary in any package ``.
+A name of the top level is refused by the config's own validation, so its line comes from the YAML location index and not from a search of the text.
 Vale's message names the search paths and has no line ([ini.go][v-load-vocab]).
 
 Two packages that hold one vocabulary name are an error that names both, as for a style.

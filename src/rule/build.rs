@@ -1052,11 +1052,13 @@ fn accepted_words(source: &Source<'_>) -> Result<(Option<Pattern>, Option<Patter
         .accepted
         .iter()
         .map(|term| {
-            let pattern = term_pattern(term);
-            if pattern.starts_with(r"\b") || pattern.ends_with(r"\b") {
-                pattern
+            // Each term is a group of its own, so a flag or a `|` in one
+            // does not reach the others.
+            let group = format!("(?:{})", term_pattern(term));
+            if group.starts_with(r"(?:\b") || group.ends_with(r"\b)") {
+                group
             } else {
-                format!(r"\b{pattern}\b")
+                format!(r"\b{group}\b")
             }
         })
         .collect();
@@ -1066,7 +1068,7 @@ fn accepted_words(source: &Source<'_>) -> Result<(Option<Pattern>, Option<Patter
         .accepted
         .iter()
         .filter(|term| term.contains([' ', '\t']) || term.contains(r"\s"))
-        .map(|term| term_pattern(term))
+        .map(|term| format!("(?:{})", term_pattern(term)))
         .collect();
     let masks = if phrases.is_empty() {
         None

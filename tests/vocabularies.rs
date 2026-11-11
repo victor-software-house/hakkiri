@@ -181,7 +181,7 @@ fn an_unknown_vocabulary_is_an_error_on_the_key_line() -> TestResult {
     assert!(
         result
             .err
-            .contains("line 3: vocab: `Nope` is not a vocabulary in any package"),
+            .contains("line 3: vocab[0]: `Nope` is not a vocabulary in any package"),
         "{}",
         result.err
     );
@@ -272,9 +272,7 @@ fn a_vocab_that_is_not_a_list_is_an_error() -> TestResult {
     let result = run(top.path(), &["check"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     assert!(
-        result
-            .err
-            .contains("line 3: vocab: is a list of vocabulary names"),
+        result.err.contains("line 3: expected sequence start"),
         "{}",
         result.err
     );
@@ -307,6 +305,67 @@ fn a_config_with_no_vocab_loads_as_before() -> TestResult {
         "text/a.md:1:19: warning Team.Filler: Remove 'harness'.",
     ] {
         assert!(lines.contains(&line), "{line} is missing from {lines:#?}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_bad_top_level_vocab_is_placed_on_its_own_line() -> TestResult {
+    let suite = Suite::new("vocabularies-line");
+    let root = project(&suite, "line")?;
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  'text/*.md':\n    styles: [Team]\n    vocab: [Team]\nvocab: [Team, Nope]\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .err
+            .contains("line 7: vocab[1]: `Nope` is not a vocabulary in any package"),
+        "{}",
+        result.err
+    );
+    Ok(())
+}
+
+/// The words a `spelling` rule reports in `text`, with `terms` accepted.
+fn unaccepted(
+    suite: &Suite,
+    name: &str,
+    terms: &str,
+    text: &str,
+) -> Result<BTreeSet<String>, Box<dyn Error>> {
+    let root = suite.scenario(name);
+    root.file("styles/config/vocabularies/Team/accept.txt", terms);
+    root.file(
+        "styles/Team/Spell.yml",
+        "extends: spelling\nmessage: \"Did you really mean '%s'?\"\nlevel: error\n",
+    );
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nvocab: [Team]\nfiles:\n  '*.md': {styles: [Team]}\n",
+    );
+    root.file("a.md", text);
+    let result = run(root.path(), &["check", "--format", "json"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    Ok(rows_of(&result.out)?.into_iter().map(|row| row.7).collect())
+}
+
+#[test]
+fn each_accepted_term_matches_only_itself_in_spelling() -> TestResult {
+    let suite = Suite::new("vocabularies-grouped");
+    let text = "blorft Blorft zibble zibbled azobble zobble snorp Snorp.\n";
+    let flagged = BTreeSet::from([
+        "Blorft".to_owned(),
+        "zibbled".to_owned(),
+        "azobble".to_owned(),
+    ]);
+    for (name, terms) in [
+        ("flag-first", "(?-i)blorft\nzibble|zobble\nsnorp\n"),
+        ("flag-last", "snorp\nzibble|zobble\n(?-i)blorft\n"),
+    ] {
+        assert_eq!(unaccepted(&suite, name, terms, text)?, flagged, "{name}");
     }
     Ok(())
 }
