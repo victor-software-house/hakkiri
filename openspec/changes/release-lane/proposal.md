@@ -35,4 +35,4 @@ None.
 
 [ledger]: ../../../tasks.yaml
 [check]: ../archive/2026-11-10-check-command/proposal.md
-[test]: ../test-command/proposal.md
+[test]: ../archive/2026-11-10-test-command/proposal.md

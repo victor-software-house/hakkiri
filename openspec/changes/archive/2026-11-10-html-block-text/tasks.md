@@ -52,7 +52,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 4. Integration
 
-- [ ] 4.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+- [x] 4.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+  - 2026-11-11 (UTC), CI passed on the head of [PR 55][pr55] in [run 42930851210][ci55], and on the head of [PR 58][pr58], its review fixes, in [run 42933135415][ci58]. The Template check passed in both.
+    Main CI passed after the merge, on [4979c2a][c-main], in [run 42948574268][ci-main].
 
 ## Workflow follow-up
 
@@ -63,3 +65,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-heading]: https://github.com/victor-software-house/hakkiri/commit/f35261be1af13acdb2f72ec4afd3a017bde57bb0
 [c-vtab]: https://github.com/victor-software-house/hakkiri/commit/f9d09dd988ef4a619b9881ee74b17ec22f139ab5
 [c-blank]: https://github.com/victor-software-house/hakkiri/commit/e40f778495f7c71c53704c75f5d4cddf7bc3d293
+[pr55]: https://github.com/victor-software-house/hakkiri/pull/55
+[pr58]: https://github.com/victor-software-house/hakkiri/pull/58
+[ci55]: https://github.com/victor-software-house/hakkiri/actions/runs/42930851210
+[ci58]: https://github.com/victor-software-house/hakkiri/actions/runs/42933135415
+[c-main]: https://github.com/victor-software-house/hakkiri/commit/4979c2aab5de774e24e5684cd9553720733588a0
+[ci-main]: https://github.com/victor-software-house/hakkiri/actions/runs/42948574268

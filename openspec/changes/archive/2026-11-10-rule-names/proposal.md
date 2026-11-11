@@ -33,7 +33,8 @@ None.
 ## Impact
 
 - `src/rule.rs` (`rule_name`, `load_style`) and `src/suite.rs` change. No new dependency.
-- The unarchived `test-command` change names a rule as the loader does, so its design and spec change in this pull request, from `Team.Foo.v2` to `Team.Foo`.
+- The [`test-command`][test] change, now archived, names a rule as the loader does, so its design and spec change in this pull request, from `Team.Foo.v2` to `Team.Foo`.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
+[test]: ../2026-11-10-test-command/proposal.md
 [thread]: https://github.com/victor-software-house/hakkiri/pull/57#discussion_r4532307394

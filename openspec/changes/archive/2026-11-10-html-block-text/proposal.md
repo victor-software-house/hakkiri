@@ -50,4 +50,4 @@ The operator also ruled that hakkiri gives at least Vale's result, and departs o
 - `Node` gains `reads`, a reading for each segment, and `Scope` gains eight variants.
 - `tests/html_parity.rs` compares 41 rules over 52 inputs with Vale.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml

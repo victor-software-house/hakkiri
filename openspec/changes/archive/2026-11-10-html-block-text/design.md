@@ -135,9 +135,9 @@ Lost: the `>` of a quote would read as text.
 [v-tags]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L619-L651
 [v-clean]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L734-L761
 [v-skip]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L14-L22
-[reset]: ../../../src/html.rs
-[tree-reading]: ../../../src/tree.rs
-[case-9]: ../archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
-[format-7]: ../archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[hkr-027]: ../../../tasks.yaml
-[hkr-031]: ../../../tasks.yaml
+[reset]: ../../../../src/html.rs
+[tree-reading]: ../../../../src/tree.rs
+[case-9]: ../2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[hkr-027]: ../../../../tasks.yaml
+[hkr-031]: ../../../../tasks.yaml

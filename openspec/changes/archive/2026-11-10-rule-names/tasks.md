@@ -39,13 +39,15 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 3. Record
 
-- [x] 3.1 Update `src/instructions.md`, the `rule-loading` spec, and the unarchived `test-command` change.  
+- [x] 3.1 Update `src/instructions.md`, the `rule-loading` spec, and the [`test-command`][test] change, now archived.  
   Verify `openspec validate --all --strict` and the budget check pass.
   - 2026-11-11 (UTC), both pass on the Mac for the docs of [eeafcb0][c-docs] with two sentences split.
 
 ## 4. Integration
 
-- [ ] 4.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+- [x] 4.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
+  - 2026-11-11 (UTC), CI and the Template check passed on the head of [PR 60][pr60], [58f7975][c-head], in [run 42947844816][ci60].  
+    Main CI passed after the merge, on [4979c2a][c-main], in [run 42948574268][ci-main].
 
 ## Workflow follow-up
 
@@ -60,3 +62,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-link]: https://github.com/victor-software-house/hakkiri/commit/a19b4de4b4f5773413d7483d8a78daf6b5baacf9
 [c-shared]: https://github.com/victor-software-house/hakkiri/commit/f7a77425a0a0c1a735458c342e46764c5597355b
 [c-json]: https://github.com/victor-software-house/hakkiri/commit/97241a82f24b89ef208e30792a6865f603a78cf1
+[pr60]: https://github.com/victor-software-house/hakkiri/pull/60
+[c-head]: https://github.com/victor-software-house/hakkiri/commit/58f79758ba9973b4e31025cba8a989f5355124c6
+[ci60]: https://github.com/victor-software-house/hakkiri/actions/runs/42947844816
+[c-main]: https://github.com/victor-software-house/hakkiri/commit/4979c2aab5de774e24e5684cd9553720733588a0
+[ci-main]: https://github.com/victor-software-house/hakkiri/actions/runs/42948574268
+[test]: ../2026-11-10-test-command/proposal.md

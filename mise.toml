@@ -31,6 +31,8 @@ mr-boxington = "1.29.1"
 "github:EmbarkStudios/cargo-deny" = "0.20.2"
 "github:bnjbvr/cargo-machete" = "0.9.2"
 jq = "1.8.2"
+# The ver task (release workflow, check:versions) runs this verctl.
+"github:victor-software-house/verctl" = "0.8.0"
 
 # The shared Rust tasks read their toolchains from here and name none.
 [env]
@@ -65,6 +67,8 @@ includes = [
   "mise-tasks",
   # The q task for the tasks.yaml work queue; it pins its own qctl.
   "git::https://github.com/victor-software-house/qctl.git//tasks/q?ref=v0.6.0",
+  # The ver task the release workflow and check:versions run; it pins the verctl above.
+  "git::https://github.com/victor-software-house/verctl.git//tasks/ver?ref=v0.8.0",
   # The shared Rust tasks, at actions main, 2026-11-11.
   "git::https://github.com/victor-software-house/actions.git//tasks/rust.toml?ref=e6e13c808cce87ac8f1faf59cfaf2bab34bda7aa",
   # template:check, template:off, and template:on, at actions main, 2026-11-11.

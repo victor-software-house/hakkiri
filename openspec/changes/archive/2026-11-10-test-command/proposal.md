@@ -32,6 +32,6 @@ The rule-files spec already says how a case reads and passes, but the loader ref
 - `src/rule/schema.rs` gains a `tests` field on every check type, and new modules hold the case reader and runner.
 - `src/instructions.md` and `skills/hakkiri/SKILL.md` gain the command.
 
-[ledger]: ../../../tasks.yaml
-[check]: ../archive/2026-11-10-check-command/proposal.md
-[release]: ../release-lane/proposal.md
+[ledger]: ../../../../tasks.yaml
+[check]: ../2026-11-10-check-command/proposal.md
+[release]: ../../release-lane/proposal.md
