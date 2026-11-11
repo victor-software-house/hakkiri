@@ -151,7 +151,8 @@ The package vocabularies and the project's add up, in package order and then the
 A `vocab` written as an empty list drops the names before it, as Vale's `Vocab = NONE` does, and a missing key keeps them.
 The field is an optional list for that: an empty list and a missing key must differ, and a plain list cannot tell them apart.
 The top level and the lists of a glob follow the rule, and a later package wins over an earlier one.
-A glob's empty list drops the names that earlier globs gave the file, which is broader than Vale: there `NONE` clears only the section of that name.
+A glob's empty list drops only the lists that earlier configs gave the same glob text, as Vale's `NONE` clears only the section of that name (operator, 2026-11-11).
+Other globs that match the file still add their lists.
 A name is checked as the project's is, by the vocabulary check of `HKR-019`.
 
 ## Risks

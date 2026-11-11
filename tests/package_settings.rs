@@ -343,49 +343,90 @@ fn an_empty_vocab_list_drops_the_names_of_the_packages() -> TestResult {
 }
 
 #[test]
-fn a_later_package_and_a_glob_can_clear_vocabularies_too() -> TestResult {
+fn a_later_package_can_clear_the_vocabularies_of_an_earlier_one() -> TestResult {
     let suite = Suite::new("package-settings-vocab-later");
-    let write = |root: &Root<'_>, a: &str| {
-        root.file("pkg/styles/Team/Filler.yml", TERMS);
-        root.file("pkg/styles/config/vocabularies/Docs/accept.txt", "GitHub\n");
-        root.file("pkg/.ctl/hakkiri.yaml", a);
-        root.file("a.md", "Use GitHub here.\n");
-        root.file("b.md", "Use GitHub here.\n");
-    };
-    let flagged = |lines: &[String], file: &str| {
-        lines
-            .iter()
-            .any(|line| line.starts_with(file) && line.contains("Remove 'GitHub'"))
-    };
-
     let root = project(
         &suite,
         "package",
         "packages:\n  - path: pkg/styles\n  - path: later/styles\n",
     );
-    write(&root, "vocab: [Docs]\nfiles:\n  '*.md': {styles: [Team]}\n");
+    root.file("pkg/styles/Team/Filler.yml", TERMS);
+    root.file("pkg/styles/config/vocabularies/Docs/accept.txt", "GitHub\n");
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "vocab: [Docs]\nfiles:\n  '*.md': {styles: [Team]}\n",
+    );
     root.file("later/styles/.keep", "");
     root.file("later/.ctl/hakkiri.yaml", "vocab: []\n");
+    root.file("a.md", "Use GitHub here.\n");
     let (code, lines, err) = check(&root)?;
     assert_eq!(code, 0, "{err}");
     assert!(
-        flagged(&lines, "a.md") && flagged(&lines, "b.md"),
+        lines.iter().any(|line| line.contains("Remove 'GitHub'")),
         "{lines:?}"
     );
+    Ok(())
+}
 
-    let root = project(
-        &suite,
-        "glob",
-        "packages:\n  - path: pkg/styles\nfiles:\n  'a.md': {vocab: []}\n",
-    );
-    write(
-        &root,
-        "files:\n  '*.md':\n    styles: [Team]\n    vocab: [Docs]\n",
-    );
-    let (code, lines, err) = check(&root)?;
-    assert_eq!(code, 0, "{err}");
-    assert!(flagged(&lines, "a.md"), "{lines:?}");
-    assert!(!flagged(&lines, "b.md"), "{lines:?}");
+#[test]
+fn an_empty_vocab_in_a_glob_clears_only_the_lists_of_the_same_glob_text() -> TestResult {
+    let suite = Suite::new("package-settings-vocab-glob");
+    // The package's `*.md` glob names `Docs`, which accepts `GitHub`, and its
+    // `a.md` glob names `Own`, which accepts `Kubernetes`. Both globs match
+    // `a.md`, and only the first matches `b.md`.
+    let write = |root: &Root<'_>| {
+        root.file("pkg/styles/Team/Filler.yml", TERMS);
+        root.file("pkg/styles/config/vocabularies/Docs/accept.txt", "GitHub\n");
+        root.file(
+            "pkg/styles/config/vocabularies/Own/accept.txt",
+            "Kubernetes\n",
+        );
+        root.file(
+            "pkg/.ctl/hakkiri.yaml",
+            "files:\n  '*.md':\n    styles: [Team]\n    vocab: [Docs]\n  'a.md':\n    vocab: [Own]\n",
+        );
+        root.file("a.md", "Use GitHub and Kubernetes here.\n");
+        root.file("b.md", "Use GitHub and Kubernetes here.\n");
+    };
+    let flagged = |lines: &[String], file: &str, word: &str| {
+        lines
+            .iter()
+            .any(|line| line.starts_with(file) && line.contains(&format!("Remove '{word}'")))
+    };
+    // The glob the project writes, and whether `GitHub` is flagged in `a.md`
+    // and in `b.md`, and `Kubernetes` in `a.md`. `Kubernetes` is flagged in
+    // `b.md` whatever the project writes.
+    for (name, glob, a_github, b_github, a_kubernetes) in [
+        ("same", "'*.md': {vocab: []}", true, true, false),
+        ("same-a", "'a.md': {vocab: []}", false, false, true),
+        ("other", "'[ab].md': {vocab: []}", false, false, false),
+        ("missing", "'*.md': {styles: [Team]}", false, false, false),
+    ] {
+        let root = project(
+            &suite,
+            name,
+            &format!("packages:\n  - path: pkg/styles\nfiles:\n  {glob}\n"),
+        );
+        write(&root);
+        let (code, lines, err) = check(&root)?;
+        assert_eq!(code, 0, "{name}: {err}");
+        assert_eq!(
+            flagged(&lines, "a.md", "GitHub"),
+            a_github,
+            "{name}: {lines:?}"
+        );
+        assert_eq!(
+            flagged(&lines, "b.md", "GitHub"),
+            b_github,
+            "{name}: {lines:?}"
+        );
+        assert_eq!(
+            flagged(&lines, "a.md", "Kubernetes"),
+            a_kubernetes,
+            "{name}: {lines:?}"
+        );
+        assert!(flagged(&lines, "b.md", "Kubernetes"), "{name}: {lines:?}");
+    }
     Ok(())
 }
 
