@@ -18,6 +18,8 @@ use hakkiri::rule::{Level, LoadError, LoadProblem, Rule, read_style};
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 
+use crate::package;
+
 /// Where the config is when no flag or variable names another file.
 pub(crate) const DEFAULT: &str = ".ctl/hakkiri.yaml";
 
@@ -135,14 +137,29 @@ fn entry_ok(entry: &Entry, _: &()) -> garde::Result {
             "`sha256` belongs to a `url`, and this entry holds a `path`",
         )),
         (None, Some(_), None) => Err(garde::Error::new("a `url` needs its `sha256`")),
-        (None, Some(_), Some(_)) => Err(garde::Error::new(
-            "a package `url` is not downloaded yet: use a `path` to a folder of styles",
-        )),
+        (None, Some(url), Some(sha256)) => url_ok(url, sha256),
         (None, None, _) => Err(garde::Error::new(
             "an entry needs a `path` to a folder of styles",
         )),
         (Some(_), None, None) => Ok(()),
     }
+}
+
+/// Whether a package `url` and its `sha256` have the shape a fetch needs.
+fn url_ok(url: &str, sha256: &str) -> garde::Result {
+    if !(url.starts_with("https://") || url.starts_with("http://")) {
+        return Err(garde::Error::new(
+            "a package `url` starts with `https://` or `http://`",
+        ));
+    }
+    if sha256.len() != 64
+        || !sha256
+            .bytes()
+            .all(|byte| matches!(byte, b'0'..=b'9' | b'a'..=b'f'))
+    {
+        return Err(garde::Error::new("`sha256` is 64 lowercase hex digits"));
+    }
+    Ok(())
 }
 
 /// What a rule key under a glob does to the rule.
@@ -376,7 +393,9 @@ fn project_root(config: &Path) -> io::Result<PathBuf> {
     Ok(root.to_path_buf())
 }
 
-/// Reads the config at `path`, and loads the style folders of its packages.
+/// Reads the config at `path`, and loads the style folders of its packages. A
+/// package pinned by `url` is fetched into `cache_dir`, or into the per-user
+/// cache folder when there is none, unless that folder already holds it.
 ///
 /// # Errors
 ///
@@ -384,7 +403,7 @@ fn project_root(config: &Path) -> io::Result<PathBuf> {
 /// A fault is a file that cannot be read, a key the config does not define, a
 /// package that cannot be read or that repeats a style, or a rule that does not
 /// load. It is also a glob, a style or a rule name that names nothing.
-pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
+pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, LoadError> {
     let input = Input::read(path).map_err(LoadError::from)?;
     let raw: Raw = input.load().map_err(LoadError::from)?;
     let text = input.text();
@@ -401,7 +420,7 @@ pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
             });
         }
     };
-    let loaded = load_packages(&raw.packages, &root, text, &mut faults);
+    let loaded = load_packages(&raw.packages, &root, text, cache_dir, &mut faults);
     let globs = read_globs(raw.files, text, &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
@@ -419,22 +438,36 @@ pub(crate) fn load(path: &Path) -> Result<Project, LoadError> {
 }
 
 /// Loads the style folders of each package `entries` names, each `path` read
-/// relative to `root`.
-fn load_packages(entries: &[Entry], root: &Path, text: &str, faults: &mut Faults<'_>) -> Loaded {
+/// relative to `root` and each `url` fetched into `cache_dir`.
+fn load_packages(
+    entries: &[Entry],
+    root: &Path,
+    text: &str,
+    cache_dir: Option<&Path>,
+    faults: &mut Faults<'_>,
+) -> Loaded {
     let mut loaded = Loaded::default();
     let mut folders: BTreeMap<String, PathBuf> = BTreeMap::new();
     let mut from = key_line(text, "packages", 1).unwrap_or(1);
     for entry in entries {
-        let Some(written) = entry.path.as_deref().map(Path::new) else {
-            continue;
-        };
-        let folder = root.join(written);
-        let line = key_line(text, "path", from);
+        let key = if entry.url.is_some() { "url" } else { "path" };
+        let line = key_line(text, key, from);
         from = line.map_or(from, |line| line + 1);
+        let (written, folder) = match (&entry.path, &entry.url, &entry.sha256) {
+            (Some(path), _, _) => (PathBuf::from(path), root.join(path)),
+            (None, Some(url), Some(sha256)) => match package::fetch(cache_dir, url, sha256) {
+                Ok(folder) => (PathBuf::from(url), folder),
+                Err(message) => {
+                    faults.add(line, key, message);
+                    continue;
+                }
+            },
+            (None, _, _) => continue,
+        };
         match fs::canonicalize(&folder) {
             Ok(real) => loaded.packages.push(real),
             Err(error) => {
-                faults.add(line, "path", format!("`{}`: {error}", written.display()));
+                faults.add(line, key, format!("`{}`: {error}", written.display()));
                 continue;
             }
         }
@@ -447,7 +480,7 @@ fn load_packages(entries: &[Entry], root: &Path, text: &str, faults: &mut Faults
             if let Some(first) = folders.get(&name) {
                 faults.add(
                     line,
-                    "path",
+                    key,
                     format!(
                         "the style `{name}` is in both `{}` and `{}`",
                         first.display(),

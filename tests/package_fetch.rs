@@ -44,8 +44,6 @@ const WRONG_SHA256: &str = "0000000000000000000000000000000000000000000000000000
 enum Route {
     /// 200 with this body.
     Body(Vec<u8>),
-    /// This status, with no body.
-    Status(u16),
     /// 302 to this path.
     Redirect(&'static str),
 }
@@ -140,12 +138,6 @@ fn answer(
             )?;
             stream.write_all(body)?;
         }
-        Some(Route::Status(code)) => {
-            write!(
-                stream,
-                "HTTP/1.1 {code} Status\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-            )?;
-        }
         Some(Route::Redirect(to)) => {
             write!(
                 stream,
@@ -181,7 +173,12 @@ fn entry(url: &str, sha256: &str) -> String {
 /// Runs `hakkiri` in `root` with its cache in `cache`.
 fn hakkiri(root: &Root<'_>, cache: &Path, args: &[&str]) -> Result<common::Run, Box<dyn Error>> {
     let cache = cache.to_str().ok_or("the cache path is not UTF-8")?;
-    run(root.path(), args, &[("HAKKIRI_CACHE_DIR", cache)])
+    let envs = [
+        ("HAKKIRI_CACHE_DIR", cache),
+        ("NO_PROXY", "127.0.0.1,localhost"),
+        ("no_proxy", "127.0.0.1,localhost"),
+    ];
+    run(root.path(), args, &envs)
 }
 
 /// A cache folder inside the suite's temporary tree, apart from the project.
@@ -487,7 +484,12 @@ fn the_cache_folder_defaults_to_the_per_user_folder() -> TestResult {
     let result = run(
         root.path(),
         &["check"],
-        &[("HOME", home_path), ("XDG_CACHE_HOME", "")],
+        &[
+            ("HOME", home_path),
+            ("XDG_CACHE_HOME", ""),
+            ("NO_PROXY", "127.0.0.1,localhost"),
+            ("no_proxy", "127.0.0.1,localhost"),
+        ],
     )?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
     let base = if cfg!(target_os = "macos") {
@@ -516,7 +518,11 @@ fn the_cache_dir_option_moves_the_cache() -> TestResult {
     );
     let cache = cache_folder(&suite, "cache-option-cache");
     let folder = cache.path().to_str().ok_or("the cache path is not UTF-8")?;
-    let result = run(root.path(), &["check", "--cache-dir", folder], &[])?;
+    let envs = [
+        ("NO_PROXY", "127.0.0.1,localhost"),
+        ("no_proxy", "127.0.0.1,localhost"),
+    ];
+    let result = run(root.path(), &["check", "--cache-dir", folder], &envs)?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
     assert!(cache.path().join(TEAM_SHA256).join("Team/styles").is_dir());
     Ok(())

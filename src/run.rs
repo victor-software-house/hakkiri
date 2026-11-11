@@ -24,7 +24,7 @@ const STACK: usize = 8 * 1024 * 1024;
 pub(crate) fn check(args: &CheckArgs) -> Check {
     let fail_level = Level::from(args.fail_level);
     let config = args.config.as_deref().unwrap_or_else(|| Path::new(DEFAULT));
-    let project = match config::load(config) {
+    let project = match config::load(config, args.cache_dir.as_deref()) {
         Ok(project) => project,
         Err(error) => return Check::stopped(&error, fail_level),
     };

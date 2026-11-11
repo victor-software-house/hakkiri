@@ -91,7 +91,7 @@ A broken config stops the run before any file lints, and prints to standard erro
 
 ## Variables
 
-Every long option reads `HAKKIRI_<LONG>`: `HAKKIRI_CONFIG` names the config, `HAKKIRI_FAIL_LEVEL` sets the level, `HAKKIRI_COVERAGE` turns coverage on for `test`, and `HAKKIRI_FORMAT=json` asks for JSON.
+Every long option reads `HAKKIRI_<LONG>`: `HAKKIRI_CONFIG` names the config, `HAKKIRI_CACHE_DIR` names the folder that keeps fetched packages, `HAKKIRI_FAIL_LEVEL` sets the level, `HAKKIRI_COVERAGE` turns coverage on for `test`, and `HAKKIRI_FORMAT=json` asks for JSON.
 `HAKKIRI_COLOR` and `HAKKIRI_QUIET` set the shared flags `--color` and `--quiet`, and `--no-color` has no variable.
 Pretty output of `check` holds no colour, so `--color` changes nothing there. `--quiet` hides a successful pretty run.
 A flag on the command line wins over its variable, and an empty variable counts as unset.
@@ -113,7 +113,10 @@ files:
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
 - `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule, in the folder or under it. A folder that starts with `.` or `_` and a `*.test.yml` file are skipped.
   Two folders that hold one style name are refused. So are two files that give one rule name, and a name with a bracket, when a glob lists the style: a style no glob lists is not refused, as in Vale.
-  A `url` entry is not downloaded yet.
+  A `url` entry holds the `url` of a zip, which starts with `https://` or `http://`, and its `sha256`, 64 lowercase hex digits. The first run downloads the zip, checks the hash, and unpacks it into the cache folder under that hash, and a later run reads it from there and asks for nothing.
+  The zip holds one top folder, which holds a `styles` folder of styles or is a style itself, as in a Vale package, and the cache keeps it as the zip laid it out.
+  A download over 32 MiB, one that does not match its hash, and one that is not a zip, names a file outside the package, holds a link or has no single top folder, is an error that names the `url`, and nothing is cached.
+  The cache folder is `--cache-dir`, or `hakkiri` in the per-user cache folder: `~/Library/Caches` on macOS, and `$XDG_CACHE_HOME` or `~/.cache` elsewhere.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.
@@ -129,6 +132,9 @@ files:
 `hakkiri check` has no `--glob`, `--filter`, `--ext`, `--sort`, `--relative` or `--no-global`, and reads no standard input.
 It prints the level in each line, and its JSON is one object instead of a map from path to alerts.
 `--fail-level` takes the place of `--no-exit`.
+
+hakkiri fetches a package pinned by `url` and `sha256` on the first run and keeps it in a cache folder outside the project, where Vale needs `vale sync` and copies the styles into `StylesPath`.
+It refuses a download that does not match its hash, and Vale installs any zip.
 
 hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.
 A key that names no rule, or a word that is neither a level, `on` nor `off`, is an error.

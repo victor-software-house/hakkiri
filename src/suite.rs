@@ -26,6 +26,7 @@ pub(crate) fn test(args: &TestArgs) -> Tests {
             .config
             .clone()
             .unwrap_or_else(|| PathBuf::from(DEFAULT)),
+        cache_dir: args.cache_dir.clone(),
         project: None,
         rules: HashMap::new(),
         results: Vec::new(),
@@ -216,6 +217,8 @@ enum Setup<'a> {
 /// What a run has done so far.
 struct Runner {
     config: PathBuf,
+    /// The folder that keeps fetched packages, or the per-user default.
+    cache_dir: Option<PathBuf>,
     /// The project config, read when the first case needs it.
     project: Option<Result<Project, String>>,
     /// The rule files cases named, read once.
@@ -341,9 +344,11 @@ impl Runner {
 
     /// The project config, read once.
     fn project(&mut self) -> Result<&Project, String> {
-        let config = &self.config;
+        let (config, cache_dir) = (&self.config, self.cache_dir.as_deref());
         self.project
-            .get_or_insert_with(|| config::load(config).map_err(|error| one_line(&error)))
+            .get_or_insert_with(|| {
+                config::load(config, cache_dir).map_err(|error| one_line(&error))
+            })
             .as_ref()
             .map_err(Clone::clone)
     }

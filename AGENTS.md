@@ -25,7 +25,10 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
 5. **Packages.**
    Rules ship as versioned packages that a project pins by version and hash.  
    hakkiri fetches and caches them; there is no separate sync step.  
-   Until `HKR-006`, a package entry is a local `path` to a folder of style folders, and an entry with a `url` is refused.
+   A package entry is a local `path` to a folder of style folders, or a `url` and its `sha256`.  
+   A `url` names a zip that hakkiri downloads on the first run, checks against the hash, and unpacks whole into `<cache>/<sha256>/`, where the per-user cache folder or `--cache-dir` is the cache.  
+   A later run reads that folder with no network.  
+   The zip is a Vale package kept as it lays out: one top folder that holds a `styles` folder or is a style, so `HKR-007` and `HKR-008` find its files where Vale puts them.
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
    Vale matches the path as given; the departure is in the `vale-differences` spec.
 6. **Exit status.**

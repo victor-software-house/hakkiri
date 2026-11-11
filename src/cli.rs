@@ -55,6 +55,12 @@ pub(crate) struct TestArgs {
     #[arg(long, value_hint = clap::ValueHint::FilePath)]
     pub(crate) config: Option<PathBuf>,
 
+    /// The folder that keeps fetched packages, read only by a case that runs
+    /// through a config that pins a package by `url`. Defaults to the per-user
+    /// cache folder `hakkiri`.
+    #[arg(long, value_hint = clap::ValueHint::DirPath)]
+    pub(crate) cache_dir: Option<PathBuf>,
+
     /// Fail when a rule under the paths flags nothing in any case.
     #[arg(long)]
     pub(crate) coverage: bool,
@@ -70,6 +76,11 @@ pub(crate) struct CheckArgs {
     /// The project config. Defaults to `.ctl/hakkiri.yaml`.
     #[arg(long, value_hint = clap::ValueHint::FilePath)]
     pub(crate) config: Option<PathBuf>,
+
+    /// The folder that keeps fetched packages. Defaults to the per-user cache
+    /// folder `hakkiri`.
+    #[arg(long, value_hint = clap::ValueHint::DirPath)]
+    pub(crate) cache_dir: Option<PathBuf>,
 
     /// The lowest level of an alert that makes the run exit 1.
     #[arg(long, value_enum, default_value_t = FailLevel::Error)]
