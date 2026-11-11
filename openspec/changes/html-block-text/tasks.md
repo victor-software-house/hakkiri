@@ -6,7 +6,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 - [x] 1.1 Build Vale `66bbb85` in a throwaway Linux box, and run `existence` rules and `dump` rules over 49 inputs that hold HTML blocks and inline HTML.  
   Verify `tests/fixtures/html-block/vale.tsv` holds the alerts, and that the probe covers references, `code`, `tt`, `kbd`, `samp`, `pre`, joins, captions, descriptions, alt text, scripts and promoted blocks.
-  - 2026-11-10 (UTC), Vale built from source in a throwaway Linux box gave 1,659 alert rows, kept in [54adf86][c-feat].  
+  - 2026-11-10 (UTC), Vale built from source in a throwaway Linux box gave 1,659 alert rows, kept in [8e901f2][c-feat].  
     A `dump` rule matches the whole text of a block, so a row shows how Vale read it.  
     The probe found that a `quote` rule makes Vale parse the HTML again, so no rule of the probe has that scope.
 
@@ -14,7 +14,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 - [x] 2.1 Port the tokenizer and Vale's walk to `src/html.rs`, with its promotion of block elements inside inline ones and its escaped states for `script`, and keep `resets_scope` as a question to that walk.  
   Verify the scope parity test and the tree snapshots pass in CI as before.
-  - 2026-11-10 (UTC), `mise run test` passes in a clean archive of [54adf86][c-feat] in the same kind of box.  
+  - 2026-11-10 (UTC), `mise run test` passes in a clean archive of [8e901f2][c-feat] in the same kind of box.  
     Three snapshots changed, since the text of a node now carries its joins and masks, and one of them reads `Cell **** text` for a `kbd`.
 - [x] 2.2 Give the text of an HTML block nodes with the scope Vale gives it, including captions, `data` and descriptions.  
   Verify the `html-block` snapshot and the `html-block-crlf` snapshot pass in CI.
@@ -33,14 +33,14 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     The others are a block of masked text only, and a script that never ends.
 - [x] 2.6 Read a heading of depth 0 or 7 to 9 under its own scope, and trim a reference that stands for a blank at an end of a text.  
   Verify the `heading-depths`, `raw-references`, `plaintext` and `reference-spaces` inputs match Vale, apart from the rows of `departures.tsv`.
-  - 2026-11-10 (UTC), Vale gave 1,837 alert rows on the 49 inputs, and the `html_parity` test passes in [5730042][c-heading].  
+  - 2026-11-10 (UTC), Vale gave 1,837 alert rows on the 49 inputs, and the `html_parity` test passes in [f35261b][c-heading].  
     `departures.tsv` holds 52 rows, and none is about a heading or a raw text tag.
 
 ## 3. Record
 
 - [x] 3.1 Update `vale-differences`: remove the known gap, and add each difference with a link to its decision.  
   Verify `openspec validate --all --strict` and the budget check pass in CI.
-  - 2026-11-10 (UTC), both pass in a clean checkout, in [d1483b6][c-docs].
+  - 2026-11-10 (UTC), both pass in a clean checkout, in [ee076fe][c-docs].
 
 ## 4. Integration
 
@@ -50,6 +50,6 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 - Archive this change after the pull request merges, then archive `HKR-021` with `qctl close-from-openspec`.
 
-[c-docs]: https://github.com/victor-software-house/hakkiri/commit/d1483b69d4600908e35cb10447c092b7d38ba065
-[c-feat]: https://github.com/victor-software-house/hakkiri/commit/54adf865bc6f94d4ad8ea2ec1493e0a998adfffa
-[c-heading]: https://github.com/victor-software-house/hakkiri/commit/573004274dc2264b55fa226802e671ba89fc70ed
+[c-docs]: https://github.com/victor-software-house/hakkiri/commit/ee076feb79198b3e4b467f03c5979fa29dd23176
+[c-feat]: https://github.com/victor-software-house/hakkiri/commit/8e901f2aef680f7304cfefba0726cee5bbcb6856
+[c-heading]: https://github.com/victor-software-house/hakkiri/commit/f35261be1af13acdb2f72ec4afd3a017bde57bb0
