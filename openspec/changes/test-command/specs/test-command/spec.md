@@ -21,6 +21,21 @@ It SHALL read any other `.yml` file only when it holds `extends` and `tests`, an
 - **WHEN** the paths hold no case
 - **THEN** hakkiri reports an error that no case was found, and exits 2
 
+### Requirement: A rule file may hold cases
+
+A rule file SHALL take `tests` as the cases of design decision 2.  
+`hakkiri check` SHALL load them and run none, and SHALL refuse a malformed `tests` with its line.
+
+#### Scenario: A rule with cases under check
+
+- **WHEN** `hakkiri check` runs over a style whose rule holds a case that would fail
+- **THEN** hakkiri reports no failure for the case, and exits by the alerts alone
+
+#### Scenario: A malformed case in a rule
+
+- **WHEN** a rule's `tests` holds a case with the field `inputs`
+- **THEN** hakkiri refuses the rule, names the line of `inputs`, and exits 2
+
 ### Requirement: A case is checked before it runs
 
 A case SHALL have a `name` that is unique in its file, and at least one of `want`, `contains` and `absent`.  
@@ -70,7 +85,7 @@ It SHALL skip dot and underscore folders when it lists the rules.
 ### Requirement: The report and exit status say what happened
 
 hakkiri SHALL print, for each failed case, its file, name and reason, and the alerts it got, and then a count line.  
-`--format json` SHALL print `passed`, `failed`, `results` and `uncovered`.  
+`--format json` SHALL print `passed`, `failed`, `files`, `results`, `uncovered` and `failures`.  
 It SHALL exit 0 when every case passes and no rule is uncovered, 1 when a case fails or a rule is uncovered, and 2 when a case could not run, after every other case has reported.
 
 #### Scenario: A failed case

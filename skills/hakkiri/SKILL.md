@@ -2,8 +2,8 @@
 name: hakkiri
 description: >-
   Run the hakkiri prose linter on Markdown, MDX and source comments: hakkiri
-  check, the project config .ctl/hakkiri.yaml, rule packages, alert levels and
-  exit codes. Use when a repository has .ctl/hakkiri.yaml, when a lint:prose
+  check, hakkiri test, the project config .ctl/hakkiri.yaml, rule packages,
+  rule test cases, alert levels and exit codes. Use when a repository has .ctl/hakkiri.yaml, when a lint:prose
   task or a pre-commit hook runs hakkiri, or when the user mentions hakkiri,
   prose lint alerts or ProseStyle.
 license: AGPL-3.0-or-later
@@ -15,6 +15,7 @@ compatibility: Requires a hakkiri binary on the path.
 
 `hakkiri check` lints Markdown, MDX and the comments of Rust, TypeScript and
 JavaScript files under `.ctl/hakkiri.yaml`.
+`hakkiri test` runs the test cases of rule files.
 `hakkiri instructions` and `--help` are the contract of the installed version.
 This skill is the workflow and does not repeat the whole grammar.
 
@@ -30,6 +31,20 @@ hakkiri check --format json
 With no path, `check` walks the current directory.
 A walk skips `node_modules`, `.git` and package folders, and skips files that no language reads.
 A file named on the command line that no language reads is a failure.
+
+## Run the test cases
+
+```sh
+hakkiri test
+hakkiri test --coverage
+hakkiri test styles/Team/Filler.yml
+```
+
+A rule file holds cases under `tests`, and a `*.test.yml` file is a list of cases.
+Each case has a `name`, an `input`, and one of `want`, `contains` and `absent`.
+A failed case prints as `failed <file>: <name>` with its reason and the alerts it got.
+`--coverage` also fails for a rule that no case makes flag anything.
+`test` exits 0 when every case passes, 1 when a case fails or a rule is uncovered, and 2 when a case could not run or no case was found.
 
 ## Read the result
 
@@ -51,6 +66,7 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 | Flag | Variable | Meaning |
 |:--|:--|:--|
 | `--config` | `HAKKIRI_CONFIG` | The config file, `.ctl/hakkiri.yaml` by default |
+| `--coverage` | `HAKKIRI_COVERAGE` | With `test`, fail when a rule flags nothing in any case |
 | `--fail-level` | `HAKKIRI_FAIL_LEVEL` | The lowest level that exits 1: `suggestion`, `warning` or `error` |
 | `--format` | `HAKKIRI_FORMAT` | `pretty` or `json` |
 | `--color` | `HAKKIRI_COLOR` | `auto`, `always` or `never`; pretty output holds no colour |
@@ -62,7 +78,8 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 1. Exit 2 with a config error: the message names the file, the line and the key. Fix the config first, because no file was linted.
 2. Exit 2 with `failed <path>`: that file could not be read or parsed. The other files were linted.
    Exit 2 with `no path given lies under the project root`: the config names another root than the files you gave. Check `--config` and `HAKKIRI_CONFIG`.
-3. Exit 1: fix the alerts, or lower the rule's level under `files` when the rule is too strict for those files.
-4. An alert that looks wrong is a rule fault. Set the rule `off` for those files in the config, and say why in the pull request.
+3. `test` exits 1 with `failed <file>: <name>`: the rule or the case is wrong. With `uncovered <Rule>`, add a case that makes the rule flag something.
+4. Exit 1: fix the alerts, or lower the rule's level under `files` when the rule is too strict for those files.
+5. An alert that looks wrong is a rule fault. Set the rule `off` for those files in the config, and say why in the pull request.
 
 The config keys are in `hakkiri instructions`.
