@@ -115,7 +115,8 @@ files:
   Two folders that hold one style name are refused. So are two files that give one rule name, and a name with a bracket, when a glob lists the style: a style no glob lists is not refused, as in Vale.
   A `url` entry holds the `url` of a zip, which starts with `https://` or `http://`, and its `sha256`, 64 lowercase hex digits. The first run downloads the zip, checks the hash, and unpacks it into the cache folder under that hash, and a later run reads it from there and asks for nothing.
   The zip holds one top folder, which holds a `styles` folder of styles or is a style itself, as in a Vale package, and the cache keeps it as the zip laid it out.
-  A download over 32 MiB, one that does not match its hash, and one that is not a zip, names a file outside the package, holds a link or has no single top folder, is an error that names the `url`, and nothing is cached.
+  A download is an error that names the `url`, and nothing is cached, when it is over 32 MiB or does not match its hash.
+  The same holds when it is not a zip, names a file outside the package, holds a link or has no single top folder.
   The cache folder is `--cache-dir`, or `hakkiri` in the per-user cache folder: `~/Library/Caches` on macOS, and `$XDG_CACHE_HOME` or `~/.cache` elsewhere.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.

@@ -37,10 +37,11 @@ type Archive = ZipArchive<Cursor<Vec<u8>>>;
 ///
 /// # Errors
 ///
-/// Returns the fault, which names the `url`: the cache folder is unknown, the
-/// request failed, the download is over 32 MiB or does not match `sha256`, or
-/// the zip is not a zip, holds a file outside the package, holds a link, has no
-/// single top folder, or unpacks to over 128 MiB.
+/// Returns a fault that names the `url`, or the option when no cache folder is
+/// known. A fault is a failed request, or a download over 32 MiB or with
+/// another hash than `sha256`. A fault is also a body that is not a zip, a file
+/// outside the package, a link, no single top folder, or an unpacked size over
+/// 128 MiB.
 pub(crate) fn fetch(cache_dir: Option<&Path>, url: &str, sha256: &str) -> Result<PathBuf, String> {
     let cache = cache_folder(cache_dir)?;
     let folder = cache.join(sha256);
