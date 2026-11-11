@@ -51,7 +51,7 @@ hakkiri test --format json
 - A path is a file or a directory. A walk skips dot folders other than the one named, and `node_modules`. It reads a `.yml` file that is not a test file only when it holds `extends` and `tests`.
 - `--coverage` lists the rule files under the paths and fails when a rule flags nothing in any case.
 - A failed case prints as `failed <file>: <name>`, its reason, its `about`, and the alerts it got, with a `-` and `+` diff against `want`. The last line counts the files, the cases that passed and the cases that failed.
-- `--format json` prints `passed`, `failed`, `files`, `results`, `uncovered` and `failures`.
+- `--format json` prints `passed`, `failed`, `files`, `results`, `uncovered` and `failures`. An `uncovered` entry is an object with the `rule` name, and with `files` when two rule files give the name.
 
 `hakkiri test` exits 0 when every case passes and no rule is uncovered.
 It exits 1 when a case fails or a rule is uncovered.

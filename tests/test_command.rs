@@ -618,3 +618,46 @@ fn a_project_reached_through_a_link_names_a_nested_rule_as_check_does() -> TestR
     assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed, 0 uncovered"]);
     Ok(())
 }
+
+#[test]
+fn json_lists_an_uncovered_rule_as_an_object_with_files_only_for_a_shared_name() -> TestResult {
+    let suite = Suite::new("test-uncovered-json");
+    let shared = suite.scenario("shared");
+    shared.file("styles/Team/Terms.yml", quiet("zzz"));
+    shared.file("styles/Team/Terms.custom.yml", quiet("yyy"));
+    shared.file(
+        "styles/Team/Other.yml",
+        FOO.replace("Team.Foo", "Team.Other"),
+    );
+    let result = run(
+        shared.path(),
+        &["test", "--coverage", "--format", "json", "styles"],
+        &[],
+    )?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    let json: Value = serde_json::from_str(&result.out)?;
+    assert_eq!(
+        json["uncovered"],
+        serde_json::json!([{
+            "rule": "Team.Terms",
+            "files": ["styles/Team/Terms.custom.yml", "styles/Team/Terms.yml"],
+        }])
+    );
+    let alone = suite.scenario("alone");
+    alone.file("styles/Team/Terms.yml", quiet("zzz"));
+    alone.file(
+        "styles/Team/Other.yml",
+        FOO.replace("Team.Foo", "Team.Other"),
+    );
+    let result = run(
+        alone.path(),
+        &["test", "--coverage", "--format", "json", "styles"],
+        &[],
+    )?;
+    let json: Value = serde_json::from_str(&result.out)?;
+    assert_eq!(
+        json["uncovered"],
+        serde_json::json!([{"rule": "Team.Terms"}])
+    );
+    Ok(())
+}

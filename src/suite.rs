@@ -12,7 +12,7 @@ use hakkiri::{Language, parse};
 use crate::cli::TestArgs;
 use crate::config::{self, DEFAULT, Project};
 use crate::files::is_skipped;
-use crate::report::{CaseResult, Failure, Tests};
+use crate::report::{CaseResult, Failure, Tests, Uncovered};
 use crate::run::lint_planned;
 
 /// The suffix of a file that holds only cases.
@@ -59,9 +59,9 @@ pub(crate) fn test(args: &TestArgs) -> Tests {
         named
             .into_iter()
             .filter(|(name, _)| !runner.fired.contains(name))
-            .map(|(name, files)| match files.as_slice() {
-                [_] => name,
-                _ => format!("{name} (named by {})", files.join(", ")),
+            .map(|(rule, files)| Uncovered {
+                rule,
+                files: if files.len() > 1 { files } else { Vec::new() },
             })
             .collect()
     } else {

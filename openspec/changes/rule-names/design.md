@@ -48,6 +48,7 @@ It finds the package as the folder above the file whose real path is one of the 
 `test` loads an isolated rule alone, so two files with one name are no error there, as in `vale test`.
 A shared name counts as covered when a case flags it through either file, which a probe of `vale test --coverage` also showed.
 When no case flags it, `test` lists it once with both files, where Vale lists the name twice and names no file.
+In JSON the entry is an object, `{"rule": "Team.Terms", "files": [...]}`, so a script reads the rule name as a field, and `files` appears only for a shared name.
 
 Alternative: always take the folder that holds the file.
 Lost: `test` would name `Team/Sub/Bar.yml` as `Sub.Bar` and `check` as `Team.Sub.Bar`, so a coverage report and an alert would name one rule two ways.

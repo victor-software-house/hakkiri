@@ -287,6 +287,16 @@ pub(crate) struct CaseResult {
     pub(crate) about: String,
 }
 
+/// A rule no case makes flag anything.
+#[derive(Debug, Serialize)]
+pub(crate) struct Uncovered {
+    /// The rule name.
+    pub(crate) rule: String,
+    /// The rule files that give the name, only when more than one does.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) files: Vec<String>,
+}
+
 /// The result of `hakkiri test`.
 #[derive(Debug, Serialize)]
 pub(crate) struct Tests {
@@ -294,7 +304,7 @@ pub(crate) struct Tests {
     failed: usize,
     files: usize,
     results: Vec<CaseResult>,
-    uncovered: Vec<String>,
+    uncovered: Vec<Uncovered>,
     failures: Vec<Failure>,
     /// Whether the run checked coverage.
     #[serde(skip)]
@@ -306,7 +316,7 @@ impl Tests {
     pub(crate) fn new(
         files: usize,
         results: Vec<CaseResult>,
-        uncovered: Vec<String>,
+        uncovered: Vec<Uncovered>,
         mut failures: Vec<Failure>,
         coverage: bool,
     ) -> Self {
@@ -386,11 +396,15 @@ impl Present for Tests {
                 .iter()
                 .map(|failure| format!("failed {}: {}", failure.subject(), failure.message)),
         );
-        lines.extend(
-            self.uncovered
-                .iter()
-                .map(|rule| format!("uncovered {rule}: no case makes it flag anything")),
-        );
+        lines.extend(self.uncovered.iter().map(|entry| {
+            let rule = &entry.rule;
+            if entry.files.is_empty() {
+                format!("uncovered {rule}: no case makes it flag anything")
+            } else {
+                let files = entry.files.join(", ");
+                format!("uncovered {rule} (named by {files}): no case makes it flag anything")
+            }
+        }));
         lines.push(self.count());
         Document::new().verbatim(lines.join("\n"))
     }

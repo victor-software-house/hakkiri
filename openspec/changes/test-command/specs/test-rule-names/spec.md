@@ -45,3 +45,8 @@ A rule file named as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHA
 
 - **WHEN** `Terms.yml` and `Terms.custom.yml` both give `Team.Terms`, and a case flags it through either file
 - **THEN** `test --coverage` counts the name as covered, as `vale test --coverage` does, and when no case flags it, lists it once with both files
+
+#### Scenario: A shared name in JSON
+
+- **WHEN** `test --coverage --format json` finds that no case flags `Team.Terms`, which `Terms.yml` and `Terms.custom.yml` both give
+- **THEN** `uncovered` holds one object, `{"rule": "Team.Terms", "files": [...]}` with both files, and the object of a name one file gives holds `rule` alone
