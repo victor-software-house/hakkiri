@@ -1,0 +1,6 @@
+extends: existence
+message: "Raw '%s'"
+level: warning
+scope: raw
+tokens:
+  - 'very'

@@ -45,6 +45,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    The forms are `hakkiri off` and `on`, `hakkiri Style.Rule: off` and `on`, a level, and Vale's own.  
    `src/control.rs` reads the comments, leaves the text between `off` and `on` out of the tree, gates each block when its element ends, and drops an alert that lies between two comments.  
    Math reads as code by Pandoc's rules, as in Vale: `src/math.rs` finds each `$…$` span and `$$…$$` block, masks the file at the same length, and parses it again (row `HKR-048`).  
+   Front matter values are nodes of the scope `frontmatter`, with their key as label: `src/frontmatter.rs` reads the top-level strings of YAML, TOML and JSON by lines, and the ignore rewrite leaves them as written (row `HKR-049`).  
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
    Vale matches the path as given; the departure is in the `vale-differences` spec.
 6. **Exit status.**
