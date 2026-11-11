@@ -9,6 +9,7 @@
 
 mod affix;
 mod build;
+mod cases;
 mod field;
 mod package;
 mod schema;
@@ -20,6 +21,7 @@ use ctl_core::input::{Input, InputError};
 use serde::de::DeserializeOwned;
 
 use self::build::Source;
+pub use self::cases::{TestCase, alert_lines, cases_from_text};
 use self::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
     OccurrenceFields, Probe, ReadabilityFields, RepetitionFields, SequenceFields, SpellingFields,
@@ -99,6 +101,8 @@ pub struct Rule {
     pub scope: Selector,
     /// The rule's `action`.
     pub action: Option<Action>,
+    /// The test cases of the rule file, which `check` loads and never runs.
+    pub tests: Vec<TestCase>,
     /// What the rule checks.
     pub check: Check,
 }
