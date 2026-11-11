@@ -81,6 +81,7 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
    Check the `url` and the `sha256`, and set `--cache-dir` when the default cache folder is read-only.
 2. Exit 2 with `failed <path>`: that file could not be read or parsed. The other files were linted.
    Exit 2 with `no path given lies under the project root`: the config names another root than the files you gave. Check `--config` and `HAKKIRI_CONFIG`.
+   Exit 2 with a `failed` line that names a rule file and a rule: the rule is a Vale script rule or a `doc()` scope, which hakkiri cannot run. The rest of the style ran. Set the rule `off` under `files` to leave it out.
 3. `test` exits 1 with `failed <file>: <name>`: the rule or the case is wrong. With `uncovered <Rule>`, add a case that makes the rule flag something.
 4. Exit 1: fix the alerts, or lower the rule's level under `files` when the rule is too strict for those files.
 5. An alert that looks wrong is a rule fault. Set the rule `off` for those files in the config, and say why in the pull request.

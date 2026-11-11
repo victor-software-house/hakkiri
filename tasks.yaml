@@ -31,13 +31,18 @@ queue:
       - 2026-11-10, the case-and-sequence-checks change leaves capitalization's vocab with no effect, and the spelling check of the spelling-and-affix-checks change (task 1.1) reads accepted words from this row.
 
   - id: HKR-007
-    title: Import Vale styles
-    scope: import
+    title: Load Vale styles as they are
+    scope: rules
     outcome: >-
-      hakkiri import vale converts every Vale rule type except script into the format.
+      hakkiri loads a Vale style folder as it is: a rule may extend another rule, and a rule hakkiri cannot run is reported while the rest of its style runs.
     blocked_by: []
     acceptance:
-      - Each converted Voices, Std and Readability rule passes the cases from its own Vale file.
+      - Every rule of the committed Voices and Std styles passes its own cases under hakkiri test, with the inheritance of Direct.Length and the GenZ rules resolved.
+      - A listed style with a script rule runs the rest of its rules and fails the run for the script rule until the config turns it off, in a test.
+      - A chain Vale refuses is refused with the message of the fault, in a test for each fault.
+    plan: openspec/changes/vale-styles/proposal.md
+    notes:
+      - '2026-11-11, operator decision: hakkiri reads a Vale style as it is, so the rule-file converter this row first named is not built. The .vale.ini import keeps the name hakkiri import vale and is HKR-035.'
 
   - id: HKR-008
     title: Run ProseStyle on hakkiri
@@ -51,6 +56,63 @@ queue:
     acceptance:
       - Every rule case and package case passes under hakkiri test.
       - An alert diff against Vale with ProseStyle 0.0.7 over our public repositories shows only the intended differences.
+    notes:
+      - 2026-11-11, ProseStyle holds five script rules (FlatRhythm, BareWorkItem, SameSentenceStart, HardBreak, SentencePerLine). This row ports them to native rules, since HKR-036 runs Tengo only later. The Readability style holds one script rule, Polysyllables, which the config turns off.
+
+  - id: HKR-035
+    title: Import a Vale config
+    scope: config
+    outcome: hakkiri import vale [SOURCE] converts a .vale.ini into the project config.
+    blocked_by: []
+    acceptance:
+      - With no argument in a folder under a .vale.ini, the command writes .ctl/hakkiri.yaml, and a second run refuses to overwrite it unless --force is given.
+      - The --dry-run flag prints the conversion and writes nothing.
+      - A section converts to a glob, BasedOnStyles to styles, a level to its level, YES and NO to on and off, and MinAlertLevel to level, each with a test.
+      - Each Vale setting the conversion cannot carry is listed in the vale-differences Known gaps with a row.
+    notes:
+      - "2026-11-11, command shape decided (operator): hakkiri import vale [SOURCE]. With no argument it uses Vale's upward lookup for .vale.ini or _vale.ini. It writes the file --config names, default .ctl/hakkiri.yaml, and refuses an existing file unless --force (-F, as qctl init). The --dry-run flag is ctl-core's preview flag. --force is the only new flag; --config, --format and --color already exist on the other verbs."
+      - A .vale.ini package URL needs a sha256 the file does not hold; HKR-006 decides whether the import fetches it.
+
+  - id: HKR-038
+    title: Run the built-in Vale.Repetition rule
+    scope: rules
+    outcome: >-
+      A glob that lists the style Vale runs the built-in Vale.Repetition rule with
+      Vale defaults.
+    blocked_by: []
+    acceptance:
+      - A repeated word is reported as Vale reports it, in a test, and the vale-differences scenario for the built-in rules names Terms, Avoid and Spelling only.
+    notes:
+      - '2026-11-11, size: one embedded rule, extends repetition, level error, scope text, ignorecase, alpha, tokens [^\s.!?]+. Vale.Terms and Vale.Avoid belong to HKR-019, and Vale.Spelling to HKR-026.'
+
+  - id: HKR-037
+    title: Read metric formulas past arithmetic
+    scope: engine
+    outcome: >-
+      A metric formula may use the ternary, comparisons and logical operators that
+      Vale evaluates in a Tengo expression.
+    blocked_by: []
+    acceptance:
+      - A formula with a ternary, a comparison and a logical operator gives the value Vale gives in a test.
+      - The vale-differences scenario for a formula outside the listed syntax is removed.
+    notes:
+      - '2026-11-11, size: about 150 lines in src/formula.rs. None of the 10 formulas in Std, Voices, Readability and the popular Vale styles needs it.'
+
+  - id: HKR-036
+    title: Run Tengo script rules
+    scope: engine
+    outcome: >-
+      A script rule runs as Vale runs its Tengo program, and a style that holds one
+      needs no off in the config.
+    blocked_by:
+      - HKR-008
+    acceptance:
+      - Readability.Polysyllables flags the same words as Vale 3.26.0 in a parity test.
+      - A script that never ends stops after a step budget, with an error that names the rule.
+      - The vale-differences scenario for a script rule is removed.
+    notes:
+      - '2026-11-11, size: no maintained Rust Tengo exists (crates.io has none; one repository, Laine-S/tengo-rs, holds a single commit and no release). An interpreter of the subset Vale scripts use is about 2,000 to 2,500 lines: := and =, if, for and for-in, func and closures, arrays, maps, slices, the ternary, import, len, append, float, about 25 text functions, and math. Vale gives a script the modules text, fmt and math, the variable scope, the result matches with begin, end and message, a 2 s limit, and a .tengo file under config/scripts.'
+      - HKR-008 ports ProseStyle's five scripts to native rules, so this row is not on its path.
 
   - id: HKR-026
     title: Run Vale's built-in spelling rule
@@ -405,3 +467,15 @@ horizon:
       - '2026-11-10, Ronacher (2026) ranks agent-session words by inflation against wordfreq: https://lucumr.pocoo.org/2026/5/4/content-for-contents-sake/.'
       - '2026-11-10, prior rule sets: https://github.com/tbhb/vale-ai-tells and https://github.com/Syntaf/vale-llm-slop (comments in source files).'
       - 2026-11-10, Wikipedia Signs of AI writing warns that word tells change across model generations, so a list needs dated evidence and review.
+
+  - id: HKR-039
+    title: Run doc scopes and Views
+    scope: engine
+    outcome: >-
+      A scope doc(selector), a View in config/views, conditional in and the case
+      field view run as Vale runs them.
+    kind: deferred
+    open: >-
+      Needs Markdown rendered to HTML as Vale renders it, which HKR-027 measures, and
+      a CSS selector engine. None of 161 rule files in eight popular Vale styles uses
+      a doc selector or a View.

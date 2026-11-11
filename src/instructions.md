@@ -118,6 +118,7 @@ files:
   A download is an error that names the `url`, and nothing is cached, when it is over 32 MiB or does not match its hash.
   The same holds when it is not a zip, names a file outside the package, holds a link or has no single top folder.
   The cache folder is `--cache-dir`, or `hakkiri` in the per-user cache folder: `~/Library/Caches` on macOS, and `$XDG_CACHE_HOME` or `~/.cache` elsewhere.
+  A Vale style folder loads as it is. `extends: Style.Rule` names a parent rule in any loaded package, `key+` adds to a list or mapping of the parent, and `key-` removes from one.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.
@@ -125,6 +126,8 @@ files:
   A level or `on` also runs the rule when no glob lists its style, as `Team.Terms: warning` does, and `off` on such a rule changes nothing.
   A level set once stays when a later glob turns the rule `off` and `on` again.
   A name that no loaded style holds is an error that names it and its line.
+  A rule hakkiri cannot run, a `script` rule or one with a `doc()` scope, loads no rule, and the rest of its style runs.
+  Each such rule in a style a glob lists, or that a level or `on` turns on, makes the run exit 2 with a `failed` line, until the config turns it `off`. In a style no glob lists it is ignored.
 
 ## Differences from Vale
 
@@ -140,3 +143,5 @@ It refuses a download that does not match its hash, and Vale installs any zip.
 hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.
 A key that names no rule, or a word that is neither a level, `on` nor `off`, is an error.
 Vale ignores the key, and warns and turns the rule off for the word.
+
+hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini` and no built-in `Vale` style.

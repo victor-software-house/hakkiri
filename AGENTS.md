@@ -6,11 +6,13 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
 
 ## Decisions
 
-1. **Own format.**
-   hakkiri reads its own rule files and `.ctl/hakkiri.yaml`, not `.vale.ini` or Vale rule files.  
+1. **Vale rule files, own config.**
+   hakkiri reads Vale rule files as they are, and its own `.ctl/hakkiri.yaml`, not `.vale.ini`.  
    A rule selects text with Vale's `scope`: its lowercase dotted names, such as `sentence` and `text.comment.doc`, and its operators `~`, `&` and lists.  
    Its checks are Vale's check types except `script`; a rate is a `metric` whose formula reads `occurrences`.  
-   Vale styles enter only through `hakkiri import vale`, which a package build runs.
+   A Vale style folder loads with no conversion: a rule may extend another rule, as in Vale.  
+   A rule hakkiri cannot run, such as a `script` rule, is reported and the rest of its style runs, until the config turns it `off`.  
+   `hakkiri import vale` will convert a `.vale.ini` into the project config (row `HKR-035`).
 2. **Structure first.**
    A rule selects text by its scope in the document tree; a pattern only narrows that selection.  
    A rule that needs a regular expression to find whether text sits in code, a link or a comment shows a missing scope.
