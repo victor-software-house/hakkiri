@@ -50,6 +50,8 @@ A case in a rule's `tests`, or one with `rule`, loads that rule alone, from a pa
 It reads no config, reports an alert of any level, and applies no `level` or `off` from a glob.
 The rule keeps its project name: the folder it sits in, a dot, and its file name without the extension, so `Foo.v2.yml` in `Team` is `Team.Foo.v2`.
 The style loader and the `test` command derive the name in one function, so a coverage report and an alert agree.
+The name comes from the path made absolute, with symlinks left alone.
+Vale does the same: `vale test styles/Team/Foo.yml` names the rule `Team.Foo` when `styles/Team` is a symlink, and `Foo.yml` or `./Foo.yml` run from inside `Team` does too.
 Any other case lints `input` as a file named `input.<format>` in the current directory, through the whole config, so its globs, styles and levels apply.
 Vale isolates the same way ([isolate][v-isolate]).
 

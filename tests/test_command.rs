@@ -313,6 +313,100 @@ fn a_rule_file_with_a_dotted_name_is_named_as_the_style_loader_names_it() -> Tes
     Ok(())
 }
 
+/// A rule on `very` that holds one case, so it is named by its own file.
+const FOO: &str = "\
+extends: existence
+message: \"Remove '%s'.\"
+level: warning
+tokens: [very]
+tests:
+  - name: flags very
+    input: This is very good.
+    want: \"1:9:Team.Foo:Remove 'very'.\"
+";
+
+#[test]
+fn a_rule_file_is_named_from_inside_its_style_folder() -> TestResult {
+    let suite = Suite::new("test-inside");
+    let root = suite.scenario("inside");
+    root.file("styles/Team/Foo.yml", FOO);
+    let folder = root.path().join("styles/Team");
+    for (args, count) in [
+        (&["test", "Foo.yml"][..], "1 file, 1 passed, 0 failed"),
+        (&["test", "./Foo.yml"][..], "1 file, 1 passed, 0 failed"),
+        (
+            &["test", "--coverage", "."][..],
+            "1 file, 1 passed, 0 failed, 0 uncovered",
+        ),
+        (
+            &["test", "--coverage", "../Team/Foo.yml"][..],
+            "1 file, 1 passed, 0 failed, 0 uncovered",
+        ),
+    ] {
+        let result = run(&folder, args, &[])?;
+        assert_eq!(result.code, 0, "{args:?}: {}{}", result.out, result.err);
+        assert_eq!(result.lines(), [count], "{args:?}");
+    }
+    Ok(())
+}
+
+#[cfg(unix)]
+#[test]
+fn a_symlinked_style_folder_is_named_by_its_link() -> TestResult {
+    let suite = Suite::new("test-symlink");
+    let root = suite.scenario("symlink");
+    root.file("shared/TeamStyle/Foo.yml", HEDGE);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    std::fs::create_dir_all(root.path().join("styles"))?;
+    std::os::unix::fs::symlink("../shared/TeamStyle", root.path().join("styles/Team"))?;
+    root.file(
+        "through.test.yml",
+        "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Foo\n",
+    );
+    let result = run(
+        root.path(),
+        &[
+            "test",
+            "--coverage",
+            "through.test.yml",
+            "styles/Team/Foo.yml",
+        ],
+        &[],
+    )?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed, 0 uncovered"]);
+    Ok(())
+}
+
+#[test]
+fn a_yaml_rule_file_is_neither_read_nor_covered() -> TestResult {
+    let suite = Suite::new("test-yaml-rule");
+    let root = styled(&suite, "yaml-rule");
+    root.file("styles/Team/Other.yaml", FOO);
+    let result = run(root.path(), &["test", "--coverage"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 2 passed, 0 failed, 0 uncovered"]);
+    Ok(())
+}
+
+#[test]
+fn an_explicit_node_modules_folder_is_walked() -> TestResult {
+    let suite = Suite::new("test-explicit-modules");
+    let root = styled(&suite, "explicit-modules");
+    root.file(
+        "node_modules/pkg/vendored.test.yml",
+        "- name: vendored\n  rule: ../../styles/Team/Filler.yml\n  input: A very day.\n  contains: Team.Filler\n",
+    );
+    root.file(
+        "node_modules/pkg/node_modules/deep/inner.test.yml",
+        "- name: inner\n  rule: ../../../../styles/Team/Filler.yml\n  input: A very day.\n  absent: Team.Filler\n",
+    );
+    let result = run(root.path(), &["test", "node_modules/pkg"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"]);
+    Ok(())
+}
+
 #[test]
 fn json_holds_no_escape_byte_under_forced_colour() -> TestResult {
     let suite = Suite::new("test-json");

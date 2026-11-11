@@ -45,6 +45,7 @@ hakkiri test --format json
 - A case sees its alerts as lines, `line:column:Rule:message`. `want` equals them after both are trimmed, and an empty `want` means no alerts.
 - A case in a rule file, and a case with `rule` (a path relative to its test file), loads that rule alone: no config, every level.
   Any other case lints `input` as `input.<format>` through the project config.
+- A rule is named by its style folder as the path gives it, so a style folder that is a symlink keeps the name of the link, and `Foo.yml` run from inside `Team` is `Team.Foo`.
 - A path is a file or a directory. A walk skips dot folders other than the one named, and `node_modules`. It reads a `.yml` file that is not a test file only when it holds `extends` and `tests`.
 - `--coverage` lists the rule files under the paths and fails when a rule flags nothing in any case.
 - A failed case prints as `failed <file>: <name>`, its reason, its `about`, and the alerts it got, with a `-` and `+` diff against `want`. The last line counts the files, the cases that passed and the cases that failed.

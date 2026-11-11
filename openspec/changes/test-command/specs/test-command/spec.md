@@ -21,6 +21,11 @@ It SHALL read any other `.yml` file only when it holds `extends` and `tests`, an
 - **WHEN** `node_modules/pkg/x.test.yml` holds a failing case and the rest of the project holds passing ones
 - **THEN** `hakkiri test` runs no case from `node_modules` and exits 0
 
+#### Scenario: A folder named as an argument
+
+- **WHEN** `hakkiri test node_modules/pkg` runs and `pkg` holds a case, and `pkg/node_modules` holds a failing one
+- **THEN** hakkiri runs the case in `pkg` and none from `pkg/node_modules`, as `check` does
+
 #### Scenario: No case
 
 - **WHEN** the paths hold no case
@@ -76,6 +81,26 @@ Any other case SHALL lint `input` as a file named `input.<format>` through the p
 
 - **WHEN** a case has no `rule` and `files` maps `*.md` to `styles: [Team]`
 - **THEN** the case lints its input with the rules of `Team`
+
+### Requirement: A rule is named from the path it was found at
+
+hakkiri SHALL name a rule from its path made absolute, with `.` and `..` parts folded away and symlinks left alone, as the style loader names it from the folder it was given.  
+A rule file named as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHALL get the name of that folder.
+
+#### Scenario: Run from inside the style folder
+
+- **WHEN** `hakkiri test Foo.yml`, `hakkiri test ./Foo.yml` and `hakkiri test --coverage .` run in `styles/Team`
+- **THEN** each runs the cases of `Foo.yml` and names the rule `Team.Foo`
+
+#### Scenario: A symlinked style folder
+
+- **WHEN** `styles/Team` is a symlink to `shared/TeamStyle` that holds `Foo.yml`, and a case through the config flags `Team.Foo`
+- **THEN** `hakkiri test --coverage styles/Team/Foo.yml` counts `Team.Foo` as covered
+
+#### Scenario: A `.yaml` rule file
+
+- **WHEN** `styles/Team/Other.yaml` holds `extends` and `tests`
+- **THEN** `hakkiri test --coverage` reads no case from it and names no rule for it
 
 ### Requirement: Coverage names rules no case fires
 

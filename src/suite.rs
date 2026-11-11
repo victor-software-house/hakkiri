@@ -168,20 +168,33 @@ fn is_rule_file(file: &Path) -> bool {
         && fs::read_to_string(file).is_ok_and(|text| has_key(&text, "extends:"))
 }
 
-/// The folder that holds `file`'s style folder, with symlinks resolved.
-fn package_of(file: &Path) -> Option<PathBuf> {
-    Some(
-        fs::canonicalize(file)
-            .ok()?
-            .parent()?
-            .parent()?
-            .to_path_buf(),
-    )
+/// `file` made absolute, with its `.` and `..` parts folded away and its
+/// symlinks left alone, as Go's `filepath.Abs` does for Vale.
+///
+/// The style loader names a rule from the folder it was given, so a style
+/// folder that is a symlink keeps the name of the link.
+fn absolute(file: &Path) -> Option<PathBuf> {
+    let mut clean = PathBuf::new();
+    for part in std::path::absolute(file).ok()?.components() {
+        match part {
+            Component::ParentDir => {
+                clean.pop();
+            }
+            Component::CurDir => {}
+            Component::Prefix(_) | Component::RootDir | Component::Normal(_) => clean.push(part),
+        }
+    }
+    Some(clean)
 }
 
-/// The name the style loader gives the rule in `file`, with symlinks resolved.
+/// The folder that holds `file`'s style folder, as the style loader finds it.
+fn package_of(file: &Path) -> Option<PathBuf> {
+    Some(absolute(file)?.parent()?.parent()?.to_path_buf())
+}
+
+/// The name the style loader gives the rule in `file`.
 fn rule_name(file: &Path) -> Option<String> {
-    rule::rule_name(&fs::canonicalize(file).ok()?)
+    rule::rule_name(&absolute(file)?)
 }
 
 /// Where a case runs.
