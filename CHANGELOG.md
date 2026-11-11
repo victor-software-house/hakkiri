@@ -1,5 +1,15 @@
 # Changelog
 
+## hakkiri 0.0.5
+
+### Added
+
+- A glob's empty `vocab` list drops only the lists that earlier configs gave the same glob text, as Vale's `NONE` clears only the section of that name.
+  The other globs that match a file still add their lists ([`a855a45`](https://github.com/victor-software-house/hakkiri/commit/a855a45fb2963bcd52b598009a51c54b85c5e48e)).
+- A package folder may hold `.ctl/hakkiri.yaml` in the format of the project config.
+  hakkiri applies the settings of each package ahead of the project's own, so the project overrides a package and a later package overrides an earlier one.
+  A package may list packages, pinned by `url` and `sha256`, to a depth of 10 ([`15c5e81`](https://github.com/victor-software-house/hakkiri/commit/15c5e813715f1148b2e047735ae7bbe68da5875f)).
+
 ## hakkiri 0.0.4
 
 ### Added
