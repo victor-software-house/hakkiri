@@ -1343,3 +1343,57 @@ fn an_unknown_fail_level_in_the_config_is_refused() -> TestResult {
     assert!(result.err.contains("loud"), "{}", result.err);
     Ok(())
 }
+
+/// A linked git worktree of the project: `.git` is a file that points into the
+/// `worktrees` folder of a main repository, as `git worktree add` writes it.
+/// The worktree's `.gitignore` ignores `build/`, and the main repository's
+/// `info/exclude` holds `exclude`. The main repository comes back with the
+/// worktree, because its directory is deleted when it drops.
+fn worktree<'a>(suite: &'a Suite, name: &str, exclude: &str) -> (Root<'a>, Root<'a>) {
+    let main = suite.scenario(&format!("{name}-main"));
+    main.file(".git/HEAD", "ref: refs/heads/main\n");
+    main.file(".git/info/exclude", exclude);
+    main.file(".git/worktrees/wt/gitdir", "wt/.git\n");
+    main.file(".git/worktrees/wt/commondir", "../..\n");
+    let gitdir = main.path().join(".git/worktrees/wt");
+    let root = project(suite, name, CONFIG);
+    root.file(".git", format!("gitdir: {}\n", gitdir.display()));
+    root.file(".gitignore", "build/\n");
+    root.file("a.md", "This is very good.\n");
+    root.file("draft.md", "This is very good.\n");
+    root.file("build/b.md", "This is very good.\n");
+    (root, main)
+}
+
+#[test]
+fn a_walk_in_a_git_worktree_skips_what_gitignore_ignores() -> TestResult {
+    let suite = Suite::new("check-worktree");
+    let (root, _main) = worktree(&suite, "gitignore", "");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "draft.md:1:9: warning Team.Filler: Remove 'very'.",
+            "2 alerts in 2 files",
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_walk_in_a_git_worktree_skips_what_the_main_exclude_file_ignores() -> TestResult {
+    let suite = Suite::new("check-worktree-exclude");
+    let (root, _main) = worktree(&suite, "exclude", "draft.md\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file",
+        ]
+    );
+    Ok(())
+}
