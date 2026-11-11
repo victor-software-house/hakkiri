@@ -3,7 +3,7 @@
 
 use markdown::{ParseOptions, to_mdast};
 
-use super::{find, mask};
+use super::{find, inline_spans, mask};
 
 /// `source` masked: each inline span a code span, each display line blank.
 fn masked(source: &str) -> String {
@@ -156,5 +156,55 @@ fn a_quote_keeps_its_markers_around_a_block() {
     assert_eq!(
         masked("> Quote\n> $$\n> q\n> $$"),
         "> Quote\n>   \n>  \n>   "
+    );
+}
+
+#[test]
+fn a_run_of_backticks_that_opens_no_code_span_cannot_pair_with_a_span() {
+    assert_eq!(masked("A ` b $x$ c"), "A ' b `x` c");
+    assert_eq!(masked("A ``$x$ c"), "A ''`x` c");
+    assert_eq!(masked("A $x$ then ` c"), "A `x` then ' c");
+    assert_eq!(masked("A ` b c"), "A ` b c");
+}
+
+#[test]
+fn a_code_span_and_a_span_that_touch_are_one_code_span() {
+    assert_eq!(masked("A `x`$y$ b"), "A `x``y` b");
+    assert_eq!(masked("A $x$$y$ b"), "A `x``y` b");
+}
+
+#[test]
+fn a_line_indented_four_columns_or_more_opens_no_block() {
+    let open = |text: &str| !masked(text).contains('z');
+    assert!(open("Para\n   $$\n   z\n   $$\ntail."));
+    assert!(!open("Para\n    $$\n    z\n    $$\ntail."));
+    assert!(!open("Para\n\t$$\n\tz\n\t$$\ntail."));
+}
+
+#[test]
+fn the_indentation_of_a_container_is_not_the_indentation_of_a_line() {
+    let open = |text: &str| !masked(text).contains('z');
+    assert!(open("- Item\n    $$\n    z\n    $$\n- Two\n"));
+    assert!(!open("- Item\n      $$\n      z\n      $$\n- Two\n"));
+    assert!(open("1. Item\n   $$\n   z\n   $$\n"));
+    assert!(!open("1. Item\n       $$\n       z\n       $$\n"));
+    assert!(open("> Quote\n>   $$\n>   z\n>   $$\n"));
+    assert!(!open("> Quote\n>     $$\n>     z\n>     $$\n"));
+}
+
+#[test]
+fn a_paragraph_of_unclosed_openers_costs_its_length() {
+    let started = std::time::Instant::now();
+    for text in [
+        "$a ".repeat(100_000),
+        "<a".repeat(100_000),
+        "$a$5 ".repeat(100_000),
+    ] {
+        let _ = inline_spans(&text, 0, false);
+    }
+    assert!(
+        started.elapsed() < std::time::Duration::from_secs(5),
+        "{:?}",
+        started.elapsed()
     );
 }

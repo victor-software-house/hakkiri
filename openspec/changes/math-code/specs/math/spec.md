@@ -87,3 +87,41 @@ The text before and after the block SHALL read as separate paragraphs.
 
 - **WHEN** an MDX file holds an inline span, money, a block and `{1 + 1}` in one line with a span
 - **THEN** the alerts are those of a Markdown file, and the expression holds no math
+
+### Requirement: A backtick beside math changes nothing
+
+A run of backticks that opens no code span SHALL stay text beside a span, and a code span or a span that touches a span SHALL read as code with it.
+
+#### Scenario: A tick that opens no code span
+
+- **WHEN** a paragraph reads `` A lone ` tick $a very$ end very. `` or ``` Double ``$a very$ end very. ```
+- **THEN** the code rule reports the `very` in the span, and the text rule reports the last `very`
+
+#### Scenario: Spans that touch
+
+- **WHEN** a paragraph reads `` Code `x`$a very$ end very. ``, `` Math $a very$`x` end very. `` or `Pair $a very$$b very$ end very.`
+- **THEN** the code rule reports each `very` in a span and both `$` of each, and the text rule reports the last `very`
+
+### Requirement: A line indented four columns opens no block
+
+A line indented four columns or more beyond its container SHALL be text of the paragraph, and SHALL open no display block.  
+A tab runs to the next multiple of four.
+
+#### Scenario: Under no container
+
+- **WHEN** a paragraph holds `$$`, `z very` and `$$` on lines indented four spaces or a tab, or three spaces
+- **THEN** the text rule reports `z very` for four spaces and a tab, and does not for three
+
+#### Scenario: Under a list item and a quote
+
+- **WHEN** the lines are indented four columns past the content of a list item, or past the `>` and its space in a block quote
+- **THEN** the text rule reports `w very` and `q very`, and does not for two columns
+
+### Requirement: A paragraph of unclosed delimiters costs its length
+
+The search for the closing `$` of a span and for the end of an HTML tag SHALL take time in proportion to the length of the paragraph.
+
+#### Scenario: A hundred thousand unclosed openers
+
+- **WHEN** a paragraph holds `$a ` or `<a` a hundred thousand times with no closer
+- **THEN** the spans are found in seconds
