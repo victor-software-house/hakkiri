@@ -21,10 +21,7 @@ A list item or a block quote SHALL be read through the paragraphs inside it, so 
 ### Requirement: A character reference reads as its character
 
 The text of a paragraph, heading, table cell, caption, link, strong text, emphasis and alt text SHALL read each HTML character reference as the character it stands for, as `golang.org/x/net/html` at v0.62.0 reads it.  
-That covers named references, with or without the `;` for the names that HTML allows without it, and decimal and hexadecimal ones.  
-A code span, a comment and the `raw` text SHALL read as written.  
-A reference SHALL read once, so `&amp;lt;` reads as `&lt;`.  
-An alert on a character that a reference gave SHALL point at the first byte of the reference.
+A code span, a comment and the `raw` text SHALL read as written.
 
 #### Scenario: A reference in a paragraph
 
@@ -34,9 +31,24 @@ An alert on a character that a reference gave SHALL point at the first byte of t
 #### Scenario: A reference without a semicolon
 
 - **WHEN** a paragraph holds `a &copy b`
-- **THEN** the paragraph reads `a © b`, and an alert on `©` points at the byte of `&`
+- **THEN** the paragraph reads `a © b`
 
 #### Scenario: A reference in a code span
 
 - **WHEN** a code span holds `&amp;` and a rule with `scope: code` matches `&amp;`
 - **THEN** hakkiri reports one alert
+
+### Requirement: A reference reads once and keeps its place
+
+A reference SHALL read once, so `&amp;lt;` reads as `&lt;`.  
+An alert on a character that a reference gave SHALL point at the first byte of the reference.
+
+#### Scenario: A reference of a reference
+
+- **WHEN** a paragraph holds `&amp;lt; marker`
+- **THEN** the paragraph reads `&lt; marker`
+
+#### Scenario: An alert on a decoded character
+
+- **WHEN** a paragraph holds `a &#38; b` and a rule matches `&`
+- **THEN** hakkiri reports the alert at the column of the `&` that starts `&#38;`
