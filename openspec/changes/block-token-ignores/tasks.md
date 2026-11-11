@@ -19,8 +19,10 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 2. The surfaces
 
-- [ ] 2.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md`, `README.md` and `AGENTS.md`, record the differences in the `vale-differences` spec, and add the patch changeset.  
-  Verify `operator_docs` passes, the instructions name both keys, and the changeset names `hakkiri: patch`.
+- [x] 2.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md`, `README.md` and `AGENTS.md`, record the differences in the `vale-differences` spec, and add the patch changeset.  
+  Verify `operator_docs` passes, the instructions name both keys, and the changeset names `hakkiri: patch`.  
+  Evidence, 2026-11-11 (UTC): the full suite, 621 tests, passed in a box with `cargo fmt`, `clippy -D warnings` on the host and musl targets, `cargo deny` and `cargo machete`, and `operator_docs` with it.  
+  The Mac gate passed: the prose lint, rumdl, typos, workflow lint, workflow policy, `check:local`, `specs:budget`, `format:toml`, `qctl check` and `openspec validate --all --strict`.
 
 ## 3. Integration
 
