@@ -7,6 +7,14 @@
 //! matched text. The rows come from Vale at `66bbb85` run on the inputs with
 //! the rules as one style.
 //!
+//! A `dump-` rule matches the whole text of a block, which shows how the block
+//! reads.
+//! Vale places such an alert where it finds the words of the text in the file,
+//! and a text that holds a masked word, a decoded reference or a joined tag is
+//! not in the file, so the test compares only the file and the text of a
+//! `dump-` alert, and not its place.
+//! A line feed or a tab in the text is written `\n` or `\t`, as `jq` writes it.
+//!
 //! `departures.tsv` holds one row for each alert that only one side gave, led
 //! by `vale` or `hakkiri`. The `html-block-text` change records each in the
 //! `vale-differences` spec. The test fails on any difference that file does
@@ -31,18 +39,41 @@ type TestResult = Result<(), Box<dyn Error>>;
 /// A rule, a file, a line, the first and last column, and the matched text.
 type Row = (String, String, usize, usize, usize, String);
 
+/// The row for an alert, with the place of a `dump-` alert left out.
+fn alert_row(rule: &str, file: &str, place: (usize, usize, usize), matched: &str) -> Row {
+    let (line, first, last) = if rule.starts_with("Scope.dump-") {
+        (0, 0, 0)
+    } else {
+        place
+    };
+    (
+        rule.to_owned(),
+        file.to_owned(),
+        line,
+        first,
+        last,
+        matched.to_owned(),
+    )
+}
+
 fn row(cells: &[&str]) -> Result<Row, Box<dyn Error>> {
     let [rule, file, line, first, last, matched] = cells else {
         return Err(format!("a row has not six columns: {cells:?}").into());
     };
-    Ok((
-        (*rule).to_owned(),
-        (*file).to_owned(),
-        line.parse()?,
-        first.parse()?,
-        last.parse()?,
-        (*matched).to_owned(),
+    Ok(alert_row(
+        rule,
+        file,
+        (line.parse()?, first.parse()?, last.parse()?),
+        matched,
     ))
+}
+
+/// `text` as `jq` writes it in a tab-separated row.
+fn escaped(text: &str) -> String {
+    text.replace('\\', "\\\\")
+        .replace('\t', "\\t")
+        .replace('\n', "\\n")
+        .replace('\r', "\\r")
 }
 
 fn files_in(dir: &Path) -> Result<Vec<PathBuf>, Box<dyn Error>> {
@@ -82,13 +113,11 @@ fn html_block_text_reads_as_vale_does_but_where_decided() -> TestResult {
             let source = fs::read_to_string(input)?;
             let tree = parse(Language::Markdown, &source)?;
             for alert in lint(std::slice::from_ref(&rule), &tree, &source, "md")? {
-                hakkiri.insert((
-                    name.clone(),
-                    name_of(input)?.trim_end_matches(".fixture").to_owned(),
-                    alert.line,
-                    alert.first_column,
-                    alert.last_column,
-                    alert.matched,
+                hakkiri.insert(alert_row(
+                    &name,
+                    name_of(input)?.trim_end_matches(".fixture"),
+                    (alert.line, alert.first_column, alert.last_column),
+                    &escaped(&alert.matched),
                 ));
             }
         }

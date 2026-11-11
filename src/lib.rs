@@ -12,6 +12,7 @@ mod check;
 mod comments;
 pub mod dictionary;
 pub mod engine;
+mod entity;
 mod error;
 pub mod formula;
 mod html;
@@ -37,7 +38,7 @@ pub mod words;
 
 pub use error::Error;
 pub use language::Language;
-pub use tree::{Node, Scope, Tree};
+pub use tree::{Join, Node, Reading, Scope, Tree};
 
 /// Parses `source`, the text of a file in `language`, into its document tree.
 ///

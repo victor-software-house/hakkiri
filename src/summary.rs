@@ -2,7 +2,7 @@
 //! and the counts of its elements.
 
 use crate::select::{SelectError, replacements};
-use crate::text::Text;
+use crate::text::{Decode, Parts, Text};
 use crate::tree::{Node, Scope, Tree};
 
 /// The numbers of elements in a file, as a formula reads them.
@@ -82,9 +82,13 @@ pub fn summarize(tree: &Tree, source: &str) -> Result<Summary, SelectError> {
             Scope::Paragraph => {
                 let text = Text::build(
                     source,
-                    &node.segments,
-                    &node.rows(),
-                    &replacements(node, &[]),
+                    &Parts {
+                        segments: &node.segments,
+                        reads: &node.reads,
+                        rows: &node.rows(),
+                        replacements: &replacements(node, &[]),
+                        decode: Decode::Text,
+                    },
                 )
                 .ok_or(SelectError::Segment(node.scope))?;
                 summary.content.push_str(text.as_str());
@@ -109,11 +113,15 @@ pub fn summarize(tree: &Tree, source: &str) -> Result<Summary, SelectError> {
             | Scope::TableRow
             | Scope::TableHeader
             | Scope::TableCell
+            | Scope::TableCaption
+            | Scope::FigureCaption
             | Scope::Link
             | Scope::Code
             | Scope::Strong
             | Scope::Emphasis
             | Scope::Alt
+            | Scope::Description
+            | Scope::Meta
             | Scope::Raw
             | Scope::CommentLine
             | Scope::CommentBlock

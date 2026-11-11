@@ -9,7 +9,7 @@
 use std::ops::Range;
 
 use crate::html::{self, Block, Inline, Place};
-use crate::tree::{Node, Scope};
+use crate::tree::{Join, Node, Reading, Scope};
 
 /// One line of the block, and where it lies in the file.
 #[derive(Debug)]
@@ -73,47 +73,6 @@ impl Lines {
     }
 }
 
-/// The whitespace Vale trims from a text.
-const fn is_space(c: char) -> bool {
-    matches!(c, ' ' | '\n' | '\r' | '\t' | '\x0c' | '\x0b')
-}
-
-/// The ranges of the text of `block`, with its leading and trailing blanks
-/// left out and a blank after a blank dropped, each with the index of its
-/// piece.
-///
-/// A masked piece is left out.
-fn kept(html: &str, block: &Block) -> Option<Vec<(usize, Range<usize>)>> {
-    let mut kept: Vec<(usize, Range<usize>)> = Vec::new();
-    let mut spaced = true;
-    for (index, piece) in block.pieces.iter().enumerate() {
-        if piece.hidden {
-            continue;
-        }
-        let text = html.get(piece.range.clone())?;
-        let start = if spaced {
-            piece.range.start + (text.len() - text.trim_start_matches(is_space).len())
-        } else {
-            piece.range.start
-        };
-        if start >= piece.range.end {
-            continue;
-        }
-        spaced = html.get(start..piece.range.end)?.ends_with(is_space);
-        kept.push((index, start..piece.range.end));
-    }
-    while let Some((_, last)) = kept.last_mut() {
-        let text = html.get(last.clone())?;
-        last.end = last.start + text.trim_end_matches(is_space).len();
-        if last.start >= last.end {
-            kept.pop();
-        } else {
-            break;
-        }
-    }
-    Some(kept)
-}
-
 const fn inline_scope(kind: Inline) -> Scope {
     match kind {
         Inline::Link => Scope::Link,
@@ -123,43 +82,74 @@ const fn inline_scope(kind: Inline) -> Scope {
     }
 }
 
+/// The segments of some pieces of a block, and how each reads.
+struct Run {
+    segments: Vec<Range<usize>>,
+    reads: Vec<Reading>,
+}
+
 impl Lines {
+    /// The segments of the pieces `pieces` of `block`, a segment for each line
+    /// of each piece.
+    fn run(&self, block: &Block, pieces: Range<usize>) -> Run {
+        let mut run = Run {
+            segments: Vec::new(),
+            reads: Vec::new(),
+        };
+        for piece in block.pieces.get(pieces).unwrap_or_default() {
+            for (line, range) in self.map(&piece.range).into_iter().enumerate() {
+                run.segments.push(range);
+                run.reads.push(Reading {
+                    before: if line == 0 {
+                        piece.reading.before
+                    } else {
+                        Join::Gap
+                    },
+                    ..piece.reading
+                });
+            }
+        }
+        run
+    }
+
     /// The node for one block of text, or `None` when it holds no text, or
     /// hakkiri has no scope for it.
-    fn block(&self, html: &str, block: &Block, first: bool) -> Option<Node> {
-        let kept = kept(html, block)?;
-        let segments: Vec<Range<usize>> =
-            kept.iter().flat_map(|(_, range)| self.map(range)).collect();
+    fn block(&self, block: &Block, first: bool) -> Option<Node> {
+        let whole = self.run(block, 0..block.pieces.len());
         let mut children: Vec<Node> = block
             .captures
             .iter()
             .filter_map(|capture| {
-                let inside: Vec<Range<usize>> = kept
-                    .iter()
-                    .filter(|(index, _)| capture.pieces.contains(index))
-                    .flat_map(|(_, range)| self.map(range))
-                    .collect();
-                Node::from_segments(inline_scope(capture.kind), inside, Vec::new())
+                let inside = self.run(block, capture.pieces.clone());
+                Node::from_segments(inline_scope(capture.kind), inside.segments, Vec::new())
+                    .map(|node| node.with_reads(inside.reads))
             })
             .collect();
         children.sort_by_key(|child| child.span.start);
-        let leaf = |scope| Node::from_segments(scope, segments.clone(), children.clone());
+        let leaf = |scope, children: Vec<Node>| {
+            Node::from_segments(scope, whole.segments.clone(), children)
+                .map(|node| node.with_reads(whole.reads.clone()))
+        };
         let node = match block.place {
-            Place::Paragraph => leaf(Scope::Paragraph),
-            Place::Heading(depth) => leaf(Scope::heading(depth)?),
-            Place::Header => leaf(Scope::TableHeader),
-            Place::Cell => leaf(Scope::TableCell),
+            Place::Paragraph => leaf(Scope::Paragraph, children),
+            Place::Heading(depth) => leaf(Scope::heading(depth)?, children),
+            Place::Header => leaf(Scope::TableHeader, children),
+            Place::Cell => leaf(Scope::TableCell, children),
+            Place::TableCaption => leaf(Scope::TableCaption, children),
+            Place::FigureCaption => leaf(Scope::FigureCaption, children),
+            Place::Meta => leaf(Scope::Meta, Vec::new()),
             Place::List | Place::Blockquote => {
                 let inner = Node {
                     first: true,
-                    ..leaf(Scope::Paragraph)?
+                    ..leaf(Scope::Paragraph, children)?
                 };
                 let container = if block.place == Place::List {
                     Scope::List
                 } else {
                     Scope::Blockquote
                 };
-                Node::from_segments(container, segments.clone(), vec![inner])
+                Node::from_segments(container, whole.segments.clone(), vec![inner])
+                    .map(|node| node.with_reads(whole.reads.clone()))
             }
             Place::Skipped => None,
         };
@@ -180,16 +170,21 @@ pub(crate) fn nodes(
     first: bool,
 ) -> Option<Vec<Node>> {
     let walk = html::walk(html);
-    if walk.blocks.is_empty() && walk.alts.is_empty() {
+    if walk.blocks.is_empty() && walk.alts.is_empty() && walk.descriptions.is_empty() {
         return Some(Vec::new());
     }
     let lines = Lines::new(source, span, html)?;
     let mut nodes = Vec::new();
     for (index, block) in walk.blocks.iter().enumerate() {
-        nodes.extend(lines.block(html, block, first && index == 0));
+        nodes.extend(lines.block(block, first && index == 0));
     }
-    for alt in &walk.alts {
-        nodes.extend(Node::from_segments(Scope::Alt, lines.map(alt), Vec::new()));
+    for (scope, ranges) in [
+        (Scope::Alt, &walk.alts),
+        (Scope::Description, &walk.descriptions),
+    ] {
+        for range in ranges {
+            nodes.extend(Node::from_segments(scope, lines.map(range), Vec::new()));
+        }
     }
     nodes.sort_by_key(|node| node.span.start);
     Some(nodes)

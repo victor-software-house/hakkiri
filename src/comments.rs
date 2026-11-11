@@ -203,6 +203,7 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
         scope: group.marker.scope(),
         span: start..end,
         segments: group.comments.clone(),
+        reads: Vec::new(),
         children,
         first: false,
     };
@@ -210,6 +211,7 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
         scope: Scope::Raw,
         span: start..end,
         segments: group.comments.clone(),
+        reads: Vec::new(),
         children: vec![comment],
         first: false,
     })

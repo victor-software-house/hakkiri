@@ -8,21 +8,31 @@
 //! tag that is not inline, and at the end of the input.
 //! It resets the tags at an end tag that is not inline, and when it flushes
 //! at a start tag.
+//! A block element that opens inside an inline element reads as inline.
 //! The text of `script`, `style`, `noscript`, `iframe` and `pre` is left out,
 //! as is the text of an element whose class is `code`, `pre` or `problematic`.
-//! The first text after a `tt`, `code`, `kbd` or `samp` start tag is masked.
+//! The first text after a `tt`, `code`, `kbd` or `samp` start tag is masked,
+//! and reads as one `*` for each character.
 //! hakkiri reads the text of `tt` and `code` as a code span, which a rule reads
-//! as one word, and leaves out the text of `kbd` and `samp`.
+//! as one word.
+//!
+//! Vale joins the texts of a block with a space where an inline tag opens
+//! before the text, and as the source has it where one closes before it.
+//! [`Spacer`] follows that.
 //!
 //! This module follows [that tokenizer's rules][tokenizer] for where a tag
 //! ends and what is text, so a `>` in a quoted attribute value, or inside a
 //! bogus comment such as `<?php echo "<div>"; ?>`, is read as it reads it.
-//! It does not follow the tokenizer's escaped states for the content of a
-//! `script` element: that content ends at the first `</script`.
+//! The content of a `script` element ends at the first `</script` that no
+//! `<!--` and `<script` hide.
 //!
 //! [tokenizer]: https://github.com/golang/net/blob/v0.62.0/html/token.go
 
+use std::collections::HashMap;
 use std::ops::Range;
+
+use crate::entity;
+use crate::tree::{Join, Reading};
 
 /// The inline tags: an end tag of one resets nothing.
 const INLINE_TAGS: [&str; 23] = [
@@ -42,10 +52,11 @@ const SKIP_TAGS: [&str; 5] = ["script", "style", "pre", "noscript", "iframe"];
 /// The classes whose element Vale leaves out of a block.
 const SKIP_CLASSES: [&str; 3] = ["problematic", "pre", "code"];
 
-/// The tags whose first text is masked, and read as nothing.
-/// Vale also masks the text of `tt` and `code`, which hakkiri reads as a code
-/// span.
-const MASKED_TAGS: [&str; 2] = ["kbd", "samp"];
+/// The tags whose first text Vale masks.
+const MASKED_TAGS: [&str; 4] = ["tt", "code", "kbd", "samp"];
+
+/// The tags whose first text hakkiri reads as a code span, and not as `*`.
+const CODE_TAGS: [&str; 2] = ["tt", "code"];
 
 /// The tags whose content is text up to their end tag.
 const RAW_TEXT_TAGS: [&str; 10] = [
@@ -63,11 +74,6 @@ const RAW_TEXT_TAGS: [&str; 10] = [
 
 const fn is_blank(c: u8) -> bool {
     matches!(c, b' ' | b'\n' | b'\r' | b'\t' | 0x0c | 0x0b)
-}
-
-/// Whether `text` holds nothing but the whitespace Vale trims.
-fn blank(text: &str) -> bool {
-    text.bytes().all(is_blank)
 }
 
 /// An attribute of a tag.
@@ -108,6 +114,27 @@ enum Token {
     Comment,
     /// The end of the input, or a tag that it ends.
     Eof,
+}
+
+/// A state of the script reader.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum Script {
+    Data,
+    LessThan,
+    EndTagOpen,
+    EscapeStart,
+    EscapeStartDash,
+    Escaped,
+    EscapedDash,
+    EscapedDashDash,
+    EscapedLessThan,
+    EscapedEndTagOpen,
+    DoubleEscapeStart,
+    DoubleEscaped,
+    DoubleEscapedDash,
+    DoubleEscapedDashDash,
+    DoubleEscapedLessThan,
+    DoubleEscapeEnd,
 }
 
 /// The tokenizer of `golang.org/x/net/html` at v0.62.0, over the bytes of one
@@ -161,6 +188,8 @@ impl<'a> Tokenizer<'a> {
             if raw == "plaintext" {
                 self.at = self.bytes.len();
                 self.eof = true;
+            } else if raw == "script" {
+                self.read_script();
             } else {
                 self.read_raw_text(raw);
             }
@@ -231,6 +260,116 @@ impl<'a> Tokenizer<'a> {
             }
             if self.read_raw_end_tag(raw) || self.eof {
                 return;
+            }
+        }
+    }
+
+    /// Reads the content of a `script` element, up to its end tag, which is
+    /// not consumed.
+    ///
+    /// A `<!--` hides the end tag until a `-->`, and a `<script` after it
+    /// hides it again until the end tag of that script, as HTML5 says.
+    fn read_script(&mut self) {
+        let mut state = Script::Data;
+        loop {
+            let Some(next) = self.script_step(state) else {
+                return;
+            };
+            state = next;
+        }
+    }
+
+    /// Reads one byte of a script and gives the state it leaves, or `None`
+    /// when the content ends.
+    fn script_step(&mut self, state: Script) -> Option<Script> {
+        use Script::{
+            Data, DoubleEscapeEnd, DoubleEscapeStart, DoubleEscaped, DoubleEscapedDash,
+            DoubleEscapedDashDash, DoubleEscapedLessThan, EndTagOpen, EscapeStart, EscapeStartDash,
+            Escaped, EscapedDash, EscapedDashDash, EscapedEndTagOpen, EscapedLessThan, LessThan,
+        };
+        match state {
+            EndTagOpen | EscapedEndTagOpen => {
+                if self.read_raw_end_tag("script") || self.eof {
+                    return None;
+                }
+                Some(if state == EndTagOpen { Data } else { Escaped })
+            }
+            DoubleEscapeStart => {
+                self.back();
+                for letter in "script".bytes() {
+                    let c = self.read()?;
+                    if !c.eq_ignore_ascii_case(&letter) {
+                        self.back();
+                        return Some(Escaped);
+                    }
+                }
+                let c = self.read()?;
+                if is_blank(c) || matches!(c, b'/' | b'>') {
+                    return Some(DoubleEscaped);
+                }
+                self.back();
+                Some(Escaped)
+            }
+            DoubleEscapeEnd => {
+                if self.read_raw_end_tag("script") {
+                    self.at += "</script>".len();
+                    return Some(Escaped);
+                }
+                if self.eof {
+                    return None;
+                }
+                Some(DoubleEscaped)
+            }
+            Data
+            | LessThan
+            | EscapeStart
+            | EscapeStartDash
+            | Escaped
+            | EscapedDash
+            | EscapedDashDash
+            | EscapedLessThan
+            | DoubleEscaped
+            | DoubleEscapedDash
+            | DoubleEscapedDashDash
+            | DoubleEscapedLessThan => {
+                let c = self.read()?;
+                Some(match (state, c) {
+                    (Data, b'<') => LessThan,
+                    (LessThan, b'/') => EndTagOpen,
+                    (LessThan, b'!') => EscapeStart,
+                    (EscapeStart, b'-') => EscapeStartDash,
+                    (EscapeStartDash | EscapedDash | EscapedDashDash, b'-') => EscapedDashDash,
+                    (Escaped | EscapedDash | EscapedDashDash, b'<') => EscapedLessThan,
+                    (Escaped, b'-') => EscapedDash,
+                    (EscapedLessThan, b'/') => EscapedEndTagOpen,
+                    (EscapedLessThan, letter) if letter.is_ascii_alphabetic() => DoubleEscapeStart,
+                    (DoubleEscaped, b'-') => DoubleEscapedDash,
+                    (DoubleEscapedDash | DoubleEscapedDashDash, b'-') => DoubleEscapedDashDash,
+                    (DoubleEscaped | DoubleEscapedDash | DoubleEscapedDashDash, b'<') => {
+                        DoubleEscapedLessThan
+                    }
+                    (DoubleEscapedLessThan, b'/') => DoubleEscapeEnd,
+                    // The states above that read an end tag or a word give no
+                    // byte here.
+                    (EscapedDashDash | DoubleEscapedDashDash, b'>') | (Data | EndTagOpen, _) => {
+                        Data
+                    }
+                    (LessThan | EscapeStart | EscapeStartDash | EscapedLessThan, _) => {
+                        // A byte that starts nothing is read again as script.
+                        self.back();
+                        Data
+                    }
+                    (DoubleEscapedLessThan, _) => {
+                        self.back();
+                        DoubleEscaped
+                    }
+                    (
+                        Escaped | EscapedDash | EscapedDashDash | EscapedEndTagOpen
+                        | DoubleEscapeStart | DoubleEscapeEnd,
+                        _,
+                    ) => Escaped,
+                    (DoubleEscaped | DoubleEscapedDash | DoubleEscapedDashDash, _) => DoubleEscaped,
+                })
             }
         }
     }
@@ -468,8 +607,14 @@ pub(crate) enum Place {
     Header,
     /// A table cell: a `td` is open.
     Cell,
-    /// A scope hakkiri has no node for, such as a caption: the text is not
-    /// read.
+    /// The caption of a table: a `caption` is open.
+    TableCaption,
+    /// The caption of a figure: a `figcaption` is open.
+    FigureCaption,
+    /// A `data` element is open.
+    Meta,
+    /// A heading of a depth that does not exist, such as `h7`, which Vale
+    /// reads as a heading and hakkiri has no scope for: the text is not read.
     Skipped,
 }
 
@@ -478,7 +623,7 @@ impl Place {
     /// first.
     fn of(history: &[String]) -> Self {
         if history.iter().any(|tag| tag == "data") {
-            return Self::Skipped;
+            return Self::Meta;
         }
         for tag in history {
             let place = match tag.as_str() {
@@ -486,7 +631,8 @@ impl Place {
                 "blockquote" => Self::Blockquote,
                 "th" => Self::Header,
                 "td" => Self::Cell,
-                "caption" | "figcaption" => Self::Skipped,
+                "caption" => Self::TableCaption,
+                "figcaption" => Self::FigureCaption,
                 other => match other.as_bytes() {
                     [b'h', depth @ b'0'..=b'9'] => match depth {
                         b'1'..=b'6' => Self::Heading(depth - b'0'),
@@ -526,13 +672,14 @@ impl Inline {
     }
 }
 
-/// A run of text in a block.
+/// A run of text in a block: one text token, without the whitespace at its
+/// ends.
 #[derive(Debug)]
 pub(crate) struct Piece {
-    /// The bytes of the text token in the HTML.
+    /// The bytes of the text in the HTML.
     pub(crate) range: Range<usize>,
-    /// Vale masks this text, so it is not read.
-    pub(crate) hidden: bool,
+    /// What reads before the text, and whether it reads as `*`.
+    pub(crate) reading: Reading,
 }
 
 /// An inline element and the pieces it holds.
@@ -561,6 +708,181 @@ pub(crate) struct Walk {
     pub(crate) blocks: Vec<Block>,
     /// The alt text of each image, in order.
     pub(crate) alts: Vec<Range<usize>>,
+    /// The content of each `meta` tag that describes the page, in order.
+    pub(crate) descriptions: Vec<Range<usize>>,
+}
+
+/// The whitespace Vale trims from a token's text.
+const fn is_blank_char(c: char) -> bool {
+    matches!(c, ' ' | '\n' | '\r' | '\t' | '\x0c' | '\x0b')
+}
+
+/// The separator the source put at an end of a text: a line feed for a line
+/// break, a space for any other whitespace, and none when there was none.
+fn separator(c: Option<char>) -> Option<char> {
+    match c? {
+        '\n' | '\r' => Some('\n'),
+        ' ' | '\t' => Some(' '),
+        _ => None,
+    }
+}
+
+/// Whether text that starts with `c` is not padded with a space before it:
+/// it closes a sentence or a bracket.
+const fn closes(c: char) -> bool {
+    matches!(
+        c,
+        '.' | '?' | '!' | ',' | ':' | ';' | ')' | ']' | '}' | '—' | '–'
+    )
+}
+
+/// Whether text that follows `c` is not padded with a space: `c` opens a
+/// bracket or is a dash.
+const fn binds_tightly(c: char) -> bool {
+    matches!(c, '(' | '[' | '{' | '—' | '–')
+}
+
+/// What Vale keeps while it joins the texts of a block, one variable of its
+/// walk each.
+#[derive(Debug, Default)]
+struct Spacer {
+    /// The last start tag opened an inline element or a void one.
+    inline: bool,
+    /// An inline element or a comment closed since the last text.
+    closed_inline: bool,
+    /// The next text is masked.
+    skip: bool,
+    /// What the last text ended with.
+    trailing: Option<char>,
+    /// What the text before a comment ended with, when the comment follows
+    /// text that no inline element holds.
+    pad_comment: Option<char>,
+}
+
+impl Spacer {
+    /// A start tag that Vale reads as the opening of an element.
+    fn open(&mut self, inline_or_void: bool, masks: bool) {
+        self.inline = inline_or_void;
+        self.skip = masks;
+        self.closed_inline = false;
+        self.pad_comment = None;
+    }
+
+    /// The end tag of an inline element.
+    fn close_inline(&mut self) {
+        self.closed_inline = true;
+        self.pad_comment = None;
+    }
+
+    /// A self-closing tag of an inline element.
+    const fn self_closing_inline(&mut self) {
+        self.inline = true;
+        self.closed_inline = false;
+    }
+
+    /// A comment.
+    const fn comment(&mut self) {
+        if !self.inline {
+            self.closed_inline = true;
+            self.pad_comment = self.trailing;
+        }
+    }
+
+    /// Whether the tag, comment or declaration `html` changes how the text
+    /// around it joins: an inline or void tag, or a comment.
+    fn joins(html: &str) -> bool {
+        match Tokenizer::new(html).read_token() {
+            Token::Start(tag) => {
+                INLINE_TAGS.contains(&tag.name.as_str()) || VOID_TAGS.contains(&tag.name.as_str())
+            }
+            Token::End(tag) | Token::SelfClosing(tag) => INLINE_TAGS.contains(&tag.name.as_str()),
+            Token::Comment => true,
+            Token::Text(_) | Token::Eof => false,
+        }
+    }
+
+    /// A tag, comment or declaration, written as `html`.
+    fn tag(&mut self, html: &str) {
+        match Tokenizer::new(html).read_token() {
+            Token::Start(tag) => {
+                let name = tag.name.as_str();
+                let inline = INLINE_TAGS.contains(&name) || VOID_TAGS.contains(&name);
+                self.open(
+                    inline,
+                    MASKED_TAGS.contains(&name) || SKIP_TAGS.contains(&name),
+                );
+            }
+            Token::End(tag) => {
+                if INLINE_TAGS.contains(&tag.name.as_str()) {
+                    self.close_inline();
+                }
+            }
+            Token::SelfClosing(tag) => {
+                if INLINE_TAGS.contains(&tag.name.as_str()) {
+                    self.self_closing_inline();
+                }
+            }
+            Token::Comment => self.comment(),
+            Token::Text(_) | Token::Eof => {}
+        }
+    }
+
+    /// A text that continues the one before it.
+    fn continue_text(&mut self, text: &str) {
+        self.trailing = separator(text.chars().next_back());
+    }
+
+    /// A text token `decoded`, as the tokenizer gives it.
+    ///
+    /// `last` is the last character of the block so far, `class_skipped` is
+    /// whether the element before the text has a class that Vale leaves out,
+    /// and `is_href` whether the text is the address of the link before it.
+    /// Returns how the text reads, or `None` when it is blank.
+    fn text(
+        &mut self,
+        decoded: &str,
+        last: Option<char>,
+        class_skipped: bool,
+        is_href: bool,
+    ) -> Option<Reading> {
+        let body = decoded.trim_matches(is_blank_char);
+        if body.is_empty() {
+            self.trailing = separator(decoded.chars().next_back());
+            return None;
+        }
+        let mut sep = separator(decoded.chars().next());
+        if self.closed_inline && sep.is_none() {
+            sep = self.pad_comment;
+        }
+        self.pad_comment = None;
+        let masking = self.skip || class_skipped;
+        let starter = !masking && body.chars().next().is_some_and(closes);
+        let mut lead = if self.closed_inline && sep.is_some() {
+            sep
+        } else if !self.closed_inline && self.inline && !starter {
+            Some(' ')
+        } else {
+            None
+        };
+        self.closed_inline = false;
+        self.skip = false;
+        if lead == Some(' ') {
+            let tight = self.trailing.is_none() && last.is_some_and(binds_tightly);
+            let after_space = last.is_some_and(|c| !c.is_ascii() && c.is_whitespace());
+            if tight || after_space {
+                lead = None;
+            }
+        }
+        self.trailing = separator(decoded.chars().next_back());
+        Some(Reading {
+            before: match lead {
+                Some('\n') => Join::Newline,
+                Some(_) => Join::Space,
+                None => Join::Nothing,
+            },
+            masked: masking || is_href,
+        })
+    }
 }
 
 /// An inline element that is still open.
@@ -569,6 +891,14 @@ struct Open {
     tag: String,
     /// The index of the first piece after its start tag.
     first: usize,
+}
+
+/// Which tag a token is.
+#[derive(Clone, Copy, Eq, PartialEq)]
+enum Kind {
+    Start,
+    SelfClosing,
+    End,
 }
 
 /// What Vale keeps while it walks the tokens of one block.
@@ -585,8 +915,13 @@ struct Walker {
     pieces: Vec<Piece>,
     /// Whether the text so far is more than blanks.
     nonblank: bool,
+    /// The last character of the text so far.
+    last: Option<char>,
     open: Vec<Open>,
     captures: Vec<Capture>,
+    spacer: Spacer,
+    /// The next text is of a `code` or a `tt`, which reads as a code span.
+    code_next: bool,
     /// A skipped element is open.
     in_block: bool,
     /// The element of a skipped class that is open, its name and the number
@@ -594,10 +929,13 @@ struct Walker {
     class_block: Option<(String, usize, usize)>,
     /// The block elements that are open, and whether each has a skipped class.
     enclosing: Vec<(String, bool)>,
-    /// The next text is masked.
-    mask_next: bool,
+    /// How many elements of each name opened inside an inline element, which
+    /// Vale reads as inline.
+    promoted: HashMap<String, usize>,
     /// The class of the token before had a skipped class.
     previous_skipped: bool,
+    /// The `href` of the token before.
+    previous_href: String,
     walk: Walk,
 }
 
@@ -627,147 +965,208 @@ impl Walker {
         match token {
             Token::Eof => self.flush(),
             Token::Text(range) => self.text(html, range),
-            Token::Comment => self.previous_skipped = false,
-            Token::Start(tag) => self.start(html, &tag, false),
-            Token::SelfClosing(tag) => self.start(html, &tag, true),
-            Token::End(tag) => self.end(html, &tag),
+            Token::Comment => {
+                self.spacer.comment();
+                self.previous_skipped = false;
+                self.previous_href.clear();
+            }
+            Token::Start(tag) => self.tag(html, &tag, Kind::Start),
+            Token::SelfClosing(tag) => self.tag(html, &tag, Kind::SelfClosing),
+            Token::End(tag) => self.tag(html, &tag, Kind::End),
         }
     }
 
-    /// Records the alt text of an image.
-    fn image(&mut self, html: &str, tag: &Tag, skipped_class: bool) {
-        if tag.name != "img" || skipped_class || self.enclosing.iter().any(|(_, skipped)| *skipped)
-        {
-            return;
-        }
-        if let Some(alt) = tag
-            .attributes
+    /// Whether an inline element is in the tags open around the text.
+    fn inside_inline(&self) -> bool {
+        self.history
             .iter()
-            .find(|attribute| attribute.key == "alt")
-            && html.get(alt.value.clone()).is_some_and(|text| !blank(text))
-        {
-            self.walk.alts.push(alt.value.clone());
-        }
+            .any(|tag| INLINE_TAGS.contains(&tag.as_str()))
     }
 
-    fn start(&mut self, html: &str, tag: &Tag, self_closing: bool) {
+    fn tag(&mut self, html: &str, tag: &Tag, kind: Kind) {
         let name = tag.name.as_str();
-        let inline = INLINE_TAGS.contains(&name);
+        let mut inline = INLINE_TAGS.contains(&name);
         let void = VOID_TAGS.contains(&name);
-        let skipped_class = tag.skipped_class(html);
+        if kind == Kind::Start && !inline && !void && self.inside_inline() {
+            *self.promoted.entry(tag.name.clone()).or_default() += 1;
+            inline = true;
+        } else if kind == Kind::End
+            && !inline
+            && let Some(count) = self.promoted.get_mut(name)
+            && *count > 0
+        {
+            *count -= 1;
+            inline = true;
+        }
         if let Some((class_tag, begin, end)) = &mut self.class_block
             && class_tag == name
         {
-            if self_closing {
-                *end += 1;
-            } else {
+            if kind == Kind::Start {
                 *begin += 1;
+            } else {
+                *end += 1;
             }
         }
         let closes_class = self
             .class_block
             .as_ref()
             .is_some_and(|(_, begin, end)| begin == end && *begin > 0);
-        self.image(html, tag, skipped_class);
-        self.previous_skipped = skipped_class;
-        if self_closing {
-            // A self-closing tag is no start tag, and no end tag either.
-            if self.in_block && closes_class {
-                self.in_block = false;
-                self.class_block = None;
-            }
-            return;
-        }
-        if !inline && !void {
+        let skipped_class = tag.skipped_class(html);
+        if kind == Kind::Start && !inline && !void {
             self.enclosing.push((tag.name.clone(), skipped_class));
+        } else if kind == Kind::End
+            && !inline
+            && let Some(at) = self.enclosing.iter().rposition(|(open, _)| open == name)
+        {
+            self.enclosing.remove(at);
         }
         let block_skip = skipped_class && !inline;
-        if !inline && (SKIP_TAGS.contains(&name) || block_skip) {
+        let skips = SKIP_TAGS.contains(&name);
+        if kind == Kind::Start && !inline && (skips || block_skip) {
             if block_skip {
                 self.class_block = Some((tag.name.clone(), 1, 0));
             }
             self.in_block = true;
-            return;
-        }
-        if self.in_block && closes_class {
-            self.in_block = false;
-            self.class_block = None;
-        }
-        if !inline && !void && self.nonblank {
-            self.flush();
-            self.reset();
-        }
-        self.mask_next = MASKED_TAGS.contains(&name);
-        if let Some(kind) = Inline::of(name) {
-            self.open.push(Open {
-                kind,
-                tag: tag.name.clone(),
-                first: self.pieces.len(),
-            });
-        }
-        self.history.push(tag.name.clone());
-    }
-
-    fn end(&mut self, html: &str, tag: &Tag) {
-        let name = tag.name.as_str();
-        let inline = INLINE_TAGS.contains(&name);
-        if let Some((class_tag, _, end)) = &mut self.class_block
-            && class_tag == name
-        {
-            *end += 1;
-        }
-        let closes_class = self
-            .class_block
-            .as_ref()
-            .is_some_and(|(_, begin, end)| begin == end && *begin > 0);
-        if !inline && let Some(at) = self.enclosing.iter().rposition(|(open, _)| open == name) {
-            self.enclosing.remove(at);
-        }
-        self.previous_skipped = tag.skipped_class(html);
-        if self.in_block && (closes_class || !inline && SKIP_TAGS.contains(&name)) {
+        } else if self.in_block && (closes_class || kind == Kind::End && !inline && skips) {
             self.in_block = false;
             if closes_class {
                 self.class_block = None;
             }
-        } else if inline {
-            if self.history.last().is_some_and(|last| last == name) {
-                self.history.pop();
-            }
-            if self.open.last().is_some_and(|open| open.tag == name)
-                && let Some(open) = self.open.pop()
-            {
-                self.captures.push(Capture {
-                    kind: open.kind,
-                    pieces: open.first..self.pieces.len(),
-                });
-            }
+        } else if kind == Kind::Start {
+            self.start(tag, inline, void);
+        } else if kind == Kind::End && inline {
+            self.end_inline(name);
+        } else if kind == Kind::SelfClosing && inline {
+            self.spacer.self_closing_inline();
         }
-        if !inline {
+        if kind == Kind::End && !inline {
             self.walk.resets = true;
             self.flush();
             self.reset();
         }
+        self.previous_skipped = skipped_class;
+        self.previous_href = tag
+            .attributes
+            .iter()
+            .find(|attribute| attribute.key == "href")
+            .and_then(|attribute| html.get(attribute.value.clone()))
+            .map(|href| entity::unescape(href, true).into_owned())
+            .unwrap_or_default();
+        if !skipped_class && !self.enclosing.iter().any(|(_, skipped)| *skipped) {
+            self.attributes(html, tag);
+        }
+    }
+
+    /// A start tag that no skip reads past.
+    fn start(&mut self, tag: &Tag, inline: bool, void: bool) {
+        if !inline && !void && self.nonblank {
+            self.flush();
+            self.reset();
+        }
+        // Vale reads an `em` or a `b` in a `code` as a `code`.
+        let in_code = self.history.last().is_some_and(|last| last == "code");
+        let name = if matches!(tag.name.as_str(), "em" | "b") && in_code {
+            "code"
+        } else {
+            tag.name.as_str()
+        };
+        self.spacer.open(
+            inline || void,
+            MASKED_TAGS.contains(&name) || SKIP_TAGS.contains(&name),
+        );
+        self.code_next = CODE_TAGS.contains(&name);
+        if let Some(kind) = Inline::of(name) {
+            self.open.push(Open {
+                kind,
+                tag: name.to_owned(),
+                first: self.pieces.len(),
+            });
+        }
+        self.history.push(name.to_owned());
+    }
+
+    /// The end tag of an inline element, or of one read as inline.
+    fn end_inline(&mut self, name: &str) {
+        if self.history.last().is_some_and(|last| last == name) {
+            self.history.pop();
+        }
+        self.spacer.close_inline();
+        if self.open.last().is_some_and(|open| open.tag == name)
+            && let Some(open) = self.open.pop()
+        {
+            self.captures.push(Capture {
+                kind: open.kind,
+                pieces: open.first..self.pieces.len(),
+            });
+        }
+    }
+
+    /// Records the alt text of an image and the description of a page.
+    fn attributes(&mut self, html: &str, tag: &Tag) {
+        let value = |key: &str| {
+            tag.attributes
+                .iter()
+                .find(|attribute| attribute.key == key)
+                .map(|attribute| (attribute.value.clone(), html.get(attribute.value.clone())))
+        };
+        match tag.name.as_str() {
+            "img" => {
+                if let Some((range, Some(alt))) = value("alt")
+                    && alt.bytes().any(|c| !is_blank(c))
+                {
+                    self.walk.alts.push(range);
+                }
+            }
+            "meta" => {
+                let describes = value("name").is_some_and(|(_, name)| name == Some("description"))
+                    || value("property").is_some_and(|(_, name)| name == Some("og:description"));
+                if describes
+                    && let Some((range, Some(content))) = value("content")
+                    && !content.is_empty()
+                {
+                    self.walk.descriptions.push(range);
+                }
+            }
+            _ => {}
+        }
     }
 
     fn text(&mut self, html: &str, range: Range<usize>) {
-        let text = html.get(range.clone()).unwrap_or_default();
-        let skipped = self.previous_skipped;
+        let class_skipped = self.previous_skipped;
+        let href = std::mem::take(&mut self.previous_href);
         self.previous_skipped = false;
         if self.in_block {
             return;
         }
-        if blank(text) {
-            self.pieces.push(Piece {
-                range,
-                hidden: false,
-            });
+        let raw = html.get(range.clone()).unwrap_or_default();
+        let decoded = entity::unescape(raw, false);
+        let body = decoded.trim_matches(is_blank_char);
+        let Some(reading) = self.spacer.text(
+            &decoded,
+            self.last,
+            class_skipped,
+            !href.is_empty() && href == body,
+        ) else {
             return;
-        }
-        let hidden = self.mask_next || skipped;
-        self.mask_next = false;
-        self.nonblank = true;
+        };
+        let code = std::mem::take(&mut self.code_next);
         self.walk.resets = true;
-        self.pieces.push(Piece { range, hidden });
+        self.nonblank |= reading.masked || body.chars().any(|c| !c.is_whitespace());
+        self.last = if reading.masked {
+            Some('*')
+        } else {
+            body.chars().next_back()
+        };
+        let start = range.end - raw.trim_start_matches(is_blank_char).len();
+        let end = start + raw.trim_matches(is_blank_char).len();
+        self.pieces.push(Piece {
+            range: start..end,
+            // The text of a code span reads as `x`, and not as `*`.
+            reading: Reading {
+                masked: reading.masked && !code,
+                ..reading
+            },
+        });
     }
 
     /// Gives the text so far to the walk, under the tags that are open.
@@ -789,5 +1188,99 @@ impl Walker {
         self.captures.clear();
         self.open.clear();
         self.nonblank = false;
+        self.last = None;
+    }
+}
+
+/// How the segments of a Markdown paragraph read, where HTML tags lie between
+/// them.
+///
+/// `start` is where the node starts, `segments` its text, and `tags` the spans
+/// of its inline HTML, each one tag or comment, all in `source`.
+/// Vale joins the text after a tag as it joins the text of an HTML block, and
+/// masks the text of a `kbd` or a `samp`.
+/// It trims each text between two tags, so a segment that touches a tag loses
+/// its whitespace there, and one that holds only whitespace is dropped.
+/// Returns the segments, and a reading for each, or no reading when no tag lies
+/// between two segments.
+pub(crate) fn inline_reads(
+    source: &str,
+    start: usize,
+    segments: Vec<Range<usize>>,
+    tags: &[Range<usize>],
+) -> (Vec<Range<usize>>, Vec<Reading>) {
+    // A tag that opens a block ends the text in Vale, and hakkiri reads the
+    // text around it as it did before: one text, with the tag a gap.
+    let tags: Vec<Range<usize>> = tags
+        .iter()
+        .filter(|tag| source.get((*tag).clone()).is_some_and(Spacer::joins))
+        .cloned()
+        .collect();
+    let mut spacer = Spacer::default();
+    let mut kept = Vec::with_capacity(segments.len());
+    let mut reads = Vec::with_capacity(segments.len());
+    let mut last: Option<char> = None;
+    let mut from = start;
+    let mut tagged = false;
+    let mut masked_run = false;
+    for (index, segment) in segments.iter().enumerate() {
+        let text = source.get(segment.clone()).unwrap_or_default();
+        let before: Vec<&Range<usize>> = tags
+            .iter()
+            .filter(|tag| from <= tag.start && tag.end <= segment.start)
+            .collect();
+        let until = segments
+            .get(index + 1)
+            .map_or(usize::MAX, |next| next.start);
+        let tag_after = tags
+            .iter()
+            .any(|tag| segment.end <= tag.start && tag.end <= until);
+        let mut range = segment.clone();
+        let reading = if before.is_empty() {
+            spacer.continue_text(text);
+            let one_text = source
+                .get(from..segment.start)
+                .is_some_and(|gap| gap.chars().all(|c| c.is_whitespace() || c == '>'));
+            Reading {
+                before: Join::Gap,
+                masked: masked_run && one_text,
+            }
+        } else {
+            tagged = true;
+            for tag in before {
+                if let Some(html) = source.get(tag.clone()) {
+                    spacer.tag(html);
+                }
+            }
+            range.start += text.len() - text.trim_start_matches(is_blank_char).len();
+            let decoded = entity::unescape(text, false);
+            spacer
+                .text(&decoded, last, false, false)
+                .unwrap_or_default()
+        };
+        if tag_after {
+            tagged = true;
+            let trimmed = text.trim_end_matches(is_blank_char).len();
+            range.end = range.end.min(segment.start + trimmed);
+        }
+        from = segment.end;
+        if range.start >= range.end {
+            continue;
+        }
+        masked_run = reading.masked;
+        last = if reading.masked {
+            Some('*')
+        } else {
+            source
+                .get(range.clone())
+                .and_then(|kept| kept.chars().next_back())
+        };
+        kept.push(range);
+        reads.push(reading);
+    }
+    if tagged {
+        (kept, reads)
+    } else {
+        (segments, Vec::new())
     }
 }

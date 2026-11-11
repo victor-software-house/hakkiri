@@ -1,0 +1,32 @@
+<p>a <kbd>marker</kbd> b</p>
+
+<p>a<kbd>marker</kbd>b</p>
+
+<p><kbd>x</kbd> only</p>
+
+<p><kbd>one</kbd> and <kbd>two</kbd></p>
+
+<p><kbd>multi
+line</kbd> after</p>
+
+<p>a <samp>é ü</samp> b</p>
+
+<p>a <code>x</code> b</p>
+
+<p><code><b>x</b></code> a</p>
+
+<p><kbd><i>x</i></kbd> a</p>
+
+<p>a <kbd>x &amp; y</kbd> b</p>
+
+<p><tt>x</tt>y</p>
+
+<p>a <a href="http://x.example/">http://x.example/</a> b</p>
+
+<p>a <kbd>x</kbd></p>
+
+<p><kbd>x</kbd></p>
+
+<p>a <kbd></kbd> b marker</p>
+
+<p>a <kbd>x<b>y</b>z</kbd> b</p>
