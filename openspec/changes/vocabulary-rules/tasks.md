@@ -21,4 +21,4 @@ This change follows [`vocabularies`][vocabularies], which reads the lists and na
 
 - [ ] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
 
-[vocabularies]: ../vocabularies/tasks.md
+[vocabularies]: ../archive/2026-11-11-vocabularies/tasks.md

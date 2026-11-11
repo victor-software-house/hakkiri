@@ -37,7 +37,7 @@ The [vale-differences spec][differences] lists this as a known gap.
 - Changed: the rule builders in `src/rule/build.rs`, the checks and the engine, which take a file's own accepted terms, the config loader, `src/instructions.md`, the skill, `AGENTS.md` and `README.md`.
 - No new dependency.
 
-[ledger]: ../../../tasks.yaml
-[rules]: ../vocabulary-rules/proposal.md
-[differences]: ../../specs/vale-differences/spec.md
+[ledger]: ../../../../tasks.yaml
+[rules]: ../../vocabulary-rules/proposal.md
+[differences]: ../../../specs/vale-differences/spec.md
 [prose-style-ini]: https://github.com/victor-software-house/prose-style/blob/90c7c8e673b92f836cce257427724fc79da997e8/ProseStyle/.vale.ini

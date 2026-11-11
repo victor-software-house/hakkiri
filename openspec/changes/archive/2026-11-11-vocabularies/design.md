@@ -181,4 +181,4 @@ It lost because the exceptions are compiled patterns sorted and rewritten at bui
 [v-spelling-suggest]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L391-L430
 [v-yaml-vocab]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/vocab.go#L18-L181
 [prose-style-ini]: https://github.com/victor-software-house/prose-style/blob/90c7c8e673b92f836cce257427724fc79da997e8/ProseStyle/.vale.ini
-[rules]: ../vocabulary-rules/proposal.md
+[rules]: ../../vocabulary-rules/proposal.md

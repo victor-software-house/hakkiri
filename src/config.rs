@@ -4,6 +4,8 @@
 //!
 //! [`load`] reads the file once, loads every style folder of every package, and
 //! refuses what it cannot run, with the file and line of the fault.
+//! A package may ship a settings file in the same format, and the settings of
+//! each package apply before the project's own.
 //! [`Project::plan`] then says which rules run on a file.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -23,6 +25,10 @@ use crate::vocabulary::{self, SETTINGS_FOLDER, Vocabulary};
 
 /// Where the config is when no flag or variable names another file.
 pub(crate) const DEFAULT: &str = ".ctl/hakkiri.yaml";
+
+/// The most packages one chain may hold: a package the project lists, the
+/// packages it lists, and so on.
+const MAX_DEPTH: usize = 10;
 
 /// The levels a config names, in the words it writes them.
 const LEVELS: &str = "suggestion, warning or error";
@@ -102,8 +108,8 @@ struct Raw {
     #[garde(dive)]
     packages: Vec<Entry>,
     #[serde(default)]
-    #[garde(inner(custom(vocab_known)))]
-    vocab: Vec<String>,
+    #[garde(inner(inner(custom(vocab_known))))]
+    vocab: Option<Vec<String>>,
     #[serde(default)]
     #[garde(skip)]
     files: Ordered<Ordered<Setting>>,
@@ -202,10 +208,14 @@ enum Choice {
 /// One glob of `files` and what it sets.
 #[derive(Debug)]
 struct Glob {
+    /// The glob as written, which two config files share when they write it
+    /// alike.
+    pattern: String,
     matcher: GlobMatcher,
     styles: Option<Vec<String>>,
-    /// The vocabularies the glob names, for the files it matches.
-    vocab: Vec<String>,
+    /// The vocabularies the glob names, for the files it matches. A written
+    /// empty list drops the names earlier globs gave the file.
+    vocab: Option<Vec<String>>,
     choices: Vec<(String, Choice)>,
 }
 
@@ -310,9 +320,14 @@ impl Project {
         let mut named: Vec<&str> = Vec::new();
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
             matched = true;
-            for name in &glob.vocab {
-                if !named.contains(&name.as_str()) {
-                    named.push(name);
+            if let Some(names) = &glob.vocab {
+                if names.is_empty() {
+                    named.clear();
+                }
+                for name in names {
+                    if !named.contains(&name.as_str()) {
+                        named.push(name);
+                    }
                 }
             }
             if let Some(listed) = &glob.styles {
@@ -457,6 +472,8 @@ struct Loaded {
 
 /// A package folder that was found, and where its entry is written.
 struct Found {
+    /// The config file that holds the entry, as a fault names it.
+    origin: String,
     written: PathBuf,
     folder: PathBuf,
     key: &'static str,
@@ -485,16 +502,192 @@ fn project_root(config: &Path) -> io::Result<PathBuf> {
     Ok(root.to_path_buf())
 }
 
+/// One config file whose settings apply: a package's, or the project's.
+#[derive(Debug)]
+struct Layer {
+    /// How a fault names the file.
+    name: String,
+    text: String,
+    raw: Raw,
+}
+
+/// The packages of a config, and the packages they list, with the settings
+/// files they ship.
+///
+/// The packages a package lists come before it, in the order written, so its
+/// own settings override theirs.
+struct Walk<'a> {
+    root: &'a Path,
+    cache_dir: Option<&'a Path>,
+    /// The package folders, in load order.
+    found: Vec<Found>,
+    /// The settings files of the packages, in load order.
+    layers: Vec<Layer>,
+    /// The real path of each package folder.
+    packages: Vec<PathBuf>,
+    /// The packages already loaded: a `sha256` for a download, a real path for
+    /// a folder, so a package named twice loads once.
+    done: HashSet<String>,
+    problems: Vec<LoadProblem>,
+}
+
+impl<'a> Walk<'a> {
+    fn new(root: &'a Path, cache_dir: Option<&'a Path>) -> Self {
+        Self {
+            root,
+            cache_dir,
+            found: Vec::new(),
+            layers: Vec::new(),
+            packages: Vec::new(),
+            done: HashSet::new(),
+            problems: Vec::new(),
+        }
+    }
+
+    /// Finds each package `entries` names, each `path` read relative to the
+    /// project root and each `url` fetched into the cache folder, then the
+    /// packages that package lists.
+    ///
+    /// `file` is the config that holds `entries`, as a fault names it, and
+    /// `depth` the packages between it and the project.
+    fn entries(&mut self, entries: &[Entry], text: &str, file: &str, depth: usize) {
+        let mut faults = Faults {
+            file,
+            problems: Vec::new(),
+        };
+        let mut from = key_line(text, "packages", 1).unwrap_or(1);
+        for entry in entries {
+            let key = if entry.url.is_some() { "url" } else { "path" };
+            let line = key_line(text, key, from);
+            from = line.map_or(from, |line| line + 1);
+            if depth > 0 && entry.path.is_some() {
+                faults.add(
+                    line,
+                    key,
+                    "is not allowed in a package's settings: pin the package by `url` and `sha256`"
+                        .to_owned(),
+                );
+                continue;
+            }
+            if depth >= MAX_DEPTH {
+                faults.add(
+                    line,
+                    key,
+                    format!("is over the limit of {MAX_DEPTH} packages in a chain"),
+                );
+                continue;
+            }
+            let (written, folder, hash) = match (&entry.path, &entry.url, &entry.sha256) {
+                (Some(path), _, _) => (PathBuf::from(path), self.root.join(path), None),
+                (None, Some(url), Some(sha256)) => {
+                    match package::fetch(self.cache_dir, url, sha256) {
+                        Ok(folder) => (PathBuf::from(url), folder, Some(sha256.clone())),
+                        Err(message) => {
+                            faults.add(line, key, message);
+                            continue;
+                        }
+                    }
+                }
+                (None, _, _) => continue,
+            };
+            let real = match fs::canonicalize(&folder) {
+                Ok(real) => real,
+                Err(error) => {
+                    faults.add(line, key, format!("`{}`: {error}", written.display()));
+                    continue;
+                }
+            };
+            let is_download = hash.is_some();
+            if !self
+                .done
+                .insert(hash.unwrap_or_else(|| real.display().to_string()))
+            {
+                continue;
+            }
+            let top = if is_download {
+                written.clone()
+            } else {
+                written.parent().map(Path::to_path_buf).unwrap_or_default()
+            };
+            self.settings(&real, &top, depth);
+            self.packages.push(real);
+            self.found.push(Found {
+                origin: file.to_owned(),
+                written,
+                folder,
+                key,
+                line,
+            });
+        }
+        self.problems.extend(faults.problems);
+    }
+
+    /// The folder that holds the package whose styles folder is `styles`: its
+    /// parent, when `styles` is named `styles`.
+    ///
+    /// The project's own config is not a package's: its `.ctl` folder sits in
+    /// the project root, so a parent that is the project root, or holds it, is
+    /// no package top.
+    fn top_of(&self, styles: &Path) -> Option<PathBuf> {
+        let top = styles.parent()?;
+        (styles.file_name()? == "styles" && top != self.root && !self.root.starts_with(top))
+            .then(|| top.to_path_buf())
+    }
+
+    /// Reads the settings file of the package whose styles folder is `styles`,
+    /// when its top folder holds one, and walks the packages it lists.
+    ///
+    /// `shown` is the top folder as the config writes it.
+    fn settings(&mut self, styles: &Path, shown: &Path, depth: usize) {
+        let Some(top) = self.top_of(styles) else {
+            return;
+        };
+        let path = top.join(DEFAULT);
+        if !path.is_file() {
+            return;
+        }
+        let name = shown.join(DEFAULT).display().to_string();
+        let text = match fs::read_to_string(&path) {
+            Ok(text) => text,
+            Err(error) => {
+                self.problems.push(LoadProblem {
+                    file: name,
+                    line: None,
+                    column: None,
+                    field: String::new(),
+                    message: error.to_string(),
+                    unrunnable: false,
+                });
+                return;
+            }
+        };
+        let raw: Raw = match Input::new(&name, &text).load() {
+            Ok(raw) => raw,
+            Err(error) => {
+                self.problems.extend(LoadError::from(error).problems);
+                return;
+            }
+        };
+        self.entries(&raw.packages, &text, &name, depth + 1);
+        self.layers.push(Layer { name, text, raw });
+    }
+}
+
 /// Reads the config at `path`, and loads the style folders of its packages. A
 /// package pinned by `url` is fetched into `cache_dir`, or into the per-user
 /// cache folder when there is none, unless that folder already holds it.
+///
+/// A package whose top folder holds `.ctl/hakkiri.yaml` ships settings in the
+/// format of the config: they apply ahead of the project's, and the packages
+/// that file lists are fetched as the project's are.
 ///
 /// # Errors
 ///
 /// Returns every fault found.
 /// A fault is a file that cannot be read, a key the config does not define, a
 /// package that cannot be read or that repeats a style, or a rule that does not
-/// load. It is also a glob, a style or a rule name that names nothing.
+/// load. It is also a glob, a style or a rule name that names nothing, and a
+/// chain of packages over [`MAX_DEPTH`].
 pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, LoadError> {
     let input = Input::read(path).map_err(LoadError::from)?;
     let raw: Raw = input.load().map_err(LoadError::from)?;
@@ -512,15 +705,44 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
             });
         }
     };
-    let vocab = Named::of(&raw, text);
-    let loaded = load_packages(&raw.packages, &root, text, cache_dir, &vocab, &mut faults);
+    let mut walk = Walk::new(&root, cache_dir);
+    walk.entries(&raw.packages, text, input.name(), 0);
+    faults.problems.append(&mut walk.problems);
+    let mut layers = walk.layers;
+    layers.push(Layer {
+        name: input.name().to_owned(),
+        text: text.to_owned(),
+        raw,
+    });
+    let level = layers
+        .iter()
+        .rev()
+        .find_map(|layer| layer.raw.level.as_deref().and_then(level_named));
+    let mut vocab = Named::default();
+    for layer in &layers {
+        vocab.add_layer(layer);
+    }
+    let loaded = load_packages(walk.found, walk.packages, &vocab, &mut faults);
     let known = Known {
         holders: Some(loaded.holders.clone()),
     };
-    if let Err(error) = input.check(&raw, &known) {
-        faults.problems.extend(LoadError::from(error).problems);
+    let mut globs: Vec<Glob> = Vec::new();
+    let mut listed: HashMap<String, Vec<String>> = HashMap::new();
+    for layer in layers {
+        if let Err(error) = Input::new(&layer.name, &layer.text).check(&layer.raw, &known) {
+            faults.problems.extend(LoadError::from(error).problems);
+        }
+        let mut at = Faults {
+            file: &layer.name,
+            problems: Vec::new(),
+        };
+        for mut glob in read_globs(layer.raw.files, &layer.text, &loaded, &mut at) {
+            add_up(&mut glob, &mut listed);
+            globs.push(glob);
+        }
+        faults.problems.append(&mut at.problems);
     }
-    let globs = read_globs(raw.files, text, &loaded, &mut faults);
+    refuse_names(&globs, &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
             problems: faults.problems,
@@ -532,56 +754,47 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         unrunnable: loaded.unrunnable,
         globs,
         vocabularies: loaded.vocabularies,
-        level: raw.level.as_deref().and_then(level_named),
+        level,
         packages: loaded.packages,
         root,
     })
 }
 
-/// Loads the style folders of each package `entries` names, each `path` read
-/// relative to `root` and each `url` fetched into `cache_dir`.
+/// Makes the `styles` list of `glob` add to the list an earlier config file
+/// gave the same glob text, as Vale merges the sections of one name.
+///
+/// An empty list stays empty, which drops the earlier styles and the rule
+/// settings before it. `listed` holds the list each glob text ended with.
+fn add_up(glob: &mut Glob, listed: &mut HashMap<String, Vec<String>>) {
+    let Some(own) = glob.styles.as_mut() else {
+        return;
+    };
+    if !own.is_empty()
+        && let Some(earlier) = listed.get(&glob.pattern)
+    {
+        let mut all = earlier.clone();
+        for name in own.iter() {
+            if !all.contains(name) {
+                all.push(name.clone());
+            }
+        }
+        *own = all;
+    }
+    listed.insert(glob.pattern.clone(), own.clone());
+}
+
+/// Loads the style folders of each package in `found`, in order.
 fn load_packages(
-    entries: &[Entry],
-    root: &Path,
-    text: &str,
-    cache_dir: Option<&Path>,
+    found: Vec<Found>,
+    packages: Vec<PathBuf>,
     vocab: &Named,
     faults: &mut Faults<'_>,
 ) -> Loaded {
     let mut loaded = Loaded::default();
     let mut folders: BTreeMap<String, PathBuf> = BTreeMap::new();
-    let mut found: Vec<Found> = Vec::new();
-    let mut from = key_line(text, "packages", 1).unwrap_or(1);
-    for entry in entries {
-        let key = if entry.url.is_some() { "url" } else { "path" };
-        let line = key_line(text, key, from);
-        from = line.map_or(from, |line| line + 1);
-        let (written, folder) = match (&entry.path, &entry.url, &entry.sha256) {
-            (Some(path), _, _) => (PathBuf::from(path), root.join(path)),
-            (None, Some(url), Some(sha256)) => match package::fetch(cache_dir, url, sha256) {
-                Ok(folder) => (PathBuf::from(url), folder),
-                Err(message) => {
-                    faults.add(line, key, message);
-                    continue;
-                }
-            },
-            (None, _, _) => continue,
-        };
-        match fs::canonicalize(&folder) {
-            Ok(real) => {
-                loaded.packages.push(real);
-                found.push(Found {
-                    written,
-                    folder,
-                    key,
-                    line,
-                });
-            }
-            Err(error) => faults.add(line, key, format!("`{}`: {error}", written.display())),
-        }
-    }
     // A rule may extend a rule in any package, so every package is on the
     // search path before the first style is read.
+    loaded.packages = packages;
     let search = loaded.packages.clone();
     read_vocabularies(&found, vocab, &mut loaded, faults);
     let accepted: Vec<String> = vocab
@@ -591,20 +804,25 @@ fn load_packages(
         .flat_map(|vocabulary| vocabulary.accepted.iter().cloned())
         .collect();
     for Found {
+        origin,
         written,
         folder,
         key,
         line,
     } in found
     {
-        for style in style_folders(&folder, line, faults) {
+        let mut at = Faults {
+            file: &origin,
+            problems: Vec::new(),
+        };
+        for style in style_folders(&folder, line, &mut at) {
             let name = style
                 .file_name()
                 .map(|name| name.to_string_lossy().into_owned())
                 .unwrap_or_default();
             let shown = written.join(&name);
             if let Some(first) = folders.get(&name) {
-                faults.add(
+                at.add(
                     line,
                     key,
                     format!(
@@ -632,10 +850,11 @@ fn load_packages(
                             rule,
                         }));
                 }
-                Err(error) => faults.problems.extend(error.problems),
+                Err(error) => at.problems.extend(error.problems),
             }
             folders.insert(name, shown);
         }
+        faults.problems.append(&mut at.problems);
     }
     loaded
 }
@@ -666,7 +885,7 @@ fn read_globs(
         };
         let inner = line.map_or(1, |line| line + 1);
         let mut listed = None;
-        let mut vocabularies = Vec::new();
+        let mut vocabularies = None;
         let mut choices = Vec::new();
         for (key, setting) in settings.0 {
             let at = key_line(text, &key, inner);
@@ -686,7 +905,7 @@ fn read_globs(
                 ("styles", Setting::Word(_)) => {
                     faults.add(at, "styles", "is a list of style names".to_owned());
                 }
-                ("vocab", Setting::List(list)) => vocabularies = list,
+                ("vocab", Setting::List(list)) => vocabularies = Some(list),
                 ("vocab", Setting::Word(_)) => {
                     faults.add(at, "vocab", "is a list of vocabulary names".to_owned());
                 }
@@ -714,13 +933,13 @@ fn read_globs(
             }
         }
         globs.push(Glob {
+            pattern: pattern.clone(),
             matcher,
             styles: listed,
             vocab: vocabularies,
             choices,
         });
     }
-    refuse_names(&globs, loaded, faults);
     globs
 }
 
@@ -739,42 +958,58 @@ fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
     }
 }
 
-/// The vocabularies a config names: at its top level, and in the globs of
-/// `files`.
+/// The vocabularies the config files name: at their top level, and in the
+/// globs of `files`.
+#[derive(Default)]
 struct Named {
-    /// Each name once, with the line of the key that first names it.
-    all: Vec<(String, Option<usize>)>,
-    /// The names of the top level, in order.
+    /// Each name once, with the line of the key that first names it and the
+    /// file that holds the key.
+    all: Vec<(String, Option<usize>, String)>,
+    /// The names of the top level, in order: those of each package's file and
+    /// then the project's. A written empty list drops the names before it.
     top: Vec<String>,
+    /// Every name a top level wrote, cleared or not, which the config check
+    /// reports on its own line.
+    written: Vec<String>,
 }
 
 impl Named {
-    /// The vocabularies `raw` names.
-    fn of(raw: &Raw, text: &str) -> Self {
-        let mut all = Self {
-            all: Vec::new(),
-            top: raw.vocab.clone(),
-        };
-        for name in &raw.vocab {
-            all.add(name, None);
+    /// Adds the vocabularies `layer` names: its top-level list and the lists
+    /// of its globs.
+    fn add_layer(&mut self, layer: &Layer) {
+        // A list that is written and empty clears the names before it, as
+        // Vale's `Vocab = NONE` does; a key that is absent keeps them.
+        if let Some(names) = &layer.raw.vocab {
+            if names.is_empty() {
+                self.top.clear();
+            }
+            for name in names {
+                self.add(name, None, &layer.name);
+                if !self.top.contains(name) {
+                    self.top.push(name.clone());
+                }
+                if !self.written.contains(name) {
+                    self.written.push(name.clone());
+                }
+            }
         }
-        for (pattern, settings) in &raw.files.0 {
+        let text = &layer.text;
+        for (pattern, settings) in &layer.raw.files.0 {
             let inner = key_line(text, pattern, 1).map_or(1, |line| line + 1);
             for (key, setting) in &settings.0 {
                 if let ("vocab", Setting::List(names)) = (key.as_str(), setting) {
                     let at = key_line(text, "vocab", inner);
                     for name in names {
-                        all.add(name, at);
+                        self.add(name, at, &layer.name);
                     }
                 }
             }
         }
-        all
     }
 
-    fn add(&mut self, name: &str, line: Option<usize>) {
-        if !self.all.iter().any(|(known, _)| known == name) {
-            self.all.push((name.to_owned(), line));
+    fn add(&mut self, name: &str, line: Option<usize>, file: &str) {
+        if !self.all.iter().any(|(known, _, _)| known == name) {
+            self.all.push((name.to_owned(), line, file.to_owned()));
         }
     }
 }
@@ -782,7 +1017,11 @@ impl Named {
 /// Reads each vocabulary `vocab` names from the package folders in `found`,
 /// and refuses a name no package holds and a name two packages hold.
 fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults: &mut Faults<'_>) {
-    for (name, line) in &vocab.all {
+    for (name, line, file) in &vocab.all {
+        let mut at = Faults {
+            file,
+            problems: Vec::new(),
+        };
         let holders: Vec<(PathBuf, PathBuf)> = found
             .iter()
             .filter_map(|package| {
@@ -801,9 +1040,9 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
         );
         // A name of the top level is refused when the config is checked
         // again, on the line of its own entry.
-        let refused = !vocab.top.contains(name);
+        let refused = !vocab.written.contains(name);
         match holders.as_slice() {
-            [] if refused => faults.add(
+            [] if refused => at.add(
                 *line,
                 "vocab",
                 format!("`{name}` is not a vocabulary in any package"),
@@ -812,9 +1051,9 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
                 Ok(read) => {
                     loaded.vocabularies.insert(name.clone(), read);
                 }
-                Err(problems) => faults.problems.extend(problems),
+                Err(problems) => at.problems.extend(problems),
             },
-            [(_, first), (_, second), ..] if refused => faults.add(
+            [(_, first), (_, second), ..] if refused => at.add(
                 *line,
                 "vocab",
                 format!(
@@ -825,6 +1064,7 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
             ),
             _ => {}
         }
+        faults.problems.append(&mut at.problems);
     }
 }
 

@@ -31,6 +31,10 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A `url` names a zip that hakkiri downloads on the first run, checks against the hash, and unpacks whole into `<cache>/<sha256>/`, where the per-user cache folder or `--cache-dir` is the cache.  
    A later run reads that folder with no network.  
    The zip is a Vale package kept as it lays out: one top folder that holds a `styles` folder or is a style, so `HKR-007` and `HKR-008` find its files where Vale puts them.
+   A package may ship `.ctl/hakkiri.yaml` in its top folder, beside `styles`, in the format of the project config (operator, 2026-11-11).  
+   hakkiri applies the settings of each package ahead of the project's own, as Vale reads a package's `.vale.ini` under the project's, so the project overrides a package and a later package overrides an earlier one.  
+   A `styles` list adds to a package's under the same glob text and replaces it under another, as in Vale.  
+   A package's `packages` are fetched, pinned by `url` and `sha256`, to a depth of 10.  
    A package may hold vocabularies in `config/vocabularies/<name>/`, which the `vocab` key names at the top level and in a glob of `files` (operator, 2026-11-11).  
    The top level reaches every check that reads accepted terms, and a glob's list reaches the files it matches, as Vale's `Vocab` does.  
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  

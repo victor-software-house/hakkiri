@@ -127,6 +127,12 @@ files:
   The accepted terms of the top level hold back matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules. A rule with `vocab: false` reads none, and nor does an `existence` rule with `nonword`.
   A glob's list holds back matches in `existence`, `repetition`, `spelling` and `substitution` rules in the files that glob matches, whatever the rule sets. A file takes the lists of every glob that matches it.
   An unknown vocabulary, a name in two packages and a term that is not a pattern are errors. The rejected terms are read and checked, and no rule uses them yet.
+- A package may hold `.ctl/hakkiri.yaml` in its top folder, the folder that holds `styles`, in the format of the config. A `path` entry that names a folder called `styles` has its top in the parent of that folder. When the parent is the project root or holds it, there is no top, so the project's own config is never read as a package's. For a zip the top is the top folder of the zip.
+  The settings of each package apply before the project's own, in the order of `packages`, so the project overrides a package and a later package overrides an earlier one.
+  The file holds `level`, `vocab`, `files` and `packages`. A `styles` list under the same glob text as a package's adds to its list, and under another glob it replaces it. `level` is the project's when it sets one.
+  A written `vocab: []` drops the vocabularies the packages named, and a missing `vocab` keeps them. In a glob it drops what earlier globs gave the file.
+  A package's `packages` hold a `url` and a `sha256`, never a `path`, and are fetched like the project's. A package named twice loads once, and a chain more than 10 packages deep is an error.
+  A fault in the file is an error that names the package, the file and the line.
 - `files` maps globs to settings. A file is linted only when a glob matches it. `*` crosses `/`, and `**` and `{a,b}` work.
   Every matching glob applies in the order written, and a later glob wins for the same key.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.
