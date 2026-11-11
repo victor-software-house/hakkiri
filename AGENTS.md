@@ -51,8 +51,10 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
 6. **Exit status.**
    `hakkiri check` exits as Vale does: 2 when the config, a rule or a file failed, then 1 when a reported alert reaches `--fail-level` (default `error`), then 0.  
    `--fail-level` takes the place of Vale's `--no-exit`.  
-   `fail_level`, `gitignore` and `on_unmatched` are flags, variables and config keys, resolved in that order and then the default; only the project's config holds the keys, and a package's settings file that does is an error.  
+   `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` are flags, variables and config keys, resolved in that order and then the default; only the project's config holds the keys, and a package's settings file that does is an error.  
    A walk is the `ignore` crate's, with git rules only: it skips what git ignores unless `gitignore` is false, and a named file is never filtered.  
+   A selected file with no reader is plain text (`Language::Text`, one `raw` root of paragraphs), unless `on_unknown` changes that.  
+   `formats` looks a file up as Vale's `formatFor` does: the extension, then the name or a glob, in key order.  
    The pretty output is a line per alert with no colour and no frame, because tools read it.
 7. **Test cases.**
    A rule file holds its cases under `tests`, and a `*.test.yml` file is a list of them. `check` loads cases and never runs them.  

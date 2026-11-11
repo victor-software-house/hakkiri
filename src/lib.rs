@@ -26,6 +26,7 @@ mod markdown;
 mod math;
 mod metric;
 pub mod pattern;
+mod plain;
 pub mod readability;
 pub mod rule;
 pub mod scope;
@@ -42,7 +43,7 @@ mod tree;
 pub mod words;
 
 pub use error::Error;
-pub use language::Language;
+pub use language::{Language, READERS};
 use pattern::Pattern;
 pub use tree::{Comment, Join, Node, Reading, Scope, Tree};
 
@@ -53,6 +54,8 @@ pub use tree::{Comment, Join, Node, Reading, Scope, Tree};
 /// A source file gives one `raw` root per comment group, so no string literal
 /// reaches the tree.
 /// A group is one comment, or adjacent line comments that share a marker.
+/// A plain-text file gives one `raw` root whose children are its paragraphs,
+/// read as written.
 ///
 /// # Errors
 ///
@@ -109,6 +112,7 @@ pub fn parse_ignoring(
             0,
             Vec::new(),
         ),
+        Language::Text => (plain::roots(source), 0, Vec::new()),
     };
     let mut roots = roots;
     // The text after a comment that turns every rule off is no one's prose.

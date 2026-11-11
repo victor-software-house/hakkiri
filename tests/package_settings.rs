@@ -842,15 +842,48 @@ fn a_package_that_sets_a_run_option_is_an_error() -> TestResult {
     let root = project(&suite, "run-options", "packages:\n  - path: pkg/styles\n");
     root.file(
         "pkg/.ctl/hakkiri.yaml",
-        "files: {}\ngitignore: false\nfail_level: warning\non_unmatched: error\n",
+        "files: {}\ngitignore: false\nfail_level: warning\non_unmatched: error\non_unknown: warn\n",
     );
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
-    for (line, key) in [(2, "gitignore"), (3, "fail_level"), (4, "on_unmatched")] {
+    for (line, key) in [
+        (2, "gitignore"),
+        (3, "fail_level"),
+        (4, "on_unmatched"),
+        (5, "on_unknown"),
+    ] {
         let want = format!(
             "failed pkg/.ctl/hakkiri.yaml: line {line}: {key}: belongs to the project's config"
         );
         assert!(result.err.contains(&want), "{}", result.err);
     }
+    Ok(())
+}
+
+#[test]
+fn a_package_maps_extensions_and_the_project_overrides_it() -> TestResult {
+    let suite = Suite::new("package-settings-formats");
+    let root = project(&suite, "formats", "packages:\n  - path: pkg/styles\n");
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "formats:\n  txt: md\nfiles:\n  '*': {styles: [Team]}\n",
+    );
+    root.file("a.txt", "```\nvery\n```\n");
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert!(
+        lines.iter().all(|line| !line.contains("a.txt")),
+        "the package reads a.txt as md: {lines:?}"
+    );
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "formats:\n  txt: text\npackages:\n  - path: pkg/styles\n",
+    );
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert!(
+        lines.contains(&very("a.txt", "warning").replace(":1:9:", ":2:1:")),
+        "the project reads a.txt as text: {lines:?}"
+    );
     Ok(())
 }

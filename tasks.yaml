@@ -107,6 +107,7 @@ queue:
       - on_unknown (--on-unknown, HAKKIRI_ON_UNKNOWN) takes text, the default, or warn, error or ignore for an extension with no reader; a binary file is skipped with no alert, as ripgrep and typos skip binaries.
     notes:
       - '2026-11-11, operator decision: a text file a glob or a name lists is read; plain text is the default, extensions can be remapped as in Vale, and the default can be turned off.'
+    plan: openspec/changes/plain-text-files/proposal.md
 
   - id: HKR-031
     title: Turn rules off and on with comments

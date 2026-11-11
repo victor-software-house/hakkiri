@@ -108,6 +108,12 @@ pub(crate) struct CheckArgs {
     /// Defaults to the config's `on_unmatched`, then to `warn`.
     #[arg(long, value_enum)]
     pub(crate) on_unmatched: Option<OnUnmatched>,
+
+    /// What to do with a selected file that no reader reads: read it as plain
+    /// text, or warn, fail or say nothing. Defaults to the config's
+    /// `on_unknown`, then to `text`.
+    #[arg(long, value_enum)]
+    pub(crate) on_unknown: Option<OnUnknown>,
 }
 
 impl CheckArgs {
@@ -121,6 +127,21 @@ impl CheckArgs {
             self.gitignore.or(config).unwrap_or(true)
         }
     }
+}
+
+/// What a run does with a file that a glob selects and that no reader reads.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, ValueEnum)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum OnUnknown {
+    /// Read it as plain text.
+    #[default]
+    Text,
+    /// Print a warning and skip it.
+    Warn,
+    /// Fail the run: exit 2.
+    Error,
+    /// Skip it and say nothing.
+    Ignore,
 }
 
 /// What a run does with a file named on the command line that no glob selects.

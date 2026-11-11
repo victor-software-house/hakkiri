@@ -4,12 +4,13 @@
 use std::collections::HashSet;
 use std::ffi::OsStr;
 use std::fs;
+use std::io::Read;
 use std::path::{Component, Path, PathBuf};
 
 use hakkiri::Language;
 use ignore::WalkBuilder;
 
-use crate::cli::OnUnmatched;
+use crate::cli::{OnUnknown, OnUnmatched};
 use crate::config::{Plan, Project, leads_to};
 use crate::report::Failure;
 
@@ -37,6 +38,24 @@ pub(crate) struct Job<'a> {
     pub(crate) plan: Plan<'a>,
 }
 
+/// Why a selected file that no reader reads is not linted, when `on_unknown`
+/// says it is not read as text.
+const UNKNOWN: &str = "no reader reads this file, so it is not linted: map it in `formats`";
+
+/// How many bytes of a file decide whether it is binary.
+const SNIFF: u64 = 8192;
+
+/// Whether the file at `path` is binary: it holds a NUL byte in its first
+/// 8192 bytes, as ripgrep and typos judge it. A file that cannot be read is not
+/// binary here, and the run reports the failure when it reads the file.
+fn is_binary(path: &Path) -> bool {
+    let Ok(file) = fs::File::open(path) else {
+        return false;
+    };
+    let mut head = Vec::new();
+    file.take(SNIFF).read_to_end(&mut head).is_ok() && head.contains(&0)
+}
+
 /// How a run chooses its files.
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Options {
@@ -44,6 +63,8 @@ pub(crate) struct Options {
     pub(crate) gitignore: bool,
     /// What to do with a named file that no glob selects.
     pub(crate) on_unmatched: OnUnmatched,
+    /// What to do with a selected file that no reader reads.
+    pub(crate) on_unknown: OnUnknown,
 }
 
 /// What a walk finds, in the order it finds it.
@@ -79,22 +100,14 @@ fn display(path: &Path, current: Option<&Path>) -> String {
 }
 
 impl Finder<'_> {
-    /// Lints `file` when a language reads it and a glob selects it.
+    /// Lints `file` when a glob selects it and a reader reads it.
     ///
-    /// A file the run was given by name that no language reads is a failure,
-    /// and a file a walk found is skipped.
+    /// The reader is the one a `formats` entry gives, else the one its
+    /// extension names. A selected file that no reader reads is plain text,
+    /// unless `on_unknown` says otherwise, and a plain-text file that holds a
+    /// NUL byte is binary and skipped, with no message.
     fn file(&mut self, file: &Path, named: bool) {
         let path = display(file, self.current.as_deref());
-        let Some(language) = Language::from_path(file) else {
-            if named {
-                self.failures.push(Failure::file(
-                    &path,
-                    "no language reads this file: hakkiri reads Markdown, MDX, Rust, \
-                     TypeScript, TSX and JavaScript files by their extension",
-                ));
-            }
-            return;
-        };
         let Some(relative) = self.project.relative(file) else {
             return;
         };
@@ -108,6 +121,28 @@ impl Finder<'_> {
             return;
         };
         if !first {
+            return;
+        }
+        let language = match self
+            .project
+            .mapped_language(&relative)
+            .or_else(|| Language::from_path(file))
+        {
+            Some(language) => language,
+            None => match self.options.on_unknown {
+                OnUnknown::Text => Language::Text,
+                OnUnknown::Warn => {
+                    self.warnings.push(format!("{path}: {UNKNOWN}"));
+                    return;
+                }
+                OnUnknown::Error => {
+                    self.failures.push(Failure::file(&path, UNKNOWN));
+                    return;
+                }
+                OnUnknown::Ignore => return,
+            },
+        };
+        if language == Language::Text && is_binary(file) {
             return;
         }
         let extension = file

@@ -21,16 +21,17 @@ hakkiri check docs README.md
 hakkiri check --fail-level warning
 hakkiri check --no-gitignore
 hakkiri check --on-unmatched error README.md
+hakkiri check --on-unknown warn
 hakkiri check --format json
 ```
 
 - A path is a file or a directory. A directory is walked in sorted order, and with no path the current directory is walked.
-- A walk skips `node_modules`, `.git` and each folder a `packages` entry names. It skips files that no language reads, with no message.
+- A walk skips `node_modules`, `.git` and each folder a `packages` entry names.
 - A walk also skips what `.gitignore`, `.git/info/exclude` and the global git excludes ignore, as ripgrep does, inside a git repository. `--no-gitignore`, `--gitignore=false` or `gitignore: false` in the config reads those files too. A file named on the command line is never skipped for being ignored.
 - A file named on the command line that no glob selects draws a warning on standard error and is not linted. `--on-unmatched` or `on_unmatched` takes `warn`, the default, `error`, which fails the run with exit 2, or `ignore`. A file that a glob selects but whose styles hold no rule draws nothing, and nor does a file a walk found.
-- A file named on the command line that no language reads is a failure.
-- Languages come from the extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` and `.js`.
-  Other files, plain text included, are not linted yet.
+- Readers come from the extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` and `.js`, or from a `formats` entry. A file that a glob selects and that no reader reads is plain text: one block per run of lines between blank lines, read as written.
+- `--on-unknown` or `on_unknown` takes `text`, the default, `warn`, which skips the file with a warning, `error`, which fails the run with exit 2, or `ignore`. A file that no glob selects draws no message.
+- A plain-text file that holds a NUL byte in its first 8192 bytes is binary, and a run skips it with no message.
 - Files lint in parallel. The report is sorted by path, then line, then column, so two runs print the same text.
 - A file that cannot be read or parsed is a failure. The other files still lint.
 
@@ -100,7 +101,7 @@ A broken config stops the run before any file lints, and prints to standard erro
 Every long option reads `HAKKIRI_<LONG>`: `HAKKIRI_CONFIG` names the config, `HAKKIRI_CACHE_DIR` names the folder that keeps fetched packages, `HAKKIRI_FAIL_LEVEL` sets the level, `HAKKIRI_COVERAGE` turns coverage on for `test`, and `HAKKIRI_FORMAT=json` asks for JSON.
 `HAKKIRI_COLOR` and `HAKKIRI_QUIET` set the shared flags `--color` and `--quiet`, and `--no-color` has no variable.
 Pretty output of `check` holds no colour, so `--color` changes nothing there. `--quiet` hides a successful pretty run.
-`HAKKIRI_GITIGNORE` takes `true` or `false`, so `HAKKIRI_GITIGNORE=false` reads the files git ignores, and `--no-gitignore` has no variable. `HAKKIRI_ON_UNMATCHED` takes `warn`, `error` or `ignore`.
+`HAKKIRI_GITIGNORE` takes `true` or `false`, so `HAKKIRI_GITIGNORE=false` reads the files git ignores, and `--no-gitignore` has no variable. `HAKKIRI_ON_UNMATCHED` takes `warn`, `error` or `ignore`, and `HAKKIRI_ON_UNKNOWN` takes `text`, `warn`, `error` or `ignore`.
 A flag on the command line wins over its variable, and an empty variable counts as unset.
 The config sets `fail_level`, `gitignore` and `on_unmatched` too, and the order is the flag, then the variable, then the config, then the default.
 
@@ -121,7 +122,9 @@ files:
 - The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every `path` and glob is relative to the project root, the folder that holds `.ctl`, and a file outside it matches no glob. A path given outside the root draws a warning on standard error, and a run where no path lies under the root exits 2.
 - A key the config does not define is an error that names the key and its line.
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
-- `fail_level`, `gitignore` and `on_unmatched` set the options of the same names for `check`. Only the project's config holds them, and a package's settings file that does is an error.
+- `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` set the options of the same names for `check`. Only the project's config holds them, and a package's settings file that does is an error.
+- `formats` maps an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`. A key that holds `*`, `?`, `[`, `{` or `/` is a glob.
+  An entry named by the file's extension wins, then the first key in text order that is the file's name or a glob that matches its name or path. An entry beats the extension table, so `md: text` reads Markdown files as text.
 - `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule, in the folder or under it. A folder that starts with `.` or `_` and a `*.test.yml` file are skipped, and so is a folder named `config`, where Vale keeps vocabularies and other settings.
   Two folders that hold one style name are refused. So are two files that give one rule name, and a name with a bracket, when a glob lists the style: a style no glob lists is not refused, as in Vale.
   A `url` entry holds the `url` of a zip, which starts with `https://` or `http://`, and its `sha256`, 64 lowercase hex digits. The first run downloads the zip, checks the hash, and unpacks it into the cache folder under that hash, and a later run reads it from there and asks for nothing.
@@ -140,7 +143,7 @@ files:
   List `Vale` in `styles` to run them, or set them by name. A vocabulary that a glob lists builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no setting.
 - A package may hold `.ctl/hakkiri.yaml` in its top folder, the folder that holds `styles`, in the format of the config. A `path` entry that names a folder called `styles` has its top in the parent of that folder. When the parent is the project root or holds it, there is no top, so the project's own config is never read as a package's. For a zip the top is the top folder of the zip.
   The settings of each package apply before the project's own, in the order of `packages`, so the project overrides a package and a later package overrides an earlier one.
-  The file holds `level`, `vocab`, `files` and `packages`. A `styles` list under the same glob text as a package's adds to its list, and under another glob it replaces it. `level` is the project's when it sets one.
+  The file holds `level`, `vocab`, `files`, `formats` and `packages`. A `styles` list under the same glob text as a package's adds to its list, and under another glob it replaces it. `level` is the project's when it sets one.
   A written `vocab: []` drops the vocabularies the packages named, and a missing `vocab` keeps them. In a glob it drops the lists that earlier configs gave the same glob text.
   A package's `packages` hold a `url` and a `sha256`, never a `path`, and are fetched like the project's. A package named twice loads once, and a chain more than 10 packages deep is an error.
   A fault in the file is an error that names the package, the file and the line.
@@ -184,6 +187,9 @@ It prints the level in each line, and its JSON is one object instead of a map fr
 
 hakkiri fetches a package pinned by `url` and `sha256` on the first run and keeps it in a cache folder outside the project, where Vale needs `vale sync` and copies the styles into `StylesPath`.
 It refuses a download that does not match its hash, and Vale installs any zip.
+
+hakkiri reads a plain-text file as paragraphs and skips a binary file, where Vale reads a file with no reader as lines of one block.
+It takes a project's `formats` entry over a package's, where Vale keeps the first value.
 
 hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.
 A key that names no rule, or a word that is neither a level, `on` nor `off`, is an error.

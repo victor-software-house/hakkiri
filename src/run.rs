@@ -39,6 +39,7 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
             .on_unmatched
             .or(project.on_unmatched)
             .unwrap_or_default(),
+        on_unknown: args.on_unknown.or(project.on_unknown).unwrap_or_default(),
     };
     let found = find(&project, &args.paths, options);
     for warning in &found.warnings {

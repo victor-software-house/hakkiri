@@ -16,6 +16,7 @@ use std::{fmt, fs, io};
 use ctl_core::input::Input;
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
+use hakkiri::Language;
 use hakkiri::pattern::Pattern;
 use hakkiri::rule::{
     Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style, vocabulary_rules,
@@ -23,7 +24,8 @@ use hakkiri::rule::{
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 
-use crate::cli::{FailLevel, OnUnmatched};
+use crate::cli::{FailLevel, OnUnknown, OnUnmatched};
+use crate::formats::Formats;
 use crate::package;
 use crate::vocabulary::{self, SETTINGS_FOLDER, Vocabulary};
 
@@ -127,6 +129,13 @@ struct Raw {
     #[serde(default)]
     #[garde(skip)]
     on_unmatched: Option<OnUnmatched>,
+    #[serde(default)]
+    #[garde(skip)]
+    on_unknown: Option<OnUnknown>,
+    /// The reader of each extension, file name or glob.
+    #[serde(default)]
+    #[garde(skip)]
+    formats: BTreeMap<String, String>,
 }
 
 /// One entry of `packages`.
@@ -260,6 +269,11 @@ pub(crate) struct Project {
     pub(crate) gitignore: Option<bool>,
     /// The config's `on_unmatched`.
     pub(crate) on_unmatched: Option<OnUnmatched>,
+    /// The config's `on_unknown`.
+    pub(crate) on_unknown: Option<OnUnknown>,
+    /// The `formats` of the packages and the project, a later one winning for
+    /// the same key.
+    formats: Formats,
     /// The package folders, which a walk leaves alone.
     pub(crate) packages: Vec<PathBuf>,
     /// The project root: the folder that holds the `.ctl` folder of the
@@ -303,6 +317,12 @@ impl Project {
     /// holds it, so a walk of it can reach a file under the root.
     pub(crate) fn leads_to_root(&self, real: &Path) -> bool {
         leads_to(&self.root, real)
+    }
+
+    /// The language a `formats` entry gives the file at `path`, written
+    /// relative to the project root with `/` separators, when one does.
+    pub(crate) fn mapped_language(&self, path: &str) -> Option<Language> {
+        self.formats.language_of(path)
     }
 
     /// Whether some glob matches `path`, written relative to the project root
@@ -732,6 +752,7 @@ impl<'a> Walk<'a> {
             ("fail_level", raw.fail_level.is_some()),
             ("gitignore", raw.gitignore.is_some()),
             ("on_unmatched", raw.on_unmatched.is_some()),
+            ("on_unknown", raw.on_unknown.is_some()),
         ] {
             if set {
                 faults.add(
@@ -765,7 +786,12 @@ impl<'a> Walk<'a> {
 pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, LoadError> {
     let input = Input::read(path).map_err(LoadError::from)?;
     let raw: Raw = input.load().map_err(LoadError::from)?;
-    let (fail_level, gitignore, on_unmatched) = (raw.fail_level, raw.gitignore, raw.on_unmatched);
+    let (fail_level, gitignore, on_unmatched, on_unknown) = (
+        raw.fail_level,
+        raw.gitignore,
+        raw.on_unmatched,
+        raw.on_unknown,
+    );
     let text = input.text();
     let mut faults = Faults {
         file: input.name(),
@@ -803,6 +829,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
     };
     let mut globs: Vec<Glob> = Vec::new();
     let mut listed: HashMap<String, Vec<String>> = HashMap::new();
+    let mut formats = Formats::default();
     for layer in layers {
         if let Err(error) = Input::new(&layer.name, &layer.text).check(&layer.raw, &known) {
             faults.problems.extend(LoadError::from(error).problems);
@@ -811,6 +838,11 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
             file: &layer.name,
             problems: Vec::new(),
         };
+        for (key, reader) in &layer.raw.formats {
+            if let Err(message) = formats.insert(key, reader) {
+                at.add(key_line(&layer.text, key, 1), key, message);
+            }
+        }
         for mut glob in read_globs(layer.raw.files, &layer.text, &loaded, &mut at) {
             add_up(&mut glob, &mut listed);
             if glob.clears_vocab {
@@ -838,6 +870,8 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         fail_level,
         gitignore,
         on_unmatched,
+        on_unknown,
+        formats,
         packages: loaded.packages,
         root,
     })
