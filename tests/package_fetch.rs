@@ -43,6 +43,12 @@ const ALPHA_SHA256: &str = "c46cffdaaab0d6eb0d5adbf8cb2a6dc2315662540a84aa083c0a
 const BETA: &[u8] = include_bytes!("fixtures/packages/Beta.zip");
 const BETA_SHA256: &str = "760e55c4f7412703ffedd42fec9108ce1327fa8a2bcec167381188f7d36f9a11";
 
+/// `ProseStyle` v0.0.14, as its release holds it: the Voices, Direct, Std and
+/// Readability styles beside its own, with six script rules and the rules
+/// that inherit.
+const PROSE_STYLE: &[u8] = include_bytes!("fixtures/packages/ProseStyle.zip");
+const PROSE_STYLE_SHA256: &str = "8eeeb7192f24ceb3150292956df89869f6239c8632e6742d0401163c08e337da";
+
 /// A hash no fixture has.
 const WRONG_SHA256: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -593,5 +599,101 @@ fn the_cache_dir_option_moves_the_cache() -> TestResult {
     let result = run(root.path(), &["check", "--cache-dir", folder], &envs)?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
     assert!(cache.path().join(TEAM_SHA256).join("Team/styles").is_dir());
+    Ok(())
+}
+
+/// A project that pins `ProseStyle` by `url`, with `files` as its globs and a
+/// text of 29 words in `a.md`.
+fn prose_style_project<'a>(suite: &'a Suite, name: &str, url: &str, files: &str) -> Root<'a> {
+    let root = suite.scenario(name);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        format!(
+            "packages:\n{}files:\n{files}",
+            entry(url, PROSE_STYLE_SHA256)
+        ),
+    );
+    root.file(
+        "a.md",
+        "When you have finished the installation and confirmed that the service starts, open the settings page and choose the account you want to connect, and then paste the token.\n",
+    );
+    root
+}
+
+#[test]
+fn a_fetched_package_with_inheriting_rules_lints_from_the_cache() -> TestResult {
+    let suite = Suite::new("package-inherit");
+    let server = Server::start(vec![("/ProseStyle.zip", Route::Body(PROSE_STYLE.to_vec()))])?;
+    let root = prose_style_project(
+        &suite,
+        "inherit",
+        &server.url("/ProseStyle.zip"),
+        "  '*.md': {styles: [Direct], Direct.Length: suggestion, Direct.Ease: off}\n",
+    );
+    let cache = cache_folder(&suite, "inherit-cache");
+    let first = hakkiri(&root, cache.path(), &["check"])?;
+    assert_eq!(first.code, 0, "{}{}", first.out, first.err);
+    assert!(
+        first
+            .lines()
+            .contains(&"a.md:1:1: suggestion Direct.Length: Sentence runs to 29 words. Split it."),
+        "{}{}",
+        first.out,
+        first.err
+    );
+    assert!(!first.out.contains("failed"), "{}", first.out);
+    let second = hakkiri(&root, cache.path(), &["check"])?;
+    assert_eq!(first.out, second.out);
+    assert_eq!(server.hits(), 1, "the second run made no request");
+    Ok(())
+}
+
+#[test]
+fn a_fetched_package_runs_but_for_its_script_rules_until_they_are_off() -> TestResult {
+    let suite = Suite::new("package-scripts");
+    let server = Server::start(vec![("/ProseStyle.zip", Route::Body(PROSE_STYLE.to_vec()))])?;
+    let root = prose_style_project(
+        &suite,
+        "scripts",
+        &server.url("/ProseStyle.zip"),
+        "  '*.md': {styles: [ProseStyle, Direct], Direct.Ease: off}\n",
+    );
+    let cache = cache_folder(&suite, "scripts-cache");
+    let result = hakkiri(&root, cache.path(), &["check"])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    let failed: Vec<&str> = result
+        .lines()
+        .into_iter()
+        .filter(|line| line.starts_with("failed "))
+        .collect();
+    for rule in [
+        "ProseStyle.BareWorkItem",
+        "ProseStyle.FlatRhythm",
+        "ProseStyle.HardBreak",
+        "ProseStyle.PrepositionChain",
+        "ProseStyle.SameSentenceStart",
+        "ProseStyle.SentencePerLine",
+    ] {
+        assert_eq!(
+            failed.iter().filter(|line| line.contains(rule)).count(),
+            1,
+            "{rule}: {}",
+            result.out
+        );
+    }
+    assert_eq!(failed.len(), 6, "{}", result.out);
+    assert!(
+        result
+            .lines()
+            .iter()
+            .any(|line| line.contains("Direct.Length")),
+        "the rest of the styles ran: {}",
+        result.out
+    );
+    let off = "  '*.md':\n    styles: [ProseStyle, Direct]\n    Direct.Ease: off\n    ProseStyle.BareWorkItem: off\n    ProseStyle.FlatRhythm: off\n    ProseStyle.HardBreak: off\n    ProseStyle.PrepositionChain: off\n    ProseStyle.SameSentenceStart: off\n    ProseStyle.SentencePerLine: off\n";
+    let quiet = prose_style_project(&suite, "scripts-off", &server.url("/ProseStyle.zip"), off);
+    let after = hakkiri(&quiet, cache.path(), &["check"])?;
+    assert_ne!(after.code, 2, "{}{}", after.out, after.err);
+    assert!(!after.out.contains("failed"), "{}", after.out);
     Ok(())
 }

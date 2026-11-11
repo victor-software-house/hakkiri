@@ -406,6 +406,14 @@ struct Loaded {
     unrunnable: Vec<Held>,
 }
 
+/// A package folder that was found, and where its entry is written.
+struct Found {
+    written: PathBuf,
+    folder: PathBuf,
+    key: &'static str,
+    line: Option<usize>,
+}
+
 /// A rule hakkiri cannot run, and the style that holds it.
 #[derive(Debug)]
 struct Held {
@@ -484,13 +492,7 @@ fn load_packages(
 ) -> Loaded {
     let mut loaded = Loaded::default();
     let mut folders: BTreeMap<String, PathBuf> = BTreeMap::new();
-    // A rule may extend a rule in any package, so every package is on the
-    // search path before the first style is read.
-    let search: Vec<PathBuf> = entries
-        .iter()
-        .filter_map(|entry| entry.path.as_deref())
-        .filter_map(|written| fs::canonicalize(root.join(written)).ok())
-        .collect();
+    let mut found: Vec<Found> = Vec::new();
     let mut from = key_line(text, "packages", 1).unwrap_or(1);
     for entry in entries {
         let key = if entry.url.is_some() { "url" } else { "path" };
@@ -508,12 +510,28 @@ fn load_packages(
             (None, _, _) => continue,
         };
         match fs::canonicalize(&folder) {
-            Ok(real) => loaded.packages.push(real),
-            Err(error) => {
-                faults.add(line, key, format!("`{}`: {error}", written.display()));
-                continue;
+            Ok(real) => {
+                loaded.packages.push(real);
+                found.push(Found {
+                    written,
+                    folder,
+                    key,
+                    line,
+                });
             }
+            Err(error) => faults.add(line, key, format!("`{}`: {error}", written.display())),
         }
+    }
+    // A rule may extend a rule in any package, so every package is on the
+    // search path before the first style is read.
+    let search = loaded.packages.clone();
+    for Found {
+        written,
+        folder,
+        key,
+        line,
+    } in found
+    {
         for style in style_folders(&folder, line, faults) {
             let name = style
                 .file_name()
