@@ -749,3 +749,60 @@ fn a_formats_entry_picks_the_reader_of_a_case() -> TestResult {
     assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"]);
     Ok(())
 }
+
+/// A project that runs `Team` on `*.txt` and sets `on_unknown`.
+fn unknown_project<'a>(suite: &'a Suite, name: &str, word: &str) -> Root<'a> {
+    let root = suite.scenario(name);
+    root.file("styles/Team/Filler.yml", FILLER);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        format!(
+            "on_unknown: {word}\npackages:\n  - path: styles\nfiles:\n  '*.txt': {{styles: [Team]}}\n"
+        ),
+    );
+    root.file(
+        "through.test.yml",
+        "- name: a very day\n  format: txt\n  input: A very day.\n  want: ''\n",
+    );
+    root
+}
+
+#[test]
+fn on_unknown_error_stops_a_case_in_a_format_no_reader_reads() -> TestResult {
+    let suite = Suite::new("test-on-unknown-error");
+    let root = unknown_project(&suite, "error", "error");
+    let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result.out.contains("no reader reads the format `txt`"),
+        "{}",
+        result.out
+    );
+    Ok(())
+}
+
+#[test]
+fn on_unknown_warn_and_ignore_give_a_case_no_alerts() -> TestResult {
+    let suite = Suite::new("test-on-unknown-skip");
+    for word in ["warn", "ignore"] {
+        let root = unknown_project(&suite, word, word);
+        let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+        assert_eq!(result.code, 0, "{word}: {}{}", result.out, result.err);
+        assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"], "{word}");
+    }
+    Ok(())
+}
+
+#[test]
+fn on_unknown_text_reads_the_case_as_plain_text() -> TestResult {
+    let suite = Suite::new("test-on-unknown-text");
+    let root = unknown_project(&suite, "text", "text");
+    let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert!(
+        result.out.contains("failed through.test.yml"),
+        "{}",
+        result.out
+    );
+    Ok(())
+}

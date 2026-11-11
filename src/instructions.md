@@ -47,6 +47,7 @@ hakkiri test --format json
 - A rule file holds cases under `tests`, and a `*.test.yml` file is a list of cases. `check` loads the cases and never runs them.
 - A case has `name` (required, unique in its file), `about`, `input`, `format` (an extension, `md` by default), `rule`, `want`, `contains` and `absent`.
   A `format` that no reader reads is plain text, and a case that runs through the config reads `input.<format>` by the config's `formats` entry first.
+  A case through the config follows `on_unknown` for such a format: `error` fails the case, and `warn` and `ignore` give it no alerts.
   A case needs one of `want`, `contains` and `absent`. `contains` and `absent` take a string or a list.
 - A case sees its alerts as lines, `line:column:Rule:message`. `want` equals them after both are trimmed, and an empty `want` means no alerts.
 - A case in a rule file, and a case with `rule` (a path relative to its test file), loads that rule alone: no config, every level.

@@ -15,6 +15,7 @@ A `formats` entry that maps an extension to a reader changed nothing for a case.
 - A case with a format that no extension names reads its input as plain text.
 - A case that runs through the config reads its input by the reader a `formats` entry gives `input.<format>`, before the extension, as `check` does.
 - An isolated case reads by the extension, or as plain text.
+- A case through the config follows `on_unknown` when no reader reads its format, as `check` does for a selected file.
 
 ## Capabilities
 

@@ -9,7 +9,7 @@ use hakkiri::alert::Alert;
 use hakkiri::rule::{self, LoadError, Rule, TestCase, alert_lines, cases_from_text};
 use hakkiri::{Language, parse};
 
-use crate::cli::TestArgs;
+use crate::cli::{OnUnknown, TestArgs};
 use crate::config::{self, DEFAULT, Project};
 use crate::files::is_skipped;
 use crate::report::{CaseResult, Failure, Tests, Uncovered};
@@ -332,9 +332,10 @@ impl Runner {
     /// The alerts `case` gets under `setup`, or why it could not run.
     fn lint(&mut self, case: &TestCase, setup: Setup<'_>) -> Result<Vec<Alert>, String> {
         let name = format!("input.{}", case.format);
-        // A format no reader reads is plain text, as for a file `check`
-        // selects.
-        let by_extension = Language::from_path(Path::new(&name)).unwrap_or(Language::Text);
+        let known = Language::from_path(Path::new(&name));
+        // An isolated case reads a format that no extension names as plain
+        // text.
+        let by_extension = known.unwrap_or(Language::Text);
         match setup {
             Setup::Rule(rule) => {
                 let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
@@ -347,11 +348,22 @@ impl Runner {
             }
             Setup::Project => {
                 let project = self.project()?;
-                let language = project.mapped_language(&name).unwrap_or(by_extension);
-                let tree = parse(language, &case.input).map_err(|error| error.to_string())?;
                 let Some(plan) = project.plan(&name) else {
                     return Ok(Vec::new());
                 };
+                // A case reads as `check` reads a selected file: a `formats`
+                // entry, then the extension, then what `on_unknown` says.
+                let language = match project.mapped_language(&name).or(known) {
+                    Some(language) => language,
+                    None => match project.on_unknown.unwrap_or_default() {
+                        OnUnknown::Text => Language::Text,
+                        OnUnknown::Warn | OnUnknown::Ignore => return Ok(Vec::new()),
+                        OnUnknown::Error => {
+                            return Err(format!("no reader reads the format `{}`", case.format));
+                        }
+                    },
+                };
+                let tree = parse(language, &case.input).map_err(|error| error.to_string())?;
                 if !plan.unrunnable.is_empty() {
                     let names: Vec<&str> = plan
                         .unrunnable
