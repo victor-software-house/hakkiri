@@ -27,4 +27,4 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 [test-2]: ../../design.md#2-a-case-is-a-small-record
 [test-5]: ../../design.md#5-finding-cases
 [test-7]: ../../design.md#7-the-report-and-the-exit-status
-[rule-names-4]: ../../../rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
+[rule-names-4]: ../../../../rule-names/design.md#4-test-finds-the-style-folder-as-vale-does

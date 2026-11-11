@@ -1,20 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-028
+active: HKR-032
 queue:
-  - id: HKR-028
-    title: Ship the test command
-    scope: cli
-    outcome: >-
-      hakkiri test runs the cases of rule files and test files, and fails when a rule
-      fires in no case.
-    blocked_by: []
-    acceptance:
-      - Integration tests cover the cases of a rule file and of a test file, an isolated and a project run, coverage, and exit status by outcome.
-      - JSON output holds no ESC byte with CLICOLOR_FORCE=1.
-    plan: openspec/changes/test-command/proposal.md
-
   - id: HKR-032
     title: Name and load rule files as Vale does
     scope: rules
@@ -47,8 +35,7 @@ queue:
     title: Release hakkiri through verctl
     scope: release
     outcome: A verctl Version PR publishes a release of hakkiri, and mise installs it.
-    blocked_by:
-      - HKR-028
+    blocked_by: []
     acceptance:
       - A verctl Version PR publishes 0.0.1 as a tag and a GitHub Release with a linux-x64 and a darwin-arm64 tarball and their checksums, and no crates.io crate.
       - mise installs the release on a Mac and on Linux x86-64 from a pinned version and a locked checksum.
@@ -183,6 +170,19 @@ queue:
     acceptance:
       - Every adopted project passes CI on hakkiri.
 archive:
+  - id: HKR-028
+    title: Ship the test command
+    scope: cli
+    outcome: >-
+      hakkiri test runs the cases of rule files and test files, and fails when a rule
+      fires in no case.
+    plan: openspec/changes/archive/2026-11-10-test-command/proposal.md
+    completed: 2026-11-11T02:54:28
+    evidence:
+      - openspec/changes/archive/2026-11-10-test-command/
+      - PR 57, PR 59 and PR 60 merged hakkiri test at 4979c2a, with its CI run green on that commit; the test-command change is archived.
+    disposition: completed
+
   - id: HKR-005
     title: Ship the check command
     scope: cli
