@@ -39,6 +39,10 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify the `vertical-tab` and `short-references` inputs match Vale, apart from the rows of `departures.tsv`.
   - 2026-11-11 (UTC), the `vertical-tab` input fails on the old whitespace set and passes on the new one, in [f9d09dd][c-vtab].  
     Vale gave 152 more alert rows on the two inputs, and `departures.tsv` gains one row, for a reference unescaped twice.
+- [x] 2.8 Read an `img` alt text that is only whitespace.  
+  Verify the `blank-alt` input matches Vale, apart from the rows of `departures.tsv`.
+  - 2026-11-11 (UTC), the `blank-alt` input fails on the old check, with two alt rows only Vale gave, and passes on the new one, in [e40f778][c-blank].  
+    `departures.tsv` gains one row, for the text around a blank alt, which Vale does not report.
 
 ## 3. Record
 
@@ -58,3 +62,4 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 [c-feat]: https://github.com/victor-software-house/hakkiri/commit/8e901f2aef680f7304cfefba0726cee5bbcb6856
 [c-heading]: https://github.com/victor-software-house/hakkiri/commit/f35261be1af13acdb2f72ec4afd3a017bde57bb0
 [c-vtab]: https://github.com/victor-software-house/hakkiri/commit/f9d09dd988ef4a619b9881ee74b17ec22f139ab5
+[c-blank]: https://github.com/victor-software-house/hakkiri/commit/e40f778495f7c71c53704c75f5d4cddf7bc3d293
