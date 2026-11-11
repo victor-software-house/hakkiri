@@ -284,6 +284,36 @@ fn coverage_names_a_rule_no_case_fires() -> TestResult {
 }
 
 #[test]
+fn a_walk_skips_node_modules() -> TestResult {
+    let suite = Suite::new("test-node-modules");
+    let root = styled(&suite, "node-modules");
+    root.file(
+        "node_modules/pkg/vendored.test.yml",
+        "- name: vendored\n  rule: ../../styles/Team/Filler.yml\n  input: A very day.\n  absent: Team.Filler\n",
+    );
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 2 passed, 0 failed"]);
+    Ok(())
+}
+
+#[test]
+fn a_rule_file_with_a_dotted_name_is_named_as_the_style_loader_names_it() -> TestResult {
+    let suite = Suite::new("test-dotted");
+    let root = suite.scenario("dotted");
+    root.file("styles/Team/Foo.v2.yml", HEDGE);
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file(
+        "through.test.yml",
+        "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Foo.v2\n",
+    );
+    let result = run(root.path(), &["test", "--coverage"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed, 0 uncovered"]);
+    Ok(())
+}
+
+#[test]
 fn json_holds_no_escape_byte_under_forced_colour() -> TestResult {
     let suite = Suite::new("test-json");
     let root = styled(&suite, "json");

@@ -48,7 +48,8 @@ This is Vale's form ([run][v-run]), so ProseStyle's `want` and `contains` string
 
 A case in a rule's `tests`, or one with `rule`, loads that rule alone, from a path relative to its test file.
 It reads no config, reports an alert of any level, and applies no `level` or `off` from a glob.
-The rule keeps its project name: the folder it sits in, a dot, and its file name without `.yml`.
+The rule keeps its project name: the folder it sits in, a dot, and its file name without the extension, so `Foo.v2.yml` in `Team` is `Team.Foo.v2`.
+The style loader and the `test` command derive the name in one function, so a coverage report and an alert agree.
 Any other case lints `input` as a file named `input.<format>` in the current directory, through the whole config, so its globs, styles and levels apply.
 Vale isolates the same way ([isolate][v-isolate]).
 
@@ -56,6 +57,7 @@ Vale isolates the same way ([isolate][v-isolate]).
 
 An argument is a file, read as given, or a directory, walked in sorted order, and no argument means the current directory.
 The walk skips a dot directory except the root it was given, as Vale does ([find][v-find]).
+It skips `node_modules` too, through the same test as the `check` walk, so one list of skipped folders serves both.
 A `*.test.yml` file is read as cases, and any other `.yml` file only when it holds `extends` and `tests`, so `test` can walk a repository that holds other YAML.
 No case found is an error.
 

@@ -653,6 +653,19 @@ fn at_tab(mut error: InputError, text: &str) -> LoadError {
     LoadError::from(error)
 }
 
+/// The name the rule in `file` has: the folder that holds it, a dot, and the
+/// file name without its extension, so `Team/Foo.v2.yml` is `Team.Foo.v2`.
+///
+/// [`load_style`] names its rules this way, and so does every caller that
+/// must agree with it. `None` when the file has no folder name or its names
+/// are not UTF-8.
+#[must_use]
+pub fn rule_name(file: &Path) -> Option<String> {
+    let style = file.parent()?.file_name()?.to_str()?;
+    let stem = file.file_stem()?.to_str()?;
+    Some(format!("{style}.{stem}"))
+}
+
 /// Loads every `.yml` file directly inside the style folder `folder`.
 ///
 /// A rule is named by the folder, a dot, and its file name without the
@@ -674,10 +687,9 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
             message,
         }],
     };
-    let style = folder
-        .file_name()
-        .and_then(|name| name.to_str())
-        .ok_or_else(|| unread("the style folder has no name".to_owned()))?;
+    if folder.file_name().and_then(|name| name.to_str()).is_none() {
+        return Err(unread("the style folder has no name".to_owned()));
+    }
     let package = folder
         .parent()
         .filter(|parent| !parent.as_os_str().is_empty())
@@ -694,22 +706,22 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
     let mut rules = Vec::new();
     let mut problems = Vec::new();
     for path in files {
-        let stem = path
-            .file_stem()
-            .and_then(|stem| stem.to_str())
-            .unwrap_or_default();
         let file = path.display().to_string();
-        let rule = fs::read_to_string(&path)
-            .map_err(|error| LoadError {
-                problems: vec![LoadProblem {
-                    file: file.clone(),
-                    line: None,
-                    column: None,
-                    field: String::new(),
-                    message: error.to_string(),
-                }],
-            })
-            .and_then(|text| Rule::from_text_in(&format!("{style}.{stem}"), &file, &text, package));
+        let failed = |message: String| LoadError {
+            problems: vec![LoadProblem {
+                file: file.clone(),
+                line: None,
+                column: None,
+                field: String::new(),
+                message,
+            }],
+        };
+        let rule = rule_name(&path)
+            .ok_or_else(|| failed("the file name is not UTF-8".to_owned()))
+            .and_then(|name| {
+                let text = fs::read_to_string(&path).map_err(|error| failed(error.to_string()))?;
+                Rule::from_text_in(&name, &file, &text, package)
+            });
         match rule {
             Ok(rule) => rules.push(rule),
             Err(error) => problems.extend(error.problems),

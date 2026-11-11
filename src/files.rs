@@ -2,6 +2,7 @@
 //! the rules the config runs on each.
 
 use std::collections::HashSet;
+use std::ffi::OsStr;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 
@@ -12,6 +13,11 @@ use crate::report::Failure;
 
 /// The folders a walk never enters.
 const SKIPPED: [&str; 2] = ["node_modules", ".git"];
+
+/// Whether a walk never enters a folder named `name`.
+pub(crate) fn is_skipped(name: &OsStr) -> bool {
+    SKIPPED.iter().any(|skipped| name == *skipped)
+}
 
 /// One file to lint.
 #[derive(Debug)]
@@ -129,8 +135,7 @@ impl Finder<'_> {
     /// `.git`, a folder of a package, or a folder that is neither under the
     /// project root nor on the way to it.
     fn skips(&self, path: &Path) -> bool {
-        path.file_name()
-            .is_some_and(|name| SKIPPED.iter().any(|skipped| name == *skipped))
+        path.file_name().is_some_and(is_skipped)
             || fs::canonicalize(path).is_ok_and(|real| {
                 self.project.packages.contains(&real) || !self.project.leads_to_root(&real)
             })

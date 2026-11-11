@@ -3,7 +3,7 @@
 ### Requirement: Cases come from rule files and test files
 
 `hakkiri test` SHALL run the `tests` of each rule file and each case of each `*.test.yml` file under the paths it is given, or under the current directory when it is given none.  
-A directory walk SHALL skip a dot directory other than the one named.  
+A directory walk SHALL skip a dot directory other than the one named, and every folder the `check` walk skips by name.  
 It SHALL read any other `.yml` file only when it holds `extends` and `tests`, and SHALL fail when it finds no case.
 
 #### Scenario: A rule with cases and a test file
@@ -15,6 +15,11 @@ It SHALL read any other `.yml` file only when it holds `extends` and `tests`, an
 
 - **WHEN** a directory holds `ci.yml`, a workflow with no `extends`
 - **THEN** hakkiri reads no case from it and reports nothing about it
+
+#### Scenario: A folder the walk skips
+
+- **WHEN** `node_modules/pkg/x.test.yml` holds a failing case and the rest of the project holds passing ones
+- **THEN** `hakkiri test` runs no case from `node_modules` and exits 0
 
 #### Scenario: No case
 
@@ -59,7 +64,7 @@ A case's alerts SHALL be one line each, `line:column:Rule:message`, in order of 
 ### Requirement: An isolated case loads one rule
 
 A case in a rule's `tests`, and a case with `rule`, SHALL load that rule alone, from a path relative to its file.  
-It SHALL read no config, report an alert of any level, and name the rule by its folder and file name.  
+It SHALL read no config, report an alert of any level, and name the rule by its folder and its file name without the extension, as the style loader does, so `Team/Foo.v2.yml` is `Team.Foo.v2`.  
 Any other case SHALL lint `input` as a file named `input.<format>` through the project config.
 
 #### Scenario: A rule turned off in the config
@@ -81,6 +86,11 @@ It SHALL skip dot and underscore folders when it lists the rules.
 
 - **WHEN** `Team.Filler` and `Team.Hedge` each hold a case and only `Team.Filler` flags anything
 - **THEN** `hakkiri test --coverage` names `Team.Hedge`, and exits 1
+
+#### Scenario: A rule file with a dotted name
+
+- **WHEN** `styles/Team/Foo.v2.yml` flags a line that a case through the config lints, under `--coverage`
+- **THEN** hakkiri counts `Team.Foo.v2` as covered, the name the alert carries
 
 ### Requirement: The report and exit status say what happened
 

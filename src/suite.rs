@@ -6,11 +6,12 @@ use std::fs;
 use std::path::{Component, Path, PathBuf};
 
 use hakkiri::alert::Alert;
-use hakkiri::rule::{LoadError, Rule, TestCase, alert_lines, cases_from_text};
+use hakkiri::rule::{self, LoadError, Rule, TestCase, alert_lines, cases_from_text};
 use hakkiri::{Language, parse};
 
 use crate::cli::TestArgs;
 use crate::config::{self, DEFAULT, Project};
+use crate::files::is_skipped;
 use crate::report::{CaseResult, Failure, Tests};
 use crate::run::lint_planned;
 
@@ -93,9 +94,9 @@ fn skips_inert(name: &str) -> bool {
 /// The `.yml` files `paths` name or hold, in sorted order, and the paths that
 /// could not be read.
 ///
-/// A file is taken as given. A walk skips a folder when it is a dot folder or
-/// `inert` says so, except the folder it was given, and keeps a file when
-/// `keep` says so.
+/// A file is taken as given. A walk skips a folder when it is a dot folder,
+/// when `inert` says so, or when `check`'s walk skips it, except the folder it
+/// was given, and keeps a file when `keep` says so.
 fn find(
     paths: &[PathBuf],
     inert: &dyn Fn(&str) -> bool,
@@ -146,7 +147,7 @@ fn walk(
             continue;
         };
         if kind.is_dir() {
-            if !name.starts_with('.') && !inert(&name) {
+            if !name.starts_with('.') && !inert(&name) && !is_skipped(&entry.file_name()) {
                 walk(&path, inert, keep, found, failures);
             }
         } else if path.extension().is_some_and(|extension| extension == "yml") && keep(&path) {
@@ -178,13 +179,9 @@ fn package_of(file: &Path) -> Option<PathBuf> {
     )
 }
 
-/// The name a rule file gives its rule: its folder, a dot, and the file name
-/// up to its first dot.
+/// The name the style loader gives the rule in `file`, with symlinks resolved.
 fn rule_name(file: &Path) -> Option<String> {
-    let real = fs::canonicalize(file).ok()?;
-    let style = real.parent()?.file_name()?.to_string_lossy().into_owned();
-    let stem = real.file_name()?.to_string_lossy();
-    Some(format!("{style}.{}", stem.split('.').next()?))
+    rule::rule_name(&fs::canonicalize(file).ok()?)
 }
 
 /// Where a case runs.
