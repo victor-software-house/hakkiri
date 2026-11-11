@@ -70,6 +70,23 @@ checksum_source = "mise-versions"
 url = "https://github.com/victor-software-house/qctl/releases/download/v0.6.0/qctl_0.6.0_macos_arm64.tar.gz"
 url_api = "https://api.github.com/repos/victor-software-house/qctl/releases/assets/671129358"
 
+[[tools."github:victor-software-house/verctl"]]
+version = "0.8.0"
+backend = "github:victor-software-house/verctl"
+specifiers = ["0.8.0"]
+
+[tools."github:victor-software-house/verctl"."platforms.linux-x64"]
+checksum = "sha256:74d1c725e16a689fa2ac270b151cdf5ea61af65ee1b54c963eb91a1ba648d469"
+checksum_source = "mise-versions"
+url = "https://github.com/victor-software-house/verctl/releases/download/v0.8.0/verctl_0.8.0_linux_x64.tar.gz"
+url_api = "https://api.github.com/repos/victor-software-house/verctl/releases/assets/733285768"
+
+[tools."github:victor-software-house/verctl"."platforms.macos-arm64"]
+checksum = "sha256:acb6a1bc5e890704a95dfd33c5a7db7659ed87899f363376bd0f9d2db50632fb"
+checksum_source = "mise-versions"
+url = "https://github.com/victor-software-house/verctl/releases/download/v0.8.0/verctl_0.8.0_macos_arm64.tar.gz"
+url_api = "https://api.github.com/repos/victor-software-house/verctl/releases/assets/733294377"
+
 [[tools.jactionlint]]
 version = "2.5.0"
 backend = "packslip:github.com/jdx/jactionlint"
