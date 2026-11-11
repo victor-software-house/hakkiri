@@ -42,6 +42,11 @@ hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the named v
 - **WHEN** `data\Wset` is accepted and the text is `A data set, data-set, dataxset and DATA SET.`
 - **THEN** the only alert is ``Use 'data\Wset' instead of 'DATA SET'.``, because hakkiri lowercases the literal text of the term and leaves `\W` a non-word character
 
+#### Scenario: A group name, a backreference and a flag in a term
+
+- **WHEN** `(?<Dup>Ab)\k<Dup>`, `(?U)Ab+` or `A\pLB` is accepted
+- **THEN** the term builds as `(?<Dup>ab)\k<Dup>`, `(?U)ab+` or `a\pLb`, since only the literal text is lowercased
+
 #### Scenario: A phrase that wraps
 
 - **WHEN** `mea culpa` is accepted and the text wraps `mea` and `Culpa`, or `mea` and `culpa`, over two lines

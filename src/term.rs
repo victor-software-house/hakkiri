@@ -10,13 +10,17 @@
 #[cfg(test)]
 mod tests;
 
+use std::iter::Peekable;
+use std::str::Chars;
+
 /// The most spellings a term may list; past it a term is no longer one word
 /// spelled several ways.
 const MAX_EXPANSIONS: usize = 64;
 
 /// `term` with the literal text of the pattern lowercased and the rest as
-/// written: an escape such as `\W`, `\p{Lu}` or `\x{41}`, and the name of a
-/// capture group.
+/// written: an escape such as `\W`, `\p{Lu}`, `\pL` or `\x{41}`, the name of a
+/// capture group and of a backreference to it, and a flag group such as
+/// `(?U)`.
 ///
 /// Vale lowercases the whole pattern, so `\W` becomes `\w` and the term means
 /// something else. hakkiri leaves the escapes alone.
@@ -29,45 +33,80 @@ pub(crate) fn lowercase_literals(term: &str) -> String {
                 out.push(c);
                 let Some(escaped) = chars.next() else { break };
                 out.push(escaped);
-                if matches!(escaped, 'p' | 'P' | 'x' | 'u' | 'U') && chars.peek() == Some(&'{') {
-                    for inner in chars.by_ref() {
-                        out.push(inner);
-                        if inner == '}' {
-                            break;
-                        }
-                    }
-                }
+                escape(escaped, &mut chars, &mut out);
             }
             '(' => {
                 out.push(c);
-                // `(?P<Name>` and `(?<Name>` name a group.
-                let rest: String = chars.clone().take(4).collect();
-                let skip = if rest.starts_with("?P<") {
-                    3
-                } else if rest.starts_with("?<")
-                    && !rest.starts_with("?<=")
-                    && !rest.starts_with("?<!")
-                {
-                    2
-                } else {
-                    0
-                };
-                if skip > 0 {
-                    for inner in chars.by_ref().take(skip) {
-                        out.push(inner);
-                    }
-                    for inner in chars.by_ref() {
-                        out.push(inner);
-                        if inner == '>' {
-                            break;
-                        }
-                    }
-                }
+                group(&mut chars, &mut out);
             }
             _ => out.extend(c.to_lowercase()),
         }
     }
     out
+}
+
+/// The characters of an escape after its letter `escaped`, copied as written:
+/// `\pL`, `\p{Lu}`, `\x{41}` and `\k<Name>`, `\k'Name'` and `\k{Name}`.
+fn escape(escaped: char, chars: &mut Peekable<Chars<'_>>, out: &mut String) {
+    match (escaped, chars.peek().copied()) {
+        ('p' | 'P', Some(next)) if next.is_alphabetic() => out.extend(chars.next()),
+        ('p' | 'P' | 'x' | 'u' | 'U' | 'k', Some('{')) => copy_through(chars, out, '}'),
+        ('k', Some('<')) => copy_through(chars, out, '>'),
+        ('k', Some('\'')) => copy_through(chars, out, '\''),
+        _ => {}
+    }
+}
+
+/// The characters of a group after its `(`, copied as written when they name
+/// the group, refer to one or set flags: `(?P<Name>`, `(?<Name>`, `(?'Name'`,
+/// `(?P=Name)`, `(?i)`, `(?-i:` and `(?U)`.
+fn group(chars: &mut Peekable<Chars<'_>>, out: &mut String) {
+    if chars.peek() != Some(&'?') {
+        return;
+    }
+    let rest: String = chars.clone().take(4).collect();
+    if rest.starts_with("?P<") {
+        out.extend(chars.by_ref().take(3));
+        copy_until(chars, out, '>');
+    } else if rest.starts_with("?P=") {
+        out.extend(chars.by_ref().take(3));
+        copy_until(chars, out, ')');
+    } else if rest.starts_with("?<") && !rest.starts_with("?<=") && !rest.starts_with("?<!") {
+        out.extend(chars.by_ref().take(2));
+        copy_until(chars, out, '>');
+    } else if rest.starts_with("?'") {
+        out.extend(chars.by_ref().take(2));
+        copy_until(chars, out, '\'');
+    } else if rest
+        .chars()
+        .nth(1)
+        .is_some_and(|flag| flag.is_ascii_alphabetic() || flag == '-')
+    {
+        out.extend(chars.by_ref().take(1));
+        while let Some(&flag) = chars.peek() {
+            if !(flag.is_ascii_alphabetic() || flag == '-') {
+                break;
+            }
+            out.extend(chars.next());
+        }
+    }
+}
+
+/// The opening character the iterator is at, and every character after it
+/// through `close`, copied as written.
+fn copy_through(chars: &mut Peekable<Chars<'_>>, out: &mut String, close: char) {
+    out.extend(chars.next());
+    copy_until(chars, out, close);
+}
+
+/// Every character through `close`, copied as written.
+fn copy_until(chars: &mut Peekable<Chars<'_>>, out: &mut String, close: char) {
+    for inner in chars.by_ref() {
+        out.push(inner);
+        if inner == close {
+            break;
+        }
+    }
 }
 
 /// `term` in the spelling that equals `observed` without regard to case, when

@@ -2,6 +2,7 @@
 //! `recaseToTerm` in Vale.
 
 use super::{lowercase_literals, recase_to_term};
+use crate::pattern::Pattern;
 
 #[test]
 fn a_plain_term_is_shown_as_it_is() {
@@ -45,4 +46,23 @@ fn only_the_literal_text_is_lowercased() {
     assert_eq!(lowercase_literals("(?<Word>Ab)"), "(?<Word>ab)");
     assert_eq!(lowercase_literals("(?<=Ab)C"), "(?<=ab)c");
     assert_eq!(lowercase_literals("Ab\\"), "ab\\");
+}
+
+#[test]
+fn the_names_of_groups_and_backreferences_and_the_flags_are_kept() {
+    for (term, kept) in [
+        ("(?<Dup>Ab)\\k<Dup>", "(?<Dup>ab)\\k<Dup>"),
+        ("(?<Dup>Ab)\\k'Dup'", "(?<Dup>ab)\\k'Dup'"),
+        ("(?<Dup>Ab)\\k{Dup}", "(?<Dup>ab)\\k{Dup}"),
+        ("(?P<Dup>Ab)(?P=Dup)", "(?P<Dup>ab)(?P=Dup)"),
+        ("(?'Dup'Ab)\\k<Dup>", "(?'Dup'ab)\\k<Dup>"),
+        ("(?U)Ab+", "(?U)ab+"),
+        ("(?i:Ab)C", "(?i:ab)c"),
+        ("A\\pLB", "a\\pLb"),
+    ] {
+        assert_eq!(lowercase_literals(term), kept);
+    }
+    let pattern =
+        Pattern::new(&lowercase_literals("(?<Dup>Ab)\\k<Dup>")).expect("the pattern compiles");
+    assert!(pattern.is_match("abab").expect("the search runs"));
 }
