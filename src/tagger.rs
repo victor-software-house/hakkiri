@@ -6,11 +6,18 @@
 //! [`Tagger::english()`] reads the model once per process, and
 //! [`Tagger::tag()`] tokenizes one sentence and tags each token.
 //!
+//! A few rules then correct the model's tags where it is wrong on the prose of
+//! our documents: the possessive `'s`, a word in capitals, a modal in capitals
+//! and a semicolon.
+//! [`Tagger::tag()`] and [`Tagger::tag_words()`] apply them.
+//! [`Tagger::tag_treebank()`] does not, so a title is read as prose reads it.
+//!
 //! The model is trained on UD English EWT and is under CC BY-SA 4.0.
 //! Its notice is in `data/tagger/NOTICE.md`.
 //!
 //! [prose]: https://github.com/jdkato/prose/tree/b33e60dbff0492289b227f3681120ac057d8131b
 
+mod corrections;
 mod features;
 mod model;
 mod tokens;
@@ -120,19 +127,29 @@ impl Tagger {
 
     /// The words of `sentence` as prose's Treebank tokenizer cuts them, the
     /// way a title is tagged, each with its tag.
+    ///
+    /// The tags are the model's, with no correction, as prose gives them.
     #[must_use]
     pub fn tag_treebank(&self, sentence: &str) -> Vec<String> {
         let words = treebank::tokenize(sentence);
         let refs: Vec<&str> = words.iter().map(String::as_str).collect();
-        self.tag_words(&refs)
+        self.model_tags(&refs)
             .into_iter()
             .map(str::to_owned)
             .collect()
     }
 
-    /// The tag of each of `words`, which are already cut.
+    /// The tag of each of `words`, which are already cut, after the
+    /// corrections.
     #[must_use]
     pub fn tag_words<'a>(&'a self, words: &[&'a str]) -> Vec<&'a str> {
+        let mut tags = self.model_tags(words);
+        corrections::apply(words, &mut tags);
+        tags
+    }
+
+    /// The tag the model gives each of `words`, which are already cut.
+    fn model_tags<'a>(&'a self, words: &[&'a str]) -> Vec<&'a str> {
         let mut context = vec![features::START.to_owned(), features::START2.to_owned()];
         context.extend(words.iter().map(|word| features::normalize(word)));
         context.push(features::END.to_owned());
