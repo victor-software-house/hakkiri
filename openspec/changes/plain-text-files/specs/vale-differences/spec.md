@@ -78,6 +78,11 @@ hakkiri SHALL read a selected file that no reader reads as plain text, skip a bi
 - **WHEN** a glob selects a file that holds a NUL byte
 - **THEN** hakkiri skips it, and Vale has no such test and reads it as lines ([plain-text 5][plain-text-5])
 
+#### Scenario: The extension of a mapped file
+
+- **WHEN** `formats` maps `txt: md` and a rule has `scope: text.md`
+- **THEN** hakkiri selects the text of `a.txt`, and Vale compares the scope's extension with the file's own, `.txt`, and selects nothing ([plain-text 6][plain-text-6])
+
 #### Scenario: A plain-text file with markup
 
 - **WHEN** `notes.cfg` holds a fenced block, a glob selects it and no `formats` entry maps it
@@ -93,6 +98,7 @@ hakkiri SHALL read a selected file that no reader reads as plain text, skip a bi
 [ledger]: ../../../../../tasks.yaml
 [plain-text-1]: ../../design.md#1-plain-text-is-one-raw-root-of-paragraphs
 [plain-text-5]: ../../design.md#5-a-binary-file-is-skipped
+[plain-text-6]: ../../design.md#6-a-mapped-file-takes-the-extension-of-the-reader
 [settings-5]: ../../../archive/2026-11-11-package-settings/design.md#5-scalars-the-project-wins
 [spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
 [styles-4]: ../../../archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart

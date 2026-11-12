@@ -63,6 +63,14 @@ Vale has no such test in `NewFile` or `lintFile`, so it reads a binary file as l
 Alternative: test every file.
 It lost because a file with a reader is the project's own statement that it is text.
 
+### 6. A mapped file takes the extension of the reader
+
+A `formats` entry that gives the reader also gives the extension the scopes see: `text.md` and `~heading.md` select in a `.txt` file mapped to `md`.
+Vale compares a scope's extension with the file's own, `RealExt`, so there `text.md` selects nothing in that file.
+A file with no entry keeps its own extension, as in Vale.
+Alternative: keep the file's own extension, as Vale does.
+It lost because the entry marks the file as Markdown, and a rule for Markdown should apply to it.
+
 [check]: ../../specs/check-command/spec.md
 [v-format]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/format.go#L169-L196
 [v-for]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/format.go#L203-L229

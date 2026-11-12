@@ -54,6 +54,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A walk is the `ignore` crate's, with git rules only: it skips what git ignores unless `gitignore` is false, and a named file is never filtered.  
    A selected file with no reader is plain text (`Language::Text`, one `raw` root of paragraphs), unless `on_unknown` changes that.  
    `formats` looks a file up as Vale's `formatFor` does: the extension, then the name or a glob, in key order.  
+   A file it maps has the extension of its reader in scopes such as `text.md`, where Vale keeps the file's own.  
    The pretty output is a line per alert with no colour and no frame, because tools read it.
 7. **Test cases.**
    A rule file holds its cases under `tests`, and a `*.test.yml` file is a list of them. `check` loads cases and never runs them.  
