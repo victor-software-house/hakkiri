@@ -24,6 +24,8 @@ A fault about a name of a list, such as a `styles` name that is no style, a `voc
 A fault about the whole value of a key still lands where the value starts.
 For a scalar or a flow value that is the line of the key, and for a block collection it is the first line below it.
 The faults about the key itself take `Input::place_key`, which ctl-core adds in [CTC-054][ledger].
+They are a glob that is no glob and a setting that names no rule.
+They are also a key that a package's settings file may not hold, and a `path` entry in such a file.
 
 ### 3. A layer keeps one `Input`
 

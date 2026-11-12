@@ -486,6 +486,16 @@ fn set_vocabulary_rules<S: AsRef<str>>(switches: &mut HashMap<String, bool>, nam
     }
 }
 
+/// The 1-based line where `input` writes the key at `path`, or where its
+/// nearest written ancestor's key is, and `None` when the text does not parse.
+///
+/// A fault about a key itself, such as a glob that is no glob, belongs here,
+/// since the value of a key that holds a block collection starts on the line
+/// below it.
+fn key_line_of(input: &Input, path: &FieldPath) -> Option<usize> {
+    input.place_key(path).map(|at| at.line)
+}
+
 /// The 1-based line where `input` writes the value at `path`, or where its
 /// nearest written ancestor is, and `None` when the text does not parse.
 ///
@@ -625,13 +635,11 @@ impl<'a> Walk<'a> {
         };
         for (index, entry) in entries.iter().enumerate() {
             let key = if entry.url.is_some() { "url" } else { "path" };
-            let line = line_of(
-                input,
-                &FieldPath::root().key("packages").index(index).key(key),
-            );
+            let entry_path = FieldPath::root().key("packages").index(index).key(key);
+            let line = line_of(input, &entry_path);
             if depth > 0 && entry.path.is_some() {
                 faults.add(
-                    line,
+                    key_line_of(input, &entry_path),
                     key,
                     "is not allowed in a package's settings: pin the package by `url` and `sha256`"
                         .to_owned(),
@@ -750,7 +758,7 @@ impl<'a> Walk<'a> {
         ] {
             if set {
                 faults.add(
-                    line_of(&input, &FieldPath::root().key(key)),
+                    key_line_of(&input, &FieldPath::root().key(key)),
                     key,
                     "belongs to the project's config, not a package's settings".to_owned(),
                 );
@@ -1008,7 +1016,7 @@ fn read_globs(
     for (pattern, settings) in files.0 {
         // One key of the path, whatever dots, stars and slashes the glob holds.
         let glob = FieldPath::root().key("files").key(&pattern);
-        let line = line_of(input, &glob);
+        let line = key_line_of(input, &glob);
         let matcher = match GlobBuilder::new(&pattern).build() {
             Ok(glob) => glob.compile_matcher(),
             Err(error) => {
@@ -1061,7 +1069,11 @@ fn read_globs(
                     } else {
                         "names no rule in any style the config loads"
                     };
-                    faults.add(at, &key, message.to_owned());
+                    faults.add(
+                        key_line_of(input, &glob.clone().key(&key)),
+                        &key,
+                        message.to_owned(),
+                    );
                 }
                 (_, Setting::List(_)) => {
                     faults.add(at, &key, format!("is set to {LEVELS}, `on` or `off`"));

@@ -443,3 +443,25 @@ fn a_fault_about_a_later_style_names_the_line_of_that_style() -> TestResult {
     );
     Ok(())
 }
+
+/// A glob that is no glob, and a setting that names no rule, each with a block
+/// value: the fault is about the key, so it names the key's line and not the
+/// line below it.
+#[test]
+fn a_fault_about_a_key_with_a_block_value_names_the_line_of_the_key() -> TestResult {
+    let suite = Suite::new("rule-setting-key-lines");
+    let root = project(
+        &suite,
+        "key-lines",
+        "  '[a':\n    styles: [Other]\n  'a.md':\n    Nope.Rule:\n      - x\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    for expected in [
+        "line 4: [a: is not a glob",
+        "line 7: Nope.Rule: is not `styles`, and names no rule",
+    ] {
+        assert!(result.err.contains(expected), "{expected}: {}", result.err);
+    }
+    Ok(())
+}

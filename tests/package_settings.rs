@@ -887,3 +887,22 @@ fn a_package_maps_extensions_and_the_project_overrides_it() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn a_refused_key_of_a_package_file_names_its_own_line_whatever_its_value_spans() -> TestResult {
+    let suite = Suite::new("package-settings-refused-key-lines");
+    let root = project(&suite, "refused", "packages:\n  - path: pkg/styles\n");
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "level: warning\nfail_level:\n  error\npackages:\n  - path:\n      ../own\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    for expected in [
+        "line 2: fail_level: belongs to the project's config",
+        "line 5: path: is not allowed in a package's settings",
+    ] {
+        assert!(result.err.contains(expected), "{expected}: {}", result.err);
+    }
+    Ok(())
+}
