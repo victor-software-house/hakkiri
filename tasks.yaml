@@ -299,14 +299,15 @@ queue:
     outcome: The values in a Markdown file's front matter are linted as text, as Vale does.
     blocked_by: []
     acceptance:
-      - A text rule reports a word in a front matter value, with the alerts Vale 66bbb85 gives on the probe files in tests/fixtures/front-matter, less the four alerts Vale places at the wrong text.
+      - A text rule reports a word in a front matter value, with the alerts Vale 66bbb85 gives on the probe files in tests/fixtures/front-matter, less the nine alerts Vale places at the wrong text.
       - The values of YAML and TOML front matter come from ctl-core Input::top_level, and no line reader of our own reads them.
     notes:
       - '2026-11-11, found while probing comment controls: Vale flags the word very in the title value of a front matter block, and hakkiri skips the whole block. The probe is tests/fixtures/markup-differences/text/m2.md. Which keys Vale lints is not measured yet.'
       - '2026-11-12, measured on Vale 66bbb85 over ten files and three configs (590 alerts): it lints the top-level string values only, as the front-matter spec lists, and places 4 alerts at the wrong text per config: the second line of a folded scalar, a TOML value found by searching the block, and a !!str value.'
-      - 2026-11-12, an earlier reader of our own (PR 106, reverted in PR 113) skipped anchors, aliases and complex keys. The rebuild reads YAML and TOML through ctl-core 0.7.3 Input::top_level, and only dates and the plain value << need a filter in hakkiri, since yaml.v3 reads them as no string and serde-saphyr as one.
+      - 2026-11-12, an earlier reader of our own (PR 106, reverted in PR 113) skipped anchors, aliases and complex keys. The rebuild reads YAML and TOML through ctl-core Input::top_level, and only dates and the plain value << need a filter in hakkiri, since yaml.v3 reads them as no string and serde-saphyr as one.
       - '2026-11-12, measured in a box: the release binary grew from 14,375,208 to 15,038,184 bytes (662,976, 4.6%) with ctl-core 0.7.3 and its input-toml feature, which adds the toml crate.'
-      - 2026-11-12, ctl-core 0.7.3 refuses a whole YAML block that holds .inf, -.inf or .NaN as a value, so no value of that block is linted, where Vale lints the others. The probe file f7 holds 3 where it held those three values, so the 590 alerts of Vale still hold line by line; the fix is in ctl-core (top_level reads under its own options).
+      - '2026-11-12, ctl-core 0.7.3 refused a whole YAML block that held a repeated key, a merge key, .inf, -.inf or .NaN as a value, and left out a number or null key, where Vale lints the other values. ctl-core 0.7.4 (CTC-055) lists them all, so the probe file f7 holds its three original values again, and f11 to f15 record the 306 more alerts of Vale for an alias, a repeated key, a merge key, number and null keys and the three non-finite floats.'
+      - '2026-11-12, Vale fails a file whose front matter no parser reads, and a sequence key as well, with E201 on line 1, and lints none of it. hakkiri fails the file with the line of the parser problem and lints the rest, and lints the rest of a block with a sequence key, which a parser reads. Vale puts a value after an anchor at the anchor, as it does after a tag, so the four misplaced alerts per config are nine.'
     plan: openspec/changes/front-matter-values/proposal.md
 
   - id: HKR-051

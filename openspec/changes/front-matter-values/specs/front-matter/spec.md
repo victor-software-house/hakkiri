@@ -28,10 +28,15 @@ An opening fence line MAY carry blanks after the dashes or pluses.
 - **WHEN** a value has an anchor, a key has an anchor, a value is an alias, and an entry has a sequence as its key
 - **THEN** the anchored value and the anchored key's value are read, the alias and the entry with the sequence key are not, and the entries after them are
 
-#### Scenario: A block the parser refuses
+#### Scenario: Keys that other parsers refuse
 
-- **WHEN** a YAML block holds a key twice
-- **THEN** no value of the block is read
+- **WHEN** a YAML block holds a key twice, a merge key `<<: *base`, a key that is a number or a null, and the values `.inf`, `-.inf` and `.NaN`, each beside strings
+- **THEN** every string is read, a key written twice gives each of its values, and no value of the block is lost
+
+#### Scenario: Front matter that no parser reads
+
+- **WHEN** a YAML, TOML or JSON block is not valid, such as `other: [open`
+- **THEN** `hakkiri check` reports the file as a failure with the line of the problem, exits 2, reads no value of the block, and lints the rest of the file
 
 #### Scenario: A fence with blanks
 

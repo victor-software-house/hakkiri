@@ -1,0 +1,9 @@
+---
+title: very before
+up: .inf
+down: -.inf
+none: .NaN
+after: very after
+---
+
+Body very.

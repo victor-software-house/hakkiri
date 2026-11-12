@@ -89,6 +89,11 @@ pub fn parse_ignoring(
     blocks: &[&Pattern],
     tokens: &[&Pattern],
 ) -> Result<Tree, Error> {
+    let front_matter_fault = if matches!(language, Language::Markdown | Language::Mdx) {
+        frontmatter::fault(source)
+    } else {
+        None
+    };
     let (roots, code_blocks, comments) = match language {
         Language::Markdown => ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?,
         Language::Mdx => ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?,
@@ -124,5 +129,6 @@ pub fn parse_ignoring(
         roots,
         code_blocks,
         comments,
+        front_matter_fault,
     })
 }

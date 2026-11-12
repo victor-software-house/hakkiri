@@ -1,7 +1,7 @@
 //! Tests for the string values of front matter: which entries are text, and
 //! where the text lies in the file.
 
-use super::{json_nodes, leading, nodes};
+use super::{fault, json_nodes, leading, nodes};
 use crate::tree::Node;
 
 /// The label and the text of each value that `nodes` gives for `source`, whose
@@ -115,8 +115,56 @@ fn an_alias_and_a_complex_key_hold_no_text_and_drop_no_entry_after_them() {
 }
 
 #[test]
-fn a_block_the_parser_refuses_has_no_values() {
-    assert_eq!(values("---\na: x\na: y\n---\n", false), []);
+fn a_repeated_key_and_a_merge_key_keep_their_values() {
+    assert_eq!(
+        values("---\na: x\na: y\nb: z\n---\n", false),
+        [pair("a", "x"), pair("a", "y"), pair("b", "z")]
+    );
+    let merge = "---\nbase: &b {x: 1}\n<<: *b\nt: text\n---\n";
+    assert_eq!(values(merge, false), [pair("t", "text")]);
+}
+
+#[test]
+fn a_number_key_a_null_key_and_a_non_finite_float_keep_their_values() {
+    let source = "---\n1: one\nnull: two\nup: .inf\nnone: .NaN\ntitle: three\n---\n";
+    assert_eq!(
+        values(source, false),
+        [
+            pair("1", "one"),
+            pair("null", "two"),
+            pair("title", "three")
+        ]
+    );
+}
+
+#[test]
+fn front_matter_that_no_parser_reads_has_a_fault_with_its_line() {
+    for (source, line) in [
+        ("---\ntitle: ok\nother: [open\n---\n\nBody.\n", "line 3"),
+        ("---\nkey: x\n  bad: indent\n---\n", "line 3"),
+        ("+++\ntitle = \"open\n+++\n", "line 2"),
+        (";;;\n{\"title\": \"x\", \n;;;\n", "line 2"),
+    ] {
+        let Some(fault) = fault(source) else {
+            panic!("{source:?} has no fault");
+        };
+        assert!(fault.starts_with(line), "{source:?}: {fault}");
+    }
+}
+
+#[test]
+fn front_matter_that_a_parser_reads_or_that_never_closes_has_no_fault() {
+    for source in [
+        "---\ntitle: ok\n---\n",
+        "---\n? [a, b]\n: x\ntitle: y\n---\n",
+        "+++\ntitle = \"ok\"\n+++\n",
+        ";;;\n{\"title\": \"ok\"}\n;;;\n",
+        "---\ntitle: [open\n",
+        "Body.\n",
+        "",
+    ] {
+        assert_eq!(fault(source), None, "{source:?}");
+    }
 }
 
 #[test]

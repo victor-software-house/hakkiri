@@ -77,8 +77,11 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
     let mut linted = 0;
     for (job, outcome) in jobs.iter().zip(outcomes) {
         match outcome {
-            Ok(found) => {
+            Ok((found, fault)) => {
                 linted += 1;
+                if let Some(fault) = fault {
+                    failures.push(Failure::file(&job.path, format!("front matter: {fault}")));
+                }
                 alerts.extend(
                     found
                         .into_iter()
@@ -110,7 +113,7 @@ fn read_text(path: &Path) -> io::Result<String> {
 }
 
 /// The alerts of one file, at the levels the config sets, or why it gave none.
-fn lint_file(job: &Job<'_>) -> Result<Vec<Alert>, String> {
+fn lint_file(job: &Job<'_>) -> Result<(Vec<Alert>, Option<String>), String> {
     let source = read_text(&job.file).map_err(|error| error.to_string())?;
     let tree = parse_ignoring(
         job.language,
@@ -119,7 +122,8 @@ fn lint_file(job: &Job<'_>) -> Result<Vec<Alert>, String> {
         &job.plan.token_ignores,
     )
     .map_err(|error| error.to_string())?;
-    lint_planned(&job.plan, &tree, &source, &job.extension)
+    let alerts = lint_planned(&job.plan, &tree, &source, &job.extension)?;
+    Ok((alerts, tree.front_matter_fault))
 }
 
 /// The alerts of `source` under `plan`, at the levels the config sets.

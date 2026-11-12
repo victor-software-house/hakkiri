@@ -11,8 +11,14 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 1.2 Read the top-level string values of YAML, TOML and JSON front matter into nodes of the scope `frontmatter`, with their keys, YAML and TOML through ctl-core's `Input::top_level`, and let the patterns leave them as written.  
   Verify `tests/front_matter.rs` fails before the change and passes after it.  
   Evidence, 2026-11-12 (UTC): in a cloud box, `every_config_gives_the_alerts_vale_gives` gave the 590 alerts of Vale over the three configs, less the 4 it misplaces, once dates and `<<` were left out in hakkiri.  
-  The first run failed on the dates and on `<<`, which serde-saphyr reads as strings, and on the three non-finite floats of the probe file, which ctl-core refuses (the vale-differences spec lists them).  
+  The first run failed on the dates and on `<<`, which serde-saphyr reads as strings.  
   Unit tests in `src/frontmatter/tests.rs` pin an anchored value, an anchored key, an alias, a sequence as a key, a repeated key and an opening fence with blanks.
+- [x] 1.3 Read what ctl-core 0.7.4 lists, and fail a file whose front matter no parser reads.  
+  Verify the three original `.inf`, `-.inf` and `.NaN` values are back in the probe file f7, and the alerts of Vale for a repeated key, a merge key, number and null keys and an alias match.  
+  Verify `hakkiri check` reports a block that no parser reads as a failure with its line, exits 2, and lints the rest of the file, and that a sequence key does neither.  
+  Evidence, 2026-11-12 (UTC): Vale at `66bbb85` run again over the fixture folder gave exactly the 896 rows of `vale.tsv`, which are the 590 of the first probe and 306 for `f11` to `f15`.  
+  Vale fails a file with a block no parser reads, and a block with a sequence key, with E201 on line 1 and lints none of it.  
+  In a cloud box, `every_config_gives_the_alerts_vale_gives` and `front_matter_no_parser_reads_fails_the_file_and_leaves_the_rest_linted` passed, and so did the 18 unit tests of `frontmatter`.
 
 ## 2. The surfaces
 
