@@ -245,7 +245,8 @@ pub(crate) fn item_content(source: &str, start: usize, column: usize) -> usize {
 ///
 /// A line that lacks the indentation of a list item continues the paragraph
 /// lazily, and holds what it has.
-/// A line with no `>` in a block quote keeps all its spaces.
+/// A line with no `>` in a block quote keeps all its spaces, and none of the
+/// containers inside the quote holds it.
 /// A tab runs to the next multiple of four.
 fn indent_in(line: &str, containers: &[Container]) -> usize {
     let bytes = line.as_bytes();
@@ -279,7 +280,10 @@ fn indent_in(line: &str, containers: &[Container]) -> usize {
                         column += 1;
                     }
                 } else {
+                    // The line is a lazy continuation of the quote, so it
+                    // holds none of the containers inside the quote either.
                     (at, column) = (before, start);
+                    break;
                 }
             }
         }
