@@ -11,6 +11,9 @@ use std::ops::Range;
 /// The type of a token that is a number, whatever its digits.
 pub(super) const NUMBER: &str = "##number##";
 
+/// The type of a token that is a code span, whatever its code.
+pub(super) const CODE: &str = "##code##";
+
 /// What a word ends with.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(super) enum Mark {
@@ -40,6 +43,9 @@ pub(super) struct Token<'a> {
     pub(super) colon_after: bool,
     /// What comes before the token.
     pub(super) gap: Gap,
+    /// The word is the one-letter reading of a code span, with no letter of
+    /// its own: it is no initial, and it has no case.
+    pub(super) code: bool,
 }
 
 /// What separates a token from the one before it.
@@ -63,6 +69,16 @@ pub(super) struct Annotation {
     /// The token is an ellipsis.
     pub(super) ellipsis: bool,
 }
+
+/// The abbreviations of units of measure.
+///
+/// A unit follows a number, and the word after it can begin a sentence, as in
+/// `the call took 5 ms. Then it ended.`
+const UNITS: &[&str] = &[
+    "ns", "us", "ms", "s", "sec", "secs", "min", "mins", "h", "hr", "hrs", "b", "kb", "mb", "gb",
+    "tb", "kib", "mib", "gib", "tib", "hz", "khz", "mhz", "ghz", "mm", "cm", "km", "mg", "kg",
+    "ml", "px", "pt", "mph",
+];
 
 /// Quotes, brackets and Markdown marks that open or close a word.
 const fn is_edge(c: char) -> bool {
@@ -101,7 +117,10 @@ const fn is_closing(c: char) -> bool {
 }
 
 /// The tokens of `text`, in order.
-pub(super) fn tokens(text: &str) -> Vec<Token<'_>> {
+///
+/// `code` holds the byte ranges of `text` that read a code span, in text
+/// order.
+pub(super) fn tokens<'a>(text: &'a str, code: &[Range<usize>]) -> Vec<Token<'a>> {
     let mut tokens = Vec::new();
     let mut previous_end = 0;
     let mut run_start = None;
@@ -109,7 +128,7 @@ pub(super) fn tokens(text: &str) -> Vec<Token<'_>> {
         match (c.is_whitespace(), run_start) {
             (false, None) => run_start = Some(index),
             (true, Some(start)) => {
-                tokens.push(token(text, start..index, previous_end));
+                tokens.push(token(text, start..index, previous_end, code));
                 previous_end = index;
                 run_start = None;
             }
@@ -117,7 +136,7 @@ pub(super) fn tokens(text: &str) -> Vec<Token<'_>> {
         }
     }
     if let Some(start) = run_start {
-        tokens.push(token(text, start..text.len(), previous_end));
+        tokens.push(token(text, start..text.len(), previous_end, code));
     }
     mark_spaced_ellipses(&mut tokens);
     tokens
@@ -145,13 +164,23 @@ fn mark_spaced_ellipses(tokens: &mut [Token<'_>]) {
 
 /// The token for the run `span`, after the whitespace that starts at
 /// `previous_end`.
-fn token(text: &str, span: Range<usize>, previous_end: usize) -> Token<'_> {
+fn token<'a>(
+    text: &'a str,
+    span: Range<usize>,
+    previous_end: usize,
+    code: &[Range<usize>],
+) -> Token<'a> {
     let gap = text.get(previous_end..span.start).unwrap_or_default();
     let breaks = gap.matches('\n').count();
     let first = previous_end == 0;
     let run = text.get(span.clone()).unwrap_or_default();
     let (core, internal_after) = trim(run);
     let (word, mark) = split_mark(core);
+    let word_start = span.start + (run.len() - run.trim_start_matches(is_edge).len());
+    let reads_code = matches!(word, "x" | "x.")
+        && code
+            .get(code.partition_point(|range| range.end <= word_start))
+            .is_some_and(|range| range.start <= word_start);
     Token {
         span,
         word,
@@ -165,6 +194,7 @@ fn token(text: &str, span: Range<usize>, previous_end: usize) -> Token<'_> {
         } else {
             Gap::Space
         },
+        code: reads_code,
     }
 }
 
@@ -212,21 +242,33 @@ impl Token<'_> {
 
     /// Whether the word starts with an upper-case letter.
     pub(super) fn first_upper(&self) -> bool {
-        self.word.chars().next().is_some_and(char::is_uppercase)
+        !self.code && self.word.chars().next().is_some_and(char::is_uppercase)
     }
 
     /// Whether the word starts with a lower-case letter.
     pub(super) fn first_lower(&self) -> bool {
-        self.word.chars().next().is_some_and(char::is_lowercase)
+        !self.code && self.word.chars().next().is_some_and(char::is_lowercase)
     }
 
     /// Whether the word is one letter and a period, such as an initial.
     pub(super) fn is_initial(&self) -> bool {
         let mut chars = self.word.chars();
-        matches!(
-            (chars.next(), chars.next(), chars.next()),
-            (Some(letter), Some('.'), None) if letter.is_alphabetic()
-        )
+        !self.code
+            && matches!(
+                (chars.next(), chars.next(), chars.next()),
+                (Some(letter), Some('.'), None) if letter.is_alphabetic()
+            )
+    }
+
+    /// Whether the word is the abbreviation of a unit of measure, such as
+    /// `ms.`, which follows a number and does not stand for a title or a
+    /// name.
+    pub(super) fn is_unit(&self) -> bool {
+        self.mark == Mark::Period
+            && self
+                .word
+                .strip_suffix('.')
+                .is_some_and(|unit| UNITS.contains(&unit))
     }
 
     /// Whether the word is letters and nothing else.
@@ -237,6 +279,9 @@ impl Token<'_> {
     /// The word in lower case, with every number as [`NUMBER`], and its
     /// period kept.
     pub(super) fn kind(&self) -> String {
+        if self.code {
+            return CODE.to_owned();
+        }
         let lower = self.word.to_lowercase();
         if is_number(&lower) {
             NUMBER.to_owned()
@@ -294,7 +339,7 @@ impl Token<'_> {
             Mark::Strong => annotation.sentence_break = true,
             Mark::Ellipsis => annotation.ellipsis = true,
             Mark::Period => {
-                if self.word != "." && is_abbreviation(self.word, abbreviations) {
+                if self.word != "." && !self.code && is_abbreviation(self.word, abbreviations) {
                     annotation.abbreviation = true;
                 } else {
                     annotation.sentence_break = true;
@@ -331,7 +376,7 @@ mod tests {
     use super::{Gap, Mark, tokens};
 
     fn marks(text: &str) -> Vec<(&str, Mark)> {
-        tokens(text)
+        tokens(text, &[])
             .into_iter()
             .map(|token| (token.word, token.mark))
             .collect()
@@ -369,7 +414,7 @@ mod tests {
 
     #[test]
     fn a_comma_after_a_mark_keeps_the_sentence_going() {
-        let found = tokens("etc., and more");
+        let found = tokens("etc., and more", &[]);
         assert_eq!(found[0].word, "etc.");
         assert!(found[0].internal_after);
         assert!(!found[1].internal_after);
@@ -377,7 +422,7 @@ mod tests {
 
     #[test]
     fn counts_line_and_paragraph_starts() {
-        let found = tokens("one\ntwo\n\nthree four");
+        let found = tokens("one\ntwo\n\nthree four", &[]);
         let gaps: Vec<_> = found.iter().map(|token| token.gap).collect();
         assert_eq!(
             gaps,

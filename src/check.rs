@@ -395,7 +395,12 @@ fn run_metric(metric: &Metric, text: &Text, code_span_size: u8) -> Result<Vec<Hi
         .as_ref()
         .map(|tokens| count_tokens(tokens, content))
         .transpose()?;
-    let Some(base) = variables(&text.code_sized(code_span_size), Elements::default()) else {
+    let sized = text.code_sized(code_span_size);
+    let Some(base) = variables(
+        &sized,
+        &text.code_sized_ranges(code_span_size),
+        Elements::default(),
+    ) else {
         return Ok(Vec::new());
     };
     Ok(measure(metric, &base, occurrences)
@@ -656,7 +661,12 @@ fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchErro
 /// One hit at the start of `text` when the average grade of the text is over
 /// the rule's grade, measured apart from the rest of the file.
 fn run_readability(readability: &Readability, text: &Text, code_span_size: u8) -> Vec<Hit> {
-    let Some(base) = variables(&text.code_sized(code_span_size), Elements::default()) else {
+    let sized = text.code_sized(code_span_size);
+    let Some(base) = variables(
+        &sized,
+        &text.code_sized_ranges(code_span_size),
+        Elements::default(),
+    ) else {
         return Vec::new();
     };
     graded(readability, &base)

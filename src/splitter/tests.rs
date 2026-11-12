@@ -25,11 +25,81 @@ fn sentences(text: &str) -> Result<Vec<&str>, Box<dyn Error>> {
         .collect())
 }
 
+/// The sentences of `text`, where each pair of backticks holds a code span
+/// that reads as one `x`.
+fn code_sentences(text: &str) -> Result<Vec<String>, Box<dyn Error>> {
+    let model = Model::english().map_err(ToString::to_string)?;
+    let mut read = String::new();
+    let mut code = Vec::new();
+    let mut inside = false;
+    for c in text.chars() {
+        match (c, inside) {
+            ('`', false) => {
+                code.push(read.len()..read.len() + 1);
+                read.push('x');
+                inside = true;
+            }
+            ('`', true) => inside = false,
+            (_, true) => {}
+            (_, false) => read.push(c),
+        }
+    }
+    Ok(model
+        .split_code(&read, &code)
+        .into_iter()
+        .filter_map(|range| read.get(range).map(str::to_owned))
+        .collect())
+}
+
 #[test]
 fn two_plain_sentences() -> TestResult {
     assert_eq!(
         sentences("The build passed. Ship it now!")?,
         ["The build passed.", "Ship it now!"]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_code_span_begins_a_sentence_after_a_full_stop() -> TestResult {
+    assert_eq!(
+        code_sentences("The step needs a tag. `bun publish` gives it latest.")?,
+        ["The step needs a tag.", "x gives it latest."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_full_stop_after_a_code_span_ends_a_sentence() -> TestResult {
+    assert_eq!(
+        code_sentences("Its hash is `abc123`. hakkiri made no change to it.")?,
+        ["Its hash is x.", "hakkiri made no change to it."]
+    );
+    assert_eq!(
+        code_sentences("Use `a`. Then use `b`. `c` is last.")?,
+        ["Use x.", "Then use x.", "x is last."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_code_span_after_an_abbreviation_goes_on() -> TestResult {
+    assert_eq!(
+        code_sentences("Use a flag, e.g. `--tag` or `--dry-run`.")?,
+        ["Use a flag, e.g. x or x."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_unit_after_a_number_ends_a_sentence_before_a_capital() -> TestResult {
+    assert_eq!(
+        sentences("The test takes 92 ms. Tests cover a phrase.")?,
+        ["The test takes 92 ms.", "Tests cover a phrase."]
+    );
+    assert_eq!(
+        sentences("It waits 5 ms. then stops.")?,
+        ["It waits 5 ms. then stops."]
     );
     Ok(())
 }

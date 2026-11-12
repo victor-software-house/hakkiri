@@ -8,6 +8,7 @@
 //! [prose]: https://github.com/jdkato/prose
 
 use std::collections::HashSet;
+use std::ops::Range;
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -244,10 +245,27 @@ impl Counts {
     /// sentences by `model`.
     #[must_use]
     pub fn of(text: &str, model: &Model) -> Self {
+        Self::with_code(text, &[], model)
+    }
+
+    /// The counts of `text`, as [`Counts::of`] gives them, where each of the
+    /// byte ranges `code`, in text order, reads a code span.
+    #[must_use]
+    pub fn with_code(text: &str, code: &[Range<usize>], model: &Model) -> Self {
         let mut counts = Self::default();
         let mut seen = HashSet::new();
+        let mut offset = 0;
         for paragraph in text.split("\n\n") {
-            for range in model.split(paragraph) {
+            let end = offset + paragraph.len();
+            let first = code.partition_point(|range| range.end <= offset);
+            let inside: Vec<Range<usize>> = code
+                .iter()
+                .skip(first)
+                .take_while(|range| range.start < end)
+                .map(|range| range.start - offset..range.end - offset)
+                .collect();
+            offset = end + 2;
+            for range in model.split_code(paragraph, &inside) {
                 let sentence = paragraph.get(range).unwrap_or_default();
                 counts.sentences += 1;
                 let before = counts.words;

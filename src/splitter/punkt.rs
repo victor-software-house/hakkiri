@@ -13,19 +13,26 @@ use super::model::Model;
 use super::token::{Mark, NUMBER, Token};
 
 /// Whether `current`, which is followed by `next`, ends a sentence.
-pub(super) fn ends_sentence(model: &Model, current: &Token<'_>, next: &Token<'_>) -> bool {
+///
+/// `after_number` is whether a number comes right before `current`.
+pub(super) fn ends_sentence(
+    model: &Model,
+    current: &Token<'_>,
+    next: &Token<'_>,
+    after_number: bool,
+) -> bool {
     if current.internal_after {
         return false;
     }
     match current.mark {
         Mark::None => false,
         Mark::Strong => true,
-        Mark::Period | Mark::Ellipsis => after_period(model, current, next),
+        Mark::Period | Mark::Ellipsis => after_period(model, current, next, after_number),
     }
 }
 
 /// The decision for a token that ends in a period or an ellipsis.
-fn after_period(model: &Model, current: &Token<'_>, next: &Token<'_>) -> bool {
+fn after_period(model: &Model, current: &Token<'_>, next: &Token<'_>, after_number: bool) -> bool {
     let first = current.first_look(model.abbreviations());
     let next_first = next.first_look(model.abbreviations());
     let kind = current.kind_without_period();
@@ -36,6 +43,11 @@ fn after_period(model: &Model, current: &Token<'_>, next: &Token<'_>) -> bool {
     }
     let initial = current.is_initial();
     let starts = starts_sentence(model, next, &next_kind);
+    // The abbreviation of a unit after a number, as in `5 ms.`, ends the
+    // sentence before a capitalized word, which no name follows.
+    if first.abbreviation && after_number && current.is_unit() && next.first_upper() {
+        return true;
+    }
     // An abbreviation or an ellipsis ends the sentence only when the next
     // word is known to start one.
     if (first.abbreviation || first.ellipsis) && !initial {

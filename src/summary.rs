@@ -1,6 +1,8 @@
 //! The summary of a file: the prose a whole-file metric measures,
 //! and the counts of its elements.
 
+use std::ops::Range;
+
 use crate::select::{SelectError, replacements};
 use crate::text::{Decode, Parts, Text};
 use crate::tree::{Node, Scope, Tree};
@@ -46,6 +48,8 @@ pub struct Summary {
     /// The paragraphs, list items and block quotes of the file, each followed
     /// by a blank line. Headings and table cells are not in it.
     pub content: String,
+    /// The bytes of `content` that read a code span, in order.
+    pub code: Vec<Range<usize>>,
     /// The element counts.
     pub elements: Elements,
 }
@@ -93,6 +97,12 @@ pub fn summarize(tree: &Tree, source: &str, code_span_size: u8) -> Result<Summar
                     },
                 )
                 .ok_or(SelectError::Segment(node.scope))?;
+                let start = summary.content.len();
+                summary.code.extend(
+                    text.code_sized_ranges(code_span_size)
+                        .iter()
+                        .map(|range| start + range.start..start + range.end),
+                );
                 summary.content.push_str(&text.code_sized(code_span_size));
                 summary.content.push_str("\n\n");
                 let enclosing = path
