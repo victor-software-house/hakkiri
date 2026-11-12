@@ -165,6 +165,8 @@ files:
   An alert between the comment that turns a rule off and the one that turns it on is left out.
   The words must be exactly as shown, with the spaces around `:` and `=`, and case matters. A comment in a code block or a code span is text.
   An MDX file reads `{/* hakkiri off */}` and `{/* vale off */}` in the same way, as a block of its own or inside a line, and a source file reads no comment control.
+- An MDX file's `{…}` expressions, and its JSX elements with no children, read as code, as in Vale: a `code` rule reads `{x}` and `<Tag a="x" />`, and no text rule does.
+  The tags of an element with children and a `{/* … */}` comment read as no node, and an open and a close tag with nothing between them inside a line of text are no code.
 - Math in a Markdown or MDX file reads as code, as in Vale, so no text rule reports it and a `code` rule reads it.
   An inline span runs from a `$` that a non-space follows to a `$` that follows a non-space and is no digit's neighbour: `$5 and $10` is money and `$x$` is math. A span may wrap over lines of a paragraph.
   A display block opens at a line that starts with `$$`, even in the middle of a paragraph, and closes at a line that ends with `$$`, a blank line or the end of the paragraph. The text before and after reads as separate paragraphs. A line indented four columns or more past its container opens no block.

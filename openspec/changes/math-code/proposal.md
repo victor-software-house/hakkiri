@@ -23,6 +23,7 @@ The probe in `tests/fixtures/markup-differences` showed it, and the row `HKR-048
 ### New Capabilities
 
 - `math`: the spans and blocks that read as math, and what a rule reads in them.
+- `mdx-code`: the expressions and childless JSX elements of an MDX file that read as code.
 
 ### Modified Capabilities
 
