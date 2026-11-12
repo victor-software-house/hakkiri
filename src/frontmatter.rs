@@ -7,10 +7,12 @@
 //! A key, a number, a boolean, a null, a date, a list and a nested mapping hold
 //! no text it lints.
 //!
-//! ctl-core's [`Input::top_level`] reads YAML and TOML: it gives each top-level
-//! key, the bytes of its value as written, how the value is written and, for a
-//! string, its text. JSON front matter is no markdown-rs construct, and a small
-//! reader takes its top-level strings.
+//! ctl-core's [`Input::top_level`] reads the three kinds: it gives each
+//! top-level key, the bytes of its value as written, how the value is written
+//! and, for a string, its text.
+//! JSON is read as YAML, which holds it.
+//! A block that no parser reads gives no value and is a [`fault`] of the file,
+//! where Vale lints nothing of the file.
 //!
 //! [v-meta]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/metadata.go
 //! [v-values]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/frontmatter.go
@@ -24,27 +26,34 @@ use ctl_core::input::{Entry, Format, Input, Written};
 
 use crate::tree::{Join, Node, Reading, Scope};
 
+/// How the front matter of a file is written.
+#[derive(Clone, Copy)]
+enum Kind {
+    /// Between `---` lines.
+    Yaml,
+    /// Between `+++` lines.
+    Toml,
+    /// Between `;;;` lines, which markdown-rs reads as no front matter.
+    Json,
+}
+
+impl Kind {
+    /// The format that reads the block: JSON is a part of YAML.
+    const fn format(self) -> Format {
+        match self {
+            Self::Yaml | Self::Json => Format::Yaml,
+            Self::Toml => Format::Toml,
+        }
+    }
+}
+
 /// The nodes for the string values of the front matter that `span` covers in
 /// `source`, fences included.
 pub(crate) fn nodes(source: &str, span: &Range<usize>, toml: bool) -> Vec<Node> {
-    let Some(content) = content_of(source, span) else {
-        return Vec::new();
-    };
-    let format = if toml { Format::Toml } else { Format::Yaml };
-    let input = Input::new_with_format(
-        "front matter",
-        source.get(content.clone()).unwrap_or_default(),
-        format,
-    );
-    // A block the parser refuses, such as one with a duplicate key, has no
-    // values to lint.
-    let Ok(entries) = input.top_level() else {
-        return Vec::new();
-    };
-    entries
-        .iter()
-        .filter_map(|entry| value_node(source, content.start, entry))
-        .collect()
+    let kind = if toml { Kind::Toml } else { Kind::Yaml };
+    content_of(source, span)
+        .map(|content| entry_nodes(source, content, kind))
+        .unwrap_or_default()
 }
 
 /// The nodes for the string values of the front matter that starts `source`,
@@ -53,27 +62,9 @@ pub(crate) fn nodes(source: &str, span: &Range<usize>, toml: bool) -> Vec<Node> 
 /// A rewrite of the text, such as the block and token patterns do, leaves the
 /// front matter as it is: Vale lints the metadata before it rewrites the body.
 pub(crate) fn leading(source: &str) -> Vec<Node> {
-    for (fence, toml) in [("---", false), ("+++", true)] {
-        let Some(rest) = source
-            .strip_prefix(fence)
-            .map(|rest| rest.trim_start_matches([' ', '\t']))
-            .and_then(|rest| {
-                rest.strip_prefix("\r\n")
-                    .or_else(|| rest.strip_prefix('\n'))
-            })
-        else {
-            continue;
-        };
-        let mut at = source.len() - rest.len();
-        for line in rest.split('\n') {
-            if line.trim_end() == fence {
-                return nodes(source, &(0..at + fence.len()), toml);
-            }
-            at += line.len() + 1;
-        }
-        return Vec::new();
-    }
-    json_nodes(source)
+    block(source)
+        .map(|(kind, content)| entry_nodes(source, content, kind))
+        .unwrap_or_default()
 }
 
 /// The nodes for the string values of JSON front matter, which a file holds
@@ -82,85 +73,76 @@ pub(crate) fn leading(source: &str) -> Vec<Node> {
 /// markdown-rs reads no such block, so the text stays a paragraph of the body,
 /// as it is in Vale, which lints the block twice.
 pub(crate) fn json_nodes(source: &str) -> Vec<Node> {
-    let Some(rest) = source
-        .strip_prefix(";;;\n")
-        .or_else(|| source.strip_prefix(";;;\r\n"))
-    else {
+    match block(source) {
+        Some((Kind::Json, content)) => entry_nodes(source, content, Kind::Json),
+        Some((Kind::Yaml | Kind::Toml, _)) | None => Vec::new(),
+    }
+}
+
+/// Why the front matter that starts `source` is no YAML, TOML or JSON that its
+/// parser reads, as the line of the file and the parser's words, or `None` when
+/// it has none or a parser reads it.
+pub(crate) fn fault(source: &str) -> Option<String> {
+    let (kind, content) = block(source)?;
+    let error = input_of(source, &content, kind).top_level().err()?;
+    let before = source
+        .get(..content.start)
+        .map_or(0, |text| text.matches('\n').count());
+    error.problems.first().map(|problem| match problem.line {
+        Some(line) => format!("line {}: {}", line + before, problem.message),
+        None => problem.message.clone(),
+    })
+}
+
+/// The kind of the front matter that starts `source` and the bytes between
+/// its fence lines, or `None` when the file has none or never closes it.
+///
+/// A fence line may carry blanks after it, as markdown-rs reads it.
+fn block(source: &str) -> Option<(Kind, Range<usize>)> {
+    [
+        ("---", Kind::Yaml),
+        ("+++", Kind::Toml),
+        (";;;", Kind::Json),
+    ]
+    .into_iter()
+    .find_map(|(fence, kind)| {
+        let rest = source.strip_prefix(fence)?.trim_start_matches([' ', '\t']);
+        let rest = rest
+            .strip_prefix("\r\n")
+            .or_else(|| rest.strip_prefix('\n'))?;
+        let start = source.len() - rest.len();
+        let mut at = start;
+        for line in rest.split('\n') {
+            if line.trim_end() == fence {
+                return Some((kind, start..at));
+            }
+            at += line.len() + 1;
+        }
+        None
+    })
+}
+
+/// The input that reads `content` of `source` as front matter of `kind`.
+fn input_of(source: &str, content: &Range<usize>, kind: Kind) -> Input {
+    Input::new_with_format(
+        "front matter",
+        source.get(content.clone()).unwrap_or_default(),
+        kind.format(),
+    )
+}
+
+/// The nodes for the string values of the front matter whose bytes between the
+/// fences are `content` in `source`.
+///
+/// A block the parser refuses has no values here: it is a [`fault`].
+fn entry_nodes(source: &str, content: Range<usize>, kind: Kind) -> Vec<Node> {
+    let Ok(entries) = input_of(source, &content, kind).top_level() else {
         return Vec::new();
     };
-    let start = source.len() - rest.len();
-    let mut end = None;
-    let mut at = start;
-    for line in rest.split('\n') {
-        if line.trim_end_matches('\r') == ";;;" {
-            end = Some(at);
-            break;
-        }
-        at += line.len() + 1;
-    }
-    let Some(end) = end else { return Vec::new() };
-    json_values(source, start..end)
-}
-
-/// The top-level string values of the JSON object in `span`.
-fn json_values(source: &str, span: Range<usize>) -> Vec<Node> {
-    let bytes = source.as_bytes();
-    let mut found = Vec::new();
-    let mut depth = 0_usize;
-    let mut at = span.start;
-    let mut key: Option<String> = None;
-    while at < span.end {
-        match bytes.get(at) {
-            Some(b'{' | b'[') => {
-                depth += 1;
-                at += 1;
-            }
-            Some(b'}' | b']') => {
-                depth = depth.saturating_sub(1);
-                at += 1;
-            }
-            Some(b'"') => {
-                let Some(close) = json_string_end(bytes, at, span.end) else {
-                    break;
-                };
-                let inner = at + 1..close;
-                if depth == 1 {
-                    let after = source
-                        .get(close + 1..span.end)
-                        .unwrap_or_default()
-                        .trim_start();
-                    if after.starts_with(':') {
-                        key = Some(text(source, &inner).to_owned());
-                    } else if let Some(key) = key.take() {
-                        found.extend(node(&key, vec![inner], Join::Space));
-                    }
-                }
-                at = close + 1;
-            }
-            Some(b',') => {
-                if depth == 1 {
-                    key = None;
-                }
-                at += 1;
-            }
-            _ => at += 1,
-        }
-    }
-    found
-}
-
-/// The byte of the quote that closes the string opened at `open`, in the first
-/// `end` bytes of `bytes`.
-fn json_string_end(bytes: &[u8], open: usize, end: usize) -> Option<usize> {
-    let mut at = open + 1;
-    while at < end {
-        match bytes.get(at)? {
-            b'\\' => at += 2,
-            b'"' => return Some(at),
-            _ => at += 1,
-        }
-    }
-    None
+    entries
+        .iter()
+        .filter_map(|entry| value_node(source, content.start, entry))
+        .collect()
 }
 
 /// The bytes between the opening fence line and the closing fence line of the

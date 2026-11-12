@@ -23,15 +23,17 @@ Non-goals:
 ### 1. The values come from ctl-core's top-level entries
 
 hakkiri has no YAML or TOML parser of its own.
-An earlier version read the block line by line, and it skipped anchors, aliases and complex keys, so [ctl-core 0.7.3][ctl-core-top-level] gives it `Input::top_level` instead.
+An earlier version read the block line by line, and it skipped anchors, aliases and complex keys, so [ctl-core 0.7.4][ctl-core-top-level] gives it `Input::top_level` instead.
 The method lists each top-level entry of a YAML or TOML text: the key, the bytes of the value as written, how the value is written and, when the parser reads it as a string, its text.
 serde-saphyr decides the types of YAML and the `toml` crate those of TOML, and yamled and the `toml` tree give the spans.
-Anchors, tags and aliases are resolved by the parser, so an anchored or tagged value keeps its place, and an entry whose key is no string is left out with none of the entries after it lost.
+Anchors, tags and aliases are resolved by the parser, so an anchored or tagged value keeps its place.
+The listing refuses nothing that YAML allows: a key written twice, a merge key and `.inf`, `-.inf` and `.NaN` are entries, and a key that is a number, a boolean or a null is listed by its text.
+An entry whose key is a sequence, a mapping or an alias is left out, with none of the entries after it lost.
 hakkiri takes the bytes of the value from the entry and cuts them to the text: a quoted value loses its quotes, a block scalar its header line and its indent, and a TOML multi-line string its delimiters.
 Each value becomes a node of the new scope `frontmatter`, with its key as the node's label, and its segments are the bytes of the text in the file.
 A folded scalar and a scalar over lines join their lines with a space, and a literal scalar with a line feed.
-A block the parser refuses, such as one with a duplicate key, has no values.
-JSON front matter is no markdown-rs construct, and a small reader of its top level stays in hakkiri.
+A block the parser refuses has no values, and it is a fault of the file ([decision 6](#6-a-block-no-parser-reads-is-a-fault-of-the-file)).
+JSON front matter is no markdown-rs construct, and a YAML parser reads it, since a JSON object is a YAML flow mapping.
 
 yaml.v3, which Vale reads with, and serde-saphyr differ on two plain scalars: yaml.v3 reads a date and the merge key `<<` as no string, and serde-saphyr reads them as strings.
 hakkiri leaves those two out unless a tag or a quote makes them strings.
@@ -68,12 +70,19 @@ The ignore rewrite of hakkiri reads the front matter again from the file as writ
 
 ### 5. Where Vale puts an alert
 
-The probe shows three alerts that Vale puts at the wrong place, and hakkiri puts them at the text:
+The probe shows alerts that Vale puts at the wrong place, and hakkiri puts them at the text:
 
 - The words of the second line of a folded scalar land on its first line.
 - A TOML value is found by searching the block, so `title` in `title = "A very toml title"` lands on the key.
-- The text of a scalar under `!!str` starts at the tag.
+- The text of a scalar under `!!str` starts at the tag, and the text of a scalar after an anchor starts at the anchor.
 
-[ctl-core-top-level]: https://docs.rs/ctl-core/0.7.3/ctl_core/input/struct.Input.html#method.top_level
+### 6. A block no parser reads is a fault of the file
+
+Vale fails a file whose front matter its parser refuses, and a block with a sequence key, with E201 on line 1, and lints none of the file.
+hakkiri reads the block with the parser that reads its values, so the sequence key is no fault, and every other value is read.
+A block the parser refuses gives no values and a fault, which the tree holds with the line of the file and the parser's words.
+`hakkiri check` reports the fault as a failure of the file, which exits 2, and lints the rest of the file, where the failure and the alerts are both the operator's.
+
+[ctl-core-top-level]: https://docs.rs/ctl-core/0.7.4/ctl_core/input/struct.Input.html#method.top_level
 [v-meta]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/metadata.go
 [v-values]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/frontmatter.go

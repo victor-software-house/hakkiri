@@ -1,0 +1,9 @@
+---
+title: very first
+alias: &x very anchored text
+other: *x
+tagged: !!str &y very tagged
+again: *y
+---
+
+Body very.

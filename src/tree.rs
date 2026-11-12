@@ -477,6 +477,11 @@ pub struct Tree {
     /// MDX file, in file order, which may turn rules off and on. A source file
     /// gives none.
     pub comments: Vec<Comment>,
+    /// Why the front matter of a Markdown or MDX file is no YAML, TOML or JSON
+    /// that its parser reads, as the line of the file and the parser's words.
+    /// The tree holds no value of such a block, and the rest of the file is
+    /// read as written.
+    pub front_matter_fault: Option<String>,
 }
 
 /// One HTML comment of a Markdown file.

@@ -14,25 +14,27 @@ hakkiri SHALL read the front matter values as Vale does, and put each alert at t
 - **WHEN** a TOML value reads `"A very toml title"` and a rule flags `title`
 - **THEN** hakkiri puts the alert in the value, and Vale puts it on the key, since it finds the value by searching the block ([front-matter-values 5][front-matter-values-5])
 
-#### Scenario: An explicit tag
+#### Scenario: An explicit tag or an anchor
 
-- **WHEN** a YAML value reads `!!str tagged` and a rule flags `tagged`
-- **THEN** hakkiri puts the alert at the word, and Vale puts it at the tag ([front-matter-values 5][front-matter-values-5])
+- **WHEN** a YAML value reads `!!str tagged` or `&x anchored text` and a rule flags `tagged` or `anchored`
+- **THEN** hakkiri puts the alert at the word, and Vale puts it at the tag or the anchor ([front-matter-values 5][front-matter-values-5])
 
 #### Scenario: An alias
 
 - **WHEN** a YAML value is an alias such as `*name`
-- **THEN** hakkiri reads no text for it, since no text of the string lies at the alias, and what Vale does is not measured
+- **THEN** hakkiri reads no text for it, and neither does Vale
 
-#### Scenario: A block the parser refuses
+#### Scenario: Front matter that no parser reads
 
-- **WHEN** a YAML block holds a key twice, or a key that is a merge key
-- **THEN** hakkiri reads no value of the block, and what Vale does is not measured
+- **WHEN** a block is no YAML, TOML or JSON that its parser reads, such as `other: [open`
+- **THEN** hakkiri reports the file as a failure with the line of the problem, and lints the rest of the file
+- **AND** Vale fails the file with its error on line 1 and lints none of it ([front-matter-values 6][front-matter-values-6])
 
-#### Scenario: A non-finite float
+#### Scenario: A sequence as a key
 
-- **WHEN** a YAML block holds `.inf`, `-.inf` or `.NaN` as a value
-- **THEN** hakkiri reads no value of the block, since ctl-core refuses the block, and Vale lints the other values ([front-matter-values 1][front-matter-values-1])
+- **WHEN** a YAML block has a key that is a sequence, such as `? [a, b]`, and other entries
+- **THEN** hakkiri lints the values of the other entries
+- **AND** Vale fails the file with its error on line 1 and lints none of it ([front-matter-values 6][front-matter-values-6])
 
-[front-matter-values-1]: ../../design.md#1-the-values-come-from-ctl-cores-top-level-entries
 [front-matter-values-5]: ../../design.md#5-where-vale-puts-an-alert
+[front-matter-values-6]: ../../design.md#6-a-block-no-parser-reads-is-a-fault-of-the-file
