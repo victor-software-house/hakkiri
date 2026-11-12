@@ -12,6 +12,9 @@ use crate::select::{Block, SelectError, select};
 use crate::summary::{Summary, summarize};
 use crate::tree::{Scope, Tree};
 
+/// How many words a code span counts as when nothing sets it.
+pub const DEFAULT_CODE_SPAN_SIZE: u8 = 1;
+
 /// The alerts of `rules` in one file, sorted by line and then by column.
 ///
 /// `rules` is a slice of rules or of references to them, so a caller that picks
@@ -43,7 +46,7 @@ pub fn lint<R: Borrow<Rule>>(
     source: &str,
     extension: &str,
 ) -> Result<Vec<Alert>, SelectError> {
-    lint_accepting(rules, tree, source, extension, &[])
+    lint_accepting(rules, tree, source, extension, &[], DEFAULT_CODE_SPAN_SIZE)
 }
 
 /// The alerts of `rules` in one file, as [`lint`] gives them, with the
@@ -51,6 +54,8 @@ pub fn lint<R: Borrow<Rule>>(
 ///
 /// `accepted` holds the [`Exceptions`] of each vocabulary a glob that matches
 /// the file names.
+/// A `metric` or `readability` rule counts each code span as `code_span_size`
+/// words: [`DEFAULT_CODE_SPAN_SIZE`] by default, and 0 as Vale does.
 /// An `existence`, `repetition`, `spelling` or `substitution` rule holds back
 /// each match they hold back, besides its own exceptions, whatever it sets for
 /// `vocab` and `nonword`.
@@ -65,6 +70,7 @@ pub fn lint_accepting<R: Borrow<Rule>>(
     source: &str,
     extension: &str,
     accepted: &[&Exceptions],
+    code_span_size: u8,
 ) -> Result<Vec<Alert>, SelectError> {
     let mut locator = Locator::new(source);
     let controls = Controls::new(
@@ -89,7 +95,7 @@ pub fn lint_accepting<R: Borrow<Rule>>(
                 // Vale takes the whole file as the summary of a plain-text file
                 // (`lint.go` lines 539 to 544 at 66bbb85). That applies once
                 // hakkiri reads a plain-text language, which it does not yet.
-                let summary = summarize(tree, source)?;
+                let summary = summarize(tree, source, code_span_size)?;
                 let base = variables(&summary.content, summary.elements);
                 measured = Some((summary, base));
             }
@@ -136,6 +142,7 @@ pub fn lint_accepting<R: Borrow<Rule>>(
                 &mut memory,
                 tree.language.extension(),
                 accepted,
+                code_span_size,
             ) {
                 Ok(hits) => {
                     for hit in hits {

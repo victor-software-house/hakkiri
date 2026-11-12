@@ -68,6 +68,8 @@ pub(crate) struct Memory {
 /// An `existence`, `repetition`, `spelling` or `substitution` rule holds back
 /// the matches they name, besides its own exceptions, whatever it sets for
 /// `vocab` and `nonword`.
+/// A `metric` or `readability` rule counts each code span as `code_span_size`
+/// words.
 ///
 /// # Errors
 ///
@@ -78,16 +80,17 @@ pub(crate) fn run(
     memory: &mut Memory,
     extension: &str,
     accepted: &[&Exceptions],
+    code_span_size: u8,
 ) -> Result<Vec<Hit>, SearchError> {
     match check {
         Check::Existence(existence) => run_existence(existence, text, accepted),
         Check::Substitution(substitution) => run_substitution(substitution, text, accepted),
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
-        Check::Metric(metric) => run_metric(metric, text),
+        Check::Metric(metric) => run_metric(metric, text, code_span_size),
         Check::Consistency(consistency) => run_consistency(consistency, text, memory),
         Check::Conditional(conditional) => run_conditional(conditional, text, memory),
         Check::Repetition(repetition) => run_repetition(repetition, text, accepted),
-        Check::Readability(readability) => Ok(run_readability(readability, text)),
+        Check::Readability(readability) => Ok(run_readability(readability, text, code_span_size)),
         Check::Capitalization(capitalization) => Ok(run_capitalization(capitalization, text)),
         Check::Sequence(sequence) => run_sequence(sequence, text),
         Check::Spelling(spelling) => Ok(run_spelling(spelling, text, extension, accepted)),
@@ -385,14 +388,14 @@ fn count_tokens(existence: &Existence, content: &str) -> Result<usize, SearchErr
 
 /// One hit at the start of `text` when the metric holds for it, measured
 /// apart from the rest of the file.
-fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
+fn run_metric(metric: &Metric, text: &Text, code_span_size: u8) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
     let occurrences = metric
         .tokens
         .as_ref()
         .map(|tokens| count_tokens(tokens, content))
         .transpose()?;
-    let Some(base) = variables(content, Elements::default()) else {
+    let Some(base) = variables(&text.code_sized(code_span_size), Elements::default()) else {
         return Ok(Vec::new());
     };
     Ok(measure(metric, &base, occurrences)
@@ -652,8 +655,8 @@ fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchErro
 
 /// One hit at the start of `text` when the average grade of the text is over
 /// the rule's grade, measured apart from the rest of the file.
-fn run_readability(readability: &Readability, text: &Text) -> Vec<Hit> {
-    let Some(base) = variables(text.as_str(), Elements::default()) else {
+fn run_readability(readability: &Readability, text: &Text, code_span_size: u8) -> Vec<Hit> {
+    let Some(base) = variables(&text.code_sized(code_span_size), Elements::default()) else {
         return Vec::new();
     };
     graded(readability, &base)

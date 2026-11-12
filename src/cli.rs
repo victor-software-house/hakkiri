@@ -114,6 +114,12 @@ pub(crate) struct CheckArgs {
     /// `on_unknown`, then to `text`.
     #[arg(long, value_enum)]
     pub(crate) on_unknown: Option<OnUnknown>,
+
+    /// How many words a code span counts as in a word count, and in the
+    /// metrics built on words. 0 counts it as Vale does. Defaults to the
+    /// `code_span_size` of the file's glob, then of the config, then to 1.
+    #[arg(long, value_name = "WORDS")]
+    pub(crate) code_span_size: Option<u8>,
 }
 
 impl CheckArgs {

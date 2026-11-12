@@ -22,6 +22,7 @@ hakkiri check --fail-level warning
 hakkiri check --no-gitignore
 hakkiri check --on-unmatched error README.md
 hakkiri check --on-unknown warn
+hakkiri check --code-span-size 0
 hakkiri check --format json
 ```
 
@@ -31,6 +32,7 @@ hakkiri check --format json
 - A file named on the command line that no glob selects draws a warning on standard error and is not linted. `--on-unmatched` or `on_unmatched` takes `warn`, the default, `error`, which fails the run with exit 2, or `ignore`. A file that a glob selects but whose styles hold no rule draws nothing, and nor does a file a walk found.
 - Readers come from the extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` and `.js`, or from a `formats` entry. A file that a glob selects and that no reader reads is plain text: one block per run of lines between blank lines, read as written.
 - `--on-unknown` or `on_unknown` takes `text`, the default, `warn`, which skips the file with a warning, `error`, which fails the run with exit 2, or `ignore`. A file that no glob selects draws no message.
+- `--code-span-size` or `code_span_size` sets how many words a code span counts as, in words. It reaches a word count and the metrics built on it: the `words`, `sentences` and `syllables` of a `metric` or `readability` rule, and the scores. It is 1 by default, and 0 counts as Vale does, 2 or more counts that many. `HAKKIRI_CODE_SPAN_SIZE` is its variable. A rule that reads a match, such as `existence` or `occurrence`, ignores it.
 - A plain-text file that holds a NUL byte in its first 8192 bytes is binary, and a run skips it with no message. A byte that is not valid UTF-8, in a Latin-1 file for example, reads as one `?`, so the file is linted and a column counts bytes, as in Vale.
 - Files lint in parallel. The report is sorted by path, then line, then column, so two runs print the same text.
 - A file that cannot be read or parsed is a failure. The other files still lint.
@@ -125,6 +127,7 @@ files:
 - A key the config does not define is an error that names the key and its line.
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
 - `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` set the options of the same names for `check`. Only the project's config holds them, and a package's settings file that does is an error.
+- `code_span_size` is a key of the project config, of a package's settings file and of a glob under `files`, a whole number of words from 0 to 255. A package's file applies first, then the project's top level, then each matching glob, and `HAKKIRI_CODE_SPAN_SIZE` and then `--code-span-size` beat them all. A value outside 0 to 255, or a word or a list under a glob, is an error with its line.
 - `formats` maps an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`. A key that holds `*`, `?`, `[`, `{` or `/` is a glob.
   An entry named by the file's extension wins, then the first key in text order that is the file's name or a glob that matches its name or path. An entry beats the extension table, so `md: text` reads Markdown files as text.
   A file that an entry maps has two extensions for a scope such as `text.md`: its own and its reader's. With `txt: md`, `text.txt` and `text.md` both select text in `a.txt`. Vale compares the scope with the file's own extension only, so `text.md` selects nothing there. A case that runs through the config has the same two extensions.

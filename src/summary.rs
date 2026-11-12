@@ -59,11 +59,13 @@ enum Step<'t> {
 /// The summary of `tree`, the tree of `source`: its paragraphs, which in a code
 /// file are the paragraphs of its comments.
 ///
+/// Each code span counts as `code_span_size` words.
+///
 /// # Errors
 ///
 /// Returns a [`SelectError`] when a segment of `tree` is not a slice of
 /// `source`.
-pub fn summarize(tree: &Tree, source: &str) -> Result<Summary, SelectError> {
+pub fn summarize(tree: &Tree, source: &str, code_span_size: u8) -> Result<Summary, SelectError> {
     let mut summary = Summary {
         elements: Elements {
             pre: tree.code_blocks,
@@ -91,7 +93,7 @@ pub fn summarize(tree: &Tree, source: &str) -> Result<Summary, SelectError> {
                     },
                 )
                 .ok_or(SelectError::Segment(node.scope))?;
-                summary.content.push_str(text.as_str());
+                summary.content.push_str(&text.code_sized(code_span_size));
                 summary.content.push_str("\n\n");
                 let enclosing = path
                     .iter()

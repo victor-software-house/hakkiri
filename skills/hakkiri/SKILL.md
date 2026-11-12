@@ -28,6 +28,7 @@ hakkiri check --fail-level warning
 hakkiri check --no-gitignore
 hakkiri check --on-unmatched error README.md
 hakkiri check --on-unknown warn
+hakkiri check --code-span-size 0
 hakkiri check --format json
 ```
 
@@ -89,6 +90,7 @@ A rule holds `tokens` or `forms`, never both, and Vale stops with a panic on a r
 
 Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an empty variable counts as unset.
 `--fail-level`, `--gitignore`, `--on-unmatched` and `--on-unknown` are also keys of the project config, `fail_level`, `gitignore`, `on_unmatched` and `on_unknown`, which the variable wins over.
+`--code-span-size` is also the key `code_span_size`, of the project config, a package's settings file and a glob under `files`, in words: a glob beats the top level, and the variable and the flag beat both.
 
 | Flag | Variable | Meaning |
 |:--|:--|:--|
@@ -99,6 +101,7 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
 | `--gitignore` | `HAKKIRI_GITIGNORE` | `true`, the default, or `false` to read what git ignores; `--no-gitignore` is the same as `--gitignore=false` and has no variable |
 | `--on-unmatched` | `HAKKIRI_ON_UNMATCHED` | What to do with a named file no glob selects: `warn`, the default, `error` or `ignore` |
 | `--on-unknown` | `HAKKIRI_ON_UNKNOWN` | What to do with a selected file no reader reads: `text`, the default, `warn`, `error` or `ignore` |
+| `--code-span-size` | `HAKKIRI_CODE_SPAN_SIZE` | How many words a code span counts as in a word count and the metrics built on words: 1 by default, 0 as Vale counts it, up to 255 |
 | `--format` | `HAKKIRI_FORMAT` | `pretty` or `json` |
 | `--color` | `HAKKIRI_COLOR` | `auto`, `always` or `never`; pretty output holds no colour |
 | `--quiet` | `HAKKIRI_QUIET` | Hide successful pretty output |

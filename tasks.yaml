@@ -192,7 +192,8 @@ queue:
     notes:
       - "2026-11-11, found by the ProseStyle port: v0.0.14 LongSentence is an occurrence rule whose token (?:\\b\\w+\\b|\\*+) counts Vale's mask of a code span, a run of asterisks. hakkiri has no mask and an occurrence counts no match that overlaps a code span, so it counts 3 words in Run `a`, `b`, `c` and `one two three` today, where Vale counts 7."
       - '2026-11-11, decision: the engine stays as the match-checks spec states, since a metric words rule counts each code span once. The rule moves to a metric words form, with its message and cases, in the prose-style package.'
-    plan: openspec/changes/code-span-words/proposal.md
+      - '2026-11-12, operator decision: a setting code_span_size sets how many words a code span counts as, 1 by default and 0 as Vale counts it. HKR-063 builds it in the same change, now named code-span-size.'
+    plan: openspec/changes/code-span-size/proposal.md
 
   - id: HKR-052
     title: Correct the tags that the model gets wrong on our prose
@@ -334,6 +335,22 @@ queue:
     notes:
       - '2026-11-12, operator decision: the key is forms, a list of mappings that each hold tokens; overlapping matches keep the earlier one.'
     plan: openspec/changes/sequence-forms/proposal.md
+
+  - id: HKR-063
+    title: Set how many words a code span counts as
+    scope: config
+    outcome: >-
+      A setting code_span_size sets the number of words a code span counts as in a
+      word count, 1 by default and 0 to match Vale, in a package, the project and a glob,
+      with a flag and a variable.
+    blocked_by: []
+    acceptance:
+      - With code_span_size 0 the alerts of the word-counting rules over the same probes equal Vale 66bbb85 alerts, and by default they equal the alerts before the change, proved in a box.
+      - The key reads from a package settings file, the project config and a glob, and --code-span-size and HAKKIRI_CODE_SPAN_SIZE win over them, with tests that run the binary.
+    plan: openspec/changes/code-span-size/proposal.md
+    notes:
+      - '2026-11-12, operator decision: a code span counts as one word by default, a setting sets it to zero, at the package, project and glob levels, with a flag and a variable. The key is code_span_size, and its unit is words.'
+      - It applies only to word counts and to the metrics built on words. HKR-051 keeps the rule form of LongSentence; this row gives a project the way to count as Vale does.
 archive:
   - id: HKR-031
     title: Turn rules off and on with comments

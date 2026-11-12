@@ -40,6 +40,7 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
             .or(project.on_unmatched)
             .unwrap_or_default(),
         on_unknown: args.on_unknown.or(project.on_unknown).unwrap_or_default(),
+        code_span_size: args.code_span_size,
     };
     let found = find(&project, &args.paths, options);
     for warning in &found.warnings {
@@ -133,8 +134,15 @@ pub(crate) fn lint_planned(
     source: &str,
     extension: &str,
 ) -> Result<Vec<Alert>, String> {
-    let mut alerts = lint_accepting(&plan.rules, tree, source, extension, &plan.accepted)
-        .map_err(|error| error.to_string())?;
+    let mut alerts = lint_accepting(
+        &plan.rules,
+        tree,
+        source,
+        extension,
+        &plan.accepted,
+        plan.code_span_size,
+    )
+    .map_err(|error| error.to_string())?;
     for alert in alerts.iter_mut().filter(|alert| !alert.fault) {
         if let Some(level) = plan.levels.get(alert.rule.as_str()) {
             alert.level = *level;

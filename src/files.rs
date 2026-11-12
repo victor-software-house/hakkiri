@@ -56,7 +56,8 @@ fn is_binary(path: &Path) -> bool {
     file.take(SNIFF).read_to_end(&mut head).is_ok() && head.contains(&0)
 }
 
-/// How a run chooses its files.
+/// How a run chooses its files, and the `code_span_size` that overrides every
+/// file's.
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Options {
     /// Whether a walk skips what git ignores.
@@ -65,6 +66,9 @@ pub(crate) struct Options {
     pub(crate) on_unmatched: OnUnmatched,
     /// What to do with a selected file that no reader reads.
     pub(crate) on_unknown: OnUnknown,
+    /// The words a code span counts as, from the flag or its variable, which
+    /// win over the plan of each file.
+    pub(crate) code_span_size: Option<u8>,
 }
 
 /// What a walk finds, in the order it finds it.
@@ -116,7 +120,7 @@ impl Finder<'_> {
             return;
         };
         let first = self.seen.insert(relative.clone());
-        let Some(plan) = self.project.plan(&relative) else {
+        let Some(mut plan) = self.project.plan(&relative) else {
             // A walk may reach the file before the command line names it, so
             // the warning has its own set.
             if named && !self.project.selects(&relative) && self.warned.insert(relative) {
@@ -126,6 +130,9 @@ impl Finder<'_> {
         };
         if !first {
             return;
+        }
+        if let Some(words) = self.options.code_span_size {
+            plan.code_span_size = words;
         }
         let language = match self
             .project

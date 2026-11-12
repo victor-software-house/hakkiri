@@ -1,5 +1,6 @@
 //! The text a check reads, and where each byte of it lies in the file.
 
+use std::borrow::Cow;
 use std::ops::Range;
 use std::sync::OnceLock;
 
@@ -297,6 +298,32 @@ impl Text {
             self.code.get(first).is_some_and(|code| code.start <= at)
         };
         lies_in(range.start) || lies_in(range.end - 1)
+    }
+
+    /// The content as a count of words reads it: each code span is `size`
+    /// words.
+    ///
+    /// One is the content as it is. Zero reads each span as one `*`, which is
+    /// no word, as Vale's mask is none. More reads it as that many `x`
+    /// separated by spaces.
+    pub(crate) fn code_sized(&self, size: u8) -> Cow<'_, str> {
+        if size == 1 || self.code.is_empty() {
+            return Cow::Borrowed(&self.content);
+        }
+        let reading = if size == 0 {
+            "*".to_owned()
+        } else {
+            vec!["x"; usize::from(size)].join(" ")
+        };
+        let mut sized = String::with_capacity(self.content.len() + self.code.len() * reading.len());
+        let mut cursor = 0;
+        for code in &self.code {
+            sized.push_str(self.content.get(cursor..code.start).unwrap_or_default());
+            sized.push_str(&reading);
+            cursor = code.end;
+        }
+        sized.push_str(self.content.get(cursor..).unwrap_or_default());
+        Cow::Owned(sized)
     }
 
     /// The part of this text in the bytes `range`, or `None` when `range` is

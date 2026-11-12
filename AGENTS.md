@@ -68,6 +68,10 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` are flags, variables and config keys, resolved in that order and then the default; only the project's config holds the keys, and a package's settings file that does is an error.  
    A walk is the `ignore` crate's, with git rules only: it skips what git ignores unless `gitignore` is false, and a named file is never filtered.  
    A selected file with no reader is plain text (`Language::Text`, one `raw` root of paragraphs), unless `on_unknown` changes that.  
+   `code_span_size` is the words a code span counts as, 1 by default and 0 as Vale counts it.  
+   It is a key of a package's file, the project and a glob, then `HAKKIRI_CODE_SPAN_SIZE`, then `--code-span-size`, each beating the one before.  
+   `Plan` holds the value of each file, and `Text::code_sized` reads the text of a `metric` or `readability` rule with it.  
+   A rule that reads a match never sees it.  
    `formats` looks a file up as Vale's `formatFor` does: the extension, then the name or a glob, in key order.  
    A file it maps has two extensions for a scope such as `text.md`, its own and its reader's, where Vale keeps the file's own.  
    The tree records the reader, and a scope may name either extension.  

@@ -17,6 +17,7 @@ use ctl_core::input::{FieldPath, Input};
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
 use hakkiri::Language;
+use hakkiri::engine::DEFAULT_CODE_SPAN_SIZE;
 use hakkiri::pattern::Pattern;
 use hakkiri::rule::{
     Exceptions, Level, LoadError, LoadProblem, Param, Rule, Unrunnable, read_style,
@@ -85,7 +86,8 @@ impl<'de, V: Deserialize<'de>> Deserialize<'de> for Ordered<V> {
 }
 
 /// One setting under a glob: the list of `styles`, the word that sets a
-/// rule's level, or the mapping of `params`.
+/// rule's level, the mapping of `params`, or the number of words of
+/// `code_span_size`.
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum Setting {
@@ -95,6 +97,8 @@ enum Setting {
     Word(String),
     /// The parameters of some rules, by rule name.
     Map(Ordered<Value>),
+    /// A number of words.
+    Number(u64),
 }
 
 /// A value under `params`, read as written so a fault names its place.
@@ -160,6 +164,10 @@ struct Raw {
     #[serde(default)]
     #[garde(skip)]
     files: Ordered<Ordered<Setting>>,
+    /// How many words a code span counts as in a word count.
+    #[serde(default)]
+    #[garde(custom(words_ok))]
+    code_span_size: Option<u64>,
     /// The options of a run, which only the project's config sets.
     #[serde(default)]
     #[garde(skip)]
@@ -200,6 +208,19 @@ fn level_ok(value: &Option<String>, _: &Known) -> garde::Result {
         Some(name) if level_named(name).is_none() => Err(garde::Error::new(format!(
             "`{name}` is not a level: use {LEVELS}"
         ))),
+        _ => Ok(()),
+    }
+}
+
+#[expect(
+    clippy::ref_option,
+    reason = "garde calls a custom rule with a reference to the field."
+)]
+fn words_ok(value: &Option<u64>, _: &Known) -> garde::Result {
+    match value {
+        Some(words) if u8::try_from(*words).is_err() => {
+            Err(garde::Error::new(too_many_words(*words)))
+        }
         _ => Ok(()),
     }
 }
@@ -296,6 +317,8 @@ struct Glob {
     block_ignores: Vec<Pattern>,
     /// The patterns whose matches are hidden as inline text.
     token_ignores: Vec<Pattern>,
+    /// How many words a code span counts as in the files the glob matches.
+    code_span_size: Option<u8>,
     choices: Vec<(String, Choice)>,
     /// The parameters the glob sets, by rule name, in the order written.
     params: Vec<(String, Params)>,
@@ -319,6 +342,9 @@ pub(crate) struct Project {
     vocabularies: BTreeMap<String, Vocabulary>,
     /// The lowest level an alert reports at.
     pub(crate) level: Option<Level>,
+    /// The `code_span_size` of the last config file that sets it, the project's
+    /// after its packages'.
+    code_span_size: Option<u8>,
     /// The config's `fail_level`.
     pub(crate) fail_level: Option<FailLevel>,
     /// The config's `gitignore`.
@@ -356,6 +382,9 @@ pub(crate) struct Plan<'a> {
     pub(crate) block_ignores: Vec<&'a Pattern>,
     /// The token patterns of the globs matching the file, in the same order.
     pub(crate) token_ignores: Vec<&'a Pattern>,
+    /// How many words a code span counts as in a word count of the file: the
+    /// last matching glob's `code_span_size`, else the config's, else one.
+    pub(crate) code_span_size: u8,
 }
 
 /// Whether the resolved directory `real` is under `root` or holds it.
@@ -443,8 +472,10 @@ impl Project {
         let mut named: Vec<&str> = Vec::new();
         let mut block_ignores: Vec<&Pattern> = Vec::new();
         let mut token_ignores: Vec<&Pattern> = Vec::new();
+        let mut code_span_size = self.code_span_size.unwrap_or(DEFAULT_CODE_SPAN_SIZE);
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
             matched = true;
+            code_span_size = glob.code_span_size.unwrap_or(code_span_size);
             block_ignores.extend(&glob.block_ignores);
             token_ignores.extend(&glob.token_ignores);
             for name in &glob.vocab {
@@ -528,6 +559,7 @@ impl Project {
             accepted,
             block_ignores,
             token_ignores,
+            code_span_size,
         })
     }
 }
@@ -924,6 +956,11 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         .iter()
         .rev()
         .find_map(|layer| layer.raw.level.as_deref().and_then(level_named));
+    let code_span_size = layers
+        .iter()
+        .rev()
+        .find_map(|layer| layer.raw.code_span_size)
+        .and_then(|words| u8::try_from(words).ok());
     let mut vocab = Named::default();
     for layer in &layers {
         vocab.add_layer(layer);
@@ -975,6 +1012,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         variants,
         vocabularies: loaded.vocabularies,
         level,
+        code_span_size,
         fail_level,
         gitignore,
         on_unmatched,
@@ -1134,6 +1172,7 @@ fn read_globs(
         let mut vocabularies = None;
         let mut block_ignores = Vec::new();
         let mut token_ignores = Vec::new();
+        let mut code_span_size = None;
         let mut choices = Vec::new();
         let mut params = Vec::new();
         for (key, setting) in settings.0 {
@@ -1143,31 +1182,28 @@ fn read_globs(
                     refuse_unknown_styles(&names, input, &glob, loaded, faults);
                     listed = Some(names);
                 }
-                ("styles", Setting::Word(_) | Setting::Map(_)) => {
-                    faults.add(at, "styles", "is a list of style names".to_owned());
-                }
                 ("vocab", Setting::List(list)) => vocabularies = Some(list),
-                ("vocab", Setting::Word(_) | Setting::Map(_)) => {
-                    faults.add(at, "vocab", "is a list of vocabulary names".to_owned());
-                }
                 ("block_ignores", Setting::List(list)) => {
                     block_ignores = compile_all(&list, input, &glob, "block_ignores", faults);
                 }
                 ("token_ignores", Setting::List(list)) => {
                     token_ignores = compile_all(&list, input, &glob, "token_ignores", faults);
                 }
-                ("block_ignores" | "token_ignores", Setting::Word(_) | Setting::Map(_)) => {
-                    faults.add(at, &key, "is a list of patterns".to_owned());
+                (list @ ("styles" | "vocab" | "block_ignores" | "token_ignores"), _) => {
+                    faults.add(at, list, expects_a_list(list).to_owned());
                 }
                 ("params", Setting::Map(rules)) => {
                     params = read_params(rules, input, &glob, &known, faults);
                 }
-                ("params", Setting::List(_) | Setting::Word(_)) => {
+                ("params", Setting::List(_) | Setting::Word(_) | Setting::Number(_)) => {
                     faults.add(
                         at,
                         "params",
                         "is a mapping of rule names to their parameters".to_owned(),
                     );
+                }
+                ("code_span_size", setting) => {
+                    code_span_size = glob_words(&setting, at, faults);
                 }
                 (_, setting) if !known.contains(key.as_str()) => {
                     let message = if matches!(setting, Setting::List(_)) {
@@ -1181,7 +1217,7 @@ fn read_globs(
                         message.to_owned(),
                     );
                 }
-                (_, Setting::List(_) | Setting::Map(_)) => {
+                (_, Setting::List(_) | Setting::Map(_) | Setting::Number(_)) => {
                     faults.add(at, &key, format!("is set to {LEVELS}, `on` or `off`"));
                 }
                 (_, Setting::Word(word)) => match choice_named(&word) {
@@ -1202,6 +1238,7 @@ fn read_globs(
             vocab: vocabularies.unwrap_or_default(),
             block_ignores,
             token_ignores,
+            code_span_size,
             choices,
             params,
         });
@@ -1296,6 +1333,37 @@ fn read_params(
         read.push((rule, params));
     }
     read
+}
+
+/// What a glob's `key` holds, when it is one of the keys that hold a list.
+fn expects_a_list(key: &str) -> &'static str {
+    match key {
+        "styles" => "is a list of style names",
+        "vocab" => "is a list of vocabulary names",
+        _ => "is a list of patterns",
+    }
+}
+
+/// The words a glob's `code_span_size` sets, or a fault on the line `at`.
+fn glob_words(setting: &Setting, at: Option<usize>, faults: &mut Faults<'_>) -> Option<u8> {
+    let Setting::Number(words) = setting else {
+        faults.add(
+            at,
+            "code_span_size",
+            "is the number of words a code span counts as, such as 0 or 1".to_owned(),
+        );
+        return None;
+    };
+    let size = u8::try_from(*words).ok();
+    if size.is_none() {
+        faults.add(at, "code_span_size", too_many_words(*words));
+    }
+    size
+}
+
+/// The fault of a `code_span_size` over the most a count holds.
+fn too_many_words(words: u64) -> String {
+    format!("`{words}` is too many words: use 0 to {}", u8::MAX)
 }
 
 /// The patterns `list` holds, the value of `key` under the glob at `glob` in
