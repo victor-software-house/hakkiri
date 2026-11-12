@@ -86,6 +86,53 @@ pub struct Action {
     pub params: Vec<String>,
 }
 
+/// The value of a rule parameter: one scalar, as a config writes it.
+#[derive(Clone, Debug, PartialEq)]
+pub enum Param {
+    /// `true` or `false`.
+    Bool(bool),
+    /// A whole number.
+    Int(i64),
+    /// A number with decimals.
+    Float(f64),
+    /// Text, which a field that wants a number or a flag reads as one.
+    Text(String),
+}
+
+/// The fields of a rule that a parameter may not set: lists, mappings, the
+/// rule's identity and its prose, as Vale 3.26.0 lists them.
+/// Changing one is authoring, which a rule that extends another does.
+const NOT_PARAMETERS: [&str; 14] = [
+    "extends",
+    "name",
+    "path",
+    "tests",
+    "message",
+    "description",
+    "link",
+    "tokens",
+    "swap",
+    "exceptions",
+    "filters",
+    "ignore",
+    "raw",
+    "either",
+];
+
+/// What a rule was read from, so it can be read again with parameters.
+#[derive(Debug)]
+enum Recipe {
+    /// A rule file: its name in errors, its text, and the package that holds
+    /// it.
+    File {
+        file: String,
+        text: String,
+        package: Option<PathBuf>,
+    },
+    /// A rule built from a vocabulary, which has no fields to set.
+    Fixed,
+}
+
 /// One rule: a check, what it reports, and the text it reads.
 #[derive(Debug)]
 pub struct Rule {
@@ -110,6 +157,7 @@ pub struct Rule {
     pub tests: Vec<TestCase>,
     /// What the rule checks.
     pub check: Check,
+    recipe: Recipe,
 }
 
 /// The check a rule runs, and the patterns it compiled.
@@ -606,7 +654,7 @@ impl Rule {
     /// the wrong kind, and a feature hakkiri does not run. A pattern that does
     /// not compile is refused, and so is a pattern with nothing to match.
     pub fn from_text(name: &str, file: &str, text: &str) -> Result<Self, LoadError> {
-        Self::read(name, file, text, None, &[], &[])
+        Self::read(name, file, text, None, &[], &[], &[])
     }
 
     /// Reads one rule from the text of its file, in the package `package`.
@@ -632,6 +680,7 @@ impl Rule {
             text,
             Some(package),
             &[package.to_path_buf()],
+            &[],
             &[],
         )
     }
@@ -664,7 +713,94 @@ impl Rule {
         search: &[PathBuf],
         accepted: &[String],
     ) -> Result<Self, LoadError> {
-        Self::read(name, file, text, Some(package), search, accepted)
+        Self::read(name, file, text, Some(package), search, accepted, &[])
+    }
+
+    /// Reads this rule again with `params` laid over its fields, a bare key
+    /// replacing a field as in a rule that extends another.
+    ///
+    /// `search` and `accepted` are what the rule was first read with.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`LoadError`] with a problem for each parameter that is a
+    /// level, which the rule's own setting carries, and for each that is not
+    /// adjustable: `extends`, `name`, `path`, `tests`, `message`,
+    /// `description`, `link`, `tokens`, `swap`, `exceptions`, `filters`,
+    /// `ignore`, `raw` and `either`.
+    /// A parameter the rule's check does not define, or whose value is of the
+    /// wrong kind, is refused as the same field of a rule file is, naming the
+    /// field and no line.
+    /// A rule built from a vocabulary has no field to set, and refuses every
+    /// parameter.
+    pub fn with_params(
+        &self,
+        search: &[PathBuf],
+        accepted: &[String],
+        params: &[(String, Param)],
+    ) -> Result<Self, LoadError> {
+        let refuse = |field: &str, message: String| LoadProblem {
+            file: self.name.clone(),
+            line: None,
+            column: None,
+            field: field.to_owned(),
+            message,
+            unrunnable: false,
+        };
+        let problems: Vec<LoadProblem> = params
+            .iter()
+            .filter_map(|(field, _)| {
+                if field == "level" {
+                    Some(refuse(
+                        field,
+                        format!(
+                            "is not a parameter: set the level with the rule's own setting, such as `{}: warning`",
+                            self.name
+                        ),
+                    ))
+                } else if NOT_PARAMETERS.contains(&field.as_str()) {
+                    Some(refuse(
+                        field,
+                        format!(
+                            "is not adjustable as a parameter: extend `{}` in a style instead",
+                            self.name
+                        ),
+                    ))
+                } else {
+                    None
+                }
+            })
+            .collect();
+        if !problems.is_empty() {
+            return Err(LoadError { problems });
+        }
+        match &self.recipe {
+            Recipe::File {
+                file,
+                text,
+                package,
+            } => Self::read(
+                &self.name,
+                file,
+                text,
+                package.as_deref(),
+                search,
+                accepted,
+                params,
+            ),
+            Recipe::Fixed => Err(LoadError {
+                problems: params
+                    .iter()
+                    .map(|(field, _)| {
+                        refuse(
+                            field,
+                            "is not a parameter: this rule is built from a vocabulary and takes none"
+                                .to_owned(),
+                        )
+                    })
+                    .collect(),
+            }),
+        }
     }
 
     fn read(
@@ -674,18 +810,26 @@ impl Rule {
         package: Option<&Path>,
         search: &[PathBuf],
         accepted: &[String],
+        params: &[(String, Param)],
     ) -> Result<Self, LoadError> {
         let input = Input::new(file, text);
         let probe: Probe = input.load().map_err(|error| at_tab(error, text))?;
-        if inherit::is_rule_ref(probe.extends.value()) {
-            let merged = inherit::merged(file, text, search)?;
+        let mut rule = if inherit::is_rule_ref(probe.extends.value()) || !params.is_empty() {
+            let merged = inherit::merged(file, text, search, params)?;
             let input = Input::new(file, merged);
             let probe: Probe = input
                 .load()
                 .map_err(|error| unplaced(LoadError::from(error)))?;
-            return Self::build(name, file, package, accepted, &probe, &input).map_err(unplaced);
-        }
-        Self::build(name, file, package, accepted, &probe, &input)
+            Self::build(name, file, package, accepted, &probe, &input).map_err(unplaced)?
+        } else {
+            Self::build(name, file, package, accepted, &probe, &input)?
+        };
+        rule.recipe = Recipe::File {
+            file: file.to_owned(),
+            text: text.to_owned(),
+            package: package.map(Path::to_path_buf),
+        };
+        Ok(rule)
     }
 
     /// The rule `probe` and `input` hold, once its `extends` is a check type.
@@ -1055,6 +1199,18 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
     }
 }
 
+/// The rule file of `Vale.Repetition`: Vale's own definition, with the level
+/// `error`, the scope `text`, the tokens `[^\s.!?]+`, `ignorecase` and `alpha`.
+/// Its `vocab` is on, as in any rule that reads accepted terms by default.
+const VALE_REPETITION: &str = r#"extends: repetition
+message: "'%s' is repeated!"
+level: error
+scope: text
+ignorecase: true
+alpha: true
+tokens: ['[^\s.!?]+']
+"#;
+
 /// The rule `Vale.Repetition`, which Vale builds into its style `Vale`: it
 /// reports a word that repeats, such as `the the`, at the level `error`.
 /// `project_accepted` holds the accepted terms of the project, which hold a
@@ -1064,7 +1220,15 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
 ///
 /// Returns a [`LoadError`] when an accepted term is not a pattern.
 pub fn vale_repetition(project_accepted: &[String]) -> Result<Rule, LoadError> {
-    build::vale_repetition_rule("Vale.Repetition", project_accepted)
+    Rule::read(
+        "Vale.Repetition",
+        "the built-in style Vale",
+        VALE_REPETITION,
+        None,
+        &[],
+        project_accepted,
+        &[],
+    )
 }
 
 /// The rules a vocabulary builds, named `{prefix}.Terms` and `{prefix}.Avoid`,

@@ -1,0 +1,19 @@
+packages:
+  - path: styles
+files:
+  "text/*.md":
+    styles: [Team, Vale]
+    params:
+      Vale.Repetition:
+        max: 1
+      Team.Exist:
+        ignorecase: true
+        limit: 3
+      Team.Occ:
+        max: 1
+      Team.Cap:
+        match: '$title'
+      Team.Sub:
+        ignorecase: true
+      Team.Rep:
+        max: 1

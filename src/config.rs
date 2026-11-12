@@ -19,8 +19,8 @@ use globset::{GlobBuilder, GlobMatcher};
 use hakkiri::Language;
 use hakkiri::pattern::Pattern;
 use hakkiri::rule::{
-    Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style, vale_repetition,
-    vocabulary_rules,
+    Exceptions, Level, LoadError, LoadProblem, Param, Rule, Unrunnable, read_style,
+    vale_repetition, vocabulary_rules,
 };
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
@@ -84,8 +84,8 @@ impl<'de, V: Deserialize<'de>> Deserialize<'de> for Ordered<V> {
     }
 }
 
-/// One setting under a glob: the list of `styles`, or the word that sets a
-/// rule's level.
+/// One setting under a glob: the list of `styles`, the word that sets a
+/// rule's level, or the mapping of `params`.
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum Setting {
@@ -93,6 +93,46 @@ enum Setting {
     List(Vec<String>),
     /// A level, `on` or `off`.
     Word(String),
+    /// The parameters of some rules, by rule name.
+    Map(Ordered<Value>),
+}
+
+/// A value under `params`, read as written so a fault names its place.
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+enum Value {
+    Null(()),
+    Bool(bool),
+    Int(i64),
+    Float(f64),
+    Text(String),
+    #[expect(
+        dead_code,
+        reason = "A list is read only to be refused, with its place."
+    )]
+    List(Vec<Value>),
+    Map(Ordered<Value>),
+}
+
+/// A parameter of a rule as a glob sets it, and where the config writes it.
+#[derive(Clone, Debug)]
+struct Written {
+    param: Param,
+    /// The config file that holds it, as a fault names it.
+    file: String,
+    line: Option<usize>,
+}
+
+/// The parameters one glob sets for a rule, by name.
+type Params = BTreeMap<String, Written>;
+
+/// What a set of parameters is called when it picks a rule: the same
+/// parameters with the same values.
+fn variant_key<'a>(params: impl Iterator<Item = (&'a str, &'a Param)>) -> String {
+    params
+        .map(|(name, param)| format!("{name}={param:?}"))
+        .collect::<Vec<_>>()
+        .join(";")
 }
 
 /// The folders of each vocabulary the config names, for the check that runs
@@ -229,6 +269,15 @@ enum Choice {
     Level(Level),
 }
 
+/// The choice a word names: `off`, `on` or a level, `None` for any other word.
+fn choice_named(word: &str) -> Option<Choice> {
+    match word {
+        "off" => Some(Choice::Off),
+        "on" => Some(Choice::On),
+        _ => level_named(word).map(Choice::Level),
+    }
+}
+
 /// One glob of `files` and what it sets.
 #[derive(Debug)]
 struct Glob {
@@ -248,6 +297,8 @@ struct Glob {
     /// The patterns whose matches are hidden as inline text.
     token_ignores: Vec<Pattern>,
     choices: Vec<(String, Choice)>,
+    /// The parameters the glob sets, by rule name, in the order written.
+    params: Vec<(String, Params)>,
 }
 
 /// A config with its packages loaded.
@@ -260,6 +311,10 @@ pub(crate) struct Project {
     /// The rules that are valid Vale and that hakkiri cannot run.
     unrunnable: Vec<Held>,
     globs: Vec<Glob>,
+    /// The rule each set of parameters gives, by the rule's place in `rules`
+    /// and the parameters' [`variant_key`]: one for every set that the globs
+    /// matching some file can add up to.
+    variants: HashMap<(usize, String), Rule>,
     /// The vocabularies the config names, by name.
     vocabularies: BTreeMap<String, Vocabulary>,
     /// The lowest level an alert reports at.
@@ -374,6 +429,9 @@ impl Project {
     /// off, or when the config turns it on or sets its level, whatever style
     /// holds it. A level once set stays when a later glob turns the rule off or
     /// on, as in Vale.
+    /// A parameter a glob sets reaches the files that glob matches, a later
+    /// glob winning for the same parameter, and an empty `styles` list drops
+    /// the parameters before it as it drops the levels.
     /// A rule hakkiri cannot run is held to the same test, and each one that
     /// passes it is in [`Plan::unrunnable`].
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
@@ -381,6 +439,7 @@ impl Project {
         let mut styles: &[String] = &[];
         let mut switches: HashMap<String, bool> = HashMap::new();
         let mut set_levels: HashMap<&str, Level> = HashMap::new();
+        let mut set_params: HashMap<&str, BTreeMap<&str, &Written>> = HashMap::new();
         let mut named: Vec<&str> = Vec::new();
         let mut block_ignores: Vec<&Pattern> = Vec::new();
         let mut token_ignores: Vec<&Pattern> = Vec::new();
@@ -398,22 +457,17 @@ impl Project {
                 if listed.is_empty() {
                     switches.clear();
                     set_levels.clear();
+                    set_params.clear();
                 }
             }
-            for (name, choice) in &glob.choices {
-                match choice {
-                    Choice::Off => {
-                        switches.insert(name.clone(), false);
-                    }
-                    Choice::On => {
-                        switches.insert(name.clone(), true);
-                    }
-                    Choice::Level(level) => {
-                        switches.insert(name.clone(), true);
-                        set_levels.insert(name.as_str(), *level);
-                    }
-                }
+            for (rule, params) in &glob.params {
+                set_params.entry(rule.as_str()).or_default().extend(
+                    params
+                        .iter()
+                        .map(|(name, written)| (name.as_str(), written)),
+                );
             }
+            choose(&glob.choices, &mut switches, &mut set_levels);
             // A glob that names a vocabulary runs the rules of that vocabulary
             // on its files, after the glob's own settings, as in Vale.
             set_vocabulary_rules(&mut switches, &glob.vocab);
@@ -430,7 +484,7 @@ impl Project {
             .flatten()
         {
             listed.insert(*index);
-            let rule = self.rules.get(*index)?;
+            let rule = self.rule_for(*index, &set_params)?;
             if switches.get(rule.name.as_str()) != Some(&false) {
                 rules.push(rule);
                 if let Some(level) = set_levels.get(rule.name.as_str()) {
@@ -443,7 +497,7 @@ impl Project {
                 continue;
             }
             if switches.get(rule.name.as_str()) == Some(&true) {
-                rules.push(rule);
+                rules.push(self.rule_for(index, &set_params)?);
                 if let Some(level) = set_levels.get(rule.name.as_str()) {
                     levels.insert(rule.name.as_str(), *level);
                 }
@@ -475,6 +529,51 @@ impl Project {
             block_ignores,
             token_ignores,
         })
+    }
+}
+
+/// Applies the rule keys of one glob: `off` and `on` switch a rule, and a level
+/// switches it on and sets the level of its alerts.
+fn choose<'a>(
+    choices: &'a [(String, Choice)],
+    switches: &mut HashMap<String, bool>,
+    set_levels: &mut HashMap<&'a str, Level>,
+) {
+    for (name, choice) in choices {
+        match choice {
+            Choice::Off => {
+                switches.insert(name.clone(), false);
+            }
+            Choice::On => {
+                switches.insert(name.clone(), true);
+            }
+            Choice::Level(level) => {
+                switches.insert(name.clone(), true);
+                set_levels.insert(name.as_str(), *level);
+            }
+        }
+    }
+}
+
+impl Project {
+    /// The rule at `index`, read with the parameters `set` holds for its name
+    /// when it holds any.
+    fn rule_for(
+        &self,
+        index: usize,
+        set: &HashMap<&str, BTreeMap<&str, &Written>>,
+    ) -> Option<&Rule> {
+        let rule = self.rules.get(index)?;
+        match set
+            .get(rule.name.as_str())
+            .filter(|params| !params.is_empty())
+        {
+            Some(params) => {
+                let key = variant_key(params.iter().map(|(name, w)| (*name, &w.param)));
+                self.variants.get(&(index, key))
+            }
+            None => Some(rule),
+        }
     }
 }
 
@@ -545,6 +644,9 @@ struct Loaded {
     /// The folders that hold each vocabulary the config names, as the config
     /// writes them.
     holders: BTreeMap<String, Vec<PathBuf>>,
+    /// The accepted terms of the project's vocabularies, which the rules read
+    /// as exceptions.
+    accepted: Vec<String>,
 }
 
 /// A package folder that was found, and where its entry is written.
@@ -859,6 +961,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         faults.problems.append(&mut at.problems);
     }
     refuse_names(&globs, &loaded, &mut faults);
+    let variants = build_variants(&globs, &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
             problems: faults.problems,
@@ -869,6 +972,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         styles: loaded.styles,
         unrunnable: loaded.unrunnable,
         globs,
+        variants,
         vocabularies: loaded.vocabularies,
         level,
         fail_level,
@@ -932,6 +1036,7 @@ fn load_packages(
         .flat_map(|vocabulary| vocabulary.rejected.iter().cloned())
         .collect();
     build_vocabulary_rules(&mut loaded, vocab, &accepted, &rejected, faults);
+    loaded.accepted.clone_from(&accepted);
     for Found {
         origin,
         written,
@@ -1030,29 +1135,19 @@ fn read_globs(
         let mut block_ignores = Vec::new();
         let mut token_ignores = Vec::new();
         let mut choices = Vec::new();
+        let mut params = Vec::new();
         for (key, setting) in settings.0 {
             let at = line_of(input, &glob.clone().key(&key));
             match (key.as_str(), setting) {
                 ("styles", Setting::List(names)) => {
-                    let list = glob.clone().key("styles");
-                    for (index, name) in names.iter().enumerate() {
-                        if !loaded.styles.contains_key(name) {
-                            // Each name has its own line, whatever its place in
-                            // the list.
-                            faults.add(
-                                line_of(input, &list.clone().index(index)),
-                                "styles",
-                                format!("`{name}` is not a style in any package"),
-                            );
-                        }
-                    }
+                    refuse_unknown_styles(&names, input, &glob, loaded, faults);
                     listed = Some(names);
                 }
-                ("styles", Setting::Word(_)) => {
+                ("styles", Setting::Word(_) | Setting::Map(_)) => {
                     faults.add(at, "styles", "is a list of style names".to_owned());
                 }
                 ("vocab", Setting::List(list)) => vocabularies = Some(list),
-                ("vocab", Setting::Word(_)) => {
+                ("vocab", Setting::Word(_) | Setting::Map(_)) => {
                     faults.add(at, "vocab", "is a list of vocabulary names".to_owned());
                 }
                 ("block_ignores", Setting::List(list)) => {
@@ -1061,8 +1156,18 @@ fn read_globs(
                 ("token_ignores", Setting::List(list)) => {
                     token_ignores = compile_all(&list, input, &glob, "token_ignores", faults);
                 }
-                ("block_ignores" | "token_ignores", Setting::Word(_)) => {
+                ("block_ignores" | "token_ignores", Setting::Word(_) | Setting::Map(_)) => {
                     faults.add(at, &key, "is a list of patterns".to_owned());
+                }
+                ("params", Setting::Map(rules)) => {
+                    params = read_params(rules, input, &glob, &known, faults);
+                }
+                ("params", Setting::List(_) | Setting::Word(_)) => {
+                    faults.add(
+                        at,
+                        "params",
+                        "is a mapping of rule names to their parameters".to_owned(),
+                    );
                 }
                 (_, setting) if !known.contains(key.as_str()) => {
                     let message = if matches!(setting, Setting::List(_)) {
@@ -1076,14 +1181,12 @@ fn read_globs(
                         message.to_owned(),
                     );
                 }
-                (_, Setting::List(_)) => {
+                (_, Setting::List(_) | Setting::Map(_)) => {
                     faults.add(at, &key, format!("is set to {LEVELS}, `on` or `off`"));
                 }
-                (_, Setting::Word(word)) => match (word.as_str(), level_named(&word)) {
-                    ("off", _) => choices.push((key.clone(), Choice::Off)),
-                    ("on", _) => choices.push((key.clone(), Choice::On)),
-                    (_, Some(level)) => choices.push((key.clone(), Choice::Level(level))),
-                    (_, None) => faults.add(
+                (_, Setting::Word(word)) => match choice_named(&word) {
+                    Some(choice) => choices.push((key.clone(), choice)),
+                    None => faults.add(
                         at,
                         &key,
                         format!("`{word}` is not a level: use {LEVELS}, `on` or `off`"),
@@ -1100,9 +1203,99 @@ fn read_globs(
             block_ignores,
             token_ignores,
             choices,
+            params,
         });
     }
     globs
+}
+
+/// Refuses each name of the `styles` list under the glob at `glob` that no
+/// package holds, on the line of that name.
+fn refuse_unknown_styles(
+    names: &[String],
+    input: &Input,
+    glob: &FieldPath,
+    loaded: &Loaded,
+    faults: &mut Faults<'_>,
+) {
+    let list = glob.clone().key("styles");
+    for (index, name) in names.iter().enumerate() {
+        if !loaded.styles.contains_key(name) {
+            faults.add(
+                line_of(input, &list.clone().index(index)),
+                "styles",
+                format!("`{name}` is not a style in any package"),
+            );
+        }
+    }
+}
+
+/// The parameters `rules` holds, the value of `params` under the glob at
+/// `glob` in `input`, and a fault on the line of each name or value that is
+/// not one.
+///
+/// A rule must be one the config loads and its parameters a mapping of one
+/// value each: a number, `true` or `false`, or text. What a rule's check does
+/// with a parameter is refused when its rules are read again.
+fn read_params(
+    rules: Ordered<Value>,
+    input: &Input,
+    glob: &FieldPath,
+    known: &HashSet<&str>,
+    faults: &mut Faults<'_>,
+) -> Vec<(String, Params)> {
+    let mut read = Vec::new();
+    for (rule, value) in rules.0 {
+        let at = glob.clone().key("params").key(&rule);
+        if !known.contains(rule.as_str()) {
+            faults.add(
+                key_line_of(input, &at),
+                &rule,
+                "names no rule in any style the config loads".to_owned(),
+            );
+            continue;
+        }
+        let Value::Map(values) = value else {
+            faults.add(
+                line_of(input, &at),
+                &rule,
+                "is a mapping of parameter names to values".to_owned(),
+            );
+            continue;
+        };
+        let mut params = Params::new();
+        for (name, value) in values.0 {
+            let place = line_of(input, &at.clone().key(&name));
+            let param = match value {
+                Value::Bool(value) => Param::Bool(value),
+                Value::Int(value) => Param::Int(value),
+                Value::Float(value) => Param::Float(value),
+                Value::Text(value) => Param::Text(value),
+                Value::Null(()) => {
+                    faults.add(place, &name, "needs a value".to_owned());
+                    continue;
+                }
+                Value::List(_) | Value::Map(_) => {
+                    faults.add(
+                        place,
+                        &name,
+                        "takes one value: a number, `true` or `false`, or text".to_owned(),
+                    );
+                    continue;
+                }
+            };
+            params.insert(
+                name,
+                Written {
+                    param,
+                    file: faults.file.to_owned(),
+                    line: place,
+                },
+            );
+        }
+        read.push((rule, params));
+    }
+    read
 }
 
 /// The patterns `list` holds, the value of `key` under the glob at `glob` in
@@ -1141,6 +1334,119 @@ fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
             faults.problems.extend(problems.iter().cloned());
         }
     }
+}
+
+/// Reads each rule again for every set of parameters that the globs matching
+/// some file can give it, and refuses a parameter its rule cannot take.
+///
+/// A file gets the parameters of the globs that match it, in order, and an
+/// empty `styles` list drops those before it. So each glob either matches a
+/// file or does not, and the sets a rule can get are those that each choice
+/// leaves, without the sets that come out alike counted twice.
+/// A fault is placed on the line of the parameter it names, or of the first
+/// parameter of the set when it names none. When a set of several is refused,
+/// each parameter is read alone, so every fault shows at once.
+fn build_variants(
+    globs: &[Glob],
+    loaded: &Loaded,
+    faults: &mut Faults<'_>,
+) -> HashMap<(usize, String), Rule> {
+    let mut variants = HashMap::new();
+    let names: BTreeSet<&str> = globs
+        .iter()
+        .flat_map(|glob| glob.params.iter().map(|(rule, _)| rule.as_str()))
+        .collect();
+    for name in names {
+        let Some(index) = loaded.rules.iter().position(|rule| rule.name == name) else {
+            continue;
+        };
+        let mut sets: Vec<Params> = vec![Params::new()];
+        for glob in globs {
+            let clears = glob.styles.as_ref().is_some_and(Vec::is_empty);
+            let own = glob
+                .params
+                .iter()
+                .find(|(rule, _)| rule == name)
+                .map(|(_, params)| params);
+            if !clears && own.is_none() {
+                continue;
+            }
+            let mut next = sets.clone();
+            for set in &sets {
+                let mut matched = if clears { Params::new() } else { set.clone() };
+                matched.extend(
+                    own.into_iter()
+                        .flatten()
+                        .map(|(k, v)| (k.clone(), v.clone())),
+                );
+                next.push(matched);
+            }
+            let mut seen = HashSet::new();
+            next.retain(|set| {
+                seen.insert(variant_key(set.iter().map(|(k, w)| (k.as_str(), &w.param))))
+            });
+            sets = next;
+        }
+        for set in sets.into_iter().filter(|set| !set.is_empty()) {
+            let params: Vec<(String, Param)> = set
+                .iter()
+                .map(|(name, written)| (name.clone(), written.param.clone()))
+                .collect();
+            let key = variant_key(set.iter().map(|(k, w)| (k.as_str(), &w.param)));
+            match loaded.rules[index].with_params(&loaded.packages, &loaded.accepted, &params) {
+                Ok(rule) => {
+                    variants.insert((index, key), rule);
+                }
+                Err(error) => {
+                    // Each parameter alone, so a fault of one does not hide
+                    // the fault of another; a fault of the set as a whole is
+                    // what the set gave.
+                    let alone: Vec<LoadProblem> = if params.len() > 1 {
+                        params
+                            .iter()
+                            .filter_map(|one| {
+                                loaded.rules[index]
+                                    .with_params(
+                                        &loaded.packages,
+                                        &loaded.accepted,
+                                        std::slice::from_ref(one),
+                                    )
+                                    .err()
+                            })
+                            .flat_map(|error| error.problems)
+                            .collect()
+                    } else {
+                        Vec::new()
+                    };
+                    let problems = if alone.is_empty() {
+                        error.problems
+                    } else {
+                        alone
+                    };
+                    for problem in problems {
+                        let at = set.get(&problem.field).or_else(|| set.values().next());
+                        let message = if problem.message.starts_with("rule `") {
+                            problem.message
+                        } else {
+                            format!("rule `{name}`: {}", problem.message)
+                        };
+                        let fault = LoadProblem {
+                            file: at.map_or_else(String::new, |written| written.file.clone()),
+                            line: at.and_then(|written| written.line),
+                            column: None,
+                            field: problem.field,
+                            message,
+                            unrunnable: false,
+                        };
+                        if !faults.problems.contains(&fault) {
+                            faults.problems.push(fault);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    variants
 }
 
 /// The vocabularies the config files name: at their top level, and in the

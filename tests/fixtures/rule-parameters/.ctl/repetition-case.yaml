@@ -1,0 +1,9 @@
+packages:
+  - path: styles
+files:
+  "text/*.md":
+    styles: [Team, Vale]
+    params:
+      Vale.Repetition:
+        ignorecase: false
+        alpha: false

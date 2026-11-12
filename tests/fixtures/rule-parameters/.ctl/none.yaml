@@ -1,0 +1,5 @@
+packages:
+  - path: styles
+files:
+  "text/*.md":
+    styles: [Team, Vale]

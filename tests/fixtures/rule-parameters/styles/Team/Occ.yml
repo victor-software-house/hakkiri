@@ -1,0 +1,6 @@
+extends: occurrence
+message: "Too many 'very'."
+level: warning
+scope: paragraph
+max: 2
+token: very

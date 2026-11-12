@@ -7,6 +7,8 @@
 //!
 //! [`merged`] resolves the chain and writes the result as JSON text, which is
 //! valid YAML, so the rule reads through the same reader as any other file.
+//! It lays a config's parameters over the fields last, as a bare key replaces
+//! a field of a rule.
 
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
@@ -16,7 +18,7 @@ use std::path::PathBuf;
 use ctl_core::input::Input;
 use serde::Deserialize;
 
-use super::{LoadError, LoadProblem};
+use super::{LoadError, LoadProblem, Param};
 
 /// How many rules a chain may hold before it is taken for a cycle.
 const MAX_DEPTH: usize = 10;
@@ -181,8 +183,20 @@ fn resolve(name: &str, search: &[PathBuf]) -> Result<PathBuf, String> {
     ))
 }
 
+impl From<&Param> for Node {
+    fn from(param: &Param) -> Self {
+        match param {
+            Param::Bool(value) => Self::Bool(*value),
+            Param::Int(value) => Self::Int(*value),
+            Param::Float(value) => Self::Float(*value),
+            Param::Text(value) => Self::Text(value.clone()),
+        }
+    }
+}
+
 /// `text`, the rule file `file`, with its chain of parents resolved against
-/// the package folders in `search`, as JSON text.
+/// the package folders in `search`, and each of `params` laid over a field of
+/// the rule, as JSON text.
 ///
 /// # Errors
 ///
@@ -191,12 +205,20 @@ fn resolve(name: &str, search: &[PathBuf]) -> Result<PathBuf, String> {
 /// a `Vale.` parent.
 /// They are also a key written both bare and with `+` or `-`, and an edit of
 /// a field the parent lacks or of a value that is no list or mapping.
-pub(super) fn merged(file: &str, text: &str, search: &[PathBuf]) -> Result<String, LoadError> {
+pub(super) fn merged(
+    file: &str,
+    text: &str,
+    search: &[PathBuf],
+    params: &[(String, Param)],
+) -> Result<String, LoadError> {
     let fail = |problem| LoadError {
         problems: vec![problem],
     };
     let child = parse(file, text).map_err(fail)?;
-    let fields = flatten(child, file, &mut Vec::new(), search).map_err(fail)?;
+    let mut fields = flatten(child, file, &mut Vec::new(), search).map_err(fail)?;
+    for (name, param) in params {
+        fields.insert(name.clone(), Node::from(param));
+    }
     let mut out = String::new();
     write_map(&fields, &mut out).map_err(|message| fail(problem(file, "", message)))?;
     Ok(out)

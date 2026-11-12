@@ -1,0 +1,10 @@
+packages:
+  - path: styles
+files:
+  "text/*.md":
+    styles: [Team, Vale]
+    params:
+      Team.Cap:
+        match: '$title'
+        style: 'Chicago'
+        threshold: 0.5

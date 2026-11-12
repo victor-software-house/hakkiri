@@ -452,6 +452,8 @@ queue:
       - A parameter that Vale refuses, a level spelled as a parameter and a structural key such as tokens, is refused with the file and the line.
     notes:
       - "2026-11-12, found while probing Vale.Repetition at 66bbb85: ini.go asRuleParam stores Style.Rule.param = value, and defaultRule applies it when the rule compiles. hakkiri's config reads a level, on and off by rule name and no parameter."
+      - 2026-11-12, the key Vale 66bbb85 reads is Style.Rule[param] = value, not Style.Rule.param, and it applies a parameter to every file whichever section sets it, with the last section winning everywhere. hakkiri applies it to the files of the glob that sets it, as the rule-parameters change records.
+    plan: openspec/changes/rule-parameters/proposal.md
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary
