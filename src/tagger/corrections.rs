@@ -83,10 +83,22 @@ const MODIFIERS: [&str; 8] = ["NN", "NNS", "NNP", "NNPS", "JJ", "CD", "POS", "VB
 /// The tags of the words that can be the subject of a verb of saying.
 const SUBJECTS: [&str; 5] = ["NN", "NNS", "NNP", "NNPS", "JJ"];
 
-/// Words that technical prose uses as nouns where the model reads one other
-/// part of speech: `check`, `split`, `round`, `prompt`, `fade` and `thinking`
-/// name a thing in `the id check`, `the split` and `the thinking mode`.
-const TECHNICAL_NOUNS: [&str; 6] = ["check", "split", "round", "prompt", "fade", "thinking"];
+/// Words that technical prose uses as nouns after a determiner, a possessive or
+/// an adjective, where the model reads one other part of speech.
+/// On nine repositories a reader found each one a noun in all 163 sampled
+/// places after a determiner, so none has a verb or an adjective to lose.
+/// `split` and `round` are not here: `the split DNS` and `the round trip` read
+/// as adjectives in a fifth of their places after a determiner.
+const NOUNS_AFTER_DETERMINER: [&str; 4] = ["check", "prompt", "thinking", "fade"];
+
+/// Words that fill the slot of a noun before `pull request` in a title, as in
+/// `the load split pull request`, where the model reads a past tense, an
+/// adverb or an adjective.
+const NOUNS_IN_TITLE: [&str; 3] = ["prompt", "round", "split"];
+
+/// Words that end a compound of singular nouns as a base form, as in `the peer
+/// user id check against`, where the model reads a verb.
+const NOUNS_ENDING_COMPOUND: [&str; 1] = ["check"];
 
 /// The tags of the words after the corrections.
 ///
@@ -194,19 +206,20 @@ fn pull_requests(words: &[&str], tags: &mut [&str]) {
     }
 }
 
-/// Reads a word of [`TECHNICAL_NOUNS`] as the noun it is when a noun phrase
-/// holds it.
+/// Reads a word of [`NOUNS_AFTER_DETERMINER`], [`NOUNS_IN_TITLE`] or
+/// [`NOUNS_ENDING_COMPOUND`] as the noun it is when a noun phrase holds it.
 ///
 /// The model reads `split` in `the load split pull request` as a past tense,
 /// `round` in `the mask round pull request` as an adverb, and `check` in `the
 /// peer user id check` as a verb, since the corpus it learned from uses these
 /// words as one other part of speech.
-/// A determiner, a possessive or an adjective before the word makes it a noun,
-/// unless it is a participle after an adjective, as in `so stupid thinking`.
-/// So does a noun before it, when the nouns after it run up to `pull request`,
-/// the head of the title of a pull request.
-/// A base form after two singular nouns, with no noun after it, is a noun too,
-/// as no singular noun takes it as its verb.
+/// A word of the first list is a noun after a determiner, a possessive or an
+/// adjective, unless it is a participle after an adjective, as in `so stupid
+/// thinking`.
+/// A word of the second is a noun after a noun, when the nouns after it run up
+/// to `pull request`, the head of the title of a pull request.
+/// A word of the third is a noun as a base form after two singular nouns with
+/// no noun after it, as no singular noun takes it as its verb.
 fn nouns_of_technical_prose(words: &[&str], tags: &mut [&str]) {
     let noun_at = |tags: &[&str], index: Option<usize>| {
         index
@@ -217,15 +230,19 @@ fn nouns_of_technical_prose(words: &[&str], tags: &mut [&str]) {
         let (Some(&word), Some(&tag)) = (words.get(index), tags.get(index)) else {
             continue;
         };
-        if !TECHNICAL_NOUNS.contains(&word) || matches!(tag, "NN" | "NNS") {
+        if matches!(tag, "NN" | "NNS") {
             continue;
         }
         let before = index.checked_sub(1);
         let before_tag = before.and_then(|at| tags.get(at)).copied();
-        let after_determiner = matches!(before_tag, Some("DT" | "PRP$" | "POS"))
-            || (before_tag == Some("JJ") && tag != "VBG");
-        let in_title = noun_at(tags, before) && heads_pull_request(words, tags, index);
-        let ends_compound = before_tag == Some("NN")
+        let after_determiner = NOUNS_AFTER_DETERMINER.contains(&word)
+            && (matches!(before_tag, Some("DT" | "PRP$" | "POS"))
+                || (before_tag == Some("JJ") && tag != "VBG"));
+        let in_title = NOUNS_IN_TITLE.contains(&word)
+            && noun_at(tags, before)
+            && heads_pull_request(words, tags, index);
+        let ends_compound = NOUNS_ENDING_COMPOUND.contains(&word)
+            && before_tag == Some("NN")
             && noun_at(tags, index.checked_sub(2))
             && matches!(tag, "VB" | "VBP")
             && matches!(
@@ -324,8 +341,8 @@ fn subjects_of_verbs_of_saying(words: &[&str], tags: &mut [&str]) {
 /// it alone, and `asked` in `a batch a request asked for` as a participle.
 /// A clause that follows `asks` like a relative clause makes it a noun.
 /// A noun phrase that starts with a determiner and is the object of a
-/// preposition, of a gerund or of a first-word imperative ends in a noun, so
-/// a verb tag on `asks` there is wrong, and a past tense is a participle.
+/// preposition, of a gerund or of a first-word imperative ends in a noun.
+/// So a verb tag on `asks` there is wrong, and a past tense is a participle.
 /// A noun after a noun in any other place is the verb of the clause, and a
 /// participle there is a past tense.
 fn asking_in_noun_phrases(words: &[&str], tags: &mut [&str]) {

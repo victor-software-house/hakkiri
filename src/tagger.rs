@@ -7,9 +7,11 @@
 //! [`Tagger::tag()`] tokenizes one sentence and tags each token.
 //!
 //! A few rules then correct the model's tags where it is wrong on the prose of
-//! our documents: the possessive `'s`, a word in capitals, a modal in capitals,
-//! a semicolon, a verb after a noun phrase, and the verbs of saying and asking
-//! after a noun.
+//! our documents.
+//! They cover the possessive `'s`, a word in capitals, a modal in capitals, and
+//! a semicolon.
+//! They also cover a verb after a noun phrase, the verbs of saying and asking
+//! after a noun, and the nouns of technical prose.
 //! [`Tagger::tag()`] and [`Tagger::tag_words()`] apply them.
 //! [`Tagger::tag_code()`] reads a noun in place of each code span first.
 //! [`Tagger::tag_treebank()`] does not, so a title is read as prose reads it.
