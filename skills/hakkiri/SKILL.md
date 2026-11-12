@@ -65,6 +65,13 @@ JSON never holds an escape byte.
 | 1 | A reported alert reaches `--fail-level`, which defaults to `error` |
 | 2 | The config or a rule is wrong, a file failed, no path lies under the project root, or the command line is wrong |
 
+## Read the tags of a sequence rule
+
+A `sequence` rule reads part-of-speech tags, and hakkiri's are not Vale's.
+It tags with the model of prose at `b33e60d` and corrects a possessive `'s`, a modal or a name in capitals, a semicolon, and a verb after a noun phrase.
+So a `sequence` rule can flag other words than in Vale.
+`hakkiri instructions` lists the difference.
+
 ## Flags and variables
 
 Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an empty variable counts as unset.

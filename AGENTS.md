@@ -71,6 +71,10 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    No other build links it.  
    Each change that ships behaviour adds a `.changeset/` fragment; merging the Version PR is the release.  
    The README's install line and the skill's `version:` line are version pins, so never edit their numbers by hand.
+10. **Tags.**
+    The English tagger is the model of prose at `b33e60d` with the corrections of `src/tagger/corrections.rs` applied after it, each a rule with its reason.
+    `tag_treebank` skips them, so a title is tagged as prose tags it.
+    A new correction needs a test, and a measure on UD English GUM, on the judged conflicts of our documents and on the alerts of a rule that reads tags.
 
 ## Workflow
 
