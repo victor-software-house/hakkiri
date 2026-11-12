@@ -184,11 +184,25 @@ pub(crate) fn nodes(
     for (scope, ranges) in [
         (Scope::Alt, &walk.alts),
         (Scope::Description, &walk.descriptions),
-        (Scope::Title, &walk.titles),
     ] {
         for range in ranges {
             nodes.extend(Node::from_segments(scope, lines.map(range), Vec::new()));
         }
+    }
+    for (range, holder) in &walk.titles {
+        let Some(title) = Node::from_segments(Scope::Title, lines.map(range), Vec::new()) else {
+            continue;
+        };
+        // A title of an `a` or an `img` tag sits in an empty node of the
+        // element, so `title & link` and `title & image` select it as they
+        // select the title of a Markdown link and image.
+        nodes.push(match holder {
+            Some(element) => {
+                let at = title.span.start;
+                Node::new(*element, at..at, vec![title])
+            }
+            None => title,
+        });
     }
     nodes.sort_by_key(|node| node.span.start);
     Some(nodes)

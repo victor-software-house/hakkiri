@@ -47,8 +47,14 @@ The scope `image` SHALL select the alt text of an image, and a title in a headin
 
 In an HTML block, the `title` attribute of a tag with text SHALL be selected by `title`, and by no prose scope.
 In a line of text, the attribute SHALL be read by `raw` only, as in Vale.
+The attribute of an `a` tag SHALL be a link title, and that of an `img` tag an image title.
 
 #### Scenario: An HTML block
 
 - **WHEN** an HTML block is `<p title="an html marker">Some text.</p>`
 - **THEN** `title` selects `an html marker`, and `text` selects `Some text.`
+
+#### Scenario: An a tag and an img tag
+
+- **WHEN** an HTML block holds `<a href="u" title="an a marker">x</a>` and `<img src="i.png" title="an img marker">`
+- **THEN** `title & link` selects `an a marker`, `title & image` selects `an img marker`, and `link` and `image` select neither
