@@ -47,12 +47,19 @@ No marker, escape or entity SHALL change its text.
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text that holds a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message, whether a walk finds it or the command line names it.
+A file read as plain text SHALL be skipped with no alert and no message when its first 8192 bytes hold a NUL byte or are not valid UTF-8.
+This SHALL hold whether a walk finds the file or the command line names it.
+A character that the cut splits SHALL NOT make the file binary.
 
 #### Scenario: A picture
 
 - **WHEN** `logo.png` holds a NUL byte and the glob `*` selects it
 - **THEN** hakkiri skips it, counts no file for it, and exits 0
+
+#### Scenario: A Latin-1 file
+
+- **WHEN** `latin.txt` holds a word that has the byte `E9`, and no NUL byte, and the glob `*` selects it
+- **THEN** hakkiri skips it, counts no file for it, and exits 0, where it would fail the run for a file it cannot read as text
 
 ### Requirement: A file a formats entry maps has the extension of its reader
 

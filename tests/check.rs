@@ -121,6 +121,32 @@ fn a_binary_file_is_skipped_with_no_message() -> TestResult {
 }
 
 #[test]
+fn a_file_that_is_not_utf_8_is_skipped_with_no_message() -> TestResult {
+    let suite = Suite::new("check-latin-1");
+    let root = project(&suite, "latin-1", ALL);
+    root.file("latin.txt", b"r\xe9sum\xe9 very\n");
+    // A character that the 8192-byte cut splits is no invalid byte.
+    let mut cut = "a".repeat(8191).into_bytes();
+    cut.extend_from_slice("é very\n".as_bytes());
+    root.file("cut.txt", cut);
+    root.file("a.md", "Fine.\n");
+    let walked = run(root.path(), &["check"], &[])?;
+    assert_eq!(walked.code, 0, "{}{}", walked.out, walked.err);
+    assert_eq!(walked.err, "");
+    assert_eq!(
+        walked.lines().last(),
+        Some(&"1 alert in 2 files"),
+        "cut.txt is linted, latin.txt is skipped: {:?}",
+        walked.lines()
+    );
+    let named = run(root.path(), &["check", "latin.txt"], &[])?;
+    assert_eq!(named.code, 0, "{}{}", named.out, named.err);
+    assert_eq!(named.lines(), ["0 alerts in 0 files"]);
+    assert_eq!(named.err, "");
+    Ok(())
+}
+
+#[test]
 fn a_file_no_reader_reads_is_linted_as_plain_text() -> TestResult {
     let suite = Suite::new("check-plain");
     let root = project(&suite, "plain", ALL);

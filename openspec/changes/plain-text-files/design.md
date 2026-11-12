@@ -57,7 +57,9 @@ It lost because the point of the row is that a `*` glob lints text files, and a 
 
 ### 5. A binary file is skipped
 
-A file read as plain text that holds a NUL byte in its first 8192 bytes is binary and skipped with no message, as ripgrep and typos skip binaries.
+A file read as plain text is binary and skipped with no message when its first 8192 bytes hold a NUL byte or are not valid UTF-8, since the run could not read it as text.
+A character that the 8192-byte cut splits is not invalid.
+ripgrep and typos skip a file with a NUL byte as binary.
 Only a file read as text is tested: a `.md` or `.rs` file is read as it is.
 Vale has no such test in `NewFile` or `lintFile`, so it reads a binary file as lines.
 Alternative: test every file.

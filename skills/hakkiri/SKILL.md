@@ -35,7 +35,7 @@ With no path, `check` walks the current directory.
 A walk skips `node_modules`, `.git` and package folders, and what git ignores in a git repository.
 `--no-gitignore` reads the ignored files, and a file named on the command line is read whether git ignores it or not.
 A file named on the command line that no glob selects draws a warning, and `--on-unmatched error` fails the run for it.
-A file that a glob selects and that no reader reads is linted as plain text, and a binary file is skipped.
+A file that a glob selects and that no reader reads is linted as plain text, and a binary file, with a NUL byte or bytes that are not UTF-8 at its start, is skipped.
 `formats` in the config maps an extension, a file name or a glob to a reader, and `--on-unknown` turns the plain-text default into a warning, a failure or nothing.
 
 ## Run the test cases
