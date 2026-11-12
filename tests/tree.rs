@@ -356,7 +356,6 @@ fn a_jsx_element_with_text() -> TestResult {
             "title=\"t\"",
             "<Note",
             "</Note>",
-            "{expression}",
             "<b>",
             "<Callout>",
         ] {
@@ -367,6 +366,8 @@ fn a_jsx_element_with_text() -> TestResult {
         }
     }
     assert!(paragraphs.iter().any(|text| text == "A paragraph inside."));
+    // Vale reads an expression as code, in a heading and in a line of text.
+    assert_eq!(fixture.texts(Scope::Code), ["{meta.title}", "{expression}"]);
     assert_eq!(fixture.texts(Scope::List), ["A list item"]);
     // One paragraph, with the expression and the tags as gaps in its segments.
     assert_eq!(

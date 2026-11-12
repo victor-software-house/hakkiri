@@ -1,0 +1,8 @@
+packages:
+  - path: styles
+files:
+  '*':
+    block_ignores: ['(?s)(BEGIN.*?END)']
+    token_ignores: ['({{.*?}})']
+  'text/*.md':
+    styles: [Team]

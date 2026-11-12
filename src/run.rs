@@ -8,13 +8,14 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{fs, io, thread};
 
 use hakkiri::alert::Alert;
+use hakkiri::control::apply_levels;
 use hakkiri::engine::lint_accepting;
 use hakkiri::rule::{Level, Unrunnable};
-use hakkiri::{Tree, parse};
+use hakkiri::{Tree, parse_ignoring};
 
 use crate::cli::CheckArgs;
 use crate::config::{self, DEFAULT, Plan};
-use crate::files::{Job, find};
+use crate::files::{Job, Options, find};
 use crate::report::{Check, Failure, Row};
 
 /// The stack of a lint thread: as much as the main thread has, because a deep
@@ -23,13 +24,24 @@ const STACK: usize = 8 * 1024 * 1024;
 
 /// Runs `check`.
 pub(crate) fn check(args: &CheckArgs) -> Check {
-    let fail_level = Level::from(args.fail_level);
     let config = args.config.as_deref().unwrap_or_else(|| Path::new(DEFAULT));
     let project = match config::load(config, args.cache_dir.as_deref()) {
         Ok(project) => project,
-        Err(error) => return Check::stopped(&error, fail_level),
+        Err(error) => {
+            let level = args.fail_level.unwrap_or_default();
+            return Check::stopped(&error, Level::from(level));
+        }
     };
-    let found = find(&project, &args.paths);
+    let fail_level = Level::from(args.fail_level.or(project.fail_level).unwrap_or_default());
+    let options = Options {
+        gitignore: args.gitignore(project.gitignore),
+        on_unmatched: args
+            .on_unmatched
+            .or(project.on_unmatched)
+            .unwrap_or_default(),
+        on_unknown: args.on_unknown.or(project.on_unknown).unwrap_or_default(),
+    };
+    let found = find(&project, &args.paths, options);
     for warning in &found.warnings {
         eprintln!("warning {warning}");
     }
@@ -83,7 +95,13 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
 /// The alerts of one file, at the levels the config sets, or why it gave none.
 fn lint_file(job: &Job<'_>) -> Result<Vec<Alert>, String> {
     let source = fs::read_to_string(&job.file).map_err(|error| error.to_string())?;
-    let tree = parse(job.language, &source).map_err(|error| error.to_string())?;
+    let tree = parse_ignoring(
+        job.language,
+        &source,
+        &job.plan.block_ignores,
+        &job.plan.token_ignores,
+    )
+    .map_err(|error| error.to_string())?;
     lint_planned(&job.plan, &tree, &source, &job.extension)
 }
 
@@ -96,11 +114,12 @@ pub(crate) fn lint_planned(
 ) -> Result<Vec<Alert>, String> {
     let mut alerts = lint_accepting(&plan.rules, tree, source, extension, &plan.accepted)
         .map_err(|error| error.to_string())?;
-    for alert in &mut alerts {
+    for alert in alerts.iter_mut().filter(|alert| !alert.fault) {
         if let Some(level) = plan.levels.get(alert.rule.as_str()) {
             alert.level = *level;
         }
     }
+    apply_levels(tree, source, &mut alerts);
     Ok(alerts)
 }
 

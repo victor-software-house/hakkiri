@@ -1,0 +1,35 @@
+Intro very.
+
+$$
+x = very
+$$
+
+After very.
+
+$$y = very$$
+
+Next very.
+
+Mid para very
+$$
+z very
+$$ {#eq-a}
+tail very.
+
+$$
+unclosed very
+
+After blank very.
+
+Line $$x very$$ inline double very.
+
+- Item very
+  $$
+  w very
+  $$
+- Item two very
+
+> Quote very
+> $$
+> q very
+> $$

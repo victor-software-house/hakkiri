@@ -398,72 +398,6 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 - **WHEN** an HTML block holds `<script><!-- <script </script> marker`, and the next block holds `last marker`
 - **THEN** hakkiri reads the next block, since it tokenizes each HTML block alone, and Vale tokenizes the whole file as one stream, so the open script hides the rest of it ([html 1][html-1])
 
-### Requirement: Known gaps are listed apart from the intended differences
-
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
-A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
-
-#### Scenario: The built-in spelling rule
-
-- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
-
-#### Scenario: Vocabularies
-
-- **WHEN** a section of a Vale config sets `Vocab`, or the top level names a vocabulary
-- **THEN** hakkiri holds back the matches the accepted terms name, and builds no `Vale.Terms`, `Vale.Avoid`, `Vale.<Name>.Terms` or `Vale.<Name>.Avoid`, which Vale runs for the project or the section (row [HKR-042][ledger], [vocabulary-rules 1][vocabulary-rules-1])
-
-#### Scenario: A YAML vocabulary
-
-- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
-- **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
-
-#### Scenario: The Markdown parser
-
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
-- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
-
-#### Scenario: A plain-text file
-
-- **WHEN** a glob matches a file that no language reads, such as `notes.txt`
-- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
-
-#### Scenario: Comments that turn rules off and on
-
-- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
-- **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
-
-#### Scenario: A script rule
-
-- **WHEN** a rule has `extends: script`
-- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
-
-#### Scenario: A formula outside the listed syntax
-
-- **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
-- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
-
-#### Scenario: The built-in repetition rule
-
-- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
-- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
-
-#### Scenario: A doc selector or a View
-
-- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
-  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
-
-#### Scenario: A Vale configuration file
-
-- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
-- **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
-
-#### Scenario: An action
-
-- **WHEN** a rule holds an `action`
-- **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
-
 ### Requirement: A rule setting is spelled as hakkiri's config spells it
 
 hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and SHALL refuse a rule key that names no rule and a value that is none of those words or a level.
@@ -599,6 +533,81 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 - **WHEN** a project's section under another glob replaces the styles a package turned on
 - **THEN** hakkiri prints nothing, and Vale warns once that the section replaces the styles of the package ([package settings 4][settings-4])
 
+### Requirement: Known gaps are listed apart from what differs by choice
+
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
+
+#### Scenario: The built-in spelling rule
+
+- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
+- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+
+#### Scenario: A YAML vocabulary
+
+- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
+- **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
+
+#### Scenario: The Markdown parser
+
+- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
+
+#### Scenario: A plain-text file
+
+- **WHEN** a glob matches a file that no language reads, such as `notes.txt`
+- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
+
+#### Scenario: Comments that turn rules off and on
+
+- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
+- **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
+
+#### Scenario: A script rule
+
+- **WHEN** a rule has `extends: script`
+- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
+
+#### Scenario: A formula outside the listed syntax
+
+- **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
+- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
+
+#### Scenario: The built-in repetition rule
+
+- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
+- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
+
+#### Scenario: A doc selector or a View
+
+- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
+  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+
+#### Scenario: A Vale configuration file
+
+- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
+- **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
+
+#### Scenario: An action
+
+- **WHEN** a rule holds an `action`
+- **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
+
+### Requirement: Vocabulary rules differ from Vale's in these ways
+
+hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from the scenarios below.
+
+#### Scenario: An escape in a term
+
+- **WHEN** `data\Wset` is accepted and the text is `A data set, data-set, dataxset and DATA SET.`
+- **THEN** hakkiri flags `DATA SET`, since it lowercases the literal text of the term and keeps `\W`, and Vale flags `dataxset`, since it lowercases the escape to `\w` ([vocabulary-rules 1][vocabulary-rules-1])
+
+#### Scenario: The style Vale with no term
+
+- **WHEN** a glob lists `styles: [Vale]` and no named vocabulary holds a term
+- **THEN** hakkiri refuses the config, where Vale runs `Vale.Spelling` and `Vale.Repetition` from that style (rows [HKR-026][ledger] and [HKR-038][ledger], [vocabulary-rules 4][vocabulary-rules-4])
+
 [bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
 [bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
 [case-1]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
@@ -666,4 +675,5 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 [vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
 [vocabularies-8]: ../../changes/archive/2026-11-11-vocabularies/design.md#8-what-stays-different
-[vocabulary-rules-1]: ../../changes/vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
+[vocabulary-rules-1]: ../../changes/archive/2026-11-11-vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
+[vocabulary-rules-4]: ../../changes/archive/2026-11-11-vocabulary-rules/design.md#4-the-style-vale-needs-a-vocabulary-term

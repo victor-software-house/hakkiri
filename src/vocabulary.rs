@@ -23,6 +23,8 @@ pub(crate) const SETTINGS_FOLDER: &str = "config";
 pub(crate) struct Vocabulary {
     /// The accepted terms, in the order the lists walk and the lines read.
     pub(crate) accepted: Vec<String>,
+    /// The rejected terms, in the same order.
+    pub(crate) rejected: Vec<String>,
     /// What holds back a match of an accepted term.
     pub(crate) exceptions: Exceptions,
 }
@@ -51,6 +53,7 @@ pub(crate) fn read(folder: &Path, shown: &Path) -> Result<Vocabulary, Vec<LoadPr
         return Err(vec![problem(shown, None, error.to_string())]);
     }
     let mut accepted = Vec::new();
+    let mut rejected = Vec::new();
     let mut problems = Vec::new();
     for (path, accepts) in lists {
         let relative = path.strip_prefix(folder).unwrap_or(&path);
@@ -69,7 +72,7 @@ pub(crate) fn read(folder: &Path, shown: &Path) -> Result<Vocabulary, Vec<LoadPr
             }
             match Exceptions::of(&[term.to_owned()]) {
                 Ok(_) if accepts => accepted.push(term.to_owned()),
-                Ok(_) => {}
+                Ok(_) => rejected.push(term.to_owned()),
                 Err(error) => problems.push(problem(
                     &file,
                     Some(index + 1),
@@ -84,6 +87,7 @@ pub(crate) fn read(folder: &Path, shown: &Path) -> Result<Vocabulary, Vec<LoadPr
     match Exceptions::of(&accepted) {
         Ok(exceptions) => Ok(Vocabulary {
             accepted,
+            rejected,
             exceptions,
         }),
         Err(error) => Err(vec![problem(shown, None, error.to_string())]),

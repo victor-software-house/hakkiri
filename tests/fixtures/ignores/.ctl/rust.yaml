@@ -1,0 +1,11 @@
+packages:
+  - path: styles
+files:
+  'text/*.rs':
+    styles: [Team]
+    Team.Sentence: off
+    block_ignores:
+      - "(?s)(BEGIN.*?END)"
+    token_ignores:
+      - "(Why this module is unsafe)"
+      - "({{.*?}})"

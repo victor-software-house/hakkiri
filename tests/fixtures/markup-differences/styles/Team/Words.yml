@@ -1,0 +1,6 @@
+extends: existence
+message: "Words '%s'"
+level: warning
+scope: text
+tokens:
+  - 'very'

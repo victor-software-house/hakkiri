@@ -8,9 +8,6 @@
 //! level, the rule, the message and the matched text. The rows come from Vale
 //! at `66bbb85` run from the fixture folder as `vale --config=vale/<name>.ini
 //! --output=JSON text`.
-//!
-//! A row of a rule named `Vale.<Name>.Terms` is left out of the comparison: it
-//! belongs to the vocabulary-rules change.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -83,7 +80,7 @@ fn vale_rows(name: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
         else {
             return Err(format!("a row of vale.tsv has {} cells", cells.len()).into());
         };
-        if config == name && !rule.starts_with("Vale.") {
+        if config == name {
             rows.insert((
                 file.to_owned(),
                 line.parse()?,
@@ -367,5 +364,26 @@ fn each_accepted_term_matches_only_itself_in_spelling() -> TestResult {
     ] {
         assert_eq!(unaccepted(&suite, name, terms, text)?, flagged, "{name}");
     }
+    Ok(())
+}
+
+#[test]
+fn an_unknown_vocabulary_of_a_glob_names_the_line_of_that_name() -> TestResult {
+    let suite = Suite::new("vocabularies-later-name");
+    let root = project(&suite, "later-name")?;
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  'text/*.md':\n    styles: [Team]\n    vocab:\n      - Team\n      - Nope\n",
+    );
+    root.file("text/a.md", "Fine.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .err
+            .contains("line 8: vocab: `Nope` is not a vocabulary in any package"),
+        "{}",
+        result.err
+    );
     Ok(())
 }

@@ -7,9 +7,9 @@ use std::path::{Component, Path, PathBuf};
 
 use hakkiri::alert::Alert;
 use hakkiri::rule::{self, LoadError, Rule, TestCase, alert_lines, cases_from_text};
-use hakkiri::{Language, parse};
+use hakkiri::{Language, parse, parse_ignoring};
 
-use crate::cli::TestArgs;
+use crate::cli::{OnUnknown, TestArgs};
 use crate::config::{self, DEFAULT, Project};
 use crate::files::is_skipped;
 use crate::report::{CaseResult, Failure, Tests, Uncovered};
@@ -332,12 +332,17 @@ impl Runner {
     /// The alerts `case` gets under `setup`, or why it could not run.
     fn lint(&mut self, case: &TestCase, setup: Setup<'_>) -> Result<Vec<Alert>, String> {
         let name = format!("input.{}", case.format);
-        let language = Language::from_path(Path::new(&name))
-            .ok_or_else(|| format!("no language reads the format `{}`", case.format))?;
-        let tree = parse(language, &case.input).map_err(|error| error.to_string())?;
+        let known = Language::from_path(Path::new(&name));
+        // An isolated case reads a format that no extension names as plain
+        // text.
+        let by_extension = known.unwrap_or(Language::Text);
         match setup {
-            Setup::Rule(rule) => lint_alone(rule, &tree, case),
+            Setup::Rule(rule) => {
+                let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
+                lint_alone(rule, &tree, case)
+            }
             Setup::File(path) => {
+                let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
                 let rule = self.rule_at(&path)?;
                 lint_alone(rule, &tree, case)
             }
@@ -346,6 +351,25 @@ impl Runner {
                 let Some(plan) = project.plan(&name) else {
                     return Ok(Vec::new());
                 };
+                // A case reads as `check` reads a selected file: a `formats`
+                // entry, then the extension, then what `on_unknown` says.
+                let language = match project.mapped_language(&name).or(known) {
+                    Some(language) => language,
+                    None => match project.on_unknown.unwrap_or_default() {
+                        OnUnknown::Text => Language::Text,
+                        OnUnknown::Warn | OnUnknown::Ignore => return Ok(Vec::new()),
+                        OnUnknown::Error => {
+                            return Err(format!("no reader reads the format `{}`", case.format));
+                        }
+                    },
+                };
+                let tree = parse_ignoring(
+                    language,
+                    &case.input,
+                    &plan.block_ignores,
+                    &plan.token_ignores,
+                )
+                .map_err(|error| error.to_string())?;
                 if !plan.unrunnable.is_empty() {
                     let names: Vec<&str> = plan
                         .unrunnable

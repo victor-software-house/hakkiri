@@ -10,6 +10,9 @@ extend-exclude = [
   "tests/fixtures/spelling-parity",
   "tests/fixtures/vale-styles",
   "tests/fixtures/vocabularies",
+  "tests/fixtures/vocabulary-rules",
+  "tests/fixtures/ignores",
+  "tests/fixtures/comment-controls",
   "tests/fixtures/tagger/treebank.tsv",
   "data/entities/html5.tsv",
 ]

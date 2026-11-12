@@ -1,0 +1,4 @@
+packages:
+  - path: styles
+files:
+  'text/*.md': {styles: [Team], Vale.Team.Terms: off, vocab: [Team]}

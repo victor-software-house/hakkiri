@@ -1,0 +1,5 @@
+packages:
+  - path: styles
+files:
+  'text/t1.md': {styles: [Team], vocab: [Team]}
+  'text/t6.md': {styles: [Team], vocab: [Docs]}

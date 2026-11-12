@@ -38,6 +38,6 @@ The [vale-differences spec][differences] lists this as a known gap.
 - No new dependency.
 
 [ledger]: ../../../../tasks.yaml
-[rules]: ../../vocabulary-rules/proposal.md
+[rules]: ../2026-11-11-vocabulary-rules/proposal.md
 [differences]: ../../../specs/vale-differences/spec.md
 [prose-style-ini]: https://github.com/victor-software-house/prose-style/blob/90c7c8e673b92f836cce257427724fc79da997e8/ProseStyle/.vale.ini

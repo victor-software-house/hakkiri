@@ -124,6 +124,7 @@ pub fn summarize(tree: &Tree, source: &str) -> Result<Summary, SelectError> {
             | Scope::Strong
             | Scope::Emphasis
             | Scope::Alt
+            | Scope::Title
             | Scope::Description
             | Scope::Meta
             | Scope::Raw

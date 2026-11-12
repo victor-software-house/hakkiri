@@ -1,0 +1,5 @@
+extends: sequence
+message: "'%[2]s' follows '%[1]s'."
+tokens:
+  - pattern: your
+  - pattern: self

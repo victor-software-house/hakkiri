@@ -1,0 +1,31 @@
+K1 very really good.
+
+<!-- vale on -->
+
+K2 very really good.
+
+<!-- vale off -->
+
+<!-- vale off -->
+
+K3 very really good.
+
+<!-- vale on -->
+
+K4 very really good.
+
+<!-- vale Team.Words = NO -->
+
+K5 very really good.
+
+<!-- vale Team.Words = NO -->
+
+K6 very really good.
+
+<!-- vale Team.Words = YES -->
+
+K7 very really good.
+
+<!-- vale off -->
+
+K8 very really good.

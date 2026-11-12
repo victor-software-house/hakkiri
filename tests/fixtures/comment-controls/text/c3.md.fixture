@@ -1,0 +1,27 @@
+C1 very <!-- vale off --> C2 very <!-- vale on --> C3 very really good.
+
+C4 very really <!-- vale Team.Words = NO --> C5 very really <!-- vale Team.Words = YES --> C6 very really good.
+
+C7 very really <!-- vale Team.Words = NO --> C8 very really good.
+
+C9 very really good.
+
+<!-- vale Team.Words = YES -->
+
+C10 very really good.
+
+C11 very <!-- vale off --> C12 very really good.
+
+C13 very really good.
+
+<!-- vale on -->
+
+C14 very really good.
+
+*C15 very* <!-- vale off -->*C16 very*<!-- vale on --> C17 very.
+
+Line C18 very
+<!-- vale off -->
+line C19 very
+<!-- vale on -->
+line C20 very.

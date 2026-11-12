@@ -100,7 +100,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [vocabularies-3]: ../../design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../design.md#4-a-line-of-a-list-is-a-pattern
 [vocabularies-8]: ../../design.md#8-what-stays-different
-[vocabulary-rules-1]: ../../../../vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
+[vocabulary-rules-1]: ../../../2026-11-11-vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
 [ledger]: ../../../../../../tasks.yaml
 [spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
 [tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx

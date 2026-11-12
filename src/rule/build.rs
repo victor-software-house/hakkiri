@@ -23,6 +23,7 @@ use crate::pattern::{Pattern, PatternError};
 use crate::scope::Selector;
 use crate::sequence::{sentence_scope, upos};
 use crate::strcase::{Sentence, Style, Title, WORD};
+use crate::term::lowercase_literals;
 
 /// Where a rule came from, for the errors that name it.
 #[derive(Clone, Copy, Debug)]
@@ -153,7 +154,7 @@ fn literal_term(term: &str) -> bool {
 
 /// An exception as a pattern: a plain term has its periods escaped, and the
 /// space between its words matches a line wrap too.
-fn term_pattern(term: &str) -> String {
+pub(crate) fn term_pattern(term: &str) -> String {
     let term = if literal_term(term) {
         term.replace('.', r"\.")
     } else {
@@ -367,6 +368,7 @@ fn substitution(
         )?,
         capitalize: fields.capitalize.value(),
         ignorecase: fields.ignorecase.value(),
+        terms: false,
     })
 }
 
@@ -1088,4 +1090,96 @@ pub(super) fn spelling_rule(
         fields,
         Check::Spelling(spelling(source, fields)?)
     ))
+}
+
+/// The rule of `name` that Vale builds from a vocabulary, with the level
+/// `error`, the scope `text` and no fix.
+fn vocabulary_rule(name: &str, message: &str, check: Check) -> Result<Rule, LoadError> {
+    let scope = Selector::parse(&["text".to_owned()]).map_err(|refused| LoadError {
+        problems: vec![LoadProblem {
+            file: name.to_owned(),
+            line: None,
+            column: None,
+            field: "scope".to_owned(),
+            message: refused.to_string(),
+            unrunnable: false,
+        }],
+    })?;
+    Ok(Rule {
+        name: name.to_owned(),
+        level: level_of("error"),
+        message: message.to_owned(),
+        description: String::new(),
+        link: String::new(),
+        limit: 0,
+        scope,
+        action: None,
+        tests: Vec::new(),
+        check,
+    })
+}
+
+/// Where the rules of a vocabulary come from, for the errors that name them.
+fn vocabulary_source(name: &str) -> Source<'_> {
+    Source {
+        name,
+        file: "a vocabulary",
+        package: None,
+        accepted: &[],
+    }
+}
+
+/// `Terms`: the rule `name` that reports an accepted term written in another
+/// case. Each term lowercased is a swap key between the boundaries `(?<!\w)`
+/// and `(?!\w)`, matched without regard to case, with the term as its value.
+/// A later term with the same key replaces an earlier one.
+pub(super) fn terms_rule(name: &str, terms: &[String]) -> Result<Rule, LoadError> {
+    let source = vocabulary_source(name);
+    let mut swaps: Vec<Swap> = Vec::new();
+    for term in terms {
+        let key = format!(r"(?<!\w){}(?!\w)", term_pattern(&lowercase_literals(term)));
+        match swaps.iter_mut().find(|swap| swap.key == key) {
+            Some(swap) => swap.value.clone_from(term),
+            None => swaps.push(Swap {
+                key,
+                value: term.clone(),
+            }),
+        }
+    }
+    swaps.sort_by_key(|swap| Reverse(swap.key.len()));
+    let alternatives: Vec<String> = swaps
+        .iter()
+        .enumerate()
+        .map(|(index, swap)| format!("(?P<{}{index}>{})", Swap::GROUP, wrap_spaces(&swap.key)))
+        .collect();
+    let keys: Vec<&str> = swaps.iter().map(|swap| swap.key.as_str()).collect();
+    let pattern = template(false, true, &alternatives.join("|"));
+    let expanders = swaps.iter().map(|_| None).collect();
+    let check = Check::Substitution(Substitution {
+        pattern: source.compile("swap", &pattern, &keys)?,
+        swaps,
+        expanders,
+        exceptions: Exceptions::default(),
+        capitalize: false,
+        ignorecase: true,
+        terms: true,
+    });
+    vocabulary_rule(name, "Use '%s' instead of '%s'.", check)
+}
+
+/// `Avoid`: the rule `name` that reports a rejected term, matched with case
+/// between word boundaries. The `accepted` terms of the project hold a match
+/// back.
+pub(super) fn avoid_rule(
+    name: &str,
+    rejected: &[String],
+    accepted: &[String],
+) -> Result<Rule, LoadError> {
+    let source = vocabulary_source(name);
+    let tokens: Vec<String> = rejected.iter().map(|term| term_pattern(term)).collect();
+    let check = Check::Existence(Existence {
+        pattern: tokens_pattern(&source, &[], &tokens, false, false, false)?,
+        exceptions: exceptions(&source, accepted)?,
+    });
+    vocabulary_rule(name, "Avoid using '%s'.", check)
 }

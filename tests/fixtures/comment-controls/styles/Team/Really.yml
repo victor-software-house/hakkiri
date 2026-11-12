@@ -1,0 +1,6 @@
+extends: existence
+message: "Really '%s'"
+level: warning
+scope: text
+tokens:
+  - 'really'

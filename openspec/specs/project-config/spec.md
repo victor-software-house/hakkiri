@@ -472,3 +472,17 @@ A rule setting that names no loaded rule SHALL be an error, as in the project's 
 
 - **WHEN** a package's file sets `Team.Nope: warning` and no loaded style holds `Team.Nope`
 - **THEN** hakkiri reports an error naming the key and the line
+
+### Requirement: The built-in style Vale holds the vocabulary rules
+
+hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Terms` and `Avoid`, when a named vocabulary holds a term, and SHALL refuse it as a style that no package holds when none does.
+
+#### Scenario: A style named Vale
+
+- **WHEN** a glob lists `styles: [Vale]` and the config names a vocabulary with an accepted term
+- **THEN** the glob runs `Vale.Terms`
+
+#### Scenario: No vocabulary
+
+- **WHEN** a glob lists `styles: [Vale]` and no named vocabulary holds a term
+- **THEN** hakkiri reports that `Vale` is not a style in any package, and exits with a failure status

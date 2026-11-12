@@ -8,6 +8,13 @@ use crate::splitter::{FormatError, Model};
 use crate::text::{Decode, Parts, Replace, Text};
 use crate::tree::{Node, Reading, Scope, Tree};
 
+#[cfg(test)]
+thread_local! {
+    /// How many times this thread called [`select`], for the tests that count
+    /// the selections a run makes.
+    pub(crate) static SELECTIONS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 /// One piece of text a rule reads.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Block {
@@ -17,6 +24,8 @@ pub struct Block {
     pub sentence: bool,
     /// The text, and where each byte of it lies in the file.
     pub text: Text,
+    /// The byte where the element that holds the text ends.
+    pub closes: usize,
 }
 
 /// Why a selection failed.
@@ -69,6 +78,7 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -107,6 +117,7 @@ fn opens(parent: &Node, child: &Node) -> bool {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -144,6 +155,7 @@ const fn is_prose(scope: Scope) -> bool {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -184,7 +196,7 @@ const fn decodes(scope: Scope) -> Decode {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Meta => Decode::Text,
-        Scope::Alt | Scope::Description => Decode::Attribute,
+        Scope::Alt | Scope::Title | Scope::Description => Decode::Attribute,
         Scope::Code
         | Scope::Raw
         | Scope::CommentLine
@@ -222,7 +234,8 @@ fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
         | Scope::TableCaption
         | Scope::FigureCaption => vec![chain.unwrap_or_else(|| scope.name()), "text"],
         Scope::Alt | Scope::Description => vec![scope.name(), "text"],
-        Scope::TableRow
+        Scope::Title
+        | Scope::TableRow
         | Scope::Link
         | Scope::Code
         | Scope::Strong
@@ -272,6 +285,7 @@ fn segments(node: &Node) -> Vec<Range<usize>> {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw => node.segments.clone(),
@@ -312,6 +326,7 @@ fn readings(node: &Node) -> Vec<Reading> {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw => node.reads.clone(),
@@ -372,6 +387,8 @@ pub fn select(
     source: &str,
     extension: &str,
 ) -> Result<Vec<Block>, SelectError> {
+    #[cfg(test)]
+    SELECTIONS.with(|count| count.set(count.get() + 1));
     let model = if selector.wants_sentences() {
         Some(Model::english().map_err(SelectError::Model)?)
     } else {
@@ -429,6 +446,7 @@ pub fn select(
                     scope: node.scope,
                     sentence: false,
                     text: text.clone(),
+                    closes: node.closes,
                 });
             }
             if let (Some(blank), Some(model)) = (&sentences, model) {
@@ -442,6 +460,7 @@ pub fn select(
                             scope: node.scope,
                             sentence: true,
                             text,
+                            closes: node.closes,
                         });
                     }
                 }

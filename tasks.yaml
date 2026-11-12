@@ -13,6 +13,7 @@ queue:
       - Every rule case and package case passes under hakkiri test.
       - An alert diff against Vale with ProseStyle v0.0.14 over our public repositories shows only the intended differences.
       - The 14 opt-in rules do not run until a project turns them on, in a test.
+      - The release is a patch tag, v0.0.16, only when the alert diff shows hakkiri gives the same or better alerts than Vale with v0.0.14; otherwise it waits.
     notes:
       - '2026-11-11, operator decision: ProseStyle owns its rules. The 36 upstream rule files that ProseStyle.zip copies today (Voices, Direct, Readability, and the Abbreviations, DateTime, Grammar, Punctuation and Usage rules of Std) are reviewed one by one. Each valuable one becomes a native hakkiri rule in the one style ProseStyle, with tests, and the MIT sources are credited in a NOTICE. The rest are dropped with a reason. upstream.toml and the copying go.'
       - '2026-11-11, operator decision: from its next release ProseStyle.zip is the hakkiri package. Vale projects stay pinned to v0.0.14, and the templates pin stays there until HKR-009. There is no second asset.'
@@ -22,20 +23,143 @@ queue:
       - '2026-11-11, operator decision, renames: Banned becomes SlopWords, Recap RecapOpener, Weasel VagueAttribution, Latin LatinAbbreviation, Spacing SentenceSpacing, Length SentenceLength and FleschKincaid GradeLevel. Hedging and Preamble keep their names, and every other port keeps its upstream name.'
       - "2026-11-11, operator decision, overlaps: no text draws two alerts for one fault. Drop 'harness the power' from StockPhrases, since SlopWords covers it, and make 'stands as a testament' draw only the Puffery alert. SentenceLength at 25 words as a suggestion beside LongSentence at 40 as an error stays by design."
       - '2026-11-11, operator decision: the opt-in rules ship off through a package settings file, so this row waits for HKR-040.'
+      - '2026-11-11, operator decision: the tag stays a patch while the package works the same or better, and every rule is validated. prose-style v0.0.15 goes to PullRequestStyle, a Vale package (prose-style PR 32), so this package takes v0.0.16.'
+      - '2026-11-11, the package settings carry the OpenSpec proposal entry under block_ignores, so the release waits for HKR-043 in a hakkiri release; the alert diff covers the nine repositories that run Vale today: nishiki, hakkiri, verctl, ctl-core and five private ones.'
 
-  - id: HKR-042
-    title: Build Vale.Terms and Vale.Avoid from a vocabulary
+  - id: HKR-043
+    title: Skip blocks and tokens by pattern
     scope: config
     outcome: >-
-      The built-in style Vale holds Terms, which reports an accepted term written in
-      another case, and Avoid, which reports a rejected term, with Vale's messages and
-      levels.
+      A glob can skip the blocks and the inline text that a pattern matches, as Vale
+      BlockIgnores and TokenIgnores do.
     blocked_by: []
     acceptance:
-      - Accepted and rejected terms give the alerts that Vale's generated Vale.Terms and Vale.Avoid rules give, in tests against Vale's recorded alerts.
-      - A glob that lists the style Vale, or sets Vale.Terms or Vale.Avoid by name, runs the rules at the level it sets, in a test.
-      - A glob's vocabulary builds Vale.<Name>.Terms and Vale.<Name>.Avoid, which run on the files of that glob with no style or setting, in a test.
-    plan: openspec/changes/vocabulary-rules/proposal.md
+      - A files glob takes block_ignores and token_ignores, each a list of patterns, and the text they match draws no alert, with the alerts Vale 66bbb85 gives on probes for the same BlockIgnores and TokenIgnores.
+      - A package settings file can hold both keys, and a project glob adds to them.
+    notes:
+      - "2026-11-11, operator decision: hakkiri matches Vale here, under Vale's own names in the config's casing. OpenSpec 1.16.0 and 1.17.0 refuse a proposal without the headings Why and What Changes, and ProseStyle.ChattyHeadings flags both at the error level; six repositories skip the two lines with BlockIgnores today, and one uses TokenIgnores."
+      - 2026-11-11, the ProseStyle package carries the proposal entry, so the template and the consumers write none (lead decision).
+    plan: openspec/changes/block-token-ignores/proposal.md
+
+  - id: HKR-044
+    title: Choose which files a run reads
+    scope: files
+    outcome: >-
+      A run skips what git ignores and says what it does with a named file no glob
+      selects, and every check option can be set in the config, a flag or a variable.
+    blocked_by: []
+    acceptance:
+      - A walk skips the files and folders that .gitignore, .git/info/exclude and the global git excludes ignore, unless gitignore is false (--no-gitignore, HAKKIRI_GITIGNORE).
+      - A file named on the command line that no glob selects draws a warning by default, and on_unmatched (--on-unmatched, HAKKIRI_ON_UNMATCHED) takes warn, error or ignore; error makes the run exit 2, and ignore reports nothing.
+      - fail_level, gitignore and on_unmatched are config keys as well as flags and variables, the flag winning, then the variable, then the config, then the default.
+    notes:
+      - '2026-11-11, operator decision: git-ignored files are skipped by default, everything stays configurable in the config file and overridable by flags and variables as ctl-core allows, and the names are gitignore and on_unmatched. The ignore crate is the authorized new dependency for the walk.'
+      - 2026-11-11, the templates lint:prose task passes every tracked file because Vale walks git-ignored folders while a build writes them; with this row it runs a bare hakkiri check.
+    plan: openspec/changes/gitignore-walk/proposal.md
+
+  - id: HKR-045
+    title: Fill indexed verbs in messages
+    scope: engine
+    outcome: >-
+      A rule message fills Go's indexed verbs such as %[1]s and %[2]s, as Vale's
+      messages do.
+    blocked_by: []
+    acceptance:
+      - The cases of ProseStyle v0.0.14 NounStack and ThingsSpeakNoun pass, with the message Vale 66bbb85 prints for the same match.
+    notes:
+      - '2026-11-11, found by the ProseStyle port: hakkiri prints %[1]s %[2]s unfilled in a sequence rule message, and hakkiri main has no support for indexed verbs.'
+    plan: openspec/changes/indexed-verbs/proposal.md
+
+  - id: HKR-046
+    title: Keep a fence open across a blank doc-comment line
+    scope: tree
+    outcome: >-
+      A fenced block in a Rust doc comment stays code across a blank comment line, as
+      Markdown reads it.
+    blocked_by: []
+    acceptance:
+      - "The ProseStyle v0.0.14 BareURLInComment case 'keeps a doc comment's fence open across a blank line' passes: hakkiri reports no URL inside the fence."
+    notes:
+      - '2026-11-11, found by the ProseStyle port: hakkiri reports a URL inside the fence that Vale skips; the cause is not yet traced.'
+      - '2026-11-11, traced: comments::groups joined line comments only when exactly one line break lay between them, so a blank line between two doc lines cut the comment in two and the fence opened before it was gone. Vale joins the same way, but its raw scope reads the whole file. Doc line comments now join across blank lines, as rustdoc reads them.'
+    plan: openspec/changes/doc-fence/proposal.md
+
+  - id: HKR-047
+    title: End an alert where a multi-line match ends
+    scope: engine
+    outcome: >-
+      An alert for a match that spans lines names the line and column of the match's last character.
+    blocked_by: []
+    acceptance:
+      - The JSON alert carries end_line and end_column of the last character of the match, also for a match on one line, and a test covers a match across a line wrap and one across markup.
+      - The alerts spec, the check-command spec's alert field list and the instructions state it, vale-differences records that Vale prints the first column plus the match length, which can pass the end of the line, and the vocabulary-rules comparison checks the end through that mapping.
+    notes:
+      - "2026-11-11, operator decision: the true end, with a new end_line field in the JSON. hakkiri never copies a flaw of Vale's to match it; Vale's count can point past the end of the line, and hakkiri's alerts spec stopped at the end of the first line."
+      - 2026-11-11, the pretty line keeps path:line:column, so tools that parse it are unaffected.
+    plan: openspec/changes/match-end/proposal.md
+
+  - id: HKR-030
+    title: Read files by extension, with plain text by default
+    scope: engine
+    outcome: A file whose extension has no reader is read as plain text, formats maps an extension to a reader as Vale [formats] does, and on_unknown can turn the plain-text default off.
+    blocked_by: []
+    acceptance:
+      - A file with an extension that has no reader, such as notes.txt or Cargo.toml, that a glob selects or a name lists is linted as plain text, and the vale-differences scenario for it is removed.
+      - 'formats maps an extension to a reader, such as toml: text or mdx: md, as Vale [formats] does, and a package settings file can hold it.'
+      - on_unknown (--on-unknown, HAKKIRI_ON_UNKNOWN) takes text, the default, or warn, error or ignore for an extension with no reader; a binary file is skipped with no alert, as ripgrep and typos skip binaries.
+    notes:
+      - '2026-11-11, operator decision: a text file a glob or a name lists is read; plain text is the default, extensions can be remapped as in Vale, and the default can be turned off.'
+    plan: openspec/changes/plain-text-files/proposal.md
+
+  - id: HKR-050
+    title: Read a test case's format with no reader as plain text
+    scope: test
+    outcome: >-
+      A test case whose format no extension names, such as txt, lints its input as
+      plain text, and a formats entry picks the reader of a case's format.
+    blocked_by: []
+    acceptance:
+      - A case with format txt, in a rule's tests and in a test file, lints its input as plain text, and a test for each fails on the source before the change.
+      - A formats entry of the config decides the reader of a case that runs through the config, and the test-command spec says so.
+    plan: openspec/changes/test-plain-text/proposal.md
+    notes:
+      - '2026-11-11, found by the ProseStyle port: hakkiri test refused a case with format txt before HKR-030 and after it, so the package case that a text file is not prose could not run.'
+
+  - id: HKR-031
+    title: Turn rules off and on with comments
+    scope: engine
+    outcome: >-
+      A comment in a file turns rules off and on for the text after it: Vale's off, on and per-rule comments, and hakkiri's own comments in the config's words.
+    blocked_by: []
+    acceptance:
+      - Vale's off and on comments and its per-rule comments give the alerts Vale 66bbb85 gives on probes, in Markdown text and in HTML blocks.
+      - Any alert that differs is fixed or recorded as an intended difference in the vale-differences spec.
+      - 'hakkiri reads <!-- hakkiri off -->, <!-- hakkiri on -->, and <!-- hakkiri Style.Rule: off -->, on, or a level, with the same reach as the Vale form.'
+      - The instructions and README show the hakkiri form first.
+    notes:
+      - '2026-11-10, found while reading HTML-block text: hakkiri has no comment control, so a vale off comment turns nothing off and the text after it is linted.'
+      - '2026-11-11, operator decision: hakkiri reads both the vale and the hakkiri comments, prefers its own, and its own use the words of .ctl/hakkiri.yaml. The consumers use only the per-rule form today: 58 tags in one private repository, 4 in nishiki, 2 in hakkiri and 2 in prose-style; the rollout pull requests rewrite them to the hakkiri form.'
+    plan: openspec/changes/comment-controls/proposal.md
+
+  - id: HKR-009
+    title: Switch the template to hakkiri
+    scope: template
+    outcome: >-
+      The lint_prose piece runs hakkiri from mise and a pre-commit hook, with no Vale
+      left.
+    blocked_by:
+      - HKR-008
+      - HKR-043
+      - HKR-044
+      - HKR-030
+      - HKR-031
+    acceptance:
+      - The templates Template check passes, and one pilot project passes CI on its update.
+      - The lint_prose piece renders .ctl/hakkiri.yaml with level warning, the ProseStyle url and sha256 from the pins, styles [] for each generated path, and fail_level from prose_fail_level; mise installs hakkiri; .vale.ini, .vale/.gitignore, prose:sync and the Vale pin are gone.
+      - 'Every repository that runs Vale today runs hakkiri through a merged update pull request: nishiki, verctl and three private repositories through the template; ctl-core and two private repositories by hand; and the local editor hook too.'
+    notes:
+      - '2026-11-11, operator decision: the switch is orchestrated with the templates repository. Order: hakkiri closes HKR-043, HKR-044, HKR-030 and HKR-031 and releases; prose-style tags v0.0.16 (HKR-008); the template change is tagged and piloted on hakkiri; then one update pull request per consumer, each moving its .vale.ini sections into .ctl/hakkiri.yaml and its vale comments to the hakkiri form.'
+      - 2026-11-11, the local editor hook sends text on standard input with --ext=.md, which hakkiri does not read; it writes a temporary .md file instead, or a later row adds standard input.
 
   - id: HKR-041
     title: Read YAML vocabularies
@@ -58,8 +182,10 @@ queue:
     acceptance:
       - Comment prose is linted, built in, in Vale's 26 languages and in Bash, HCL, Kotlin, Nix, Solidity and YAML, with a test for each language.
       - The release binary's size before and after is measured and recorded before the change ships.
+      - TOML comments are linted too.
     notes:
       - "2026-11-11, operator decision: this row moves from the horizon to the queue, after HKR-008. It promises Vale's 26 languages plus Bash, HCL, Kotlin, Nix, Solidity and YAML, with the binary-size cost measured before it ships."
+      - '2026-11-11, operator request: TOML is read, which neither Vale nor the earlier list covered.'
 
   - id: HKR-035
     title: Import a Vale config
@@ -140,38 +266,6 @@ queue:
     notes:
       - '2026-11-10, found while matching HTML-block text: a Markdown paragraph `a*b*c` reads `abc` in hakkiri and `a bc` in Vale, which reads the HTML its converter writes, where an opening inline tag puts a space before its text. The corpus covers inline markup between letters.'
 
-  - id: HKR-031
-    title: Turn rules off and on with comments
-    scope: engine
-    outcome: >-
-      A comment in a file turns rules off and on for the text after it, as the vale
-      off and vale on comments and the per-rule comments of Vale do.
-    blocked_by: []
-    acceptance:
-      - Vale's off and on comments and its per-rule comments give the alerts Vale 66bbb85 gives on probes, in Markdown text and in HTML blocks.
-      - Any alert that differs is fixed or recorded as an intended difference in the vale-differences spec.
-    notes:
-      - '2026-11-10, found while reading HTML-block text: hakkiri has no comment control, so a vale off comment turns nothing off and the text after it is linted.'
-
-  - id: HKR-030
-    title: Lint plain-text files
-    scope: engine
-    outcome: A file that no language reads is linted as plain text, as Vale lints it.
-    blocked_by: []
-    acceptance:
-      - A file with another extension, such as notes.txt, that a files glob matches is linted as plain text, and the vale-differences scenario for it is removed.
-
-  - id: HKR-009
-    title: Switch the template to hakkiri
-    scope: template
-    outcome: >-
-      The lint_prose piece runs hakkiri from mise and a pre-commit hook, with no Vale
-      left.
-    blocked_by:
-      - HKR-008
-    acceptance:
-      - The templates Template check passes, and one pilot project passes CI on its update.
-
   - id: HKR-010
     title: Release 1
     scope: release
@@ -180,7 +274,119 @@ queue:
       - HKR-009
     acceptance:
       - Every adopted project passes CI on hakkiri.
+
+  - id: HKR-048
+    title: Read inline math as code
+    scope: markdown
+    outcome: >-
+      A dollar-delimited math span in a Markdown file is no prose, as in Vale, where
+      a code rule reads it and a text rule does not.
+    blocked_by: []
+    acceptance:
+      - Text and sentence rules report nothing inside a $…$ span, and a code rule reports it, with the alerts Vale 66bbb85 gives on the probe file in tests/fixtures/markup-differences.
+    notes:
+      - '2026-11-11, found while probing comment controls: Vale reads $very + really$ as a code span, and hakkiri reads it as text, so a text rule flags it. The probe is tests/fixtures/markup-differences/text/m1.md.'
+    plan: openspec/changes/math-code/proposal.md
+
+  - id: HKR-049
+    title: Lint front matter values
+    scope: markdown
+    outcome: The values in a Markdown file's front matter are linted as text, as Vale does.
+    blocked_by: []
+    acceptance:
+      - A text rule reports a word in a front matter value, with the alerts Vale 66bbb85 gives on the probe file in tests/fixtures/markup-differences.
+    notes:
+      - '2026-11-11, found while probing comment controls: Vale flags the word very in the title value of a front matter block, and hakkiri skips the whole block. The probe is tests/fixtures/markup-differences/text/m2.md. Which keys Vale lints is not measured yet.'
+
+  - id: HKR-051
+    title: Count code spans in LongSentence under hakkiri
+    scope: prose-style
+    outcome: >-
+      ProseStyle's LongSentence fails a sentence over 40 words with each code span
+      counted once when hakkiri runs it.
+    blocked_by: []
+    acceptance:
+      - The ProseStyle LongSentence case 'counts each code span as a word' passes under hakkiri test, with the rule written in a form hakkiri counts.
+    notes:
+      - "2026-11-11, found by the ProseStyle port: v0.0.14 LongSentence is an occurrence rule whose token (?:\\b\\w+\\b|\\*+) counts Vale's mask of a code span, a run of asterisks. hakkiri has no mask and an occurrence counts no match that overlaps a code span, so it counts 3 words in Run `a`, `b`, `c` and `one two three` today, where Vale counts 7."
+      - '2026-11-11, decision: the engine stays as the match-checks spec states, since a metric words rule counts each code span once. The rule moves to a metric words form, with its message and cases, in the prose-style package.'
+    plan: openspec/changes/code-span-words/proposal.md
+
+  - id: HKR-052
+    title: Tag a sentence as the Vale release ProseStyle is tested on tags it
+    scope: tagger
+    outcome: >-
+      hakkiri's English tags agree with the tags of Vale 3.26.0 on the sentences of
+      the ProseStyle cases, so NounStack, ThingsSpeakNoun and the harness case pass.
+    blocked_by: []
+    acceptance:
+      - The ProseStyle v0.0.14 cases of NounStack, ThingsSpeakNoun and 'harness as a noun passes' give under hakkiri the alerts they give under Vale 3.26.0.
+      - A test holds the tags that prose v3.2.2 gives six sentences, among them 'The freshness harness reads stdout.', and fails on the source before the change.
+    notes:
+      - "2026-11-11, found by the ProseStyle port: hakkiri's tagger is faithful to prose at b33e60d, the version Vale 66bbb85 builds on, and gives the tags a Go program on that version gives. Vale 3.26.0 ships prose v3.2.2, whose model is older (3,411,804 bytes, the bytes feature template, MIT) and tags 'reads' in 'The freshness harness reads stdout.' as VBZ, where the b33e60d model (1,877,993 bytes, UD English EWT, CC BY-SA 4.0, the runes template) gives NNS."
+      - '2026-11-11, on 1,296 sentences of our documents the two models give a different tag for 3,395 of 18,431 tokens, 18.4%. The most common changes from the older to the newer are JJ to NN (545), NNS to VBZ (405) and VBZ to NNS (128). Two ways to close it: ship the v3.2.2 model, with the bytes template that hakkiri does not read yet, or keep the model and accept the difference in the vale-differences spec.'
+
+  - id: HKR-053
+    title: Place config faults through the location index
+    scope: config
+    outcome: >-
+      A fault in the config names the line of its own key, found through ctl-core's
+      location index and not a text search.
+    blocked_by: []
+    acceptance:
+      - A glob key that holds dots, stars or slashes, and a config in flow style, each give a fault on its own line, with tests.
+    plan: openspec/changes/config-key-lines/proposal.md
+    notes:
+      - "2026-11-11, found while placing glob-level errors in ctl-core: key_line read the first line that looked like the key, so two globs that set one rule gave the first glob's fault the second glob's line. ctl-core 0.7.1 holds FieldPath and Input::place."
+      - "2026-11-11, the lead asked for a fault about one list item to name that item: a styles name, a vocab name and an ignore pattern take the index step of the item. The key faults move to ctl-core's place_key (CTC-054) once it is released."
+      - "2026-11-11, ctl-core 0.7.2 holds place_key: a fault about a key itself (a glob that is no glob, a setting that names no rule, the refused keys of a package's settings file) names the key's line, also when its value is a block."
+
+  - id: HKR-054
+    title: Read the title of a link as text
+    scope: tree
+    outcome: >-
+      The title attribute of a Markdown link and of an image is a scope a rule can
+      read, so a URL in a title draws the alert Vale gives it.
+    blocked_by: []
+    acceptance:
+      - A scope for the title text of a link and of an image selects it, with a case in the scope-selection spec and a test that fails on the source before the change.
+      - The ProseStyle v0.0.14 BareURL case for a URL in a link title gives the same alert under hakkiri as under Vale, with the rule reading the new scope.
+    notes:
+      - '2026-11-11, found by the BareURL comparison of the ProseStyle port: on 24 planted Markdown shapes hakkiri and Vale 3.26.0 with the v0.0.14 rules alerted on the same lines except two. hakkiri flags a URL in plain parentheses or double quotes that v0.0.14 passes, which is right. v0.0.14 flags the URL in [t](https://a.example/a "see https://b.example/b"), a link title, which no scope hakkiri reads holds.'
+    plan: openspec/changes/link-title/proposal.md
+
+  - id: HKR-055
+    title: Select the text of a scope once for every rule that reads it
+    scope: engine
+    outcome: >-
+      A run with many rules over a long file splits and builds the text of each scope
+      once, so the time of a rule is its own check and not the selection it shares
+      with the others.
+    blocked_by: []
+    acceptance:
+      - On a Markdown file of 12,000 lines the ProseStyle package takes at most half the 25 seconds it takes with hakkiri 0.0.5, measured in a box with the release binary.
+      - A unit test counts the selections of three rules with one scope and finds one, and fails on the source before the change.
+    notes:
+      - '2026-11-11, measured in a box with optimized builds: ProseStyle v0.0.14 on Vale built from 66bbb85 took 355 s on a Markdown file of 12,000 lines, and the package on hakkiri 0.0.5 took 25 s. hakkiri is 14 times faster, and the operator wants it faster everywhere.'
+      - '2026-11-11, the time grows by 0.4 to 0.5 s for each rule that reads the sentence, text or paragraph scope: 1, 5 and 10 sentence rules that match nothing took 1.2, 3.1 and 5.6 s, and 1, 5 and 10 raw rules took 0.7 s each time. The package with 20, 40 and 75 rules took 7.5, 13.7 and 28 s. engine.rs calls select once for each rule, so each rule splits the sentences and builds the text of the same blocks again.'
+      - 2026-11-11, with one selection for each scope, a release build of the branch ran the package on the same file in 5.5 s with the same 24,490 alerts, against 25.3 s for the 0.0.5 release binary on the same box. That is 4.6 times faster, and 65 times faster than Vale at 66bbb85 on the v0.0.14 rules.
 archive:
+  - id: HKR-042
+    title: Build Vale.Terms and Vale.Avoid from a vocabulary
+    scope: config
+    outcome: >-
+      The built-in style Vale holds Terms, which reports an accepted term written in
+      another case, and Avoid, which reports a rejected term, with Vale's messages and
+      levels.
+    plan: openspec/changes/archive/2026-11-11-vocabulary-rules/proposal.md
+    notes:
+      - "2026-11-11, lead decision: Vale lowercases a term pattern with its escapes, so \\W turns into \\w and data\\Wset flags dataxset; hakkiri lowercases only the literal text and records it as an intended difference, since Vale's form changes what the pattern means."
+    completed: 2026-11-11T21:53:39
+    evidence:
+      - PR 92 builds Vale.Terms and Vale.Avoid from a vocabulary, matching Vale at 66bbb85 over nine configs (152 alerts); a term's escapes keep their meaning, as a recorded difference.
+      - The vocabulary-rules change is archived, its tasks hold the evidence.
+    disposition: completed
+
   - id: HKR-040
     title: Read a package's settings
     scope: config

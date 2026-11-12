@@ -45,6 +45,11 @@ fn place(alert: &Alert) -> (usize, usize, usize) {
     (alert.line, alert.first_column, alert.last_column)
 }
 
+/// The line and column of the last character of an alert's match.
+fn end(alert: &Alert) -> (usize, usize) {
+    (alert.last_line, alert.last_column)
+}
+
 #[test]
 fn a_word_in_a_sentence() -> TestResult {
     let found = alerts(
@@ -133,6 +138,109 @@ fn a_percent_sign() -> TestResult {
     Ok(())
 }
 
+/// The messages of the alerts that the `sequence` rule with `message` gives
+/// for `tokens` in the Markdown `source`.
+fn sequence_messages(
+    message: &str,
+    tokens: &str,
+    source: &str,
+) -> Result<Vec<String>, Box<dyn Error>> {
+    let rule = format!("extends: sequence\nmessage: \"{message}\"\ntokens: {tokens}\n");
+    Ok(markdown(&rule, source)?
+        .into_iter()
+        .map(|alert| alert.message)
+        .collect())
+}
+
+#[test]
+fn values_taken_by_number() -> TestResult {
+    assert_eq!(
+        sequence_messages(
+            "'%[2]s' follows '%[1]s'.",
+            "[{pattern: your}, {pattern: self}]",
+            "Do it your self.",
+        )?,
+        ["'self' follows 'your'."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_plain_verb_after_an_indexed_one() -> TestResult {
+    assert_eq!(
+        sequence_messages(
+            "%[2]s %s %[1]s %s.",
+            "[{pattern: red}, {pattern: green}, {pattern: blue}]",
+            "Paint it red green blue today.",
+        )?,
+        ["green blue red green."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_value_used_twice() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: \"'%[1]s' twice: '%[1]s'.\"\ntokens: [very]\n",
+        "It is very good.",
+    )?;
+    assert_eq!(
+        found.iter().map(|a| a.message.as_str()).collect::<Vec<_>>(),
+        ["'very' twice: 'very'."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_verb_with_no_value() -> TestResult {
+    assert_eq!(
+        sequence_messages(
+            "[%[3]s][%[0]s][%s]",
+            "[{pattern: red}, {pattern: green}]",
+            "Paint it red green today.",
+        )?,
+        ["[][][]"]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_bracket_that_is_no_verb_stays_as_written() -> TestResult {
+    assert_eq!(
+        sequence_messages(
+            "%[x]s %[1]d %[1 %[ %",
+            "[{pattern: red}]",
+            "Paint it red today.",
+        )?,
+        ["%[x]s %[1]d %[1 %[ %"]
+    );
+    Ok(())
+}
+
+/// The lines of the Rust file `source` where a `text` rule flags `curl`, which
+/// is every `curl` that is prose and none that sits in a fenced block.
+fn curl_lines(source: &str) -> Result<Vec<usize>, Box<dyn Error>> {
+    let rule = "extends: existence\nmessage: m\nscope: text\ntokens: [curl]\n";
+    let found = alerts(&[("Team.Text", rule)], "a.rs", source)?;
+    Ok(found.iter().map(|alert| alert.line).collect())
+}
+
+#[test]
+fn a_fence_in_doc_comments_stays_open_across_a_blank_line() -> TestResult {
+    let lines = curl_lines("/// ```sh\n\n/// curl it\n/// ```\nfn f() {}\n")?;
+    assert_eq!(lines, Vec::<usize>::new());
+    Ok(())
+}
+
+#[test]
+fn a_fence_does_not_cross_a_line_of_code_or_a_plain_comment() -> TestResult {
+    let lines = curl_lines("/// ```sh\n/// curl a\nfn f() {}\n\n/// curl b\nfn g() {}\n")?;
+    assert_eq!(lines, [5]);
+    let lines = curl_lines("// ```sh\n\n// curl c\n// ```\nfn h() {}\n")?;
+    assert_eq!(lines, [3]);
+    Ok(())
+}
+
 #[test]
 fn a_match_across_markup_ends_at_its_last_character() -> TestResult {
     let found = markdown(
@@ -144,6 +252,7 @@ fn a_match_across_markup_ends_at_its_last_character() -> TestResult {
     };
     assert_eq!(alert.matched, "very easy");
     assert_eq!(place(alert), (1, 3, 13));
+    assert_eq!(end(alert), (1, 13));
     Ok(())
 }
 
@@ -154,6 +263,7 @@ fn a_match_that_ends_in_a_wide_character() -> TestResult {
         "Un café.",
     )?;
     assert_eq!(found.iter().map(place).collect::<Vec<_>>(), [(1, 4, 7)]);
+    assert_eq!(found.iter().map(end).collect::<Vec<_>>(), [(1, 7)]);
     Ok(())
 }
 
@@ -164,6 +274,7 @@ fn a_zero_width_match_ends_where_it_starts() -> TestResult {
         "abc",
     )?;
     assert_eq!(found.iter().map(place).collect::<Vec<_>>(), [(1, 2, 2)]);
+    assert_eq!(found.iter().map(end).collect::<Vec<_>>(), [(1, 2)]);
     Ok(())
 }
 
@@ -178,7 +289,37 @@ fn a_match_across_a_line_break() -> TestResult {
     };
     assert_eq!(alert.message, "'very good'");
     assert_eq!(alert.matched, "very\ngood");
-    assert_eq!(place(alert), (1, 7, 11));
+    assert_eq!((alert.line, alert.first_column), (1, 7));
+    assert_eq!(end(alert), (2, 4));
+    Ok(())
+}
+
+#[test]
+fn a_match_across_a_line_break_and_markup() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: ['very good']\n",
+        "It is **very\ngood** here.",
+    )?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(alert.matched, "very\ngood");
+    assert_eq!((alert.line, alert.first_column), (1, 9));
+    assert_eq!(end(alert), (2, 4));
+    Ok(())
+}
+
+#[test]
+fn a_match_across_three_lines() -> TestResult {
+    let found = markdown(
+        "extends: existence\nmessage: m\ntokens: ['a b c']\n",
+        "x a\nb\nc y",
+    )?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!((alert.line, alert.first_column), (1, 3));
+    assert_eq!(end(alert), (3, 1));
     Ok(())
 }
 
@@ -544,6 +685,26 @@ fn a_code_span_is_no_match() -> TestResult {
         "Run `cargo` now.",
     )?;
     assert_eq!(found, Vec::<Alert>::new());
+    Ok(())
+}
+
+#[test]
+fn an_occurrence_counts_no_code_span() -> TestResult {
+    let rule = |token: &str| {
+        format!("extends: occurrence\nmessage: \"%d\"\nscope: sentence\nmax: 2\ntoken: '{token}'\n")
+    };
+    let count = |token: &str, source: &str| -> Result<Vec<String>, Box<dyn Error>> {
+        Ok(markdown(&rule(token), source)?
+            .into_iter()
+            .map(|alert| alert.message)
+            .collect())
+    };
+    let first = "Run `a`, `b`, `c` and `one two three` today.\n";
+    let second = "Two words `four word span` more.\n";
+    for source in [first, second] {
+        assert_eq!(count(r"(?:\b\w+\b|\*+)", source)?, ["3"]);
+        assert_eq!(count(r"\b\w+\b", source)?, ["3"]);
+    }
     Ok(())
 }
 

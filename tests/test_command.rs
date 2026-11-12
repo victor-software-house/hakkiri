@@ -44,6 +44,17 @@ const CONFIG: &str = "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [T
 const CONFIG_OFF: &str =
     "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Team], Team.Filler: off}\n";
 
+/// A project config that hides the text between `BEGIN` and `END` from `*.md`.
+const CONFIG_IGNORING: &str = "\
+packages:
+  - path: styles
+files:
+  '*.md':
+    styles: [Team]
+    block_ignores:
+      - \"(?s)BEGIN(.*?)END\"
+";
+
 /// A project whose style `Team` holds a rule with two cases.
 fn styled<'a>(suite: &'a Suite, name: &str) -> Root<'a> {
     let root = suite.scenario(name);
@@ -255,6 +266,24 @@ fn a_case_through_the_config_lints_with_its_styles() -> TestResult {
         "through.test.yml",
         "- name: through the config\n  input: A very day.\n  contains: Team.Filler\n",
     );
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["2 files, 3 passed, 0 failed"]);
+    Ok(())
+}
+
+#[test]
+fn a_case_through_the_config_reads_the_text_the_config_ignores() -> TestResult {
+    let suite = Suite::new("test-ignoring");
+    let root = styled(&suite, "ignoring");
+    root.file(".ctl/hakkiri.yaml", CONFIG_IGNORING);
+    root.file(
+        "through.test.yml",
+        "- name: an ignored block\n  input: \"BEGIN\\nA very day.\\nEND\\n\"\n  want: ''\n",
+    );
+    root.file("doc.md", "BEGIN\nA very day.\nEND\n");
+    let checked = run(root.path(), &["check", "doc.md"], &[])?;
+    assert_eq!(checked.code, 0, "{}{}", checked.out, checked.err);
     let result = run(root.path(), &["test"], &[])?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
     assert_eq!(result.lines(), ["2 files, 3 passed, 0 failed"]);
@@ -658,6 +687,151 @@ fn json_lists_an_uncovered_rule_as_an_object_with_files_only_for_a_shared_name()
     assert_eq!(
         json["uncovered"],
         serde_json::json!([{"rule": "Team.Terms"}])
+    );
+    Ok(())
+}
+
+/// `ProseStyle` v0.0.14 `NounStack` and `ThingsSpeakNoun` write their messages
+/// with `%[1]s` and `%[2]s`, and each rule's own cases look for the filled
+/// text.
+#[test]
+fn the_cases_of_two_rules_with_indexed_verbs_pass() -> TestResult {
+    let suite = Suite::new("test-indexed");
+    let root = suite.scenario("indexed");
+    let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/sequence-verbs/rules");
+    for name in ["NounStack", "ThingsSpeakNoun"] {
+        let rule = std::fs::read_to_string(fixture.join(format!("{name}.yml")))?;
+        root.file(format!("styles/ProseStyle/{name}.yml"), &rule);
+    }
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["2 files, 6 passed, 0 failed"]);
+    Ok(())
+}
+
+/// `ProseStyle` v0.0.14 `BareURLInComment` reads the whole Rust file as `raw`,
+/// and its own case expects a fence in a doc comment to stay open across a
+/// blank line.
+#[test]
+fn the_cases_of_a_rule_that_reads_a_fence_across_a_blank_line_pass() -> TestResult {
+    let suite = Suite::new("test-bare-url-comment");
+    let root = suite.scenario("bare-url-comment");
+    let rule = std::fs::read_to_string(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/bare-url-comment/BareURLInComment.yml"),
+    )?;
+    root.file("styles/ProseStyle/BareURLInComment.yml", &rule);
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 9 passed, 0 failed"]);
+    Ok(())
+}
+
+/// A rule that warns on `very`, with a case in plain text.
+const FILLER_TEXT: &str = "\
+extends: existence
+message: \"Remove '%s'.\"
+level: warning
+tokens: [very]
+tests:
+  - name: flags very in plain text
+    format: txt
+    input: This is very good.
+    want: \"1:9:Team.Filler:Remove 'very'.\"
+";
+
+#[test]
+fn a_case_in_a_format_no_extension_names_reads_as_plain_text() -> TestResult {
+    let suite = Suite::new("test-plain");
+    let root = suite.scenario("plain");
+    root.file("styles/Team/Filler.yml", FILLER_TEXT);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  '*.txt': {styles: [Team]}\n",
+    );
+    root.file(
+        "through.test.yml",
+        "- name: through the config\n  format: txt\n  input: A very day.\n  want: \"1:3:Team.Filler:Remove 'very'.\"\n",
+    );
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["2 files, 2 passed, 0 failed"]);
+    Ok(())
+}
+
+#[test]
+fn a_formats_entry_picks_the_reader_of_a_case() -> TestResult {
+    let suite = Suite::new("test-formats");
+    let root = suite.scenario("formats");
+    root.file("styles/Team/Filler.yml", FILLER);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "formats:\n  cfg: md\npackages:\n  - path: styles\nfiles:\n  '*.cfg': {styles: [Team]}\n",
+    );
+    root.file(
+        "through.test.yml",
+        "- name: a fence is code\n  format: cfg\n  input: |\n    ```\n    very\n    ```\n  want: ''\n",
+    );
+    let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"]);
+    Ok(())
+}
+
+/// A project that runs `Team` on `*.txt` and sets `on_unknown`.
+fn unknown_project<'a>(suite: &'a Suite, name: &str, word: &str) -> Root<'a> {
+    let root = suite.scenario(name);
+    root.file("styles/Team/Filler.yml", FILLER);
+    root.file(
+        ".ctl/hakkiri.yaml",
+        format!(
+            "on_unknown: {word}\npackages:\n  - path: styles\nfiles:\n  '*.txt': {{styles: [Team]}}\n"
+        ),
+    );
+    root.file(
+        "through.test.yml",
+        "- name: a very day\n  format: txt\n  input: A very day.\n  want: ''\n",
+    );
+    root
+}
+
+#[test]
+fn on_unknown_error_stops_a_case_in_a_format_no_reader_reads() -> TestResult {
+    let suite = Suite::new("test-on-unknown-error");
+    let root = unknown_project(&suite, "error", "error");
+    let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result.out.contains("no reader reads the format `txt`"),
+        "{}",
+        result.out
+    );
+    Ok(())
+}
+
+#[test]
+fn on_unknown_warn_and_ignore_give_a_case_no_alerts() -> TestResult {
+    let suite = Suite::new("test-on-unknown-skip");
+    for word in ["warn", "ignore"] {
+        let root = unknown_project(&suite, word, word);
+        let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+        assert_eq!(result.code, 0, "{word}: {}{}", result.out, result.err);
+        assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"], "{word}");
+    }
+    Ok(())
+}
+
+#[test]
+fn on_unknown_text_reads_the_case_as_plain_text() -> TestResult {
+    let suite = Suite::new("test-on-unknown-text");
+    let root = unknown_project(&suite, "text", "text");
+    let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert!(
+        result.out.contains("failed through.test.yml"),
+        "{}",
+        result.out
     );
     Ok(())
 }

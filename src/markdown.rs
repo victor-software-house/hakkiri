@@ -8,7 +8,8 @@ use markdown::{Constructs, MdxSignal, ParseOptions};
 use tree_sitter::{InputEdit, Node as SyntaxNode, Parser, Point, Tree};
 
 use crate::error::Error;
-use crate::tree::{Node, Scope};
+use crate::math;
+use crate::tree::{Comment, Node, Scope};
 
 /// Which constructs the parser reads.
 #[derive(Clone, Copy, Debug)]
@@ -170,30 +171,116 @@ fn first_error(root: SyntaxNode<'_>) -> SyntaxNode<'_> {
     }
 }
 
+/// What the parse of a Markdown or MDX text gives.
+pub(crate) struct Built {
+    /// The prose nodes.
+    pub(crate) nodes: Vec<Node>,
+    /// The fenced and indented code blocks.
+    pub(crate) code_blocks: usize,
+    /// The HTML comments of a Markdown file, in file order.
+    pub(crate) comments: Vec<Comment>,
+}
+
 /// The tree of a whole Markdown or MDX file: one `raw` root over the prose
-/// nodes, and the number of its fenced and indented code blocks.
-pub(crate) fn document(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
-    let (children, code_blocks) = build(source, flavor)?;
+/// nodes, the number of its fenced and indented code blocks, and its HTML
+/// comments.
+pub(crate) fn document(
+    source: &str,
+    flavor: Flavor,
+) -> Result<(Vec<Node>, usize, Vec<Comment>), Error> {
+    let built = build(source, flavor)?;
     Ok((
-        vec![Node::new(Scope::Raw, 0..source.len(), children)],
-        code_blocks,
+        vec![Node::new(Scope::Raw, 0..source.len(), built.nodes)],
+        built.code_blocks,
+        built.comments,
     ))
 }
 
 /// The prose nodes of `source`, with spans in `source`.
 pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
-    Ok(build(source, flavor)?.0)
+    Ok(build(source, flavor)?.nodes)
 }
 
-/// The prose nodes of `source` and its number of code blocks.
-fn build(source: &str, flavor: Flavor) -> Result<(Vec<Node>, usize), Error> {
-    let root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
+/// The prose nodes of `source`, its number of code blocks, and the HTML
+/// comments of a Markdown file.
+pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
+    let mut root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
+    // Vale reads math as code, which markdown-rs reads by other rules, so the
+    // text is parsed again with each math span marked as code.
+    let masked;
+    let mut spans = Vec::new();
+    let source = if matches!(flavor, Flavor::Comment) {
+        source
+    } else {
+        let math = math::find(&root, source, matches!(flavor, Flavor::Mdx));
+        if math.is_empty() {
+            source
+        } else {
+            masked = math::mask(source, &math);
+            root = markdown::to_mdast(&masked, &flavor.options()).map_err(Error::Mdx)?;
+            spans = math.inline;
+            &masked
+        }
+    };
     let builder = Builder {
         source,
         code_blocks: Cell::new(0),
     };
-    let nodes = builder.visit(&root, Scope::TableCell).nodes;
-    Ok((nodes, builder.code_blocks.get()))
+    let mut nodes = builder.visit(&root, Scope::TableCell).nodes;
+    math::include_delimiters(&mut nodes, &spans);
+    let comments = match flavor {
+        Flavor::Markdown | Flavor::Mdx => comments_of(&root, source),
+        Flavor::Comment => Vec::new(),
+    };
+    Ok(Built {
+        nodes,
+        code_blocks: builder.code_blocks.get(),
+        comments,
+    })
+}
+
+/// The comments below `root`, in file order: the HTML comments of an HTML
+/// block and of inline HTML, and the `{/* … */}` comments of an MDX file, as a
+/// flow expression or in a line of text. A code block and a code span hold
+/// none.
+fn comments_of(root: &Mdast, source: &str) -> Vec<Comment> {
+    let mut found = Vec::new();
+    let mut pending = vec![root];
+    while let Some(node) = pending.pop() {
+        if let Mdast::Html(_) = node
+            && let Some(span) = span_of(node)
+            && let Some(html) = source.get(span.clone())
+        {
+            for range in crate::html::comments(html) {
+                let written = html.get(range.clone()).unwrap_or_default();
+                let inner = written.strip_prefix("<!--").unwrap_or(written);
+                let inner = inner
+                    .strip_suffix("-->")
+                    .or_else(|| inner.strip_suffix("--!>"))
+                    .unwrap_or(inner);
+                found.push(Comment {
+                    at: span.start + range.start,
+                    text: inner.trim().to_owned(),
+                });
+            }
+        }
+        if let Mdast::MdxFlowExpression(_) | Mdast::MdxTextExpression(_) = node
+            && let Some(span) = span_of(node)
+            && let Some(written) = source.get(span.clone())
+            && let Some(inner) = written
+                .strip_prefix("{/*")
+                .and_then(|rest| rest.strip_suffix("*/}"))
+        {
+            found.push(Comment {
+                at: span.start,
+                text: inner.trim().to_owned(),
+            });
+        }
+        if let Some(children) = node.children() {
+            pending.extend(children.iter().rev());
+        }
+    }
+    found
 }
 
 /// Whether a block leaves the first place free: a thematic break, a link
@@ -460,14 +547,17 @@ impl Builder<'_> {
                 Step::Done(Visited::cut(span_of(node)))
             }
             Mdast::Html(_) => Step::Done(Visited::tag(span_of(node))),
+            Mdast::MdxFlowExpression(_) | Mdast::MdxTextExpression(_) => {
+                Step::Done(self.expression(node))
+            }
             Mdast::MdxjsEsm(_)
-            | Mdast::MdxFlowExpression(_)
-            | Mdast::MdxTextExpression(_)
             | Mdast::Toml(_)
             | Mdast::Yaml(_)
             | Mdast::InlineMath(_)
-            | Mdast::Math(_)
-            | Mdast::Definition(_) => Step::Done(Visited::cut(span_of(node))),
+            | Mdast::Math(_) => Step::Done(Visited::cut(span_of(node))),
+            Mdast::Definition(definition) => {
+                Step::Done(self.definition(node, definition.title.is_some()))
+            }
             Mdast::Root(_)
             | Mdast::FootnoteDefinition(_)
             | Mdast::List(_)
@@ -483,10 +573,46 @@ impl Builder<'_> {
     /// What a node gives its parent once the nodes below it are visited.
     fn finish(&self, frame: Frame<'_>) -> Visited {
         match frame.kind {
-            Kind::Scoped(scope) => self.scoped(frame.node, scope, frame.inner, frame.first),
+            Kind::Scoped(scope) => {
+                let mut visited = self.scoped(frame.node, scope, frame.inner, frame.first);
+                if let Mdast::Link(link) = frame.node
+                    && link.title.is_some()
+                    && let Some(span) = span_of(frame.node)
+                {
+                    let from = frame
+                        .node
+                        .children()
+                        .and_then(|kids| kids.last())
+                        .and_then(span_of)
+                        .map_or(span.start, |last| last.end);
+                    if let Some(title) = self.title(&span, from, true) {
+                        match visited.nodes.last_mut() {
+                            Some(node) if node.scope == Scope::Link => node.children.push(title),
+                            _ => visited.nodes.push(title),
+                        }
+                    }
+                }
+                visited
+            }
             Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner, frame.first),
-            Kind::Jsx => Self::jsx(frame.node, frame.inner),
+            Kind::Jsx => self.jsx(frame.node, frame.inner),
             Kind::Transparent => Self::strikethrough(frame.node, frame.inner),
+        }
+    }
+
+    /// Makes each paragraph of the tight list item `node` close with the item.
+    ///
+    /// A tight item has no `p` around its text, so Vale reads the text when
+    /// the item closes, and a comment indented under the text reaches it.
+    fn close_tight_item(node: &Mdast, children: &mut [Node], element_end: usize) {
+        if let Mdast::ListItem(item) = node
+            && !item.spread
+        {
+            for child in children {
+                if child.scope == Scope::Paragraph {
+                    child.closes = element_end;
+                }
+            }
         }
     }
 
@@ -503,11 +629,13 @@ impl Builder<'_> {
             return inner;
         };
         let Markup { span, own, up } = self.markup(node, scope, span);
+        let element_end = span_of(node).map_or(span.end, |element| element.end);
         let Visited {
-            nodes: children,
+            nodes: mut children,
             mut cuts,
             tags,
         } = inner;
+        Self::close_tight_item(node, &mut children, element_end);
         cuts.extend(own);
         let segments = match scope {
             // A container reads as the content inside it.
@@ -541,6 +669,7 @@ impl Builder<'_> {
             | Scope::Strong
             | Scope::Emphasis
             | Scope::Alt
+            | Scope::Title
             | Scope::Description
             | Scope::Meta
             | Scope::Raw
@@ -584,6 +713,7 @@ impl Builder<'_> {
             Node::from_segments(scope, segments, children)
                 .map(|node| Node {
                     first,
+                    closes: element_end,
                     ..node.with_reads(reads)
                 })
                 .into_iter()
@@ -666,6 +796,7 @@ impl Builder<'_> {
             | Scope::TableCaption
             | Scope::FigureCaption
             | Scope::Alt
+            | Scope::Title
             | Scope::Description
             | Scope::Meta
             | Scope::Raw
@@ -861,20 +992,58 @@ impl Builder<'_> {
     }
 
     /// A JSX element: its children stay prose and its tags are gaps.
-    fn jsx(node: &Mdast, mut visited: Visited) -> Visited {
+    fn jsx(&self, node: &Mdast, mut visited: Visited) -> Visited {
         if let Some(span) = span_of(node) {
             let children = node.children().map_or(&[][..], Vec::as_slice);
             let first = children.first().and_then(span_of);
             let last = children.last().and_then(span_of);
-            match (first, last) {
-                (Some(first), Some(last)) => {
-                    visited.cuts.push(span.start..first.start);
-                    visited.cuts.push(last.end..span.end);
+            if let (Some(first), Some(last)) = (first, last) {
+                visited.cuts.push(span.start..first.start);
+                visited.cuts.push(last.end..span.end);
+            } else {
+                if self.reads_as_code(node, &span) {
+                    visited.nodes.push(Self::code(span.clone()));
                 }
-                _ => visited.cuts.push(span),
+                visited.cuts.push(span);
             }
         }
         visited
+    }
+
+    /// Whether Vale reads the JSX element `node`, which holds no node, as
+    /// code: a flow element, and a text element written as `<Tag />`.
+    /// An open and a close tag with nothing between them, inside a line of
+    /// text, are no code.
+    fn reads_as_code(&self, node: &Mdast, span: &Range<usize>) -> bool {
+        matches!(node, Mdast::MdxJsxFlowElement(_))
+            || self
+                .source
+                .get(span.clone())
+                .is_some_and(|text| text.ends_with("/>"))
+    }
+
+    /// An `{…}` expression, which Vale reads as code, and not a `{/* … */}`
+    /// comment, which it turns into an HTML comment.
+    fn expression(&self, node: &Mdast) -> Visited {
+        let span = span_of(node);
+        let mut visited = Visited::cut(span.clone());
+        if let Some(span) = span
+            && !self
+                .source
+                .get(span.clone())
+                .is_some_and(|text| text.starts_with("{/*") && text.ends_with("*/}"))
+        {
+            visited.nodes.push(Self::code(span));
+        }
+        visited
+    }
+
+    /// A node of code over `span`, as written.
+    fn code(span: Range<usize>) -> Node {
+        Node {
+            closes: span.end,
+            ..Node::new(Scope::Code, span, Vec::new())
+        }
     }
 
     /// The `alt` node of an image or an image reference: the label between
@@ -886,15 +1055,82 @@ impl Builder<'_> {
             let start = span.start + "![".len();
             Some(start..start + length)
         });
+        let mut nodes: Vec<Node> = span
+            .map(|span| Node::new(Scope::Alt, span, Vec::new()))
+            .into_iter()
+            .collect();
+        if let Mdast::Image(image) = node
+            && image.title.is_some()
+            && let Some(whole) = span_of(node)
+            && let Some(title) = self.title(&whole, whole.start, true)
+        {
+            nodes.push(title);
+        }
         Visited {
-            nodes: span
-                .map(|span| Node::new(Scope::Alt, span, Vec::new()))
-                .into_iter()
-                .collect(),
+            nodes,
             cuts: span_of(node).into_iter().collect(),
             tags: Vec::new(),
         }
     }
+
+    /// A link reference definition: a gap in the text, and the `title` node of
+    /// its title.
+    fn definition(&self, node: &Mdast, titled: bool) -> Visited {
+        let span = span_of(node);
+        let mut visited = Visited::cut(span.clone());
+        if titled
+            && let Some(span) = span
+            && let Some(title) = self.title(&span, span.start, false)
+        {
+            visited.nodes.push(title);
+        }
+        visited
+    }
+
+    /// The `title` node of the title that ends the link, image or definition
+    /// at `span`, looked for after the byte `from`.
+    fn title(&self, span: &Range<usize>, from: usize, paren: bool) -> Option<Node> {
+        title_range(self.source, from, span.end, paren)
+            .map(|range| Node::new(Scope::Title, range, Vec::new()))
+    }
+}
+
+/// The bytes between the delimiters of the title that ends `source[from..to]`,
+/// when the text ends with one.
+///
+/// A title is written `"…"`, `'…'` or `(…)` after white space, and an inline
+/// link or image closes with a `)` after it, which `paren` says to strip.
+/// A backslash escapes a delimiter inside the title.
+fn title_range(source: &str, from: usize, to: usize, paren: bool) -> Option<Range<usize>> {
+    let mut text = source.get(from..to)?;
+    if paren {
+        text = text.strip_suffix(')')?;
+    }
+    let text = text.trim_end();
+    let bytes = text.as_bytes();
+    let close = text.len().checked_sub(1)?;
+    let open = match bytes.get(close)? {
+        b'"' => b'"',
+        b'\'' => b'\'',
+        b')' => b'(',
+        _ => return None,
+    };
+    for at in (0..close).rev() {
+        let slashes = bytes
+            .get(..at)?
+            .iter()
+            .rev()
+            .take_while(|byte| **byte == b'\\')
+            .count();
+        if bytes.get(at) == Some(&open) && slashes % 2 == 0 {
+            let spaced = at
+                .checked_sub(1)
+                .and_then(|before| bytes.get(before))
+                .is_some_and(u8::is_ascii_whitespace);
+            return (spaced && at + 1 < close).then_some(from + at + 1..from + close);
+        }
+    }
+    None
 }
 
 fn span_of(node: &Mdast) -> Option<Range<usize>> {

@@ -1,0 +1,68 @@
+B1 very really good.
+
+<!-- vale Team.Words = NO -->
+
+B2 very really good.
+
+<!-- vale Team.Words = YES -->
+
+B3 very really good.
+
+<!-- vale Team.Really = off -->
+
+B4 very really good.
+
+<!-- vale Team.Really = on -->
+
+B5 very really good.
+
+<!-- vale Team = NO -->
+
+B6 very really good.
+
+<!-- vale Team = YES -->
+
+B7 very really good.
+
+<!-- vale Other = NO -->
+
+B8 very really good.
+
+<!-- vale Other = YES -->
+
+B9 very really good.
+
+<!-- vale Team.Words = NO -->
+<!-- vale Other.Good = NO -->
+
+B10 very really good.
+
+<!-- vale Team.Words = YES -->
+
+B11 very really good.
+
+<!-- vale Other.Good = YES -->
+
+B12 very really good.
+
+<!-- vale Nope.Rule = NO -->
+
+B13 very really good.
+
+<!--vale Team.Words = NO-->
+
+B14 very really good.
+
+<!-- vale Team.Words=NO -->
+
+B15 very really good.
+
+<!-- vale Team.Words = YES -->
+
+<!-- vale team.words = NO -->
+
+B16 very really good.
+
+<!-- vale Team.Words = YES -->
+
+B17 very really good.

@@ -1,0 +1,5 @@
+extends: sequence
+message: "%s, %[1]s and %s."
+tokens:
+  - pattern: red
+  - pattern: green

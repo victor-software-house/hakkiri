@@ -10,9 +10,10 @@ use std::ops::Range;
 use tree_sitter::{Language as Grammar, Parser, Query, QueryCursor, StreamingIterator};
 
 use crate::error::Error;
-use crate::jsdoc;
 use crate::markdown::{self, Flavor};
-use crate::tree::{Node, Scope};
+use crate::pattern::Pattern;
+use crate::tree::{Node, Scope, remap_nodes};
+use crate::{ignore, jsdoc};
 
 /// The grammar that finds the comments of a file.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -101,6 +102,11 @@ impl Marker {
     const fn is_line(self) -> bool {
         matches!(self, Self::Line | Self::OuterDocLine | Self::InnerDocLine)
     }
+
+    /// Whether rustdoc reads a run of these across blank lines as one text.
+    const fn is_doc_line(self) -> bool {
+        matches!(self, Self::OuterDocLine | Self::InnerDocLine)
+    }
 }
 
 /// One comment, or several adjacent line comments of the same marker.
@@ -112,10 +118,18 @@ struct Group {
 }
 
 /// The `raw` roots of a source file: one per comment group.
-pub(crate) fn roots(dialect: Dialect, source: &str) -> Result<Vec<Node>, Error> {
+///
+/// The Markdown of each comment is rewritten under `blocks` and `tokens`, as
+/// [`crate::ignore`] explains for a file.
+pub(crate) fn roots(
+    dialect: Dialect,
+    source: &str,
+    blocks: &[&Pattern],
+    tokens: &[&Pattern],
+) -> Result<Vec<Node>, Error> {
     groups(source, &find(dialect, source)?)
         .iter()
-        .map(|group| root(dialect, source, group))
+        .map(|group| root(dialect, source, group, blocks, tokens))
         .collect()
 }
 
@@ -145,7 +159,9 @@ fn find(dialect: Dialect, source: &str) -> Result<Vec<(Range<usize>, Marker)>, E
 }
 
 /// Joins each run of adjacent line comments that share a marker, as rustdoc
-/// does.
+/// does. Doc line comments join across blank lines too, since rustdoc reads
+/// the lines of one item's doc comments as one text, so a fence opened before
+/// a blank line stays open after it.
 fn groups(source: &str, comments: &[(Range<usize>, Marker)]) -> Vec<Group> {
     let mut groups: Vec<Group> = Vec::new();
     for (range, marker) in comments {
@@ -155,7 +171,7 @@ fn groups(source: &str, comments: &[(Range<usize>, Marker)]) -> Vec<Group> {
                 && group.comments.last().is_some_and(|previous| {
                     let gap = source.get(previous.end..range.start).unwrap_or_default();
                     gap.trim().is_empty()
-                        && gap.matches('\n').count() == 1
+                        && (marker.is_doc_line() || gap.matches('\n').count() == 1)
                         && starts_line(source, previous.start)
                 })
         });
@@ -179,7 +195,13 @@ fn starts_line(source: &str, offset: usize) -> bool {
 }
 
 /// The `raw` root of one group: the comment node over the Markdown of its text.
-fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
+fn root(
+    dialect: Dialect,
+    source: &str,
+    group: &Group,
+    blocks: &[&Pattern],
+    tokens: &[&Pattern],
+) -> Result<Node, Error> {
     let stripped = strip(source, &lines(source, group));
     let segments = if dialect != Dialect::Rust && group.marker == Marker::DocBlock {
         jsdoc::prose(&stripped.text)
@@ -189,13 +211,33 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
     let mut children = Vec::new();
     for segment in segments {
         let text = stripped.text.get(segment.clone()).unwrap_or_default();
-        let mut nodes = markdown::blocks(text, Flavor::Comment)?;
-        for node in &mut nodes {
-            node.map_segments(&|span| {
-                stripped.segments(span.start + segment.start..span.end + segment.start)
-            });
+        if blocks.is_empty() && tokens.is_empty() {
+            let mut nodes = markdown::blocks(text, Flavor::Comment)?;
+            for node in &mut nodes {
+                node.map_segments(&|span| {
+                    stripped.segments(span.start + segment.start..span.end + segment.start)
+                });
+            }
+            children.extend(nodes);
+        } else {
+            let changed = ignore::rewrite(text, blocks, tokens).map_err(Error::Ignore)?;
+            let mut nodes = markdown::blocks(changed.text(), Flavor::Comment)?;
+            remap_nodes(
+                &mut nodes,
+                &|span| {
+                    changed
+                        .origin(span)
+                        .into_iter()
+                        .flat_map(|place| {
+                            stripped
+                                .segments(place.start + segment.start..place.end + segment.start)
+                        })
+                        .collect()
+                },
+                &Some,
+            );
+            children.extend(nodes);
         }
-        children.extend(nodes);
     }
     let start = group.comments.first().map_or(0, |comment| comment.start);
     let end = group.comments.last().map_or(0, |comment| comment.end);
@@ -206,6 +248,7 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
         reads: Vec::new(),
         children,
         first: false,
+        closes: end,
     };
     Ok(Node {
         scope: Scope::Raw,
@@ -214,6 +257,7 @@ fn root(dialect: Dialect, source: &str, group: &Group) -> Result<Node, Error> {
         reads: Vec::new(),
         children: vec![comment],
         first: false,
+        closes: end,
     })
 }
 

@@ -1,0 +1,152 @@
+rules	text/t1.md	1	8	13	error	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+rules	text/t1.md	1	19	24	error	Vale.Terms	Use 'GitHub' instead of 'Github'.	Github
+rules	text/t1.md	1	45	51	error	Vale.Terms	Use 'Node.js' instead of 'node.js'.	node.js
+rules	text/t1.md	1	73	81	error	Vale.Terms	Use 'harnesses' instead of 'Harnesses'.	Harnesses
+rules	text/t1.md	1	99	105	error	Vale.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+rules	text/t1.md	1	116	124	error	Vale.Terms	Use 'mea culpa' instead of 'Mea Culpa'.	Mea Culpa
+rules	text/t1.md	1	130	138	error	Vale.Terms	Use 'mea culpa' instead of 'MEA CULPA'.	MEA CULPA
+rules	text/t1.md	1	160	165	error	Vale.Terms	Use 'padded' instead of 'Padded'.	Padded
+rules	text/t2.md	1	5	9	error	Vale.Terms	Use 'color' instead of 'COLOR'.	COLOR
+rules	text/t2.md	1	15	20	error	Vale.Terms	Use 'colour' instead of 'Colour'.	Colour
+rules	text/t2.md	1	74	81	error	Vale.Terms	Use 'data\Wset' instead of 'dataxset'.	dataxset
+rules	text/t3.md	1	8	10	error	Vale.Terms	Use 'IOS' instead of 'ios'.	ios
+rules	text/t3.md	1	16	18	error	Vale.Terms	Use 'IOS' instead of 'Ios'.	Ios
+rules	text/t3.md	1	24	26	error	Vale.Terms	Use 'IOS' instead of 'iOS'.	iOS
+rules	text/t4.md	1	8	14	error	Vale.Avoid	Avoid using 'utilize'.	utilize
+rules	text/t4.md	1	20	27	error	Vale.Avoid	Avoid using 'leverage'.	leverage
+rules	text/t4.md	1	62	93	error	Vale.Avoid	Avoid using 'foo123bar and fooXbar and foobar'.	foo123bar and fooXbar and foobar
+rules	text/t4.md	1	113	120	error	Vale.Avoid	Avoid using 'Bad Word'.	Bad Word
+rules	text/t4.md	1	126	134	error	Vale.Avoid	Avoid using 'Bad  Word'.	Bad  Word
+rules	text/t4.md	1	137	141	error	Vale.Terms	Use 'Alpha' instead of 'alpha'.	alpha
+rules	text/t5.md	1	5	13	error	Vale.Terms	Use 'mea culpa' instead of 'mea Culpa'.	mea\nCulpa
+rules	text/t5.md	2	17	24	error	Vale.Avoid	Avoid using 'Bad Word'.	Bad\nWord
+rules	text/t7.md	1	5	10	error	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+rules	text/t7.md	1	21	26	suggestion	Team.Marker	Marked 'marker'.	marker
+teamonly	text/t7.md	1	21	26	suggestion	Team.Marker	Marked 'marker'.	marker
+levels	text/t1.md	1	8	13	warning	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+levels	text/t1.md	1	19	24	warning	Vale.Terms	Use 'GitHub' instead of 'Github'.	Github
+levels	text/t1.md	1	45	51	warning	Vale.Terms	Use 'Node.js' instead of 'node.js'.	node.js
+levels	text/t1.md	1	73	81	warning	Vale.Terms	Use 'harnesses' instead of 'Harnesses'.	Harnesses
+levels	text/t1.md	1	99	105	warning	Vale.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+levels	text/t1.md	1	116	124	warning	Vale.Terms	Use 'mea culpa' instead of 'Mea Culpa'.	Mea Culpa
+levels	text/t1.md	1	130	138	warning	Vale.Terms	Use 'mea culpa' instead of 'MEA CULPA'.	MEA CULPA
+levels	text/t1.md	1	160	165	warning	Vale.Terms	Use 'padded' instead of 'Padded'.	Padded
+levels	text/t2.md	1	5	9	warning	Vale.Terms	Use 'color' instead of 'COLOR'.	COLOR
+levels	text/t2.md	1	15	20	warning	Vale.Terms	Use 'colour' instead of 'Colour'.	Colour
+levels	text/t2.md	1	74	81	warning	Vale.Terms	Use 'data\Wset' instead of 'dataxset'.	dataxset
+levels	text/t3.md	1	8	10	warning	Vale.Terms	Use 'IOS' instead of 'ios'.	ios
+levels	text/t3.md	1	16	18	warning	Vale.Terms	Use 'IOS' instead of 'Ios'.	Ios
+levels	text/t3.md	1	24	26	warning	Vale.Terms	Use 'IOS' instead of 'iOS'.	iOS
+levels	text/t4.md	1	8	14	suggestion	Vale.Avoid	Avoid using 'utilize'.	utilize
+levels	text/t4.md	1	20	27	suggestion	Vale.Avoid	Avoid using 'leverage'.	leverage
+levels	text/t4.md	1	62	93	suggestion	Vale.Avoid	Avoid using 'foo123bar and fooXbar and foobar'.	foo123bar and fooXbar and foobar
+levels	text/t4.md	1	113	120	suggestion	Vale.Avoid	Avoid using 'Bad Word'.	Bad Word
+levels	text/t4.md	1	126	134	suggestion	Vale.Avoid	Avoid using 'Bad  Word'.	Bad  Word
+levels	text/t4.md	1	137	141	warning	Vale.Terms	Use 'Alpha' instead of 'alpha'.	alpha
+levels	text/t5.md	1	5	13	warning	Vale.Terms	Use 'mea culpa' instead of 'mea Culpa'.	mea\nCulpa
+levels	text/t5.md	2	17	24	suggestion	Vale.Avoid	Avoid using 'Bad Word'.	Bad\nWord
+levels	text/t7.md	1	5	10	warning	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+levels	text/t7.md	1	21	26	suggestion	Team.Marker	Marked 'marker'.	marker
+off	text/t4.md	1	8	14	error	Vale.Avoid	Avoid using 'utilize'.	utilize
+off	text/t4.md	1	20	27	error	Vale.Avoid	Avoid using 'leverage'.	leverage
+off	text/t4.md	1	62	93	error	Vale.Avoid	Avoid using 'foo123bar and fooXbar and foobar'.	foo123bar and fooXbar and foobar
+off	text/t4.md	1	113	120	error	Vale.Avoid	Avoid using 'Bad Word'.	Bad Word
+off	text/t4.md	1	126	134	error	Vale.Avoid	Avoid using 'Bad  Word'.	Bad  Word
+off	text/t5.md	2	17	24	error	Vale.Avoid	Avoid using 'Bad Word'.	Bad\nWord
+off	text/t7.md	1	21	26	suggestion	Team.Marker	Marked 'marker'.	marker
+both	text/t1.md	1	8	13	error	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+both	text/t1.md	1	19	24	error	Vale.Terms	Use 'GitHub' instead of 'Github'.	Github
+both	text/t1.md	1	45	51	error	Vale.Terms	Use 'Node.js' instead of 'node.js'.	node.js
+both	text/t1.md	1	73	81	error	Vale.Terms	Use 'harnesses' instead of 'Harnesses'.	Harnesses
+both	text/t1.md	1	99	105	error	Vale.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+both	text/t1.md	1	116	124	error	Vale.Terms	Use 'mea culpa' instead of 'Mea Culpa'.	Mea Culpa
+both	text/t1.md	1	130	138	error	Vale.Terms	Use 'mea culpa' instead of 'MEA CULPA'.	MEA CULPA
+both	text/t1.md	1	160	165	error	Vale.Terms	Use 'padded' instead of 'Padded'.	Padded
+both	text/t2.md	1	5	9	error	Vale.Terms	Use 'color' instead of 'COLOR'.	COLOR
+both	text/t2.md	1	15	20	error	Vale.Terms	Use 'colour' instead of 'Colour'.	Colour
+both	text/t2.md	1	74	81	error	Vale.Terms	Use 'data\Wset' instead of 'dataxset'.	dataxset
+both	text/t3.md	1	8	10	error	Vale.Terms	Use 'IOS' instead of 'ios'.	ios
+both	text/t3.md	1	16	18	error	Vale.Terms	Use 'IOS' instead of 'Ios'.	Ios
+both	text/t3.md	1	24	26	error	Vale.Terms	Use 'IOS' instead of 'iOS'.	iOS
+both	text/t4.md	1	8	14	error	Vale.Avoid	Avoid using 'utilize'.	utilize
+both	text/t4.md	1	20	27	error	Vale.Avoid	Avoid using 'leverage'.	leverage
+both	text/t4.md	1	62	93	error	Vale.Avoid	Avoid using 'foo123bar and fooXbar and foobar'.	foo123bar and fooXbar and foobar
+both	text/t4.md	1	113	120	error	Vale.Avoid	Avoid using 'Bad Word'.	Bad Word
+both	text/t4.md	1	126	134	error	Vale.Avoid	Avoid using 'Bad  Word'.	Bad  Word
+both	text/t4.md	1	137	141	error	Vale.Terms	Use 'Alpha' instead of 'alpha'.	alpha
+both	text/t5.md	1	5	13	error	Vale.Terms	Use 'mea culpa' instead of 'mea Culpa'.	mea\nCulpa
+both	text/t5.md	2	17	24	error	Vale.Avoid	Avoid using 'Bad Word'.	Bad\nWord
+both	text/t6.md	1	18	22	error	Vale.Terms	Use 'Zebra' instead of 'zebra'.	zebra
+both	text/t6.md	1	28	32	error	Vale.Avoid	Avoid using 'moist'.	moist
+both	text/t7.md	1	5	10	error	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+both	text/t7.md	1	21	26	suggestion	Team.Marker	Marked 'marker'.	marker
+glob	text/t1.md	1	8	13	error	Vale.Team.Terms	Use 'GitHub' instead of 'github'.	github
+glob	text/t1.md	1	19	24	error	Vale.Team.Terms	Use 'GitHub' instead of 'Github'.	Github
+glob	text/t1.md	1	45	51	error	Vale.Team.Terms	Use 'Node.js' instead of 'node.js'.	node.js
+glob	text/t1.md	1	73	81	error	Vale.Team.Terms	Use 'harnesses' instead of 'Harnesses'.	Harnesses
+glob	text/t1.md	1	99	105	error	Vale.Team.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+glob	text/t1.md	1	160	165	error	Vale.Team.Terms	Use 'padded' instead of 'Padded'.	Padded
+glob	text/t2.md	1	5	9	error	Vale.Team.Terms	Use 'color' instead of 'COLOR'.	COLOR
+glob	text/t2.md	1	15	20	error	Vale.Team.Terms	Use 'colour' instead of 'Colour'.	Colour
+glob	text/t2.md	1	74	81	error	Vale.Team.Terms	Use 'data\Wset' instead of 'dataxset'.	dataxset
+glob	text/t3.md	1	8	10	error	Vale.Team.Terms	Use 'IOS' instead of 'ios'.	ios
+glob	text/t3.md	1	16	18	error	Vale.Team.Terms	Use 'IOS' instead of 'Ios'.	Ios
+glob	text/t4.md	1	8	14	error	Vale.Team.Avoid	Avoid using 'utilize'.	utilize
+glob	text/t4.md	1	20	27	error	Vale.Team.Avoid	Avoid using 'leverage'.	leverage
+glob	text/t4.md	1	62	93	error	Vale.Team.Avoid	Avoid using 'foo123bar and fooXbar and foobar'.	foo123bar and fooXbar and foobar
+glob	text/t4.md	1	113	120	error	Vale.Team.Avoid	Avoid using 'Bad Word'.	Bad Word
+glob	text/t4.md	1	126	134	error	Vale.Team.Avoid	Avoid using 'Bad  Word'.	Bad  Word
+glob	text/t4.md	1	137	141	error	Vale.Team.Terms	Use 'Alpha' instead of 'alpha'.	alpha
+glob	text/t5.md	2	17	24	error	Vale.Team.Avoid	Avoid using 'Bad Word'.	Bad\nWord
+glob	text/t7.md	1	5	10	error	Vale.Team.Terms	Use 'GitHub' instead of 'github'.	github
+glob	text/t7.md	1	21	26	suggestion	Team.Marker	Marked 'marker'.	marker
+globvale	text/t1.md	1	8	13	error	Vale.Team.Terms	Use 'GitHub' instead of 'github'.	github
+globvale	text/t1.md	1	19	24	error	Vale.Team.Terms	Use 'GitHub' instead of 'Github'.	Github
+globvale	text/t1.md	1	45	51	error	Vale.Team.Terms	Use 'Node.js' instead of 'node.js'.	node.js
+globvale	text/t1.md	1	73	81	error	Vale.Team.Terms	Use 'harnesses' instead of 'Harnesses'.	Harnesses
+globvale	text/t1.md	1	99	105	error	Vale.Team.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+globvale	text/t1.md	1	160	165	error	Vale.Team.Terms	Use 'padded' instead of 'Padded'.	Padded
+globvale	text/t2.md	1	5	9	error	Vale.Team.Terms	Use 'color' instead of 'COLOR'.	COLOR
+globvale	text/t2.md	1	15	20	error	Vale.Team.Terms	Use 'colour' instead of 'Colour'.	Colour
+globvale	text/t2.md	1	74	81	error	Vale.Team.Terms	Use 'data\Wset' instead of 'dataxset'.	dataxset
+globvale	text/t3.md	1	8	10	error	Vale.Team.Terms	Use 'IOS' instead of 'ios'.	ios
+globvale	text/t3.md	1	16	18	error	Vale.Team.Terms	Use 'IOS' instead of 'Ios'.	Ios
+globvale	text/t4.md	1	8	14	error	Vale.Team.Avoid	Avoid using 'utilize'.	utilize
+globvale	text/t4.md	1	20	27	error	Vale.Team.Avoid	Avoid using 'leverage'.	leverage
+globvale	text/t4.md	1	62	93	error	Vale.Team.Avoid	Avoid using 'foo123bar and fooXbar and foobar'.	foo123bar and fooXbar and foobar
+globvale	text/t4.md	1	113	120	error	Vale.Team.Avoid	Avoid using 'Bad Word'.	Bad Word
+globvale	text/t4.md	1	126	134	error	Vale.Team.Avoid	Avoid using 'Bad  Word'.	Bad  Word
+globvale	text/t4.md	1	137	141	error	Vale.Team.Terms	Use 'Alpha' instead of 'alpha'.	alpha
+globvale	text/t5.md	2	17	24	error	Vale.Team.Avoid	Avoid using 'Bad Word'.	Bad\nWord
+globvale	text/t6.md	1	18	22	error	Vale.Terms	Use 'Zebra' instead of 'zebra'.	zebra
+globvale	text/t6.md	1	28	32	error	Vale.Avoid	Avoid using 'moist'.	moist
+globvale	text/t7.md	1	5	10	error	Vale.Team.Terms	Use 'GitHub' instead of 'github'.	github
+globvale	text/t7.md	1	21	26	suggestion	Team.Marker	Marked 'marker'.	marker
+globoff	text/t1.md	1	8	13	error	Vale.Team.Terms	Use 'GitHub' instead of 'github'.	github
+globoff	text/t1.md	1	19	24	error	Vale.Team.Terms	Use 'GitHub' instead of 'Github'.	Github
+globoff	text/t1.md	1	45	51	error	Vale.Team.Terms	Use 'Node.js' instead of 'node.js'.	node.js
+globoff	text/t1.md	1	73	81	error	Vale.Team.Terms	Use 'harnesses' instead of 'Harnesses'.	Harnesses
+globoff	text/t1.md	1	99	105	error	Vale.Team.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+globoff	text/t1.md	1	160	165	error	Vale.Team.Terms	Use 'padded' instead of 'Padded'.	Padded
+globoff	text/t2.md	1	5	9	error	Vale.Team.Terms	Use 'color' instead of 'COLOR'.	COLOR
+globoff	text/t2.md	1	15	20	error	Vale.Team.Terms	Use 'colour' instead of 'Colour'.	Colour
+globoff	text/t2.md	1	74	81	error	Vale.Team.Terms	Use 'data\Wset' instead of 'dataxset'.	dataxset
+globoff	text/t3.md	1	8	10	error	Vale.Team.Terms	Use 'IOS' instead of 'ios'.	ios
+globoff	text/t3.md	1	16	18	error	Vale.Team.Terms	Use 'IOS' instead of 'Ios'.	Ios
+globoff	text/t4.md	1	8	14	error	Vale.Team.Avoid	Avoid using 'utilize'.	utilize
+globoff	text/t4.md	1	20	27	error	Vale.Team.Avoid	Avoid using 'leverage'.	leverage
+globoff	text/t4.md	1	62	93	error	Vale.Team.Avoid	Avoid using 'foo123bar and fooXbar and foobar'.	foo123bar and fooXbar and foobar
+globoff	text/t4.md	1	113	120	error	Vale.Team.Avoid	Avoid using 'Bad Word'.	Bad Word
+globoff	text/t4.md	1	126	134	error	Vale.Team.Avoid	Avoid using 'Bad  Word'.	Bad  Word
+globoff	text/t4.md	1	137	141	error	Vale.Team.Terms	Use 'Alpha' instead of 'alpha'.	alpha
+globoff	text/t5.md	2	17	24	error	Vale.Team.Avoid	Avoid using 'Bad Word'.	Bad\nWord
+globoff	text/t7.md	1	5	10	error	Vale.Team.Terms	Use 'GitHub' instead of 'github'.	github
+globoff	text/t7.md	1	21	26	suggestion	Team.Marker	Marked 'marker'.	marker
+twoglobs	text/t1.md	1	8	13	error	Vale.Team.Terms	Use 'GitHub' instead of 'github'.	github
+twoglobs	text/t1.md	1	19	24	error	Vale.Team.Terms	Use 'GitHub' instead of 'Github'.	Github
+twoglobs	text/t1.md	1	45	51	error	Vale.Team.Terms	Use 'Node.js' instead of 'node.js'.	node.js
+twoglobs	text/t1.md	1	73	81	error	Vale.Team.Terms	Use 'harnesses' instead of 'Harnesses'.	Harnesses
+twoglobs	text/t1.md	1	99	105	error	Vale.Team.Terms	Use 'harness' instead of 'HARNESS'.	HARNESS
+twoglobs	text/t1.md	1	160	165	error	Vale.Team.Terms	Use 'padded' instead of 'Padded'.	Padded
+twoglobs	text/t6.md	1	18	22	error	Vale.Docs.Terms	Use 'Zebra' instead of 'zebra'.	zebra
+twoglobs	text/t6.md	1	28	32	error	Vale.Docs.Avoid	Avoid using 'moist'.	moist

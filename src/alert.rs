@@ -12,7 +12,7 @@ pub struct Alert {
     pub rule: String,
     /// The level of the alert.
     pub level: Level,
-    /// The rule's message with its `%s` filled.
+    /// The rule's message with its `%s` and `%[n]s` filled.
     pub message: String,
     /// The rule's description with its `%s` filled, empty when the rule has
     /// none.
@@ -23,46 +23,73 @@ pub struct Alert {
     pub line: usize,
     /// The 1-based column, in characters, where the match starts.
     pub first_column: usize,
-    /// The 1-based column, in characters, of the last character of the match
-    /// in the file, or of the end of the first line when the match goes on to
-    /// the next.
+    /// The 1-based line of the last character of the match, which is `line`
+    /// when the match stays on it.
+    pub last_line: usize,
+    /// The 1-based column, in characters, of the last character of the match in
+    /// the file, on `last_line`.
     pub last_column: usize,
     /// The text that matched.
     pub matched: String,
     /// The rule's `action`. Nothing applies it.
     pub action: Option<Action>,
+    /// Whether the alert reports a fault of the rule itself, such as a pattern
+    /// that gave up, and not a match. No level of a config or a comment
+    /// changes it, so a broken rule stays an error.
+    pub fault: bool,
 }
 
-/// Fills the `%s` of `template` with `values`, in order.
+/// Fills the `%s` and the indexed `%[n]s` of `template` with `values`, in
+/// order.
 ///
-/// `%%` is `%`. A `%s` with no value left is nothing, and a value left over is
-/// dropped. A `%` before any other character stays as written. A line break
-/// in a value is one space.
+/// `%[n]s` takes the `n`th value, counting from 1, and a `%s` after it takes
+/// the value that follows, as Go's `fmt` does and as Vale's messages rely on.
+/// `%%` is `%`. A `%s` or `%[n]s` with no value to take is nothing, and a value
+/// left over is dropped. A `%` before any other character stays as written. A
+/// line break in a value is one space.
 #[must_use]
 pub fn fill(template: &str, values: &[&str]) -> String {
     let mut out = String::with_capacity(template.len());
-    let mut values = values.iter();
-    let mut chars = template.chars().peekable();
-    while let Some(c) = chars.next() {
-        if c != '%' {
-            out.push(c);
+    let mut next = 0;
+    let mut rest = template;
+    while let Some(at) = rest.find('%') {
+        out.push_str(&rest[..at]);
+        rest = &rest[at + 1..];
+        let Some((index, after)) = verb(rest) else {
+            out.push('%');
+            if let Some(after) = rest.strip_prefix('%') {
+                rest = after;
+            }
             continue;
+        };
+        let position = index.map_or(Some(next), |number| number.checked_sub(1));
+        if let Some(position) = position {
+            next = position.saturating_add(1);
         }
-        match chars.peek() {
-            Some('%') => {
-                chars.next();
-                out.push('%');
-            }
-            Some('s') => {
-                chars.next();
-                if let Some(value) = values.next() {
-                    out.extend(value.chars().map(|v| if v == '\n' { ' ' } else { v }));
-                }
-            }
-            _ => out.push('%'),
+        if let Some(value) = position.and_then(|position| values.get(position)) {
+            out.extend(value.chars().map(|v| if v == '\n' { ' ' } else { v }));
         }
+        rest = after;
     }
+    out.push_str(rest);
     out
+}
+
+/// The verb `text`, the text after a `%`, starts, and the text after the verb.
+///
+/// A plain `s` has no number. `[n]s` has `n` in digits, and a number too large
+/// for `usize` reads as the largest, so it names no value.
+fn verb(text: &str) -> Option<(Option<usize>, &str)> {
+    if let Some(after) = text.strip_prefix('s') {
+        return Some((None, after));
+    }
+    let inside = text.strip_prefix('[')?;
+    let (number, tail) = inside.split_once(']')?;
+    if number.is_empty() || !number.bytes().all(|byte| byte.is_ascii_digit()) {
+        return None;
+    }
+    let after = tail.strip_prefix('s')?;
+    Some((Some(number.parse().unwrap_or(usize::MAX)), after))
 }
 
 /// Where the bytes of one file lie as lines and columns.
@@ -126,17 +153,6 @@ impl<'a> Locator<'a> {
         (line, self.cursor.columns + 1)
     }
 
-    /// The column of the last character of `line`, counting its line feed.
-    fn line_end(&self, line: usize) -> usize {
-        let start = line
-            .checked_sub(1)
-            .and_then(|index| self.starts.get(index))
-            .copied()
-            .unwrap_or_default();
-        let end = self.starts.get(line).copied().unwrap_or(self.source.len());
-        self.characters(start..end)
-    }
-
     /// The characters that start inside the bytes `range` of the source.
     fn characters(&self, range: Range<usize>) -> usize {
         self.source.as_bytes().get(range).map_or(0, |bytes| {
@@ -192,12 +208,12 @@ impl<'a> Locator<'a> {
         (message, description): (String, String),
     ) -> Alert {
         let (line, first_column) = self.place(offset);
-        let last_column = last.map_or(first_column, |last| {
+        let (last_line, last_column) = last.map_or((line, first_column), |last| {
             let (last_line, column) = self.place(last);
-            if last_line > line {
-                self.line_end(line)
+            if last_line == line {
+                (line, column.max(first_column))
             } else {
-                column.max(first_column)
+                (last_line, column)
             }
         });
         Alert {
@@ -208,9 +224,11 @@ impl<'a> Locator<'a> {
             link: rule.link.clone(),
             line,
             first_column,
+            last_line,
             last_column,
             matched: matched.to_owned(),
             action: rule.action.clone(),
+            fault: false,
         }
     }
 
@@ -232,9 +250,11 @@ impl<'a> Locator<'a> {
             link: String::new(),
             line,
             first_column,
+            last_line: line,
             last_column: first_column,
             matched: String::new(),
             action: None,
+            fault: true,
         }
     }
 }

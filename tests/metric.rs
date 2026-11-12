@@ -36,6 +36,26 @@ fn printing(formula: &str, source: &str) -> Result<Vec<String>, Box<dyn Error>> 
     )
 }
 
+/// A rule that reports the words of each sentence when there are more than two.
+const WORDS_OVER_TWO: &str =
+    "extends: metric\nmessage: \"%s\"\nscope: sentence\nformula: words\ncondition: '> 2'\n";
+
+#[test]
+fn a_code_span_counts_one_word_in_a_metric() -> TestResult {
+    assert_eq!(
+        messages(
+            WORDS_OVER_TWO,
+            "Run `a`, `b`, `c` and `one two three` today.\n"
+        )?,
+        ["7.00"]
+    );
+    assert_eq!(
+        messages(WORDS_OVER_TWO, "Two words `four word span` more.\n")?,
+        ["4.00"]
+    );
+    Ok(())
+}
+
 #[test]
 fn words_per_sentence() -> TestResult {
     let found = messages(

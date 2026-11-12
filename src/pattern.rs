@@ -21,6 +21,26 @@ pub(crate) struct Captured {
     pub(crate) groups: Vec<Range<usize>>,
 }
 
+/// What the first capture group of a pattern holds in one match.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) enum FirstGroup {
+    /// The pattern has no capture group.
+    Missing,
+    /// The pattern has a first group, and it took no part in this match.
+    Skipped,
+    /// The bytes of the first group.
+    At(Range<usize>),
+}
+
+/// One match that holds text, and the first capture group in it.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) struct Replaceable {
+    /// The bytes of the whole match.
+    pub(crate) whole: Range<usize>,
+    /// What the first capture group holds.
+    pub(crate) first: FirstGroup,
+}
+
 /// A compiled pattern.
 #[derive(Debug)]
 pub struct Pattern {
@@ -289,6 +309,42 @@ impl Pattern {
         Ok(found)
     }
 
+    /// Each match that holds text, with the first capture group in it.
+    ///
+    /// A match of no bytes is left out.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`SearchError`] when `fancy-regex` gives up on `text`.
+    pub(crate) fn find_replaceable(&self, text: &str) -> Result<Vec<Replaceable>, SearchError> {
+        let mut found = Vec::new();
+        match &self.engine {
+            Engine::Regex(regex) => {
+                let grouped = regex.captures_len() > 1;
+                for captures in regex.captures_iter(text) {
+                    found.extend(replaceable(
+                        grouped,
+                        captures.get(0).map(|hit| hit.range()),
+                        captures.get(1).map(|hit| hit.range()),
+                    ));
+                }
+            }
+            Engine::Fancy(regex) => {
+                let grouped = regex.captures_len() > 1;
+                for captures in regex.captures_iter(text) {
+                    let captures =
+                        captures.map_err(|error| SearchError::new(&self.source, &error))?;
+                    found.extend(replaceable(
+                        grouped,
+                        captures.get(0).map(|hit| hit.range()),
+                        captures.get(1).map(|hit| hit.range()),
+                    ));
+                }
+            }
+        }
+        Ok(found)
+    }
+
     /// `text` with every match replaced by `replacement`, where `$1` reads as
     /// the text of the first group.
     ///
@@ -316,6 +372,22 @@ impl Pattern {
     pub const fn backtracks(&self) -> bool {
         matches!(self.engine, Engine::Fancy(_))
     }
+}
+
+/// The match `whole`, with what its first group `first` holds, or `None` for a
+/// match of no bytes. `grouped` says whether the pattern has a capture group.
+fn replaceable(
+    grouped: bool,
+    whole: Option<Range<usize>>,
+    first: Option<Range<usize>>,
+) -> Option<Replaceable> {
+    let whole = whole.filter(|whole| !whole.is_empty())?;
+    let first = match (grouped, first) {
+        (false, _) => FirstGroup::Missing,
+        (true, None) => FirstGroup::Skipped,
+        (true, Some(first)) => FirstGroup::At(first),
+    };
+    Some(Replaceable { whole, first })
 }
 
 /// The reason in an engine's message: the text after its last `error:` line,

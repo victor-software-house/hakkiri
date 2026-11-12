@@ -1,0 +1,5 @@
+utilize
+leverage
+foo.*bar
+Bad Word
+Alpha

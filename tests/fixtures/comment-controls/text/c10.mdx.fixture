@@ -1,0 +1,56 @@
+E1 very really good.
+
+{/* vale off */}
+
+E2 very really good.
+
+{/* vale on */}
+
+E3 very really good.
+
+{/* vale Team.Words = NO */}
+
+E4 very really good.
+
+{/* vale Team.Words = YES */}
+
+E5 very really good.
+
+{/*vale off*/}
+
+E6 very really good.
+
+{/*   vale on   */}
+
+E7 very really good.
+
+{ /* vale off */ }
+
+E8 very really good.
+
+{/* Vale Off */}
+
+E9 very really good.
+
+E10 very {/* vale off */} E11 very {/* vale on */} E12 very really good.
+
+E13 very {/* vale Team.Words = NO */} E14 very really good.
+
+{/* vale Team.Words = YES */}
+
+E15 very really good.
+
+{/*
+vale off
+*/}
+
+E16 very really good.
+
+{/* vale on */}
+
+- E17 very really good.
+  {/* vale off */}
+- E18 very really good.
+  {/* vale on */}
+- E19 very really good.
+

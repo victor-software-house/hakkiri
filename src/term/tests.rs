@@ -1,0 +1,68 @@
+//! Tests for the term shown in the case of the text it replaced: the cases of
+//! `recaseToTerm` in Vale.
+
+use super::{lowercase_literals, recase_to_term};
+use crate::pattern::Pattern;
+
+#[test]
+fn a_plain_term_is_shown_as_it_is() {
+    assert_eq!(recase_to_term("GitHub", "github"), "GitHub");
+    assert_eq!(recase_to_term("Node.js", "NODE.JS"), "Node.js");
+}
+
+#[test]
+fn a_pattern_is_shown_as_the_spelling_the_text_matches() {
+    assert_eq!(recase_to_term("harness(?:es)?", "Harnesses"), "harnesses");
+    assert_eq!(recase_to_term("harness(?:es)?", "HARNESS"), "harness");
+    assert_eq!(recase_to_term("colou?r", "COLOR"), "color");
+    assert_eq!(recase_to_term("colou?r", "Colour"), "colour");
+    assert_eq!(recase_to_term("OAuth2?", "Oauth"), "OAuth");
+}
+
+#[test]
+fn a_phrase_that_wraps_counts_as_one_space() {
+    assert_eq!(recase_to_term("mea culpa", "mea\nCulpa"), "mea culpa");
+}
+
+#[test]
+fn a_pattern_no_finite_set_stands_for_is_shown_as_written() {
+    assert_eq!(recase_to_term("foo.*bar", "FOO1BAR"), "foo.*bar");
+    assert_eq!(recase_to_term("data\\Wset", "dataxset"), "data\\Wset");
+    assert_eq!(recase_to_term("[pP]y.*\\b", "PYTHON"), "[pP]y.*\\b");
+}
+
+#[test]
+fn more_than_sixty_four_spellings_fall_back_to_the_literal_characters() {
+    assert_eq!(recase_to_term("a?b?c?d?e?f?g?", "ABCDEFG"), "abcdefg");
+}
+
+#[test]
+fn only_the_literal_text_is_lowercased() {
+    assert_eq!(lowercase_literals("GitHub"), "github");
+    assert_eq!(lowercase_literals("Data\\Wset"), "data\\Wset");
+    assert_eq!(lowercase_literals("Foo\\.Bar"), "foo\\.bar");
+    assert_eq!(lowercase_literals("A\\p{Lu}B"), "a\\p{Lu}b");
+    assert_eq!(lowercase_literals("(?P<Word>Ab)C"), "(?P<Word>ab)c");
+    assert_eq!(lowercase_literals("(?<Word>Ab)"), "(?<Word>ab)");
+    assert_eq!(lowercase_literals("(?<=Ab)C"), "(?<=ab)c");
+    assert_eq!(lowercase_literals("Ab\\"), "ab\\");
+}
+
+#[test]
+fn the_names_of_groups_and_backreferences_and_the_flags_are_kept() {
+    for (term, kept) in [
+        ("(?<Dup>Ab)\\k<Dup>", "(?<Dup>ab)\\k<Dup>"),
+        ("(?<Dup>Ab)\\k'Dup'", "(?<Dup>ab)\\k'Dup'"),
+        ("(?<Dup>Ab)\\k{Dup}", "(?<Dup>ab)\\k{Dup}"),
+        ("(?P<Dup>Ab)(?P=Dup)", "(?P<Dup>ab)(?P=Dup)"),
+        ("(?'Dup'Ab)\\k<Dup>", "(?'Dup'ab)\\k<Dup>"),
+        ("(?U)Ab+", "(?U)ab+"),
+        ("(?i:Ab)C", "(?i:ab)c"),
+        ("A\\pLB", "a\\pLb"),
+    ] {
+        assert_eq!(lowercase_literals(term), kept);
+    }
+    let pattern =
+        Pattern::new(&lowercase_literals("(?<Dup>Ab)\\k<Dup>")).expect("the pattern compiles");
+    assert!(pattern.is_match("abab").expect("the search runs"));
+}

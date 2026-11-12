@@ -25,6 +25,7 @@ use ctl_core::input::{Input, InputError};
 use serde::de::DeserializeOwned;
 
 use self::build::Source;
+pub(crate) use self::build::term_pattern;
 pub use self::cases::{TestCase, alert_lines, cases_from_text};
 use self::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
@@ -204,6 +205,11 @@ pub struct Substitution {
     pub capitalize: bool,
     /// Whether the keys match without regard to case.
     pub ignorecase: bool,
+    /// Whether the rule is built from the accepted terms of a vocabulary: each
+    /// value is a term, which may be a pattern. A match is in form when the
+    /// term as a pattern matches it whole, and the term is shown in the case of
+    /// the text it replaced.
+    pub terms: bool,
 }
 
 /// An `occurrence` rule.
@@ -1047,4 +1053,37 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
     } else {
         Err(LoadError { problems })
     }
+}
+
+/// The rules a vocabulary builds, named `{prefix}.Terms` and `{prefix}.Avoid`,
+/// as Vale builds them.
+///
+/// `Terms` reports an accepted term written in another case, and is there only
+/// when `accepted` holds a term. `Avoid` reports a rejected term, and is there
+/// only when `rejected` holds one. Both have the level `error` and the scope
+/// `text`, and a rule that is there runs on no file until a config lists it.
+/// `project_accepted` holds the accepted terms of the project, which hold a
+/// match of `Avoid` back.
+///
+/// # Errors
+///
+/// Returns a [`LoadError`] when a term is not a pattern.
+pub fn vocabulary_rules(
+    prefix: &str,
+    accepted: &[String],
+    rejected: &[String],
+    project_accepted: &[String],
+) -> Result<Vec<Rule>, LoadError> {
+    let mut rules = Vec::new();
+    if !accepted.is_empty() {
+        rules.push(build::terms_rule(&format!("{prefix}.Terms"), accepted)?);
+    }
+    if !rejected.is_empty() {
+        rules.push(build::avoid_rule(
+            &format!("{prefix}.Avoid"),
+            rejected,
+            project_accepted,
+        )?);
+    }
+    Ok(rules)
 }

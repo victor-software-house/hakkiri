@@ -13,13 +13,19 @@ use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
 use std::{fmt, fs, io};
 
-use ctl_core::input::Input;
+use ctl_core::input::{FieldPath, Input};
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
-use hakkiri::rule::{Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style};
+use hakkiri::Language;
+use hakkiri::pattern::Pattern;
+use hakkiri::rule::{
+    Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style, vocabulary_rules,
+};
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 
+use crate::cli::{FailLevel, OnUnknown, OnUnmatched};
+use crate::formats::Formats;
 use crate::package;
 use crate::vocabulary::{self, SETTINGS_FOLDER, Vocabulary};
 
@@ -113,6 +119,23 @@ struct Raw {
     #[serde(default)]
     #[garde(skip)]
     files: Ordered<Ordered<Setting>>,
+    /// The options of a run, which only the project's config sets.
+    #[serde(default)]
+    #[garde(skip)]
+    fail_level: Option<FailLevel>,
+    #[serde(default)]
+    #[garde(skip)]
+    gitignore: Option<bool>,
+    #[serde(default)]
+    #[garde(skip)]
+    on_unmatched: Option<OnUnmatched>,
+    #[serde(default)]
+    #[garde(skip)]
+    on_unknown: Option<OnUnknown>,
+    /// The reader of each extension, file name or glob.
+    #[serde(default)]
+    #[garde(skip)]
+    formats: BTreeMap<String, String>,
 }
 
 /// One entry of `packages`.
@@ -218,6 +241,11 @@ struct Glob {
     /// Whether the glob wrote an empty `vocab` list, which drops the lists of
     /// the earlier globs of the same text.
     clears_vocab: bool,
+    /// The patterns whose matches are hidden as blocks from the files the glob
+    /// matches.
+    block_ignores: Vec<Pattern>,
+    /// The patterns whose matches are hidden as inline text.
+    token_ignores: Vec<Pattern>,
     choices: Vec<(String, Choice)>,
 }
 
@@ -235,6 +263,17 @@ pub(crate) struct Project {
     vocabularies: BTreeMap<String, Vocabulary>,
     /// The lowest level an alert reports at.
     pub(crate) level: Option<Level>,
+    /// The config's `fail_level`.
+    pub(crate) fail_level: Option<FailLevel>,
+    /// The config's `gitignore`.
+    pub(crate) gitignore: Option<bool>,
+    /// The config's `on_unmatched`.
+    pub(crate) on_unmatched: Option<OnUnmatched>,
+    /// The config's `on_unknown`.
+    pub(crate) on_unknown: Option<OnUnknown>,
+    /// The `formats` of the packages and the project, a later one winning for
+    /// the same key.
+    formats: Formats,
     /// The package folders, which a walk leaves alone.
     pub(crate) packages: Vec<PathBuf>,
     /// The project root: the folder that holds the `.ctl` folder of the
@@ -256,6 +295,16 @@ pub(crate) struct Plan<'a> {
     /// The exceptions of the vocabularies that the globs matching the file
     /// name, one for each, in the order the globs are written.
     pub(crate) accepted: Vec<&'a Exceptions>,
+    /// The block patterns of the globs matching the file, in the order the
+    /// globs are written.
+    pub(crate) block_ignores: Vec<&'a Pattern>,
+    /// The token patterns of the globs matching the file, in the same order.
+    pub(crate) token_ignores: Vec<&'a Pattern>,
+}
+
+/// Whether the resolved directory `real` is under `root` or holds it.
+pub(crate) fn leads_to(root: &Path, real: &Path) -> bool {
+    real.starts_with(root) || root.starts_with(real)
 }
 
 impl Project {
@@ -267,7 +316,19 @@ impl Project {
     /// Whether the resolved directory `real` is under the project root or
     /// holds it, so a walk of it can reach a file under the root.
     pub(crate) fn leads_to_root(&self, real: &Path) -> bool {
-        real.starts_with(&self.root) || self.root.starts_with(real)
+        leads_to(&self.root, real)
+    }
+
+    /// The language a `formats` entry gives the file at `path`, written
+    /// relative to the project root with `/` separators, when one does.
+    pub(crate) fn mapped_language(&self, path: &str) -> Option<Language> {
+        self.formats.language_of(path)
+    }
+
+    /// Whether some glob matches `path`, written relative to the project root
+    /// with `/` separators, whatever rules the globs give it.
+    pub(crate) fn selects(&self, path: &str) -> bool {
+        self.globs.iter().any(|glob| glob.matcher.is_match(path))
     }
 
     /// Whether `argument` can lead to a file under the project root: a file
@@ -317,11 +378,15 @@ impl Project {
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
         let mut matched = false;
         let mut styles: &[String] = &[];
-        let mut switches: HashMap<&str, bool> = HashMap::new();
+        let mut switches: HashMap<String, bool> = HashMap::new();
         let mut set_levels: HashMap<&str, Level> = HashMap::new();
         let mut named: Vec<&str> = Vec::new();
+        let mut block_ignores: Vec<&Pattern> = Vec::new();
+        let mut token_ignores: Vec<&Pattern> = Vec::new();
         for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
             matched = true;
+            block_ignores.extend(&glob.block_ignores);
+            token_ignores.extend(&glob.token_ignores);
             for name in &glob.vocab {
                 if !named.contains(&name.as_str()) {
                     named.push(name);
@@ -337,17 +402,20 @@ impl Project {
             for (name, choice) in &glob.choices {
                 match choice {
                     Choice::Off => {
-                        switches.insert(name.as_str(), false);
+                        switches.insert(name.clone(), false);
                     }
                     Choice::On => {
-                        switches.insert(name.as_str(), true);
+                        switches.insert(name.clone(), true);
                     }
                     Choice::Level(level) => {
-                        switches.insert(name.as_str(), true);
+                        switches.insert(name.clone(), true);
                         set_levels.insert(name.as_str(), *level);
                     }
                 }
             }
+            // A glob that names a vocabulary runs the rules of that vocabulary
+            // on its files, after the glob's own settings, as in Vale.
+            set_vocabulary_rules(&mut switches, &glob.vocab);
         }
         if !matched {
             return None;
@@ -403,27 +471,38 @@ impl Project {
             levels,
             unrunnable,
             accepted,
+            block_ignores,
+            token_ignores,
         })
     }
 }
 
-/// The 1-based line of the first line at or after line `from` that is the key
-/// `key`, written bare or quoted and perhaps after a list dash, or `None` when
-/// there is none.
-fn key_line(text: &str, key: &str, from: usize) -> Option<usize> {
-    text.lines()
-        .enumerate()
-        .skip(from.saturating_sub(1))
-        .find_map(|(index, line)| {
-            let item = line.trim_start();
-            let item = item.strip_prefix("- ").map_or(item, str::trim_start);
-            let rest = item.trim_start_matches(['\'', '"']);
-            let after = rest.strip_prefix(key)?;
-            after
-                .trim_start_matches(['\'', '"'])
-                .starts_with(':')
-                .then_some(index + 1)
-        })
+/// Turns the rules of each vocabulary in `names` on.
+fn set_vocabulary_rules<S: AsRef<str>>(switches: &mut HashMap<String, bool>, names: &[S]) {
+    for name in names {
+        for rule in ["Terms", "Avoid"] {
+            switches.insert(format!("Vale.{}.{rule}", name.as_ref()), true);
+        }
+    }
+}
+
+/// The 1-based line where `input` writes the key at `path`, or where its
+/// nearest written ancestor's key is, and `None` when the text does not parse.
+///
+/// A fault about a key itself, such as a glob that is no glob, belongs here,
+/// since the value of a key that holds a block collection starts on the line
+/// below it.
+fn key_line_of(input: &Input, path: &FieldPath) -> Option<usize> {
+    input.place_key(path).map(|at| at.line)
+}
+
+/// The 1-based line where `input` writes the value at `path`, or where its
+/// nearest written ancestor is, and `None` when the text does not parse.
+///
+/// The path names each key as one step, so a glob such as `docs/**/*.md` or
+/// `*.{md,rs}` is one key and not a run of steps.
+fn line_of(input: &Input, path: &FieldPath) -> Option<usize> {
+    input.place(path).map(|at| at.line)
 }
 
 /// What a config fault names: the file, and the line when the text shows it.
@@ -504,7 +583,9 @@ fn project_root(config: &Path) -> io::Result<PathBuf> {
 struct Layer {
     /// How a fault names the file.
     name: String,
-    text: String,
+    /// The text, read once, so each fault finds its line through the same
+    /// document.
+    input: Input,
     raw: Raw,
 }
 
@@ -547,19 +628,18 @@ impl<'a> Walk<'a> {
     ///
     /// `file` is the config that holds `entries`, as a fault names it, and
     /// `depth` the packages between it and the project.
-    fn entries(&mut self, entries: &[Entry], text: &str, file: &str, depth: usize) {
+    fn entries(&mut self, entries: &[Entry], input: &Input, file: &str, depth: usize) {
         let mut faults = Faults {
             file,
             problems: Vec::new(),
         };
-        let mut from = key_line(text, "packages", 1).unwrap_or(1);
-        for entry in entries {
+        for (index, entry) in entries.iter().enumerate() {
             let key = if entry.url.is_some() { "url" } else { "path" };
-            let line = key_line(text, key, from);
-            from = line.map_or(from, |line| line + 1);
+            let entry_path = FieldPath::root().key("packages").index(index).key(key);
+            let line = line_of(input, &entry_path);
             if depth > 0 && entry.path.is_some() {
                 faults.add(
-                    line,
+                    key_line_of(input, &entry_path),
                     key,
                     "is not allowed in a package's settings: pin the package by `url` and `sha256`"
                         .to_owned(),
@@ -658,15 +738,35 @@ impl<'a> Walk<'a> {
                 return;
             }
         };
-        let raw: Raw = match Input::new(&name, &text).load() {
+        let input = Input::new(&name, &text);
+        let raw: Raw = match input.load() {
             Ok(raw) => raw,
             Err(error) => {
                 self.problems.extend(LoadError::from(error).problems);
                 return;
             }
         };
-        self.entries(&raw.packages, &text, &name, depth + 1);
-        self.layers.push(Layer { name, text, raw });
+        let mut faults = Faults {
+            file: &name,
+            problems: Vec::new(),
+        };
+        for (key, set) in [
+            ("fail_level", raw.fail_level.is_some()),
+            ("gitignore", raw.gitignore.is_some()),
+            ("on_unmatched", raw.on_unmatched.is_some()),
+            ("on_unknown", raw.on_unknown.is_some()),
+        ] {
+            if set {
+                faults.add(
+                    key_line_of(&input, &FieldPath::root().key(key)),
+                    key,
+                    "belongs to the project's config, not a package's settings".to_owned(),
+                );
+            }
+        }
+        self.problems.append(&mut faults.problems);
+        self.entries(&raw.packages, &input, &name, depth + 1);
+        self.layers.push(Layer { name, input, raw });
     }
 }
 
@@ -688,9 +788,15 @@ impl<'a> Walk<'a> {
 pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, LoadError> {
     let input = Input::read(path).map_err(LoadError::from)?;
     let raw: Raw = input.load().map_err(LoadError::from)?;
-    let text = input.text();
+    let (fail_level, gitignore, on_unmatched, on_unknown) = (
+        raw.fail_level,
+        raw.gitignore,
+        raw.on_unmatched,
+        raw.on_unknown,
+    );
+    let name = input.name().to_owned();
     let mut faults = Faults {
-        file: input.name(),
+        file: &name,
         problems: Vec::new(),
     };
     let root = match project_root(path) {
@@ -703,12 +809,12 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         }
     };
     let mut walk = Walk::new(&root, cache_dir);
-    walk.entries(&raw.packages, text, input.name(), 0);
+    walk.entries(&raw.packages, &input, input.name(), 0);
     faults.problems.append(&mut walk.problems);
     let mut layers = walk.layers;
     layers.push(Layer {
-        name: input.name().to_owned(),
-        text: text.to_owned(),
+        name: name.clone(),
+        input,
         raw,
     });
     let level = layers
@@ -725,15 +831,22 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
     };
     let mut globs: Vec<Glob> = Vec::new();
     let mut listed: HashMap<String, Vec<String>> = HashMap::new();
+    let mut formats = Formats::default();
     for layer in layers {
-        if let Err(error) = Input::new(&layer.name, &layer.text).check(&layer.raw, &known) {
+        if let Err(error) = layer.input.check(&layer.raw, &known) {
             faults.problems.extend(LoadError::from(error).problems);
         }
         let mut at = Faults {
             file: &layer.name,
             problems: Vec::new(),
         };
-        for mut glob in read_globs(layer.raw.files, &layer.text, &loaded, &mut at) {
+        for (key, reader) in &layer.raw.formats {
+            if let Err(message) = formats.insert(key, reader) {
+                let path = FieldPath::root().key("formats").key(key);
+                at.add(line_of(&layer.input, &path), key, message);
+            }
+        }
+        for mut glob in read_globs(layer.raw.files, &layer.input, &loaded, &mut at) {
             add_up(&mut glob, &mut listed);
             if glob.clears_vocab {
                 for earlier in globs.iter_mut().filter(|g| g.pattern == glob.pattern) {
@@ -757,6 +870,11 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         globs,
         vocabularies: loaded.vocabularies,
         level,
+        fail_level,
+        gitignore,
+        on_unmatched,
+        on_unknown,
+        formats,
         packages: loaded.packages,
         root,
     })
@@ -799,12 +917,20 @@ fn load_packages(
     loaded.packages = packages;
     let search = loaded.packages.clone();
     read_vocabularies(&found, vocab, &mut loaded, faults);
-    let accepted: Vec<String> = vocab
+    let top: Vec<&Vocabulary> = vocab
         .top
         .iter()
         .filter_map(|name| loaded.vocabularies.get(name))
+        .collect();
+    let accepted: Vec<String> = top
+        .iter()
         .flat_map(|vocabulary| vocabulary.accepted.iter().cloned())
         .collect();
+    let rejected: Vec<String> = top
+        .iter()
+        .flat_map(|vocabulary| vocabulary.rejected.iter().cloned())
+        .collect();
+    build_vocabulary_rules(&mut loaded, vocab, &accepted, &rejected, faults);
     for Found {
         origin,
         written,
@@ -823,6 +949,17 @@ fn load_packages(
                 .map(|name| name.to_string_lossy().into_owned())
                 .unwrap_or_default();
             let shown = written.join(&name);
+            if loaded.styles.contains_key(&name) && !folders.contains_key(&name) {
+                faults.add(
+                    line,
+                    key,
+                    format!(
+                        "the style `{name}` is built in from a vocabulary, and `{}` holds a style of that name",
+                        shown.display()
+                    ),
+                );
+                continue;
+            }
             if let Some(first) = folders.get(&name) {
                 at.add(
                     line,
@@ -865,7 +1002,7 @@ fn load_packages(
 /// `loaded` holds, and a level that is none.
 fn read_globs(
     files: Ordered<Ordered<Setting>>,
-    text: &str,
+    input: &Input,
     loaded: &Loaded,
     faults: &mut Faults<'_>,
 ) -> Vec<Glob> {
@@ -877,7 +1014,9 @@ fn read_globs(
         .collect();
     let mut globs = Vec::new();
     for (pattern, settings) in files.0 {
-        let line = key_line(text, &pattern, 1);
+        // One key of the path, whatever dots, stars and slashes the glob holds.
+        let glob = FieldPath::root().key("files").key(&pattern);
+        let line = key_line_of(input, &glob);
         let matcher = match GlobBuilder::new(&pattern).build() {
             Ok(glob) => glob.compile_matcher(),
             Err(error) => {
@@ -885,18 +1024,22 @@ fn read_globs(
                 continue;
             }
         };
-        let inner = line.map_or(1, |line| line + 1);
         let mut listed = None;
         let mut vocabularies = None;
+        let mut block_ignores = Vec::new();
+        let mut token_ignores = Vec::new();
         let mut choices = Vec::new();
         for (key, setting) in settings.0 {
-            let at = key_line(text, &key, inner);
+            let at = line_of(input, &glob.clone().key(&key));
             match (key.as_str(), setting) {
                 ("styles", Setting::List(names)) => {
-                    for name in &names {
+                    let list = glob.clone().key("styles");
+                    for (index, name) in names.iter().enumerate() {
                         if !loaded.styles.contains_key(name) {
+                            // Each name has its own line, whatever its place in
+                            // the list.
                             faults.add(
-                                at,
+                                line_of(input, &list.clone().index(index)),
                                 "styles",
                                 format!("`{name}` is not a style in any package"),
                             );
@@ -911,13 +1054,26 @@ fn read_globs(
                 ("vocab", Setting::Word(_)) => {
                     faults.add(at, "vocab", "is a list of vocabulary names".to_owned());
                 }
+                ("block_ignores", Setting::List(list)) => {
+                    block_ignores = compile_all(&list, input, &glob, "block_ignores", faults);
+                }
+                ("token_ignores", Setting::List(list)) => {
+                    token_ignores = compile_all(&list, input, &glob, "token_ignores", faults);
+                }
+                ("block_ignores" | "token_ignores", Setting::Word(_)) => {
+                    faults.add(at, &key, "is a list of patterns".to_owned());
+                }
                 (_, setting) if !known.contains(key.as_str()) => {
                     let message = if matches!(setting, Setting::List(_)) {
                         "is not `styles`, and names no rule in any style the config loads"
                     } else {
                         "names no rule in any style the config loads"
                     };
-                    faults.add(at, &key, message.to_owned());
+                    faults.add(
+                        key_line_of(input, &glob.clone().key(&key)),
+                        &key,
+                        message.to_owned(),
+                    );
                 }
                 (_, Setting::List(_)) => {
                     faults.add(at, &key, format!("is set to {LEVELS}, `on` or `off`"));
@@ -940,10 +1096,35 @@ fn read_globs(
             styles: listed,
             clears_vocab: vocabularies.as_ref().is_some_and(Vec::is_empty),
             vocab: vocabularies.unwrap_or_default(),
+            block_ignores,
+            token_ignores,
             choices,
         });
     }
     globs
+}
+
+/// The patterns `list` holds, the value of `key` under the glob at `glob` in
+/// `input`, compiled, and a fault on the line of each that does not compile.
+fn compile_all(
+    list: &[String],
+    input: &Input,
+    glob: &FieldPath,
+    key: &str,
+    faults: &mut Faults<'_>,
+) -> Vec<Pattern> {
+    let items = glob.clone().key(key);
+    list.iter()
+        .enumerate()
+        .filter_map(|(index, source)| match Pattern::new(source) {
+            Ok(pattern) => Some(pattern),
+            Err(error) => {
+                let at = line_of(input, &items.clone().index(index));
+                faults.add(at, key, error.to_string());
+                None
+            }
+        })
+        .collect()
 }
 
 /// Refuses the faults in the rule names of each style a glob lists, as Vale
@@ -974,6 +1155,8 @@ struct Named {
     /// Every name a top level wrote, cleared or not, which the config check
     /// reports on its own line.
     written: Vec<String>,
+    /// The names that a glob lists, each once.
+    globs: Vec<String>,
 }
 
 impl Named {
@@ -996,14 +1179,17 @@ impl Named {
                 }
             }
         }
-        let text = &layer.text;
         for (pattern, settings) in &layer.raw.files.0 {
-            let inner = key_line(text, pattern, 1).map_or(1, |line| line + 1);
+            let glob = FieldPath::root().key("files").key(pattern);
             for (key, setting) in &settings.0 {
                 if let ("vocab", Setting::List(names)) = (key.as_str(), setting) {
-                    let at = key_line(text, "vocab", inner);
-                    for name in names {
+                    let list = glob.clone().key("vocab");
+                    for (index, name) in names.iter().enumerate() {
+                        let at = line_of(&layer.input, &list.clone().index(index));
                         self.add(name, at, &layer.name);
+                        if !self.globs.contains(name) {
+                            self.globs.push(name.clone());
+                        }
                     }
                 }
             }
@@ -1068,6 +1254,50 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
             _ => {}
         }
         faults.problems.append(&mut at.problems);
+    }
+}
+
+/// Builds the rules of the vocabularies the config names, as Vale builds them.
+/// The lists of the top level give `Vale.Terms` and `Vale.Avoid` in a style
+/// `Vale`. Each vocabulary a glob lists gives `Vale.<Name>.Terms` and
+/// `Vale.<Name>.Avoid`, which that glob runs on its files.
+fn build_vocabulary_rules(
+    loaded: &mut Loaded,
+    vocab: &Named,
+    accepted: &[String],
+    rejected: &[String],
+    faults: &mut Faults<'_>,
+) {
+    let mut built = vec![(
+        "Vale".to_owned(),
+        accepted.to_vec(),
+        rejected.to_vec(),
+        true,
+    )];
+    for name in &vocab.globs {
+        if let Some(vocabulary) = loaded.vocabularies.get(name) {
+            built.push((
+                format!("Vale.{name}"),
+                vocabulary.accepted.clone(),
+                vocabulary.rejected.clone(),
+                false,
+            ));
+        }
+    }
+    for (prefix, own_accepted, own_rejected, style) in built {
+        match vocabulary_rules(&prefix, &own_accepted, &own_rejected, accepted) {
+            Ok(rules) if !rules.is_empty() => {
+                let first = loaded.rules.len();
+                loaded.rules.extend(rules);
+                if style {
+                    loaded
+                        .styles
+                        .insert(prefix, (first..loaded.rules.len()).collect());
+                }
+            }
+            Ok(_) => {}
+            Err(error) => faults.problems.extend(error.problems),
+        }
     }
 }
 

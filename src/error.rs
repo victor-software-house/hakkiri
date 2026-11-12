@@ -2,6 +2,8 @@
 
 use std::{error, fmt};
 
+use crate::pattern::SearchError;
+
 /// Why a file gave no tree.
 #[derive(Debug)]
 pub enum Error {
@@ -13,6 +15,8 @@ pub enum Error {
     Query(tree_sitter::QueryError),
     /// tree-sitter gave no tree for the file.
     Syntax,
+    /// A block or token pattern gave up on the file.
+    Ignore(SearchError),
 }
 
 impl fmt::Display for Error {
@@ -22,6 +26,7 @@ impl fmt::Display for Error {
             Self::Grammar(error) => write!(f, "cannot load the grammar: {error}"),
             Self::Query(error) => write!(f, "cannot compile the comment query: {error}"),
             Self::Syntax => f.write_str("tree-sitter gave no syntax tree"),
+            Self::Ignore(error) => write!(f, "an ignore pattern failed: {error}"),
         }
     }
 }
@@ -32,6 +37,7 @@ impl error::Error for Error {
             Self::Mdx(_) | Self::Syntax => None,
             Self::Grammar(error) => Some(error),
             Self::Query(error) => Some(error),
+            Self::Ignore(error) => Some(error),
         }
     }
 }
