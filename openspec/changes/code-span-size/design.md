@@ -62,5 +62,39 @@ The variable and the flag beat every file, as for the other options of `check`.
 `code_span_size` is a reserved key under a glob, as `styles` and `vocab` are, and no rule name can equal it, since a rule name holds a dot.
 `hakkiri test` reads the project's key for a case that runs through the config, and runs a case of one rule file at 1.
 
+### 6. Vale drops an alert that has the place of another
+
+Vale keeps each alert under the key of its line, its column and its rule, and drops a later alert with the same key ([history key][v-history]).
+A block that is not a sentence is reported at the first column of its line, so a table row of three cells gives one alert, the one of its first cell.
+A sentence that starts with a code span has no place in its block, so Vale reports it at the line the block was found on, and an earlier sentence often holds that place.
+Vale also finds the line of a block by searching the file for its text ([walker.advance][v-advance]), so a block whose text is not in the file as written can land on the line of another block, and the later alert is dropped.
+A reference definition that repeats the text of a code span, and an entity such as `&amp;lt;` in a code span, are two ways to get there.
+
+The probe at 0 differed from Vale in 1,910 alerts.
+A build of Vale with that check off, in a box, differs in 860: the drop is the cause of 1,050.
+Table cells fall from 584 to 0, headings from 19 to 0, and list items from 71 to 2.
+hakkiri keeps each alert at its own place, since each block was measured, and the alert is as true as the others.
+Alternative: drop the alert the way Vale does.
+It lost because it loses a measurement that exists, and it needs Vale's search to know which blocks collide.
+
+### 7. A link that repeats its address
+
+Vale replaces the text of an element whose address equals its text with asterisks ([clean][v-clean]), so `[a.md](a.md)` counts no word.
+hakkiri did not, and now does, in [HKR-064][ledger].
+Vale does the same for `<https://a.example>` but not for `<a@b.example>`, whose address is `mailto:a@b.example`, so it counts the three words of the email, and hakkiri does too.
+
+### 8. The sentences that remain
+
+Of the 860 differences left with Vale's check off, 70 are the text of a link that repeats its address, which [HKR-064][ledger] fixes.
+The 790 that remain are in how sentences split.
+They are the sentence alerts and the counts built on sentences: `sentences`, the scores and the paragraph metrics.
+Two of them are the long words of `はっきり`, which `vale-differences` already records as a count of characters.
+The other 788 belong to the sentence splitter, row [HKR-065][ledger]: 172 minimal inputs, each still different from Vale, fall into four groups by what ends or starts the sentence.
+
 [engine-text]: ../archive/2026-11-10-rule-engine/design.md
 [pattern-9]: ../archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
+[v-history]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L568-L571
+[v-advance]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/walk.go#L831-L864
+[v-clean]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L744-L747
+
+[ledger]: ../../../tasks.yaml

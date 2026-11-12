@@ -102,6 +102,66 @@ fn a_link_whose_text_is_its_address_counts_no_word() -> TestResult {
     Ok(())
 }
 
+/// A rule that reports the words of every block of one scope.
+fn words_of(scope: &str) -> String {
+    format!("extends: metric\nmessage: \"%s\"\nscope: {scope}\nformula: words\ncondition: '> -1'\n")
+}
+
+#[test]
+fn each_alert_keeps_its_place_where_vale_drops_it() -> TestResult {
+    // Each case lists what Vale 66bbb85 gives: the same alerts less the ones
+    // that share a line and a column with an earlier alert of the rule.
+    let table = "| Head | Other |\n|:--|:--|\n| one | two words |\n";
+    // Vale: 1.00.
+    assert_eq!(sized(&words_of("table.cell"), table, 0)?, ["1.00", "2.00"]);
+    // Vale: 2.00 and 2.00.
+    assert_eq!(
+        sized(
+            &words_of("sentence"),
+            "First sentence. `Second` starts with code. Third one.\n",
+            0
+        )?,
+        ["2.00", "3.00", "2.00"]
+    );
+    // Vale: 1.00, on the line of the definition.
+    assert_eq!(
+        sized(
+            &words_of("paragraph"),
+            "See [`a/b`][r].\n\nTwo words here.\n\nThree words go here.\n\n[r]: a/b\n",
+            0
+        )?,
+        ["1.00", "3.00", "4.00"]
+    );
+    // Vale: 4.00.
+    assert_eq!(
+        sized(
+            &words_of("paragraph"),
+            "First a paragraph holds `&amp;lt; marker`\n\nSecond paragraph here reads `&lt; marker`\n",
+            0
+        )?,
+        ["4.00", "4.00"]
+    );
+    Ok(())
+}
+
+#[test]
+fn an_autolink_counts_the_words_that_vale_counts() -> TestResult {
+    // Vale counts 8 for the first, since the address of an email autolink is
+    // not its text, and 4 for the second.
+    assert_eq!(
+        printing(
+            "words",
+            "Alan Beale <a@b.example> deserves special thanks.\n"
+        )?,
+        ["8.00"]
+    );
+    assert_eq!(
+        printing("words", "Visit <https://b.example/a> for special thanks.\n")?,
+        ["4.00"]
+    );
+    Ok(())
+}
+
 #[test]
 fn the_size_of_a_code_span_reaches_a_metric_of_the_whole_file() -> TestResult {
     let whole = "extends: metric\nmessage: \"%s\"\nformula: words\ncondition: '> 2'\n";

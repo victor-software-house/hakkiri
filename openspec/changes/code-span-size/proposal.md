@@ -21,12 +21,13 @@ The operator decided on 2026-11-12 that a code span counts as one word by defaul
 - `code_span_size` sets how many words a code span counts as, in the package's settings file, the project config and a glob, with the flag `--code-span-size` and the variable `HAKKIRI_CODE_SPAN_SIZE`.
   It is 1 by default, and 0 gives Vale's counts.
   It applies only to word counts and to the metrics built on words.
+- The `vale-differences` spec records why the counts at 0 still differ from Vale's: Vale drops an alert that has the place of an earlier one.
 
 ## Capabilities
 
 ### Modified Capabilities
 
-- `vale-differences`: an `occurrence` count of a code span, and how `code_span_size` matches Vale.
+- `vale-differences`: an `occurrence` count of a code span, how `code_span_size` matches Vale, and the alerts Vale drops.
 - `project-config`: the key `code_span_size`, at three levels.
 - `check-command`: the flag and its variable.
 - `metric-check`: a word count reads a code span as `code_span_size` words.
