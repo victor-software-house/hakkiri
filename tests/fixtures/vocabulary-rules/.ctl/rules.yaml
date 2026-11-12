@@ -2,4 +2,4 @@ packages:
   - path: styles
 vocab: [Team]
 files:
-  'text/*.md': {styles: [Team, Vale]}
+  'text/*.md': {styles: [Team, Vale], Vale.Repetition: off}

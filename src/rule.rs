@@ -1055,6 +1055,18 @@ pub fn load_style(folder: &Path) -> Result<Vec<Rule>, LoadError> {
     }
 }
 
+/// The rule `Vale.Repetition`, which Vale builds into its style `Vale`: it
+/// reports a word that repeats, such as `the the`, at the level `error`.
+/// `project_accepted` holds the accepted terms of the project, which hold a
+/// repeat back.
+///
+/// # Errors
+///
+/// Returns a [`LoadError`] when an accepted term is not a pattern.
+pub fn vale_repetition(project_accepted: &[String]) -> Result<Rule, LoadError> {
+    build::vale_repetition_rule("Vale.Repetition", project_accepted)
+}
+
 /// The rules a vocabulary builds, named `{prefix}.Terms` and `{prefix}.Avoid`,
 /// as Vale builds them.
 ///
