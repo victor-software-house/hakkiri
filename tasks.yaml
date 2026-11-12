@@ -217,6 +217,7 @@ queue:
       - A repeated word is reported as Vale reports it, in a test, and the vale-differences scenario for the built-in rules names Terms, Avoid and Spelling only.
     notes:
       - '2026-11-11, size: one embedded rule, extends repetition, level error, scope text, ignorecase, alpha, tokens [^\s.!?]+. Vale.Terms and Vale.Avoid belong to HKR-019, and Vale.Spelling to HKR-026.'
+    plan: openspec/changes/vale-repetition/proposal.md
 
   - id: HKR-037
     title: Read metric formulas past arithmetic
@@ -438,6 +439,19 @@ queue:
       - The result of judging 100 alerts only Vale gives, by the rule text, is 3 true and, with a capitalised noun counted, 15 true. The 100 that only hakkiri gives hold 10 true by either reading.
       - '2026-11-12, an anchor cannot do it: with the pattern ^[a-z][a-z-]*$ neither hakkiri 0.0.5 nor Vale 3.26.0 matches The session lake store path is long., because the pattern is not matched against the token alone. A lookaround, (?<![A-Za-z])[a-z][a-z-]*(?![A-Za-z]), gives the same result in both tools, and the package branch carries it with a case for a stack of capitalised names.'
       - '2026-11-12, found by judging the NounStack alerts of nine repositories: the text of the rule says each noun is a lowercase word, but the pattern [a-z][a-z-]* matches the lowercase letters inside a capitalised name, so both tools count GitHub as a noun of a stack.'
+
+  - id: HKR-059
+    title: Set rule parameters from the config
+    scope: config
+    outcome: >-
+      A glob sets a scalar parameter of a rule by name, as Vale does with
+      Style.Rule.param.
+    blocked_by: []
+    acceptance:
+      - A glob that sets Vale.Repetition.max to 1 lets one repeat pass and reports the next, as Vale does, in a test against its alerts.
+      - A parameter that Vale refuses, a level spelled as a parameter and a structural key such as tokens, is refused with the file and the line.
+    notes:
+      - "2026-11-12, found while probing Vale.Repetition at 66bbb85: ini.go asRuleParam stores Style.Rule.param = value, and defaultRule applies it when the rule compiles. hakkiri's config reads a level, on and off by rule name and no parameter."
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary

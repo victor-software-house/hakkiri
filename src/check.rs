@@ -505,10 +505,36 @@ fn run_consistency(
 /// Whether the matches `before` and `current` are the same word.
 fn same(repetition: &Repetition, before: &str, current: &str) -> bool {
     if repetition.ignorecase {
-        before.to_lowercase() == current.to_lowercase()
+        equal_fold(before, current)
     } else {
         before == current
     }
+}
+
+/// Whether `left` and `right` are equal without regard to case, as Go's
+/// `strings.EqualFold` reads them: character by character, each by its simple
+/// case folding. Lowercasing the whole text is not that, since it gives a
+/// final `ς` for a `Σ` at the end of a word and a `σ` for one inside it, so
+/// `ΣΑΣ` and `σασ` differ.
+fn equal_fold(left: &str, right: &str) -> bool {
+    left.chars().map(fold).eq(right.chars().map(fold))
+}
+
+/// The simple case folding of `character`, found as the lowercase of its
+/// uppercase when each is one character: `Σ`, `σ` and `ς` all give `σ`, and
+/// `K` of the Kelvin sign gives `k`. A character with a longer case mapping,
+/// such as `ß` or `İ`, keeps it out of that step. The dotless `ı` is the one
+/// character whose uppercase is not in its folding, so it stays as it is.
+fn fold(character: char) -> char {
+    fn single(mut mapped: impl Iterator<Item = char>) -> Option<char> {
+        let first = mapped.next()?;
+        mapped.next().is_none().then_some(first)
+    }
+    if character == '\u{131}' {
+        return character;
+    }
+    let upper = single(character.to_uppercase()).unwrap_or(character);
+    single(upper.to_lowercase()).unwrap_or(upper)
 }
 
 /// Each match of the tokens that repeats the one before it, once the repeats

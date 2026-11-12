@@ -19,7 +19,8 @@ use globset::{GlobBuilder, GlobMatcher};
 use hakkiri::Language;
 use hakkiri::pattern::Pattern;
 use hakkiri::rule::{
-    Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style, vocabulary_rules,
+    Exceptions, Level, LoadError, LoadProblem, Rule, Unrunnable, read_style, vale_repetition,
+    vocabulary_rules,
 };
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
@@ -954,7 +955,7 @@ fn load_packages(
                     line,
                     key,
                     format!(
-                        "the style `{name}` is built in from a vocabulary, and `{}` holds a style of that name",
+                        "the style `{name}` is built in, and `{}` holds a style of that name",
                         shown.display()
                     ),
                 );
@@ -1271,10 +1272,12 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
     }
 }
 
-/// Builds the rules of the vocabularies the config names, as Vale builds them.
-/// The lists of the top level give `Vale.Terms` and `Vale.Avoid` in a style
-/// `Vale`. Each vocabulary a glob lists gives `Vale.<Name>.Terms` and
-/// `Vale.<Name>.Avoid`, which that glob runs on its files.
+/// Builds the rules of the style `Vale` and of the vocabularies the config
+/// names, as Vale builds them.
+/// The style `Vale` holds `Vale.Repetition`, and the lists of the top level
+/// give it `Vale.Terms` and `Vale.Avoid`. Each vocabulary a glob lists gives
+/// `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which that glob runs on its
+/// files.
 fn build_vocabulary_rules(
     loaded: &mut Loaded,
     vocab: &Named,
@@ -1299,8 +1302,23 @@ fn build_vocabulary_rules(
         }
     }
     for (prefix, own_accepted, own_rejected, style) in built {
-        match vocabulary_rules(&prefix, &own_accepted, &own_rejected, accepted) {
-            Ok(rules) if !rules.is_empty() => {
+        // The style `Vale` always holds `Vale.Repetition`, as in Vale.
+        let built_in = if style {
+            vale_repetition(accepted).map(|rule| vec![rule])
+        } else {
+            Ok(Vec::new())
+        };
+        let rules = built_in.and_then(|mut rules| {
+            rules.extend(vocabulary_rules(
+                &prefix,
+                &own_accepted,
+                &own_rejected,
+                accepted,
+            )?);
+            Ok(rules)
+        });
+        match rules {
+            Ok(rules) if style || !rules.is_empty() => {
                 let first = loaded.rules.len();
                 loaded.rules.extend(rules);
                 if style {

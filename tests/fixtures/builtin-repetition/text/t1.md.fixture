@@ -1,0 +1,46 @@
+This is is a test.
+
+The the lower and The The mixed and THE the.
+
+Three three three repeats, and four four four four times.
+
+Numbers 1 1 and 2 2 are no words, and 3x 3x neither.
+
+Contractions don't don't repeat, and well-well and under_score under_score do not.
+
+End. End of a sentence. Of of course.
+
+That. That is two sentences.
+
+Accents été été and straße Straße and ÜNÏ ünï.
+
+Mixed 日本 日本 and Ünï Ünï.
+
+A code `x` x and x `x` x and `y` `y` y.
+
+A **bold** bold word, a *very* very strong one, and a [link](https://example.com/a) link text link.
+
+Tab	tab here and  double  double space.
+
+Line break the
+the next line, and the
+  the indented line.
+
+Ellipsis wait... wait and question? question and bang! bang and comma, comma.
+
+An email a@b.c a@b.c and a path a/b a/b and a URL https://x.y/z https://x.y/z end.
+
+Quotes "said said" and (paren paren) and [brace brace].
+
+# A heading heading
+
+- An item item
+- Another another item
+
+> A quote quote here
+
+| Cell cell | Other other |
+|:--|:--|
+| Row row | Done done |
+
+An entity &amp; &amp; and a pair of <b>tags tags</b> in text.

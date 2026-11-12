@@ -38,6 +38,8 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A package may hold vocabularies in `config/vocabularies/<name>/`, which the `vocab` key names at the top level and in a glob of `files` (operator, 2026-11-11).  
    The top level reaches every check that reads accepted terms, and a glob's list reaches the files it matches, as Vale's `Vocab` does.  
    The lists build `Vale.Terms` and `Vale.Avoid` in a built-in style `Vale`, and a glob's vocabulary builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` for its files.  
+   The style `Vale` always exists and holds `Vale.Repetition`, built in code with Vale's defaults by `vale_repetition_rule`; `Vale.Spelling` is still missing (row `HKR-026`). The rule is row `HKR-038`.  
+   Repetition compares words by simple case folding, as Go's `EqualFold` does, never by lowercasing the whole word.  
    A vocabulary folder holds `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml`, all read (row `HKR-041`).  
    `src/vocabulary/yaml.rs` parses a YAML file through ctl-core's input and checks each entry on its node, so one run reports every wrong entry on Vale's line.  
    A plain YAML term is literal, `affix` names an affix file in the packages' `config/dictionaries` folders (the holder first, never `$DICPATH`), and a key the file does not define is an error.  

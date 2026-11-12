@@ -144,8 +144,8 @@ files:
   The accepted terms of the top level hold back matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules. A rule with `vocab: false` reads none, and nor does an `existence` rule with `nonword`.
   A glob's list holds back matches in `existence`, `repetition`, `spelling` and `substitution` rules in the files that glob matches, whatever the rule sets. A file takes the lists of every glob that matches it.
   An unknown vocabulary, a name in two packages, a term that is not a pattern and a wrong YAML entry are errors.
-  The lists build rules, as in Vale. `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term, both at `error`. They belong to a style `Vale` that exists only while a top-level vocabulary holds a term. `Terms` matches a term without regard to case and keeps the escapes of a pattern term, so `data\Wset` keeps its `\W`, where Vale lowercases it to `\w`. It also keeps the names of groups, the backreferences to them and the flags, such as `(?U)`.
-  List `Vale` in `styles` to run them, or set them by name. A vocabulary that a glob lists builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no setting.
+  The lists build rules, as in Vale. `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term, both at `error`. They belong to the built-in style `Vale`, which holds them only while a top-level vocabulary holds a term. `Terms` matches a term without regard to case and keeps the escapes of a pattern term, so `data\Wset` keeps its `\W`, where Vale lowercases it to `\w`. It also keeps the names of groups, the backreferences to them and the flags, such as `(?U)`.
+  The style `Vale` also holds `Vale.Repetition`, which reports a word that repeats, such as `the the`, at `error`, with Vale's defaults: it ignores case, reads letters only, and ignores two words in different sentences, a code span between them, and a repeat that an accepted term holds back. List `Vale` in `styles` to run them, or set them by name. A vocabulary that a glob lists builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no setting.
 - A package may hold `.ctl/hakkiri.yaml` in its top folder, the folder that holds `styles`, in the format of the config. A `path` entry that names a folder called `styles` has its top in the parent of that folder. When the parent is the project root or holds it, there is no top, so the project's own config is never read as a package's. For a zip the top is the top folder of the zip.
   The settings of each package apply before the project's own, in the order of `packages`, so the project overrides a package and a later package overrides an earlier one.
   The file holds `level`, `vocab`, `files`, `formats` and `packages`. A `styles` list under the same glob text as a package's adds to its list, and under another glob it replaces it. `level` is the project's when it sets one.
@@ -220,7 +220,7 @@ hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.
 A key that names no rule, or a word that is neither a level, `on` nor `off`, is an error.
 Vale ignores the key, and warns and turns the rule off for the word.
 
-hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini` and no built-in `Vale` style.
+hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini`. Its built-in style `Vale` holds no `Vale.Spelling`, which Vale also builds in.
 
 hakkiri tags a sentence with the model of prose at `b33e60d`, where Vale tags with the older model of prose v3.2.2.
 It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a semicolon, and a verb after a noun phrase.

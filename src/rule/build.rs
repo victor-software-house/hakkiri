@@ -1183,3 +1183,25 @@ pub(super) fn avoid_rule(
     });
     vocabulary_rule(name, "Avoid using '%s'.", check)
 }
+
+/// `Repetition`: the rule `name` that Vale builds in, `extends: repetition`
+/// with the level `error`, the scope `text`, the tokens `[^\s.!?]+`,
+/// `ignorecase` and `alpha`, and a `max` of 0. The `accepted` terms of the
+/// project hold a repeat back, as the rule's `vocab` does.
+pub(super) fn vale_repetition_rule(name: &str, accepted: &[String]) -> Result<Rule, LoadError> {
+    let source = Source {
+        name,
+        file: "the built-in style Vale",
+        package: None,
+        accepted,
+    };
+    let token = r"[^\s.!?]+";
+    let check = Check::Repetition(Repetition {
+        pattern: source.compile("tokens", &format!("(?i)({token})"), &[token])?,
+        max: 0,
+        ignorecase: true,
+        letters: Some(source.compile("alpha", r"\A\p{L}+\z", &[])?),
+        exceptions: exceptions(&source, &with_accepted(&source, &[], true))?,
+    });
+    vocabulary_rule(name, "'%s' is repeated!", check)
+}
