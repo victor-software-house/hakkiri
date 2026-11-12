@@ -287,11 +287,22 @@ impl Alternative {
         if has_positive && !names_the_block {
             return false;
         }
-        self.parts
-            .iter()
-            .filter(|part| {
-                part.negated && Inline::of(&part.name).is_none() && part.applies_to(extension)
-            })
-            .all(|part| !names.iter().any(|name| named(&part.name, name)))
+        // A negated part that names the element around the block leaves the
+        // block out, so `title & ~link` selects no title of a link.
+        // The names of inline elements are read as blank in a block that
+        // holds them, and only the element around a block excludes it here.
+        let excluded_by_around = self.parts.iter().any(|part| {
+            part.negated
+                && part.applies_to(extension)
+                && around.iter().any(|name| named(&part.name, name))
+        });
+        !excluded_by_around
+            && self
+                .parts
+                .iter()
+                .filter(|part| {
+                    part.negated && Inline::of(&part.name).is_none() && part.applies_to(extension)
+                })
+                .all(|part| !names.iter().any(|name| named(&part.name, name)))
     }
 }
