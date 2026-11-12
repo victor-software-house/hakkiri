@@ -234,8 +234,8 @@ fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
         | Scope::TableCaption
         | Scope::FigureCaption => vec![chain.unwrap_or_else(|| scope.name()), "text"],
         Scope::Alt | Scope::Description => vec![scope.name(), "text"],
-        Scope::Title => vec![scope.name()],
-        Scope::TableRow
+        Scope::Title
+        | Scope::TableRow
         | Scope::Link
         | Scope::Code
         | Scope::Strong
