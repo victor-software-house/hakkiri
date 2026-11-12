@@ -711,6 +711,8 @@ pub(crate) struct Walk {
     pub(crate) alts: Vec<Range<usize>>,
     /// The content of each `meta` tag that describes the page, in order.
     pub(crate) descriptions: Vec<Range<usize>>,
+    /// The value of each `title` attribute that holds text, in order.
+    pub(crate) titles: Vec<Range<usize>>,
 }
 
 /// The whitespace Vale trims from a token's text.
@@ -1162,7 +1164,8 @@ impl Walker {
         }
     }
 
-    /// Records the alt text of an image and the description of a page.
+    /// Records the alt text of an image, the description of a page and the
+    /// `title` attribute of each tag.
     fn attributes(&mut self, html: &str, tag: &Tag) {
         let value = |key: &str| {
             tag.attributes
@@ -1170,6 +1173,11 @@ impl Walker {
                 .find(|attribute| attribute.key == key)
                 .map(|attribute| (attribute.value.clone(), html.get(attribute.value.clone())))
         };
+        if let Some((range, Some(title))) = value("title")
+            && !title.is_empty()
+        {
+            self.walk.titles.push(range);
+        }
         match tag.name.as_str() {
             "img" => {
                 if let Some((range, Some(alt))) = value("alt")

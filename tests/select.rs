@@ -104,6 +104,79 @@ fn title_selects_the_title_of_a_link_an_image_and_a_definition() -> TestResult {
     Ok(())
 }
 
+/// A link, an image and a definition, each with a title that holds `marker`.
+fn titled() -> String {
+    concat_lines(&[
+        "A [link](u.html \"a link marker\") and ![img](i.png 'an image marker') end.",
+        "",
+        "[ref]: u.html (a definition marker)",
+        "",
+    ])
+}
+
+#[test]
+fn title_and_link_select_only_the_title_of_a_link() -> TestResult {
+    let source = titled();
+    let found = |scope: &str| -> Result<Vec<String>, Box<dyn Error>> {
+        Ok(texts(&blocks(&[scope], "a.md", &source)?)
+            .into_iter()
+            .map(str::to_owned)
+            .collect())
+    };
+    assert_eq!(found("title & link")?, ["a link marker"]);
+    assert_eq!(found("title & image")?, ["an image marker"]);
+    assert_eq!(
+        found("title")?,
+        ["a link marker", "an image marker", "a definition marker"]
+    );
+    // The element around a title is no scope of the title itself.
+    assert!(found("link")?.iter().all(|text| !text.contains("marker")));
+    assert!(found("image")?.iter().all(|text| !text.contains("marker")));
+    Ok(())
+}
+
+#[test]
+fn image_selects_the_alt_text_of_an_image() -> TestResult {
+    let found = blocks(
+        &["image"],
+        "a.md",
+        "A ![an alt marker](i.png \"t\") and ![](j.png \"u\").\n",
+    )?;
+    assert_eq!(texts(&found), ["an alt marker"]);
+    let found = blocks(
+        &["title & image"],
+        "a.md",
+        "A ![](j.png \"an empty marker\") end.\n",
+    )?;
+    assert_eq!(texts(&found), ["an empty marker"]);
+    Ok(())
+}
+
+#[test]
+fn a_title_in_a_heading_and_in_a_table_cell_is_a_link_title() -> TestResult {
+    let source = concat_lines(&[
+        "# A [heading](u.html \"a heading marker\")",
+        "",
+        "| Cell |",
+        "|:--|",
+        "| [cell](u.html \"a cell marker\") |",
+        "",
+    ]);
+    let found = blocks(&["title & link"], "a.md", &source)?;
+    assert_eq!(texts(&found), ["a heading marker", "a cell marker"]);
+    Ok(())
+}
+
+#[test]
+fn title_selects_the_title_attribute_of_an_html_block() -> TestResult {
+    let source = "<p title=\"an html marker\">Some text.</p>\n";
+    let found = blocks(&["title"], "a.md", source)?;
+    assert_eq!(texts(&found), ["an html marker"]);
+    let found = blocks(&["text"], "a.md", source)?;
+    assert_eq!(texts(&found), ["Some text."]);
+    Ok(())
+}
+
 #[test]
 fn no_prose_scope_reads_a_title() -> TestResult {
     let source = concat_lines(&[

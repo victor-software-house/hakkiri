@@ -169,7 +169,11 @@ pub(crate) fn nodes(
     first: bool,
 ) -> Option<Vec<Node>> {
     let walk = html::walk(html);
-    if walk.blocks.is_empty() && walk.alts.is_empty() && walk.descriptions.is_empty() {
+    if walk.blocks.is_empty()
+        && walk.alts.is_empty()
+        && walk.descriptions.is_empty()
+        && walk.titles.is_empty()
+    {
         return Some(Vec::new());
     }
     let lines = Lines::new(source, span, html)?;
@@ -180,6 +184,7 @@ pub(crate) fn nodes(
     for (scope, ranges) in [
         (Scope::Alt, &walk.alts),
         (Scope::Description, &walk.descriptions),
+        (Scope::Title, &walk.titles),
     ] {
         for range in ranges {
             nodes.extend(Node::from_segments(scope, lines.map(range), Vec::new()));

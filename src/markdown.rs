@@ -670,6 +670,7 @@ impl Builder<'_> {
             | Scope::Emphasis
             | Scope::Alt
             | Scope::Title
+            | Scope::Image
             | Scope::Description
             | Scope::Meta
             | Scope::Raw
@@ -797,6 +798,7 @@ impl Builder<'_> {
             | Scope::FigureCaption
             | Scope::Alt
             | Scope::Title
+            | Scope::Image
             | Scope::Description
             | Scope::Meta
             | Scope::Raw
@@ -1056,15 +1058,27 @@ impl Builder<'_> {
             Some(start..start + length)
         });
         let mut nodes: Vec<Node> = span
+            .clone()
             .map(|span| Node::new(Scope::Alt, span, Vec::new()))
             .into_iter()
             .collect();
-        if let Mdast::Image(image) = node
-            && image.title.is_some()
+        if matches!(node, Mdast::Image(_) | Mdast::ImageReference(_))
             && let Some(whole) = span_of(node)
-            && let Some(title) = self.title(&whole, whole.start, true)
         {
-            nodes.push(title);
+            // The image holds its title, so `title & image` selects it. An
+            // image with no alt text holds an empty span, which reads as
+            // nothing.
+            let titled = matches!(node, Mdast::Image(image) if image.title.is_some());
+            let titles: Vec<Node> = titled
+                .then(|| self.title(&whole, whole.start, true))
+                .flatten()
+                .into_iter()
+                .collect();
+            let label = span.unwrap_or_else(|| {
+                let start = whole.start + "![".len();
+                start..start
+            });
+            nodes.push(Node::new(Scope::Image, label, titles));
         }
         Visited {
             nodes,
