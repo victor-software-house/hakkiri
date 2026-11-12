@@ -202,9 +202,11 @@ fn value_node(source: &str, base: usize, entry: &Entry) -> Option<Node> {
     node(&entry.key, segments, join)
 }
 
-/// Whether the plain scalar at `value` is a date or the merge key `<<`, which
-/// yaml.v3, the parser Vale reads front matter with, reads as no string and
-/// serde-saphyr reads as one, unless a tag such as `!!str` says otherwise.
+/// Whether the plain scalar at `value` is a date or the merge key `<<`.
+///
+/// yaml.v3, the parser Vale reads front matter with, reads them as no string.
+/// serde-saphyr reads them as strings, unless a tag such as `!!str` says
+/// otherwise.
 fn plain_non_string(source: &str, value: &Range<usize>) -> bool {
     let line_start = source
         .get(..value.start)
