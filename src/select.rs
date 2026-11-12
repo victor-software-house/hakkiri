@@ -8,6 +8,13 @@ use crate::splitter::{FormatError, Model};
 use crate::text::{Decode, Parts, Replace, Text};
 use crate::tree::{Node, Reading, Scope, Tree};
 
+#[cfg(test)]
+thread_local! {
+    /// How many times this thread called [`select`], for the tests that count
+    /// the selections a run makes.
+    pub(crate) static SELECTIONS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 /// One piece of text a rule reads.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Block {
@@ -374,6 +381,8 @@ pub fn select(
     source: &str,
     extension: &str,
 ) -> Result<Vec<Block>, SelectError> {
+    #[cfg(test)]
+    SELECTIONS.with(|count| count.set(count.get() + 1));
     let model = if selector.wants_sentences() {
         Some(Model::english().map_err(SelectError::Model)?)
     } else {

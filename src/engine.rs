@@ -7,7 +7,8 @@ use crate::check::{Memory, run, run_summary};
 use crate::control::{Controls, styles_of};
 use crate::metric::{Variables, variables};
 use crate::rule::{Check, Exceptions, Rule};
-use crate::select::{SelectError, select};
+use crate::scope::Selector;
+use crate::select::{Block, SelectError, select};
 use crate::summary::{Summary, summarize};
 use crate::tree::{Scope, Tree};
 
@@ -30,6 +31,8 @@ use crate::tree::{Scope, Tree};
 /// A `readability` rule reports at column 1 of the first line of each block.
 /// The counts and scores of that prose are worked out once, and each rule adds
 /// only its `occurrences`.
+/// The blocks of a scope are selected once, and every rule that reads the scope
+/// shares them.
 ///
 /// # Errors
 ///
@@ -74,6 +77,9 @@ pub fn lint_accepting<R: Borrow<Rule>>(
     );
     let mut alerts = Vec::new();
     let mut measured: Option<(Summary, Option<Variables>)> = None;
+    // The blocks of each scope, selected once for every rule that reads it:
+    // selecting splits the sentences and builds the text of each block.
+    let mut selected: Vec<(&Selector, Vec<Block>)> = Vec::new();
     for rule in rules {
         let rule: &Rule = rule.borrow();
         if matches!(rule.check, Check::Metric(_) | Check::Readability(_))
@@ -102,7 +108,14 @@ pub fn lint_accepting<R: Borrow<Rule>>(
         let mut found = Vec::new();
         let mut failure = None;
         let mut memory = Memory::default();
-        'blocks: for block in select(&rule.scope, tree, source, extension)? {
+        let at = if let Some(at) = selected.iter().position(|(scope, _)| *scope == &rule.scope) {
+            at
+        } else {
+            selected.push((&rule.scope, select(&rule.scope, tree, source, extension)?));
+            selected.len() - 1
+        };
+        let blocks: &[Block] = selected.get(at).map_or(&[], |(_, blocks)| blocks);
+        'blocks: for block in blocks {
             // Vale reads the whole file at the end, after it has forgotten
             // every comment but `off`.
             let gated = if block.scope == Scope::Raw {
@@ -144,3 +157,6 @@ pub fn lint_accepting<R: Borrow<Rule>>(
     alerts.sort_by_key(|alert| (alert.line, alert.first_column));
     Ok(alerts)
 }
+
+#[cfg(test)]
+mod tests;

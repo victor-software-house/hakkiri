@@ -368,6 +368,7 @@ queue:
     notes:
       - '2026-11-11, measured in a box with optimized builds: ProseStyle v0.0.14 on Vale built from 66bbb85 took 355 s on a Markdown file of 12,000 lines, and the package on hakkiri 0.0.5 took 25 s. hakkiri is 14 times faster, and the operator wants it faster everywhere.'
       - '2026-11-11, the time grows by 0.4 to 0.5 s for each rule that reads the sentence, text or paragraph scope: 1, 5 and 10 sentence rules that match nothing took 1.2, 3.1 and 5.6 s, and 1, 5 and 10 raw rules took 0.7 s each time. The package with 20, 40 and 75 rules took 7.5, 13.7 and 28 s. engine.rs calls select once for each rule, so each rule splits the sentences and builds the text of the same blocks again.'
+      - 2026-11-11, with one selection for each scope, a release build of the branch ran the package on the same file in 5.5 s with the same 24,490 alerts, against 25.3 s for the 0.0.5 release binary on the same box. That is 4.6 times faster, and 65 times faster than Vale at 66bbb85 on the v0.0.14 rules.
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary
