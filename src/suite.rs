@@ -338,11 +338,15 @@ impl Runner {
         let by_extension = known.unwrap_or(Language::Text);
         match setup {
             Setup::Rule(rule) => {
-                let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
+                let tree = parse(by_extension, &case.input)
+                    .map_err(|error| error.to_string())
+                    .and_then(readable)?;
                 lint_alone(rule, &tree, case)
             }
             Setup::File(path) => {
-                let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
+                let tree = parse(by_extension, &case.input)
+                    .map_err(|error| error.to_string())
+                    .and_then(readable)?;
                 let rule = self.rule_at(&path)?;
                 lint_alone(rule, &tree, case)
             }
@@ -369,10 +373,8 @@ impl Runner {
                     &plan.block_ignores,
                     &plan.token_ignores,
                 )
-                .map_err(|error| error.to_string())?;
-                if let Some(fault) = &tree.front_matter_fault {
-                    return Err(format!("front matter: {fault}"));
-                }
+                .map_err(|error| error.to_string())
+                .and_then(readable)?;
                 if !plan.unrunnable.is_empty() {
                     let names: Vec<&str> = plan
                         .unrunnable
@@ -487,6 +489,15 @@ impl Runner {
             search.insert(0, package.to_path_buf());
         }
         search
+    }
+}
+
+/// `tree`, or why a case with it cannot run: its front matter is no YAML, TOML
+/// or JSON that its parser reads, which fails a file under `check`.
+fn readable(tree: hakkiri::Tree) -> Result<hakkiri::Tree, String> {
+    match tree.front_matter_fault {
+        Some(fault) => Err(format!("front matter: {fault}")),
+        None => Ok(tree),
     }
 }
 

@@ -272,24 +272,37 @@ fn a_case_through_the_config_lints_with_its_styles() -> TestResult {
     Ok(())
 }
 
+/// A case input whose front matter no parser reads.
+const BROKEN_INPUT: &str = "\"---\\ntitle: [open\\n---\\n\\nA very day.\\n\"";
+
 #[test]
 fn a_case_whose_front_matter_no_parser_reads_cannot_run() -> TestResult {
     let suite = Suite::new("test-front-matter");
     let root = styled(&suite, "front-matter");
     root.file(".ctl/hakkiri.yaml", CONFIG);
     root.file(
+        "styles/Team/Embedded.yml",
+        format!(
+            "extends: existence\nmessage: \"Remove '%s'.\"\nlevel: warning\ntokens: [very]\ntests:\n  - name: in a rule\n    input: {BROKEN_INPUT}\n    want: ''\n"
+        ),
+    );
+    root.file(
         "broken.test.yml",
-        "- name: broken\n  input: \"---\\ntitle: [open\\n---\\n\\nA very day.\\n\"\n  contains: Team.Filler\n",
+        format!(
+            "- name: through the config\n  input: {BROKEN_INPUT}\n  contains: Team.Filler\n- name: by rule key\n  rule: styles/Team/Filler.yml\n  input: {BROKEN_INPUT}\n  contains: Team.Filler\n"
+        ),
     );
     let result = run(root.path(), &["test"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
-    assert!(
-        result
-            .out
-            .contains("could not run broken.test.yml: broken: front matter: line 2: "),
-        "{}",
-        result.out
-    );
+    for name in ["in a rule", "through the config", "by rule key"] {
+        assert!(
+            result
+                .out
+                .contains(&format!("{name}: front matter: line 2: ")),
+            "{name}: {}",
+            result.out
+        );
+    }
     Ok(())
 }
 
