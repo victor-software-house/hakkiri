@@ -217,3 +217,6 @@ hakkiri tags a sentence with the model of prose at `b33e60d`, where Vale tags wi
 It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a semicolon, and a verb after a noun phrase.
 A `sequence` rule can therefore flag other words than in Vale.
 A title keeps the tags of the model alone.
+
+hakkiri reads a code span as a word that no token of a `sequence` rule names, and a negated token holds at it.
+Vale reads the span as a run of `*` that a tag or a pattern can match, so it flags `` `flag` says `` for a noun and a verb.
