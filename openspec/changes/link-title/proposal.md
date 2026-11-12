@@ -17,7 +17,7 @@ hakkiri's package moves that rule onto the scopes it can read cheaply, and no sc
 - A scope `title` selects the text of the title of an inline link, an inline image and a link reference definition.
 - No prose scope reads a title, as in Vale: `text`, `paragraph`, `link`, `alt` and `sentence` give no block of one.
 - `title & link` and `title & image` select the title of a link and of an image, by the element that holds it, and a new scope `image` selects the alt text.
-- The `title` attribute of a tag in an HTML block is a title, and in a line of text only `raw` reads it, as in Vale.
+- The `title` attribute of an HTML tag, in a block or in a line of text, and of a JSX element is a title, which Vale reads through `raw` only.
 - The scope has its own name, because Vale has no scope for a title, and the dotted names of Vale keep their meaning.
 
 ## Capabilities

@@ -189,21 +189,42 @@ pub(crate) fn nodes(
             nodes.extend(Node::from_segments(scope, lines.map(range), Vec::new()));
         }
     }
-    for (range, holder) in &walk.titles {
-        let Some(title) = Node::from_segments(Scope::Title, lines.map(range), Vec::new()) else {
-            continue;
-        };
-        // A title of an `a` or an `img` tag sits in an empty node of the
-        // element, so `title & link` and `title & image` select it as they
-        // select the title of a Markdown link and image.
-        nodes.push(match holder {
-            Some(element) => {
-                let at = title.span.start;
-                Node::new(*element, at..at, vec![title])
-            }
-            None => title,
-        });
-    }
+    nodes.extend(title_nodes(&lines, &walk.titles));
     nodes.sort_by_key(|node| node.span.start);
     Some(nodes)
+}
+
+/// The nodes for the `title` attributes of the tags `titles` lists.
+///
+/// A title of an `a` or an `img` tag sits in an empty node of the element, so
+/// `title & link` and `title & image` select it as they select the title of a
+/// Markdown link and image.
+fn title_nodes(lines: &Lines, titles: &[(Range<usize>, Option<Scope>)]) -> Vec<Node> {
+    titles
+        .iter()
+        .filter_map(|(range, holder)| {
+            let title = Node::from_segments(Scope::Title, lines.map(range), Vec::new())?;
+            Some(match holder {
+                Some(element) => {
+                    let at = title.span.start;
+                    Node::new(*element, at..at, vec![title])
+                }
+                None => title,
+            })
+        })
+        .collect()
+}
+
+/// The nodes for the `title` attributes of the tag text `tag`, which `span`
+/// covers in `source`: an inline HTML tag in a line of text, or the opening
+/// tag of a JSX element.
+///
+/// Vale reads such an attribute only through `raw`. The `title` scope reads it
+/// too, so a rule on `title` sees what a rule on `raw` sees in a title.
+pub(crate) fn tag_titles(source: &str, span: &Range<usize>, tag: &str) -> Vec<Node> {
+    let walk = html::walk(tag);
+    if walk.titles.is_empty() {
+        return Vec::new();
+    }
+    Lines::new(source, span, tag).map_or_else(Vec::new, |lines| title_nodes(&lines, &walk.titles))
 }

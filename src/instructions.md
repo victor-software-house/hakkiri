@@ -188,15 +188,16 @@ A rule's `scope` is Vale's: lowercase dotted names such as `text`, `heading.h1` 
 `&` keeps the blocks that hold every name, so `sentence & paragraph` selects the sentences of paragraphs.
 
 hakkiri adds two scopes that Vale lacks.
-`title` selects the title of a Markdown link, of an image and of a link reference definition, and the `title` attribute of a tag in an HTML block.
+`title` selects the title of a Markdown link, of an image and of a link reference definition, and the `title` attribute of an HTML tag, in a block or in a line of text, and of a JSX element.
 `image` selects the alt text of an image.
 
 A title is selected by what holds it too.
 `title & link` selects the title of a link, `title & image` the title of an image, and only `title` selects the title of a definition.
-In an HTML block, `title & link` selects the `title` attribute of an `a` tag and `title & image` that of an `img` tag.
+In HTML, `title & link` selects the `title` attribute of an `a` tag and `title & image` that of an `img` tag.
 `title & ~link` leaves out the titles of links, and `title & ~image` those of images.
+The title of a tag in the text of a link is that tag's, so `title & link` leaves it out.
 `link` and `image` alone never select a title, and no other scope reads one, as in Vale, where only `raw` does.
-A `title` attribute in a line of text is read by `raw` only.
+`raw` still reads every title.
 
 ## Differences from Vale
 
