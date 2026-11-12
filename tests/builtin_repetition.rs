@@ -5,10 +5,10 @@
 //! vocabulary `Rep`), three Markdown files and one Rust file (`text`, with
 //! `.fixture` after the extension), and five configs for each tool:
 //! `vale/<name>.ini` and `.ctl/<name>.yaml`. `vale.tsv` holds one row for each
-//! alert Vale gave on the files under each config: the config, the file, the
-//! line, the first and last column, the level, the rule, the message and the
-//! matched text, with a line feed written `\n` and a tab `\t`. The rows come
-//! from Vale at `66bbb85` run from the fixture folder as `vale
+//! alert Vale gave on the files under each config. A row has the config, the
+//! file, the line, the first and last column, the level, the rule, the message
+//! and the matched text, with a line feed written `\n` and a tab `\t`.
+//! The rows come from Vale at `66bbb85` run from the fixture folder as `vale
 //! --config=vale/<name>.ini --output=JSON text`, with `Vale.Spelling` turned
 //! off, which hakkiri has no rule for yet.
 //!
