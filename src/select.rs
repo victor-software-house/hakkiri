@@ -453,6 +453,10 @@ pub fn select(
 ) -> Result<Vec<Block>, SelectError> {
     #[cfg(test)]
     SELECTIONS.with(|count| count.set(count.get() + 1));
+    // A scope may name the extension the file has or the one of its reader, so
+    // `text.md` reaches a `.txt` file that `formats` maps to `md`, and
+    // `text.txt` still reaches it as in Vale.
+    let extensions = [extension, tree.language.extension()];
     let model = if selector.wants_sentences() {
         Some(Model::english().map_err(SelectError::Model)?)
     } else {
@@ -479,12 +483,12 @@ pub fn select(
         let named = names(node, chain);
         let held: Vec<&str> = named.iter().map(AsRef::as_ref).collect();
         let around = context(node, parent);
-        let own = selector.reads(&held, &around, extension, false);
+        let own = selector.reads(&held, &around, &extensions, false);
         let prose = is_prose(node.scope);
         let sentences = if prose && model.is_some() {
             let mut with_sentence = vec!["sentence"];
             with_sentence.extend(&held);
-            selector.reads(&with_sentence, &around, extension, true)
+            selector.reads(&with_sentence, &around, &extensions, true)
         } else {
             None
         };

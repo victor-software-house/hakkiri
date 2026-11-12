@@ -120,6 +120,7 @@ pub fn parse_ignoring(
         control::cut(&mut root.children, &comments, source.len());
     }
     Ok(Tree {
+        language,
         roots,
         code_blocks,
         comments,

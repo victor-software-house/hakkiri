@@ -3,6 +3,8 @@
 use std::fmt;
 use std::ops::Range;
 
+use crate::language::Language;
+
 /// The scope of a node, named as a rule's `scope` names it.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Scope {
@@ -462,6 +464,9 @@ pub(crate) fn remap_nodes(
 /// The tree of one file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Tree {
+    /// The language the file was read as, whose extension a scope such as
+    /// `text.md` may name beside the extension the file has.
+    pub language: Language,
     /// The `raw` roots: one for a Markdown or MDX file, one per comment group
     /// for a source file.
     pub roots: Vec<Node>,

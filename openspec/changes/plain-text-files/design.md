@@ -57,20 +57,23 @@ It lost because the point of the row is that a `*` glob lints text files, and a 
 
 ### 5. A binary file is skipped
 
-A file read as plain text is binary and skipped with no message when its first 8192 bytes hold a NUL byte or are not valid UTF-8, since the run could not read it as text.
-A character that the 8192-byte cut splits is not invalid.
-ripgrep and typos skip a file with a NUL byte as binary.
+A file read as plain text that holds a NUL byte in its first 8192 bytes is binary and skipped with no message, as ripgrep and typos skip binaries.
+A file with bytes that are not valid UTF-8 is not binary: each such byte reads as one `?`.
+So every other byte keeps its offset, and a line and a column name the place Vale names, which counts bytes.
 Only a file read as text is tested: a `.md` or `.rs` file is read as it is.
 Vale has no such test in `NewFile` or `lintFile`, so it reads a binary file as lines.
 Alternative: test every file.
 It lost because a file with a reader is the project's own statement that it is text.
 
-### 6. A mapped file takes the extension of the reader
+### 6. A mapped file has two extensions
 
-A `formats` entry that gives the reader also gives the extension the scopes see: `text.md` and `~heading.md` select in a `.txt` file mapped to `md`.
+A scope may name either extension of a file: the file's own and the reader's, which the tree records.
+So `text.md` and `~heading.md` select in a `.txt` file mapped to `md`, and `text.txt` still selects in it.
 Vale compares a scope's extension with the file's own, `RealExt`, so there `text.md` selects nothing in that file.
-A file with no entry keeps its own extension, as in Vale.
-Alternative: keep the file's own extension, as Vale does.
+A file with no entry has its own extension and its reader's too, which is the same one for a Markdown or source file.
+Alternative: only the reader's extension.
+It lost because a rule written for `.txt` files would stop applying to a `.txt` file that `formats` maps, where Vale applies it.
+Alternative: only the file's own extension, as Vale does.
 It lost because the entry marks the file as Markdown, and a rule for Markdown should apply to it.
 
 [check]: ../../specs/check-command/spec.md

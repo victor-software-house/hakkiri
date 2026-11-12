@@ -126,7 +126,13 @@ pub fn lint_accepting<R: Borrow<Rule>>(
             if gated {
                 continue;
             }
-            match run(&rule.check, &block.text, &mut memory, extension, accepted) {
+            match run(
+                &rule.check,
+                &block.text,
+                &mut memory,
+                tree.language.extension(),
+                accepted,
+            ) {
                 Ok(hits) => {
                     for hit in hits {
                         let messages = hit.messages(rule);

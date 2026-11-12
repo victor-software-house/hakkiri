@@ -92,9 +92,26 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
     Check::new(alerts, failures, linted, fail_level)
 }
 
+/// The text of the file at `path`, with each byte that is not valid UTF-8 read
+/// as a `?`.
+///
+/// Vale lints such a file, a Latin-1 one for example, and reads each bad byte
+/// as a character that is no letter. One `?` for one byte keeps every other
+/// byte at the offset it has in the file, so a line and a column still name
+/// the place Vale names.
+fn read_text(path: &Path) -> io::Result<String> {
+    let bytes = fs::read(path)?;
+    let mut text = String::with_capacity(bytes.len());
+    for chunk in bytes.utf8_chunks() {
+        text.push_str(chunk.valid());
+        text.extend(chunk.invalid().iter().map(|_| '?'));
+    }
+    Ok(text)
+}
+
 /// The alerts of one file, at the levels the config sets, or why it gave none.
 fn lint_file(job: &Job<'_>) -> Result<Vec<Alert>, String> {
-    let source = fs::read_to_string(&job.file).map_err(|error| error.to_string())?;
+    let source = read_text(&job.file).map_err(|error| error.to_string())?;
     let tree = parse_ignoring(
         job.language,
         &source,
