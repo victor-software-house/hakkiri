@@ -405,8 +405,12 @@ queue:
     acceptance:
       - A ThingsSpeakNoun case with a code span before says gives no alert under hakkiri, with a test.
       - The vale-differences spec lists the difference, since Vale gives the alert on the mask.
+      - The sequence-check spec states that no token names a code span and a negated token holds at it, with tests.
+      - The alert diff of nine repositories is judged by hand, and each true alert it loses is listed.
     notes:
       - '2026-11-12, found by judging the ThingsSpeakNoun alerts of nine repositories: 22 of 80 alerts that only hakkiri gives read a code span as x before says, asks or agrees, and 13 of the 18 that only Vale gives read the mask as a noun. Both are false, since code is not prose.'
+      - '2026-11-12, the change removes 72 alerts of nine repositories, 41 NounStack and 31 ThingsSpeakNoun, and adds none. 64 are false, and 8 name a prose noun that speaks, with a code span between it and the verb, so they are lost: a scenario or a notice that says, a check that agrees, a marker that says.'
+    plan: openspec/changes/code-span-tokens/proposal.md
 
   - id: HKR-057
     title: Make the NounStack pattern match its text
