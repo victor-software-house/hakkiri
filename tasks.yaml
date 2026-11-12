@@ -408,22 +408,19 @@ queue:
       - 2026-11-11, with binary searches over the replacements, which lie in file order with no overlap, a release build ran the package on the same file in 1.8 s with the same 24,490 alerts, against 5.8 s for the build before it and 24.6 s for the 0.0.5 release binary.
 
   - id: HKR-056
-    title: Give no alert for a code span read as the noun of a verb
+    title: Read a code span as a noun in a sequence rule
     scope: sequence
     outcome: >-
-      A sequence rule that reads a noun before a verb gives no alert when the noun is
-      a code span, whichever tool masks it.
+      A sequence rule reads a code span as a noun: a rule of a noun and a verb flags a code name that says, and a rule for four lowercase nouns counts none.
     blocked_by: []
     acceptance:
-      - A ThingsSpeakNoun case with a code span before says gives no alert under hakkiri, with a test.
-      - The vale-differences spec lists the difference, since Vale gives the alert on the mask.
-      - The sequence-check spec states that no token names a code span and a negated token holds at it, with tests.
-      - The alert diff of nine repositories is judged by hand, and each true alert it loses is listed.
+      - A ThingsSpeakNoun case with a code span before says gives an alert under hakkiri, and a NounStack case with a code span in a stack gives none, with tests.
+      - The sequence-check spec states that a code span has the tag NN and reads as the letter X, with tests.
+      - The vale-differences spec lists the difference, since Vale reads the span as a run of stars.
+      - The alerts that Vale and hakkiri do not all give are labelled against a written definition of each rule by two readers, and each false alert that remains is listed.
     notes:
-      - '2026-11-12, found by judging the ThingsSpeakNoun alerts of nine repositories: 22 of 80 alerts that only hakkiri gives read a code span as x before says, asks or agrees, and 13 of the 18 that only Vale gives read the mask as a noun. Both are false, since code is not prose.'
-      - '2026-11-12, the change removes 72 alerts of nine repositories, 41 NounStack and 31 ThingsSpeakNoun, and adds none. 64 are false, and 8 name a prose noun that speaks, with a code span between it and the verb, so they are lost: a scenario or a notice that says, a check that agrees, a marker that says.'
-      - '2026-11-12, the change lets a code span stand for the noun that a preposition before it attaches it to, so the run lands on the prose noun. Against the stack top before the code-span change it removes 72 alerts and adds 17: 64 removed are false, 12 added are true and 5 added are false.'
-      - 'Three true alerts stay lost: the scenario `Orphans after a crash` that said, the scenario `A blob file deleted by hand` that says, and the `UNIQUE` check on `session.dir` that agrees. A noun right before the span cannot stand for it, since the snapshot `request` asks for reads like the scenario `A` says.'
+      - 2026-11-12, the alerts of ThingsSpeakNoun and NounStack that six builds do not all agree on were labelled, 296 and 531. By the definitions a code name before says is a thing that speaks, so the refusal of the span removed 64 false and 8 true alerts and left 44 of 268 true ones.
+      - 2026-11-12, reading the span as a noun gives 264 of the 268 true alerts of ThingsSpeakNoun and 26 false, 20 of them the noun ask or asks and 6 a participle. Only a tag on the verb token of the rule, in the package, removes them.
     plan: openspec/changes/code-span-tokens/proposal.md
 
   - id: HKR-057

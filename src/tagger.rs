@@ -10,6 +10,7 @@
 //! our documents: the possessive `'s`, a word in capitals, a modal in capitals
 //! and a semicolon.
 //! [`Tagger::tag()`] and [`Tagger::tag_words()`] apply them.
+//! [`Tagger::tag_code()`] reads a noun in place of each code span first.
 //! [`Tagger::tag_treebank()`] does not, so a title is read as prose reads it.
 //!
 //! The model is trained on UD English EWT and is under CC BY-SA 4.0.
@@ -32,6 +33,10 @@ use std::sync::LazyLock;
 pub use model::FormatError;
 use model::Model;
 use regex::Regex;
+
+/// The word the model reads in place of a code span: a noun it tags `NN` in
+/// every place a noun stands.
+const CODE_NOUN: &str = "name";
 
 /// The English model, in prose's flat format.
 const ENGLISH: &[u8] = include_bytes!("../data/tagger/en.bin");
@@ -113,6 +118,45 @@ impl Tagger {
     #[must_use]
     pub fn tag<'a>(&'a self, sentence: &'a str) -> Vec<Tagged<'a>> {
         self.tag_with(sentence, Self::tag_words)
+    }
+
+    /// The tokens of `sentence`, each with its tag, where `is_code` marks the
+    /// tokens that read a code span.
+    ///
+    /// A code span names a thing, so the model reads the noun [`CODE_NOUN`] in
+    /// its place, with the words around it in context, and the tag of the span
+    /// is `NN`.
+    /// The square brackets of an intra-doc link, as in ``[`Name`]``, belong
+    /// to the span.
+    #[must_use]
+    pub fn tag_code<'a>(
+        &'a self,
+        sentence: &'a str,
+        is_code: impl Fn(&Range<usize>) -> bool,
+    ) -> Vec<Tagged<'a>> {
+        let ranges = tokens::with_link_brackets(sentence, &tokens::tokens(sentence), &is_code);
+        let code: Vec<bool> = ranges.iter().map(&is_code).collect();
+        let words: Vec<&str> = ranges
+            .iter()
+            .zip(&code)
+            .map(|(range, code)| {
+                if *code {
+                    CODE_NOUN
+                } else {
+                    sentence.get(range.clone()).unwrap_or_default()
+                }
+            })
+            .collect();
+        let tags = self.tag_words(&words);
+        ranges
+            .into_iter()
+            .zip(tags)
+            .zip(code)
+            .map(|((range, tag), code)| Tagged {
+                range,
+                tag: if code { "NN" } else { tag },
+            })
+            .collect()
     }
 
     /// The tokens of `sentence` with the tags of the model alone.

@@ -278,58 +278,34 @@ fn noun_says() -> String {
 }
 
 #[test]
-fn a_code_span_is_no_noun_of_a_verb() -> TestResult {
+fn a_code_span_is_the_noun_it_names() -> TestResult {
     assert_eq!(
         found(&noun_says(), "The call fails as the flag says.\n")?,
         [pair("flag says", "'flag says' gives a thing speech.")]
     );
     assert_eq!(
         found(&noun_says(), "The call fails as `flag` says.\n")?,
-        none()
+        [pair("x says", "'x says' gives a thing speech.")]
+    );
+    assert_eq!(
+        found(&noun_says(), "The call fails as [`flag`] says.\n")?,
+        [pair("[x] says", "'[x] says' gives a thing speech.")]
     );
     Ok(())
 }
 
 #[test]
-fn a_negated_token_holds_at_a_code_span_in_a_file() -> TestResult {
+fn a_code_span_is_no_lowercase_word_of_a_stack() -> TestResult {
     let text = rule(
-        "'%s' ends.",
-        "tokens:\n  - pattern: files\n  - tag: NN\n    negate: true\n",
-    );
-    assert_eq!(found(&text, "Copy the files data here.\n")?, none());
-    assert_eq!(
-        found(&text, "Copy the files `data` here.\n")?,
-        [pair("files x", "'files' ends.")]
-    );
-    Ok(())
-}
-
-#[test]
-fn a_code_span_stands_for_the_noun_of_its_phrase() -> TestResult {
-    let rule = noun_says();
-    assert_eq!(
-        found(&rule, "The notice for `cmd-7` says a person stopped it.\n")?,
-        [pair(
-            "notice for x says",
-            "'notice says' gives a thing speech."
-        )]
+        "A stack of nouns.",
+        "tokens:\n  - tag: NN|NNS\n    pattern: '[a-z][a-z-]*'\n    min: 4\n",
     );
     assert_eq!(
-        found(&rule, "What the lock of the instance at `paths` says.\n")?,
-        [pair(
-            "lock of the instance at x says",
-            "'lock says' gives a thing speech."
-        )]
+        found(&text, "The session lake store path is long.\n")?,
+        [pair("session lake store path", "A stack of nouns.")]
     );
-    assert_eq!(found(&rule, "As `flag` says, it stops.\n")?, none());
-    Ok(())
-}
-
-#[test]
-fn a_code_span_does_not_stand_for_a_noun_in_a_repeated_token() -> TestResult {
-    let text = rule("Noun stack '%s'.", "tokens:\n  - tag: NN|NNS\n    min: 4\n");
     assert_eq!(
-        found(&text, "The session lake store `x` holds it.\n")?,
+        found(&text, "The session lake `store` path is long.\n")?,
         none()
     );
     Ok(())

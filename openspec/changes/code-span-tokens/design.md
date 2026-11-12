@@ -2,37 +2,48 @@
 
 ## Decisions
 
-1. **The walk refuses the word.**
-   Each word of a sentence carries whether it reads a code span, and `accepts` returns false for it when the token is not negated.
-   The alternative was to drop any match that overlaps a code span, as the other checks do, which also drops a match that passes a code span through a negated token or a `skip`.
-2. **A negated token holds at a code span.**
-   A negated token names what a word is not, and a code span is neither the tag nor the text it names.
-   The alternative was to refuse the word for every token, which makes `files` that no noun follows fail at `` files `x` ``.
-3. **The tags stay as they are.**
-   The tagger still tags the `x` of a code span, so the tags of the words around it are the ones the model gives, as Vale's are.
-   The alternative was to leave the span out of the tagged text, which moves the words next to it.
-4. **A preposition attaches the span to a prose noun.**
-   In `` the notice for `cmd-7` says `` the span ends a phrase that `notice` heads, and the run starts there.
-   The walk follows the chain, so `` the lock of the instance at `paths` says `` lands on `lock`.
-   Only a token that reads one word does this, so `NounStack`, whose token repeats, never reads a code span as a noun.
-   The alternative was to refuse every code span, which loses 8 true alerts of the nine repositories.
-5. **A noun right before the span is no head.**
-   `` the snapshot `request` asks for `` and `` the scenario `A` says `` have the same shape, and only the second is a name.
-   Taking the noun before the span brings back 7 of the 8 lost alerts and 23 of the 64 false ones.
-   Cues for a stranded preposition and a determiner before the span brought 6 of the 8 and 8 of the 64, so the change leaves them out.
+1. **The model reads a noun in place of a code span.**
+   `Tagger::tag_code` tags the sentence with the word `name` where a code span stands, and gives the span the tag `NN`.
+   With the letter `x` the model tags a symbol after a determiner, as in `the x check`, so the rule of a noun and a verb missed the span in several of the places a noun stands.
+   `name` gets `NN` in each of the places measured: after a determiner, after `as`, after a preposition, between square brackets and before a noun.
+   The alternative was to refuse the span, which loses most of the true alerts of `ThingsSpeakNoun` (decision 5).
+2. **A pattern reads a code span as `X`.**
+   `ThingsSpeakNoun` reads a noun that matches `[A-Za-z][\w-]*` with no case, and `NounStack` reads a lowercase word that matches `[a-z][a-z-]*`.
+   The capital letter satisfies the first and fails the second, so the walk needs no rule for either.
+   `NounStack` says that each noun is a lowercase word, and its own case leaves a code span out of a stack.
+3. **The brackets of an intra-doc link belong to the span.**
+   In Rust comments ``[`Name`]`` is a link, and the tagger saw a closing bracket where a noun stood.
+   `with_link_brackets` joins the three tokens when no byte lies between them.
+4. **The labels decide what a rule flags.**
+   The written definition of each rule comes from its message, its comment and its cases in the package.
+   `ThingsSpeakNoun` flags a word of saying, telling, knowing, thinking, wanting, agreeing or asking whose subject is a thing, and a code name is a thing.
+   `NounStack` flags four lowercase common nouns in a row, and a code span is none of them.
+5. **The refusal and a head noun were measured.**
+   Refusing the span gives 44 of the 268 true alerts of `ThingsSpeakNoun` that the tools disagree on.
+   Letting a preposition attach the span to the noun before it gives 56, and a head noun with two cues gives 81.
+   Reading the span as a noun gives 264, and no rule about prepositions.
 
 ## Measures
 
-The alert diff of nine repositories, at `--min-level suggestion`, against the stack top before the change.
-I judged by hand every alert it removes or adds.
+The alerts of nine repositories at `--min-level suggestion` are those of Vale 3.26.0 and of five hakkiri builds: before the refusal (`P0`), with it (`P1`), with the head noun (`B`), with a head noun and two cues (`A`), and this change (`N`).
+Each alert that the six do not all give was labelled true or false against the definitions, 296 of `ThingsSpeakNoun` and 531 of `NounStack`.
+Two readers labelled the `ThingsSpeakNoun` alerts, and two of 296 differed before I settled them by the definition.
+One reader labelled the 415 `NounStack` alerts that no code span touches, and two the other 116.
 
-| Rule | Removed | False | True | Added | True | False |
-|:--|--:|--:|--:|--:|--:|--:|
-| `NounStack` | 41 | 41 | 0 | 1 | 0 | 1 |
-| `ThingsSpeakNoun` | 31 | 23 | 8 | 16 | 12 | 4 |
+| Rule | Tool | Gives | True | False | Vale's true missed |
+|:--|:--|--:|--:|--:|--:|
+| `ThingsSpeakNoun` | Vale | 19 | 19 | 0 | |
+| | `P0` | 81 | 67 | 14 | 18 |
+| | `P1` | 50 | 44 | 6 | 19 |
+| | `B` | 66 | 56 | 10 | 18 |
+| | `N` | 290 | 264 | 26 | 4 |
+| `NounStack` | Vale | 278 | 16 | 262 | |
+| | `P0` | 251 | 39 | 212 | 16 |
+| | `P1` | 211 | 39 | 172 | 16 |
+| | `N` | 210 | 39 | 171 | 16 |
 
-A removed alert is false when its noun is a code span, or the word `asks` read as a plural noun.
-Of the 8 true ones that it removes, 5 come back on the prose noun, among 7 new true alerts.
-The 3 that stay lost name a scenario that says twice, as in `` the scenario `A` says ``, and a check that agrees, as in `` the `UNIQUE` check on `session.dir` agrees ``.
-The 4 false alerts that return are the plural noun `asks` in `` the `/compact` asks ``.
-The false `NounStack` alert is not about a code span: a fix to the count of converted verbs restores it.
+The 4 true alerts of Vale that `N` misses are tagger errors on words of prose.
+The 16 of `NounStack` come from a link that Vale reads across its text and hakkiri reads inside its own.
+Of the 26 false alerts of `N`, 20 read `ask` or `asks` as a verb where it is a noun, 23 of the 26 in one repository that uses the noun `ask`, and 6 read a participle such as `asked about` as a verb.
+The rule has no tag on its verb token, so only a package change can remove them.
+`NounStack` gives 41 fewer false alerts than `P0` for a code span in a stack, and one false alert remains that has no code span.

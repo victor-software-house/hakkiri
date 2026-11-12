@@ -235,6 +235,7 @@ It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a
 A `sequence` rule can therefore flag other words than in Vale.
 A title keeps the tags of the model alone.
 
-hakkiri reads a code span as a word that no token of a `sequence` rule names, and a negated token holds at it.
-A token that reads one word reads the noun that a preposition before the span attaches it to, so the run starts at `notice` in `` the notice for `cmd-7` says ``.
-Vale reads the span as a run of `*` that a tag or a pattern can match, so it flags `` `flag` says `` for a noun and a verb.
+hakkiri reads a code span in a `sequence` rule as a noun: its tag is `NN`, the tagger reads a noun in its place, and a pattern or a word list reads it as the letter `X`.
+A rule for a noun and a verb, such as `ThingsSpeakNoun`, flags `` `flag` says `` as it flags `the flag says`, and a rule for four lowercase nouns counts no code span.
+The square brackets of an intra-doc link, as in ``[`Name`]``, belong to the span.
+Vale reads the span as a run of `*`, and a rule with a tag and no pattern flags `` `flag` says `` there too.

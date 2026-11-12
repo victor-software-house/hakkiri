@@ -142,9 +142,6 @@ fn a_verb_after_a_noun_phrase_ends_a_noun_stack() -> TestResult {
 /// A rule that gives a noun the verb `says`, as `ThingsSpeakNoun` does.
 const NOUN_SAYS: &str = "extends: sequence\nmessage: \"'%s %s' speaks.\"\ntokens:\n  - tag: NN|NNS\n  - pattern: says\n";
 
-/// A rule with a negated step: `files` that no noun follows.
-const FILES_NO_NOUN: &str = "extends: sequence\nmessage: \"'%s' ends.\"\ntokens:\n  - pattern: files\n  - tag: NN\n    negate: true\n";
-
 /// The matches of the rule `text` in `sentence`, where the bytes `code` read a
 /// code span.
 fn matches_with_code(
@@ -156,40 +153,50 @@ fn matches_with_code(
     let Check::Sequence(check) = &rule.check else {
         return Err("Rule is not a sequence rule".into());
     };
+    let is_code = |range: &std::ops::Range<usize>| range.start < code.end && code.start < range.end;
     let tagged = Tagger::english()
         .map_err(ToString::to_string)?
-        .tag(sentence);
-    Ok(find_tagged(check, sentence, tagged, |range| {
-        range.start < code.end && code.start < range.end
-    })?
-    .into_iter()
-    .map(|matched| sentence.get(matched.range).unwrap_or_default().to_owned())
-    .collect())
+        .tag_code(sentence, is_code);
+    Ok(find_tagged(check, sentence, tagged, is_code)?
+        .into_iter()
+        .map(|matched| sentence.get(matched.range).unwrap_or_default().to_owned())
+        .collect())
 }
 
 #[test]
-fn a_code_span_is_no_noun_of_a_verb() -> TestResult {
+fn a_code_span_is_the_noun_it_names() -> TestResult {
     let sentence = "The call fails as the flag says.";
     let at = sentence.find("flag says").ok_or("no code span")?;
     assert_eq!(
         matches_with_code(NOUN_SAYS, sentence, at..at + "flag".len())?,
-        Vec::<String>::new()
+        ["flag says"]
     );
     assert_eq!(matches_with_code(NOUN_SAYS, sentence, 0..0)?, ["flag says"]);
     Ok(())
 }
 
 #[test]
-fn a_negated_token_holds_at_a_code_span() -> TestResult {
-    let sentence = "Copy the files data here.";
-    let at = sentence.find("data here").ok_or("no code span")?;
+fn a_code_span_reads_as_one_capital_letter_to_a_pattern() -> TestResult {
+    let sentence = "The session lake store path is long.";
+    let at = sentence.find("store").ok_or("no code span")?;
     assert_eq!(
-        matches_with_code(FILES_NO_NOUN, sentence, 0..0)?,
+        matches_with_code(FOUR_NOUNS, sentence, at..at + "store".len())?,
         Vec::<String>::new()
     );
     assert_eq!(
-        matches_with_code(FILES_NO_NOUN, sentence, at..at + "data".len())?,
-        ["files data"]
+        matches_with_code(FOUR_NOUNS, sentence, 0..0)?,
+        ["session lake store path"]
+    );
+    Ok(())
+}
+
+#[test]
+fn the_brackets_of_an_intra_doc_link_belong_to_the_code_span() -> TestResult {
+    let sentence = "The call fails as [flag] says.";
+    let at = sentence.find("flag").ok_or("no code span")?;
+    assert_eq!(
+        matches_with_code(NOUN_SAYS, sentence, at..at + "flag".len())?,
+        ["[flag] says"]
     );
     Ok(())
 }

@@ -4,31 +4,21 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 1. The walk
 
-- [x] 1.1 Give each word of a sentence a flag for a code span, and make `accepts` refuse it unless the token is negated.
+- [x] 1.1 Give the tagger a method that reads a noun in place of each code span and joins the brackets of an intra-doc link, and make `accepts` read a code span as the tag `NN` and the text `X`.
   Verify the tests in `src/sequence/tests.rs` and `tests/sequence.rs` fail on the source before the change and pass after it.
-  Evidence, 2026-11-12 (UTC): in a box the four new tests pass, and the comparison with Vale still passes.
-  With the refusal turned off, the two unit tests of the sequence module fail.
-  Vale 3.26.0 gives `'**** says' gives a thing speech.` for ``The call fails as `flag` says.`` and none for no span.
-- [x] 1.2 Let a token that reads one word read the noun that a preposition before the span attaches it to, and start the run there.
-  Verify the tests in `tests/sequence.rs` fail before the change and pass after it, for `` the notice for `cmd-7` says ``, `` the lock of the instance at `paths` says `` and a repeated token.
-  Evidence, 2026-11-12 (UTC): in a box the two tests pass.
-  Two other readings were measured and left out: the noun right before the span, and that with a cue for a stranded preposition and a determiner before the span.
+  Evidence, 2026-11-12 (UTC): in a box the three unit tests of the sequence module pass.
+- [x] 1.2 Label the alerts of `ThingsSpeakNoun` and `NounStack` that Vale and five hakkiri builds do not all give, against a written definition of each rule.
+  Verify two readers labelled each alert of `ThingsSpeakNoun` and each alert of `NounStack` that touches a code span, and the conflicts are settled by the definition.
+  Evidence, 2026-11-12 (UTC): 296 alerts of `ThingsSpeakNoun` and 531 of `NounStack`, with 2 conflicts of 296 on the first set and none on the 169 alerts of the second.
 - [x] 1.3 Diff the alerts of the nine repositories that run Vale, before and after.
-  Verify the true alerts that the change loses are listed, and no false alert returns beyond those listed.
-  Evidence, 2026-11-12 (UTC): at `--min-level suggestion` the change removes 72 alerts, 41 of `NounStack` and 31 of `ThingsSpeakNoun`, and adds 17.
-  All 41 `NounStack` alerts removed are false.
-  Of the 31 removed, 23 are false, from a code name or the plural noun `asks`, and 8 are true.
-  Five of the 8 come back on the prose noun, as the lock that says, a marker that says twice, a rule that tells and a notice that says, among 7 new true alerts.
-  Three stay lost: the scenario `Orphans after a crash` that said, the scenario `A blob file deleted by hand` that says, and the `UNIQUE` check on `session.dir` that agrees.
-  Of the 16 `ThingsSpeakNoun` alerts added, 12 are true and 4 are false, the plural noun `asks` in `` the `/compact` asks ``.
-  The one `NounStack` alert added is false and has no code span: the fix to the count of converted verbs restores it.
+  Verify the false alerts that remain are listed.
+  Evidence, 2026-11-12 (UTC): `ThingsSpeakNoun` gives 290 of the alerts the tools disagree on, 264 true and 26 false, and `NounStack` gives 171 false alerts of 210 where Vale gives 262 of 278.
+  No other rule of the package gives a different count from the build before the change.
 
 ## 2. The surfaces
 
 - [x] 2.1 Add the `sequence-check` and `vale-differences` requirements, the note in the instructions, the skill and `AGENTS.md`, and a patch changeset.
-  Verify the OpenSpec validation, `lint:md` and `lint:prose` pass.
-  Evidence, 2026-11-12 (UTC): the full `mise run verify` set passes in a box: `format`, `lint`, `test`, `doc`, `deny`, `deps`, `specs`, `specs:budget`, `lint:md`, `lint:prose` with 0 errors, `lint:typos`, `check:repo` and `check:versions`.
-  Not run: `semver`, the advisory check of `deny`, and the workflow policy, which the pull request's CI runs.
+  Verify the OpenSpec validation, `lint:md` and `lint:prose` pass in the pull request's CI.
 
 ## 3. Integration
 

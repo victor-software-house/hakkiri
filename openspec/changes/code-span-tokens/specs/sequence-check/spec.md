@@ -1,36 +1,31 @@
 ## ADDED Requirements
 
-### Requirement: A code span is no word of a run
+### Requirement: A code span is a noun that reads as one capital letter
 
-A `sequence` rule SHALL read a code span as a word that no token names, by its `tag`, its `pattern` or its `words`.  
-A negated token SHALL hold at it.  
-A token that reads one word SHALL instead read the noun that a preposition before the span attaches it to, when there is one, and a run that starts at the span SHALL start at that noun.
+A `sequence` rule SHALL read a code span as a noun: its tag is `NN`, and the tagger reads a noun in its place.  
+A pattern or a word list SHALL read the span as the letter `X`.  
+The square brackets of an intra-doc link around one code span SHALL belong to the span.
 
 #### Scenario: A code span in place of a noun
 
 - **WHEN** a rule has `message: "'%s %s' gives a thing speech."` and `tokens: [{tag: 'NN|NNS'}, {pattern: says}]`, and the input is ``The call fails as `flag` says.``
-- **THEN** hakkiri reports no alert ([code-span-tokens 1][code-span-tokens-1])
+- **THEN** hakkiri reports one alert, with the matched text `x says` ([code-span-tokens 1][code-span-tokens-1])
 
 #### Scenario: A prose noun
 
 - **WHEN** the same rule reads `The call fails as the flag says.`
 - **THEN** hakkiri reports one alert, with the matched text `flag says`
 
-#### Scenario: A code span that a preposition attaches to a noun
+#### Scenario: An intra-doc link
 
-- **WHEN** the same rule reads ``The notice for `cmd-7` says a person stopped it.``
-- **THEN** hakkiri reports one alert, with the matched text `notice for x says` and the message `'notice says' gives a thing speech.` ([code-span-tokens 4][code-span-tokens-4])
+- **WHEN** the same rule reads ``The call fails as [`flag`] says.``
+- **THEN** hakkiri reports one alert, with the matched text `[x] says` ([code-span-tokens 3][code-span-tokens-3])
 
-#### Scenario: A repeated token
+#### Scenario: A lowercase pattern
 
-- **WHEN** a rule has `tokens: [{tag: 'NN|NNS', min: 4}]` and the input is ``The session lake store `x` holds it.``
-- **THEN** hakkiri reports no alert
+- **WHEN** a rule has `tokens: [{tag: 'NN|NNS', pattern: '[a-z][a-z-]*', min: 4}]` and the input is ``The session lake `store` path is long.``
+- **THEN** hakkiri reports no alert, and it reports one for `The session lake store path is long.` ([code-span-tokens 2][code-span-tokens-2])
 
-#### Scenario: A negated token at a code span
-
-- **WHEN** a rule has `message: "'%s' ends."` and `tokens: [{pattern: files}, {tag: NN, negate: true}]`, and the input is ``Copy the files `data` here.``
-- **THEN** hakkiri reports one alert, with the message `'files' ends.` ([code-span-tokens 2][code-span-tokens-2])
-
-[code-span-tokens-1]: ../../design.md#1-the-walk-refuses-the-word
-[code-span-tokens-2]: ../../design.md#2-a-negated-token-holds-at-a-code-span
-[code-span-tokens-4]: ../../design.md#4-a-preposition-attaches-the-span-to-a-prose-noun
+[code-span-tokens-1]: ../../design.md#1-the-model-reads-a-noun-in-place-of-a-code-span
+[code-span-tokens-2]: ../../design.md#2-a-pattern-reads-a-code-span-as-x
+[code-span-tokens-3]: ../../design.md#3-the-brackets-of-an-intra-doc-link-belong-to-the-span

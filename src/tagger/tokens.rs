@@ -123,6 +123,36 @@ pub(super) fn tokens(sentence: &str) -> Vec<Range<usize>> {
     found
 }
 
+/// The `ranges` with each pair of square brackets around one token of a code
+/// span joined with it into one token, as in ``[`Name`]``, the form of an
+/// intra-doc link.
+///
+/// The three tokens must follow each other with no byte between them.
+pub(super) fn with_link_brackets(
+    sentence: &str,
+    ranges: &[Range<usize>],
+    is_code: &impl Fn(&Range<usize>) -> bool,
+) -> Vec<Range<usize>> {
+    let mut joined = Vec::with_capacity(ranges.len());
+    let mut at = 0;
+    while let Some(range) = ranges.get(at) {
+        if let (Some(code), Some(close)) = (ranges.get(at + 1), ranges.get(at + 2))
+            && sentence.get(range.clone()) == Some("[")
+            && sentence.get(close.clone()) == Some("]")
+            && range.end == code.start
+            && code.end == close.start
+            && is_code(code)
+        {
+            joined.push(range.start..close.end);
+            at += 3;
+        } else {
+            joined.push(range.clone());
+            at += 1;
+        }
+    }
+    joined
+}
+
 /// Breaks the run `span` of `text` into tokens, and appends them to `found`.
 fn split(text: &str, span: Range<usize>, found: &mut Vec<Range<usize>>) {
     if text
