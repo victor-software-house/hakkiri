@@ -1,0 +1,6 @@
+extends: existence
+message: "TextFmTitle '%s'"
+level: warning
+scope: text.frontmatter.title
+tokens:
+  - 'very'

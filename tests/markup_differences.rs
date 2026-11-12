@@ -1,7 +1,7 @@
-//! Two places where hakkiri reads a file otherwise than Vale: the scenarios of
-//! the `block-token-ignores` change.
+//! A place where hakkiri reads a file otherwise than Vale: the scenario of the
+//! `block-token-ignores` change.
 //!
-//! `tests/fixtures/markup-differences` holds two rules, two files (`text`,
+//! `tests/fixtures/markup-differences` holds two rules, one file (`text`,
 //! with `.fixture` after the extension) and one config for each tool.
 //! `vale.tsv` holds the alerts Vale gave at `66bbb85`, with the Rust grammar
 //! built from the same commit, run as `vale --config=vale/all.ini
@@ -68,7 +68,7 @@ fn row(file: &str, line: usize, rule: &str, matched: &str) -> Spot {
 }
 
 #[test]
-fn vale_and_hakkiri_read_front_matter_and_comment_sentences_otherwise() -> TestResult {
+fn vale_and_hakkiri_read_the_sentences_of_a_comment_otherwise() -> TestResult {
     let suite = Suite::new("markup-differences");
     let root = suite.scenario("all");
     for (from, to) in [
@@ -99,17 +99,9 @@ fn vale_and_hakkiri_read_front_matter_and_comment_sentences_otherwise() -> TestR
     )?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
     assert!(!result.lines().is_empty(), "{}", result.out);
-    // Vale lints the value of a front matter key, and runs no `sentence` rule
-    // on a comment.
-    assert_eq!(
-        vale()?,
-        [
-            row("text/m2.md", 2, "Team.Words", "very"),
-            row("text/m3.rs", 1, "Team.Words", "very"),
-        ]
-    );
-    // hakkiri skips the front matter, and runs the rule on the sentence of the
-    // comment.
+    // Vale runs no `sentence` rule on a comment.
+    assert_eq!(vale()?, [row("text/m3.rs", 1, "Team.Words", "very"),]);
+    // hakkiri runs the rule on the sentence of the comment.
     let mut found = ours(&result.out)?;
     found.sort();
     assert_eq!(
