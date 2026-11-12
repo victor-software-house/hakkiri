@@ -973,17 +973,14 @@ impl Builder<'_> {
             let children = node.children().map_or(&[][..], Vec::as_slice);
             let first = children.first().and_then(span_of);
             let last = children.last().and_then(span_of);
-            match (first, last) {
-                (Some(first), Some(last)) => {
-                    visited.cuts.push(span.start..first.start);
-                    visited.cuts.push(last.end..span.end);
+            if let (Some(first), Some(last)) = (first, last) {
+                visited.cuts.push(span.start..first.start);
+                visited.cuts.push(last.end..span.end);
+            } else {
+                if self.reads_as_code(node, &span) {
+                    visited.nodes.push(Self::code(span.clone()));
                 }
-                _ => {
-                    if self.reads_as_code(node, &span) {
-                        visited.nodes.push(Self::code(span.clone()));
-                    }
-                    visited.cuts.push(span);
-                }
+                visited.cuts.push(span);
             }
         }
         visited
