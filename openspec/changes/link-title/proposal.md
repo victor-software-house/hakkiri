@@ -5,7 +5,10 @@ Queue row: [`HKR-054`][ledger].
 ## Motivation
 
 Vale reads the title of a Markdown link only through the `raw` scope.
-No other scope holds it: a probe of Vale at `66bbb85` with one rule on each of `text`, `paragraph`, `sentence`, `link`, `alt`, `heading`, `table`, `code` and `raw`, over a link, an image, a single-quoted and a parenthesised title, two reference definitions, a heading and a table cell, gave an alert at a title for `raw` alone.
+No other scope holds it.
+A probe of Vale at `66bbb85` put one rule on each of `text`, `paragraph`, `sentence`, `link`, `alt`, `heading`, `table`, `code` and `raw`.
+It covered a link, an image, a single-quoted and a parenthesised title, two reference definitions, a heading and a table cell.
+Only `raw` gave an alert at a title.
 ProseStyle's `BareURL` rule reads `raw`, so Vale flags the URL in `[t](u "see https://x")`.
 hakkiri's package moves that rule onto the scopes it can read cheaply, and no scope holds a title, so the URL goes unseen.
 

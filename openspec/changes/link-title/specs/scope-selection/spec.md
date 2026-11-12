@@ -2,7 +2,8 @@
 
 ### Requirement: title selects the title of a link, an image and a definition
 
-In a Markdown or MDX file, the scope `title` SHALL select the text of the title of an inline link, an inline image and a link reference definition, with its delimiters left out, as one block that no sentence splitter cuts.
+In a Markdown or MDX file, the scope `title` SHALL select the text of the title of an inline link, an inline image and a link reference definition.
+The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.
 The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.
 A link or image with no title, or an empty one, SHALL give no block.
 
