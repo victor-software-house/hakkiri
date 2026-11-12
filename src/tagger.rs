@@ -124,7 +124,7 @@ impl Tagger {
     /// The tokens of `sentence`, each with its tag, where `is_code` marks the
     /// tokens that read a code span.
     ///
-    /// A code span names a thing, so the model reads the noun [`CODE_NOUN`] in
+    /// A code span names a thing, so the model reads the noun `name` in
     /// its place, with the words around it in context, and the tag of the span
     /// is `NN`, which the corrections read as well.
     /// The square brackets of an intra-doc link, as in ``[`Name`]``, belong
