@@ -35,7 +35,9 @@ fn blocks(scope: &[&str], file: &str, source: &str) -> Result<Vec<Block>, Box<dy
 
 /// The lines joined with a line feed after each.
 fn concat_lines(lines: &[&str]) -> String {
-    lines.iter().map(|line| format!("{line}\n")).collect()
+    let mut text = lines.join("\n");
+    text.push('\n');
+    text
 }
 
 fn texts(blocks: &[Block]) -> Vec<&str> {
