@@ -2,7 +2,7 @@
 
 ## Decisions
 
-1. **The walk refuses the word, not the match.**
+1. **The walk refuses the word.**
    Each word of a sentence carries whether it reads a code span, and `accepts` returns false for it when the token is not negated.
    The alternative was to drop any match that overlaps a code span, as the other checks do, which also drops a match that passes a code span through a negated token or a `skip`.
 2. **A negated token holds at a code span.**
