@@ -25,7 +25,7 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 
-use super::{find, find_tagged};
+use super::find_tagged;
 use crate::alert::fill;
 use crate::rule::{Check, Rule};
 use crate::tagger::Tagger;
@@ -41,7 +41,7 @@ fn alerts(name: &str, text: &str, sentence: &str) -> Result<Vec<(String, String)
     let tagged = Tagger::english()
         .map_err(ToString::to_string)?
         .tag_model(sentence);
-    Ok(find_tagged(check, sentence, tagged)?
+    Ok(find_tagged(check, sentence, tagged, |_| false)?
         .into_iter()
         .map(|matched| {
             let values: Vec<&str> = matched.words.iter().map(String::as_str).collect();
@@ -131,10 +131,65 @@ fn a_verb_after_a_noun_phrase_ends_a_noun_stack() -> TestResult {
         return Err("FourNouns is not a sequence rule".into());
     };
     let sentence = "The freshness harness reads stdout.";
-    let model = Tagger::english()
+    let tagger = Tagger::english().map_err(ToString::to_string)?;
+    let model = tagger.tag_model(sentence);
+    assert_eq!(find_tagged(check, sentence, model, |_| false)?.len(), 1);
+    let corrected = tagger.tag(sentence);
+    assert_eq!(find_tagged(check, sentence, corrected, |_| false)?, []);
+    Ok(())
+}
+
+/// A rule that gives a noun the verb `says`, as `ThingsSpeakNoun` does.
+const NOUN_SAYS: &str = "extends: sequence\nmessage: \"'%s %s' speaks.\"\ntokens:\n  - tag: NN|NNS\n  - pattern: says\n";
+
+/// A rule with a negated step: `files` that no noun follows.
+const FILES_NO_NOUN: &str = "extends: sequence\nmessage: \"'%s' ends.\"\ntokens:\n  - pattern: files\n  - tag: NN\n    negate: true\n";
+
+/// The matches of the rule `text` in `sentence`, where the bytes `code` read a
+/// code span.
+fn matches_with_code(
+    text: &str,
+    sentence: &str,
+    code: std::ops::Range<usize>,
+) -> Result<Vec<String>, Box<dyn Error>> {
+    let rule = Rule::from_text("Seq.Rule", "Rule.yml", text)?;
+    let Check::Sequence(check) = &rule.check else {
+        return Err("Rule is not a sequence rule".into());
+    };
+    let tagged = Tagger::english()
         .map_err(ToString::to_string)?
-        .tag_model(sentence);
-    assert_eq!(find_tagged(check, sentence, model)?.len(), 1);
-    assert_eq!(find(check, sentence)?, []);
+        .tag(sentence);
+    Ok(find_tagged(check, sentence, tagged, |range| {
+        range.start < code.end && code.start < range.end
+    })?
+    .into_iter()
+    .map(|matched| sentence.get(matched.range).unwrap_or_default().to_owned())
+    .collect())
+}
+
+#[test]
+fn a_code_span_is_no_noun_of_a_verb() -> TestResult {
+    let sentence = "The call fails as the flag says.";
+    let at = sentence.find("flag says").ok_or("no code span")?;
+    assert_eq!(
+        matches_with_code(NOUN_SAYS, sentence, at..at + "flag".len())?,
+        Vec::<String>::new()
+    );
+    assert_eq!(matches_with_code(NOUN_SAYS, sentence, 0..0)?, ["flag says"]);
+    Ok(())
+}
+
+#[test]
+fn a_negated_token_holds_at_a_code_span() -> TestResult {
+    let sentence = "Copy the files data here.";
+    let at = sentence.find("data here").ok_or("no code span")?;
+    assert_eq!(
+        matches_with_code(FILES_NO_NOUN, sentence, 0..0)?,
+        Vec::<String>::new()
+    );
+    assert_eq!(
+        matches_with_code(FILES_NO_NOUN, sentence, at..at + "data".len())?,
+        ["files data"]
+    );
     Ok(())
 }

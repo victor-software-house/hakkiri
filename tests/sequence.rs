@@ -269,3 +269,37 @@ fn a_huge_skip_and_min_cost_nothing() -> TestResult {
     assert!(started.elapsed() < Duration::from_secs(10));
     Ok(())
 }
+
+fn noun_says() -> String {
+    rule(
+        "'%s %s' gives a thing speech.",
+        "tokens:\n  - tag: NN|NNS\n  - pattern: says\n",
+    )
+}
+
+#[test]
+fn a_code_span_is_no_noun_of_a_verb() -> TestResult {
+    assert_eq!(
+        found(&noun_says(), "The call fails as the flag says.\n")?,
+        [pair("flag says", "'flag says' gives a thing speech.")]
+    );
+    assert_eq!(
+        found(&noun_says(), "The call fails as `flag` says.\n")?,
+        none()
+    );
+    Ok(())
+}
+
+#[test]
+fn a_negated_token_holds_at_a_code_span_in_a_file() -> TestResult {
+    let text = rule(
+        "'%s' ends.",
+        "tokens:\n  - pattern: files\n  - tag: NN\n    negate: true\n",
+    );
+    assert_eq!(found(&text, "Copy the files data here.\n")?, none());
+    assert_eq!(
+        found(&text, "Copy the files `data` here.\n")?,
+        [pair("files x", "'files' ends.")]
+    );
+    Ok(())
+}

@@ -15,6 +15,7 @@ use std::ops::Range;
 use crate::pattern::SearchError;
 use crate::rule::{Sequence, Token};
 use crate::tagger::{Tagged, Tagger};
+use crate::text::Text;
 
 /// One run of words a rule's tokens matched.
 #[derive(Debug, Eq, PartialEq)]
@@ -30,6 +31,9 @@ struct Word<'a> {
     text: &'a str,
     tag: &'a str,
     range: Range<usize>,
+    /// Whether the word reads a code span, which is code and no word of the
+    /// prose.
+    code: bool,
 }
 
 /// Where a walk found a match.
@@ -42,7 +46,13 @@ struct Found {
 }
 
 /// Whether `word` is one that `token` accepts.
+///
+/// A code span is no word that a token can name, by its tag or its text, so
+/// a token accepts it only when the token is negated.
 fn accepts(token: &Token, word: &Word<'_>) -> Result<bool, SearchError> {
+    if word.code {
+        return Ok(token.negate);
+    }
     let tag_failed = match &token.tag {
         Some(tag) => tag.is_match(word.tag)?,
         None => true,
@@ -246,17 +256,22 @@ fn inside(spans: &[Range<usize>], at: usize) -> bool {
 ///
 /// Returns a [`SearchError`] when a pattern gives up on a word or the
 /// sentence.
-pub(crate) fn find(sequence: &Sequence, sentence: &str) -> Result<Vec<Matched>, SearchError> {
+pub(crate) fn find(sequence: &Sequence, text: &Text) -> Result<Vec<Matched>, SearchError> {
     // The model is embedded and loads; without it no word has a tag, and no
     // run is reported.
     let Ok(tagger) = Tagger::english() else {
         return Ok(Vec::new());
     };
-    find_tagged(sequence, sentence, tagger.tag(sentence))
+    let sentence = text.as_str();
+    find_tagged(sequence, sentence, tagger.tag(sentence), |range| {
+        text.overlaps_code(range)
+    })
 }
 
 /// The runs of words in `sentence` that `sequence` matches, given the tokens of
 /// the sentence and their tags.
+///
+/// `is_code` tells whether the bytes of a token read a code span.
 ///
 /// # Errors
 ///
@@ -266,12 +281,14 @@ fn find_tagged(
     sequence: &Sequence,
     sentence: &str,
     tagged: Vec<Tagged<'_>>,
+    is_code: impl Fn(&Range<usize>) -> bool,
 ) -> Result<Vec<Matched>, SearchError> {
     let words: Vec<Word<'_>> = tagged
         .into_iter()
         .map(|token| Word {
             text: sentence.get(token.range.clone()).unwrap_or_default(),
             tag: token.tag,
+            code: is_code(&token.range),
             range: token.range,
         })
         .collect();
