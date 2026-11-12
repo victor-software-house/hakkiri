@@ -399,6 +399,45 @@ fn pull_before_request_is_a_noun() -> TestResult {
 }
 
 #[test]
+fn a_technical_noun_in_a_pull_request_title_is_a_noun() -> TestResult {
+    for (sentence, word) in [
+        ("The queue load split pull request ended it.", "split"),
+        ("The final mask round pull request fixed it.", "round"),
+        ("Before the fade removal pull request removed it.", "fade"),
+        ("It is merged (the prompt template pull request).", "prompt"),
+    ] {
+        assert_eq!(tag_of(sentence, word)?, "NN", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_technical_noun_after_a_determiner_or_a_compound_is_a_noun() -> TestResult {
+    for (sentence, word) in [
+        (
+            "The patch and its notes stay as the thinking mode fields decision set them.",
+            "thinking",
+        ),
+        ("Review the peer user id check against real files.", "check"),
+    ] {
+        assert_eq!(tag_of(sentence, word)?, "NN", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_technical_word_that_is_a_verb_stays_a_verb() -> TestResult {
+    for (sentence, word, tag) in [
+        ("The tests check the cache against the spec.", "check", "VB"),
+        ("The gas stations had repair shops in town.", "had", "VBD"),
+        ("The final mask round pull request fixed it.", "final", "JJ"),
+    ] {
+        assert_eq!(tag_of(sentence, word)?, tag, "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
 fn a_title_is_tagged_as_the_model_tags_it() -> TestResult {
     let tagger = english()?;
     let sentence = "The SSH keys; the user's files MUST stay.";

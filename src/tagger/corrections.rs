@@ -83,6 +83,11 @@ const MODIFIERS: [&str; 8] = ["NN", "NNS", "NNP", "NNPS", "JJ", "CD", "POS", "VB
 /// The tags of the words that can be the subject of a verb of saying.
 const SUBJECTS: [&str; 5] = ["NN", "NNS", "NNP", "NNPS", "JJ"];
 
+/// Words that technical prose uses as nouns where the model reads one other
+/// part of speech: `check`, `split`, `round`, `prompt`, `fade` and `thinking`
+/// name a thing in `the id check`, `the split` and `the thinking mode`.
+const TECHNICAL_NOUNS: [&str; 6] = ["check", "split", "round", "prompt", "fade", "thinking"];
+
 /// The tags of the words after the corrections.
 ///
 /// `tags` holds the model's tag of each word, and a correction replaces it.
@@ -102,6 +107,7 @@ pub(super) fn apply(words: &[&str], tags: &mut [&str]) {
     verbs_of_saying(words, tags);
     subjects_of_verbs_of_saying(words, tags);
     pull_requests(words, tags);
+    nouns_of_technical_prose(words, tags);
     asking_in_noun_phrases(words, tags);
 }
 
@@ -186,6 +192,67 @@ fn pull_requests(words: &[&str], tags: &mut [&str]) {
             *tag = "NN";
         }
     }
+}
+
+/// Reads a word of [`TECHNICAL_NOUNS`] as the noun it is when a noun phrase
+/// holds it.
+///
+/// The model reads `split` in `the load split pull request` as a past tense,
+/// `round` in `the mask round pull request` as an adverb, and `check` in `the
+/// peer user id check` as a verb, since the corpus it learned from uses these
+/// words as one other part of speech.
+/// A determiner, a possessive or an adjective before the word makes it a noun,
+/// unless it is a participle after an adjective, as in `so stupid thinking`.
+/// So does a noun before it, when the nouns after it run up to `pull request`,
+/// the head of the title of a pull request.
+/// A base form after two singular nouns, with no noun after it, is a noun too,
+/// as no singular noun takes it as its verb.
+fn nouns_of_technical_prose(words: &[&str], tags: &mut [&str]) {
+    let noun_at = |tags: &[&str], index: Option<usize>| {
+        index
+            .and_then(|index| tags.get(index))
+            .is_some_and(|tag| matches!(*tag, "NN" | "NNS"))
+    };
+    for index in 1..tags.len() {
+        let (Some(&word), Some(&tag)) = (words.get(index), tags.get(index)) else {
+            continue;
+        };
+        if !TECHNICAL_NOUNS.contains(&word) || matches!(tag, "NN" | "NNS") {
+            continue;
+        }
+        let before = index.checked_sub(1);
+        let before_tag = before.and_then(|at| tags.get(at)).copied();
+        let after_determiner = matches!(before_tag, Some("DT" | "PRP$" | "POS"))
+            || (before_tag == Some("JJ") && tag != "VBG");
+        let in_title = noun_at(tags, before) && heads_pull_request(words, tags, index);
+        let ends_compound = before_tag == Some("NN")
+            && noun_at(tags, index.checked_sub(2))
+            && matches!(tag, "VB" | "VBP")
+            && matches!(
+                tags.get(index.saturating_add(1)),
+                Some(&("IN" | "." | "," | "CC" | "TO"))
+            );
+        if (after_determiner || in_title || ends_compound)
+            && let Some(slot) = tags.get_mut(index)
+        {
+            *slot = "NN";
+        }
+    }
+}
+
+/// Whether the nouns after the word at `index` run up to `pull request`.
+fn heads_pull_request(words: &[&str], tags: &[&str], index: usize) -> bool {
+    (1..=3).any(|offset| {
+        let at = index.saturating_add(offset);
+        words.get(at).is_some_and(|word| *word == "pull")
+            && words.get(at.saturating_add(1)).is_some_and(|word| {
+                matches!(word.to_ascii_lowercase().as_str(), "request" | "requests")
+            })
+            && (1..offset).all(|between| {
+                tags.get(index.saturating_add(between))
+                    .is_some_and(|tag| matches!(*tag, "NN" | "NNS"))
+            })
+    })
 }
 
 /// Reads a verb of saying or thinking as the verb it is.
