@@ -208,3 +208,21 @@ fn a_paragraph_of_unclosed_openers_costs_its_length() {
         started.elapsed()
     );
 }
+
+#[test]
+fn a_line_without_the_marker_of_a_quote_keeps_its_spaces() {
+    let open = |text: &str| !masked(text).contains('z');
+    assert!(open("> Quote\n   $$\n   z\n   $$\n"));
+    assert!(!open("> Quote\n      $$\n      z\n      $$\n"));
+}
+
+#[test]
+fn a_quote_in_a_list_item_and_a_list_item_in_a_quote_count_both_containers() {
+    let open = |text: &str| !masked(text).contains('z');
+    assert!(open("> - Item\n>     $$\n>     z\n>     $$\n"));
+    assert!(!open("> - Item\n>       $$\n>       z\n>       $$\n"));
+    assert!(open("- Item\n  > Quote\n  >   $$\n  >   z\n  >   $$\n"));
+    assert!(!open(
+        "- Item\n  > Quote\n  >     $$\n  >     z\n  >     $$\n"
+    ));
+}

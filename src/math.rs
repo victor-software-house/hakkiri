@@ -243,8 +243,9 @@ pub(crate) fn item_content(source: &str, start: usize, column: usize) -> usize {
 /// The width in columns that the indentation of `line` adds to the content of
 /// its containers, which are `containers`.
 ///
-/// A line that lacks the marker or the indentation of a container continues
-/// the paragraph lazily, and holds what it has.
+/// A line that lacks the indentation of a list item continues the paragraph
+/// lazily, and holds what it has.
+/// A line with no `>` in a block quote keeps all its spaces.
 /// A tab runs to the next multiple of four.
 fn indent_in(line: &str, containers: &[Container]) -> usize {
     let bytes = line.as_bytes();
@@ -268,7 +269,7 @@ fn indent_in(line: &str, containers: &[Container]) -> usize {
         match container {
             Container::Item(content) => skip_spaces(&mut at, &mut column, *content),
             Container::Quote => {
-                let start = column;
+                let (before, start) = (at, column);
                 skip_spaces(&mut at, &mut column, start + 3);
                 if bytes.get(at) == Some(&b'>') {
                     at += 1;
@@ -277,6 +278,8 @@ fn indent_in(line: &str, containers: &[Container]) -> usize {
                         at += 1;
                         column += 1;
                     }
+                } else {
+                    (at, column) = (before, start);
                 }
             }
         }
