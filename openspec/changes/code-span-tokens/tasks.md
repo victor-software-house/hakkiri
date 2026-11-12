@@ -9,13 +9,19 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Evidence, 2026-11-12 (UTC): in a box the four new tests pass, and the comparison with Vale still passes.
   With the refusal turned off, the two unit tests of the sequence module fail.
   Vale 3.26.0 gives `'**** says' gives a thing speech.` for ``The call fails as `flag` says.`` and none for no span.
-- [x] 1.2 Diff the alerts of the nine repositories that run Vale, before and after.
-  Verify no removed alert is a true alert whose noun is prose, or record the ones that are.
-  Evidence, 2026-11-12 (UTC): at `--min-level suggestion` the change removes 72 alerts and adds none, 41 of `NounStack` and 31 of `ThingsSpeakNoun`.
-  All 41 `NounStack` alerts are false, each with a code span and fewer than four prose nouns.
-  Of the 31, 23 are false, from a code name or the plural noun `asks`.
-  Eight are true and lost, and each names a prose noun that speaks with a code span before the verb.
-  They are a scenario that says, a notice that says, a marker that says, a check that agrees, a lock that says and a rule that tells.
+- [x] 1.2 Let a token that reads one word read the noun that a preposition before the span attaches it to, and start the run there.
+  Verify the tests in `tests/sequence.rs` fail before the change and pass after it, for `` the notice for `cmd-7` says ``, `` the lock of the instance at `paths` says `` and a repeated token.
+  Evidence, 2026-11-12 (UTC): in a box the two tests pass.
+  Two other readings were measured and left out: the noun right before the span, and that with a cue for a stranded preposition and a determiner before the span.
+- [x] 1.3 Diff the alerts of the nine repositories that run Vale, before and after.
+  Verify the true alerts that the change loses are listed, and no false alert returns beyond those listed.
+  Evidence, 2026-11-12 (UTC): at `--min-level suggestion` the change removes 72 alerts, 41 of `NounStack` and 31 of `ThingsSpeakNoun`, and adds 17.
+  All 41 `NounStack` alerts removed are false.
+  Of the 31 removed, 23 are false, from a code name or the plural noun `asks`, and 8 are true.
+  Five of the 8 come back on the prose noun, as the lock that says, a marker that says twice, a rule that tells and a notice that says, among 7 new true alerts.
+  Three stay lost: the scenario `Orphans after a crash` that said, the scenario `A blob file deleted by hand` that says, and the `UNIQUE` check on `session.dir` that agrees.
+  Of the 16 `ThingsSpeakNoun` alerts added, 12 are true and 4 are false, the plural noun `asks` in `` the `/compact` asks ``.
+  The one `NounStack` alert added is false and has no code span: the fix to the count of converted verbs restores it.
 
 ## 2. The surfaces
 

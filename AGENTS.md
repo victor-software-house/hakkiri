@@ -80,7 +80,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
     The English tagger is the model of prose at `b33e60d` with the corrections of `src/tagger/corrections.rs` applied after it, each a rule with its reason.
     `tag_treebank` skips them, so a title is tagged as prose tags it.
     A new correction needs a test, and a measure on UD English GUM, on the judged conflicts of our documents and on the alerts of a rule that reads tags.
-    A `sequence` rule reads a code span as a word that no token names, unless the token is negated.
+    A `sequence` rule reads a code span as a word that no token names, unless the token is negated, or reads one word and a preposition attaches the span to a noun.
 
 ## Workflow
 

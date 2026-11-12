@@ -417,6 +417,8 @@ queue:
     notes:
       - '2026-11-12, found by judging the ThingsSpeakNoun alerts of nine repositories: 22 of 80 alerts that only hakkiri gives read a code span as x before says, asks or agrees, and 13 of the 18 that only Vale gives read the mask as a noun. Both are false, since code is not prose.'
       - '2026-11-12, the change removes 72 alerts of nine repositories, 41 NounStack and 31 ThingsSpeakNoun, and adds none. 64 are false, and 8 name a prose noun that speaks, with a code span between it and the verb, so they are lost: a scenario or a notice that says, a check that agrees, a marker that says.'
+      - '2026-11-12, the change lets a code span stand for the noun that a preposition before it attaches it to, so the run lands on the prose noun. Against the stack top before the code-span change it removes 72 alerts and adds 17: 64 removed are false, 12 added are true and 5 added are false.'
+      - 'Three true alerts stay lost: the scenario `Orphans after a crash` that said, the scenario `A blob file deleted by hand` that says, and the `UNIQUE` check on `session.dir` that agrees. A noun right before the span cannot stand for it, since the snapshot `request` asks for reads like the scenario `A` says.'
     plan: openspec/changes/code-span-tokens/proposal.md
 
   - id: HKR-057
