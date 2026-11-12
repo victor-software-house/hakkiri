@@ -119,7 +119,7 @@ A tab runs to the next multiple of four.
 
 #### Scenario: A lazy line and nested containers
 
-- **WHEN** a line of a quote has no `>` and is indented six spaces or three, or the lines are indented past a quote in a list item or a list item in a quote
+- **WHEN** a line of a quote or of its item has no `>` and is indented six spaces or three, or the lines are indented past a quote in a list item or a list item in a quote
 - **THEN** six spaces keep the line as text and three open a block, and the nested lines follow the same four columns past both containers
 
 ### Requirement: A paragraph of unclosed delimiters costs its length

@@ -217,6 +217,13 @@ fn a_line_without_the_marker_of_a_quote_keeps_its_spaces() {
 }
 
 #[test]
+fn a_line_without_the_marker_of_a_quote_is_outside_the_items_in_the_quote() {
+    let open = |text: &str| !masked(text).contains('z');
+    assert!(open("> - Item\n   $$\n   z\n   $$\n"));
+    assert!(!open("> - Item\n      $$\n      z\n      $$\n"));
+}
+
+#[test]
 fn a_quote_in_a_list_item_and_a_list_item_in_a_quote_count_both_containers() {
     let open = |text: &str| !masked(text).contains('z');
     assert!(open("> - Item\n>     $$\n>     z\n>     $$\n"));
