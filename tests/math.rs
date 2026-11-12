@@ -1,7 +1,7 @@
 //! Math: the scenarios of the math-as-code change.
 //!
 //! `tests/fixtures/math` holds one package of five rules (`styles`), five
-//! Markdown files and two MDX files (`text`, with `.fixture` after the
+//! Markdown files and three MDX files (`text`, with `.fixture` after the
 //! extension), and one config for each tool: `vale/all.ini` and
 //! `.ctl/all.yaml`.
 //! `vale.tsv` holds one row for each alert Vale gave on the files: the config,
