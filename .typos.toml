@@ -11,6 +11,7 @@ extend-exclude = [
   "tests/fixtures/vale-styles",
   "tests/fixtures/vocabularies",
   "tests/fixtures/vocabulary-rules",
+  "tests/fixtures/yaml-vocabularies",
   "tests/fixtures/ignores",
   "tests/fixtures/comment-controls",
   "tests/fixtures/tagger/treebank.tsv",
@@ -24,3 +25,5 @@ ment = "ment"
 thm = "thm"
 # The `mor` of `mor'n`, a contraction in the Treebank tokenizer of `src/tagger/treebank.rs`.
 mor = "mor"
+# The misspelt key `accpt:` that the `yaml-vocabularies` change tests is meant to be wrong.
+accpt = "accpt"
