@@ -533,67 +533,6 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 - **WHEN** a project's section under another glob replaces the styles a package turned on
 - **THEN** hakkiri prints nothing, and Vale warns once that the section replaces the styles of the package ([package settings 4][settings-4])
 
-### Requirement: Known gaps are listed apart from what differs by choice
-
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
-A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
-
-#### Scenario: The built-in spelling rule
-
-- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
-
-#### Scenario: A YAML vocabulary
-
-- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
-- **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
-
-#### Scenario: The Markdown parser
-
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
-- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
-
-#### Scenario: A plain-text file
-
-- **WHEN** a glob matches a file that no language reads, such as `notes.txt`
-- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
-
-#### Scenario: Comments that turn rules off and on
-
-- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
-- **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
-
-#### Scenario: A script rule
-
-- **WHEN** a rule has `extends: script`
-- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
-
-#### Scenario: A formula outside the listed syntax
-
-- **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
-- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
-
-#### Scenario: The built-in repetition rule
-
-- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
-- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
-
-#### Scenario: A doc selector or a View
-
-- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
-  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
-
-#### Scenario: A Vale configuration file
-
-- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
-- **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
-
-#### Scenario: An action
-
-- **WHEN** a rule holds an `action`
-- **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
-
 ### Requirement: Vocabulary rules differ from Vale's in these ways
 
 hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from the scenarios below.
@@ -619,7 +558,6 @@ hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from t
 [case-9]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
 [check-1]: ../../changes/archive/2026-11-10-check-command/design.md#1-one-binary-on-ctl-cores-app
 [check-3]: ../../changes/archive/2026-11-10-check-command/design.md#3-globs-and-paths-are-relative-to-the-project-root
-[check-5]: ../../changes/archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
 [check-7]: ../../changes/archive/2026-11-10-check-command/design.md#7-output-is-a-line-per-alert-or-json
 [check-8]: ../../changes/archive/2026-11-10-check-command/design.md#8-exit-status-follows-vales-with-a-level-flag
 [engine-11]: ../../changes/archive/2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
@@ -641,7 +579,6 @@ hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from t
 [html-4]: ../../changes/archive/2026-11-10-html-block-text/design.md#4-tags-join-the-text-around-them
 [html-5]: ../../changes/archive/2026-11-10-html-block-text/design.md#5-a-character-reference-reads-once
 [html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
-[html-7]: ../../changes/archive/2026-11-10-html-block-text/design.md#not-ported
 [ledger]: ../../../tasks.yaml
 [package-fetch-1]: ../../changes/archive/2026-11-11-package-fetch/design.md#1-vales-sync-is-the-reference-for-the-source
 [package-fetch-3]: ../../changes/archive/2026-11-11-package-fetch/design.md#3-the-checks-a-download-passes
@@ -677,3 +614,265 @@ hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from t
 [vocabularies-8]: ../../changes/archive/2026-11-11-vocabularies/design.md#8-what-stays-different
 [vocabulary-rules-1]: ../../changes/archive/2026-11-11-vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
 [vocabulary-rules-4]: ../../changes/archive/2026-11-11-vocabulary-rules/design.md#4-the-style-vale-needs-a-vocabulary-term
+
+### Requirement: Block and token ignores differ from Vale's in these ways
+
+hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart from the scenarios below.
+
+#### Scenario: Sections that match one file
+
+- **WHEN** two sections of a Vale config each list `TokenIgnores` and both match one file
+- **THEN** Vale applies them in the order of a Go map, which varies from run to run, and hakkiri applies the globs in the order written ([block-token-ignores 4][block-token-ignores-4])
+
+#### Scenario: A pattern that does not compile
+
+- **WHEN** a glob lists a pattern that does not compile
+- **THEN** hakkiri refuses the config at load with the key and its line, and Vale reports error E201 when it lints a file the section matches ([block-token-ignores 4][block-token-ignores-4])
+
+#### Scenario: A pattern that matches no bytes
+
+- **WHEN** a pattern is `(z*)`
+- **THEN** hakkiri changes nothing, and Vale puts an empty pair of backticks at every place in the text ([block-token-ignores 2][block-token-ignores-2])
+
+#### Scenario: Front matter
+
+- **WHEN** a Markdown file starts with front matter and a pattern matches a `---` line
+- **THEN** hakkiri leaves the front matter to the parser and the pattern sees the line, and Vale has already rewritten the front matter into a fenced block ([block-token-ignores, not ported][block-token-ignores-not-ported])
+
+#### Scenario: A code alert after a block with no group
+
+- **WHEN** a block pattern has no capture group, and a code span of the same text as dropped text follows the match
+- **THEN** hakkiri places the alert at the code span, and Vale places it at the dropped text ([block-token-ignores, not ported][block-token-ignores-not-ported])
+
+#### Scenario: The older block key
+
+- **WHEN** a Vale section lists `IgnorePatterns`
+- **THEN** hakkiri has no such key, and the patterns go under `block_ignores`
+
+#### Scenario: A source file
+
+- **WHEN** a glob that matches a Rust, TypeScript or JavaScript file lists a block or token pattern
+- **THEN** hakkiri applies it to the Markdown of each comment, and Vale applies none, since it reads a comment as plain lines ([block-token-ignores 3][block-token-ignores-3])
+
+### Requirement: A sentence rule in a comment is read otherwise than Vale reads it
+
+hakkiri SHALL list here the place where it reads a file otherwise than Vale at 66bbb85 that the probe of the ignores and the comment controls left.
+
+#### Scenario: A sentence rule in a comment
+
+- **WHEN** a doc comment of a source file holds one sentence and a rule has `scope: sentence`
+- **THEN** hakkiri runs the rule on the sentence, and Vale runs it on none, since it reads the comment as plain lines ([block-token-ignores 5][block-token-ignores-5])
+
+[block-token-ignores-2]: ../../changes/archive/2026-11-12-block-token-ignores/design.md#2-what-a-match-turns-into-is-what-vale-gives
+[block-token-ignores-3]: ../../changes/archive/2026-11-12-block-token-ignores/design.md#3-a-source-files-comments-take-the-patterns
+[block-token-ignores-4]: ../../changes/archive/2026-11-12-block-token-ignores/design.md#4-patterns-are-checked-when-the-config-loads
+[block-token-ignores-not-ported]: ../../changes/archive/2026-11-12-block-token-ignores/design.md#not-ported
+[block-token-ignores-5]: ../../changes/archive/2026-11-12-block-token-ignores/design.md#5-a-read-that-differs-from-vales
+
+### Requirement: A message verb with no value differs from Vale
+
+hakkiri SHALL read a `%s` or `%[n]s` of a message that has no value to take as nothing, where Vale 3.26.0 prints Go's error text for it.
+
+#### Scenario: A verb past the values
+
+- **WHEN** a rule has `message: "[%[3]s][%[4]s][%[0]s][%s]"` and two values
+- **THEN** hakkiri prints `[][][][]`, and Vale prints `[][%!s(BADINDEX)][%!s(BADINDEX)][%!s(MISSING)]`, since its message gets one empty value more than the check gives ([indexed-verbs 2][indexed-verbs-2])
+
+[indexed-verbs-2]: ../../changes/archive/2026-11-12-indexed-verbs/design.md#2-a-verb-with-no-value-is-nothing
+
+### Requirement: The end of a match that wraps a line differs from Vale
+
+hakkiri SHALL name the line and column of a match's last character, where Vale 3.26.0 prints the first column plus the number of characters of the match, line breaks included.
+
+#### Scenario: A match across a line break
+
+- **WHEN** a rule matches `mea Culpa` where `mea` ends line 1 and `Culpa` starts line 2, with `mea` at column 5
+- **THEN** hakkiri ends the alert on line 2, column 5, and Vale ends it at column 13 of line 1, which is past the end of the line ([match-end 1][match-end-1])
+
+[match-end-1]: ../../changes/archive/2026-11-12-match-end/design.md#1-the-end-names-the-last-character
+
+### Requirement: Known gaps are listed apart from what differs by choice
+
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+Each gap SHALL be a requirement of its own, named "<gap> is a known gap", so a pull request that closes one removes only that requirement.  
+A pull request that closes a gap SHALL record any difference the closing leaves as an intended difference.
+
+#### Scenario: A pull request closes a gap
+
+- **WHEN** a pull request closes the gap that a requirement below names
+- **THEN** the same pull request removes that requirement, and adds a scenario to the intended differences when hakkiri still differs
+
+### Requirement: The built-in spelling rule is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: The built-in spelling rule
+
+- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
+- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+
+### Requirement: A YAML vocabulary is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: A YAML vocabulary
+
+- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
+- **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
+
+### Requirement: The Markdown parser is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: The Markdown parser
+
+- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
+
+### Requirement: A script rule is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: A script rule
+
+- **WHEN** a rule has `extends: script`
+- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
+
+### Requirement: A formula outside the listed syntax is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: A formula outside the listed syntax
+
+- **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
+- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
+
+### Requirement: The built-in repetition rule is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: The built-in repetition rule
+
+- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
+- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
+
+### Requirement: A doc selector or a View is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: A doc selector or a View
+
+- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
+  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+
+### Requirement: A Vale configuration file is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: A Vale configuration file
+
+- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
+- **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
+
+### Requirement: An action is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: An action
+
+- **WHEN** a rule holds an `action`
+- **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
+
+### Requirement: Comment controls differ from Vale's in these ways
+
+hakkiri SHALL read the comments that turn rules off and on as Vale does in a Markdown file, apart from the scenarios below, and SHALL read the forms of its own as well.
+
+#### Scenario: Forms hakkiri adds
+
+- **WHEN** a Markdown file holds `<!-- hakkiri Team.Words: warning -->` or `<!-- hakkiri Team.Words: off -->`
+- **THEN** hakkiri sets the level of the rule from there on, or turns it off, and Vale reads neither form
+
+#### Scenario: A source file
+
+- **WHEN** a doc comment of a Rust, TypeScript or JavaScript file holds an HTML comment that turns rules off
+- **THEN** hakkiri turns nothing off, and Vale reads a comment as plain lines, so it turns nothing off either ([comment-controls 4][comment-controls-4])
+
+#### Scenario: A directive quoted across a line break
+
+- **WHEN** a code span reads `<!-- vale off` on one line and `-->` on the next, and a real `vale off` comment comes after it
+- **THEN** hakkiri hides the text after the real comment, and Vale also hides the text after the code span, since it takes the comment's place from the first `vale off` that its search finds ([comment-controls 8][comment-controls-8])
+
+#### Scenario: An alert in an element that holds a comment
+
+- **WHEN** a `strong` element holds a comment, and its text holds a match
+- **THEN** hakkiri places the alert on the match, and Vale places it on the comment ([comment-controls 8][comment-controls-8])
+
+#### Scenario: The styles of a file
+
+- **WHEN** a comment limits the styles to `Other`
+- **THEN** hakkiri turns off the styles of the rules the config runs on the file, and Vale turns off its `BasedOnStyles` ([comment-controls 3][comment-controls-3])
+
+[comment-controls-8]: ../../changes/archive/2026-11-12-comment-controls/design.md#8-where-vale-places-a-comment-wrongly-hakkiri-places-it-right
+[comment-controls-3]: ../../changes/archive/2026-11-12-comment-controls/design.md#3-a-style-comment-reads-the-styles-of-the-rules
+[comment-controls-4]: ../../changes/archive/2026-11-12-comment-controls/design.md#4-a-source-file-holds-no-comment-control
+
+### Requirement: A walk and a named file differ from Vale's
+
+hakkiri SHALL skip the files git ignores in a walk and SHALL warn about a named file that no glob selects, where Vale 3.26.0 does neither.
+
+#### Scenario: An ignored build folder
+
+- **WHEN** `.gitignore` holds `build/` and the folder holds a file a glob selects
+- **THEN** hakkiri skips it, and Vale lints it, because Vale skips only its default ignored folders and reads no git file ([gitignore 6][gitignore-6])
+
+#### Scenario: A named file with no glob
+
+- **WHEN** `hakkiri check README.md` runs and no glob matches it
+- **THEN** hakkiri warns that no glob selects it, and Vale lints it with no rule and reports nothing ([gitignore 6][gitignore-6])
+
+[gitignore-6]: ../../changes/archive/2026-11-12-gitignore-walk/design.md#6-what-stays-different-from-vale
+
+### Requirement: Readers differ from Vale in what a file with no reader gets
+
+hakkiri SHALL read a selected file that no reader reads as plain text, skip a binary file, and map a format as each scenario below says, where Vale 3.26.0 does otherwise.
+
+#### Scenario: A manuscript
+
+- **WHEN** a `.txt` file holds chapter lines
+- **THEN** hakkiri reads paragraphs, and Vale reads a document whose chapter lines are headings ([plain-text 1][plain-text-1])
+
+#### Scenario: A binary file
+
+- **WHEN** a glob selects a file that holds a NUL byte
+- **THEN** hakkiri skips it, and Vale has no such test and reads it as lines ([plain-text 5][plain-text-5])
+
+#### Scenario: The extension of a mapped file
+
+- **WHEN** `formats` maps `txt: md` and a rule has `scope: text.md`
+- **THEN** hakkiri selects the text of `a.txt`, and Vale compares the scope's extension with the file's own, `.txt`, and selects nothing; both select it for `text.txt` ([plain-text 6][plain-text-6])
+
+#### Scenario: A plain-text file with markup
+
+- **WHEN** `notes.cfg` holds a fenced block, a glob selects it and no `formats` entry maps it
+- **THEN** hakkiri reads the fence as text, as Vale reads a file of lines ([plain-text 1][plain-text-1])
+
+#### Scenario: A format in a package and in the project
+
+- **WHEN** a package maps `txt: md` and the project maps `txt: text`
+- **THEN** hakkiri reads the project's value, and Vale takes the first value for `[formats]`, so the package wins ([package settings 5][settings-5])
+
+[plain-text-1]: ../../changes/archive/2026-11-12-plain-text-files/design.md#1-plain-text-is-one-raw-root-of-paragraphs
+[plain-text-5]: ../../changes/archive/2026-11-12-plain-text-files/design.md#5-a-binary-file-is-skipped
+[plain-text-6]: ../../changes/archive/2026-11-12-plain-text-files/design.md#6-a-mapped-file-has-two-extensions
+
+### Requirement: Doc line comments join across blank lines
+
+hakkiri SHALL join Rust doc line comments of the same type across blank lines, where Vale 3.26.0 joins a line comment only when it follows the previous one directly.
+
+#### Scenario: A fence across a blank line
+
+- **WHEN** a Rust file holds `/// ```sh`, an empty line, `/// curl it` and `/// ```` `
+- **THEN** hakkiri reads `curl it` as code, and Vale reads two comments, so a `text` rule sees `curl it` as prose ([doc-fence 1][doc-fence-1])
+
+[doc-fence-1]: ../../changes/archive/2026-11-12-doc-fence/design.md#1-doc-line-comments-join-across-blank-lines

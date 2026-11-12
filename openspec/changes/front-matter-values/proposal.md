@@ -34,4 +34,4 @@ The probe in `tests/fixtures/markup-differences` showed it, and the row `HKR-049
 - Dependency: ctl-core moves to 0.7.4 and its `input-toml` feature is on. hakkiri already uses ctl-core's `input` feature, so no new crate of its own, and the binary grows by the size recorded in the tasks.
 
 [ledger]: ../../../tasks.yaml
-[math]: ../math-code/proposal.md
+[math]: ../archive/2026-11-12-math-code/proposal.md
