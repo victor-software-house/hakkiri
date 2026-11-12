@@ -51,7 +51,6 @@ The probe of Vale at `66bbb85` over four Markdown, MDX, Rust and TypeScript file
 hakkiri gives the same, with these exceptions, which it keeps on purpose:
 
 - A word with a curly quote or `&rsquo;` is reported where it stands, where Vale gives it no position. A rule file that names its own dictionary has the same difference.
-- An email address is no word when `custom` turns the built-in filters off.
 - A code span in a code comment is no word, where Vale reads its backticks as part of a word when `custom` turns the filters off.
 - A name after `@param` is no prose, where Vale reads it, and reads the tag itself with `custom`.
 

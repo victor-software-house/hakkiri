@@ -11,7 +11,6 @@ param-append	vale	text/prose.md	2	1	8	error	Vale.Spelling	Did you really mean 'b
 param-append	vale	text/sample.ts	2	11	13	error	Vale.Spelling	Did you really mean 'nme'?	nme
 param-append	hakkiri	text/prose.md	6	44	51	error	Vale.Spelling	Did you really mean 'blorft's'?	blorft’s
 param-custom	vale	text/code.rs	2	8	19	error	Vale.Spelling	Did you really mean '`blorftCode`'?	`blorftCode`
-param-custom	vale	text/prose.md	13	76	88	error	Vale.Spelling	Did you really mean 'me@blorft.org'?	me@blorft.org
 param-custom	vale	text/prose.md	2	1	8	error	Vale.Spelling	Did you really mean 'blorft's'?	blorft's
 param-custom	vale	text/sample.ts	2	11	13	error	Vale.Spelling	Did you really mean 'nme'?	nme
 param-custom	vale	text/sample.ts	2	4	9	error	Vale.Spelling	Did you really mean '@param'?	@param

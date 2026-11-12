@@ -18,18 +18,22 @@ hakkiri built only the first, so a project that moves from Vale loses its spelli
   It reads each package of the project where Vale has one styles path.
   It reads no word in a code span of a code comment, and no name after `@param`.
 - The fixtures of the other `Vale` tests turn the rule off in the hakkiri configs, as their Vale configs already do.
+- A Markdown file keeps a bare email address, a `www.` address and an angle-bracket email address in its text.
+  Vale's converter keeps them there, since it writes a destination that differs from their text, and hakkiri dropped them as links, so the probe showed `custom` spelling a bare email address in Vale alone.
+  The `vale-differences` spec drops the scenario that recorded it as a difference.
 
 ## Capabilities
 
 ### Modified Capabilities
 
 - `spelling-check`: the built-in rule and its folders.
-- `vale-differences`: the gap closes, and three differences are recorded.
+- `vale-differences`: the gap closes, three differences are recorded, and one is removed.
+- `node-segments`: an address that is not its own destination stays in the text around it.
 
 ## Impact
 
-- New: `tests/vale_spelling.rs` and `tests/fixtures/vale-spelling`, with 880 alerts that Vale at `66bbb85` gave under 11 configs, and the 36 alerts that only one side gives.
-- Changed: `src/rule.rs` (`vale_spelling`), `src/rule/package.rs`, `src/rule/build.rs`, `src/config.rs`, `src/instructions.md`, the skill and `AGENTS.md`.
+- New: `tests/vale_spelling.rs` and `tests/fixtures/vale-spelling`, with 880 alerts that Vale at `66bbb85` gave under 11 configs, and the 35 alerts that only one side gives.
+- Changed: `src/rule.rs` (`vale_spelling`), `src/rule/package.rs`, `src/rule/build.rs`, `src/config.rs`, `src/markdown.rs`, `src/instructions.md`, the skill and `AGENTS.md`.
 - A project that lists the style `Vale` now gets spelling alerts at `error`, as it does in Vale.
 - No new dependency.
 

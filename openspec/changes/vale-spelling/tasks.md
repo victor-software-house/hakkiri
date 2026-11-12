@@ -24,6 +24,15 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Evidence, 2026-11-12 (UTC): `operator_docs` passes in the box, and `openspec validate --all --strict` and `qctl check --no-git` pass on the authoring machine.  
   The fixtures of `builtin_repetition`, `vocabulary_rules`, `yaml_vocabularies` and `rule_parameters` failed until their hakkiri configs turned the rule off, as their Vale configs do.
 
-## 4. Integration
+## 4. A bare email address
 
-- [ ] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+- [x] 4.1 Keep a bare email address, a `www.` address and an angle-bracket email address in the text of a Markdown file, and drop the departure that recorded them.  
+  Verify `tests/vale_spelling.rs`, `tests/spelling_parity.rs` and `tests/tree.rs` pass, with the two departure rows of the email address removed.  
+  Evidence, 2026-11-12 (UTC): a probe of Vale at `66bbb85` showed that it keeps those three in the text.  
+  It drops an address in angle brackets, or written bare with a lower-case `http` scheme, because its converter writes the same destination.  
+  In a cloud box the whole `cargo test --no-fail-fast` passes with 44 test binaries ok, and the format check and the prose and spelling lints pass.  
+  Not verified: `ftp://` addresses and an upper-case scheme, which hakkiri reads differently, and are left to `HKR-027`.
+
+## 5. Integration
+
+- [ ] 5.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.

@@ -206,6 +206,20 @@ fn an_autolink_is_a_gap_around_itself() -> TestResult {
 }
 
 #[test]
+fn an_email_or_a_www_address_stays_in_the_text_around_it() -> TestResult {
+    let fixture = load("addresses.md")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        ["Mail me@b.example, me@b.example or www.b.example now."]
+    );
+    assert_eq!(
+        fixture.texts(Scope::Link),
+        ["me@b.example", "me@b.example", "www.b.example"]
+    );
+    Ok(())
+}
+
+#[test]
 fn a_pipe_in_a_link_destination_outside_a_table_is_no_space() -> TestResult {
     let fixture = load("pipe-link.md")?;
     assert_eq!(fixture.texts(Scope::Paragraph), ["Open the page now."]);

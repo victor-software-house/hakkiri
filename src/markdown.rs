@@ -871,6 +871,9 @@ impl Builder<'_> {
     /// A code span loses its backticks the same way, and keeps its content.
     /// An autolink and a bare URL keep their address as their own text, and
     /// the text around them loses the whole of it.
+    /// A link that is not its own address, such as a bare email address,
+    /// stays in the text around it, with the angle brackets cut if it has
+    /// them.
     fn markup(&self, node: &Mdast, scope: Scope, span: Range<usize>) -> Markup {
         match scope {
             Scope::Strong | Scope::Emphasis => {
@@ -891,15 +894,29 @@ impl Builder<'_> {
                         up: cuts,
                     };
                 }
-                let inner = if text.starts_with('<') && text.ends_with('>') && text.len() >= 2 {
+                let angle = text.starts_with('<') && text.ends_with('>') && text.len() >= 2;
+                let inner = if angle {
                     span.start + 1..span.end - 1
                 } else {
                     span.clone()
                 };
+                let address = self.source.get(inner.clone()).unwrap_or_default();
+                if Self::is_address(node, address, angle) {
+                    return Markup {
+                        span: inner,
+                        own: Vec::new(),
+                        up: vec![span],
+                    };
+                }
+                let cuts = if angle {
+                    vec![span.start..inner.start, inner.end..span.end]
+                } else {
+                    Vec::new()
+                };
                 Markup {
                     span: inner,
-                    own: Vec::new(),
-                    up: vec![span],
+                    own: cuts.clone(),
+                    up: cuts,
                 }
             }
             Scope::Code => {
@@ -945,6 +962,22 @@ impl Builder<'_> {
                 up: Vec::new(),
             },
         }
+    }
+
+    /// Whether an autolink is its own destination, which Vale's converter
+    /// keeps out of the text.
+    ///
+    /// A web address in angle brackets or written bare with a lower-case
+    /// scheme is.
+    /// An email address, a `www.` address and a `mailto:` address are not:
+    /// the converter writes a different destination for the first two and
+    /// reads the last as text, so their words stay in the text.
+    fn is_address(node: &Mdast, address: &str, angle: bool) -> bool {
+        let Mdast::Link(link) = node else {
+            return false;
+        };
+        link.url == address
+            && (angle || address.starts_with("http://") || address.starts_with("https://"))
     }
 
     /// The markers before the first child of `node` and after its last.
