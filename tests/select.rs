@@ -178,6 +178,25 @@ fn title_selects_the_title_attribute_of_an_html_block() -> TestResult {
 }
 
 #[test]
+fn raw_still_reads_an_html_title_in_a_block_and_in_a_line() -> TestResult {
+    let block = "<p title=\"an html marker\">Some text.</p>\n";
+    let line = "A <span title=\"a line marker\">word</span> here.\n";
+    let raw = |source: &str, marker: &str| -> Result<bool, Box<dyn Error>> {
+        Ok(texts(&blocks(&["raw"], "a.md", source)?)
+            .iter()
+            .any(|text| text.contains(marker)))
+    };
+    assert!(raw(block, "an html marker")?);
+    assert!(raw(line, "a line marker")?);
+    // In a line of text, as in Vale, no scope but `raw` reads the attribute.
+    let titles = blocks(&["title"], "a.md", line)?;
+    assert_eq!(texts(&titles), Vec::<&str>::new());
+    let text = blocks(&["text"], "a.md", line)?;
+    assert!(texts(&text).iter().all(|text| !text.contains("marker")));
+    Ok(())
+}
+
+#[test]
 fn no_prose_scope_reads_a_title() -> TestResult {
     let source = concat_lines(&[
         "A [link](u.html \"a title marker\") and ![img](i.png 'an image marker') end.",
