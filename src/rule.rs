@@ -464,7 +464,7 @@ impl Token {
 /// nothing until a walk reaches them.
 #[derive(Clone, Copy, Debug)]
 pub struct Step {
-    /// The index of the token in [`Sequence::tokens`].
+    /// The index of the token in [`Form::tokens`].
     pub token: usize,
     /// Whether a word that does not match is passed over.
     pub optional: bool,
@@ -478,9 +478,22 @@ pub struct Step {
     pub after: usize,
 }
 
-/// A `sequence` rule.
+/// A `sequence` rule: one or more forms, and the exceptions that apply to every
+/// one.
+///
+/// A rule with `tokens` has one form. A rule with `forms` has one for each,
+/// and it matches where any form does.
 #[derive(Debug)]
 pub struct Sequence {
+    /// The forms, in the order the rule wrote them.
+    pub forms: Vec<Form>,
+    /// The `exceptions`: a match that begins inside a match of one is dropped.
+    pub exceptions: Vec<Pattern>,
+}
+
+/// One list of tokens that a `sequence` rule matches.
+#[derive(Debug)]
+pub struct Form {
     /// The tokens as written.
     pub tokens: Vec<Token>,
     /// The number of steps up to the end of each token.
@@ -491,11 +504,9 @@ pub struct Sequence {
     /// Where the anchor's pattern occurs in a sentence, which bounds how many
     /// times the walk starts. A tag has no text to search for.
     pub candidates: Option<Pattern>,
-    /// The `exceptions`: a match that begins inside a match of one is dropped.
-    pub exceptions: Vec<Pattern>,
 }
 
-impl Sequence {
+impl Form {
     /// How many steps the tokens make.
     #[must_use]
     pub fn len(&self) -> usize {
@@ -521,7 +532,7 @@ impl Sequence {
         self.ends.partition_point(|end| *end <= index)
     }
 
-    /// Step `index`, which must be below [`Sequence::len`].
+    /// Step `index`, which must be below [`Form::len`].
     #[must_use]
     pub fn step(&self, index: usize) -> Step {
         let token = self.token_of(index);

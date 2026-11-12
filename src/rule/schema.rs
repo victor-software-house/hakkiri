@@ -459,11 +459,23 @@ pub(super) struct TokenFields {
     pub(super) negate: Flag,
 }
 
+/// One form of a `sequence` rule: a list of tokens.
+#[derive(Debug, Deserialize, Validate)]
+#[serde(deny_unknown_fields)]
+pub(super) struct FormFields {
+    #[garde(dive)]
+    pub(super) tokens: Vec<TokenFields>,
+}
+
 rule_fields! {
     /// A `sequence` rule.
     SequenceFields {
+        #[serde(default)]
         #[garde(dive)]
         tokens: Vec<TokenFields>,
+        #[serde(default)]
+        #[garde(dive)]
+        forms: Vec<FormFields>,
         #[serde(default)]
         #[garde(custom(valid))]
         exceptions: Texts,

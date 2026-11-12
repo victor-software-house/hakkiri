@@ -230,6 +230,12 @@ Vale ignores the key, and warns and turns the rule off for the word.
 
 hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini`. Its built-in style `Vale` holds no `Vale.Spelling`, which Vale also builds in.
 
+hakkiri reads a `sequence` rule with `forms` in place of `tokens`: a list of mappings that each hold `tokens`.
+The rule matches where any form does, and every alert carries the one rule name.
+Two forms that match overlapping words give the match that starts first, and the earlier form at a tie.
+A rule holds `tokens` or `forms`, never both.
+Vale stops with a panic on a rule with `forms` and no `tokens`, so a package that must load in both tools keeps one rule for each form.
+
 hakkiri tags a sentence with the model of prose at `b33e60d`, where Vale tags with the older model of prose v3.2.2.
 It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a semicolon, and a verb after a noun phrase.
 It also corrects the verbs of saying and asking after a noun.

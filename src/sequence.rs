@@ -4,6 +4,9 @@
 //! It tags one sentence, picks the anchor step of the rule, and from each word
 //! the anchor matches it walks left and right over the other steps.
 //! A step of `skip` is optional: a word that does not match it is passed over.
+//! A rule that lists several forms walks each one the same way and keeps the
+//! matches together, an earlier match winning over a later one that it
+//! overlaps.
 //!
 //! [sequence.go]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L343-L497
 
@@ -13,7 +16,7 @@ use std::collections::HashMap;
 use std::ops::Range;
 
 use crate::pattern::SearchError;
-use crate::rule::{Sequence, Token};
+use crate::rule::{Form, Sequence, Token};
 use crate::tagger::{Tagged, Tagger};
 use crate::text::Text;
 
@@ -81,18 +84,18 @@ fn accepts(token: &Token, word: &Word<'_>) -> Result<bool, SearchError> {
 
 /// Whether every one of `steps` is negated. A negated step holds where there
 /// is no word at all, so it holds at the edge of the sentence.
-fn negated(sequence: &Sequence, steps: Range<usize>) -> bool {
+fn negated(form: &Form, steps: Range<usize>) -> bool {
     if steps.is_empty() {
         return true;
     }
-    (sequence.token_of(steps.start)..=sequence.token_of(steps.end - 1))
-        .filter(|token| !sequence.block(*token).is_empty())
-        .all(|token| sequence.tokens[token].negate)
+    (form.token_of(steps.start)..=form.token_of(steps.end - 1))
+        .filter(|token| !form.block(*token).is_empty())
+        .all(|token| form.tokens[token].negate)
 }
 
 /// Walks the steps from the anchor step, which reads the word `at`.
-fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Found>, SearchError> {
-    let anchor = sequence.anchor;
+fn walk(form: &Form, words: &[Word<'_>], at: usize) -> Result<Option<Found>, SearchError> {
+    let anchor = form.anchor;
     let mut first: Option<usize> = None;
     let mut last: Option<usize> = None;
     let mut read = HashMap::new();
@@ -103,13 +106,13 @@ fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Fou
     let (mut step, mut word) = (anchor, at);
     while step > 0 {
         let Some(before) = word.checked_sub(1) else {
-            if negated(sequence, 0..step) {
+            if negated(form, 0..step) {
                 break;
             }
             return Ok(None);
         };
-        let current = sequence.step(step - 1);
-        let token = &sequence.tokens[current.token];
+        let current = form.step(step - 1);
+        let token = &form.tokens[current.token];
         first = Some(before);
         read.insert(step - 1, before);
         let optional = if token.skip > 0 {
@@ -133,18 +136,18 @@ fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Fou
         }
     }
     let (mut step, mut word) = (anchor, at);
-    while step < sequence.len() {
+    while step < form.len() {
         if word >= words.len() {
-            if negated(sequence, step..sequence.len()) {
+            if negated(form, step..form.len()) {
                 break;
             }
             return Ok(None);
         }
-        let current = sequence.step(step);
+        let current = form.step(step);
         first = Some(first.map_or(word, |first| first.min(word)));
         last = Some(word);
         read.insert(step, word);
-        let hit = accepts(&sequence.tokens[current.token], &words[word])?;
+        let hit = accepts(&form.tokens[current.token], &words[word])?;
         match (hit, current.optional) {
             (false, false) => return Ok(None),
             (true, true) => {
@@ -175,11 +178,11 @@ fn walk(sequence: &Sequence, words: &[Word<'_>], at: usize) -> Result<Option<Fou
 /// from the first word and in the list of earlier starts, which takes time
 /// that grows with the cube of the words when the anchor matches most of them.
 fn next_start(
-    sequence: &Sequence,
+    form: &Form,
     words: &[Word<'_>],
     cursor: &mut usize,
 ) -> Result<Option<usize>, SearchError> {
-    let anchor = &sequence.tokens[sequence.token_of(sequence.anchor)];
+    let anchor = &form.tokens[form.token_of(form.anchor)];
     while let Some(word) = words.get(*cursor) {
         let index = *cursor;
         *cursor += 1;
@@ -192,15 +195,15 @@ fn next_start(
 
 /// The words from the first to the last of the `target` tokens, when every
 /// step of such a token read a word.
-fn targeted(sequence: &Sequence, found: &Found) -> Option<(usize, usize)> {
+fn targeted(form: &Form, found: &Found) -> Option<(usize, usize)> {
     let mut range: Option<(usize, usize)> = None;
-    for (token, written) in sequence.tokens.iter().enumerate() {
+    for (token, written) in form.tokens.iter().enumerate() {
         if !written.target {
             continue;
         }
         // A targeted step that read no word was passed over. The span cannot
         // be narrowed to it, so the match keeps its whole span.
-        let block = sequence.block(token);
+        let block = form.block(token);
         let read: Vec<usize> = found
             .at
             .iter()
@@ -282,6 +285,11 @@ pub(crate) fn find(sequence: &Sequence, text: &Text) -> Result<Vec<Matched>, Sea
 ///
 /// `is_code` tells whether the bytes of a token read a code span.
 ///
+/// A rule with several forms matches where any form does. When two forms
+/// match overlapping words, the match that starts first stays and the other
+/// is dropped, so one stretch of words gives one alert. Matches of the same
+/// form never drop each other, so a rule of one list gives Vale's matches.
+///
 /// # Errors
 ///
 /// Returns a [`SearchError`] when a pattern gives up on a word or the
@@ -301,29 +309,48 @@ fn find_tagged(
             range: token.range,
         })
         .collect();
-    let tries = match &sequence.candidates {
+    let mut excluded: Option<Vec<Range<usize>>> = None;
+    let mut found: Vec<(usize, Matched)> = Vec::new();
+    for (index, form) in sequence.forms.iter().enumerate() {
+        for matched in find_form(sequence, form, sentence, &words, &mut excluded)? {
+            found.push((index, matched));
+        }
+    }
+    Ok(merged(found, sequence.forms.len()))
+}
+
+/// The runs of `words` that one form matches, with the exceptions of the rule
+/// taken out. `excluded` holds the spans of the exceptions once a match asks
+/// for them, and is shared by the forms of the rule.
+fn find_form(
+    sequence: &Sequence,
+    form: &Form,
+    sentence: &str,
+    words: &[Word<'_>],
+    excluded: &mut Option<Vec<Range<usize>>>,
+) -> Result<Vec<Matched>, SearchError> {
+    let tries = match &form.candidates {
         Some(candidates) => candidates.find_all(sentence)?.len(),
         None => words.len(),
     };
-    let mut excluded: Option<Vec<Range<usize>>> = None;
     let mut cursor = 0;
     let mut matches = Vec::new();
     for _ in 0..tries {
         // A try with no word left to start from finds nothing.
-        let Some(start) = next_start(sequence, &words, &mut cursor)? else {
+        let Some(start) = next_start(form, words, &mut cursor)? else {
             continue;
         };
-        let Some(found) = walk(sequence, &words, start)? else {
+        let Some(found) = walk(form, words, start)? else {
             continue;
         };
-        let (first, last) = targeted(sequence, &found).unwrap_or((found.first, found.last));
+        let (first, last) = targeted(form, &found).unwrap_or((found.first, found.last));
         let range = words[first].range.start..words[last].range.end;
         if excluded.is_none() {
             let mut spans = Vec::new();
             for exception in &sequence.exceptions {
                 spans.extend(exception.find_all(sentence)?);
             }
-            excluded = Some(spans);
+            *excluded = Some(spans);
         }
         if inside(excluded.as_deref().unwrap_or_default(), range.start) {
             continue;
@@ -337,6 +364,29 @@ fn find_tagged(
         });
     }
     Ok(matches)
+}
+
+/// The matches of every form as one list. One form's matches stay as they
+/// were found. Several forms' matches go in order of where they start, the
+/// earlier form first at the same place, and a match that overlaps one kept
+/// from another form is dropped.
+fn merged(mut found: Vec<(usize, Matched)>, forms: usize) -> Vec<Matched> {
+    if forms < 2 {
+        return found.into_iter().map(|(_, matched)| matched).collect();
+    }
+    found.sort_by_key(|(form, matched)| (matched.range.start, *form));
+    let mut kept: Vec<(usize, Matched)> = Vec::new();
+    for (form, matched) in found {
+        let overlaps = kept.iter().any(|(other, earlier)| {
+            *other != form
+                && earlier.range.start < matched.range.end
+                && matched.range.start < earlier.range.end
+        });
+        if !overlaps {
+            kept.push((form, matched));
+        }
+    }
+    kept.into_iter().map(|(_, matched)| matched).collect()
 }
 
 #[cfg(test)]

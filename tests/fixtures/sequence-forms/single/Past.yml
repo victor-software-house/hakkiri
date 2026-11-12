@@ -1,0 +1,15 @@
+extends: sequence
+message: "'%[1]s %[2]s' gives a thing speech or thought: name what it holds, shows, marks or matches."
+level: error
+ignorecase: true
+exceptions:
+  - '(?i)\b(?:operator|operators|user|users|reviewer|reviewers|team|teams|student|students|agent|agents)\b'
+tokens:
+  - tag: NN|NNS
+    pattern: '[A-Za-z][\w-]*'
+    target: true
+  - tag: VBD
+    pattern: said|told|knew|thought|wanted|agreed|asked|believed|hoped|understood|insisted
+    target: true
+  - tag: '^(?:TO|RB|RBR|RBS)$'
+    negate: true
