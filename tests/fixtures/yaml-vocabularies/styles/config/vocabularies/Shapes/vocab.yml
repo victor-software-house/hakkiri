@@ -1,0 +1,19 @@
+accept:
+  - GitHub
+  - Node.js
+  - C++
+  - harness(?:es)?:
+      regex: true
+  - zebra:
+      ignorecase: true
+  - utilize:
+      flags: DSG
+  - Kubernetes:
+  - Zeb(ra)
+  - gith(ub)?:
+      regex: true
+      ignorecase: true
+  - colour:
+      flags: S
+      ignorecase: true
+  - 3.10

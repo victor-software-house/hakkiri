@@ -1,0 +1,3 @@
+reject:
+  - bar
+  - [a, b]

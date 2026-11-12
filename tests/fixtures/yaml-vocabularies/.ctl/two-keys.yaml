@@ -1,0 +1,5 @@
+packages:
+  - path: styles
+vocab: [two-keys]
+files:
+  "text/*.md": {styles: [Team]}

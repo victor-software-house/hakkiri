@@ -1203,6 +1203,19 @@ impl Named {
     }
 }
 
+/// The folders that may hold the affix file a YAML vocabulary named `name`
+/// names: the dictionaries folder of the package that holds the vocabulary,
+/// then that of every other package, in order.
+fn affix_folders(found: &[Found], name: &str) -> Vec<PathBuf> {
+    let holds = |package: &&Found| vocabulary::find(&package.folder, name).is_some();
+    found
+        .iter()
+        .filter(holds)
+        .chain(found.iter().filter(|package| !holds(package)))
+        .map(|package| package.folder.join(vocabulary::DICTIONARIES))
+        .collect()
+}
+
 /// Reads each vocabulary `vocab` names from the package folders in `found`,
 /// and refuses a name no package holds and a name two packages hold.
 fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults: &mut Faults<'_>) {
@@ -1236,7 +1249,8 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
                 "vocab",
                 format!("`{name}` is not a vocabulary in any package"),
             ),
-            [(folder, shown)] => match vocabulary::read(folder, shown) {
+            [(folder, shown)] => match vocabulary::read(folder, shown, &affix_folders(found, name))
+            {
                 Ok(read) => {
                     loaded.vocabularies.insert(name.clone(), read);
                 }

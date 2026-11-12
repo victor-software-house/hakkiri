@@ -1,0 +1,135 @@
+all	text/t1.md	11	64	74	warning	Team.Probe	Found 'utilization'.	utilization
+all	text/t1.md	13	29	38	error	Vale.Terms	Use 'Kubernetes' instead of 'kubernetes'.	kubernetes
+all	text/t1.md	13	29	38	warning	Team.Probe	Found 'kubernetes'.	kubernetes
+all	text/t1.md	21	24	26	warning	Team.Probe	Found '3.1'.	3.1
+all	text/t1.md	3	24	30	warning	Team.Probe	Found 'Nodexjs'.	Nodexjs
+all	text/t1.md	5	22	24	warning	Team.Probe	Found 'Cxx'.	Cxx
+all	text/t1.md	7	39	47	warning	Team.Probe	Found 'harnessed'.	harnessed
+all	text/t2.md	1	19	21	error	Vale.Terms	Use 'foo' instead of 'Foo'.	Foo
+all	text/t2.md	1	19	21	warning	Team.Probe	Found 'Foo'.	Foo
+all	text/t2.md	1	24	27	error	Vale.Avoid	Avoid using 'baar'.	baar
+all	text/t2.md	1	33	35	error	Vale.Avoid	Avoid using 'bar'.	bar
+all	text/t2.md	1	38	40	error	Vale.Avoid	Avoid using 'BAZ'.	BAZ
+all	text/t2.md	1	46	48	error	Vale.Avoid	Avoid using 'baz'.	baz
+all	text/t2.md	5	37	41	warning	Team.Probe	Found 'Delta'.	Delta
+all	text/t2.md	7	26	29	warning	Team.Probe	Found 'fooz'.	fooz
+bool-yes	text/t1.md	11	12	18	warning	Team.Probe	Found 'utilize'.	utilize
+bool-yes	text/t1.md	11	24	31	warning	Team.Probe	Found 'utilizes'.	utilizes
+bool-yes	text/t1.md	11	37	45	warning	Team.Probe	Found 'utilizing'.	utilizing
+bool-yes	text/t1.md	11	51	58	warning	Team.Probe	Found 'utilized'.	utilized
+bool-yes	text/t1.md	11	64	74	warning	Team.Probe	Found 'utilization'.	utilization
+bool-yes	text/t1.md	1	23	28	error	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+bool-yes	text/t1.md	1	23	28	warning	Team.Probe	Found 'github'.	github
+bool-yes	text/t1.md	13	14	23	warning	Team.Probe	Found 'Kubernetes'.	Kubernetes
+bool-yes	text/t1.md	13	29	38	warning	Team.Probe	Found 'kubernetes'.	kubernetes
+bool-yes	text/t1.md	15	26	30	warning	Team.Probe	Found 'Zebra'.	Zebra
+bool-yes	text/t1.md	17	13	18	error	Vale.Terms	Use 'GitHub' instead of 'GITHUB'.	GITHUB
+bool-yes	text/t1.md	17	13	18	warning	Team.Probe	Found 'GITHUB'.	GITHUB
+bool-yes	text/t1.md	17	24	27	warning	Team.Probe	Found 'Gith'.	Gith
+bool-yes	text/t1.md	17	33	38	error	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+bool-yes	text/t1.md	17	33	38	warning	Team.Probe	Found 'github'.	github
+bool-yes	text/t1.md	19	12	17	warning	Team.Probe	Found 'colour'.	colour
+bool-yes	text/t1.md	19	23	29	warning	Team.Probe	Found 'Colours'.	Colours
+bool-yes	text/t1.md	19	35	40	warning	Team.Probe	Found 'COLOUR'.	COLOUR
+bool-yes	text/t1.md	21	15	18	warning	Team.Probe	Found '3.10'.	3.10
+bool-yes	text/t1.md	21	24	26	warning	Team.Probe	Found '3.1'.	3.1
+bool-yes	text/t1.md	3	12	18	warning	Team.Probe	Found 'Node.js'.	Node.js
+bool-yes	text/t1.md	3	24	30	warning	Team.Probe	Found 'Nodexjs'.	Nodexjs
+bool-yes	text/t1.md	5	22	24	warning	Team.Probe	Found 'Cxx'.	Cxx
+bool-yes	text/t1.md	7	13	19	warning	Team.Probe	Found 'harness'.	harness
+bool-yes	text/t1.md	7	25	33	warning	Team.Probe	Found 'harnesses'.	harnesses
+bool-yes	text/t1.md	7	39	47	warning	Team.Probe	Found 'harnessed'.	harnessed
+bool-yes	text/t1.md	9	13	17	warning	Team.Probe	Found 'zebra'.	zebra
+bool-yes	text/t1.md	9	23	27	warning	Team.Probe	Found 'Zebra'.	Zebra
+bool-yes	text/t1.md	9	33	37	warning	Team.Probe	Found 'ZEBRA'.	ZEBRA
+bool-yes	text/t2.md	1	19	21	error	Vale.Terms	Use 'foo' instead of 'Foo'.	Foo
+bool-yes	text/t2.md	1	19	21	warning	Team.Probe	Found 'Foo'.	Foo
+bool-yes	text/t2.md	3	17	23	warning	Team.Probe	Found 'utilize'.	utilize
+bool-yes	text/t2.md	3	29	36	warning	Team.Probe	Found 'utilized'.	utilized
+bool-yes	text/t2.md	3	42	49	warning	Team.Probe	Found 'utilizes'.	utilizes
+bool-yes	text/t2.md	5	14	18	warning	Team.Probe	Found 'Alpha'.	Alpha
+bool-yes	text/t2.md	5	21	24	warning	Team.Probe	Found 'Beta'.	Beta
+bool-yes	text/t2.md	5	27	31	warning	Team.Probe	Found 'Gamma'.	Gamma
+bool-yes	text/t2.md	5	37	41	warning	Team.Probe	Found 'Delta'.	Delta
+bool-yes	text/t2.md	7	16	20	warning	Team.Probe	Found 'foozz'.	foozz
+bool-yes	text/t2.md	7	26	29	warning	Team.Probe	Found 'fooz'.	fooz
+empty-entry	text/t1.md	11	12	18	warning	Team.Probe	Found 'utilize'.	utilize
+empty-entry	text/t1.md	11	24	31	warning	Team.Probe	Found 'utilizes'.	utilizes
+empty-entry	text/t1.md	11	37	45	warning	Team.Probe	Found 'utilizing'.	utilizing
+empty-entry	text/t1.md	11	51	58	warning	Team.Probe	Found 'utilized'.	utilized
+empty-entry	text/t1.md	11	64	74	warning	Team.Probe	Found 'utilization'.	utilization
+empty-entry	text/t1.md	1	23	28	error	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+empty-entry	text/t1.md	1	23	28	warning	Team.Probe	Found 'github'.	github
+empty-entry	text/t1.md	13	14	23	warning	Team.Probe	Found 'Kubernetes'.	Kubernetes
+empty-entry	text/t1.md	13	29	38	warning	Team.Probe	Found 'kubernetes'.	kubernetes
+empty-entry	text/t1.md	15	26	30	warning	Team.Probe	Found 'Zebra'.	Zebra
+empty-entry	text/t1.md	17	13	18	error	Vale.Terms	Use 'GitHub' instead of 'GITHUB'.	GITHUB
+empty-entry	text/t1.md	17	13	18	warning	Team.Probe	Found 'GITHUB'.	GITHUB
+empty-entry	text/t1.md	17	24	27	warning	Team.Probe	Found 'Gith'.	Gith
+empty-entry	text/t1.md	17	33	38	error	Vale.Terms	Use 'GitHub' instead of 'github'.	github
+empty-entry	text/t1.md	17	33	38	warning	Team.Probe	Found 'github'.	github
+empty-entry	text/t1.md	19	12	17	warning	Team.Probe	Found 'colour'.	colour
+empty-entry	text/t1.md	19	23	29	warning	Team.Probe	Found 'Colours'.	Colours
+empty-entry	text/t1.md	19	35	40	warning	Team.Probe	Found 'COLOUR'.	COLOUR
+empty-entry	text/t1.md	21	15	18	warning	Team.Probe	Found '3.10'.	3.10
+empty-entry	text/t1.md	21	24	26	warning	Team.Probe	Found '3.1'.	3.1
+empty-entry	text/t1.md	3	12	18	warning	Team.Probe	Found 'Node.js'.	Node.js
+empty-entry	text/t1.md	3	24	30	warning	Team.Probe	Found 'Nodexjs'.	Nodexjs
+empty-entry	text/t1.md	5	22	24	warning	Team.Probe	Found 'Cxx'.	Cxx
+empty-entry	text/t1.md	7	13	19	warning	Team.Probe	Found 'harness'.	harness
+empty-entry	text/t1.md	7	25	33	warning	Team.Probe	Found 'harnesses'.	harnesses
+empty-entry	text/t1.md	7	39	47	warning	Team.Probe	Found 'harnessed'.	harnessed
+empty-entry	text/t1.md	9	13	17	warning	Team.Probe	Found 'zebra'.	zebra
+empty-entry	text/t1.md	9	23	27	warning	Team.Probe	Found 'Zebra'.	Zebra
+empty-entry	text/t1.md	9	33	37	warning	Team.Probe	Found 'ZEBRA'.	ZEBRA
+empty-entry	text/t2.md	1	11	13	warning	Team.Probe	Found 'foo'.	foo
+empty-entry	text/t2.md	1	19	21	warning	Team.Probe	Found 'Foo'.	Foo
+empty-entry	text/t2.md	3	17	23	warning	Team.Probe	Found 'utilize'.	utilize
+empty-entry	text/t2.md	3	29	36	warning	Team.Probe	Found 'utilized'.	utilized
+empty-entry	text/t2.md	3	42	49	warning	Team.Probe	Found 'utilizes'.	utilizes
+empty-entry	text/t2.md	5	14	18	warning	Team.Probe	Found 'Alpha'.	Alpha
+empty-entry	text/t2.md	5	21	24	warning	Team.Probe	Found 'Beta'.	Beta
+empty-entry	text/t2.md	5	27	31	warning	Team.Probe	Found 'Gamma'.	Gamma
+empty-entry	text/t2.md	5	37	41	warning	Team.Probe	Found 'Delta'.	Delta
+empty-entry	text/t2.md	7	16	20	warning	Team.Probe	Found 'foozz'.	foozz
+empty-entry	text/t2.md	7	26	29	warning	Team.Probe	Found 'fooz'.	fooz
+empty-entry	text/t2.md	7	8	10	warning	Team.Probe	Found 'foo'.	foo
+none	text/t1.md	11	12	18	warning	Team.Probe	Found 'utilize'.	utilize
+none	text/t1.md	1	12	17	warning	Team.Probe	Found 'GitHub'.	GitHub
+none	text/t1.md	11	24	31	warning	Team.Probe	Found 'utilizes'.	utilizes
+none	text/t1.md	11	37	45	warning	Team.Probe	Found 'utilizing'.	utilizing
+none	text/t1.md	11	51	58	warning	Team.Probe	Found 'utilized'.	utilized
+none	text/t1.md	11	64	74	warning	Team.Probe	Found 'utilization'.	utilization
+none	text/t1.md	1	23	28	warning	Team.Probe	Found 'github'.	github
+none	text/t1.md	13	14	23	warning	Team.Probe	Found 'Kubernetes'.	Kubernetes
+none	text/t1.md	13	29	38	warning	Team.Probe	Found 'kubernetes'.	kubernetes
+none	text/t1.md	15	26	30	warning	Team.Probe	Found 'Zebra'.	Zebra
+none	text/t1.md	17	13	18	warning	Team.Probe	Found 'GITHUB'.	GITHUB
+none	text/t1.md	17	24	27	warning	Team.Probe	Found 'Gith'.	Gith
+none	text/t1.md	17	33	38	warning	Team.Probe	Found 'github'.	github
+none	text/t1.md	19	12	17	warning	Team.Probe	Found 'colour'.	colour
+none	text/t1.md	19	23	29	warning	Team.Probe	Found 'Colours'.	Colours
+none	text/t1.md	19	35	40	warning	Team.Probe	Found 'COLOUR'.	COLOUR
+none	text/t1.md	21	15	18	warning	Team.Probe	Found '3.10'.	3.10
+none	text/t1.md	21	24	26	warning	Team.Probe	Found '3.1'.	3.1
+none	text/t1.md	3	12	18	warning	Team.Probe	Found 'Node.js'.	Node.js
+none	text/t1.md	3	24	30	warning	Team.Probe	Found 'Nodexjs'.	Nodexjs
+none	text/t1.md	5	22	24	warning	Team.Probe	Found 'Cxx'.	Cxx
+none	text/t1.md	7	13	19	warning	Team.Probe	Found 'harness'.	harness
+none	text/t1.md	7	25	33	warning	Team.Probe	Found 'harnesses'.	harnesses
+none	text/t1.md	7	39	47	warning	Team.Probe	Found 'harnessed'.	harnessed
+none	text/t1.md	9	13	17	warning	Team.Probe	Found 'zebra'.	zebra
+none	text/t1.md	9	23	27	warning	Team.Probe	Found 'Zebra'.	Zebra
+none	text/t1.md	9	33	37	warning	Team.Probe	Found 'ZEBRA'.	ZEBRA
+none	text/t2.md	1	11	13	warning	Team.Probe	Found 'foo'.	foo
+none	text/t2.md	1	19	21	warning	Team.Probe	Found 'Foo'.	Foo
+none	text/t2.md	3	17	23	warning	Team.Probe	Found 'utilize'.	utilize
+none	text/t2.md	3	29	36	warning	Team.Probe	Found 'utilized'.	utilized
+none	text/t2.md	3	42	49	warning	Team.Probe	Found 'utilizes'.	utilizes
+none	text/t2.md	5	14	18	warning	Team.Probe	Found 'Alpha'.	Alpha
+none	text/t2.md	5	21	24	warning	Team.Probe	Found 'Beta'.	Beta
+none	text/t2.md	5	27	31	warning	Team.Probe	Found 'Gamma'.	Gamma
+none	text/t2.md	5	37	41	warning	Team.Probe	Found 'Delta'.	Delta
+none	text/t2.md	7	16	20	warning	Team.Probe	Found 'foozz'.	foozz
+none	text/t2.md	7	26	29	warning	Team.Probe	Found 'fooz'.	fooz
+none	text/t2.md	7	8	10	warning	Team.Probe	Found 'foo'.	foo
