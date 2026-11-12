@@ -19,7 +19,8 @@
    The element around a title is a name the title's parts may use beside its own, and an item still needs a part that names the block itself, so `link` alone selects no title.
    The alternative was a scope for each pair, such as `link.title`, which adds a name for each element that may hold one.
 6. **An HTML `title` attribute is a title too.**
-   The attribute of a tag in an HTML block is a `title` node, and a line of text reads it through `raw` only, as in Vale.
+   The attribute of an HTML tag is a `title` node, in a block and in a line of text, and so is the `title` attribute of a JSX element in MDX.
+   Vale reads it through `raw` only, so a rule that `raw` carries for titles moves onto `title` with no loss.
    The attribute of an `a` tag sits in an empty `link` node, and that of an `img` tag in an empty `image` node, so `title & link` and `title & image` select it as they select a Markdown title.
 
 ## Overrides

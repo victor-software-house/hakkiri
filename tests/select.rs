@@ -267,11 +267,101 @@ fn raw_still_reads_an_html_title_in_a_block_and_in_a_line() -> TestResult {
     };
     assert!(raw(block, "an html marker")?);
     assert!(raw(line, "a line marker")?);
-    // In a line of text, as in Vale, no scope but `raw` reads the attribute.
-    let titles = blocks(&["title"], "a.md", line)?;
-    assert_eq!(texts(&titles), Vec::<&str>::new());
+    // In a line of text, as in Vale, no prose scope reads the attribute.
     let text = blocks(&["text"], "a.md", line)?;
     assert!(texts(&text).iter().all(|text| !text.contains("marker")));
+    Ok(())
+}
+
+#[test]
+fn title_selects_the_title_attribute_of_inline_html_and_of_a_jsx_element() -> TestResult {
+    let source = concat_lines(&[
+        "A <a href=\"u\" title=\"an a marker\">x</a> and <span title=\"a span marker\">y</span>",
+        "and <img src=\"i.png\" title=\"an img marker\"> end.",
+        "",
+        "# A heading <b title=\"a heading marker\">x</b>",
+        "",
+        "| Cell |",
+        "|:--|",
+        "| <i title=\"a cell marker\">x</i> |",
+        "",
+        "- An item <u title=\"an item marker\">x</u>",
+        "",
+        "> A quote <a title=\"a quote marker\"",
+        "> href=\"u\">x</a> here.",
+        "",
+    ]);
+    let found = |scope: &str| -> Result<Vec<String>, Box<dyn Error>> {
+        Ok(texts(&blocks(&[scope], "a.md", &source)?)
+            .into_iter()
+            .map(str::to_owned)
+            .collect())
+    };
+    assert_eq!(
+        found("title")?,
+        [
+            "an a marker",
+            "a span marker",
+            "an img marker",
+            "a heading marker",
+            "a cell marker",
+            "an item marker",
+            "a quote marker",
+        ]
+    );
+    assert_eq!(found("title & link")?, ["an a marker", "a quote marker"]);
+    assert_eq!(found("title & image")?, ["an img marker"]);
+    assert!(found("text")?.iter().all(|text| !text.contains("marker")));
+    let mdx = "A <Foo title=\"a jsx marker\" /> and <Bar title=\"a block marker\">text</Bar>.\n";
+    let found = blocks(&["title"], "a.mdx", mdx)?;
+    assert_eq!(texts(&found), ["a jsx marker", "a block marker"]);
+    let rust = "/// A <a title=\"a doc marker\" href=\"u\">x</a> here.\nfn f() {}\n";
+    let found = blocks(&["title"], "a.rs", rust)?;
+    assert_eq!(texts(&found), ["a doc marker"]);
+    Ok(())
+}
+
+#[test]
+fn the_title_of_a_tag_in_link_text_is_that_tags_and_not_the_links() -> TestResult {
+    let source = concat_lines(&[
+        "[A <span title=\"a nested marker\">x</span> end](u \"a link marker\")",
+        "",
+        "[<img src=\"i.png\" title=\"an inner img marker\"> end](u)",
+        "",
+        "[A <i title=\"a reference marker\">y</i>][r]",
+        "",
+        "[r]: u \"a definition marker\"",
+        "",
+    ]);
+    let found = |scope: &str| -> Result<Vec<String>, Box<dyn Error>> {
+        let mut found: Vec<String> = texts(&blocks(&[scope], "a.md", &source)?)
+            .into_iter()
+            .map(str::to_owned)
+            .collect();
+        found.sort();
+        Ok(found)
+    };
+    assert_eq!(
+        found("title")?,
+        [
+            "a definition marker",
+            "a link marker",
+            "a nested marker",
+            "a reference marker",
+            "an inner img marker",
+        ]
+    );
+    assert_eq!(found("title & link")?, ["a link marker"]);
+    assert_eq!(found("title & image")?, ["an inner img marker"]);
+    assert_eq!(
+        found("title & ~link")?,
+        [
+            "a definition marker",
+            "a nested marker",
+            "a reference marker",
+            "an inner img marker",
+        ]
+    );
     Ok(())
 }
 

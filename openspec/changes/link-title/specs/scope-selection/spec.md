@@ -52,8 +52,8 @@ A negated part that names the element, such as `title & ~link`, SHALL leave out 
 
 ### Requirement: An HTML title attribute is a title
 
-In an HTML block, the `title` attribute of a tag with text SHALL be selected by `title`, and by no prose scope.
-In a line of text, the attribute SHALL be read by `raw` only, as in Vale.
+The `title` attribute of an HTML tag SHALL be selected by `title`, and by no prose scope.
+That holds for a tag in an HTML block, a tag in a line of text, and the opening tag of a JSX element.
 The attribute of an `a` tag SHALL be a link title, and that of an `img` tag an image title.
 
 #### Scenario: An HTML block
@@ -61,7 +61,17 @@ The attribute of an `a` tag SHALL be a link title, and that of an `img` tag an i
 - **WHEN** an HTML block is `<p title="an html marker">Some text.</p>`
 - **THEN** `title` selects `an html marker`, and `text` selects `Some text.`
 
+#### Scenario: A line of text and a JSX element
+
+- **WHEN** a paragraph holds `A <span title="a line marker">x</span> here.` and an MDX file holds `<Foo title="a jsx marker" />`
+- **THEN** `title` selects `a line marker` and `a jsx marker`, and `text` selects neither
+
 #### Scenario: An a tag and an img tag
 
 - **WHEN** an HTML block holds `<a href="u" title="an a marker">x</a>` and `<img src="i.png" title="an img marker">`
 - **THEN** `title & link` selects `an a marker`, `title & image` selects `an img marker`, and `link` and `image` select neither
+
+#### Scenario: A tag in the text of a link
+
+- **WHEN** a link `[A <span title="a nested marker">x</span> end](u "a link marker")` holds a tag with a title in its text
+- **THEN** `title` selects both, `title & link` selects `a link marker` only, and `title & ~link` selects `a nested marker`

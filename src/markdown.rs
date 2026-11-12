@@ -553,7 +553,16 @@ impl Builder<'_> {
                 self.code_blocks.set(self.code_blocks.get() + 1);
                 Step::Done(Visited::cut(span_of(node)))
             }
-            Mdast::Html(_) => Step::Done(Visited::tag(span_of(node))),
+            Mdast::Html(html) => {
+                let span = span_of(node);
+                let nodes = span.as_ref().map_or_else(Vec::new, |span| {
+                    crate::html_text::tag_titles(self.source, span, &html.value)
+                });
+                Step::Done(Visited {
+                    nodes,
+                    ..Visited::tag(span)
+                })
+            }
             Mdast::Yaml(_) | Mdast::Toml(_) => {
                 let span = span_of(node);
                 let toml = matches!(node, Mdast::Toml(_));
@@ -592,6 +601,21 @@ impl Builder<'_> {
         match frame.kind {
             Kind::Scoped(scope) => {
                 let mut visited = self.scoped(frame.node, scope, frame.inner, frame.first);
+                // The title of a tag in the text of a link is that tag's, so it
+                // sits beside the link, and `title & link` leaves it out.
+                let mut nested = Vec::new();
+                if scope == Scope::Link
+                    && let Some(link) = visited
+                        .nodes
+                        .last_mut()
+                        .filter(|node| node.scope == Scope::Link)
+                {
+                    let (titles, rest) = std::mem::take(&mut link.children)
+                        .into_iter()
+                        .partition(|child| child.scope == Scope::Title);
+                    link.children = rest;
+                    nested = titles;
+                }
                 if let Mdast::Link(link) = frame.node
                     && link.title.is_some()
                     && let Some(span) = span_of(frame.node)
@@ -609,6 +633,7 @@ impl Builder<'_> {
                         }
                     }
                 }
+                visited.nodes.extend(nested);
                 visited
             }
             Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner, frame.first),
@@ -1017,6 +1042,12 @@ impl Builder<'_> {
             let children = node.children().map_or(&[][..], Vec::as_slice);
             let first = children.first().and_then(span_of);
             let last = children.last().and_then(span_of);
+            // The `title` attribute of the opening tag is a title.
+            let opening = span.start..first.as_ref().map_or(span.end, |first| first.start);
+            if let Some(tag) = self.source.get(opening.clone()) {
+                let titles = crate::html_text::tag_titles(self.source, &opening, tag);
+                visited.nodes.splice(0..0, titles);
+            }
             if let (Some(first), Some(last)) = (first, last) {
                 visited.cuts.push(span.start..first.start);
                 visited.cuts.push(last.end..span.end);
