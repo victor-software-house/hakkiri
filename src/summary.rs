@@ -128,6 +128,7 @@ pub fn summarize(tree: &Tree, source: &str) -> Result<Summary, SelectError> {
             | Scope::Image
             | Scope::Description
             | Scope::Meta
+            | Scope::FrontMatter
             | Scope::Raw
             | Scope::CommentLine
             | Scope::CommentBlock

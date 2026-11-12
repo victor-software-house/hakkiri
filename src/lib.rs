@@ -16,6 +16,7 @@ pub mod engine;
 mod entity;
 mod error;
 pub mod formula;
+mod frontmatter;
 mod html;
 mod html_text;
 mod ignore;

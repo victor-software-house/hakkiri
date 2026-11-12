@@ -29,6 +29,7 @@ An editor server follows in the second release.
 - A walk skips what git ignores, as ripgrep does, and a file named on the command line draws a warning when no glob selects it. The config, a flag and a variable each set both.
 - Inline `$…$` and display `$$…$$` math reads as code in Markdown and MDX, by Pandoc's delimiter rules, as in Vale.
 - A file that no language reads is linted as plain text when a glob selects it, and `formats` maps an extension, a file name or a glob to a reader.
+- The string values of a Markdown file's YAML, TOML and JSON front matter are linted as text, with the scope of their key, as in Vale.
 - Files are checked in parallel.
 
 ## Install

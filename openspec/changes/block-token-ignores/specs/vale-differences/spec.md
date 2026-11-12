@@ -39,14 +39,9 @@ hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart
 - **WHEN** a glob that matches a Rust, TypeScript or JavaScript file lists a block or token pattern
 - **THEN** hakkiri applies it to the Markdown of each comment, and Vale applies none, since it reads a comment as plain lines ([block-token-ignores 3][block-token-ignores-3])
 
-### Requirement: Front matter and comment sentences are read otherwise than Vale reads them
+### Requirement: A sentence rule in a comment is read otherwise than Vale reads it
 
-hakkiri SHALL list here the places where it reads a file otherwise than Vale at 66bbb85, found while probing the ignores and the comment controls.
-
-#### Scenario: Front matter values
-
-- **WHEN** a front matter block holds `title: very front` and a text rule flags `very`
-- **THEN** hakkiri skips the block and reports nothing, and Vale reports `very` in the value (row [HKR-049][ledger], [block-token-ignores 5][block-token-ignores-5])
+hakkiri SHALL list here the place where it reads a file otherwise than Vale at 66bbb85 that the probe of the ignores and the comment controls left.
 
 #### Scenario: A sentence rule in a comment
 
@@ -57,5 +52,4 @@ hakkiri SHALL list here the places where it reads a file otherwise than Vale at 
 [block-token-ignores-3]: ../../design.md#3-a-source-files-comments-take-the-patterns
 [block-token-ignores-4]: ../../design.md#4-patterns-are-checked-when-the-config-loads
 [block-token-ignores-not-ported]: ../../design.md#not-ported
-[block-token-ignores-5]: ../../design.md#5-three-reads-that-differ-from-vales
-[ledger]: ../../../../../tasks.yaml
+[block-token-ignores-5]: ../../design.md#5-a-read-that-differs-from-vales
