@@ -7,6 +7,8 @@
 //! text of one alert and its message, for each alert Vale gave, in order. The
 //! rows come from Vale at `66bbb85` run in Go on each text as one sentence,
 //! with prose `b33e60d` tagging it.
+//! The walk reads the tags of the model alone here, since the corrections that
+//! hakkiri makes after the model would change the tags that Vale walked.
 //!
 //! Vale cuts each text again with prose's segmenter and tags each part apart,
 //! where hakkiri tags the sentence its own splitter gave whole. `inputs.txt`
@@ -23,9 +25,10 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 
-use super::find;
+use super::{find, find_tagged};
 use crate::alert::fill;
 use crate::rule::{Check, Rule};
+use crate::tagger::Tagger;
 
 type TestResult = Result<(), Box<dyn Error>>;
 
@@ -35,7 +38,10 @@ fn alerts(name: &str, text: &str, sentence: &str) -> Result<Vec<(String, String)
     let Check::Sequence(check) = &rule.check else {
         return Err(format!("{name} is not a sequence rule").into());
     };
-    Ok(find(check, sentence)?
+    let tagged = Tagger::english()
+        .map_err(ToString::to_string)?
+        .tag_model(sentence);
+    Ok(find_tagged(check, sentence, tagged)?
         .into_iter()
         .map(|matched| {
             let values: Vec<&str> = matched.words.iter().map(String::as_str).collect();
@@ -112,5 +118,23 @@ fn fills_indexed_verbs_as_vale_does() -> TestResult {
     let (with_alerts, wrong) = compare("sequence-verbs")?;
     assert_eq!(with_alerts, 9, "{with_alerts} texts with an alert");
     assert_eq!(wrong, Vec::<String>::new());
+    Ok(())
+}
+
+/// A rule that reads four nouns in a row, as `NounStack` does.
+const FOUR_NOUNS: &str = "extends: sequence\nmessage: \"Noun stack '%s'.\"\ntokens:\n  - tag: NN|NNS\n    pattern: '[a-z][a-z-]*'\n    min: 4\n";
+
+#[test]
+fn a_verb_after_a_noun_phrase_ends_a_noun_stack() -> TestResult {
+    let rule = Rule::from_text("Seq.FourNouns", "FourNouns.yml", FOUR_NOUNS)?;
+    let Check::Sequence(check) = &rule.check else {
+        return Err("FourNouns is not a sequence rule".into());
+    };
+    let sentence = "The freshness harness reads stdout.";
+    let model = Tagger::english()
+        .map_err(ToString::to_string)?
+        .tag_model(sentence);
+    assert_eq!(find_tagged(check, sentence, model)?.len(), 1);
+    assert_eq!(find(check, sentence)?, []);
     Ok(())
 }

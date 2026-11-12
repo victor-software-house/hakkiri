@@ -14,7 +14,7 @@ use std::ops::Range;
 
 use crate::pattern::SearchError;
 use crate::rule::{Sequence, Token};
-use crate::tagger::Tagger;
+use crate::tagger::{Tagged, Tagger};
 
 /// One run of words a rule's tokens matched.
 #[derive(Debug, Eq, PartialEq)]
@@ -252,8 +252,22 @@ pub(crate) fn find(sequence: &Sequence, sentence: &str) -> Result<Vec<Matched>, 
     let Ok(tagger) = Tagger::english() else {
         return Ok(Vec::new());
     };
-    let words: Vec<Word<'_>> = tagger
-        .tag(sentence)
+    find_tagged(sequence, sentence, tagger.tag(sentence))
+}
+
+/// The runs of words in `sentence` that `sequence` matches, given the tokens of
+/// the sentence and their tags.
+///
+/// # Errors
+///
+/// Returns a [`SearchError`] when a pattern gives up on a word or the
+/// sentence.
+fn find_tagged(
+    sequence: &Sequence,
+    sentence: &str,
+    tagged: Vec<Tagged<'_>>,
+) -> Result<Vec<Matched>, SearchError> {
+    let words: Vec<Word<'_>> = tagged
         .into_iter()
         .map(|token| Word {
             text: sentence.get(token.range.clone()).unwrap_or_default(),
