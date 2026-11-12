@@ -78,6 +78,7 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -116,6 +117,7 @@ fn opens(parent: &Node, child: &Node) -> bool {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -153,6 +155,7 @@ const fn is_prose(scope: Scope) -> bool {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -193,7 +196,7 @@ const fn decodes(scope: Scope) -> Decode {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Meta => Decode::Text,
-        Scope::Alt | Scope::Description => Decode::Attribute,
+        Scope::Alt | Scope::Title | Scope::Description => Decode::Attribute,
         Scope::Code
         | Scope::Raw
         | Scope::CommentLine
@@ -231,6 +234,7 @@ fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
         | Scope::TableCaption
         | Scope::FigureCaption => vec![chain.unwrap_or_else(|| scope.name()), "text"],
         Scope::Alt | Scope::Description => vec![scope.name(), "text"],
+        Scope::Title => vec![scope.name()],
         Scope::TableRow
         | Scope::Link
         | Scope::Code
@@ -281,6 +285,7 @@ fn segments(node: &Node) -> Vec<Range<usize>> {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw => node.segments.clone(),
@@ -321,6 +326,7 @@ fn readings(node: &Node) -> Vec<Reading> {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Alt
+        | Scope::Title
         | Scope::Description
         | Scope::Meta
         | Scope::Raw => node.reads.clone(),

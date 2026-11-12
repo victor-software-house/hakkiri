@@ -33,6 +33,11 @@ fn blocks(scope: &[&str], file: &str, source: &str) -> Result<Vec<Block>, Box<dy
     Ok(select(&Selector::parse(&items)?, &tree, source, extension)?)
 }
 
+/// The lines joined with a line feed after each.
+fn concat_lines(lines: &[&str]) -> String {
+    lines.iter().map(|line| format!("{line}\n")).collect()
+}
+
 fn texts(blocks: &[Block]) -> Vec<&str> {
     blocks.iter().map(|block| block.text.as_str()).collect()
 }
@@ -80,6 +85,53 @@ fn a_comment_reads_without_its_markers() -> TestResult {
 fn text_selects_the_prose_leaves() -> TestResult {
     let found = blocks(&["text"], "a.md", "# A marker\n\nA marker.\n\n- A marker\n")?;
     assert_eq!(texts(&found), ["A marker", "A marker.", "A marker"]);
+    Ok(())
+}
+
+#[test]
+fn title_selects_the_title_of_a_link_an_image_and_a_definition() -> TestResult {
+    let source = concat_lines(&[
+        "A [link](u.html \"a marker\") and ![img](i.png 'an marker') end.",
+        "",
+        "[ref]: u.html (a third marker)",
+        "",
+    ]);
+    let found = blocks(&["title"], "a.md", &source)?;
+    assert_eq!(texts(&found), ["a marker", "an marker", "a third marker"]);
+    assert!(found.iter().all(|block| block.scope == Scope::Title));
+    Ok(())
+}
+
+#[test]
+fn no_prose_scope_reads_a_title() -> TestResult {
+    let source = concat_lines(&[
+        "A [link](u.html \"a title marker\") and ![img](i.png 'an image marker') end.",
+        "",
+        "[ref]: u.html (a definition marker)",
+        "",
+    ]);
+    for scope in ["text", "paragraph", "link", "alt", "sentence"] {
+        for block in blocks(&[scope], "a.md", &source)? {
+            assert!(
+                !block.text.as_str().contains("title marker")
+                    && !block.text.as_str().contains("image marker")
+                    && !block.text.as_str().contains("definition marker"),
+                "scope {scope} read {:?}",
+                block.text.as_str()
+            );
+        }
+    }
+    Ok(())
+}
+
+#[test]
+fn a_link_without_a_title_and_an_escaped_quote_give_the_right_title() -> TestResult {
+    let source = concat_lines(&[
+        "A [plain](u.html) and [quoted](u.html \"say \\\"hi\\\" marker\") and [empty](u.html \"\") end.",
+        "",
+    ]);
+    let found = blocks(&["title"], "a.md", &source)?;
+    assert_eq!(texts(&found), ["say \\\"hi\\\" marker"]);
     Ok(())
 }
 

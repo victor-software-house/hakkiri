@@ -52,6 +52,9 @@ pub enum Scope {
     Emphasis,
     /// The alt text of an image.
     Alt,
+    /// The title of a link, an image or a link reference definition, which
+    /// no prose scope reads, as in Vale, where only `raw` does.
+    Title,
     /// The text of a `meta` tag that describes the page.
     Description,
     /// The content of a `data` element: a name or an identifier that is in
@@ -71,7 +74,7 @@ pub enum Scope {
 
 impl Scope {
     /// Every scope.
-    pub const ALL: [Self; 30] = [
+    pub const ALL: [Self; 31] = [
         Self::Paragraph,
         Self::Heading1,
         Self::Heading2,
@@ -95,6 +98,7 @@ impl Scope {
         Self::Strong,
         Self::Emphasis,
         Self::Alt,
+        Self::Title,
         Self::Description,
         Self::Meta,
         Self::Raw,
@@ -131,6 +135,7 @@ impl Scope {
             Self::Strong => "strong",
             Self::Emphasis => "emphasis",
             Self::Alt => "alt",
+            Self::Title => "title",
             Self::Description => "description",
             Self::Meta => "meta",
             Self::Raw => "raw",

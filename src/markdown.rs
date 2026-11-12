@@ -554,8 +554,10 @@ impl Builder<'_> {
             | Mdast::Toml(_)
             | Mdast::Yaml(_)
             | Mdast::InlineMath(_)
-            | Mdast::Math(_)
-            | Mdast::Definition(_) => Step::Done(Visited::cut(span_of(node))),
+            | Mdast::Math(_) => Step::Done(Visited::cut(span_of(node))),
+            Mdast::Definition(definition) => {
+                Step::Done(self.definition(node, definition.title.is_some()))
+            }
             Mdast::Root(_)
             | Mdast::FootnoteDefinition(_)
             | Mdast::List(_)
@@ -571,7 +573,27 @@ impl Builder<'_> {
     /// What a node gives its parent once the nodes below it are visited.
     fn finish(&self, frame: Frame<'_>) -> Visited {
         match frame.kind {
-            Kind::Scoped(scope) => self.scoped(frame.node, scope, frame.inner, frame.first),
+            Kind::Scoped(scope) => {
+                let mut visited = self.scoped(frame.node, scope, frame.inner, frame.first);
+                if let Mdast::Link(link) = frame.node
+                    && link.title.is_some()
+                    && let Some(span) = span_of(frame.node)
+                {
+                    let from = frame
+                        .node
+                        .children()
+                        .and_then(|kids| kids.last())
+                        .and_then(span_of)
+                        .map_or(span.start, |last| last.end);
+                    if let Some(title) = self.title(&span, from, true) {
+                        match visited.nodes.last_mut() {
+                            Some(node) if node.scope == Scope::Link => node.children.push(title),
+                            _ => visited.nodes.push(title),
+                        }
+                    }
+                }
+                visited
+            }
             Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner, frame.first),
             Kind::Jsx => self.jsx(frame.node, frame.inner),
             Kind::Transparent => Self::strikethrough(frame.node, frame.inner),
@@ -647,6 +669,7 @@ impl Builder<'_> {
             | Scope::Strong
             | Scope::Emphasis
             | Scope::Alt
+            | Scope::Title
             | Scope::Description
             | Scope::Meta
             | Scope::Raw
@@ -773,6 +796,7 @@ impl Builder<'_> {
             | Scope::TableCaption
             | Scope::FigureCaption
             | Scope::Alt
+            | Scope::Title
             | Scope::Description
             | Scope::Meta
             | Scope::Raw
@@ -1031,15 +1055,82 @@ impl Builder<'_> {
             let start = span.start + "![".len();
             Some(start..start + length)
         });
+        let mut nodes: Vec<Node> = span
+            .map(|span| Node::new(Scope::Alt, span, Vec::new()))
+            .into_iter()
+            .collect();
+        if let Mdast::Image(image) = node
+            && image.title.is_some()
+            && let Some(whole) = span_of(node)
+            && let Some(title) = self.title(&whole, whole.start, true)
+        {
+            nodes.push(title);
+        }
         Visited {
-            nodes: span
-                .map(|span| Node::new(Scope::Alt, span, Vec::new()))
-                .into_iter()
-                .collect(),
+            nodes,
             cuts: span_of(node).into_iter().collect(),
             tags: Vec::new(),
         }
     }
+
+    /// A link reference definition: a gap in the text, and the `title` node of
+    /// its title.
+    fn definition(&self, node: &Mdast, titled: bool) -> Visited {
+        let span = span_of(node);
+        let mut visited = Visited::cut(span.clone());
+        if titled
+            && let Some(span) = span
+            && let Some(title) = self.title(&span, span.start, false)
+        {
+            visited.nodes.push(title);
+        }
+        visited
+    }
+
+    /// The `title` node of the title that ends the link, image or definition
+    /// at `span`, looked for after the byte `from`.
+    fn title(&self, span: &Range<usize>, from: usize, paren: bool) -> Option<Node> {
+        title_range(self.source, from, span.end, paren)
+            .map(|range| Node::new(Scope::Title, range, Vec::new()))
+    }
+}
+
+/// The bytes between the delimiters of the title that ends `source[from..to]`,
+/// when the text ends with one.
+///
+/// A title is written `"…"`, `'…'` or `(…)` after white space, and an inline
+/// link or image closes with a `)` after it, which `paren` says to strip.
+/// A backslash escapes a delimiter inside the title.
+fn title_range(source: &str, from: usize, to: usize, paren: bool) -> Option<Range<usize>> {
+    let mut text = source.get(from..to)?;
+    if paren {
+        text = text.strip_suffix(')')?;
+    }
+    let text = text.trim_end();
+    let bytes = text.as_bytes();
+    let close = text.len().checked_sub(1)?;
+    let open = match bytes.get(close)? {
+        b'"' => b'"',
+        b'\'' => b'\'',
+        b')' => b'(',
+        _ => return None,
+    };
+    for at in (0..close).rev() {
+        let slashes = bytes
+            .get(..at)?
+            .iter()
+            .rev()
+            .take_while(|byte| **byte == b'\\')
+            .count();
+        if bytes.get(at) == Some(&open) && slashes % 2 == 0 {
+            let spaced = at
+                .checked_sub(1)
+                .and_then(|before| bytes.get(before))
+                .is_some_and(u8::is_ascii_whitespace);
+            return (spaced && at + 1 < close).then_some(from + at + 1..from + close);
+        }
+    }
+    None
 }
 
 fn span_of(node: &Mdast) -> Option<Range<usize>> {
