@@ -10,6 +10,8 @@
 )]
 
 use std::error::Error;
+use std::fs;
+use std::path::PathBuf;
 
 use hakkiri::alert::Alert;
 use hakkiri::engine::lint;
@@ -99,6 +101,38 @@ fn the_alert_is_at_the_last_match_of_the_pair() -> TestResult {
     assert_eq!(found.len(), 1);
     assert_eq!(found[0].matched, "adviser");
     assert_eq!((found[0].line, found[0].first_column), (3, 35));
+    Ok(())
+}
+
+/// A paragraph of two lines whose last match, inside a longer word, has the
+/// text of an earlier match.
+///
+/// `tests/fixtures/consistency-lines` holds the rule (`styles`), the
+/// paragraph (`text`, with `.fixture` after the extension), and `vale.tsv`:
+/// the row Vale gave at `66bbb85`, run from the fixture folder as
+/// `vale --config=vale/all.ini --output=JSON text`, with the config, the file,
+/// the line, the first and last column, the level, the rule, the message and
+/// the matched text.
+/// Vale searches the paragraph for the text of the match, so it puts the
+/// alert on the first line that holds the text, line 1. hakkiri puts it at
+/// the match, line 2.
+#[test]
+fn a_paragraph_of_lines_puts_the_alert_at_the_last_match() -> TestResult {
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/consistency-lines");
+    let rule = fs::read_to_string(root.join("styles/Team/Cons.yml"))?;
+    let source = fs::read_to_string(root.join("text/lines.md.fixture"))?;
+    let found = alerts(&rule, &source)?;
+    assert_eq!(found.len(), 1);
+    assert_eq!(found[0].matched, "adviser");
+    assert_eq!((found[0].line, found[0].first_column), (2, 22));
+    let table = fs::read_to_string(root.join("vale.tsv"))?;
+    let rows: Vec<Vec<&str>> = table.lines().map(|row| row.split('\t').collect()).collect();
+    assert_eq!(rows.len(), 1);
+    let [_, _, line, column, _, _, _, _, matched] = rows[0][..] else {
+        return Err("the row of vale.tsv has the wrong number of cells".into());
+    };
+    assert_eq!(matched, "adviser");
+    assert_eq!((line.parse::<usize>()?, column.parse::<usize>()?), (1, 5));
     Ok(())
 }
 

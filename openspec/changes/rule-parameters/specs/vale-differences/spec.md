@@ -39,7 +39,17 @@ hakkiri SHALL read a rule's parameters as Vale 3.26.0 does, apart from the scena
 - **WHEN** a parameter names `Vale.Terms` or `Vale.Avoid`
 - **THEN** hakkiri refuses it, and Vale ignores it ([rule-parameters 5][rule-parameters-5])
 
+### Requirement: A consistency alert in a multi-line paragraph differs from Vale
+
+hakkiri SHALL place a `consistency` alert on the last match of a form, though an earlier line holds the same text.  
+
+#### Scenario: A form inside a longer word on a later line
+
+- **WHEN** a `consistency` rule with `nonword: true` pairs `advisor` with `adviser`, and a paragraph holds `The adviser spoke first.` and then `Two advisors met two advisers.`
+- **THEN** hakkiri puts the alert on line 2, column 22, the last match, and Vale searches the paragraph for the text `adviser` and puts it on line 1, column 5 ([pattern 2][pattern-2])
+
 [rule-parameters-2]: ../../design.md#2-parameters-apply-per-glob
 [rule-parameters-3]: ../../design.md#3-an-empty-styles-list-drops-the-parameters
 [rule-parameters-4]: ../../design.md#4-the-parameters-are-laid-over-the-rules-fields-and-the-rules-reader-refuses-them
 [rule-parameters-5]: ../../design.md#5-a-rule-built-from-a-vocabulary-takes-no-parameter
+[pattern-2]: ../../../archive/2026-11-10-pattern-and-readability-checks/design.md#2-consistency-matches-as-existence-does-one-pattern-per-pair

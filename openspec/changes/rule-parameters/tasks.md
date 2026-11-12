@@ -25,6 +25,12 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   On the authoring machine, `openspec validate --all --strict` and `qctl check --no-git` passed.  
   Not run here: `cargo deny`, `cargo machete`, the doc build and the musl clippy, which the pull request's CI runs.
 
+- [x] 3.2 Record where a `consistency` alert sits in a multi-line paragraph, hakkiri on the last match and Vale on the first line that holds the text, with a fixture that pins both.  
+  Verify `a_paragraph_of_lines_puts_the_alert_at_the_last_match` passes, and `openspec validate --all --strict` passes.  
+  Evidence, 2026-11-12 (UTC): Vale at `66bbb85` gave line 1, columns 5 to 11 for `The adviser spoke first.` and `Two advisors met two advisers.` under `nonword: true`, and the test pins hakkiri at line 2, column 22.  
+  The test passed in a cloud box, with `cargo clippy --all-targets` and the format check.  
+  Vale's source shows why: `loc` holds the last match of the block, and `makeAlert` searches the block for the matched text, which lands on its first occurrence.
+
 ## 4. Integration
 
 - [ ] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.

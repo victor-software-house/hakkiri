@@ -25,6 +25,7 @@ Vale 3.26.0 at `66bbb85` reads `Style.Rule[param]` and takes `Style.Rule.param` 
 - Every fault of a config is reported at once.
 - `Vale.Repetition` is read from its Vale definition, as text, so it takes parameters through the path that any rule file takes.
 - The `vale-differences` spec records each place where hakkiri differs.
+- The same spec records that a `consistency` alert in a paragraph of several lines sits on the last match where Vale puts it on the first line that holds the text, with a fixture that pins both positions.
 
 ## Capabilities
 
@@ -34,11 +35,11 @@ Vale 3.26.0 at `66bbb85` reads `Style.Rule[param]` and takes `Style.Rule.param` 
 
 ### Modified Capabilities
 
-- `vale-differences`: one requirement lists the differences.
+- `vale-differences`: one requirement lists the parameter differences, and one records the placement of a `consistency` alert in a paragraph of lines.
 
 ## Impact
 
-- New: `tests/rule_parameters.rs` and `tests/fixtures/rule-parameters`, with Vale's alerts and errors recorded from Vale at `66bbb85`.
+- New: `tests/rule_parameters.rs` and `tests/fixtures/rule-parameters`, with Vale's alerts and errors recorded from Vale at `66bbb85`, and `tests/fixtures/consistency-lines` with the row Vale gave for the placement.
 - Changed: `src/config.rs`, `src/rule.rs`, `src/rule/inherit.rs`, `src/rule/build.rs`, `src/instructions.md`, the skill, `README.md` and `AGENTS.md`.
 - `hakkiri::rule` gains `Param` and `Rule::with_params`, and loses `vale_repetition_rule`, which was crate-private.
 - No new dependency.
