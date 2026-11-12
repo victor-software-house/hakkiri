@@ -1,0 +1,14 @@
+# Tasks
+
+Every compile, lint and test step runs in a box or the pull request's CI, not on the authoring machine.
+
+## 1. The reader
+
+- [x] 1.1 Read the definitions of a file and mask a link whose text is its address in the text around it.  
+  Verify `a_link_whose_text_is_its_address_counts_no_word` in `tests/metric.rs` passes, and the word-count probe of [HKR-063][ledger] shows no difference left that the link text causes.
+
+## 2. Integration
+
+- [ ] 2.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+
+[ledger]: ../../../tasks.yaml

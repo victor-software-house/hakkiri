@@ -352,6 +352,21 @@ queue:
     notes:
       - '2026-11-12, operator decision: a code span counts as one word by default, a setting sets it to zero, at the package, project and glob levels, with a flag and a variable. The key is code_span_size, and its unit is words.'
       - It applies only to word counts and to the metrics built on words. HKR-051 keeps the rule form of LongSentence; this row gives a project the way to count as Vale does.
+
+  - id: HKR-064
+    title: Read a link that names its address as a URL
+    scope: engine
+    outcome: >-
+      A Markdown link whose text equals its address counts no word, as Vale counts
+      none for it, so the word counts of a paragraph and a file with such a link equal Vale's.
+    blocked_by: []
+    acceptance:
+      - A link whose text is its address, inline or by reference, is a gap in the prose around it, and a link with another address counts its words.
+      - With code_span_size 0 and Vale's duplicate-position drop off, no word-count difference over the HKR-063 probes comes from link text.
+    plan: openspec/changes/link-address/proposal.md
+    notes:
+      - '2026-11-12, found by the HKR-063 attribution: Vale replaces the text of an element whose href equals its text with a run of asterisks.'
+
 archive:
   - id: HKR-031
     title: Turn rules off and on with comments

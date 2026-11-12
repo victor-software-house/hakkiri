@@ -1,6 +1,7 @@
 //! Markdown and MDX text into nodes, through markdown-rs.
 
 use std::cell::{Cell, RefCell};
+use std::collections::HashMap;
 use std::ops::Range;
 
 use markdown::mdast::Node as Mdast;
@@ -225,6 +226,7 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     let builder = Builder {
         source,
         code_blocks: Cell::new(0),
+        addresses: addresses(&root),
     };
     let mut nodes = builder.visit(&root, Scope::TableCell).nodes;
     math::include_delimiters(&mut nodes, &spans);
@@ -372,6 +374,26 @@ struct Builder<'a> {
     source: &'a str,
     /// The fenced and indented code blocks seen so far.
     code_blocks: Cell<usize>,
+    /// The address each link definition gives its label.
+    addresses: HashMap<String, String>,
+}
+
+/// The address of each link definition below `root`, by label.
+/// The first definition of a label holds, as in `CommonMark`.
+fn addresses(root: &Mdast) -> HashMap<String, String> {
+    let mut found = HashMap::new();
+    let mut pending = vec![root];
+    while let Some(node) = pending.pop() {
+        if let Mdast::Definition(definition) = node {
+            found
+                .entry(definition.identifier.clone())
+                .or_insert_with(|| definition.url.clone());
+        }
+        if let Some(children) = node.children() {
+            pending.extend(children.iter().rev());
+        }
+    }
+    found
 }
 
 /// How a node of the mdast takes part in the tree.
@@ -868,6 +890,8 @@ impl Builder<'_> {
     /// Strong text, emphasis and a link written with brackets lose the
     /// markers around what they hold, in their own text and in the text
     /// around them.
+    /// A link whose text is its address loses the whole link in the text
+    /// around it.
     /// A code span loses its backticks the same way, and keeps its content.
     /// An autolink and a bare URL keep their address as their own text, and
     /// the text around them loses the whole of it.
@@ -888,10 +912,15 @@ impl Builder<'_> {
                 let text = self.source.get(span.clone()).unwrap_or_default();
                 if text.starts_with('[') {
                     let cuts = Self::wrapper(node, &span);
+                    let up = if self.is_address(node, text, false) {
+                        vec![span.clone()]
+                    } else {
+                        cuts.clone()
+                    };
                     return Markup {
                         span,
-                        own: cuts.clone(),
-                        up: cuts,
+                        own: cuts,
+                        up,
                     };
                 }
                 let angle = text.starts_with('<') && text.ends_with('>') && text.len() >= 2;
@@ -900,8 +929,7 @@ impl Builder<'_> {
                 } else {
                     span.clone()
                 };
-                let address = self.source.get(inner.clone()).unwrap_or_default();
-                if Self::is_address(node, address, angle) {
+                if self.is_address(node, text, angle) {
                     return Markup {
                         span: inner,
                         own: Vec::new(),
@@ -964,22 +992,43 @@ impl Builder<'_> {
         }
     }
 
-    /// Whether an autolink is its own destination, which Vale's converter
-    /// keeps out of the text.
+    /// Whether the link `node`, written as `text`, is its own address, which
+    /// Vale's converter keeps out of the text.
     ///
-    /// A web address in angle brackets or written bare with a lower-case
-    /// scheme is.
+    /// A link with brackets is when its text repeats its destination, as in
+    /// `[a.md](a.md)`, whatever the destination is, and Vale reads it as a
+    /// URL.
+    /// An autolink is when its destination is what is written, which holds
+    /// for a web address in angle brackets or written bare with a lower-case
+    /// scheme.
     /// So is another address in angle brackets that is its own destination,
     /// such as `<mailto:x>`, which goldmark and Vale drop from the text.
     /// A bare email address, a bare `www.` address and a bare `mailto:`
     /// address are not: the converter writes a different destination for the
     /// first two and reads the last as text, so their words stay in the text.
-    fn is_address(node: &Mdast, address: &str, angle: bool) -> bool {
-        let Mdast::Link(link) = node else {
+    fn is_address(&self, node: &Mdast, text: &str, angle: bool) -> bool {
+        let destination = if let Mdast::Link(link) = node {
+            link.url.as_str()
+        } else if let Mdast::LinkReference(reference) = node
+            && let Some(address) = self.addresses.get(&reference.identifier)
+        {
+            address.as_str()
+        } else {
             return false;
         };
-        link.url == address
-            && (angle || address.starts_with("http://") || address.starts_with("https://"))
+        if text.starts_with('[') {
+            return matches!(
+                node.children().map(Vec::as_slice),
+                Some([Mdast::Text(shown)]) if shown.value == destination
+            );
+        }
+        let shown = if angle {
+            text.get(1..text.len() - 1).unwrap_or_default()
+        } else {
+            text
+        };
+        shown == destination
+            && (angle || shown.starts_with("http://") || shown.starts_with("https://"))
     }
 
     /// The markers before the first child of `node` and after its last.

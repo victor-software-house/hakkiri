@@ -91,6 +91,18 @@ fn a_code_span_counts_as_many_words_as_its_size() -> TestResult {
 }
 
 #[test]
+fn a_link_whose_text_is_its_address_counts_no_word() -> TestResult {
+    // Vale 66bbb85 counts 2 and 4 for the first two, and 2 for the third.
+    assert_eq!(printing("words", "See [a.md](a.md) now.\n")?, ["2.00"]);
+    assert_eq!(printing("words", "See [a.md](b.md) now.\n")?, ["4.00"]);
+    assert_eq!(
+        printing("words", "See [a.md][a] now.\n\n[a]: a.md\n")?,
+        ["2.00"]
+    );
+    Ok(())
+}
+
+#[test]
 fn the_size_of_a_code_span_reaches_a_metric_of_the_whole_file() -> TestResult {
     let whole = "extends: metric\nmessage: \"%s\"\nformula: words\ncondition: '> 2'\n";
     let text = "Run `a`, `b`, `c` and `one two three` today.\n";
