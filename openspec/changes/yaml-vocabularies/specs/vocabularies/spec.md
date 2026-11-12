@@ -63,8 +63,18 @@ An entry of `accept` or `reject` SHALL be a term, a term mapped to nothing, or a
 
 ### Requirement: A wrong YAML entry is refused with its file and line
 
-hakkiri SHALL refuse a vocabulary file that has a wrong entry. An entry is wrong when it has more than one key, a key mapped to a string or a list, an unknown option, a `regex` or `ignorecase` that is no boolean, or an empty term. An entry is also wrong when it has both `regex` and `flags`, a pattern that does not compile, or flags that do not expand. The file is refused too when its affix file is missing.
+hakkiri SHALL refuse a vocabulary file that has a wrong entry or a missing affix file.
 Each problem SHALL name the file and the line Vale names, and one run SHALL report every one.
+
+#### Scenario: A wrong shape
+
+- **WHEN** an entry has more than one key, a key mapped to a string or a list, an unknown option, a `regex` or `ignorecase` that is no boolean, or an empty term
+- **THEN** hakkiri refuses the file
+
+#### Scenario: A wrong value
+
+- **WHEN** an entry has both `regex` and `flags`, a pattern that does not compile, flags that do not expand, or an `affix` that names a missing file
+- **THEN** hakkiri refuses the file
 
 #### Scenario: Each fault
 
