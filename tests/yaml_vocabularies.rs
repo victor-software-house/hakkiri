@@ -187,13 +187,10 @@ fn every_fault_is_refused_on_the_file_and_line_vale_names() -> TestResult {
         let config = format!(".ctl/{case}.yaml");
         let result = run(root.path(), &["check", "--config", &config, "text"], &[])?;
         assert_eq!(result.code, 2, "{case}: {}{}", result.out, result.err);
-        // Vale's YAML reader and hakkiri's place a syntax fault on different
-        // lines of the same unfinished list, so that case checks the file only.
-        let wanted = if case == "yaml-syntax" {
-            format!("failed {file}: line ")
-        } else {
-            format!("failed {file}: line {line}: ")
-        };
+        // The unfinished list opens on line 3. Vale names line 2, which holds
+        // a complete entry, so hakkiri names the line of the bracket instead.
+        let line = if case == "yaml-syntax" { 3 } else { line };
+        let wanted = format!("failed {file}: line {line}: ");
         assert!(result.err.contains(&wanted), "{case}: {}", result.err);
     }
     Ok(())

@@ -34,7 +34,8 @@ An entry is a scalar, or a mapping of one key to nothing or to options.
 A small `Node` type reads the entry's shape from serde-saphyr, and the checks that Vale does while it unmarshals run on it: one key, options that are a mapping, a known option name, a boolean for `regex` and `ignorecase`, then a term, `regex` with `flags`, a pattern that compiles and flags that expand.
 Each problem is placed through `Input::place` or `Input::place_key`, on the line Vale names: the entry for a shape or term fault, the value for a mapping to a string or a list, the option key for an unknown option.
 One run lists every wrong entry, where Vale stops at the first.
-A syntax error of the whole file is one problem, on the line the parser gives, which is not the line yaml.v3 gives for the same unfinished list.
+A syntax error of the whole file is one problem, on the line the parser gives.
+For a list `[a` that opens on line 3 and never closes, that is line 3, and yaml.v3 names line 2, which holds a complete entry.
 Alternative: an untagged enum for the entry.
 It lost because serde reports only that no variant matched, with no word of what is wrong with the entry.
 
