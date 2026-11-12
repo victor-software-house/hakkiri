@@ -12,6 +12,10 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Verify the OpenSpec validation passes.  
   Evidence, 2026-11-11 (UTC): `format`, `lint`, the full suite, `specs`, `specs:budget`, `lint:md`, `lint:typos`, `lint:prose`, `check:versions` and `check:repo` pass in a box.  
   The box's crates mirror lacked ctl-layout 0.7.1, so the lockfile update and the run read crates.io directly.
+- [x] 1.3 Place a fault about one item of a list, a `styles` name, a `vocab` name or an ignore pattern, at that item.  
+  Verify the three tests for a later item fail before the change and pass after it.
+  Evidence, 2026-11-11 (UTC): against the previous `config.rs` in a box the three tests fail, and they pass with the change.  
+  `format`, `lint`, the full suite, `specs`, `specs:budget`, `lint:md`, `lint:typos`, `lint:prose`, `check:versions` and `check:repo` pass.
 
 ## 2. Integration
 

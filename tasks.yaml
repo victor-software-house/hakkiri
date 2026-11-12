@@ -338,6 +338,7 @@ queue:
     plan: openspec/changes/config-key-lines/proposal.md
     notes:
       - "2026-11-11, found while placing glob-level errors in ctl-core: key_line read the first line that looked like the key, so two globs that set one rule gave the first glob's fault the second glob's line. ctl-core 0.7.1 holds FieldPath and Input::place."
+      - "2026-11-11, the lead asked for a fault about one list item to name that item: a styles name, a vocab name and an ignore pattern take the index step of the item. The key faults move to ctl-core's place_key (CTC-054) once it is released."
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary

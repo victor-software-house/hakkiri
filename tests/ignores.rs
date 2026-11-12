@@ -237,6 +237,24 @@ fn an_invalid_pattern_is_an_error_on_its_key() -> TestResult {
 }
 
 #[test]
+fn a_pattern_that_does_not_compile_names_the_line_of_that_pattern() -> TestResult {
+    let suite = Suite::new("ignores-later-pattern");
+    let root = small(
+        &suite,
+        "later-pattern",
+        "packages:\n  - path: styles\nfiles:\n  '*.md':\n    styles: [Team]\n    token_ignores:\n      - '(z)'\n      - '('\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result.err.contains("line 8: token_ignores:") && result.err.contains("does not compile"),
+        "{}",
+        result.err
+    );
+    Ok(())
+}
+
+#[test]
 fn a_word_where_a_list_of_patterns_belongs_is_an_error() -> TestResult {
     let suite = Suite::new("ignores-word");
     let root = small(

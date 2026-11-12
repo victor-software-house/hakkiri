@@ -14,3 +14,13 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 
 - **WHEN** `files` is `{'docs/**/*.md': {Team.Hint: yes}, 'a.md': {styles: [Nope]}}` on line 4
 - **THEN** both faults name line 4
+
+#### Scenario: A later item of a list
+
+- **WHEN** `styles` holds `Other` on line 6 and `Nope` on line 7, and `Nope` is no style
+- **THEN** hakkiri names line 7, the line of the item, and not line 6
+
+#### Scenario: An unknown vocabulary of a glob and a pattern that does not compile
+
+- **WHEN** a glob's `vocab` holds `Team` and then `Nope`, or `token_ignores` holds `(z)` and then `(`, one item to a line
+- **THEN** the fault names the line of `Nope`, or of `(`

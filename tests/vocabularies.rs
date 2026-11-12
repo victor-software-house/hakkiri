@@ -366,3 +366,24 @@ fn each_accepted_term_matches_only_itself_in_spelling() -> TestResult {
     }
     Ok(())
 }
+
+#[test]
+fn an_unknown_vocabulary_of_a_glob_names_the_line_of_that_name() -> TestResult {
+    let suite = Suite::new("vocabularies-later-name");
+    let root = project(&suite, "later-name")?;
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  'text/*.md':\n    styles: [Team]\n    vocab:\n      - Team\n      - Nope\n",
+    );
+    root.file("text/a.md", "Fine.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .err
+            .contains("line 8: vocab: `Nope` is not a vocabulary in any package"),
+        "{}",
+        result.err
+    );
+    Ok(())
+}

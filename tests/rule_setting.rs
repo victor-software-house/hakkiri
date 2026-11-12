@@ -423,3 +423,23 @@ fn a_fault_in_a_glob_written_in_flow_style_still_names_its_line() -> TestResult 
     }
     Ok(())
 }
+
+#[test]
+fn a_fault_about_a_later_style_names_the_line_of_that_style() -> TestResult {
+    let suite = Suite::new("rule-setting-later-style");
+    let root = project(
+        &suite,
+        "later-style",
+        "  'a.md':\n    styles:\n      - Other\n      - Nope\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .err
+            .contains("line 7: styles: `Nope` is not a style in any package"),
+        "{}",
+        result.err
+    );
+    Ok(())
+}

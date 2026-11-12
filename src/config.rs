@@ -1025,10 +1025,13 @@ fn read_globs(
             let at = line_of(input, &glob.clone().key(&key));
             match (key.as_str(), setting) {
                 ("styles", Setting::List(names)) => {
-                    for name in &names {
+                    let list = glob.clone().key("styles");
+                    for (index, name) in names.iter().enumerate() {
                         if !loaded.styles.contains_key(name) {
+                            // Each name has its own line, whatever its place in
+                            // the list.
                             faults.add(
-                                at,
+                                line_of(input, &list.clone().index(index)),
                                 "styles",
                                 format!("`{name}` is not a style in any package"),
                             );
@@ -1044,10 +1047,10 @@ fn read_globs(
                     faults.add(at, "vocab", "is a list of vocabulary names".to_owned());
                 }
                 ("block_ignores", Setting::List(list)) => {
-                    block_ignores = compile_all(&list, at, "block_ignores", faults);
+                    block_ignores = compile_all(&list, input, &glob, "block_ignores", faults);
                 }
                 ("token_ignores", Setting::List(list)) => {
-                    token_ignores = compile_all(&list, at, "token_ignores", faults);
+                    token_ignores = compile_all(&list, input, &glob, "token_ignores", faults);
                 }
                 ("block_ignores" | "token_ignores", Setting::Word(_)) => {
                     faults.add(at, &key, "is a list of patterns".to_owned());
@@ -1089,18 +1092,22 @@ fn read_globs(
     globs
 }
 
-/// The patterns `list` holds, compiled, and a fault on line `at` of the key
-/// `key` for each that does not compile.
+/// The patterns `list` holds, the value of `key` under the glob at `glob` in
+/// `input`, compiled, and a fault on the line of each that does not compile.
 fn compile_all(
     list: &[String],
-    at: Option<usize>,
+    input: &Input,
+    glob: &FieldPath,
     key: &str,
     faults: &mut Faults<'_>,
 ) -> Vec<Pattern> {
+    let items = glob.clone().key(key);
     list.iter()
-        .filter_map(|source| match Pattern::new(source) {
+        .enumerate()
+        .filter_map(|(index, source)| match Pattern::new(source) {
             Ok(pattern) => Some(pattern),
             Err(error) => {
+                let at = line_of(input, &items.clone().index(index));
                 faults.add(at, key, error.to_string());
                 None
             }
@@ -1164,8 +1171,9 @@ impl Named {
             let glob = FieldPath::root().key("files").key(pattern);
             for (key, setting) in &settings.0 {
                 if let ("vocab", Setting::List(names)) = (key.as_str(), setting) {
-                    let at = line_of(&layer.input, &glob.clone().key("vocab"));
-                    for name in names {
+                    let list = glob.clone().key("vocab");
+                    for (index, name) in names.iter().enumerate() {
+                        let at = line_of(&layer.input, &list.clone().index(index));
                         self.add(name, at, &layer.name);
                         if !self.globs.contains(name) {
                             self.globs.push(name.clone());
