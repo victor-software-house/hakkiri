@@ -56,6 +56,18 @@ impl Lines {
         Some(Self { lines })
     }
 
+    /// The byte of the file at the byte `at` of the block.
+    fn offset(&self, at: usize) -> usize {
+        self.lines
+            .iter()
+            .rev()
+            .find(|line| line.value.start <= at)
+            .or(self.lines.first())
+            .map_or(0, |line| {
+                line.source + at.clamp(line.value.start, line.value.end) - line.value.start
+            })
+    }
+
     /// The ranges of the file that hold the bytes `range` of the block, one
     /// for each line.
     fn map(&self, range: &Range<usize>) -> Vec<Range<usize>> {
@@ -114,7 +126,7 @@ impl Lines {
 
     /// The node for one block of text, or `None` when it holds no text, or
     /// hakkiri has no scope for it.
-    fn block(&self, block: &Block, first: bool) -> Option<Node> {
+    fn block(&self, block: &Block, first: bool, then: usize) -> Option<Node> {
         let whole = self.run(block, 0..block.pieces.len());
         let mut children: Vec<Node> = block
             .captures
@@ -152,8 +164,30 @@ impl Lines {
                     .map(|node| node.with_reads(whole.reads.clone()))
             }
         };
-        node.map(|node| Node { first, ..node })
+        let closes = block.flushed_at.map_or(then, |at| self.offset(at));
+        node.map(|mut node| {
+            node.first = first;
+            close_at(&mut node, closes);
+            node
+        })
     }
+}
+
+/// Makes `node` and the nodes inside it close at the byte `at`: Vale reads
+/// the text of a block, and the elements inside it, when a tag flushes it.
+fn close_at(node: &mut Node, at: usize) {
+    node.closes = at;
+    for child in &mut node.children {
+        close_at(child, at);
+    }
+}
+
+/// The byte of the file where the first token of the HTML block `html`,
+/// which `span` covers in `source`, flushes the text before it, or `None`
+/// when no token does.
+pub(crate) fn flushes_at(source: &str, span: &Range<usize>, html: &str) -> Option<usize> {
+    let at = html::flushes_at(html)?;
+    Some(Lines::new(source, span, html).map_or(span.start, |lines| lines.offset(at)))
 }
 
 /// The nodes for the text of the HTML block `html`, which `span` covers in
@@ -162,11 +196,14 @@ impl Lines {
 ///
 /// `first` is whether the block is the first thing inside the item or quote
 /// around it, which gives its first text the scope of that item or quote.
+/// `then` is the byte of the file where the tag after the block flushes the
+/// text that no tag inside it does.
 pub(crate) fn nodes(
     source: &str,
     span: &Range<usize>,
     html: &str,
     first: bool,
+    then: usize,
 ) -> Option<Vec<Node>> {
     let walk = html::walk(html);
     if walk.blocks.is_empty()
@@ -179,7 +216,7 @@ pub(crate) fn nodes(
     let lines = Lines::new(source, span, html)?;
     let mut nodes = Vec::new();
     for (index, block) in walk.blocks.iter().enumerate() {
-        nodes.extend(lines.block(block, first && index == 0));
+        nodes.extend(lines.block(block, first && index == 0, then));
     }
     for (scope, ranges) in [
         (Scope::Alt, &walk.alts),

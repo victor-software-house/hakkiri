@@ -694,6 +694,9 @@ pub(crate) struct Capture {
 /// One block of text Vale lints: the text between two flushes.
 #[derive(Debug)]
 pub(crate) struct Block {
+    /// The byte of the HTML where the token that flushed the text starts, or
+    /// `None` when the end of the HTML did, so a tag after the HTML flushes it.
+    pub(crate) flushed_at: Option<usize>,
     pub(crate) place: Place,
     pub(crate) pieces: Vec<Piece>,
     pub(crate) captures: Vec<Capture>,
@@ -973,6 +976,8 @@ struct Walker {
     previous_skipped: bool,
     /// The `href` of the token before.
     previous_href: String,
+    /// The byte where the token being read starts.
+    token_at: usize,
     walk: Walk,
 }
 
@@ -981,6 +986,7 @@ pub(crate) fn walk(html: &str) -> Walk {
     let mut tokenizer = Tokenizer::new(html);
     let mut walker = Walker::default();
     loop {
+        walker.token_at = tokenizer.at;
         let token = tokenizer.read_token();
         let done = matches!(token, Token::Eof);
         walker.token(html, token);
@@ -989,6 +995,82 @@ pub(crate) fn walk(html: &str) -> Walk {
         }
     }
     walker.walk
+}
+
+/// The byte of `html` where its first token flushes the text before it, a
+/// start tag that is not inline and not void, or an end tag that is not
+/// inline, or `None` when it has none.
+pub(crate) fn flushes_at(html: &str) -> Option<usize> {
+    let mut tokenizer = Tokenizer::new(html);
+    loop {
+        let at = tokenizer.at;
+        match tokenizer.read_token() {
+            Token::Eof => return None,
+            Token::Start(tag)
+                if !INLINE_TAGS.contains(&tag.name.as_str())
+                    && !VOID_TAGS.contains(&tag.name.as_str()) =>
+            {
+                return Some(at);
+            }
+            Token::End(tag) if !INLINE_TAGS.contains(&tag.name.as_str()) => return Some(at),
+            Token::Text(_)
+            | Token::Comment(_)
+            | Token::Start(_)
+            | Token::SelfClosing(_)
+            | Token::End(_) => {}
+        }
+    }
+}
+
+/// The bytes of `source` where a tag among the `tags` of a paragraph flushes
+/// the text before it, as Vale's walk does.
+///
+/// A start tag flushes it unless the tag is inline, void or inside an inline
+/// element.
+/// An end tag flushes it unless the tag is inline or was promoted to inline.
+pub(crate) fn flush_tags(source: &str, tags: &[Range<usize>]) -> Vec<usize> {
+    let mut found = Vec::new();
+    let mut history: Vec<String> = Vec::new();
+    let mut promoted: HashMap<String, usize> = HashMap::new();
+    for range in tags {
+        let Some(html) = source.get(range.clone()) else {
+            continue;
+        };
+        match Tokenizer::new(html).read_token() {
+            Token::Start(tag) => {
+                let name = tag.name;
+                if INLINE_TAGS.contains(&name.as_str()) {
+                    history.push(name);
+                } else if VOID_TAGS.contains(&name.as_str()) {
+                    // A void tag flushes nothing and stays out of the history.
+                } else if history
+                    .iter()
+                    .any(|open| INLINE_TAGS.contains(&open.as_str()))
+                {
+                    *promoted.entry(name).or_default() += 1;
+                } else {
+                    found.push(range.start);
+                    history.clear();
+                    history.push(name);
+                }
+            }
+            Token::End(tag) => {
+                let name = tag.name;
+                if INLINE_TAGS.contains(&name.as_str()) {
+                    if let Some(at) = history.iter().rposition(|open| *open == name) {
+                        history.remove(at);
+                    }
+                } else if let Some(count) = promoted.get_mut(&name).filter(|count| **count > 0) {
+                    *count -= 1;
+                } else {
+                    found.push(range.start);
+                    history.clear();
+                }
+            }
+            Token::Text(_) | Token::Comment(_) | Token::SelfClosing(_) | Token::Eof => {}
+        }
+    }
+    found
 }
 
 /// The comments in `html`, as the byte range of each from `<!--` to the end
@@ -1027,7 +1109,7 @@ pub(crate) fn resets_scope(html: &str) -> bool {
 impl Walker {
     fn token(&mut self, html: &str, token: Token) {
         match token {
-            Token::Eof => self.flush(),
+            Token::Eof => self.flush(true),
             Token::Text(range) => self.text(html, range),
             Token::Comment(_) => {
                 self.spacer.comment();
@@ -1105,7 +1187,7 @@ impl Walker {
         }
         if kind == Kind::End && !inline {
             self.walk.resets = true;
-            self.flush();
+            self.flush(false);
             self.reset();
         }
         self.previous_skipped = skipped_class;
@@ -1124,7 +1206,7 @@ impl Walker {
     /// A start tag that no skip reads past.
     fn start(&mut self, tag: &Tag, inline: bool, void: bool) {
         if !inline && !void && self.nonblank {
-            self.flush();
+            self.flush(false);
             self.reset();
         }
         // Vale reads an `em` or a `b` in a `code` as a `code`.
@@ -1244,11 +1326,12 @@ impl Walker {
     }
 
     /// Gives the text so far to the walk, under the tags that are open.
-    fn flush(&mut self) {
+    fn flush(&mut self, at_end: bool) {
         if !self.nonblank {
             return;
         }
         self.walk.blocks.push(Block {
+            flushed_at: (!at_end).then_some(self.token_at),
             place: Place::of(&self.history),
             pieces: std::mem::take(&mut self.pieces),
             captures: std::mem::take(&mut self.captures),

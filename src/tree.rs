@@ -245,6 +245,12 @@ pub struct Node {
     /// It is the end of the node's span unless the element goes on, as a
     /// paragraph in a tight list item does with the item.
     pub closes: usize,
+    /// The bytes, in order, where a tag of the element that is not inline
+    /// flushes the text before it, so that text is read at that byte and the
+    /// text after the last one at [`closes`](Self::closes).
+    ///
+    /// A paragraph that holds a `<div>` has one.
+    pub flushes: Vec<usize>,
 }
 
 impl Node {
@@ -255,6 +261,7 @@ impl Node {
             segments: vec![span.clone()],
             reads: Vec::new(),
             closes: span.end,
+            flushes: Vec::new(),
             span,
             children,
             first: false,
@@ -272,6 +279,7 @@ impl Node {
         Some(Self {
             scope,
             closes: span.end,
+            flushes: Vec::new(),
             span,
             segments,
             reads: Vec::new(),
@@ -450,6 +458,10 @@ pub(crate) fn remap_nodes(
         while let Some(node) = level.get_mut(at) {
             node.remap(map);
             node.closes = place(node.closes).unwrap_or(node.span.end);
+            node.flushes = std::mem::take(&mut node.flushes)
+                .into_iter()
+                .map(|at| place(at).unwrap_or(at))
+                .collect();
             if node.segments.is_empty() {
                 let children = std::mem::take(&mut node.children);
                 level.splice(at..=at, children);

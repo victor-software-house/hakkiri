@@ -1,0 +1,58 @@
+| AY1 very <!-- vale off --> | AY2 very |
+|:--|:--|
+| AY3 very | AY4 very |
+
+AY5 very really good.
+
+<!-- vale on -->
+
+| AZ1 very | AZ2 very |
+|:--|:--|
+| BA1 very | BA2 very <!-- vale off --> |
+| BA3 very | BA4 very |
+
+BA5 very really good.
+
+<!-- vale on -->
+
+| BB1 very | BB2 `<!-- vale off -->` very |
+|:--|:--|
+| BB3 very \| <!-- vale off --> | BB4 very |
+
+BB5 very really good.
+
+<!-- vale on -->
+
+- BC1 very
+
+  | BC2 very | BC3 very |
+  |:--|:--|
+  | BC4 very <!-- vale off --> | BC5 very |
+
+BC6 very really good.
+
+<!-- vale on -->
+
+| BD1 very |
+|:--|
+| BD2 very |
+<!-- vale off -->
+| BD3 very |
+
+BD4 very really good.
+
+<!-- vale on -->
+
+| BE1 very |
+|:--|
+| BE2 very |
+
+<!-- vale Team.Words = NO -->
+
+| BE3 very |
+|:--|
+| BE4 very |
+
+<!-- vale Team.Words = YES -->
+
+BE5 very really good.

@@ -1,0 +1,46 @@
+# Head N1 very
+
+<!-- vale off -->
+
+# Head N2 very
+
+<!-- vale on -->
+
+# Head N3 <!-- vale off --> very
+
+N4 very really good.
+
+<!-- vale on -->
+
+# Head N5 very
+
+Head N6 very
+============
+
+<!-- vale Team.Head = NO -->
+
+Head N7 very
+============
+
+Head N8
+very <!-- vale Team.Words = NO -->
+=======
+
+N9 very really good.
+
+<!-- vale Team.Words = YES -->
+
+Head N10 <!-- vale Team.Head = YES --> very
+-------------------------------------------
+
+N11 very really good.
+
+## Head N12 *very <!-- vale off --> really*
+
+N13 very really good.
+
+<!-- vale on -->
+
+#Head N14 very
+
+#

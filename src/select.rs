@@ -27,6 +27,20 @@ pub struct Block {
     pub text: Text,
     /// The byte where the element that holds the text ends.
     pub closes: usize,
+    /// The bytes where a tag inside the element flushes the text before it.
+    pub flushes: Vec<usize>,
+}
+
+impl Block {
+    /// The byte where the text that holds the byte `at` is read: the first
+    /// tag after it that flushes it, or the end of the element.
+    pub(crate) fn closes_for(&self, at: usize) -> usize {
+        self.flushes
+            .iter()
+            .copied()
+            .find(|flush| *flush > at)
+            .unwrap_or(self.closes)
+    }
 }
 
 /// Why a selection failed.
@@ -526,6 +540,7 @@ pub fn select(
                     sentence: false,
                     text: text.clone(),
                     closes: node.closes,
+                    flushes: node.flushes.clone(),
                 });
             }
             if let (Some(blank), Some(model)) = (&sentences, model) {
@@ -540,6 +555,7 @@ pub fn select(
                             sentence: true,
                             text,
                             closes: node.closes,
+                            flushes: node.flushes.clone(),
                         });
                     }
                 }

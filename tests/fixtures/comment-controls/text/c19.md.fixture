@@ -1,0 +1,133 @@
+<div>A1 very
+
+<!-- vale off -->
+
+A2 very
+</div>
+
+A3 very really good.
+
+<!-- vale on -->
+
+<div>B1 very
+
+<!-- vale Team.Words = NO -->
+
+B2 very
+
+B3 very
+</div>
+
+B4 very really good.
+
+<!-- vale Team.Words = YES -->
+
+<div>C1 very
+
+<!-- vale off -->
+
+<!-- vale on -->
+
+C2 very
+</div>
+
+C3 very really good.
+
+<span>D1 very</span>
+
+<!-- vale off -->
+
+D2 very really good.
+
+<!-- vale on -->
+
+<p>E1 very
+
+<!-- vale off -->
+
+E2 very</p>
+
+E3 very really good.
+
+<!-- vale on -->
+
+<div>F1 very
+
+<!-- vale off -->
+
+```
+code
+```
+
+F2 very </div>
+
+F3 very really good.
+
+<!-- vale on -->
+
+> <div>G1 very
+>
+> <!-- vale off -->
+>
+> G2 very </div>
+
+G3 very really good.
+
+<!-- vale on -->
+
+<div>H1 very
+<!-- vale off -->
+</div>
+
+H2 very really good.
+
+<!-- vale on -->
+
+<div>
+<p>I1 very</p>
+<p>I2 very <!-- vale off --></p>
+<p>I3 very</p>
+</div>
+
+I4 very really good.
+
+<!-- vale on -->
+
+<div>J1 very</div>
+<!-- vale off -->
+<div>J2 very</div>
+
+J3 very really good.
+
+<!-- vale on -->
+
+<div>
+K1 very
+<!-- vale off -->
+K2 very
+<!-- vale on -->
+K3 very
+<!-- vale off -->
+</div>
+
+K4 very really good.
+
+<!-- vale on -->
+
+<table>
+<tr><td>L1 very</td></tr>
+<!-- vale off -->
+<tr><td>L2 very</td></tr>
+</table>
+
+L3 very really good.
+
+<!-- vale on -->
+
+<ul>
+<li>M1 very
+<!-- vale off -->
+<li>M2 very
+</ul>
+
+M3 very really good.

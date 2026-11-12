@@ -118,12 +118,16 @@ pub fn lint_accepting<R: Borrow<Rule>>(
         'blocks: for block in blocks {
             // Vale reads the whole file at the end, after it has forgotten
             // every comment but `off`.
-            let gated = if block.scope == Scope::Raw {
-                controls.off_at(block.closes)
-            } else {
-                controls.gated(&rule.name, block.closes)
+            let gated = |closes: usize| {
+                if block.scope == Scope::Raw {
+                    controls.off_at(closes)
+                } else {
+                    controls.gated(&rule.name, closes)
+                }
             };
-            if gated {
+            // Each text that a tag inside the element flushes is gated at its
+            // own byte.
+            if block.flushes.iter().all(|at| gated(*at)) && gated(block.closes) {
                 continue;
             }
             match run(
@@ -135,6 +139,13 @@ pub fn lint_accepting<R: Borrow<Rule>>(
             ) {
                 Ok(hits) => {
                     for hit in hits {
+                        let closes = block
+                            .text
+                            .file_range(hit.range.clone())
+                            .map_or(block.closes, |range| block.closes_for(range.start));
+                        if gated(closes) {
+                            continue;
+                        }
                         let messages = hit.messages(rule);
                         let alert = if matches!(rule.check, Check::Readability(_)) {
                             Some(locator.alert_on_line(rule, &block.text, messages))
@@ -146,7 +157,7 @@ pub fn lint_accepting<R: Borrow<Rule>>(
                                 &alert.rule,
                                 &alert.matched,
                                 (alert.line, alert.first_column),
-                                block.closes,
+                                closes,
                             )
                         }));
                     }

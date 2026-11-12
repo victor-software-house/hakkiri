@@ -78,12 +78,23 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 - **WHEN** a doc comment of a Rust, TypeScript or JavaScript file holds an HTML comment that turns rules off
 - **THEN** hakkiri turns nothing off, and Vale reads a comment as plain lines, so it turns nothing off either ([comment-controls 4][comment-controls-4])
 
+#### Scenario: A directive quoted across a line break
+
+- **WHEN** a code span reads `<!-- vale off` on one line and `-->` on the next, and a real `vale off` comment comes after it
+- **THEN** hakkiri hides the text after the real comment, and Vale also hides the text after the code span, since it takes the comment's place from the first `vale off` that its search finds ([comment-controls 8][comment-controls-8])
+
+#### Scenario: An alert in an element that holds a comment
+
+- **WHEN** a `strong` element holds a comment, and its text holds a match
+- **THEN** hakkiri places the alert on the match, and Vale places it on the comment ([comment-controls 8][comment-controls-8])
+
 #### Scenario: The styles of a file
 
 - **WHEN** a comment limits the styles to `Other`
 - **THEN** hakkiri turns off the styles of the rules the config runs on the file, and Vale turns off its `BasedOnStyles` ([comment-controls 3][comment-controls-3])
 
 [check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
+[comment-controls-8]: ../../design.md#8-where-vale-places-a-comment-wrongly-hakkiri-places-it-right
 [comment-controls-3]: ../../design.md#3-a-style-comment-reads-the-styles-of-the-rules
 [comment-controls-4]: ../../design.md#4-a-source-file-holds-no-comment-control
 [engine-14]: ../../../archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser

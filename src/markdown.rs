@@ -481,7 +481,8 @@ impl Builder<'_> {
                 let step = if let Mdast::Html(html) = child
                     && Self::holds_blocks(top.node)
                 {
-                    Step::Done(self.html_block(child, &html.value, first))
+                    let then = self.flush_after(top.node, top.index);
+                    Step::Done(self.html_block(child, &html.value, first, then))
                 } else {
                     self.step(child)
                 };
@@ -506,6 +507,66 @@ impl Builder<'_> {
         }
     }
 
+    /// The byte where Vale's walk flushes the text it holds when it reaches
+    /// `block`, a child of a container, or `None` when it flushes nothing.
+    ///
+    /// A block that opens an element that is not inline or void flushes the
+    /// text before it: a paragraph, a list, a quote, a code block, a table, a
+    /// heading, and an HTML block that starts such a tag.
+    /// A thematic break renders a void tag, and a definition renders nothing.
+    /// The MDX blocks and display math are not probed, and flush nothing.
+    fn flush_at(&self, block: &Mdast) -> Option<usize> {
+        let span = span_of(block)?;
+        match block {
+            Mdast::Html(html) => crate::html_text::flushes_at(self.source, &span, &html.value),
+            Mdast::ThematicBreak(_)
+            | Mdast::Definition(_)
+            | Mdast::FootnoteDefinition(_)
+            | Mdast::Yaml(_)
+            | Mdast::Toml(_)
+            | Mdast::Math(_)
+            | Mdast::MdxJsxFlowElement(_)
+            | Mdast::MdxFlowExpression(_)
+            | Mdast::MdxjsEsm(_) => None,
+            Mdast::Root(_)
+            | Mdast::Blockquote(_)
+            | Mdast::List(_)
+            | Mdast::ListItem(_)
+            | Mdast::Paragraph(_)
+            | Mdast::Heading(_)
+            | Mdast::Code(_)
+            | Mdast::Table(_)
+            | Mdast::TableRow(_)
+            | Mdast::TableCell(_)
+            | Mdast::Break(_)
+            | Mdast::InlineCode(_)
+            | Mdast::InlineMath(_)
+            | Mdast::Delete(_)
+            | Mdast::Emphasis(_)
+            | Mdast::MdxTextExpression(_)
+            | Mdast::FootnoteReference(_)
+            | Mdast::Image(_)
+            | Mdast::ImageReference(_)
+            | Mdast::MdxJsxTextElement(_)
+            | Mdast::Link(_)
+            | Mdast::LinkReference(_)
+            | Mdast::Strong(_)
+            | Mdast::Text(_) => Some(span.start),
+        }
+    }
+
+    /// The byte where the first flush comes among the children of `parent`
+    /// from the index `after` on: the start of the next block that flushes,
+    /// or the end of the parent, whose end tag flushes.
+    fn flush_after(&self, parent: &Mdast, after: usize) -> usize {
+        parent
+            .children()
+            .and_then(|children| children.get(after..))
+            .and_then(|rest| rest.iter().find_map(|block| self.flush_at(block)))
+            .or_else(|| span_of(parent).map(|span| span.end))
+            .unwrap_or(self.source.len())
+    }
+
     /// Whether the children of `node` are blocks, so that an HTML node among
     /// them is an HTML block and not an inline tag.
     const fn holds_blocks(node: &Mdast) -> bool {
@@ -521,11 +582,13 @@ impl Builder<'_> {
 
     /// An HTML block: a gap in the nodes around it, and the nodes for the text
     /// Vale reads in it.
-    fn html_block(&self, node: &Mdast, value: &str, first: bool) -> Visited {
+    ///
+    /// `then` is the byte where the next flush comes after the block.
+    fn html_block(&self, node: &Mdast, value: &str, first: bool, then: usize) -> Visited {
         let span = span_of(node);
         let mut visited = Visited::cut(span.clone());
         if let Some(span) = span
-            && let Some(nodes) = crate::html_text::nodes(self.source, &span, value, first)
+            && let Some(nodes) = crate::html_text::nodes(self.source, &span, value, first, then)
         {
             visited.nodes = nodes;
         }
@@ -642,18 +705,33 @@ impl Builder<'_> {
         }
     }
 
-    /// Makes each paragraph of the tight list item `node` close with the item.
+    /// Makes each paragraph of the tight list item `node` close where the
+    /// next flush comes.
     ///
-    /// A tight item has no `p` around its text, so Vale reads the text when
-    /// the item closes, and a comment indented under the text reaches it.
-    fn close_tight_item(node: &Mdast, children: &mut [Node], element_end: usize) {
+    /// A tight item has no `p` around its text, so Vale reads the text at the
+    /// next tag that opens a block inside the item, such as a nested list, or
+    /// when the item closes.
+    /// A comment indented under the text reaches the text unless a block
+    /// opens before it.
+    fn close_tight_item(&self, node: &Mdast, children: &mut [Node], element_end: usize) {
         if let Mdast::ListItem(item) = node
             && !item.spread
         {
+            let blocks = node.children().map_or(&[][..], Vec::as_slice);
             for child in children {
-                if child.scope == Scope::Paragraph {
-                    child.closes = element_end;
+                if child.scope != Scope::Paragraph {
+                    continue;
                 }
+                let position = blocks.iter().position(|block| {
+                    matches!(block, Mdast::Paragraph(_))
+                        && span_of(block).is_some_and(|span| {
+                            span.start <= child.span.start && child.span.start < span.end
+                        })
+                });
+                child.closes = position
+                    .and_then(|index| blocks.get(index + 1..))
+                    .and_then(|rest| rest.iter().find_map(|block| self.flush_at(block)))
+                    .unwrap_or(element_end);
             }
         }
     }
@@ -677,7 +755,7 @@ impl Builder<'_> {
             mut cuts,
             tags,
         } = inner;
-        Self::close_tight_item(node, &mut children, element_end);
+        self.close_tight_item(node, &mut children, element_end);
         cuts.extend(own);
         let mut segments = match scope {
             // A container reads as the content inside it.
@@ -722,22 +800,13 @@ impl Builder<'_> {
             | Scope::CommentDocLine
             | Scope::CommentDocBlock => self.lines_of(&span, &cuts),
         };
-        let reads = if matches!(
-            scope,
-            Scope::Paragraph
-                | Scope::Heading1
-                | Scope::Heading2
-                | Scope::Heading3
-                | Scope::Heading4
-                | Scope::Heading5
-                | Scope::Heading6
-                | Scope::Heading0
-                | Scope::Heading7
-                | Scope::Heading8
-                | Scope::Heading9
-                | Scope::TableHeader
-                | Scope::TableCell
-        ) {
+        let inline_html = Self::reads_inline_html(scope);
+        let flushes = if inline_html {
+            crate::html::flush_tags(self.source, &tags)
+        } else {
+            Vec::new()
+        };
+        let reads = if inline_html {
             let (kept, reads) = crate::html::inline_reads(self.source, span.start, segments, &tags);
             segments = kept;
             reads
@@ -757,6 +826,7 @@ impl Builder<'_> {
                 .map(|node| Node {
                     first,
                     closes: element_end,
+                    flushes,
                     ..node.with_reads(reads)
                 })
                 .into_iter()
@@ -770,6 +840,27 @@ impl Builder<'_> {
             Vec::new()
         };
         Visited { nodes, cuts, tags }
+    }
+
+    /// Whether the text of a node of `scope` holds the inline HTML that joins
+    /// and flushes it.
+    const fn reads_inline_html(scope: Scope) -> bool {
+        matches!(
+            scope,
+            Scope::Paragraph
+                | Scope::Heading1
+                | Scope::Heading2
+                | Scope::Heading3
+                | Scope::Heading4
+                | Scope::Heading5
+                | Scope::Heading6
+                | Scope::Heading0
+                | Scope::Heading7
+                | Scope::Heading8
+                | Scope::Heading9
+                | Scope::TableHeader
+                | Scope::TableCell
+        )
     }
 
     /// The syntax of an inline node that is not its text.

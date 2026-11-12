@@ -52,7 +52,9 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A source file takes them in the Markdown of each comment, where Vale applies none.  
    An HTML comment of a Markdown file, or a `{/* */}` comment of an MDX file, turns rules off and on with Vale's reach (row `HKR-031`, operator, 2026-11-11).  
    The forms are `hakkiri off` and `on`, `hakkiri Style.Rule: off` and `on`, a level, and Vale's own.  
-   `src/control.rs` reads the comments, leaves the text between `off` and `on` out of the tree, gates each block when its element ends, and drops an alert that lies between two comments.  
+   `src/control.rs` reads the comments, leaves the text between `off` and `on` out of the tree, gates each block where Vale reads it, and drops an alert that lies between two comments.  
+   Vale reads a block when its element ends, or earlier where a tag that opens a block flushes the text so far: a nested list in a tight item, a `div` inside a paragraph.  
+   `Node::closes` and `Node::flushes` hold those bytes, and the engine gates each alert at its own.  
    Math reads as code by Pandoc's rules, as in Vale: `src/math.rs` finds each `$…$` span and `$$…$$` block, masks the file at the same length, and parses it again (row `HKR-048`).  
    Front matter values are nodes of the scope `frontmatter`, with their key as label (row `HKR-049`).  
    `src/frontmatter.rs` takes the top-level strings of YAML, TOML and JSON from ctl-core's `Input::top_level`, which refuses nothing that YAML allows.  

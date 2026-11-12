@@ -51,11 +51,12 @@ Vale's `off` and `on` SHALL stand for `NO` and `YES`, and a rule name that no ru
 - **WHEN** a comment is `vale Team.Words=NO`, `vale team.words = NO` or `vale Nope.Rule = NO`
 - **THEN** it changes nothing
 
-### Requirement: A rule is gated by the element of a block
+### Requirement: A rule is gated where its text is read
 
-A rule that a comment turned off before the element of a block ends SHALL read no text in that block.  
+A rule that a comment turned off before the text of a block is read SHALL read no text in that block.  
+The text is read when its element ends, or where a tag that opens a block inside the element flushes it.  
 An alert between the comment that turned a rule off and the one that turned it on SHALL be left out.  
-A paragraph in a tight list item SHALL end with the item.
+A paragraph in a tight list item SHALL be read before a nested list, quote, code block, table, heading or HTML block that opens a block tag, and at the end of the item otherwise.
 
 #### Scenario: A comment inside a paragraph
 
@@ -71,6 +72,31 @@ A paragraph in a tight list item SHALL end with the item.
 
 - **WHEN** a comment that turns a rule off is indented under the text of a tight list item, and the one that turns it on is under the item after it
 - **THEN** the rule reports nothing in the first item, and nothing in the item between the comments
+
+#### Scenario: A block that opens inside a tight list item
+
+- **WHEN** a tight list item holds `A very`, and a nested list, a quote, a fenced block, a table or a heading under it holds a comment that turns the rule off
+- **THEN** `A very` draws its alert, and the text after the comment draws none
+
+#### Scenario: A comment before the block that opens
+
+- **WHEN** a comment that turns the rule off stands between the text of a tight list item and the nested list under it
+- **THEN** the text of the item draws no alert
+
+#### Scenario: A comment inside a nested HTML element
+
+- **WHEN** a `div` holds `one very`, a comment that turns the rule off, and a closing `</div>`
+- **THEN** `one very` draws no alert, since the closing tag reads the text after the comment
+
+#### Scenario: A tag that opens a block inside a paragraph
+
+- **WHEN** a paragraph reads `one very <div>two very <!-- hakkiri off --></div> three very.`
+- **THEN** `one very` draws its alert, and `two very` and `three very` draw none
+
+#### Scenario: Text left at the end of an HTML block
+
+- **WHEN** an HTML block ends with `one very`, and a comment block that turns the rule off comes before the next paragraph
+- **THEN** `one very` draws no alert, since the next block reads it after the comment
 
 #### Scenario: A comment in a block of its own
 

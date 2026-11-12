@@ -35,7 +35,7 @@ The probe of Vale at `66bbb85` (2026-11-11) over nine files and 304 alerts found
 hakkiri keeps the two moments apart.
 `cut` leaves the text between `off` and `on` out of the tree, as Vale leaves it out of the block.
 The engine skips a block that the toggles gate when its element ends, and drops an alert that a region holds.
-A node holds the byte where its element ends for that: a paragraph in a tight list item ends with the item, and the other nodes end with their own element.
+A node holds the byte where its text is read for that, which decision 7 explains.
 
 Alternative: drop every alert whose place lies between the comments.
 It lost because Vale also gates the text before a lone comment in the same element, and the probe shows both.
@@ -75,6 +75,34 @@ The forms probed are `off` and `on`, a rule, an inline comment, a comment in a t
 hakkiri reads the comment from the MDX expression nodes of the parser, and takes the text between `{/*` and `*/}` without the blanks at its ends.
 A gap where hakkiri does less than Vale is fixed, so no difference is recorded.
 
+### 7. The text of a block is read where a tag flushes it
+
+The probe of 2026-11-12 over 10 more files and 1,000 alerts found that Vale does not read a tight item's text when the item ends.
+It reads the text buffered so far at each start tag that is not inline or void, and at each end tag that is not inline ([ast.go][v-flush]).
+So these read where the first of them comes:
+
+- The text of a tight list item, before a nested list, a quote, a code block, a table, a heading or an HTML block that opens a block tag. A comment inside that block does not reach the text.
+- The text of an HTML block, at the next such tag inside the block. A comment between the text and that tag reaches the text, so `<div>one<!-- vale off --></div>` reads nothing, and a nested `div` closing after a comment does the same.
+- The text that an HTML block leaves buffered when it ends, at the next block that opens such a tag, or at the end of the container. A comment block between them reaches it.
+
+A thematic break renders a void tag, a definition renders nothing, and a comment is no tag, so none of them flush.
+The tokenizer of the HTML walk records the byte of the token that flushes each block of text, and the Markdown builder gives the node of a tight item's paragraph and the node of an HTML block's text that byte.
+
+Alternative: keep the end of the element for every node.
+It lost because the probe shows alerts that Vale gives and hakkiri hid, and alerts that hakkiri gave and Vale hid, in these three places.
+
+### 8. Where Vale places a comment wrongly, hakkiri places it right
+
+Vale finds the byte of a comment by searching its text from the end of the previous comment, and finds the place of an alert in an inline element by searching the element's text ([walk.go][v-search]).
+Two probes show the search fail:
+
+- A multi-line code span such as `` `<!-- vale off`` and `` -->` `` leaves the text `vale off` in the searched text, so the next real `vale off` comment takes the place of the code span, and Vale hides the alerts between them.
+- An alert inside a `strong` element that holds a comment gets the column of the words `vale` in the comment, not the column of its match.
+
+hakkiri places both from the parser, and the `vale-differences` spec records them.
+
+[v-flush]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L242-L252
+[v-search]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/walk.go#L667-L690
 [v-walk]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/ast.go#L242
 [v-file]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L758
 [v-comment]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code_ts.go#L199

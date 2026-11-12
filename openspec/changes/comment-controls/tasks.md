@@ -19,6 +19,12 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 1.4 Read the `{/* … */}` comments of an MDX file as the HTML comments of a Markdown file.  
   Verify the parity test passes over the MDX file of the fixture, in Vale's form and in hakkiri's.  
   Evidence, 2026-11-11 (UTC): Vale 66bbb85 gave 46 alerts over `c10.mdx`, and the 350 rows of the fixture match.
+- [x] 1.5 Probe the cases of the first probe that it left open, and fix each one where hakkiri read less than Vale.  
+  Verify `every_file_gives_the_alerts_vale_gives` passes over the 23 files and 1,238 rows of the `text` folder, and `vale_places_a_comment_wrongly_where_hakkiri_places_it_right` passes.  
+  Evidence, 2026-11-12 (UTC): Vale `66bbb85` and hakkiri over setext and ATX headings, links, images, references, nested quotes and lists, task lists, inline HTML, `details`, `pre`, nested `div`, fenced and indented code, tables in lists, odd comment spellings, non-ASCII text, CRLF lines and footnotes differed in six ways, apart from footnotes.  
+  Four were fixed: the text of a tight item before a block that opens in it, the text of an HTML block at the tag that flushes it, the text left at the end of an HTML block, and the text of a paragraph before a `div` tag inside it.  
+  Two are Vale's flaws, recorded in the `vale-differences` spec.  
+  Footnote definitions differ for reasons that are not comments, and move to row `HKR-027`.
 
 ## 2. The surfaces
 
@@ -29,4 +35,5 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 3. Integration
 
-- [ ] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+- [x] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+  Evidence, 2026-11-12 (UTC): PRs 98 and 103 passed CI before they merged, and main passed after.

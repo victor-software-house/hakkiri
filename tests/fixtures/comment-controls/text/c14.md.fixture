@@ -1,0 +1,82 @@
+Text AE1 very <span>AE2 very <!-- vale off --> AE3 very</span> AE4 very.
+
+<!-- vale on -->
+
+<details>
+<summary>AF1 very</summary>
+<!-- vale off -->
+AF2 very
+</details>
+
+AF3 very really good.
+
+<!-- vale on -->
+
+<pre>
+AG1 very
+<!-- vale off -->
+AG2 very
+</pre>
+
+AG3 very really good.
+
+<!-- vale on -->
+
+<ul><li>AH1 very</li>
+<!-- vale off -->
+<li>AH2 very</li></ul>
+
+AH3 very really good.
+
+<!-- vale on -->
+
+<div><!-- vale off --></div>
+
+AI1 very really good.
+
+<!-- vale on -->
+
+<div>AJ1 very<!-- vale off -->AJ2 very</div>
+
+AJ3 very really good.
+
+<!-- vale on -->
+
+<p>AK1 very</p>
+<!-- vale Team.Words = NO -->
+<p>AK2 very</p>
+
+AK3 very really good.
+
+<!-- vale Team.Words = YES -->
+
+<blockquote>AL1 very <!-- vale off --> AL2 very</blockquote>
+
+AL3 very really good.
+
+<!-- vale on -->
+
+<span>AM1 very <!-- vale off --></span> AM2 very
+
+AM3 very really good.
+
+<!-- vale on -->
+
+<div>
+<div>AN1 very
+<!-- vale off -->
+</div>
+AN2 very
+</div>
+
+AN3 very really good.
+
+<!-- vale on -->
+
+<section>
+
+AO1 very <!-- vale off -->
+
+</section>
+
+AO2 very really good.

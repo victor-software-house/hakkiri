@@ -1,0 +1,10 @@
+D1 `<!-- vale off
+-->` D2 very.
+
+<!-- vale off -->
+
+D3 very.
+
+<!-- vale on -->
+
+D4 very.

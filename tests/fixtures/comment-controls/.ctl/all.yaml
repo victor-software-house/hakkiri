@@ -3,3 +3,5 @@ packages:
 files:
   'text/*.{md,mdx}':
     styles: [Team, Other]
+  'differences/*.md':
+    styles: [Team, Other]

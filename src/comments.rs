@@ -249,6 +249,7 @@ fn root(
         children,
         first: false,
         closes: end,
+        flushes: Vec::new(),
         label: None,
     };
     Ok(Node {
@@ -259,6 +260,7 @@ fn root(
         children: vec![comment],
         first: false,
         closes: end,
+        flushes: Vec::new(),
         label: None,
     })
 }
