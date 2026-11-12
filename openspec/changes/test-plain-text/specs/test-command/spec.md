@@ -16,6 +16,16 @@ A case whose format no reader reads SHALL read its input as plain text, except t
 - **WHEN** the config maps `cfg: md`, a glob selects `*.cfg`, and a case has `format: cfg` and a fenced block that holds `very`
 - **THEN** the case reads the input as Markdown and the rule reports nothing for the fence
 
+### Requirement: A case through the config has the extension of its file
+
+A case that runs through the config SHALL have the extension that `check` gives the file `input.<format>`.
+That extension is the reader's when a `formats` entry gives the reader, and `<format>` otherwise.
+
+#### Scenario: A mapped case
+
+- **WHEN** the config maps `cfg: md`, a rule has `scope: text.md`, and a case has `format: cfg` and an input that the rule flags
+- **THEN** the case reports the alert
+
 ### Requirement: A case through the config follows on_unknown
 
 A case through the config whose format no reader reads, and whose file the config selects, SHALL follow `on_unknown` as `check` does.  
