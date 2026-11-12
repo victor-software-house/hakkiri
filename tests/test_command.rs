@@ -273,6 +273,27 @@ fn a_case_through_the_config_lints_with_its_styles() -> TestResult {
 }
 
 #[test]
+fn a_case_whose_front_matter_no_parser_reads_cannot_run() -> TestResult {
+    let suite = Suite::new("test-front-matter");
+    let root = styled(&suite, "front-matter");
+    root.file(".ctl/hakkiri.yaml", CONFIG);
+    root.file(
+        "broken.test.yml",
+        "- name: broken\n  input: \"---\\ntitle: [open\\n---\\n\\nA very day.\\n\"\n  contains: Team.Filler\n",
+    );
+    let result = run(root.path(), &["test"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result
+            .out
+            .contains("could not run broken.test.yml: broken: front matter: line 2: "),
+        "{}",
+        result.out
+    );
+    Ok(())
+}
+
+#[test]
 fn a_case_through_the_config_reads_the_text_the_config_ignores() -> TestResult {
     let suite = Suite::new("test-ignoring");
     let root = styled(&suite, "ignoring");

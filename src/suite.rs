@@ -370,6 +370,9 @@ impl Runner {
                     &plan.token_ignores,
                 )
                 .map_err(|error| error.to_string())?;
+                if let Some(fault) = &tree.front_matter_fault {
+                    return Err(format!("front matter: {fault}"));
+                }
                 if !plan.unrunnable.is_empty() {
                     let names: Vec<&str> = plan
                         .unrunnable
