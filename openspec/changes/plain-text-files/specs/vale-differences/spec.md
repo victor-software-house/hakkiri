@@ -75,7 +75,7 @@ hakkiri SHALL read a selected file that no reader reads as plain text, skip a bi
 
 #### Scenario: A binary file
 
-- **WHEN** a glob selects a file that holds a NUL byte
+- **WHEN** a glob selects a file that holds a NUL byte, or one whose first 8192 bytes are not valid UTF-8, such as a Latin-1 file
 - **THEN** hakkiri skips it, and Vale has no such test and reads it as lines ([plain-text 5][plain-text-5])
 
 #### Scenario: The extension of a mapped file

@@ -45,15 +45,19 @@ const UNKNOWN: &str = "no reader reads this file, so it is not linted: map it in
 /// How many bytes of a file decide whether it is binary.
 const SNIFF: u64 = 8192;
 
-/// Whether the file at `path` is binary: it holds a NUL byte in its first
-/// 8192 bytes, as ripgrep and typos judge it. A file that cannot be read is not
-/// binary here, and the run reports the failure when it reads the file.
+/// Whether the file at `path` is binary: its first 8192 bytes hold a NUL byte,
+/// as ripgrep and typos judge it, or are not valid UTF-8, which the run could
+/// not read as text. A character that the 8192-byte cut splits is not invalid.
+/// A file that cannot be read is not binary here, and the run reports the
+/// failure when it reads the file.
 fn is_binary(path: &Path) -> bool {
     let Ok(file) = fs::File::open(path) else {
         return false;
     };
     let mut head = Vec::new();
-    file.take(SNIFF).read_to_end(&mut head).is_ok() && head.contains(&0)
+    file.take(SNIFF).read_to_end(&mut head).is_ok()
+        && (head.contains(&0)
+            || std::str::from_utf8(&head).is_err_and(|error| error.error_len().is_some()))
 }
 
 /// How a run chooses its files.
@@ -105,7 +109,8 @@ impl Finder<'_> {
     /// The reader is the one a `formats` entry gives, else the one its
     /// extension names. A selected file that no reader reads is plain text,
     /// unless `on_unknown` says otherwise, and a plain-text file that holds a
-    /// NUL byte is binary and skipped, with no message.
+    /// NUL byte or starts with bytes that are not UTF-8 is binary and skipped,
+    /// with no message.
     ///
     /// A `formats` entry that gives the reader also gives the extension that
     /// the rules' scopes see: that of the reader, so `text.md` selects text in

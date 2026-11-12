@@ -31,7 +31,7 @@ hakkiri check --format json
 - A file named on the command line that no glob selects draws a warning on standard error and is not linted. `--on-unmatched` or `on_unmatched` takes `warn`, the default, `error`, which fails the run with exit 2, or `ignore`. A file that a glob selects but whose styles hold no rule draws nothing, and nor does a file a walk found.
 - Readers come from the extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` and `.js`, or from a `formats` entry. A file that a glob selects and that no reader reads is plain text: one block per run of lines between blank lines, read as written.
 - `--on-unknown` or `on_unknown` takes `text`, the default, `warn`, which skips the file with a warning, `error`, which fails the run with exit 2, or `ignore`. A file that no glob selects draws no message.
-- A plain-text file that holds a NUL byte in its first 8192 bytes is binary, and a run skips it with no message.
+- A plain-text file whose first 8192 bytes hold a NUL byte or are not valid UTF-8 is binary, and a run skips it with no message.
 - Files lint in parallel. The report is sorted by path, then line, then column, so two runs print the same text.
 - A file that cannot be read or parsed is a failure. The other files still lint.
 
