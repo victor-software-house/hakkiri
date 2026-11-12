@@ -725,9 +725,10 @@ impl Rule {
     ///
     /// Returns a [`LoadError`] with a problem for each parameter that is a
     /// level, which the rule's own setting carries, and for each that is not
-    /// adjustable: `extends`, `name`, `path`, `tests`, `message`,
-    /// `description`, `link`, `tokens`, `swap`, `exceptions`, `filters`,
-    /// `ignore`, `raw` and `either`.
+    /// adjustable.
+    /// The parameters that are not adjustable are `extends`, `name`, `path`,
+    /// `tests`, `message`, `description`, `link`, `tokens`, `swap`,
+    /// `exceptions`, `filters`, `ignore`, `raw` and `either`.
     /// A parameter the rule's check does not define, or whose value is of the
     /// wrong kind, is refused as the same field of a rule file is, naming the
     /// field and no line.

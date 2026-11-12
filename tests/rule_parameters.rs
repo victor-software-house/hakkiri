@@ -5,11 +5,11 @@
 //! Markdown files (`text`, with `.fixture` after the extension), and one config
 //! for each tool and scenario: `vale/<name>.ini` and `.ctl/<name>.yaml`.
 //! `vale.tsv` holds one row for each alert Vale gave on the files under each
-//! config: the config, the file, the line, the first and last column, the
-//! level, the rule, the message and the matched text, with a line feed written
-//! `\n` and a tab `\t`. The rows come from Vale at `66bbb85` run from the
-//! fixture folder as `vale --config=vale/<name>.ini --output=JSON text`, with
-//! `Vale.Spelling` turned off, which hakkiri has no rule for yet.
+//! config. A row has the config, the file, the line, the first and last column,
+//! the level, the rule, the message and the matched text, with a line feed
+//! written `\n` and a tab `\t`. The rows come from Vale at `66bbb85` run from
+//! the fixture folder as `vale --config=vale/<name>.ini --output=JSON text`,
+//! with `Vale.Spelling` turned off, which hakkiri has no rule for yet.
 //!
 //! Vale applies a parameter to every file, whichever section sets it, and
 //! hakkiri applies it to the files of the glob that sets it. Each config of the
@@ -192,9 +192,9 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
     Ok(())
 }
 
-/// The faults of the fixture: a config, the line of its fault, what hakkiri
-/// says there, and what Vale says. The unknown-field faults list the fields of
-/// the check, and their row stops before the list.
+/// The faults of the fixture: a config, the line of its fault, the message
+/// hakkiri gives there, and the message Vale gives. The unknown-field faults
+/// list the fields of the check, and their row stops before the list.
 fn faults() -> Result<Vec<[String; 4]>, Box<dyn Error>> {
     let mut rows = Vec::new();
     for line in fs::read_to_string(fixture().join("faults.tsv"))?.lines() {

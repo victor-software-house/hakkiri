@@ -108,11 +108,11 @@ fn the_alert_is_at_the_last_match_of_the_pair() -> TestResult {
 /// text of an earlier match.
 ///
 /// `tests/fixtures/consistency-lines` holds the rule (`styles`), the
-/// paragraph (`text`, with `.fixture` after the extension), and `vale.tsv`:
-/// the row Vale gave at `66bbb85`, run from the fixture folder as
-/// `vale --config=vale/all.ini --output=JSON text`, with the config, the file,
-/// the line, the first and last column, the level, the rule, the message and
-/// the matched text.
+/// paragraph (`text`, with `.fixture` after the extension), and `vale.tsv`.
+/// `vale.tsv` holds the row Vale gave at `66bbb85`, run from the fixture
+/// folder as `vale --config=vale/all.ini --output=JSON text`.
+/// The row has the config, the file, the line, the first and last column, the
+/// level, the rule, the message and the matched text.
 /// Vale searches the paragraph for the text of the match, so it puts the
 /// alert on the first line that holds the text, line 1. hakkiri puts it at
 /// the match, line 2.
