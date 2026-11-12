@@ -235,7 +235,9 @@ It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a
 It also corrects the verbs of saying and asking after a noun.
 The words in `the docs say` and `the flag asks for` read as verbs.
 The words in `for the asks that wait` and `a hook told of the file` read as a noun and a participle.
-It also reads `check`, `split`, `round`, `prompt`, `fade` and `thinking` as nouns in a noun phrase, as in `the load split pull request`.
+It also reads `check`, `prompt`, `thinking` and `fade` as nouns after a determiner.
+It reads `prompt`, `round` and `split` as nouns in `the load split pull request`.
+It reads `check` as a noun that ends a compound, as in `the peer user id check`.
 A `sequence` rule can therefore flag other words than in Vale.
 A title keeps the tags of the model alone.
 

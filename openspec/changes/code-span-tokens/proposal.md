@@ -7,7 +7,7 @@ Queue row: [`HKR-056`][ledger].
 A code span reads as the one-letter word `x` in the text of a sentence, and the tagger tags that word like any other.
 Next to a determiner the model tags `x` as a symbol, so a rule of a noun and a verb sees `` `flag` says `` for some spans and not for others.
 `NounStack` counts the word `x` as a lowercase noun of a stack, which no reader does.
-Two readers labelled every alert of `ThingsSpeakNoun` and `NounStack` that Vale and hakkiri disagree on, against a written definition of each rule.
+Two readers labelled every alert of `ThingsSpeakNoun` and `NounStack` that Vale and hakkiri diverge on, against a written definition of each rule.
 By that definition a code name before `says` is a thing that speaks, and a code span is never one of the four nouns of a stack.
 
 ## Changes
@@ -18,7 +18,8 @@ By that definition a code name before `says` is a thing that speaks, and a code 
 - The rule applies to every `sequence` rule, because the walk reads each word through one function.
 - The tagger corrects the verbs of saying and asking after a noun, for the verb tag that the package puts on the verb token of `ThingsSpeakNoun`.
 - An `existence` rule reads a code span as one `*`, as Vale masks it, and drops a match only when it starts or ends on a span, so a match across a span is a match.
-- The tagger reads `check`, `split`, `round`, `prompt`, `fade` and `thinking` as nouns in a noun phrase, where the model reads a verb, an adverb or an adjective.
+- The tagger reads `check`, `prompt`, `thinking` and `fade` as nouns after a determiner, where the model reads a verb, an adverb or an adjective.
+- It reads `prompt`, `round` and `split` as nouns before `pull request` in a title, and `check` as a noun that ends a compound.
 - The `sequence-check`, `scope-selection` and `vale-differences` specs state it.
 
 ## Capabilities
@@ -32,8 +33,9 @@ By that definition a code name before `says` is a thing that speaks, and a code 
 ## Impact
 
 - Changed: `src/sequence.rs`, `src/tagger.rs`, `src/tagger/tokens.rs`, `src/tagger/corrections.rs`, the tests of the sequence walk and the tagger, the instructions, the skill and `AGENTS.md`.
-- On nine repositories `ThingsSpeakNoun` gives 281 of the alerts the tools disagree on, 274 true and 7 false, and every true alert of Vale.
-  `NounStack` gives 232, 43 true and 189 false where Vale gives 278, 16 true and 262 false, and `ClauseChain` gives 1,523 alerts where it gave 1,020 and Vale gives 1,492.
+- On nine repositories `ThingsSpeakNoun` gives 313 of the alerts the tools diverge on, 305 true and 8 false, and every true alert of Vale.
+  `NounStack` gives 240, 44 true and 196 false where Vale gives 278, 16 true and 262 false.
+  `ClauseChain` gives 1,536 alerts where it gave 1,020, and Vale gives 1,492.
   GUM stays at 92.54%.
   The design lists the counts of every state and the false alerts that remain.
 

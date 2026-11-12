@@ -23,7 +23,9 @@ The matched text differs: hakkiri prints `x` for the span, and Vale prints the m
 
 ### Requirement: The nouns of technical prose read as nouns
 
-hakkiri SHALL tag `check`, `split`, `round`, `prompt`, `fade` and `thinking` as nouns after a determiner, in the title of a pull request after a noun, and after two singular nouns before a preposition, where the model tags them as another part of speech.
+hakkiri SHALL tag `check`, `prompt`, `thinking` and `fade` as nouns after a determiner, where the model tags them as another part of speech.
+It SHALL tag `prompt`, `round` and `split` as nouns after a noun when the nouns after them run up to `pull request`.
+It SHALL tag `check` as a noun when a base form follows two singular nouns before a preposition or a stop.
 A rule of four lowercase nouns then counts them, and the verb `check` after a plural noun stays a verb.
 
 #### Scenario: A word of a pull request title
@@ -38,7 +40,8 @@ A rule of four lowercase nouns then counts them, and the verb `check` after a pl
 
 ### Requirement: The verbs of saying and asking keep their place
 
-hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is, and `asks` and `asked` in the noun phrase of a preposition as a noun and a participle, so a `sequence` rule with a verb tag flags the first and no other.  
+hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is.
+It SHALL tag `asks` and `asked` in the noun phrase of a preposition as a noun and a participle, so a `sequence` rule with a verb tag flags the first and no other.  
 Vale tags the same words with the older model, and its rule has no verb tag.
 
 #### Scenario: A verb after a noun

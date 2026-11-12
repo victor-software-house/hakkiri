@@ -8,7 +8,8 @@
    `name` gets `NN` in each of the places measured: after a determiner, after `as`, after a preposition, between square brackets and before a noun.
    The alternative was to refuse the span, which loses most of the true alerts of `ThingsSpeakNoun` (decision 5).
 2. **A pattern reads a code span as `X`.**
-   `ThingsSpeakNoun` reads a noun that matches `[A-Za-z][\w-]*` with no case, and `NounStack` reads a lowercase word that matches `[a-z][a-z-]*`.
+   `ThingsSpeakNoun` reads a noun that matches `[A-Za-z][\w-]*` with no case.
+   `NounStack` reads a lowercase word that matches `[a-z][a-z-]*`.
    The capital letter satisfies the first and fails the second, so the walk needs no rule for either.
    `NounStack` says that each noun is a lowercase word, and its own case leaves a code span out of a stack.
 3. **The brackets of an intra-doc link belong to the span.**
@@ -19,11 +20,12 @@
    `ThingsSpeakNoun` flags a word of saying, telling, knowing, thinking, wanting, agreeing or asking whose subject is a thing, and a code name is a thing.
    `NounStack` flags four lowercase common nouns in a row, and a code span is none of them.
 5. **The refusal and a head noun were measured.**
-   Refusing the span gives 44 of the 268 true alerts of `ThingsSpeakNoun` that the tools disagree on.
+   Refusing the span gives 44 of the 268 true alerts of `ThingsSpeakNoun` that the tools diverge on.
    Letting a preposition attach the span to the noun before it gives 56, and a head noun with two cues gives 81.
    Reading the span as a noun gives 264, and no rule about prepositions.
 6. **The verb token of `ThingsSpeakNoun` carries a tag, and the tagger corrections make it hold.**
-   Without a tag the rule flags a noun or a participle that has the shape of a verb: 20 of the 26 false alerts read `asks` as a verb where it names a request, and 6 read `asked about` or `told of` as a past tense.
+   Without a tag the rule flags a noun or a participle that has the shape of a verb.
+   Of its 26 false alerts, 20 read `asks` as a verb where it names a request, and 6 read `asked about` or `told of` as a past tense.
    The package takes `tag: ^(?:VB|VBD|VBP|VBZ)$` on that token.
    The pattern is anchored because a tag is a search, and `VB` alone also matches `VBN` and `VBG`.
    The tag alone cuts 34 true alerts and 4 of Vale's, since the model reads a verb after a noun as a noun, so the tagger gets these corrections, each reading the words and tags of one sentence:
@@ -41,55 +43,109 @@
 
 7. **A pattern check reads a code span as one `*` and drops a match only at its edges.**
    `run_existence` searched the text where a code span is the letter `x`, and dropped each match that overlapped a span.
-   Vale masks a span as a run of `*`, and a match that runs across one is a match: 452 of the 487 alerts of `ClauseChain` that Vale gave and hakkiri did not held a span inside the match, and 39 of 50 sampled were real chains.
+   Vale masks a span as a run of `*`, and a match that runs across one is a match.
+   Of the 487 alerts of `ClauseChain` that Vale gave and hakkiri did not, 452 held a span inside the match, and 39 of 50 sampled were real chains.
    `Text::pattern_reading` now gives the text with each span as one `*`, a byte that no word and no space matches and that the text already uses for masked markup, so every offset holds.
    `Text::edge_in_code` drops a match whose first or last byte lies in a span, and keeps one with text on both sides.
    The sequence walk reads tokens from the tagger and keeps decision 2, so the two readings do not meet.
    `substitution`, `occurrence`, `repetition` and the rest keep the refusal of an overlap.
 8. **The tagger reads the nouns that technical prose uses where the model reads another part of speech.**
-   The model reads `split`, `round`, `check`, `prompt`, `fade` and `thinking` as one other tag in `the host load split pull request`, `the mask round pull request`, `the peer user id check`, `the prompt template pull request`, `the fade removal pull request` and `the thinking request fields decision`, so a run of four nouns lost one.
-   The model lists some words with one tag and never scores them, and for `prompt` the score of a noun is 25 points under an adjective, so no margin of the model separates `prompt` from `final`.
-   `nouns_of_technical_prose` holds the six words, and reads one as a noun after a determiner or a possessive, after an adjective unless it is a participle, in the title of a pull request after a noun, and as the base form after two singular nouns before a preposition or a stop.
-   A model margin, a rule for a word between nouns and a rule for any adjective before three nouns were measured and dropped: each cost GUM tokens or gave false alerts such as `record then places` and `outbound mask speed pull request`.
-   A rule that read a hyphenated word as an adjective, which the definition of `NounStack` holds, lost 6 tokens of GUM and was dropped; the rule's pattern accepts a hyphen, and 12 alerts of `NounStack` that are false by the definition rest on it.
+   The model reads `split`, `round`, `check`, `prompt`, `fade` and `thinking` as one other tag in `the host load split pull request`, `the mask round pull request`, `the peer user id check`, `the prompt template pull request`, `the fade removal pull request` and `the thinking request fields decision`.
+   A run of four nouns lost one, and `NounStack` lost 7 true alerts of Vale.
+   The model lists some of these words with one tag and never scores them, and for `prompt` the score of a noun is 25 points under an adjective, so no margin of the model separates `prompt` from `final`.
+   Three lists in `src/tagger/corrections.rs` hold the words, each for the one place where the sampled readings show a noun and nothing else:
+   - `NOUNS_AFTER_DETERMINER` holds `check`, `prompt`, `thinking` and `fade`, read as nouns after a determiner, a possessive, or an adjective that is no participle.
+   - `NOUNS_IN_TITLE` holds `prompt`, `round` and `split`, read as nouns after a noun when the nouns after them run up to `pull request`.
+   - `NOUNS_ENDING_COMPOUND` holds `check`, read as a noun when a base form follows two singular nouns before a preposition or a stop.
+   The word list of a place is the evidence for that place.
+   The first version listed all six words for all three places, and the counts showed that `round` and `split` did not hold after a determiner (see the measures).
+   A model margin, a rule for a word between nouns, a rule for any adjective before three nouns, and a title or compound rule for every word were measured and dropped.
+   Each cost GUM tokens or gave false alerts such as `record then places`, `names a pull request` and `base the link-scenarios pull request`.
+   A rule that read a hyphenated word as an adjective, which the definition of `NounStack` holds, lost 6 tokens of GUM and was dropped.
+   The rule's pattern accepts a hyphen, and 12 alerts of `NounStack` that are false by the definition rest on it.
 
 ## Measures
 
-The alerts of nine repositories are those of Vale 3.26.0 and of hakkiri builds: before the refusal (`P0`), with it (`P1`), with the head noun (`B`), with a head noun and two cues (`A`), this change before the tag (`N`), the tag with the tagger of `N` (`Tag`), and this change (`Fix`).
-Each alert that the tools do not all give was labelled true or false against the definitions, 304 of `ThingsSpeakNoun` and 550 of `NounStack`.
-Two readers labelled the `ThingsSpeakNoun` alerts, and two of 296 differed before I settled them by the definition.
-Two readers labelled the 415 `NounStack` alerts that no code span touches, and differed on 9, all a hyphenated word before three nouns, settled as false since a hyphenated word is an adjective.
-Two readers labelled the other 115, and two more the 10 alerts that only `Fix` gives, with no difference.
+The alerts of nine repositories are those of Vale 3.26.0 and of hakkiri builds.
+The builds are: before the refusal (`P0`), with it (`P1`), this change before the tag (`N`), the tag with the tagger of `N` (`Tag`), and this change (`Fix`).
+Each alert that the tools do not all give was labelled true or false against the definitions, 336 of `ThingsSpeakNoun` and 558 of `NounStack`.
+Two readers labelled each set, and the few that differed were settled by the definition.
+The 415 `NounStack` alerts that no code span touches differed on 9, all a hyphenated word before three nouns, settled as false since a hyphenated word is an adjective.
+
+The configuration of one repository named a style that the package dropped and mapped Rust files to Markdown, which hakkiri reads natively.
+The run that produced `P0` to `Fix` converted it as it stood, so hakkiri gave that repository no alert, and 40 alerts of its comments came to light when the conversion was corrected.
+Of those, 31 of 32 `ThingsSpeakNoun` alerts and 1 of 8 `NounStack` alerts are true.
+The table counts them for `Fix` only; the older states ran before the correction and lack them.
 
 | Rule | Tool | Gives | True | False | Vale's true missed |
 |:--|:--|--:|--:|--:|--:|
 | `ThingsSpeakNoun` | Vale | 22 | 21 | 1 | |
 | | `P0` | 84 | 69 | 15 | 18 |
 | | `P1` | 53 | 46 | 7 | 19 |
-| | `B` | 69 | 58 | 11 | 18 |
-| | `A` | 97 | 83 | 14 | 17 |
 | | `N` | 293 | 266 | 27 | 4 |
 | | `Tag` | 246 | 230 | 16 | 6 |
-| | `Fix` | 281 | 274 | 7 | 0 |
+| | `Fix` | 313 | 305 | 8 | 0 |
 | `NounStack` | Vale | 278 | 16 | 262 | |
 | | `P0` | 251 | 30 | 221 | 16 |
 | | `N` | 210 | 30 | 180 | 16 |
-| | `Fix` | 232 | 43 | 189 | 14 |
+| | `Fix` | 240 | 44 | 196 | 14 |
 
 `Fix` gives every true alert of Vale for `ThingsSpeakNoun`.
-Of its 7 false alerts one is also Vale's, `tell failures apart`, a literal verb.
+Of its 8 false alerts one is also Vale's, `tell failures apart`, a literal verb.
 Three are `asked to end` twice and `asked online`, a thing that is asked and no thing that asks, which a tagger cannot read without knowing what asks.
 Three are `asked for, or`, `asked about` and `told of`, a participle that the package's rule removes with a tag on the token that follows the verb.
-`NounStack` gives 189 false alerts where Vale gives 262, and 43 true where Vale gives 16.
+One is `the consumer wants the error` in a scenario, where the two readers differed and the definition passes a person.
+`NounStack` gives 196 false alerts where Vale gives 262, and 44 true where Vale gives 16.
 The 14 true alerts of Vale that `Fix` lacks are the words that `Fix` flags, since Vale's span runs on through the target of a link, and none is a miss.
-Of the 189 false alerts, 12 hold a hyphenated word before three nouns, which the rule's pattern accepts and the definition does not.
+Of the 196 false alerts, 12 hold a hyphenated word before three nouns, which the rule's pattern accepts and the definition does not.
 The 7 true alerts of Vale that `N` lacked name `peer user id check`, `mask round pull request`, `host load split pull request`, `load split pull request`, `fade removal pull request`, `prompt template pull request` and `thinking request fields decision`, and `Fix` gives all of them.
 GUM is right on 52,298 of 56,516 tokens, 92.54%, as before the change, and the 200 judged conflicts count 134 right against 133.
 
-On the same nine repositories the package's `ClauseChain` gave 1,020 alerts before decision 7 and 1,523 after it, where Vale gives 1,492.
+### The word lists
+
+Two readers labelled the part of speech of 530 places of the six words in the prose and the comments of the same nine repositories, 100 for each word and 30 for `fade`, taken from 17,465 places.
+They differed on one place, `split` in a file name.
+The model is wrong on `prompt` in 78 of 94 sampled places before the correction, and `thinking` and `round` in about half.
+
+| Word | Places | Noun | Not a noun | Noun after a determiner |
+|:--|--:|--:|--:|--:|
+| `check` | 100 | 83 | 17 | 50 of 50 |
+| `fade` | 30 | 29 | 1 | 13 of 13 |
+| `prompt` | 100 | 100 | 0 | 50 of 50 |
+| `round` | 100 | 79 | 21 | 41 of 50 |
+| `split` | 99 | 49 | 50 | 40 of 50 |
+| `thinking` | 100 | 99 | 1 | 50 of 50 |
+
+GUM holds 21 places of the six words.
+One is a noun, `In his thinking`, after a possessive, which is a place of the first list; the others are verbs, as in `to check` and `I was thinking`, or a preposition.
+So GUM gives no reading against the three places of the lists, and it gives none for a noun outside them.
+The places not after a determiner are where the word is a verb or a modifier, as in `to check`, `split` as a participle, and `the round trip` read as an adjective by both readers.
+
+Each case ran on the same 530 places, and on the nine repositories with its word list changed:
+
+| Change | Places fixed | Places harmed | Alerts of the nine repositories |
+|:--|--:|--:|:--|
+| All six words after a determiner | 84 | 6 | none lost |
+| `round` and `split` left out | 61 | 0 | none lost |
+| Title case off | | | 8 lost, 5 true of `NounStack` |
+| Compound case off | | | 1 lost, a true alert of Vale |
+| Title and compound cases for every word | | | 98 more alerts of `NounStack`, such as `names a pull request` |
+| Title case for `prompt`, `round` and `split`; compound case for `check` | | | none lost, none added |
+
+The six harmed places read `the round trip` and `the split DNS` as nouns, where both readers read an adjective or a participle.
+GUM and the judged conflicts stay at 92.54% and 134 under every row.
+The model stays wrong on `prompt`, `thinking` and `round` in the places that no list names, such as `system prompt` and `thinking blocks`.
+No alert of the labelled sets depends on them, so a rule for them waits for an alert that needs it, with the labels to prove it.
+
+### `ClauseChain`
+
+On the same nine repositories the package's `ClauseChain` gave 1,020 alerts before decision 7 and 1,536 after it, where Vale gives 1,492.
 The match text differs on 371 of them, where Vale prints the mask as `*` and hakkiri prints `x`, so the diff counts each as changed.
-Two readers labelled the 210 alerts that only one tool gives or that move, and differed on 9, settled by the rule that each part of a chain holds a verb.
-Pairing the rest by line leaves 11 true alerts of Vale that hakkiri lacks, the same 11 as before the change, in a comment block or a list item that the sentence splitter reads another way.
-It leaves 26 true alerts that only hakkiri gives and 18 false ones, 9 of them already given before decision 7.
-The 9 new false alerts are a semicolon between two noun phrases or two code spans, in a comment or a list.
-`ThingsSpeakNoun` gives the same alerts as before, `PrepositionChain` gives one more of Vale's, and `NounStack` gives 12 more.
+Pairing the alerts of both tools by file and by line, within 3 lines, leaves 464 alerts that only Vale gave before decision 7 and none after it.
+The 13 that remained in the first run of this change were the alerts of the repository whose configuration the run converted wrongly, so no sentence splitter explains them.
+It leaves 40 alerts that only hakkiri gives, 11 of them before decision 7.
+Two readers labelled them against the rule's definition and differed on none: 26 are true and 14 are false.
+The 14 false alerts join the items of a list with semicolons, or follow a label colon with items, so no part holds a verb.
+The rule's pattern cannot tell a list from a chain.
+Vale gives the same kind of false alert: of the 88 alerts that only Vale gave before decision 7, 46 are false.
+The cause lies in the package and not in the engine.

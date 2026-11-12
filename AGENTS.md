@@ -94,7 +94,8 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
     A new correction needs a test, and a measure on UD English GUM, on the judged conflicts of our documents and on the alerts of a rule that reads tags.
     A `sequence` rule reads a code span as a noun: the tagger reads the word `name` in its place, its tag is `NN`, and a pattern reads it as `X`, so a lowercase pattern refuses it.
     An `existence` rule reads a code span as one `*` and drops a match only when it starts or ends on the span.
-    `nouns_of_technical_prose` lists the nouns that the model reads as another part of speech; add a word to it only with the alerts that need it and the GUM count.
+    `nouns_of_technical_prose` reads three lists of nouns that the model tags as another part of speech, one for each place a noun is certain.
+    Add a word to a list only with the sampled readings of that word in that place and the alerts that need it, and run the GUM count.
 
 ## Workflow
 
