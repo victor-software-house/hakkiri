@@ -8,7 +8,7 @@
 //! level, the rule, the message and the matched text. The rows come from Vale
 //! at `66bbb85` run from the fixture folder as `vale --config=vale/<name>.ini
 //! --output=JSON text`, with `Vale.Spelling` and `Vale.Repetition` turned off,
-//! which hakkiri has no rule for yet.
+//! as the hakkiri configs turn them off.
 //!
 //! A match that spans lines ends where its last character is in hakkiri, as
 //! `end_line` and `end_column`. Vale prints the first column plus the number of

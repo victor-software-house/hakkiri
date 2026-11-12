@@ -1,0 +1,19 @@
+packages:
+  - path: dicts
+files:
+  "text/*.md":
+    styles: [Vale]
+    Vale.Repetition: off
+    params: {Vale.Spelling: {dictionaries: team, append: true}}
+  "text/*.rs":
+    styles: [Vale]
+    Vale.Repetition: off
+    params: {Vale.Spelling: {dictionaries: team, append: true}}
+  "text/*.mdx":
+    styles: [Vale]
+    Vale.Repetition: off
+    params: {Vale.Spelling: {dictionaries: team, append: true}}
+  "text/*.ts":
+    styles: [Vale]
+    Vale.Repetition: off
+    params: {Vale.Spelling: {dictionaries: team, append: true}}

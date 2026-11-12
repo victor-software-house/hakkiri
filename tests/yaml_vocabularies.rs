@@ -12,8 +12,8 @@
 //! has one fault: the config, and the error line Vale gave. The rows come from
 //! Vale at `66bbb85` run from the fixture folder as `vale
 //! --config=vale/<name>.ini --output=JSON text` and `--output=line text`, with
-//! `Vale.Spelling` and `Vale.Repetition` turned off in the first four, which
-//! hakkiri has no rule for yet.
+//! `Vale.Spelling` and `Vale.Repetition` turned off in the first four, as the
+//! hakkiri configs turn them off.
 
 #![expect(
     clippy::panic_in_result_fn,

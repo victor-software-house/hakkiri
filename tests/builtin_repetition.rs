@@ -10,7 +10,7 @@
 //! and the matched text, with a line feed written `\n` and a tab `\t`.
 //! The rows come from Vale at `66bbb85` run from the fixture folder as `vale
 //! --config=vale/<name>.ini --output=JSON text`, with `Vale.Spelling` turned
-//! off, which hakkiri has no rule for yet.
+//! off, as the hakkiri configs turn it off.
 //!
 //! A repeat that spans two lines ends where its last character is in hakkiri,
 //! as `end_line` and `end_column`. Vale prints the first column plus the

@@ -1,0 +1,4 @@
+/** A docs commnt with teh typo.
+ * @param nme the nme of it
+ */
+export const x = 1; // trailing coment

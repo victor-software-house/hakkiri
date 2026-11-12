@@ -21,7 +21,7 @@ use hakkiri::engine::DEFAULT_CODE_SPAN_SIZE;
 use hakkiri::pattern::Pattern;
 use hakkiri::rule::{
     Exceptions, Level, LoadError, LoadProblem, Param, Rule, Unrunnable, read_style,
-    vale_repetition, vocabulary_rules,
+    vale_repetition, vale_spelling, vocabulary_rules,
 };
 use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
@@ -1648,10 +1648,10 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
 
 /// Builds the rules of the style `Vale` and of the vocabularies the config
 /// names, as Vale builds them.
-/// The style `Vale` holds `Vale.Repetition`, and the lists of the top level
-/// give it `Vale.Terms` and `Vale.Avoid`. Each vocabulary a glob lists gives
-/// `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which that glob runs on its
-/// files.
+/// The style `Vale` holds `Vale.Repetition` and `Vale.Spelling`, and the lists
+/// of the top level give it `Vale.Terms` and `Vale.Avoid`. Each vocabulary a
+/// glob lists gives `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which that
+/// glob runs on its files.
 fn build_vocabulary_rules(
     loaded: &mut Loaded,
     vocab: &Named,
@@ -1676,9 +1676,12 @@ fn build_vocabulary_rules(
         }
     }
     for (prefix, own_accepted, own_rejected, style) in built {
-        // The style `Vale` always holds `Vale.Repetition`, as in Vale.
+        // The style `Vale` always holds `Vale.Repetition` and `Vale.Spelling`,
+        // as in Vale.
         let built_in = if style {
-            vale_repetition(accepted).map(|rule| vec![rule])
+            vale_repetition(accepted).and_then(|repetition| {
+                Ok(vec![repetition, vale_spelling(&loaded.packages, accepted)?])
+            })
         } else {
             Ok(Vec::new())
         };

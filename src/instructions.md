@@ -149,6 +149,7 @@ files:
   An unknown vocabulary, a name in two packages, a term that is not a pattern and a wrong YAML entry are errors.
   The lists build rules, as in Vale. `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term, both at `error`. They belong to the built-in style `Vale`, which holds them only while a top-level vocabulary holds a term. `Terms` matches a term without regard to case and keeps the escapes of a pattern term, so `data\Wset` keeps its `\W`, where Vale lowercases it to `\w`. It also keeps the names of groups, the backreferences to them and the flags, such as `(?U)`.
   The style `Vale` also holds `Vale.Repetition`, which reports a word that repeats, such as `the the`, at `error`, with Vale's defaults. It ignores case, reads letters only, and ignores two words in different sentences, a code span between them, and a repeat that an accepted term holds back. List `Vale` in `styles` to run them, or set them by name. A vocabulary that a glob lists builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no setting.
+  The style `Vale` also holds `Vale.Spelling`, which reports a word the built-in dictionary lacks, at `error`, with the message `Did you really mean '%s'?`. A package's `config/dictionaries` folder adds each dictionary in it, and every `.txt` file under its `config/ignore` folder adds the words it lists, as in Vale, for each package of the project. A glob turns it off with `Vale.Spelling: off`, and `params: {Vale.Spelling: {split: true}}` sets a field, such as `custom`, `append` or `dictionaries`. The accepted terms of a vocabulary pass.
 - A package may hold `.ctl/hakkiri.yaml` in its top folder, the folder that holds `styles`, in the format of the config. A `path` entry that names a folder called `styles` has its top in the parent of that folder. When the parent is the project root or holds it, there is no top, so the project's own config is never read as a package's. For a zip the top is the top folder of the zip.
   The settings of each package apply before the project's own, in the order of `packages`, so the project overrides a package and a later package overrides an earlier one.
   The file holds `level`, `vocab`, `files`, `formats` and `packages`. A `styles` list under the same glob text as a package's adds to its list, and under another glob it replaces it. `level` is the project's when it sets one.
@@ -231,7 +232,10 @@ hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.
 A key that names no rule, or a word that is neither a level, `on` nor `off`, is an error.
 Vale ignores the key, and warns and turns the rule off for the word.
 
-hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini`. Its built-in style `Vale` holds no `Vale.Spelling`, which Vale also builds in.
+hakkiri reads the `config/dictionaries` and `config/ignore` folders of each package for `Vale.Spelling`, where Vale reads one styles path.
+It reads no word in a code span of a code comment, which Vale reads when `custom` turns the filters off, and no name after `@param`, which Vale reads.
+
+hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini`. Its built-in style `Vale` holds `Vale.Repetition` and `Vale.Spelling`, as Vale's does.
 
 hakkiri reads a `sequence` rule with `forms` in place of `tokens`: a list of mappings that each hold `tokens`.
 The rule matches where any form does, and every alert carries the one rule name.

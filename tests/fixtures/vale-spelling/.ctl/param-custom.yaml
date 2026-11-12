@@ -1,0 +1,19 @@
+packages:
+  - path: plain
+files:
+  "text/*.md":
+    styles: [Vale]
+    Vale.Repetition: off
+    params: {Vale.Spelling: {custom: true}}
+  "text/*.rs":
+    styles: [Vale]
+    Vale.Repetition: off
+    params: {Vale.Spelling: {custom: true}}
+  "text/*.mdx":
+    styles: [Vale]
+    Vale.Repetition: off
+    params: {Vale.Spelling: {custom: true}}
+  "text/*.ts":
+    styles: [Vale]
+    Vale.Repetition: off
+    params: {Vale.Spelling: {custom: true}}

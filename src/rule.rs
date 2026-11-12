@@ -832,9 +832,9 @@ impl Rule {
             let probe: Probe = input
                 .load()
                 .map_err(|error| unplaced(LoadError::from(error)))?;
-            Self::build(name, file, package, accepted, &probe, &input).map_err(unplaced)?
+            Self::build(name, file, package, search, accepted, &probe, &input).map_err(unplaced)?
         } else {
-            Self::build(name, file, package, accepted, &probe, &input)?
+            Self::build(name, file, package, search, accepted, &probe, &input)?
         };
         rule.recipe = Recipe::File {
             file: file.to_owned(),
@@ -849,6 +849,7 @@ impl Rule {
         name: &str,
         file: &str,
         package: Option<&Path>,
+        folders: &[PathBuf],
         accepted: &[String],
         probe: &Probe,
         input: &Input,
@@ -857,6 +858,7 @@ impl Rule {
             name,
             file,
             package,
+            folders,
             accepted,
         };
         if let Some(reason) = unrunnable(probe, input)? {
@@ -1242,6 +1244,46 @@ pub fn vale_repetition(project_accepted: &[String]) -> Result<Rule, LoadError> {
         &[],
     )
 }
+
+/// The rule file of `Vale.Spelling`: Vale's own definition, with the level
+/// `error` and the scope `text`. The built-in dictionary, the dictionaries of
+/// the packages' `config/dictionaries` folders, and the word lists of their
+/// `config/ignore` folders come from [`vale_spelling`].
+const VALE_SPELLING: &str = r#"extends: spelling
+message: "Did you really mean '%s'?"
+level: error
+scope: text
+"#;
+
+/// The rule `Vale.Spelling`, which Vale builds into its style `Vale`: it
+/// reports a word the built-in dictionary does not hold, at the level
+/// `error`.
+///
+/// Vale adds to the built-in dictionary every dictionary in the
+/// `config/dictionaries` folder of its styles path, and accepts every word of
+/// the `.txt` files under its `config/ignore` folder. The rule does the same
+/// for each folder of `folders`, the package folders of the project, in order.
+/// `project_accepted` holds the accepted terms of the project, which hold a
+/// word back.
+///
+/// # Errors
+///
+/// Returns a [`LoadError`] when an accepted term is not a pattern, or a
+/// dictionary or word list of a folder cannot be read.
+pub fn vale_spelling(folders: &[PathBuf], project_accepted: &[String]) -> Result<Rule, LoadError> {
+    Rule::read(
+        VALE_SPELLING_NAME,
+        "the built-in style Vale",
+        VALE_SPELLING,
+        None,
+        folders,
+        project_accepted,
+        &[],
+    )
+}
+
+/// The name of the rule `Vale.Spelling`.
+pub(crate) const VALE_SPELLING_NAME: &str = "Vale.Spelling";
 
 /// The rules a vocabulary builds, named `{prefix}.Terms` and `{prefix}.Avoid`,
 /// as Vale builds them.

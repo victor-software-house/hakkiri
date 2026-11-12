@@ -3,6 +3,7 @@ packages:
 files:
   "text/*.md":
     styles: [Team, Vale]
+    Vale.Spelling: off
     params:
       Team.Cap:
         match: '$title'

@@ -3,6 +3,7 @@ packages:
 files:
   "text/*.md":
     styles: [Team, Vale]
+    Vale.Spelling: off
     Team.Exist: error
     Vale.Repetition: warning
     params:

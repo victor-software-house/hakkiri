@@ -2,5 +2,5 @@ packages:
   - path: styles
 vocab: [Rep]
 files:
-  "text/*.md": {styles: [Vale]}
-  "text/*.rs": {styles: [Vale]}
+  "text/*.md": {styles: [Vale], Vale.Spelling: off}
+  "text/*.rs": {styles: [Vale], Vale.Spelling: off}

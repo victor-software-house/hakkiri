@@ -1,0 +1,5 @@
+import Box from './box'
+
+# A Titel heading
+
+A blorft in <Box>teh child</Box> and {value} here.

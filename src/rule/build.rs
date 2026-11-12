@@ -5,7 +5,7 @@
 //! `raw` text before or after it, and one flag for case.
 
 use std::cmp::Reverse;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use super::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
@@ -34,6 +34,9 @@ pub(super) struct Source<'a> {
     pub(super) file: &'a str,
     /// The package that holds the rule, when it was read in one.
     pub(super) package: Option<&'a Path>,
+    /// The package folders of the project, which the built-in rule
+    /// `Vale.Spelling` reads its dictionaries and word lists from.
+    pub(super) folders: &'a [PathBuf],
     /// The accepted terms of the project's vocabularies, which a rule that
     /// reads them takes as exceptions.
     pub(super) accepted: &'a [String],
@@ -1173,6 +1176,7 @@ fn vocabulary_source(name: &str) -> Source<'_> {
         name,
         file: "a vocabulary",
         package: None,
+        folders: &[],
         accepted: &[],
     }
 }

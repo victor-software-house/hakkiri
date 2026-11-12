@@ -9,7 +9,7 @@
 //! the level, the rule, the message and the matched text, with a line feed
 //! written `\n` and a tab `\t`. The rows come from Vale at `66bbb85` run from
 //! the fixture folder as `vale --config=vale/<name>.ini --output=JSON text`,
-//! with `Vale.Spelling` turned off, which hakkiri has no rule for yet.
+//! with `Vale.Spelling` turned off, as each hakkiri config turns it off.
 //!
 //! Vale applies a parameter to every file, whichever section sets it, and
 //! hakkiri applies it to the files of the glob that sets it. Each config of the
