@@ -24,7 +24,7 @@ An editor server follows in the second release.
 - A project pins rule packages by version and hash in `.ctl/hakkiri.yaml`; hakkiri fetches and caches them.
 - A package may ship its own settings in `.ctl/hakkiri.yaml`, which apply before the project's and yield to them.
 - A package's vocabularies hold back the matches of the words a project accepts, at the top level or for a glob, and build the rules `Vale.Terms` and `Vale.Avoid`. A vocabulary is text lists or a YAML file with `regex`, `ignorecase` and `flags` options, as in Vale.
-- The built-in style `Vale` runs `Vale.Repetition`, which reports a repeated word such as `the the`, as in Vale.
+- The built-in style `Vale` runs `Vale.Repetition`, which reports a repeated word such as `the the`, and `Vale.Spelling`, which reports a word the built-in dictionary lacks, as in Vale.
 - A glob's `params` set fields of rules by name, such as `Vale.Repetition: {max: 1}`, as Vale's `Style.Rule[param]` does, for the files of that glob.
 - A glob can hide the text its block and token patterns match from the prose rules in Markdown and MDX, as Vale's `BlockIgnores` and `TokenIgnores` do.
 - An HTML comment in a Markdown file, such as `<!-- hakkiri Style.Rule: off -->`, or `{/* hakkiri Style.Rule: off */}` in an MDX file, turns rules off and on for the text after it, with Vale's reach, and Vale's own `<!-- vale off -->` comments work too.

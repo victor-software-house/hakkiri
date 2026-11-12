@@ -38,7 +38,9 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A package may hold vocabularies in `config/vocabularies/<name>/`, which the `vocab` key names at the top level and in a glob of `files` (operator, 2026-11-11).  
    The top level reaches every check that reads accepted terms, and a glob's list reaches the files it matches, as Vale's `Vocab` does.  
    The lists build `Vale.Terms` and `Vale.Avoid` in a built-in style `Vale`, and a glob's vocabulary builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` for its files.  
-   The style `Vale` always exists and holds `Vale.Repetition`, read from Vale's definition as text by `vale_repetition`; `Vale.Spelling` is still missing (row `HKR-026`). The rule is row `HKR-038`.  
+   The style `Vale` always exists and holds `Vale.Repetition` and `Vale.Spelling`, each read from Vale's definition as text by `vale_repetition` and `vale_spelling` (rows `HKR-038` and `HKR-026`).  
+   `Vale.Spelling` is the one rule named for Vale in `rule/package.rs`: it reads `config/dictionaries` and `config/ignore` of every package, where a rule file reads its own.  
+   A hakkiri config that lists `Vale` and whose Vale config turns spelling off sets `Vale.Spelling: off` too, or the fixture gives alerts that Vale does not.  
    Repetition compares words by simple case folding, as Go's `EqualFold` does, never by lowercasing the whole word.  
    A glob's `params` set fields of rules by name, as Vale's `Style.Rule[param] = value` does (row `HKR-059`).  
    `Rule::with_params` reads a rule again from the text it came from, with the parameters laid over its fields as `extends` lays a child over its parent, so each check accepts the fields it defines and the rule file's kinds.  

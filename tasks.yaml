@@ -139,6 +139,7 @@ queue:
     acceptance:
       - A rule named Vale.Spelling runs with the built-in dictionary and the default ignore list, and gives the alerts Vale 66bbb85 gives on the spelling parity inputs.
       - Any alert that differs is fixed or recorded as an intended difference in the vale-differences spec.
+    plan: openspec/changes/vale-spelling/proposal.md
 
   - id: HKR-027
     title: Probe the Markdown parser against Vale's converter
