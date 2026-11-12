@@ -779,6 +779,28 @@ fn a_formats_entry_picks_the_reader_of_a_case() -> TestResult {
     Ok(())
 }
 
+#[test]
+fn a_case_has_the_extension_of_the_reader_a_formats_entry_picks() -> TestResult {
+    let suite = Suite::new("test-formats-extension");
+    let root = suite.scenario("extension");
+    root.file(
+        "styles/Team/Alpha.yml",
+        "extends: existence\nmessage: \"Found '%s'.\"\nlevel: warning\nscope: text.md\ntokens: [alpha]\n",
+    );
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "formats:\n  cfg: md\npackages:\n  - path: styles\nfiles:\n  '*.cfg': {styles: [Team]}\n",
+    );
+    root.file(
+        "through.test.yml",
+        "- name: text.md reads a mapped case\n  format: cfg\n  input: An alpha day.\n  want: \"1:4:Team.Alpha:Found 'alpha'.\"\n",
+    );
+    let result = run(root.path(), &["test", "through.test.yml"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(result.lines(), ["1 file, 1 passed, 0 failed"]);
+    Ok(())
+}
+
 /// A project that runs `Team` on `*.txt` and sets `on_unknown`.
 fn unknown_project<'a>(suite: &'a Suite, name: &str, word: &str) -> Root<'a> {
     let root = suite.scenario(name);
