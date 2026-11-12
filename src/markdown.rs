@@ -547,9 +547,10 @@ impl Builder<'_> {
                 Step::Done(Visited::cut(span_of(node)))
             }
             Mdast::Html(_) => Step::Done(Visited::tag(span_of(node))),
+            Mdast::MdxFlowExpression(_) | Mdast::MdxTextExpression(_) => {
+                Step::Done(self.expression(node))
+            }
             Mdast::MdxjsEsm(_)
-            | Mdast::MdxFlowExpression(_)
-            | Mdast::MdxTextExpression(_)
             | Mdast::Toml(_)
             | Mdast::Yaml(_)
             | Mdast::InlineMath(_)
@@ -572,7 +573,7 @@ impl Builder<'_> {
         match frame.kind {
             Kind::Scoped(scope) => self.scoped(frame.node, scope, frame.inner, frame.first),
             Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner, frame.first),
-            Kind::Jsx => Self::jsx(frame.node, frame.inner),
+            Kind::Jsx => self.jsx(frame.node, frame.inner),
             Kind::Transparent => Self::strikethrough(frame.node, frame.inner),
         }
     }
@@ -967,7 +968,7 @@ impl Builder<'_> {
     }
 
     /// A JSX element: its children stay prose and its tags are gaps.
-    fn jsx(node: &Mdast, mut visited: Visited) -> Visited {
+    fn jsx(&self, node: &Mdast, mut visited: Visited) -> Visited {
         if let Some(span) = span_of(node) {
             let children = node.children().map_or(&[][..], Vec::as_slice);
             let first = children.first().and_then(span_of);
@@ -977,10 +978,51 @@ impl Builder<'_> {
                     visited.cuts.push(span.start..first.start);
                     visited.cuts.push(last.end..span.end);
                 }
-                _ => visited.cuts.push(span),
+                _ => {
+                    if self.reads_as_code(node, &span) {
+                        visited.nodes.push(Self::code(span.clone()));
+                    }
+                    visited.cuts.push(span);
+                }
             }
         }
         visited
+    }
+
+    /// Whether Vale reads the JSX element `node`, which holds no node, as
+    /// code: a flow element, and a text element written as `<Tag />`.
+    /// An open and a close tag with nothing between them, inside a line of
+    /// text, are no code.
+    fn reads_as_code(&self, node: &Mdast, span: &Range<usize>) -> bool {
+        matches!(node, Mdast::MdxJsxFlowElement(_))
+            || self
+                .source
+                .get(span.clone())
+                .is_some_and(|text| text.ends_with("/>"))
+    }
+
+    /// An `{…}` expression, which Vale reads as code, and not a `{/* … */}`
+    /// comment, which it turns into an HTML comment.
+    fn expression(&self, node: &Mdast) -> Visited {
+        let span = span_of(node);
+        let mut visited = Visited::cut(span.clone());
+        if let Some(span) = span
+            && !self
+                .source
+                .get(span.clone())
+                .is_some_and(|text| text.starts_with("{/*") && text.ends_with("*/}"))
+        {
+            visited.nodes.push(Self::code(span));
+        }
+        visited
+    }
+
+    /// A node of code over `span`, as written.
+    fn code(span: Range<usize>) -> Node {
+        Node {
+            closes: span.end,
+            ..Node::new(Scope::Code, span, Vec::new())
+        }
     }
 
     /// The `alt` node of an image or an image reference: the label between
