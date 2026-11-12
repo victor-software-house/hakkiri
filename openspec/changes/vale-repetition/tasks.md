@@ -6,7 +6,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 - [x] 1.1 Probe Vale at `66bbb85` for the built-in rule on Markdown and Rust files, under five configs, and record its alerts in `tests/fixtures/builtin-repetition`.  
   Verify `vale.tsv` holds the alerts of every scenario of the requirements, with the Vale commit named in the test.  
-  Evidence, 2026-11-12 (UTC): a Vale build of `66bbb85` ran in a cloud box over three Markdown files, one Rust file and five configs, and gave 86 alerts under the plain config and 87 under the two vocabulary configs, which add `Vale.Terms` alerts and drop three repeats.  
+  Evidence, 2026-11-12 (UTC): a Vale build of `66bbb85` ran in a cloud box over three Markdown files, one Rust file and five configs. It gave 86 alerts under the plain config and 87 under the two vocabulary configs, which add `Vale.Terms` alerts and drop three repeats.  
   The first probe showed one case hakkiri missed, `ΣΑΣ σασ`.
 
 ## 2. The rule
