@@ -9,4 +9,4 @@ hakkiri SHALL give no alert for a `sequence` rule whose token reads a code span 
 - **WHEN** a rule has `tokens: [{tag: 'NN|NNS'}, {pattern: says}]` and the input is ``The call fails as `flag` says.``
 - **THEN** hakkiri gives no alert, and Vale gives one for `**** says` ([code-span-tokens 1][code-span-tokens-1])
 
-[code-span-tokens-1]: ../../design.md#1-the-walk-refuses-the-word-not-the-match
+[code-span-tokens-1]: ../../design.md#1-the-walk-refuses-the-word

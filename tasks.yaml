@@ -26,6 +26,7 @@ queue:
       - '2026-11-11, operator decision: the tag stays a patch while the package works the same or better, and every rule is validated. prose-style v0.0.15 goes to PullRequestStyle, a Vale package (prose-style PR 32), so this package takes v0.0.16.'
       - '2026-11-11, the package settings carry the OpenSpec proposal entry under block_ignores, so the release waits for HKR-043 in a hakkiri release; the alert diff covers the nine repositories that run Vale today: nishiki, hakkiri, verctl, ctl-core and five private ones.'
       - '2026-11-12, found while judging the NounStack alerts of nine repositories for HKR-052: the rule says each noun is a lowercase word, but its pattern [a-z][a-z-]* has no anchor, so a capitalised name such as GitHub counts as a noun of a stack. The package branch owner is asked to anchor it; row HKR-057 tracks it.'
+      - '2026-11-12, correction to the note on NounStack: an anchor matches nothing in hakkiri 0.0.5 or Vale 3.26.0, so the package pattern is a lookaround, (?<![A-Za-z])[a-z][a-z-]*(?![A-Za-z]), that counts a word only when it is lowercase from its first to its last letter. Row HKR-057 tracks it.'
 
   - id: HKR-043
     title: Skip blocks and tokens by pattern
@@ -420,10 +421,11 @@ queue:
       Vale.
     blocked_by: []
     acceptance:
-      - The pattern of the NounStack token is anchored, so a capitalised name such as GitHub or AMD does not count as a noun of a stack, with a case.
+      - The pattern of the NounStack token counts a word only when it is lowercase from its first to its last letter, so a capitalised name such as GitHub or AMD does not count as a noun of a stack, with a case.
     notes:
-      - '2026-11-12, found by judging the NounStack alerts of nine repositories: the text of the rule says each noun is a lowercase word, but the pattern [a-z][a-z-]* has no anchor, so Vale counts a capitalised noun as one. The package branch owner is asked to anchor it.'
       - The result of judging 100 alerts only Vale gives, by the rule text, is 3 true and, with a capitalised noun counted, 15 true. The 100 that only hakkiri gives hold 10 true by either reading.
+      - '2026-11-12, an anchor cannot do it: with the pattern ^[a-z][a-z-]*$ neither hakkiri 0.0.5 nor Vale 3.26.0 matches The session lake store path is long., because the pattern is not matched against the token alone. A lookaround, (?<![A-Za-z])[a-z][a-z-]*(?![A-Za-z]), gives the same result in both tools, and the package branch carries it with a case for a stack of capitalised names.'
+      - '2026-11-12, found by judging the NounStack alerts of nine repositories: the text of the rule says each noun is a lowercase word, but the pattern [a-z][a-z-]* matches the lowercase letters inside a capitalised name, so both tools count GitHub as a noun of a stack.'
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary

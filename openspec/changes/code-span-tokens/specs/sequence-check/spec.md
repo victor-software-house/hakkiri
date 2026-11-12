@@ -20,5 +20,5 @@ A negated token SHALL hold at it.
 - **WHEN** a rule has `message: "'%s' ends."` and `tokens: [{pattern: files}, {tag: NN, negate: true}]`, and the input is ``Copy the files `data` here.``
 - **THEN** hakkiri reports one alert, with the message `'files' ends.` ([code-span-tokens 2][code-span-tokens-2])
 
-[code-span-tokens-1]: ../../design.md#1-the-walk-refuses-the-word-not-the-match
+[code-span-tokens-1]: ../../design.md#1-the-walk-refuses-the-word
 [code-span-tokens-2]: ../../design.md#2-a-negated-token-holds-at-a-code-span
