@@ -2,9 +2,9 @@
 //!
 //! The model reads UD English EWT, a corpus of web text.
 //! On the prose of our own documents it is wrong in a few cases that repeat.
-//! Each correction below is a rule with its reason, not a second model.
-//! The rules read the words and the tags of the sentence only, so a word the
-//! model decides is never fed back into its context.
+//! Each correction below is one rule, with the reason for it, and none is a
+//! second model. The rules read the words and the tags of the sentence only, so
+//! a word the model decides is never fed back into its context.
 
 /// The tags of a noun, which a possessive `'s` or a verb can follow.
 const NOUNS: [&str; 4] = ["NN", "NNS", "NNP", "NNPS"];
@@ -34,10 +34,10 @@ const MODALS: [&str; 6] = ["SHALL", "MUST", "MAY", "SHOULD", "WILL", "CAN"];
 ///
 /// `tags` holds the model's tag of each word, and a correction replaces it.
 /// A rule that reads the tag before a word reads the corrected tag.
-pub(super) fn apply<'a>(words: &[&str], tags: &mut [&'a str]) {
+pub(super) fn apply(words: &[&str], tags: &mut [&str]) {
     let mut before = "";
     for (word, tag) in words.iter().zip(tags.iter_mut()) {
-        if let Some(corrected) = corrected(word, before, *tag) {
+        if let Some(corrected) = corrected(word, before, tag) {
             *tag = corrected;
         }
         before = *tag;
@@ -75,8 +75,8 @@ fn corrected(word: &str, before: &str, model: &str) -> Option<&'static str> {
 /// The noun before it ends a noun phrase, and a determiner, a possessive
 /// pronoun, a number or a pronoun after it starts the object.
 /// A noun, an adjective or a preposition other than `of` after it starts the
-/// object or a phrase only when no other word of the sentence is a verb, since
-/// a compound noun with a plural head, such as `layout rules of the widgets`,
+/// object or a phrase only when no other word of the sentence is a verb.
+/// A compound noun with a plural head, such as `layout rules of the widgets`,
 /// reads the same.
 fn verbs_after_noun_phrases(words: &[&str], tags: &mut [&str]) {
     let others = tags.iter().filter(|tag| VERBS.contains(tag)).count();
