@@ -63,8 +63,18 @@ An entry of `accept` or `reject` SHALL be a term, a term mapped to nothing, or a
 
 ### Requirement: A wrong YAML entry is refused with its file and line
 
-hakkiri SHALL refuse a vocabulary file that has an entry with more than one key, a key mapped to a string or a list, an unknown option, a `regex` or `ignorecase` that is no boolean, an empty term, both `regex` and `flags`, a pattern that does not compile, flags that do not expand, or an affix file that is missing.
+hakkiri SHALL refuse a vocabulary file that has a wrong entry or a missing affix file.
 Each problem SHALL name the file and the line Vale names, and one run SHALL report every one.
+
+#### Scenario: A wrong shape
+
+- **WHEN** an entry has more than one key, a key mapped to a string or a list, an unknown option, a `regex` or `ignorecase` that is no boolean, or an empty term
+- **THEN** hakkiri refuses the file
+
+#### Scenario: A wrong value
+
+- **WHEN** an entry has both `regex` and `flags`, a pattern that does not compile, flags that do not expand, or an `affix` that names a missing file
+- **THEN** hakkiri refuses the file
 
 #### Scenario: Each fault
 
@@ -98,9 +108,9 @@ A name that is not one file name SHALL be refused.
 - **THEN** hakkiri reports ``affix: `../outside` is not a file name`` with the line of the key
 
 [vocabularies-3]: ../../../archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
-[yaml-vocabularies-2]: ../../design.md#2-an-entry-is-checked-on-its-node-and-every-problem-is-reported
+[yaml-vocabularies-2]: ../../design.md#2-an-entry-is-checked-on-the-node-and-every-problem-is-reported
 [yaml-vocabularies-3]: ../../design.md#3-a-plain-term-is-literal
-[yaml-vocabularies-4]: ../../design.md#4-a-scalar-that-is-not-a-string-keeps-its-spelling
+[yaml-vocabularies-4]: ../../design.md#4-a-scalar-that-is-not-a-string-keeps-the-spelling-written-in-the-file
 [yaml-vocabularies-5]: ../../design.md#5-null-and-the-words-of-yaml-11
 [yaml-vocabularies-6]: ../../design.md#6-the-affix-file-comes-from-the-packages-never-from-dicpath
 [yaml-vocabularies-7]: ../../design.md#7-every-file-of-the-folder-joins

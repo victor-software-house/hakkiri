@@ -13,7 +13,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 - [x] 2.1 Read `vocab.yml` and `vocab.yaml` in `src/vocabulary/yaml.rs`, join their patterns with those of the text lists, and look the affix file up in the packages.  
   Verify `tests/yaml_vocabularies.rs` fails before the change and passes after it.  
-  Evidence, 2026-11-12 (UTC): in the same box, the six tests of `tests/yaml_vocabularies.rs` pass: the four configs give Vale's 135 alerts, each of the twelve faults names the file and the line of Vale's error, and three further tests cover several faults at once, an unknown key and the affix lookup.  
+  Evidence, 2026-11-12 (UTC): in the same box, the six tests of `tests/yaml_vocabularies.rs` pass. The four configs give Vale's 135 alerts, and each of the twelve faults names the file and the line of Vale's error. Three further tests cover several faults at once, an unknown key and the affix lookup.  
   The first run failed because the `all` config of hakkiri listed no style `Vale`.
 
 ## 3. The surfaces

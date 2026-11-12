@@ -99,7 +99,7 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
    Check the `url` and the `sha256`, and set `--cache-dir` when the default cache folder is read-only.
    A message that names `block_ignores` or `token_ignores` means a pattern does not compile, or the value is not a list of patterns.
    A message that names a `vocab` entry means no package holds that vocabulary, two packages hold it, or a term in its lists is not a pattern.
-   A message that names a `vocab.yml` or `vocab.yaml` file and a line means an entry there is wrong: it has more than one key, an option that does not exist, a pattern that does not compile, or an `affix` file that no package holds.
+   A message that names a `vocab.yml` or `vocab.yaml` file and a line means an entry there is wrong. The entry has more than one key, an option that does not exist, a pattern that does not compile, or an `affix` file that no package holds.
    Alerts from `Vale.Terms` and `Vale.Avoid` come from a vocabulary: fix the word, or move the term between the accepted and the rejected list, in `accept.txt` and `reject.txt` or in `vocab.yml`.
    A message that names `<package>/.ctl/hakkiri.yaml` means a package ships settings with that fault: ask the package's owner, or pin another version of it.
    A folder named `.unpacking-` and a suffix in the cache is left by a killed run: delete it when no hakkiri run is using the cache.

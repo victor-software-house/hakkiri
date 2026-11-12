@@ -96,11 +96,11 @@ hakkiri SHALL read a `vocab.yml` or `vocab.yaml` as each scenario below says, wh
 [check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
 [engine-14]: ../../../archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
 [html-7]: ../../../archive/2026-11-10-html-block-text/design.md#not-ported
-[ledger]: ../../../../tasks.yaml
+[ledger]: ../../../../../tasks.yaml
 [spelling-goals]: ../../../archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
 [styles-4]: ../../../archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
 [test-2]: ../../../archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
 [tree-1]: ../../../archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
 [yaml-vocabularies-1]: ../../design.md#1-the-file-parses-through-ctl-cores-input
-[yaml-vocabularies-2]: ../../design.md#2-an-entry-is-checked-on-its-node-and-every-problem-is-reported
+[yaml-vocabularies-2]: ../../design.md#2-an-entry-is-checked-on-the-node-and-every-problem-is-reported
 [yaml-vocabularies-6]: ../../design.md#6-the-affix-file-comes-from-the-packages-never-from-dicpath
