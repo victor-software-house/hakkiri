@@ -418,9 +418,11 @@ queue:
       - The sequence-check spec states that a code span has the tag NN and reads as the letter X, with tests.
       - The vale-differences spec lists the difference, since Vale reads the span as a run of stars.
       - The alerts that Vale and hakkiri do not all give are labelled against a written definition of each rule by two readers, and each false alert that remains is listed.
+      - The package puts a verb tag on the verb token of ThingsSpeakNoun, the tagger reads a noun, a participle and a verb of saying by the place it stands in, and each correction has a test and keeps GUM at 92.53% or above.
     notes:
-      - 2026-11-12, the alerts of ThingsSpeakNoun and NounStack that six builds do not all agree on were labelled, 296 and 531. By the definitions a code name before says is a thing that speaks, so the refusal of the span removed 64 false and 8 true alerts and left 44 of 268 true ones.
-      - 2026-11-12, reading the span as a noun gives 264 of the 268 true alerts of ThingsSpeakNoun and 26 false, 20 of them the noun ask or asks and 6 a participle. Only a tag on the verb token of the rule, in the package, removes them.
+      - 2026-11-12, the alerts of ThingsSpeakNoun and NounStack that the tools do not all give were labelled, 304 and 540. By the definitions a code name before says is a thing that speaks, so the refusal of the span removed 64 false and 8 true alerts and left 44 of 268 true ones.
+      - 2026-11-12, reading the span as a noun gave 264 true and 26 false alerts of ThingsSpeakNoun, 20 of the 26 the noun ask or asks and 6 a participle. The verb tag alone cut 34 true alerts and 4 of Vale's, so the tagger corrections for the verbs of saying and asking were added. The result is 274 true and 4 false, all 21 true alerts of Vale, and GUM at 92.54% against 92.53%.
+      - 2026-11-12, 3 false alerts remain, asked to end twice and asked online, where only the thing that is asked tells the participle from a past tense. Of the 16 true NounStack alerts of Vale that hakkiri lacks, 9 are the same words with a span that runs through a link target, and 7 are a word the tagger reads as a verb, an adverb or an adjective inside a run of nouns.
     plan: openspec/changes/code-span-tokens/proposal.md
 
   - id: HKR-057

@@ -278,6 +278,127 @@ fn a_plural_noun_in_a_compound_or_after_a_possessive_stays_a_noun() -> TestResul
 }
 
 #[test]
+fn a_verb_of_saying_after_a_noun_is_a_verb() -> TestResult {
+    assert_eq!(tag_of("The docs say so.", "say")?, "VBP");
+    assert_eq!(
+        tag_of("The CI builds agree with each other.", "agree")?,
+        "VB"
+    );
+    assert_eq!(
+        tag_of("The CI builds agree with each other.", "builds")?,
+        "NNS"
+    );
+    assert_eq!(tag_of("The report agree with the log.", "agree")?, "VBP");
+    assert_eq!(tag_of("The report agree with the log.", "report")?, "NN");
+    assert_eq!(tag_of("The state says it is not done.", "says")?, "VBZ");
+    Ok(())
+}
+
+#[test]
+fn a_noun_after_a_determiner_is_no_verb_of_saying() -> TestResult {
+    assert_eq!(tag_of("They have a say in it.", "say")?, "NN");
+    Ok(())
+}
+
+#[test]
+fn a_base_form_after_a_possessive_is_a_noun() -> TestResult {
+    assert_eq!(
+        tag_of("The client's resolver asks the server's cache.", "resolver")?,
+        "NN"
+    );
+    assert_eq!(
+        tag_of("The client's resolver asks the server's cache.", "asks")?,
+        "VBZ"
+    );
+    assert_eq!(tag_of("The tool's own timing shows a size.", "own")?, "JJ");
+    assert_ne!(tag_of("No, let's stay longer.", "stay")?, "NN");
+    Ok(())
+}
+
+#[test]
+fn a_lowercase_name_that_starts_a_sentence_before_a_verb_of_asking_is_a_noun() -> TestResult {
+    assert_eq!(tag_of("cargo asks again with a header.", "cargo")?, "NN");
+    assert_eq!(tag_of("git asks for a name.", "asks")?, "VBZ");
+    assert_eq!(tag_of("Run tests for the name.", "Run")?, "VB");
+    Ok(())
+}
+
+#[test]
+fn a_plural_noun_at_the_start_before_a_determiner_is_the_verb() -> TestResult {
+    assert_eq!(tag_of("Takes every waiting item.", "Takes")?, "VBZ");
+    assert_eq!(tag_of("Cats that spend time sleep.", "Cats")?, "NNS");
+    Ok(())
+}
+
+#[test]
+fn asks_is_a_noun_after_a_preposition_a_gerund_or_an_imperative() -> TestResult {
+    for sentence in [
+        "Compact the idle session for the name asks that wait.",
+        "Answering the name asks that wait.",
+        "Answers the name asks it leaves, which no run will answer.",
+        "The person's text from the name asks it answers, joined.",
+        "Each ask waits.",
+    ] {
+        let tag = tag_of(
+            sentence,
+            if sentence.contains("Each") {
+                "ask"
+            } else {
+                "asks"
+            },
+        )?;
+        assert!(tag.starts_with("NN"), "{sentence}: {tag}");
+    }
+    Ok(())
+}
+
+#[test]
+fn asks_is_a_verb_in_the_clause_of_its_subject() -> TestResult {
+    for sentence in [
+        "A request asks for the rows.",
+        "As the name asks, the file is read.",
+        "The name asks for.",
+        "Starts the compaction name asks for, unless the connection holds one.",
+        "The test asks whether the file exists.",
+    ] {
+        assert_eq!(tag_of(sentence, "asks")?, "VBZ", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn asked_after_a_noun_phrase_is_a_participle_or_a_past_tense_by_its_place() -> TestResult {
+    assert_eq!(
+        tag_of(
+            "It is stated as the spec says, with the cache hook told of the new file.",
+            "told"
+        )?,
+        "VBN"
+    );
+    assert_eq!(
+        tag_of("How long a batch a request asked for waits.", "asked")?,
+        "VBD"
+    );
+    assert_eq!(
+        tag_of(
+            "The offset of the one asked for, or the first byte.",
+            "asked"
+        )?,
+        "VBN"
+    );
+    Ok(())
+}
+
+#[test]
+fn pull_before_request_is_a_noun() -> TestResult {
+    assert_eq!(
+        tag_of("The queue load split pull request ended it.", "pull")?,
+        "NN"
+    );
+    Ok(())
+}
+
+#[test]
 fn a_title_is_tagged_as_the_model_tags_it() -> TestResult {
     let tagger = english()?;
     let sentence = "The SSH keys; the user's files MUST stay.";

@@ -16,6 +16,7 @@ By that definition a code name before `says` is a thing that speaks, and a code 
 - A pattern or a word list reads a code span as the capital letter `X`: a pattern for any letter takes it, and a pattern for a lowercase word refuses it.
 - The square brackets of an intra-doc link, as in ``[`Name`]``, belong to the code span.
 - The rule applies to every `sequence` rule, because the walk reads each word through one function.
+- The tagger corrects the verbs of saying and asking after a noun, for the verb tag that the package puts on the verb token of `ThingsSpeakNoun`.
 - The `sequence-check` and `vale-differences` specs state it.
 
 ## Capabilities
@@ -27,9 +28,10 @@ By that definition a code name before `says` is a thing that speaks, and a code 
 
 ## Impact
 
-- Changed: `src/sequence.rs`, `src/tagger.rs`, `src/tagger/tokens.rs`, the tests of the sequence walk, the instructions, the skill and `AGENTS.md`.
-- On nine repositories `ThingsSpeakNoun` gives 240 more alerts than the build that refuses the span, 220 true and 20 false by the labels.
-  `NounStack` gives 41 fewer than the build before the refusal, all false.
+- Changed: `src/sequence.rs`, `src/tagger.rs`, `src/tagger/tokens.rs`, `src/tagger/corrections.rs`, the tests of the sequence walk and the tagger, the instructions, the skill and `AGENTS.md`.
+- On nine repositories `ThingsSpeakNoun` gives 225 more alerts than the build that refuses the span, 228 more true and 3 fewer false by the labels, and every true alert of Vale.
+  `NounStack` gives 31 fewer than the build before the refusal, 4 more true and 35 fewer false.
+  GUM stays at 92.53% or above.
   The design lists the false alerts that remain.
 
 [ledger]: ../../../tasks.yaml

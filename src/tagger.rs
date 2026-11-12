@@ -7,8 +7,9 @@
 //! [`Tagger::tag()`] tokenizes one sentence and tags each token.
 //!
 //! A few rules then correct the model's tags where it is wrong on the prose of
-//! our documents: the possessive `'s`, a word in capitals, a modal in capitals
-//! and a semicolon.
+//! our documents: the possessive `'s`, a word in capitals, a modal in capitals,
+//! a semicolon, a verb after a noun phrase, and the verbs of saying and asking
+//! after a noun.
 //! [`Tagger::tag()`] and [`Tagger::tag_words()`] apply them.
 //! [`Tagger::tag_code()`] reads a noun in place of each code span first.
 //! [`Tagger::tag_treebank()`] does not, so a title is read as prose reads it.
@@ -125,7 +126,7 @@ impl Tagger {
     ///
     /// A code span names a thing, so the model reads the noun [`CODE_NOUN`] in
     /// its place, with the words around it in context, and the tag of the span
-    /// is `NN`.
+    /// is `NN`, which the corrections read as well.
     /// The square brackets of an intra-doc link, as in ``[`Name`]``, belong
     /// to the span.
     #[must_use]
@@ -147,15 +148,17 @@ impl Tagger {
                 }
             })
             .collect();
-        let tags = self.tag_words(&words);
+        let mut tags = self.model_tags(&words);
+        for (tag, code) in tags.iter_mut().zip(&code) {
+            if *code {
+                *tag = "NN";
+            }
+        }
+        corrections::apply(&words, &mut tags);
         ranges
             .into_iter()
             .zip(tags)
-            .zip(code)
-            .map(|((range, tag), code)| Tagged {
-                range,
-                tag: if code { "NN" } else { tag },
-            })
+            .map(|(range, tag)| Tagged { range, tag })
             .collect()
     }
 
