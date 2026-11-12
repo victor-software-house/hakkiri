@@ -381,3 +381,45 @@ fn a_word_that_is_no_level_is_refused_with_its_line() -> TestResult {
     );
     Ok(())
 }
+
+/// The three faults below sit under glob keys that hold `.`, `*`, `/`, `[` and
+/// `{`, and one setting key that holds a `.`, each written as one key of the
+/// config.
+#[test]
+fn a_fault_under_a_glob_key_with_dots_stars_and_slashes_lands_on_its_own_line() -> TestResult {
+    let suite = Suite::new("rule-setting-glob-lines");
+    let root = project(
+        &suite,
+        "glob-lines",
+        "  'docs/**/*.md': {Team.Hint: yes}\n  'src/{a,b}/lib.rs':\n    styles: [Other]\n    Team.Hint: maybe\n  'x[1].md': {styles: [Nope]}\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    for expected in [
+        "line 4: Team.Hint: `yes` is not a level",
+        "line 7: Team.Hint: `maybe` is not a level",
+        "line 8: styles: `Nope` is not a style in any package",
+    ] {
+        assert!(result.err.contains(expected), "{expected}: {}", result.err);
+    }
+    Ok(())
+}
+
+#[test]
+fn a_fault_in_a_glob_written_in_flow_style_still_names_its_line() -> TestResult {
+    let suite = Suite::new("rule-setting-flow-lines");
+    let root = project(
+        &suite,
+        "flow-lines",
+        "  {'docs/**/*.md': {Team.Hint: yes}, 'a.md': {styles: [Nope]}}\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    for expected in [
+        "line 4: Team.Hint: `yes` is not a level",
+        "line 4: styles: `Nope` is not a style in any package",
+    ] {
+        assert!(result.err.contains(expected), "{expected}: {}", result.err);
+    }
+    Ok(())
+}

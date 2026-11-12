@@ -274,9 +274,9 @@ dependencies = [
 
 [[package]]
 name = "ctl-core"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8457d318c5b8137c3e8a8676a8e4e1a7d94a9dca667071de8932f82489e27e99"
+checksum = "b065a41f0c507c9663107786d9241e188099220131dd5edbc9a1a58982408e5b"
 dependencies = [
  "anyhow",
  "clap",
@@ -295,18 +295,18 @@ dependencies = [
 
 [[package]]
 name = "ctl-layout"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e16e2b5355daf722d92f7ad96b14b3431c01e3c592e8eafc2f06850ba2d31413"
+checksum = "11e2922fe028e3bc0dbd87373b882cf5dfcda8a4227da8da6882c66f5ad02c50"
 dependencies = [
  "ctl-text",
 ]
 
 [[package]]
 name = "ctl-term"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a24d887c4a19f6fe820fac34898b18dfb279d8f0fa6a935fb25798691dcad50"
+checksum = "e50358f005ee68f6ad5299b9f507c04fa68cda6040a3e9fe9688cff250be6338"
 dependencies = [
  "anstyle",
  "ctl-text",
@@ -315,9 +315,9 @@ dependencies = [
 
 [[package]]
 name = "ctl-text"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f116e352b4700d0d7a145d52a4f56d729bae4c7e03a08049ab082aaf6871b389"
+checksum = "e56e3f3a6bb9716b8d66ddfdc842a84153a4e9940594f71ed1e974e7308f83ad"
 dependencies = [
  "anstyle",
  "unicode-bidi",

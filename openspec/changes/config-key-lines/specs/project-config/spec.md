@@ -1,0 +1,16 @@
+## ADDED Requirements
+
+### Requirement: A fault names the line of its own key
+
+A fault about a key of the config SHALL name the line where the config writes that key's value, whatever characters the key holds and however the config is written.  
+A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{` split nothing.
+
+#### Scenario: Globs and settings that hold special characters
+
+- **WHEN** `files` holds `'docs/**/*.md': {Team.Hint: yes}` on line 4, `'src/{a,b}/lib.rs'` on line 5 with `styles: [Other]` on line 6 and `Team.Hint: maybe` on line 7, and `'x[1].md': {styles: [Nope]}` on line 8
+- **THEN** hakkiri names line 4 for the first fault, line 7 for the second and line 8 for the third
+
+#### Scenario: A config written in flow style
+
+- **WHEN** `files` is `{'docs/**/*.md': {Team.Hint: yes}, 'a.md': {styles: [Nope]}}` on line 4
+- **THEN** both faults name line 4

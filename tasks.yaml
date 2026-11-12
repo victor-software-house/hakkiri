@@ -325,6 +325,19 @@ queue:
     notes:
       - "2026-11-11, found by the ProseStyle port: hakkiri's tagger is faithful to prose at b33e60d, the version Vale 66bbb85 builds on, and gives the tags a Go program on that version gives. Vale 3.26.0 ships prose v3.2.2, whose model is older (3,411,804 bytes, the bytes feature template, MIT) and tags 'reads' in 'The freshness harness reads stdout.' as VBZ, where the b33e60d model (1,877,993 bytes, UD English EWT, CC BY-SA 4.0, the runes template) gives NNS."
       - '2026-11-11, on 1,296 sentences of our documents the two models give a different tag for 3,395 of 18,431 tokens, 18.4%. The most common changes from the older to the newer are JJ to NN (545), NNS to VBZ (405) and VBZ to NNS (128). Two ways to close it: ship the v3.2.2 model, with the bytes template that hakkiri does not read yet, or keep the model and accept the difference in the vale-differences spec.'
+
+  - id: HKR-053
+    title: Place config faults through the location index
+    scope: config
+    outcome: >-
+      A fault in the config names the line of its own key, found through ctl-core's
+      location index and not a text search.
+    blocked_by: []
+    acceptance:
+      - A glob key that holds dots, stars or slashes, and a config in flow style, each give a fault on its own line, with tests.
+    plan: openspec/changes/config-key-lines/proposal.md
+    notes:
+      - "2026-11-11, found while placing glob-level errors in ctl-core: key_line read the first line that looked like the key, so two globs that set one rule gave the first glob's fault the second glob's line. ctl-core 0.7.1 holds FieldPath and Input::place."
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary

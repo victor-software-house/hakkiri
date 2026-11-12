@@ -13,7 +13,7 @@ use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
 use std::{fmt, fs, io};
 
-use ctl_core::input::Input;
+use ctl_core::input::{FieldPath, Input};
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
 use hakkiri::Language;
@@ -486,23 +486,13 @@ fn set_vocabulary_rules<S: AsRef<str>>(switches: &mut HashMap<String, bool>, nam
     }
 }
 
-/// The 1-based line of the first line at or after line `from` that is the key
-/// `key`, written bare or quoted and perhaps after a list dash, or `None` when
-/// there is none.
-fn key_line(text: &str, key: &str, from: usize) -> Option<usize> {
-    text.lines()
-        .enumerate()
-        .skip(from.saturating_sub(1))
-        .find_map(|(index, line)| {
-            let item = line.trim_start();
-            let item = item.strip_prefix("- ").map_or(item, str::trim_start);
-            let rest = item.trim_start_matches(['\'', '"']);
-            let after = rest.strip_prefix(key)?;
-            after
-                .trim_start_matches(['\'', '"'])
-                .starts_with(':')
-                .then_some(index + 1)
-        })
+/// The 1-based line where `input` writes the value at `path`, or where its
+/// nearest written ancestor is, and `None` when the text does not parse.
+///
+/// The path names each key as one step, so a glob such as `docs/**/*.md` or
+/// `*.{md,rs}` is one key and not a run of steps.
+fn line_of(input: &Input, path: &FieldPath) -> Option<usize> {
+    input.place(path).map(|at| at.line)
 }
 
 /// What a config fault names: the file, and the line when the text shows it.
@@ -583,7 +573,9 @@ fn project_root(config: &Path) -> io::Result<PathBuf> {
 struct Layer {
     /// How a fault names the file.
     name: String,
-    text: String,
+    /// The text, read once, so each fault finds its line through the same
+    /// document.
+    input: Input,
     raw: Raw,
 }
 
@@ -626,16 +618,17 @@ impl<'a> Walk<'a> {
     ///
     /// `file` is the config that holds `entries`, as a fault names it, and
     /// `depth` the packages between it and the project.
-    fn entries(&mut self, entries: &[Entry], text: &str, file: &str, depth: usize) {
+    fn entries(&mut self, entries: &[Entry], input: &Input, file: &str, depth: usize) {
         let mut faults = Faults {
             file,
             problems: Vec::new(),
         };
-        let mut from = key_line(text, "packages", 1).unwrap_or(1);
-        for entry in entries {
+        for (index, entry) in entries.iter().enumerate() {
             let key = if entry.url.is_some() { "url" } else { "path" };
-            let line = key_line(text, key, from);
-            from = line.map_or(from, |line| line + 1);
+            let line = line_of(
+                input,
+                &FieldPath::root().key("packages").index(index).key(key),
+            );
             if depth > 0 && entry.path.is_some() {
                 faults.add(
                     line,
@@ -737,7 +730,8 @@ impl<'a> Walk<'a> {
                 return;
             }
         };
-        let raw: Raw = match Input::new(&name, &text).load() {
+        let input = Input::new(&name, &text);
+        let raw: Raw = match input.load() {
             Ok(raw) => raw,
             Err(error) => {
                 self.problems.extend(LoadError::from(error).problems);
@@ -756,15 +750,15 @@ impl<'a> Walk<'a> {
         ] {
             if set {
                 faults.add(
-                    key_line(&text, key, 1),
+                    line_of(&input, &FieldPath::root().key(key)),
                     key,
                     "belongs to the project's config, not a package's settings".to_owned(),
                 );
             }
         }
         self.problems.append(&mut faults.problems);
-        self.entries(&raw.packages, &text, &name, depth + 1);
-        self.layers.push(Layer { name, text, raw });
+        self.entries(&raw.packages, &input, &name, depth + 1);
+        self.layers.push(Layer { name, input, raw });
     }
 }
 
@@ -792,9 +786,9 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         raw.on_unmatched,
         raw.on_unknown,
     );
-    let text = input.text();
+    let name = input.name().to_owned();
     let mut faults = Faults {
-        file: input.name(),
+        file: &name,
         problems: Vec::new(),
     };
     let root = match project_root(path) {
@@ -807,12 +801,12 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         }
     };
     let mut walk = Walk::new(&root, cache_dir);
-    walk.entries(&raw.packages, text, input.name(), 0);
+    walk.entries(&raw.packages, &input, input.name(), 0);
     faults.problems.append(&mut walk.problems);
     let mut layers = walk.layers;
     layers.push(Layer {
-        name: input.name().to_owned(),
-        text: text.to_owned(),
+        name: name.clone(),
+        input,
         raw,
     });
     let level = layers
@@ -831,7 +825,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
     let mut listed: HashMap<String, Vec<String>> = HashMap::new();
     let mut formats = Formats::default();
     for layer in layers {
-        if let Err(error) = Input::new(&layer.name, &layer.text).check(&layer.raw, &known) {
+        if let Err(error) = layer.input.check(&layer.raw, &known) {
             faults.problems.extend(LoadError::from(error).problems);
         }
         let mut at = Faults {
@@ -840,10 +834,11 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         };
         for (key, reader) in &layer.raw.formats {
             if let Err(message) = formats.insert(key, reader) {
-                at.add(key_line(&layer.text, key, 1), key, message);
+                let path = FieldPath::root().key("formats").key(key);
+                at.add(line_of(&layer.input, &path), key, message);
             }
         }
-        for mut glob in read_globs(layer.raw.files, &layer.text, &loaded, &mut at) {
+        for mut glob in read_globs(layer.raw.files, &layer.input, &loaded, &mut at) {
             add_up(&mut glob, &mut listed);
             if glob.clears_vocab {
                 for earlier in globs.iter_mut().filter(|g| g.pattern == glob.pattern) {
@@ -999,7 +994,7 @@ fn load_packages(
 /// `loaded` holds, and a level that is none.
 fn read_globs(
     files: Ordered<Ordered<Setting>>,
-    text: &str,
+    input: &Input,
     loaded: &Loaded,
     faults: &mut Faults<'_>,
 ) -> Vec<Glob> {
@@ -1011,7 +1006,9 @@ fn read_globs(
         .collect();
     let mut globs = Vec::new();
     for (pattern, settings) in files.0 {
-        let line = key_line(text, &pattern, 1);
+        // One key of the path, whatever dots, stars and slashes the glob holds.
+        let glob = FieldPath::root().key("files").key(&pattern);
+        let line = line_of(input, &glob);
         let matcher = match GlobBuilder::new(&pattern).build() {
             Ok(glob) => glob.compile_matcher(),
             Err(error) => {
@@ -1019,14 +1016,13 @@ fn read_globs(
                 continue;
             }
         };
-        let inner = line.map_or(1, |line| line + 1);
         let mut listed = None;
         let mut vocabularies = None;
         let mut block_ignores = Vec::new();
         let mut token_ignores = Vec::new();
         let mut choices = Vec::new();
         for (key, setting) in settings.0 {
-            let at = key_line(text, &key, inner);
+            let at = line_of(input, &glob.clone().key(&key));
             match (key.as_str(), setting) {
                 ("styles", Setting::List(names)) => {
                     for name in &names {
@@ -1164,12 +1160,11 @@ impl Named {
                 }
             }
         }
-        let text = &layer.text;
         for (pattern, settings) in &layer.raw.files.0 {
-            let inner = key_line(text, pattern, 1).map_or(1, |line| line + 1);
+            let glob = FieldPath::root().key("files").key(pattern);
             for (key, setting) in &settings.0 {
                 if let ("vocab", Setting::List(names)) = (key.as_str(), setting) {
-                    let at = key_line(text, "vocab", inner);
+                    let at = line_of(&layer.input, &glob.clone().key("vocab"));
                     for name in names {
                         self.add(name, at, &layer.name);
                         if !self.globs.contains(name) {
