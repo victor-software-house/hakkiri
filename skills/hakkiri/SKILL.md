@@ -13,8 +13,8 @@ compatibility: Requires a hakkiri binary on the path.
 
 # hakkiri
 
-`hakkiri check` lints Markdown, MDX and the comments of Rust, TypeScript and
-JavaScript files under `.ctl/hakkiri.yaml`.
+`hakkiri check` lints Markdown, MDX and the comments of Rust, TypeScript,
+JavaScript, Go, Swift, YAML, TOML and Shell files under `.ctl/hakkiri.yaml`.
 `hakkiri test` runs the test cases of rule files.
 `hakkiri instructions` and `--help` are the contract of the installed version.
 This skill is the workflow and does not repeat the whole grammar.
@@ -36,10 +36,11 @@ With no path, `check` walks the current directory.
 A walk skips `node_modules`, `.git` and package folders, and what git ignores in a git repository.
 `--no-gitignore` reads the ignored files, and a file named on the command line is read whether git ignores it or not.
 A file named on the command line that no glob selects draws a warning, and `--on-unmatched error` fails the run for it.
-A file has the language of its path, or of the interpreter on its first line, and is read by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX, JavaScript or Text.
+A file has the language of its path, or of the interpreter on its first line, and is read by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text, so `.yml`, `.bash` and a `#!/bin/sh` script have a reader.
 A file that a glob selects and that no reader reads is linted as plain text, and a binary file is skipped. A byte that is not UTF-8, in a Latin-1 file for example, reads as one `?`, so a column still counts bytes.
+The comments are all that a source, YAML, TOML or Shell file gives, read as Markdown, and a comment addressed to a tool, such as `eslint-disable` or `swiftlint:`, is left out.
 `formats` in the config maps an extension, a file name or a glob to a reader, named by any name of its language, and `--on-unknown` turns the plain-text default into a warning, a failure or nothing.
-A scope may end in a language, such as `text.comment.rs`, and the comments of a fenced code block in Rust, TypeScript, TSX or JavaScript are linted as comments of that language.
+A scope may end in a language, such as `text.comment.rs`, and the comments of a fenced code block in Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML or Shell are linted as comments of that language.
 
 ## Run the test cases
 
