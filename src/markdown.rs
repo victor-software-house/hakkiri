@@ -1130,13 +1130,18 @@ fn title_range(source: &str, from: usize, to: usize, paren: bool) -> Option<Rang
         _ => return None,
     };
     for at in (0..close).rev() {
+        // Backslashes are counted only before a delimiter, so a long run of
+        // them costs its length once.
+        if bytes.get(at) != Some(&open) {
+            continue;
+        }
         let slashes = bytes
             .get(..at)?
             .iter()
             .rev()
             .take_while(|byte| **byte == b'\\')
             .count();
-        if bytes.get(at) == Some(&open) && slashes % 2 == 0 {
+        if slashes % 2 == 0 {
             let spaced = at
                 .checked_sub(1)
                 .and_then(|before| bytes.get(before))

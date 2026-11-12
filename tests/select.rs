@@ -104,6 +104,21 @@ fn title_selects_the_title_of_a_link_an_image_and_a_definition() -> TestResult {
     Ok(())
 }
 
+#[test]
+fn a_title_of_a_long_run_of_backslashes_costs_its_length() -> TestResult {
+    let run = "\\\\".repeat(100_000);
+    let source = format!("[a](u.html \"{run}\")\n");
+    let started = std::time::Instant::now();
+    let found = blocks(&["title"], "a.md", &source)?;
+    assert_eq!(texts(&found), [run.as_str()]);
+    assert!(
+        started.elapsed() < std::time::Duration::from_secs(5),
+        "{:?}",
+        started.elapsed()
+    );
+    Ok(())
+}
+
 /// A link, an image and a definition, each with a title that holds `marker`.
 fn titled() -> String {
     concat_lines(&[
