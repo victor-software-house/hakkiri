@@ -31,7 +31,7 @@ hakkiri check --format json
 - A file named on the command line that no glob selects draws a warning on standard error and is not linted. `--on-unmatched` or `on_unmatched` takes `warn`, the default, `error`, which fails the run with exit 2, or `ignore`. A file that a glob selects but whose styles hold no rule draws nothing, and nor does a file a walk found.
 - Readers come from the extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` and `.js`, or from a `formats` entry. A file that a glob selects and that no reader reads is plain text: one block per run of lines between blank lines, read as written.
 - `--on-unknown` or `on_unknown` takes `text`, the default, `warn`, which skips the file with a warning, `error`, which fails the run with exit 2, or `ignore`. A file that no glob selects draws no message.
-- A plain-text file whose first 8192 bytes hold a NUL byte or are not valid UTF-8 is binary, and a run skips it with no message.
+- A plain-text file that holds a NUL byte in its first 8192 bytes is binary, and a run skips it with no message. A byte that is not valid UTF-8, in a Latin-1 file for example, reads as one `?`, so the file is linted and a column counts bytes, as in Vale.
 - Files lint in parallel. The report is sorted by path, then line, then column, so two runs print the same text.
 - A file that cannot be read or parsed is a failure. The other files still lint.
 
@@ -127,7 +127,7 @@ files:
 - `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` set the options of the same names for `check`. Only the project's config holds them, and a package's settings file that does is an error.
 - `formats` maps an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`. A key that holds `*`, `?`, `[`, `{` or `/` is a glob.
   An entry named by the file's extension wins, then the first key in text order that is the file's name or a glob that matches its name or path. An entry beats the extension table, so `md: text` reads Markdown files as text.
-  A file that an entry maps has the extension of its reader in a scope such as `text.md`: with `txt: md`, that scope selects text in `a.txt`. Vale compares the scope with the file's own extension, so it selects nothing there. A case that runs through the config has the same extension.
+  A file that an entry maps has two extensions for a scope such as `text.md`: its own and its reader's. With `txt: md`, `text.txt` and `text.md` both select text in `a.txt`. Vale compares the scope with the file's own extension only, so `text.md` selects nothing there. A case that runs through the config has the same two extensions.
 - `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule, in the folder or under it. A folder that starts with `.` or `_` and a `*.test.yml` file are skipped, and so is a folder named `config`, where Vale keeps vocabularies and other settings.
   Two folders that hold one style name are refused. So are two files that give one rule name, and a name with a bracket, when a glob lists the style: a style no glob lists is not refused, as in Vale.
   A `url` entry holds the `url` of a zip, which starts with `https://` or `http://`, and its `sha256`, 64 lowercase hex digits. The first run downloads the zip, checks the hash, and unpacks it into the cache folder under that hash, and a later run reads it from there and asks for nothing.

@@ -47,9 +47,9 @@ No marker, escape or entity SHALL change its text.
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text SHALL be skipped with no alert and no message when its first 8192 bytes hold a NUL byte or are not valid UTF-8.
+A file read as plain text that holds a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.
 This SHALL hold whether a walk finds the file or the command line names it.
-A character that the cut splits SHALL NOT make the file binary.
+A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
 
 #### Scenario: A picture
 
@@ -58,17 +58,18 @@ A character that the cut splits SHALL NOT make the file binary.
 
 #### Scenario: A Latin-1 file
 
-- **WHEN** `latin.txt` holds a word that has the byte `E9`, and no NUL byte, and the glob `*` selects it
-- **THEN** hakkiri skips it, counts no file for it, and exits 0, where it would fail the run for a file it cannot read as text
+- **WHEN** `latin.txt` holds a word that has the byte `E9`, then a space and `very`, and no NUL byte, and a rule flags `very`
+- **THEN** hakkiri reports `very` at the column that counts the bytes, and Vale gives the same column
 
-### Requirement: A file a formats entry maps has the extension of its reader
+### Requirement: A file has its own extension and its reader's
 
-For the scopes of the rules that run on it, a file whose reader a `formats` entry gives SHALL have the extension of that reader, and any other file its own extension.
+For the scopes of the rules that run on it, a file SHALL have its own extension and the extension of the reader that reads it.
+A scope part that names an extension SHALL hold for either, and a negated part SHALL leave a block out for either.
 
 #### Scenario: A mapped file
 
-- **WHEN** `formats` maps `txt: md`, `a.txt` holds `# beta`, a blank line and `beta alpha.`, one rule has `scope: text.md` and `tokens: [alpha]`, and another has `scope: text & ~heading.md` and `tokens: [beta]`
-- **THEN** hakkiri reports `beta` on line 3 and `alpha` on line 3, and none in the heading
+- **WHEN** `formats` maps `txt: md`, `a.txt` holds `# beta`, a blank line and `beta alpha gamma.`, and three rules have `text.md` with `alpha`, `text & ~heading.md` with `beta`, and `text.txt` with `gamma`
+- **THEN** hakkiri reports `beta`, `alpha` and `gamma` on line 3, and none in the heading
 
 ### Requirement: on_unknown sets what a selected file with no reader gets
 

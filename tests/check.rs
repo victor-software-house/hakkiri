@@ -121,28 +121,25 @@ fn a_binary_file_is_skipped_with_no_message() -> TestResult {
 }
 
 #[test]
-fn a_file_that_is_not_utf_8_is_skipped_with_no_message() -> TestResult {
+fn a_file_that_is_not_utf_8_is_linted_at_the_offsets_of_its_bytes() -> TestResult {
     let suite = Suite::new("check-latin-1");
     let root = project(&suite, "latin-1", ALL);
     root.file("latin.txt", b"r\xe9sum\xe9 very\n");
-    // A character that the 8192-byte cut splits is no invalid byte.
-    let mut cut = "a".repeat(8191).into_bytes();
-    cut.extend_from_slice("é very\n".as_bytes());
-    root.file("cut.txt", cut);
     root.file("a.md", "Fine.\n");
     let walked = run(root.path(), &["check"], &[])?;
     assert_eq!(walked.code, 0, "{}{}", walked.out, walked.err);
     assert_eq!(walked.err, "");
     assert_eq!(
-        walked.lines().last(),
-        Some(&"1 alert in 2 files"),
-        "cut.txt is linted, latin.txt is skipped: {:?}",
-        walked.lines()
+        walked.lines(),
+        [
+            "latin.txt:1:8: warning Team.Filler: Remove 'very'.",
+            "1 alert in 2 files",
+        ],
+        "each bad byte takes one column, as in Vale"
     );
     let named = run(root.path(), &["check", "latin.txt"], &[])?;
     assert_eq!(named.code, 0, "{}{}", named.out, named.err);
-    assert_eq!(named.lines(), ["0 alerts in 0 files"]);
-    assert_eq!(named.err, "");
+    assert_eq!(named.lines().last(), Some(&"1 alert in 1 file"));
     Ok(())
 }
 
@@ -246,7 +243,7 @@ fn formats_map_a_file_name_and_a_glob() -> TestResult {
 }
 
 #[test]
-fn a_file_that_formats_maps_has_the_extension_of_its_reader() -> TestResult {
+fn a_file_that_formats_maps_has_its_own_extension_and_its_readers() -> TestResult {
     let suite = Suite::new("check-formats-scope-extension");
     let root = project(&suite, "scope-extension", &with_formats("  txt: md\n"));
     root.file(
@@ -257,16 +254,21 @@ fn a_file_that_formats_maps_has_the_extension_of_its_reader() -> TestResult {
         "styles/Team/Beta.yml",
         "extends: existence\nmessage: \"Found '%s'.\"\nlevel: warning\nscope: text & ~heading.md\ntokens: [beta]\n",
     );
-    root.file("a.txt", "# beta\n\nbeta alpha.\n");
+    root.file(
+        "styles/Team/Gamma.yml",
+        "extends: existence\nmessage: \"Found '%s'.\"\nlevel: warning\nscope: text.txt\ntokens: [gamma]\n",
+    );
+    root.file("a.txt", "# beta\n\nbeta alpha gamma.\n");
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(
         result.lines(),
         [
             "a.txt:3:1: warning Team.Beta: Found 'beta'.",
             "a.txt:3:6: warning Team.Alpha: Found 'alpha'.",
-            "2 alerts in 1 file",
+            "a.txt:3:12: warning Team.Gamma: Found 'gamma'.",
+            "3 alerts in 1 file",
         ],
-        "text.md selects the text of a.txt, and ~heading.md leaves out its heading"
+        "text.md selects the text of a.txt, ~heading.md leaves out its heading, and text.txt still selects it"
     );
     Ok(())
 }

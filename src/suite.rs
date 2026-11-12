@@ -353,8 +353,7 @@ impl Runner {
                 };
                 // A case reads as `check` reads a selected file: a `formats`
                 // entry, then the extension, then what `on_unknown` says.
-                let mapped = project.mapped_language(&name);
-                let language = match mapped.or(known) {
+                let language = match project.mapped_language(&name).or(known) {
                     Some(language) => language,
                     None => match project.on_unknown.unwrap_or_default() {
                         OnUnknown::Text => Language::Text,
@@ -382,13 +381,9 @@ impl Runner {
                         names.join(", ")
                     ));
                 }
-                // The extension is the one `check` gives the file: the reader's
-                // when a `formats` entry picks it, else the file's own.
-                let extension = match mapped {
-                    Some(reader) => reader.extension(),
-                    None => case.format.as_str(),
-                };
-                let mut alerts = lint_planned(&plan, &tree, &case.input, extension)?;
+                // The extension is the file's own, as `check` gives it, and the
+                // tree records the reader.
+                let mut alerts = lint_planned(&plan, &tree, &case.input, &case.format)?;
                 alerts.retain(|alert| project.level.is_none_or(|lowest| alert.level >= lowest));
                 Ok(alerts)
             }

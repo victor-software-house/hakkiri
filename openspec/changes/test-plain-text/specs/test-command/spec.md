@@ -16,10 +16,10 @@ A case whose format no reader reads SHALL read its input as plain text, except t
 - **WHEN** the config maps `cfg: md`, a glob selects `*.cfg`, and a case has `format: cfg` and a fenced block that holds `very`
 - **THEN** the case reads the input as Markdown and the rule reports nothing for the fence
 
-### Requirement: A case through the config has the extension of its file
+### Requirement: A case through the config has the extensions of its file
 
-A case that runs through the config SHALL have the extension that `check` gives the file `input.<format>`.
-That extension is the reader's when a `formats` entry gives the reader, and `<format>` otherwise.
+A case that runs through the config SHALL have the extensions that `check` gives the file `input.<format>`.
+Those are `<format>` and the extension of the reader, which a `formats` entry may give.
 
 #### Scenario: A mapped case
 
