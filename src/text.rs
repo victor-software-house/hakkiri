@@ -1,5 +1,6 @@
 //! The text a check reads, and where each byte of it lies in the file.
 
+use std::borrow::Cow;
 use std::ops::Range;
 
 use crate::entity;
@@ -244,6 +245,39 @@ impl Text {
         self.code
             .get(first)
             .is_some_and(|code| code.start < range.end.max(range.start + 1))
+    }
+
+    /// The text as a pattern reads it: each code span is one `*`, a byte that
+    /// no word and no space matches, as Vale masks it.
+    ///
+    /// A `*` and an `x` are one byte each, so every offset of the text holds.
+    #[must_use]
+    pub fn pattern_reading(&self) -> Cow<'_, str> {
+        if self.code.is_empty() {
+            return Cow::Borrowed(&self.content);
+        }
+        let mut masked = self.content.clone();
+        for code in &self.code {
+            masked.replace_range(code.clone(), "*");
+        }
+        Cow::Owned(masked)
+    }
+
+    /// Whether the first or the last byte of the bytes `range` of the text
+    /// lies in a code span.
+    ///
+    /// A match that has text on both sides of a code span reads as a match
+    /// across it, and one that starts or ends on a span does not.
+    #[must_use]
+    pub fn edge_in_code(&self, range: &Range<usize>) -> bool {
+        if range.is_empty() {
+            return self.overlaps_code(range);
+        }
+        let lies_in = |at: usize| {
+            let first = self.code.partition_point(|code| code.end <= at);
+            self.code.get(first).is_some_and(|code| code.start <= at)
+        };
+        lies_in(range.start) || lies_in(range.end - 1)
     }
 
     /// The part of this text in the bytes `range`, or `None` when `range` is

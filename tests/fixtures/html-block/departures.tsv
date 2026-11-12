@@ -20,7 +20,9 @@ hakkiri	Scope.amp	references.md	49	32	32	&
 hakkiri	Scope.dump-code	references.md	0	0	0	sixteen &amp; marker
 hakkiri	Scope.dump-text	blank-alt.md	0	0	0	one marker end
 hakkiri	Scope.dump-text	entities.md	0	0	0	&marker <marker> marker x marker marker &amp;marker
+hakkiri	Scope.dump-text	masked-inline.md	0	0	0	a x b
 hakkiri	Scope.dump-text	masks.md	0	0	0	*
+hakkiri	Scope.dump-text	masks.md	0	0	0	a x b
 hakkiri	Scope.dump-text	reference-spaces.md	0	0	0	epsilon 
 hakkiri	Scope.dump-text	reference-spaces.md	0	0	0	eta &#32;
 hakkiri	Scope.dump-text	references.md	0	0	0	&lt; marker

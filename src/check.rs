@@ -195,20 +195,23 @@ pub(crate) fn accepted_hold(
     Ok(false)
 }
 
-/// Each match of the tokens that no exception holds back and no code span
-/// overlaps.
+/// Each match of the tokens that no exception holds back and that neither
+/// starts nor ends on a code span.
+///
+/// The pattern reads a code span as `*`, so a match runs across one when
+/// there is text on both sides of it.
 fn run_existence(
     existence: &Existence,
     text: &Text,
     accepted: &[&Exceptions],
 ) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
-    let found = existence.pattern.find_all(content)?;
+    let found = existence.pattern.find_all(&text.pattern_reading())?;
     let phrases = phrase_spans(&existence.exceptions, content, !found.is_empty())?;
     let held = accepted_spans(accepted, content, !found.is_empty())?;
     let mut hits = Vec::new();
     for range in found {
-        if text.overlaps_code(&range) {
+        if text.edge_in_code(&range) {
             continue;
         }
         let Some(matched) = content.get(range.clone()) else {
