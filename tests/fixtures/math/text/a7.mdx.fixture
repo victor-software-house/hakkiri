@@ -1,0 +1,37 @@
+<Foo bar="$a very$" /> and $b very$ end very.
+
+<Foo bar={cost + "$5 very$"} /> text very.
+
+Text <b>$x very$</b> more very.
+
+<A t="$1" /> then $a very$ end very.
+
+<Box title="$x very$">
+  Inner $y very$ text very.
+</Box>
+
+Value {"$" + 5} and $a very$ very.
+
+Both {1} $a very$ {2} $b very$ done very.
+
+<Img alt="cost $1 very" /> and $5 very.
+
+{"$" + very}
+
+{/* very $ */} then very.
+
+Pre <Tag a="very">child very</Tag> post very.
+
+Pre <Tag a="very" /> post very.
+
+<Divider label="very" />
+
+<Empty label="very"></Empty>
+
+Text <Empty label="very"></Empty> end very.
+
+# Heading {"$" + very} end very
+
+| Cell | B |
+|:--|:--|
+| {"$" + very} cell very | x |
