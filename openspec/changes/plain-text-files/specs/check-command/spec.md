@@ -54,6 +54,15 @@ A file read as plain text that holds a NUL byte in its first 8192 bytes SHALL be
 - **WHEN** `logo.png` holds a NUL byte and the glob `*` selects it
 - **THEN** hakkiri skips it, counts no file for it, and exits 0
 
+### Requirement: A file a formats entry maps has the extension of its reader
+
+For the scopes of the rules that run on it, a file whose reader a `formats` entry gives SHALL have the extension of that reader, and any other file its own extension.
+
+#### Scenario: A mapped file
+
+- **WHEN** `formats` maps `txt: md`, `a.txt` holds `# beta`, a blank line and `beta alpha.`, one rule has `scope: text.md` and `tokens: [alpha]`, and another has `scope: text & ~heading.md` and `tokens: [beta]`
+- **THEN** hakkiri reports `beta` on line 3 and `alpha` on line 3, and none in the heading
+
 ### Requirement: on_unknown sets what a selected file with no reader gets
 
 For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.

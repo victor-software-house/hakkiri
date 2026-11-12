@@ -106,6 +106,10 @@ impl Finder<'_> {
     /// extension names. A selected file that no reader reads is plain text,
     /// unless `on_unknown` says otherwise, and a plain-text file that holds a
     /// NUL byte is binary and skipped, with no message.
+    ///
+    /// A `formats` entry that gives the reader also gives the extension that
+    /// the rules' scopes see: that of the reader, so `text.md` selects text in
+    /// a `.txt` file that `formats` maps to `md`.
     fn file(&mut self, file: &Path, named: bool) {
         let path = display(file, self.current.as_deref());
         let Some(relative) = self.project.relative(file) else {
@@ -123,11 +127,8 @@ impl Finder<'_> {
         if !first {
             return;
         }
-        let language = match self
-            .project
-            .mapped_language(&relative)
-            .or_else(|| Language::from_path(file))
-        {
+        let mapped = self.project.mapped_language(&relative);
+        let language = match mapped.or_else(|| Language::from_path(file)) {
             Some(language) => language,
             None => match self.options.on_unknown {
                 OnUnknown::Text => Language::Text,
@@ -145,10 +146,13 @@ impl Finder<'_> {
         if language == Language::Text && is_binary(file) {
             return;
         }
-        let extension = file
-            .extension()
-            .map(|extension| extension.to_string_lossy().into_owned())
-            .unwrap_or_default();
+        let extension = match mapped {
+            Some(reader) => reader.extension().to_owned(),
+            None => file
+                .extension()
+                .map(|extension| extension.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+        };
         self.jobs.push(Job {
             path,
             file: file.to_path_buf(),

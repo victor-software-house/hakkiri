@@ -220,6 +220,32 @@ fn formats_map_a_file_name_and_a_glob() -> TestResult {
 }
 
 #[test]
+fn a_file_that_formats_maps_has_the_extension_of_its_reader() -> TestResult {
+    let suite = Suite::new("check-formats-scope-extension");
+    let root = project(&suite, "scope-extension", &with_formats("  txt: md\n"));
+    root.file(
+        "styles/Team/Alpha.yml",
+        "extends: existence\nmessage: \"Found '%s'.\"\nlevel: warning\nscope: text.md\ntokens: [alpha]\n",
+    );
+    root.file(
+        "styles/Team/Beta.yml",
+        "extends: existence\nmessage: \"Found '%s'.\"\nlevel: warning\nscope: text & ~heading.md\ntokens: [beta]\n",
+    );
+    root.file("a.txt", "# beta\n\nbeta alpha.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(
+        result.lines(),
+        [
+            "a.txt:3:1: warning Team.Beta: Found 'beta'.",
+            "a.txt:3:6: warning Team.Alpha: Found 'alpha'.",
+            "2 alerts in 1 file",
+        ],
+        "text.md selects the text of a.txt, and ~heading.md leaves out its heading"
+    );
+    Ok(())
+}
+
+#[test]
 fn an_extension_entry_comes_before_a_glob() -> TestResult {
     let suite = Suite::new("check-formats-order");
     let root = project(&suite, "order", &with_formats("  txt: text\n  '*': md\n"));
