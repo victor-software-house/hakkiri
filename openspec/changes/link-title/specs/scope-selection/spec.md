@@ -33,6 +33,13 @@ The scope `image` SHALL select the alt text of an image, and a title in a headin
 - **WHEN** a link, an image and a definition each hold a title with the token `marker`
 - **THEN** `title & link` reports the title of the link, `title & image` that of the image, `title` all three, and `link` and `image` none
 
+A negated part that names the element, such as `title & ~link`, SHALL leave out the titles that element holds.
+
+#### Scenario: A negated element
+
+- **WHEN** a link, an image and a definition each hold a title with the token `marker`
+- **THEN** `title & ~link` selects the titles of the image and the definition, and `title & ~image` those of the link and the definition
+
 #### Scenario: A heading and a table cell
 
 - **WHEN** a heading and a table cell each hold a link with a title

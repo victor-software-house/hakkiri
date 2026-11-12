@@ -151,6 +151,41 @@ fn title_and_link_select_only_the_title_of_a_link() -> TestResult {
 }
 
 #[test]
+fn a_negated_element_leaves_out_the_titles_it_holds() -> TestResult {
+    let source = titled();
+    let found = |scope: &str| -> Result<Vec<String>, Box<dyn Error>> {
+        Ok(texts(&blocks(&[scope], "a.md", &source)?)
+            .into_iter()
+            .map(str::to_owned)
+            .collect())
+    };
+    assert_eq!(
+        found("title & ~link")?,
+        ["an image marker", "a definition marker"]
+    );
+    assert_eq!(
+        found("title & ~image")?,
+        ["a link marker", "a definition marker"]
+    );
+    let html = concat_lines(&[
+        "<p><a href=\"u\" title=\"an a marker\">x</a></p>",
+        "",
+        "<img src=\"i.png\" title=\"an img marker\">",
+        "",
+    ]);
+    let html = html.as_str();
+    let in_html = |scope: &str| -> Result<Vec<String>, Box<dyn Error>> {
+        Ok(texts(&blocks(&[scope], "a.md", html)?)
+            .into_iter()
+            .map(str::to_owned)
+            .collect())
+    };
+    assert_eq!(in_html("title & ~link")?, ["an img marker"]);
+    assert_eq!(in_html("title & ~image")?, ["an a marker"]);
+    Ok(())
+}
+
+#[test]
 fn image_selects_the_alt_text_of_an_image() -> TestResult {
     let found = blocks(
         &["image"],
