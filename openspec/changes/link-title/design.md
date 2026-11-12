@@ -20,6 +20,7 @@
    The alternative was a scope for each pair, such as `link.title`, which adds a name for each element that may hold one.
 6. **An HTML `title` attribute is a title too.**
    The attribute of a tag in an HTML block is a `title` node, and a line of text reads it through `raw` only, as in Vale.
+   The attribute of an `a` tag sits in an empty `link` node, and that of an `img` tag in an empty `image` node, so `title & link` and `title & image` select it as they select a Markdown title.
 
 ## Overrides
 

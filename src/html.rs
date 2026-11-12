@@ -35,7 +35,7 @@ use std::collections::HashMap;
 use std::ops::Range;
 
 use crate::entity;
-use crate::tree::{Join, Reading};
+use crate::tree::{Join, Reading, Scope};
 
 /// The inline tags: an end tag of one resets nothing.
 const INLINE_TAGS: [&str; 23] = [
@@ -711,8 +711,9 @@ pub(crate) struct Walk {
     pub(crate) alts: Vec<Range<usize>>,
     /// The content of each `meta` tag that describes the page, in order.
     pub(crate) descriptions: Vec<Range<usize>>,
-    /// The value of each `title` attribute that holds text, in order.
-    pub(crate) titles: Vec<Range<usize>>,
+    /// The value of each `title` attribute that holds text, in order, with the
+    /// scope of the element that holds it when that is a link or an image.
+    pub(crate) titles: Vec<(Range<usize>, Option<Scope>)>,
 }
 
 /// The whitespace Vale trims from a token's text.
@@ -1176,7 +1177,12 @@ impl Walker {
         if let Some((range, Some(title))) = value("title")
             && !title.is_empty()
         {
-            self.walk.titles.push(range);
+            let holder = match tag.name.as_str() {
+                "a" => Some(Scope::Link),
+                "img" => Some(Scope::Image),
+                _ => None,
+            };
+            self.walk.titles.push((range, holder));
         }
         match tag.name.as_str() {
             "img" => {

@@ -193,6 +193,35 @@ fn title_selects_the_title_attribute_of_an_html_block() -> TestResult {
 }
 
 #[test]
+fn title_and_link_select_the_title_of_an_html_a_tag_and_title_and_image_that_of_an_img_tag()
+-> TestResult {
+    let source = concat_lines(&[
+        "<p>See <a href=\"u.html\" title=\"an a marker\">the link</a>.</p>",
+        "",
+        "<img src=\"i.png\" alt=\"an alt\" title=\"an img marker\">",
+        "",
+        "<div title=\"a div marker\">Some text.</div>",
+        "",
+    ]);
+    let found = |scope: &str| -> Result<Vec<String>, Box<dyn Error>> {
+        Ok(texts(&blocks(&[scope], "a.md", &source)?)
+            .into_iter()
+            .map(str::to_owned)
+            .collect())
+    };
+    assert_eq!(found("title & link")?, ["an a marker"]);
+    assert_eq!(found("title & image")?, ["an img marker"]);
+    assert_eq!(
+        found("title")?,
+        ["an a marker", "an img marker", "a div marker"]
+    );
+    // The tag around a title is no scope of the title itself.
+    assert!(found("link")?.iter().all(|text| !text.contains("marker")));
+    assert!(found("image")?.iter().all(|text| !text.contains("marker")));
+    Ok(())
+}
+
+#[test]
 fn raw_still_reads_an_html_title_in_a_block_and_in_a_line() -> TestResult {
     let block = "<p title=\"an html marker\">Some text.</p>\n";
     let line = "A <span title=\"a line marker\">word</span> here.\n";

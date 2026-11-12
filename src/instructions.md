@@ -190,6 +190,7 @@ hakkiri adds two scopes that Vale lacks.
 
 A title is selected by what holds it too.
 `title & link` selects the title of a link, `title & image` the title of an image, and only `title` selects the title of a definition.
+In an HTML block, `title & link` selects the `title` attribute of an `a` tag and `title & image` that of an `img` tag.
 `link` and `image` alone never select a title, and no other scope reads one, as in Vale, where only `raw` does.
 A `title` attribute in a line of text is read by `raw` only.
 
