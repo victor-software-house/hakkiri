@@ -23,6 +23,7 @@
    A noun before it ends the noun phrase, and a determiner, a possessive pronoun, a number or a pronoun after it starts the object.
    A noun, an adjective or a preposition after it gives a verb only when no other word of the sentence is a verb, since a compound with a plural head, such as `layout rules of the widgets`, reads the same.
    `of` never gives a verb.
+   A plural noun that the rule turns into a verb counts as a verb for the nouns after it, so one clause gives one.
    The alternative was to read every plural noun before a preposition as a verb, which is wrong 55 times in 64 for a noun before it and a preposition after it on GUM.
 
 ## Measures

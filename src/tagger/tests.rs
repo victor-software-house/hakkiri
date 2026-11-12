@@ -257,6 +257,14 @@ fn a_preposition_after_a_plural_noun_makes_it_a_verb_only_in_a_clause_with_no_ot
 }
 
 #[test]
+fn only_the_first_plural_noun_of_a_clause_with_no_verb_becomes_one() -> TestResult {
+    let sentence = "The store parses user files from the disk.";
+    assert_eq!(tag_of(sentence, "parses")?, "VBZ");
+    assert_eq!(tag_of(sentence, "files")?, "NNS");
+    Ok(())
+}
+
+#[test]
 fn a_plural_noun_in_a_compound_or_after_a_possessive_stays_a_noun() -> TestResult {
     assert_eq!(
         tag_of("It reads the session notes and the user files.", "files")?,

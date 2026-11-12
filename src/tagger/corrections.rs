@@ -76,10 +76,11 @@ fn corrected(word: &str, before: &str, model: &str) -> Option<&'static str> {
 /// pronoun, a number or a pronoun after it starts the object.
 /// A noun, an adjective or a preposition other than `of` after it starts the
 /// object or a phrase only when no other word of the sentence is a verb.
+/// A plural noun that this rule turned into a verb counts as one.
 /// A compound noun with a plural head, such as `layout rules of the widgets`,
 /// reads the same.
 fn verbs_after_noun_phrases(words: &[&str], tags: &mut [&str]) {
-    let others = tags.iter().filter(|tag| VERBS.contains(tag)).count();
+    let mut others = tags.iter().filter(|tag| VERBS.contains(tag)).count();
     for index in 1..tags.len() {
         let (Some(&before), Some(&tag)) = (tags.get(index - 1), tags.get(index)) else {
             continue;
@@ -101,6 +102,7 @@ fn verbs_after_noun_phrases(words: &[&str], tags: &mut [&str]) {
             && let Some(slot) = tags.get_mut(index)
         {
             *slot = "VBZ";
+            others = others.saturating_add(1);
         }
     }
 }
