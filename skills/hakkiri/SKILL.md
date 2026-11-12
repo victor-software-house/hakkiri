@@ -70,7 +70,7 @@ JSON never holds an escape byte.
 A `sequence` rule reads part-of-speech tags, and hakkiri's are not Vale's.
 It tags with the model of prose at `b33e60d` and corrects a possessive `'s`, a modal or a name in capitals, a semicolon, and a verb after a noun phrase.
 So a `sequence` rule can flag other words than in Vale.
-A code span is no word of a `sequence` run, so a rule of a noun and a verb flags no code name.
+A code span is no word of a `sequence` run, so a rule of a noun and a verb flags no code name, but the noun that a preposition attaches the span to, as in `the notice for `cmd-7` says`.
 `hakkiri instructions` lists the difference.
 
 ## Flags and variables
