@@ -231,7 +231,10 @@ Vale ignores the key, and warns and turns the rule off for the word.
 hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini`. Its built-in style `Vale` holds no `Vale.Spelling`, which Vale also builds in.
 
 hakkiri tags a sentence with the model of prose at `b33e60d`, where Vale tags with the older model of prose v3.2.2.
-It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a semicolon, a verb after a noun phrase, and the verbs of saying and asking after a noun: `the docs say` and `the flag asks for` read as verbs, and `for the asks that wait` and `a hook told of the file` read as a noun and a participle.
+It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a semicolon, and a verb after a noun phrase.
+It also corrects the verbs of saying and asking after a noun.
+The words in `the docs say` and `the flag asks for` read as verbs.
+The words in `for the asks that wait` and `a hook told of the file` read as a noun and a participle.
 It also reads `check`, `split`, `round`, `prompt`, `fade` and `thinking` as nouns in a noun phrase, as in `the load split pull request`.
 A `sequence` rule can therefore flag other words than in Vale.
 A title keeps the tags of the model alone.
