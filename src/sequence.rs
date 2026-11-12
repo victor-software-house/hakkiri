@@ -34,6 +34,15 @@ struct Word<'a> {
     /// Whether the word reads a code span, which is code and no word of the
     /// prose.
     code: bool,
+    /// For a code span, the noun that heads the phrase it belongs to.
+    head: Option<Head<'a>>,
+}
+
+/// The noun that a code span stands for in a run.
+struct Head<'a> {
+    text: &'a str,
+    tag: &'a str,
+    range: Range<usize>,
 }
 
 /// Where a walk found a match.
@@ -47,11 +56,29 @@ struct Found {
 
 /// Whether `word` is one that `token` accepts.
 ///
-/// A code span is no word that a token can name, by its tag or its text, so
-/// a token accepts it only when the token is negated.
+/// A code span is no word that a token can name, by its tag or its text.
+/// A negated token holds at it.
+/// A token that reads one word reads the noun that heads the phrase the span
+/// belongs to, when there is one, as in the `notice` of `the notice for
+/// `cmd-7` says`.
 fn accepts(token: &Token, word: &Word<'_>) -> Result<bool, SearchError> {
     if word.code {
-        return Ok(token.negate);
+        if token.negate {
+            return Ok(true);
+        }
+        let Some(head) = word.head.as_ref().filter(|_| token.copies <= 1) else {
+            return Ok(false);
+        };
+        return accepts(
+            token,
+            &Word {
+                text: head.text,
+                tag: head.tag,
+                range: head.range.clone(),
+                code: false,
+                head: None,
+            },
+        );
     }
     let tag_failed = match &token.tag {
         Some(tag) => tag.is_match(word.tag)?,
@@ -245,6 +272,68 @@ pub(crate) fn sentence_scope(declared: &[String]) -> Vec<String> {
         .collect()
 }
 
+/// The byte where a match that starts at `word` begins: the head noun, for a
+/// code span that stands for one.
+fn start_of(word: &Word<'_>) -> usize {
+    word.head
+        .as_ref()
+        .map_or(word.range.start, |head| head.range.start)
+}
+
+/// The tags that a determiner, an adjective or a number may have between a
+/// preposition or a noun and the noun it belongs to.
+const SKIPPED: [&str; 4] = ["DT", "PRP$", "JJ", "CD"];
+
+/// The prepositions that attach a phrase to the noun before them.
+const PREPOSITIONS: [&str; 13] = [
+    "of", "in", "on", "at", "for", "with", "from", "by", "under", "within", "into", "over", "to",
+];
+
+/// The word before `at`, past the determiners, adjectives and numbers.
+fn before_skipped(words: &[Word<'_>], at: usize) -> Option<usize> {
+    words
+        .get(..at)?
+        .iter()
+        .rposition(|word| !SKIPPED.contains(&word.tag))
+}
+
+/// The noun before `at`, past the determiners, adjectives and numbers, when it
+/// is a word of the prose.
+fn noun_before(words: &[Word<'_>], at: usize) -> Option<usize> {
+    let index = before_skipped(words, at)?;
+    let word = words.get(index)?;
+    (word.tag.starts_with("NN") && !word.code).then_some(index)
+}
+
+/// The preposition before `at`, past the determiners, adjectives and numbers.
+fn preposition_before(words: &[Word<'_>], at: usize) -> Option<usize> {
+    let index = before_skipped(words, at)?;
+    let word = words.get(index)?;
+    PREPOSITIONS
+        .iter()
+        .any(|preposition| word.text.eq_ignore_ascii_case(preposition))
+        .then_some(index)
+}
+
+/// The noun that heads the phrase the code span `at` belongs to.
+///
+/// It is the noun that a preposition before the span attaches it to, as in
+/// `the notice for `cmd-7``.
+/// The nouns that further prepositions attach that noun to come next, so the
+/// head of `the lock of the instance at `paths`` is `lock`.
+/// A noun right before the span is not one, since `the snapshot `request` asks
+/// for` and `the scenario `A` says` read alike and only one is a name.
+fn head_noun(words: &[Word<'_>], at: usize) -> Option<usize> {
+    let mut head =
+        preposition_before(words, at).and_then(|preposition| noun_before(words, preposition))?;
+    while let Some(next) =
+        preposition_before(words, head).and_then(|preposition| noun_before(words, preposition))
+    {
+        head = next;
+    }
+    Some(head)
+}
+
 /// Whether `at`, the byte where a match begins, is inside one of `spans`.
 fn inside(spans: &[Range<usize>], at: usize) -> bool {
     spans.iter().any(|span| span.contains(&at))
@@ -283,15 +372,30 @@ fn find_tagged(
     tagged: Vec<Tagged<'_>>,
     is_code: impl Fn(&Range<usize>) -> bool,
 ) -> Result<Vec<Matched>, SearchError> {
-    let words: Vec<Word<'_>> = tagged
+    let mut words: Vec<Word<'_>> = tagged
         .into_iter()
         .map(|token| Word {
             text: sentence.get(token.range.clone()).unwrap_or_default(),
             tag: token.tag,
             code: is_code(&token.range),
             range: token.range,
+            head: None,
         })
         .collect();
+    let heads: Vec<Option<Head<'_>>> = (0..words.len())
+        .map(|at| {
+            let word = words.get(at)?;
+            let head = words.get(head_noun(&words, at).filter(|_| word.code)?)?;
+            Some(Head {
+                text: head.text,
+                tag: head.tag,
+                range: head.range.clone(),
+            })
+        })
+        .collect();
+    for (word, head) in words.iter_mut().zip(heads) {
+        word.head = head;
+    }
     let tries = match &sequence.candidates {
         Some(candidates) => candidates.find_all(sentence)?.len(),
         None => words.len(),
@@ -308,7 +412,7 @@ fn find_tagged(
             continue;
         };
         let (first, last) = targeted(sequence, &found).unwrap_or((found.first, found.last));
-        let range = words[first].range.start..words[last].range.end;
+        let range = start_of(&words[first])..words[last].range.end;
         if excluded.is_none() {
             let mut spans = Vec::new();
             for exception in &sequence.exceptions {
@@ -323,7 +427,11 @@ fn find_tagged(
             range,
             words: words[found.first..=found.last]
                 .iter()
-                .map(|word| word.text.to_owned())
+                .enumerate()
+                .map(|(at, word)| match &word.head {
+                    Some(head) if at == 0 => head.text.to_owned(),
+                    _ => word.text.to_owned(),
+                })
                 .collect(),
         });
     }
