@@ -380,6 +380,21 @@ queue:
       - '2026-11-11, the time grows by 0.4 to 0.5 s for each rule that reads the sentence, text or paragraph scope: 1, 5 and 10 sentence rules that match nothing took 1.2, 3.1 and 5.6 s, and 1, 5 and 10 raw rules took 0.7 s each time. The package with 20, 40 and 75 rules took 7.5, 13.7 and 28 s. engine.rs calls select once for each rule, so each rule splits the sentences and builds the text of the same blocks again.'
       - 2026-11-11, with one selection for each scope, a release build of the branch ran the package on the same file in 5.5 s with the same 24,490 alerts, against 25.3 s for the 0.0.5 release binary on the same box. That is 4.6 times faster, and 65 times faster than Vale at 66bbb85 on the v0.0.14 rules.
 
+  - id: HKR-058
+    title: Build the text of a long block in time that grows with its length
+    scope: engine
+    outcome: >-
+      The text of a block with many segments and many code spans or links builds in
+      time that grows with their number, so a long paragraph costs no more than the same
+      lines in short ones.
+    blocked_by: []
+    acceptance:
+      - A unit test builds a text of 100,000 segments with a code span in each, and fails on the source before the change by taking over two seconds.
+      - On a Markdown file of 12,000 lines in one paragraph the ProseStyle package takes at most 2 seconds with a release build, and gives the same alerts as before.
+    notes:
+      - '2026-11-11, found by profiling the package on that file: the selection of a scope took 4.1 s of the 5.3 s of the engine, and the six selections that build the text of the one paragraph took 0.37 to 0.8 s each. Text::build looped over every replacement for each segment and tested every replacement at each line break, so its time grew with the segments times the code spans and links of the block (24,000 spans for 12,000 segments).'
+      - 2026-11-11, with binary searches over the replacements, which lie in file order with no overlap, a release build ran the package on the same file in 1.8 s with the same 24,490 alerts, against 5.8 s for the build before it and 24.6 s for the 0.0.5 release binary.
+
   - id: HKR-056
     title: Give no alert for a code span read as the noun of a verb
     scope: sequence

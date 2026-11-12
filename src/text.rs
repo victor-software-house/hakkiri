@@ -77,9 +77,18 @@ impl Text {
             let reading = parts.reads.get(index).copied().unwrap_or_default();
             if let Some(end) = previous_end {
                 source.get(end..segment.start)?;
-                let inside_code = parts.replacements.iter().any(|(range, kind)| {
-                    *kind == Replace::Code && range.start <= end && segment.start <= range.end
-                });
+                // The replacements are in file order with no overlap, so the
+                // ones that reach back to `end` and forward to the segment lie
+                // together after a binary search.
+                let from = parts
+                    .replacements
+                    .partition_point(|(range, _)| range.end < segment.start);
+                let inside_code = parts
+                    .replacements
+                    .iter()
+                    .skip(from)
+                    .take_while(|(range, _)| range.start <= end)
+                    .any(|(range, kind)| *kind == Replace::Code && segment.start <= range.end);
                 let separator = match reading.before {
                     Join::Gap if inside_code => None,
                     Join::Gap => Node::separator(source, parts.rows, end, segment.start),
@@ -97,9 +106,12 @@ impl Text {
                 continue;
             }
             let mut cursor = segment.start;
-            for (range, kind) in parts.replacements {
-                if range.end <= segment.start || segment.end <= range.start {
-                    continue;
+            let first = parts
+                .replacements
+                .partition_point(|(range, _)| range.end <= segment.start);
+            for (range, kind) in parts.replacements.iter().skip(first) {
+                if segment.end <= range.start {
+                    break;
                 }
                 let from = range.start.max(segment.start);
                 let to = range.end.min(segment.end);
@@ -257,3 +269,6 @@ impl Text {
         })
     }
 }
+
+#[cfg(test)]
+mod tests;
