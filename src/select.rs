@@ -371,6 +371,33 @@ struct Step<'t> {
     parent: Option<Scope>,
 }
 
+/// The steps for the children of `node`, last first, so that a stack pops them
+/// in order.
+///
+/// A child passes the scope on when it is the first thing inside `node`.
+/// In a list, a quote or a table row that is the child's `first` flag.
+/// An HTML block with an attribute but no text can sit before it as a child.
+/// Elsewhere it is the first child.
+fn children<'t>(node: &'t Node, chain: Option<&'static str>) -> impl Iterator<Item = Step<'t>> {
+    let container = matches!(
+        node.scope,
+        Scope::List | Scope::Blockquote | Scope::TableRow
+    );
+    node.children
+        .iter()
+        .enumerate()
+        .rev()
+        .map(move |(index, child)| Step {
+            node: child,
+            chain: if (container || index == 0) && opens(node, child) {
+                chain
+            } else {
+                None
+            },
+            parent: Some(node.scope),
+        })
+}
+
 /// The scope names of the element around a node that a part may name next to
 /// the node's own: the link or the image that holds a title.
 ///
@@ -496,21 +523,7 @@ pub fn select(
                 }
             }
         }
-        steps.extend(
-            node.children
-                .iter()
-                .enumerate()
-                .rev()
-                .map(|(index, child)| Step {
-                    node: child,
-                    chain: if index == 0 && opens(node, child) {
-                        chain
-                    } else {
-                        None
-                    },
-                    parent: Some(node.scope),
-                }),
-        );
+        steps.extend(children(node, chain));
     }
     Ok(blocks)
 }
