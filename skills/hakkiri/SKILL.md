@@ -77,6 +77,14 @@ A code span is a noun in a `sequence` run, so a rule of a noun and a verb flags 
 An `existence` rule reads a code span as one `*`, as Vale masks it, so a match that runs across a span is a match, and one that starts or ends on a span is not.
 `hakkiri instructions` lists the difference.
 
+## Write a sequence rule with several forms
+
+A `sequence` rule takes `forms`, a list of mappings that each hold `tokens`, where Vale takes one `tokens` list.
+It matches where any form does and gives every alert the one rule name, so a check with three shapes is one rule.
+Forms that match overlapping words give the match that starts first.
+A rule holds `tokens` or `forms`, never both, and Vale stops with a panic on a rule with `forms`.
+`hakkiri instructions` lists the difference.
+
 ## Flags and variables
 
 Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an empty variable counts as unset.

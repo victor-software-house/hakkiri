@@ -318,6 +318,22 @@ queue:
     notes:
       - 2026-11-12, the tagger read check, split, round, prompt, fade and thinking as a verb, an adverb or an adjective inside a run of nouns, which cost NounStack 7 true alerts of Vale. nouns_of_technical_prose reads three lists of them as nouns, one for each place a noun is certain, with GUM at 92.54% and 134 of the 200 judged conflicts right against 133. Two readers labelled 530 places of the six words in nine repositories. After a determiner check, prompt, thinking and fade are nouns in 163 of 163, round in 41 of 50 and split in 40 of 50, so round and split left that list. NounStack now gives 240 alerts of the 558 the tools diverge on, 44 true and 196 false, where Vale gives 278, 16 true and 262 false, and every true alert of Vale.
       - 2026-11-12, 12 false NounStack alerts hold a hyphenated word before three nouns, which the pattern [a-z][a-z-]* accepts and the definition counts as an adjective. A tagger rule that reads a hyphenated word as an adjective cost 6 tokens of GUM, so the fix belongs to the package pattern.
+
+  - id: HKR-062
+    title: Give a sequence rule alternative token lists (forms)
+    scope: engine
+    outcome: >-
+      A sequence rule takes forms, a list of token lists, matches where any list
+      matches, and gives every alert the one rule name, so the three shapes of
+      ProseStyle.ThingsSpeak are one rule.
+    blocked_by: []
+    acceptance:
+      - A rule with forms matches where any form does, an alert carries the rule name once, and two forms that match overlapping words give the earlier match.
+      - A rule with one tokens list gives the alerts it gave before, and a rule that sets both tokens and forms, or neither, is refused, with a fault in a form placed on forms[N].tokens.
+      - The sequence-check spec, the instructions, the skill and AGENTS.md state forms, vale-differences records that Vale panics on a rule with forms, and a test equals the three one-list rules of ThingsSpeak to the merged rule.
+    notes:
+      - '2026-11-12, operator decision: the key is forms, a list of mappings that each hold tokens; overlapping matches keep the earlier one.'
+    plan: openspec/changes/sequence-forms/proposal.md
 archive:
   - id: HKR-031
     title: Turn rules off and on with comments

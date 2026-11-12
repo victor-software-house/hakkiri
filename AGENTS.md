@@ -98,6 +98,11 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
     An `existence` rule reads a code span as one `*` and drops a match only when it starts or ends on the span.
     `nouns_of_technical_prose` reads three lists of nouns that the model tags as another part of speech, one for each place a noun is certain.
     Add a word to a list only with the sampled readings of that word in that place and the alerts that need it, and run the GUM count.
+11. **Sequence forms.**
+    A `Sequence` holds `forms`, each a `Form` with its own anchor and candidate starts, and the rule's `exceptions`.
+    `find_tagged` walks each form over the one tagged sentence, and `merged` joins the matches.
+    One form's matches stay as found, which keeps a `tokens` rule at Vale's alerts.
+    A match that overlaps one kept from another form is dropped.
 
 ## Workflow
 
