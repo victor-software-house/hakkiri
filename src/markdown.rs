@@ -1068,8 +1068,8 @@ impl Builder<'_> {
             // The image holds its title, so `title & image` selects it. An
             // image with no alt text holds an empty span, which reads as
             // nothing.
-            let titled = matches!(node, Mdast::Image(image) if image.title.is_some());
-            let titles: Vec<Node> = titled
+            let has_title = matches!(node, Mdast::Image(image) if image.title.is_some());
+            let titles: Vec<Node> = has_title
                 .then(|| self.title(&whole, whole.start, true))
                 .flatten()
                 .into_iter()
