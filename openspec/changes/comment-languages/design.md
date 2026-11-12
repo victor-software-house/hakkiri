@@ -79,6 +79,7 @@ hakkiri did this for JSDoc tags only, by cutting them out of the text.
 hakkiri now keeps the masked file ranges on the tree, and the engine drops an alert whose match lies wholly in one.
 The text, the words and the sentences stay as written, so a count has the words of the link, as in Vale.
 JSDoc's `@see` and the other tags that name something take a name, as Vale's list does.
+A name does not start at an inline tag: Vale reads the `{@link Other}` of `@see {@link Other} for more.` as a type and `for` as the name, and hakkiri keeps `for` as prose.
 
 Alternative: cut the link out of the text, as for a JSDoc tag.
 It lost because `See [Stop] for more.` would read as two sentences, one that ends before the link and one that starts after it, and the counts would move.

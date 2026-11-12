@@ -113,6 +113,11 @@ In a `/** */` comment, the name after a tag SHALL carry no prose scope for `@see
 - **WHEN** a TypeScript file holds `/** Text.` on one line and `* @see Hotel The place.` on the next
 - **THEN** the tree holds prose for `Text.` and `The place.`, and none for `@see` or `Hotel`
 
+#### Scenario: A see tag with a link
+
+- **WHEN** a JavaScript file holds `* @see {@link Other} for more.` in a `/** */` comment
+- **THEN** the tree holds prose for `{@link Other} for more.`, and no name is taken from the link
+
 ### Requirement: A line comment keeps the indentation of its text
 
 For Go, YAML, TOML and shell files, hakkiri SHALL remove from each line of a line comment only the first space after its marker.  

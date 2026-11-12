@@ -29,6 +29,11 @@ hakkiri SHALL read the comments of Go, Swift, YAML, TOML and shell files, and th
 - **WHEN** a run of line comments holds a prose line, an empty comment line, and a line indented four spaces more, such as `///     cargo run`
 - **THEN** hakkiri reads the indented line as code, and Vale takes the leading spaces off every line after the first, so it reads the line as prose ([comment-languages 7][comment-languages-7])
 
+#### Scenario: A see tag that opens with a link
+
+- **WHEN** a JavaScript file holds `@see {@link Other} for more.` in a doc comment
+- **THEN** hakkiri reads `for` as prose, and Vale reads the link as a type and `for` as the name of the tag, so it drops `for` ([comment-languages 6][comment-languages-6])
+
 #### Scenario: A column after a character of many bytes
 
 - **WHEN** a Go file holds `var s = "’" // note`
@@ -37,5 +42,6 @@ hakkiri SHALL read the comments of Go, Swift, YAML, TOML and shell files, and th
 [comment-languages-3]: ../../design.md#3-the-lexer-is-the-grammars-probed-against-vale
 [comment-languages-4]: ../../design.md#4-yaml-and-toml-comments-need-no-view
 [comment-languages-5]: ../../design.md#5-a-comment-for-a-tool-is-not-prose
+[comment-languages-6]: ../../design.md#6-a-doc-link-and-a-doc-name-are-masked-at-the-alert
 [comment-languages-7]: ../../design.md#7-a-line-comment-keeps-the-indentation-of-its-text
 [comment-languages-8]: ../../design.md#8-a-column-counts-characters

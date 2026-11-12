@@ -1,0 +1,4 @@
+/**
+ * @see {@link Other} for more.
+ */
+export const g = 1;
