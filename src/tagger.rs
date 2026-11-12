@@ -112,12 +112,27 @@ impl Tagger {
     /// reads, so `sentence` should be one sentence.
     #[must_use]
     pub fn tag<'a>(&'a self, sentence: &'a str) -> Vec<Tagged<'a>> {
+        self.tag_with(sentence, Self::tag_words)
+    }
+
+    /// The tokens of `sentence` with the tags of the model alone.
+    #[cfg(test)]
+    pub(crate) fn tag_model<'a>(&'a self, sentence: &'a str) -> Vec<Tagged<'a>> {
+        self.tag_with(sentence, Self::model_tags)
+    }
+
+    /// The tokens of `sentence`, each with the tag that `tag_words` gives it.
+    fn tag_with<'a>(
+        &'a self,
+        sentence: &'a str,
+        tag_words: fn(&'a Self, &[&'a str]) -> Vec<&'a str>,
+    ) -> Vec<Tagged<'a>> {
         let ranges = tokens::tokens(sentence);
         let words: Vec<&str> = ranges
             .iter()
             .map(|range| sentence.get(range.clone()).unwrap_or_default())
             .collect();
-        let tags = self.tag_words(&words);
+        let tags = tag_words(self, &words);
         ranges
             .into_iter()
             .zip(tags)

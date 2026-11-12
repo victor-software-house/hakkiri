@@ -197,3 +197,8 @@ A key that names no rule, or a word that is neither a level, `on` nor `off`, is 
 Vale ignores the key, and warns and turns the rule off for the word.
 
 hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini` and no built-in `Vale` style.
+
+hakkiri tags a sentence with the model of prose at `b33e60d`, where Vale tags with the older model of prose v3.2.2.
+It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a semicolon, and a verb after a noun phrase.
+A `sequence` rule can therefore flag other words than in Vale.
+A title keeps the tags of the model alone.
