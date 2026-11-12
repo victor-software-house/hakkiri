@@ -1,0 +1,6 @@
+// Run it like this:
+//
+//	go run main.go -flag
+//
+//     spaces code
+package x

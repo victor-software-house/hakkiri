@@ -149,11 +149,11 @@ pub fn lint_accepting<R: Borrow<Rule>>(
             ) {
                 Ok(hits) => {
                     for hit in hits {
-                        let closes = block
-                            .text
-                            .file_range(hit.range.clone())
+                        let place = block.text.file_range(hit.range.clone());
+                        let closes = place
+                            .clone()
                             .map_or(block.closes, |range| block.closes_for(range.start));
-                        if gated(closes) {
+                        if gated(closes) || place.is_some_and(|range| tree.is_masked(&range)) {
                             continue;
                         }
                         let messages = hit.messages(rule);

@@ -1,0 +1,19 @@
+/**
+ * Alpha {@link Other} bravo {@link Other|label} charlie {@linkcode Foo} delta.
+ * @param {string} name echo the name
+ * @param [opt=1] foxtrot optional
+ * @returns {number} golf result
+ * @see Hotel
+ * @deprecated india use that
+ * @example
+ * juliet code here
+ * kilo more code
+ * @throws {Error} lima when bad
+ * @typedef {Object} Mike
+ * @property {string} november prop
+ * @custom oscar tag text
+ * @template T papa generic
+ * @inheritDoc
+ */
+export function f() {}
+/** quebec {@inheritDoc} romeo {@code sierra} tango */

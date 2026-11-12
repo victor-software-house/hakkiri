@@ -1,0 +1,16 @@
+/* globals foo */
+// alpha regular comment
+/*#__PURE__*/ bar();
+// istanbul ignore next
+// bravo text
+// c8 ignore next
+/* webpackChunkName: "x" */
+/** charlie doc block
+ * @param {string} a delta
+ */
+// v8 ignore next
+// echo plain
+/* jshint ignore:line */
+// foxtrot
+// @flow
+// golf

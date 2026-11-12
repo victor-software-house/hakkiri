@@ -153,14 +153,14 @@ fn a_file_no_reader_reads_is_linted_as_plain_text() -> TestResult {
         "notes.txt",
         "This is very good.\n\nA second very paragraph.\n",
     );
-    root.file("Cargo.toml", "name = \"very\"\n");
+    root.file("Dockerfile", "FROM very\n");
     root.file("Makefile", "# very\n");
     let walked = run(root.path(), &["check"], &[])?;
     assert_eq!(walked.code, 0, "{}", walked.err);
     assert_eq!(
         walked.lines(),
         [
-            "Cargo.toml:1:9: warning Team.Filler: Remove 'very'.",
+            "Dockerfile:1:6: warning Team.Filler: Remove 'very'.",
             "Makefile:1:3: warning Team.Filler: Remove 'very'.",
             "notes.txt:1:9: warning Team.Filler: Remove 'very'.",
             "notes.txt:3:10: warning Team.Filler: Remove 'very'.",
@@ -170,6 +170,39 @@ fn a_file_no_reader_reads_is_linted_as_plain_text() -> TestResult {
     let named = run(root.path(), &["check", "notes.txt"], &[])?;
     assert_eq!(named.code, 0, "{}", named.err);
     assert_eq!(named.lines().last(), Some(&"2 alerts in 1 file"));
+    Ok(())
+}
+
+#[test]
+fn a_toml_file_gives_its_comments_only() -> TestResult {
+    let suite = Suite::new("check-toml-comments");
+    let root = project(&suite, "toml", ALL);
+    root.file("Cargo.toml", "name = \"very\" # very\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(
+        result.lines(),
+        [
+            "Cargo.toml:1:17: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file",
+        ],
+        "the string is no prose, and the comment is"
+    );
+    Ok(())
+}
+
+#[test]
+fn formats_read_a_script_with_no_extension_as_shell() -> TestResult {
+    let suite = Suite::new("check-formats-script");
+    let root = project(&suite, "script", &with_formats("  'mise-tasks/*': sh\n"));
+    root.file("mise-tasks/lint", "#!/bin/sh\n# very\necho very\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(
+        result.lines(),
+        [
+            "mise-tasks/lint:2:3: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file",
+        ]
+    );
     Ok(())
 }
 
@@ -397,7 +430,7 @@ fn an_unknown_reader_or_a_bad_glob_in_formats_is_refused() -> TestResult {
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     assert!(
         result.err.contains(
-            "`loud` is not a language hakkiri reads: use Markdown, MDX, Rust, TypeScript, TSX, JavaScript or Text"
+            "`loud` is not a language hakkiri reads: use Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text"
         ),
         "{}",
         result.err
@@ -427,7 +460,7 @@ fn a_language_with_no_reader() -> TestResult {
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     assert!(
         result.err.contains(
-            "`python` is not a language hakkiri reads: use Markdown, MDX, Rust, TypeScript, TSX, JavaScript or Text"
+            "`python` is not a language hakkiri reads: use Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text"
         ),
         "{}",
         result.err

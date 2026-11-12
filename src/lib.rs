@@ -43,6 +43,8 @@ pub mod text;
 mod tree;
 pub mod words;
 
+use std::ops::Range;
+
 pub use error::Error;
 pub use language::Language;
 use pattern::Pattern;
@@ -95,30 +97,31 @@ pub fn parse_ignoring(
     } else {
         None
     };
-    let (roots, code_blocks, comments) = match language {
-        Language::Markdown => ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?,
-        Language::Mdx => ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?,
-        Language::Rust => (
-            comments::roots(comments::Dialect::Rust, source, blocks, tokens)?,
-            0,
-            Vec::new(),
-        ),
-        Language::TypeScript => (
-            comments::roots(comments::Dialect::TypeScript, source, blocks, tokens)?,
-            0,
-            Vec::new(),
-        ),
-        Language::Tsx => (
-            comments::roots(comments::Dialect::Tsx, source, blocks, tokens)?,
-            0,
-            Vec::new(),
-        ),
-        Language::JavaScript => (
-            comments::roots(comments::Dialect::JavaScript, source, blocks, tokens)?,
-            0,
-            Vec::new(),
-        ),
-        Language::Text => (plain::roots(source), 0, Vec::new()),
+    let (roots, code_blocks, comments, masks) = match language {
+        Language::Markdown => {
+            let (roots, code_blocks, comments) =
+                ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?;
+            (roots, code_blocks, comments, Vec::new())
+        }
+        Language::Mdx => {
+            let (roots, code_blocks, comments) =
+                ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?;
+            (roots, code_blocks, comments, Vec::new())
+        }
+        Language::Rust => source_roots(comments::Dialect::Rust, source, blocks, tokens)?,
+        Language::TypeScript => {
+            source_roots(comments::Dialect::TypeScript, source, blocks, tokens)?
+        }
+        Language::Tsx => source_roots(comments::Dialect::Tsx, source, blocks, tokens)?,
+        Language::JavaScript => {
+            source_roots(comments::Dialect::JavaScript, source, blocks, tokens)?
+        }
+        Language::Go => source_roots(comments::Dialect::Go, source, blocks, tokens)?,
+        Language::Swift => source_roots(comments::Dialect::Swift, source, blocks, tokens)?,
+        Language::Yaml => source_roots(comments::Dialect::Yaml, source, blocks, tokens)?,
+        Language::Toml => source_roots(comments::Dialect::Toml, source, blocks, tokens)?,
+        Language::Shell => source_roots(comments::Dialect::Shell, source, blocks, tokens)?,
+        Language::Text => (plain::roots(source), 0, Vec::new(), Vec::new()),
     };
     let mut roots = roots;
     // The text after a comment that turns every rule off is no one's prose.
@@ -130,6 +133,22 @@ pub fn parse_ignoring(
         roots,
         code_blocks,
         comments,
+        masks,
         front_matter_fault,
     })
+}
+
+/// The roots, the code block count, the HTML comments and the masks of a file.
+type SourceRoots = (Vec<Node>, usize, Vec<Comment>, Vec<Range<usize>>);
+
+/// The roots of a source file in `dialect`, with no code blocks and no HTML
+/// comments, which only a Markdown file holds.
+fn source_roots(
+    dialect: comments::Dialect,
+    source: &str,
+    blocks: &[&Pattern],
+    tokens: &[&Pattern],
+) -> Result<SourceRoots, Error> {
+    let (roots, masks) = comments::roots(dialect, source, blocks, tokens)?;
+    Ok((roots, 0, Vec::new(), masks))
 }

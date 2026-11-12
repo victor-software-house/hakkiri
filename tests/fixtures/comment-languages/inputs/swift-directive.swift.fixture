@@ -1,0 +1,5 @@
+// swiftlint:disable all
+// regular alpha
+// swiftformat:disable indent
+// sourcery: AutoEquatable
+let a = 1

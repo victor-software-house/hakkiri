@@ -1,0 +1,4 @@
+# yaml-language-server: $schema=https://example.com/schema.json
+# regular alpha
+# yamllint disable rule:line-length
+key: value

@@ -1,0 +1,4 @@
+/// Run it like this:
+///
+///     cargo run --release
+fn f() {}

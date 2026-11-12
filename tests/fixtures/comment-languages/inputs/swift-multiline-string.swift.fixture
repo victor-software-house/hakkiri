@@ -1,0 +1,5 @@
+let e = """
+// echo inside multiline
+/* foxtrot also */
+"""
+let f = 1

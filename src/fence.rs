@@ -139,7 +139,9 @@ pub(crate) fn nodes(source: &str, span: &Range<usize>, code: &Code) -> Vec<Node>
     let Some(placement) = Placement::new(source, span, &code.value) else {
         return Vec::new();
     };
-    let Ok(roots) = comments::roots(dialect, &code.value, &[], &[]) else {
+    // The masks of doc links hold offsets of the fence's code, which the file
+    // does not have, so a fence has none.
+    let Ok((roots, _masks)) = comments::roots(dialect, &code.value, &[], &[]) else {
         return Vec::new();
     };
     let mut nodes: Vec<Node> = roots.into_iter().flat_map(|root| root.children).collect();

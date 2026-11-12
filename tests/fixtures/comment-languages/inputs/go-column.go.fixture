@@ -1,0 +1,3 @@
+package x
+
+var smart = "toolkit’s plugin." // source keeps smart form

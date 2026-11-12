@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# comment one
+set -eu # trailing
+echo "# alpha not a comment"
+echo '# bravo not either'
+echo a#charlie
+echo ${#arr[@]} $#
+x=${y#prefix} # strip
+echo $(( 1 )) # arith
+cat <<EOF2
+# delta heredoc line
+text # echo more
+EOF2
+cat <<'EOF3'
+# foxtrot quoted heredoc
+EOF3
+cat <<-EOF4
+	# golf tab heredoc
+	EOF4
+case $x in
+  a) echo # case comment
+  ;;
+esac
+# shellcheck disable=SC2086
+echo \# hotel escaped
+echo "multi
+# india inside dq string
+end"
+f() { # after brace
+  :
+}
+#nospace
+## double
+: '
+# juliet in colon block
+'

@@ -1,0 +1,15 @@
+// eslint-disable-next-line no-console
+// alpha regular comment
+/* eslint-disable */
+/* bravo block */
+// @ts-ignore
+// charlie text
+// prettier-ignore
+const x = 1; // delta trailing
+// biome-ignore lint: foxtrot
+// golf plain
+// eslint-disable-next-line
+// hotel after directive
+//eslint-disable-line india
+//  prettier-ignore
+// juliet kilo

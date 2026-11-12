@@ -1,0 +1,37 @@
+# top comment
+key: value # trailing comment
+other: "quoted # alpha"
+single: 'also # bravo'
+plain: a#charlie not comment
+block: |
+  # literal delta text
+  more # echo text
+folded: >
+  # folded foxtrot
+  here
+list:
+  - a # item comment
+  - "x # golf"
+  - [a, b] # flow comment
+  - {k: v} # flowmap comment
+  #indented comment
+anchor: &a value # anchor comment
+--- # doc start comment
+second: 1
+...
+# omega tail
+multi: "line one
+  # hotel inside quoted
+  line three"
+? complex # key comment
+: value
+#nospace
+## double
+#	tab
+key2:   # after node
+  nested: 1
+tilde: ~ #india
+emptyc: 1 #
+url: http://example.com/#frag
+esc: "a \" # juliet"
+sq: 'it''s # kilo'

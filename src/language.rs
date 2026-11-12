@@ -1,6 +1,6 @@
 //! The languages hakkiri reads.
 //!
-//! A reader is one of the seven parsers hakkiri has, and each reads one
+//! A reader is one of the twelve parsers hakkiri has, and each reads one
 //! language of [langdex], the table of languages with their names, aliases,
 //! extensions, file names and interpreters.
 
@@ -21,6 +21,16 @@ pub enum Language {
     Tsx,
     /// JavaScript with JSX.
     JavaScript,
+    /// Go, which reads only its comments.
+    Go,
+    /// Swift, which reads only its comments.
+    Swift,
+    /// YAML, which reads only its comments.
+    Yaml,
+    /// TOML, which reads only its comments.
+    Toml,
+    /// Shell scripts, which reads only their comments.
+    Shell,
     /// Plain text: the file is prose, read as written, in paragraphs set apart
     /// by blank lines. A file reads this way when its language is Text, when
     /// nothing else reads it, or when the config maps it here.
@@ -29,13 +39,18 @@ pub enum Language {
 
 impl Language {
     /// Every reader, in the order the `formats` error names them.
-    pub const ALL: [Self; 7] = [
+    pub const ALL: [Self; 12] = [
         Self::Markdown,
         Self::Mdx,
         Self::Rust,
         Self::TypeScript,
         Self::Tsx,
         Self::JavaScript,
+        Self::Go,
+        Self::Swift,
+        Self::Yaml,
+        Self::Toml,
+        Self::Shell,
         Self::Text,
     ];
 
@@ -49,6 +64,11 @@ impl Language {
             Self::TypeScript => "TypeScript",
             Self::Tsx => "TSX",
             Self::JavaScript => "JavaScript",
+            Self::Go => "Go",
+            Self::Swift => "Swift",
+            Self::Yaml => "YAML",
+            Self::Toml => "TOML",
+            Self::Shell => "Shell",
             Self::Text => "Text",
         }
     }
@@ -63,6 +83,11 @@ impl Language {
             "TypeScript" => Some(Self::TypeScript),
             "TSX" => Some(Self::Tsx),
             "JavaScript" => Some(Self::JavaScript),
+            "Go" => Some(Self::Go),
+            "Swift" => Some(Self::Swift),
+            "YAML" => Some(Self::Yaml),
+            "TOML" => Some(Self::Toml),
+            "Shell" => Some(Self::Shell),
             "Text" => Some(Self::Text),
             _ => None,
         }

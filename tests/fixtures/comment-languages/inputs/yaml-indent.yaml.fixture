@@ -1,0 +1,4 @@
+# Include it like this:
+#
+#     "git::https://example.com/repo.git"
+key: value
