@@ -610,7 +610,7 @@ fn run_capitalization(capitalization: &Capitalization, text: &Text) -> Vec<Hit> 
 /// One hit for each run of words in `text`, a sentence, that the rule's tokens
 /// match. The message's `%s` read the words of the run.
 fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchError> {
-    Ok(find(sequence, text.as_str())?
+    Ok(find(sequence, text)?
         .into_iter()
         .map(|matched| Hit {
             message: None,
