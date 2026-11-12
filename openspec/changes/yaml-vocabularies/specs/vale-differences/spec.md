@@ -90,8 +90,8 @@ hakkiri SHALL read a `vocab.yml` or `vocab.yaml` as each scenario below says, wh
 
 #### Scenario: A syntax error of the file
 
-- **WHEN** the last list of the file is `[a` with no closing bracket
-- **THEN** hakkiri names the file and the line its parser gives, and Vale names the file and a line of yaml.v3, which is not the same line ([yaml-vocabularies 2][yaml-vocabularies-2])
+- **WHEN** the last list of the file is `[a` on line 3, with no closing bracket
+- **THEN** hakkiri names line 3, where the bracket opens, and Vale names line 2, which holds a complete entry and no fault ([yaml-vocabularies 2][yaml-vocabularies-2])
 
 [check-5]: ../../../archive/2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
 [engine-14]: ../../../archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
