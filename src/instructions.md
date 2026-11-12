@@ -178,6 +178,20 @@ files:
   A rule hakkiri cannot run, a `script` rule or one with a `doc()` scope, loads no rule, and the rest of its style runs.
   Each such rule in a style a glob lists, or that a level or `on` turns on, makes the run exit 2 with a `failed` line, until the config turns it `off`. In a style no glob lists it is ignored.
 
+## Rule scopes
+
+A rule's `scope` is Vale's: lowercase dotted names such as `text`, `heading.h1` and `sentence`, joined by `~`, `&` and lists.
+`&` keeps the blocks that hold every name, so `sentence & paragraph` selects the sentences of paragraphs.
+
+hakkiri adds two scopes that Vale lacks.
+`title` selects the title of a Markdown link, of an image and of a link reference definition, and the `title` attribute of a tag in an HTML block.
+`image` selects the alt text of an image.
+
+A title is selected by what holds it too.
+`title & link` selects the title of a link, `title & image` the title of an image, and only `title` selects the title of a definition.
+`link` and `image` alone never select a title, and no other scope reads one, as in Vale, where only `raw` does.
+A `title` attribute in a line of text is read by `raw` only.
+
 ## Differences from Vale
 
 `hakkiri test` refuses a case that sets `view`, reads no `.yaml` file, and prints its report in its own layout.

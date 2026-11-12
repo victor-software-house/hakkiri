@@ -197,19 +197,23 @@ impl Selector {
     ///
     /// `names` are the scope names the block holds, and `extension` the file's
     /// extension.
+    /// `around` are the names of the element around the block that a part may
+    /// name beside the block's own, as `link` does in `title & link`: an item
+    /// still needs a part that names the block itself.
     /// The block reads as spaces the inline elements that the selecting items
     /// leave out, such as `~link`; an item that does not select the block
     /// leaves out nothing.
     pub(crate) fn reads(
         &self,
         names: &[&str],
+        around: &[&str],
         extension: &str,
         sentence: bool,
     ) -> Option<Vec<Inline>> {
         let mut blank = Vec::new();
         let mut selected = false;
         for item in &self.alternatives {
-            if item.selects(names, extension, sentence) {
+            if item.selects(names, around, extension, sentence) {
                 selected = true;
                 for inline in item.blank(extension) {
                     if !blank.contains(&inline) {
@@ -237,7 +241,7 @@ impl Alternative {
             .any(|part| !part.negated && part.name == "sentence")
     }
 
-    fn selects(&self, names: &[&str], extension: &str, sentence: bool) -> bool {
+    fn selects(&self, names: &[&str], around: &[&str], extension: &str, sentence: bool) -> bool {
         // A sentence is read for an item that names sentences, and only that
         // one: an item such as `heading` reads the whole heading.
         if sentence && !self.wants_sentences() {
@@ -249,6 +253,7 @@ impl Alternative {
             return false;
         }
         let mut has_positive = false;
+        let mut names_the_block = false;
         for part in &self.parts {
             if part.negated {
                 continue;
@@ -258,7 +263,10 @@ impl Alternative {
                 if !sentence {
                     return false;
                 }
-            } else if !names.iter().any(|name| named(&part.name, name)) {
+                names_the_block = true;
+            } else if names.iter().any(|name| named(&part.name, name)) {
+                names_the_block = true;
+            } else if !around.iter().any(|name| named(&part.name, name)) {
                 return false;
             }
             if !part.applies_to(extension) {
@@ -266,6 +274,9 @@ impl Alternative {
             }
         }
         if !has_positive && !names.contains(&"text") {
+            return false;
+        }
+        if has_positive && !names_the_block {
             return false;
         }
         self.parts

@@ -79,6 +79,7 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -118,6 +119,7 @@ fn opens(parent: &Node, child: &Node) -> bool {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -156,6 +158,7 @@ const fn is_prose(scope: Scope) -> bool {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
         | Scope::Raw
@@ -196,7 +199,7 @@ const fn decodes(scope: Scope) -> Decode {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Meta => Decode::Text,
-        Scope::Alt | Scope::Title | Scope::Description => Decode::Attribute,
+        Scope::Alt | Scope::Title | Scope::Image | Scope::Description => Decode::Attribute,
         Scope::Code
         | Scope::Raw
         | Scope::CommentLine
@@ -235,6 +238,7 @@ fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
         | Scope::FigureCaption => vec![chain.unwrap_or_else(|| scope.name()), "text"],
         Scope::Alt | Scope::Description => vec![scope.name(), "text"],
         Scope::Title
+        | Scope::Image
         | Scope::TableRow
         | Scope::Link
         | Scope::Code
@@ -286,6 +290,7 @@ fn segments(node: &Node) -> Vec<Range<usize>> {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
         | Scope::Raw => node.segments.clone(),
@@ -327,6 +332,7 @@ fn readings(node: &Node) -> Vec<Reading> {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
         | Scope::Raw => node.reads.clone(),
@@ -361,6 +367,20 @@ pub(crate) fn replacements(node: &Node, blank: &[Inline]) -> Vec<(Range<usize>, 
 struct Step<'t> {
     node: &'t Node,
     chain: Option<&'static str>,
+    /// The scope of the node that holds this one.
+    parent: Option<Scope>,
+}
+
+/// The scope names of the element around a node that a part may name next to
+/// the node's own: the link or the image that holds a title.
+///
+/// `title & link` selects the title of a link, and `link` alone selects none,
+/// because the context is not the node's own scope.
+fn context(node: &Node, parent: Option<Scope>) -> Vec<&'static str> {
+    match (node.scope, parent) {
+        (Scope::Title, Some(parent @ (Scope::Link | Scope::Image))) => vec![parent.name()],
+        _ => Vec::new(),
+    }
 }
 
 /// The blocks of `tree`, a file of `source` with `extension`, that `selector`
@@ -399,17 +419,27 @@ pub fn select(
         .roots
         .iter()
         .rev()
-        .map(|node| Step { node, chain: None })
+        .map(|node| Step {
+            node,
+            chain: None,
+            parent: None,
+        })
         .collect();
-    while let Some(Step { node, chain }) = steps.pop() {
+    while let Some(Step {
+        node,
+        chain,
+        parent,
+    }) = steps.pop()
+    {
         let chain = chain.or_else(|| named_scope(node.scope));
         let held = names(node.scope, chain);
-        let own = selector.reads(&held, extension, false);
+        let around = context(node, parent);
+        let own = selector.reads(&held, &around, extension, false);
         let prose = is_prose(node.scope);
         let sentences = if prose && model.is_some() {
             let mut with_sentence = vec!["sentence"];
             with_sentence.extend(&held);
-            selector.reads(&with_sentence, extension, true)
+            selector.reads(&with_sentence, &around, extension, true)
         } else {
             None
         };
@@ -478,6 +508,7 @@ pub fn select(
                     } else {
                         None
                     },
+                    parent: Some(node.scope),
                 }),
         );
     }
