@@ -303,3 +303,34 @@ fn a_negated_token_holds_at_a_code_span_in_a_file() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn a_code_span_stands_for_the_noun_of_its_phrase() -> TestResult {
+    let rule = noun_says();
+    assert_eq!(
+        found(&rule, "The notice for `cmd-7` says a person stopped it.\n")?,
+        [pair(
+            "notice for x says",
+            "'notice says' gives a thing speech."
+        )]
+    );
+    assert_eq!(
+        found(&rule, "What the lock of the instance at `paths` says.\n")?,
+        [pair(
+            "lock of the instance at x says",
+            "'lock says' gives a thing speech."
+        )]
+    );
+    assert_eq!(found(&rule, "As `flag` says, it stops.\n")?, none());
+    Ok(())
+}
+
+#[test]
+fn a_code_span_does_not_stand_for_a_noun_in_a_repeated_token() -> TestResult {
+    let text = rule("Noun stack '%s'.", "tokens:\n  - tag: NN|NNS\n    min: 4\n");
+    assert_eq!(
+        found(&text, "The session lake store `x` holds it.\n")?,
+        none()
+    );
+    Ok(())
+}
