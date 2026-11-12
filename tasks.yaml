@@ -173,7 +173,10 @@ queue:
     acceptance:
       - A vocab.yml entry that is a term, or a term mapped to regex, ignorecase or flags, is read as Vale reads it, in tests against Vale's alerts.
       - An entry Vale refuses is refused with the file and the line, in a test for each fault.
-    plan: openspec/changes/archive/2026-11-11-vocabularies/proposal.md
+    plan: openspec/changes/yaml-vocabularies/proposal.md
+    notes:
+      - "2026-11-12, measured on Vale 66bbb85 over 12 faulty vocabularies and 4 alert configs: yaml.v3 reads regex: yes as true, skips a null entry, and ignores a key the file does not define; Vale finds the affix file in each search path's dictionaries folder, then in DICPATH."
+      - '2026-11-12, lead decision: affix looks in the package that holds the vocabulary, then in every other loaded package in order, never in DICPATH; every problem is reported with its file and line, where Vale stops at the first; a folder with vocab.yml and vocab.yaml reads both.'
 
   - id: HKR-017
     title: Read comments in more languages

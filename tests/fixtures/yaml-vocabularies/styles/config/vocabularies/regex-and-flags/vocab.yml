@@ -1,0 +1,5 @@
+accept:
+  - GitHub
+  - foo:
+      regex: true
+      flags: S

@@ -1,0 +1,12 @@
+two-keys	styles/config/vocabularies/two-keys/vocab.yml:3:E201:an entry is a term, or a term mapped to its options
+scalar-value	styles/config/vocabularies/scalar-value/vocab.yml:3:E201:'foo' maps to 'bar', but a vocabulary entry maps to options; for a replacement, use a substitution rule
+list-value	styles/config/vocabularies/list-value/vocab.yml:4:E201:'foo' should map to its options
+unknown-option	styles/config/vocabularies/unknown-option/vocab.yml:4:E201:'regx' isn't a vocabulary option; expected flags, ignorecase, regex
+regex-and-flags	styles/config/vocabularies/regex-and-flags/vocab.yml:3:E201:'foo' can't have both 'regex' and 'flags'
+bad-regex	styles/config/vocabularies/bad-regex/vocab.yml:3:E201:'a(' isn't a valid pattern: error parsing regexp: missing closing ) in `a(`
+bad-flag	styles/config/vocabularies/bad-flag/vocab.yml:3:E201:'!' isn't an affix flag in the default dictionary
+empty-term	styles/config/vocabularies/empty-term/vocab.yml:3:E201:an entry needs a term
+missing-affix	styles/config/vocabularies/missing-affix/vocab.yml:1:E201:'nothere.aff' not found in config/dictionaries or $DICPATH
+yaml-syntax	styles/config/vocabularies/yaml-syntax/vocab.yml:2:E201:yaml: line 2: did not find expected ',' or ']'
+bad-bool	styles/config/vocabularies/bad-bool/vocab.yml:4:E201:yaml: unmarshal errors:
+entry-list	styles/config/vocabularies/entry-list/vocab.yml:3:E201:an entry is a term, or a term mapped to its options

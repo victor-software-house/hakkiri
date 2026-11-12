@@ -1,0 +1,4 @@
+accept:
+  - GitHub
+  - foo:
+      regex: maybe

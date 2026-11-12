@@ -1,0 +1,4 @@
+affix: custom
+accept:
+  - foo:
+      flags: X
