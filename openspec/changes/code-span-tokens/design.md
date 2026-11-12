@@ -39,14 +39,27 @@
    - `pull` before `request` is a noun.
    A rule that read any verb in a noun phrase as a noun lost 78 tokens of GUM, and a rule for the middle of four nouns lost 2, so both were dropped.
 
+7. **A pattern check reads a code span as one `*` and drops a match only at its edges.**
+   `run_existence` searched the text where a code span is the letter `x`, and dropped each match that overlapped a span.
+   Vale masks a span as a run of `*`, and a match that runs across one is a match: 452 of the 487 alerts of `ClauseChain` that Vale gave and hakkiri did not held a span inside the match, and 39 of 50 sampled were real chains.
+   `Text::pattern_reading` now gives the text with each span as one `*`, a byte that no word and no space matches and that the text already uses for masked markup, so every offset holds.
+   `Text::edge_in_code` drops a match whose first or last byte lies in a span, and keeps one with text on both sides.
+   The sequence walk reads tokens from the tagger and keeps decision 2, so the two readings do not meet.
+   `substitution`, `occurrence`, `repetition` and the rest keep the refusal of an overlap.
+8. **The tagger reads the nouns that technical prose uses where the model reads another part of speech.**
+   The model reads `split`, `round`, `check`, `prompt`, `fade` and `thinking` as one other tag in `the host load split pull request`, `the mask round pull request`, `the peer user id check`, `the prompt template pull request`, `the fade removal pull request` and `the thinking request fields decision`, so a run of four nouns lost one.
+   The model lists some words with one tag and never scores them, and for `prompt` the score of a noun is 25 points under an adjective, so no margin of the model separates `prompt` from `final`.
+   `nouns_of_technical_prose` holds the six words, and reads one as a noun after a determiner or a possessive, after an adjective unless it is a participle, in the title of a pull request after a noun, and as the base form after two singular nouns before a preposition or a stop.
+   A model margin, a rule for a word between nouns and a rule for any adjective before three nouns were measured and dropped: each cost GUM tokens or gave false alerts such as `record then places` and `outbound mask speed pull request`.
+   A rule that read a hyphenated word as an adjective, which the definition of `NounStack` holds, lost 6 tokens of GUM and was dropped; the rule's pattern accepts a hyphen, and 12 alerts of `NounStack` that are false by the definition rest on it.
 
 ## Measures
 
-The alerts of nine repositories at `--min-level suggestion` are those of Vale 3.26.0 and of hakkiri builds: before the refusal (`P0`), with it (`P1`), with the head noun (`B`), with a head noun and two cues (`A`), this change before the tag (`N`), the tag with the tagger of `N` (`Tag`), and this change (`Fix`).
-Each alert that the tools do not all give was labelled true or false against the definitions, 304 of `ThingsSpeakNoun` and 540 of `NounStack`.
+The alerts of nine repositories are those of Vale 3.26.0 and of hakkiri builds: before the refusal (`P0`), with it (`P1`), with the head noun (`B`), with a head noun and two cues (`A`), this change before the tag (`N`), the tag with the tagger of `N` (`Tag`), and this change (`Fix`).
+Each alert that the tools do not all give was labelled true or false against the definitions, 304 of `ThingsSpeakNoun` and 550 of `NounStack`.
 Two readers labelled the `ThingsSpeakNoun` alerts, and two of 296 differed before I settled them by the definition.
-One reader labelled the 415 `NounStack` alerts that no code span touches, and two the other 116.
-A third reader labelled the 18 alerts that only the later builds give, and differed on one, settled by the definition.
+Two readers labelled the 415 `NounStack` alerts that no code span touches, and differed on 9, all a hyphenated word before three nouns, settled as false since a hyphenated word is an adjective.
+Two readers labelled the other 115, and two more the 10 alerts that only `Fix` gives, with no difference.
 
 | Rule | Tool | Gives | True | False | Vale's true missed |
 |:--|:--|--:|--:|--:|--:|
@@ -54,18 +67,29 @@ A third reader labelled the 18 alerts that only the later builds give, and diffe
 | | `P0` | 84 | 69 | 15 | 18 |
 | | `P1` | 53 | 46 | 7 | 19 |
 | | `B` | 69 | 58 | 11 | 18 |
+| | `A` | 97 | 83 | 14 | 17 |
 | | `N` | 293 | 266 | 27 | 4 |
 | | `Tag` | 246 | 230 | 16 | 6 |
-| | `Fix` | 278 | 274 | 4 | 0 |
+| | `Fix` | 281 | 274 | 7 | 0 |
 | `NounStack` | Vale | 278 | 16 | 262 | |
-| | `P0` | 251 | 39 | 212 | 16 |
-| | `N` | 210 | 39 | 171 | 16 |
-| | `Fix` | 220 | 43 | 177 | 16 |
+| | `P0` | 251 | 30 | 221 | 16 |
+| | `N` | 210 | 30 | 180 | 16 |
+| | `Fix` | 232 | 43 | 189 | 14 |
 
-`Fix` gives all the alerts of Vale that are true for `ThingsSpeakNoun`.
-Of its 4 false alerts one is also Vale's, `tell failures apart`, a literal verb.
-The other 3 are `asked to end` twice and `asked online`, a thing that is asked and no thing that asks, which a tagger cannot read without knowing what asks.
-Of the 16 true alerts of `NounStack` that Vale gives and `Fix` does not, 9 are the same words that `Fix` flags, since Vale's span runs on through the target of a link, and the other 7 are words the tagger reads as a verb, an adverb or an adjective in a run of nouns, such as `split pull request`.
-The 4 true alerts that `Fix` adds are `pull request` after two nouns.
-GUM is right on 52,298 of 56,516 tokens, 92.54%, where the tagger before the change is right on 52,294, 92.53%.
-Of the 200 judged conflicts, the scoring I could rebuild counts 133 right before the change and 133 after it, and the 140 of `tag-corrections` used a count I could not repeat.
+`Fix` gives every true alert of Vale for `ThingsSpeakNoun`.
+Of its 7 false alerts one is also Vale's, `tell failures apart`, a literal verb.
+Three are `asked to end` twice and `asked online`, a thing that is asked and no thing that asks, which a tagger cannot read without knowing what asks.
+Three are `asked for, or`, `asked about` and `told of`, a participle that the package's rule removes with a tag on the token that follows the verb.
+`NounStack` gives 189 false alerts where Vale gives 262, and 43 true where Vale gives 16.
+The 14 true alerts of Vale that `Fix` lacks are the words that `Fix` flags, since Vale's span runs on through the target of a link, and none is a miss.
+Of the 189 false alerts, 12 hold a hyphenated word before three nouns, which the rule's pattern accepts and the definition does not.
+The 7 true alerts of Vale that `N` lacked name `peer user id check`, `mask round pull request`, `host load split pull request`, `load split pull request`, `fade removal pull request`, `prompt template pull request` and `thinking request fields decision`, and `Fix` gives all of them.
+GUM is right on 52,298 of 56,516 tokens, 92.54%, as before the change, and the 200 judged conflicts count 134 right against 133.
+
+On the same nine repositories the package's `ClauseChain` gave 1,020 alerts before decision 7 and 1,523 after it, where Vale gives 1,492.
+The match text differs on 371 of them, where Vale prints the mask as `*` and hakkiri prints `x`, so the diff counts each as changed.
+Two readers labelled the 210 alerts that only one tool gives or that move, and differed on 9, settled by the rule that each part of a chain holds a verb.
+Pairing the rest by line leaves 11 true alerts of Vale that hakkiri lacks, the same 11 as before the change, in a comment block or a list item that the sentence splitter reads another way.
+It leaves 26 true alerts that only hakkiri gives and 18 false ones, 9 of them already given before decision 7.
+The 9 new false alerts are a semicolon between two noun phrases or two code spans, in a comment or a list.
+`ThingsSpeakNoun` gives the same alerts as before, `PrepositionChain` gives one more of Vale's, and `NounStack` gives 12 more.

@@ -69,8 +69,10 @@ JSON never holds an escape byte.
 
 A `sequence` rule reads part-of-speech tags, and hakkiri's are not Vale's.
 It tags with the model of prose at `b33e60d` and corrects a possessive `'s`, a modal or a name in capitals, a semicolon, a verb after a noun phrase, and the verbs of saying and asking after a noun.
+It also reads `check`, `split`, `round`, `prompt`, `fade` and `thinking` as nouns in a noun phrase.
 So a `sequence` rule can flag other words than in Vale.
 A code span is a noun in a `sequence` run, so a rule of a noun and a verb flags `` `flag` says `` as it flags `the flag says`, and a pattern for a lowercase word never takes the span.
+An `existence` rule reads a code span as one `*`, as Vale masks it, so a match that runs across a span is a match, and one that starts or ends on a span is not.
 `hakkiri instructions` lists the difference.
 
 ## Flags and variables

@@ -12,8 +12,8 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Evidence, 2026-11-12 (UTC): 304 alerts of `ThingsSpeakNoun` and 540 of `NounStack`, with 2 conflicts of 296 on the first set, none on the 169 alerts of the second, and 1 of 18 on the last.
 - [x] 1.3 Diff the alerts of the nine repositories that run Vale, before and after.
   Verify the false alerts that remain are listed.
-  Evidence, 2026-11-12 (UTC): `ThingsSpeakNoun` gives 278 of the alerts the tools disagree on, 274 true and 4 false, and every true alert of Vale. `NounStack` gives 177 false alerts of 220 where Vale gives 262 of 278.
-  No other rule of the package gives a different count from the build before the change.
+  Evidence, 2026-11-12 (UTC): `ThingsSpeakNoun` gives 281 of the alerts the tools disagree on, 274 true and 7 false, and every true alert of Vale. `NounStack` gives 189 false alerts of 232 where Vale gives 262 of 278, and 43 true where Vale gives 16.
+  Two readers labelled each alert, and the design lists the counts of every state and the false alerts that remain.
 
 ## 2. The surfaces
 
@@ -29,6 +29,15 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Verify GUM stays at 92.53% or above.
   Evidence, 2026-11-12 (UTC): GUM is right on 52,298 of 56,516 tokens, 92.54%, against 52,294 before; the judged conflicts count 133 right before and after.
 
-## 4. Integration
+## 4. The pattern check and the technical nouns
 
-- [ ] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+- [x] 4.1 Make `run_existence` read a code span as one `*` and drop a match only when it starts or ends on a span.
+  Verify the integration test of a match across a span in `tests/alerts.rs` fails on the source before the change and passes after it, the test of an edge on a span passes, and the departures of `tests/fixtures/html-block` list the two rows the change adds.
+  Evidence, 2026-11-12 (UTC): in a box `cargo test --no-fail-fast` passes and `clippy --lib --bins --tests -D warnings` passes; `ClauseChain` gives 1,523 alerts where it gave 1,020 and Vale gives 1,492.
+- [x] 4.2 Add `nouns_of_technical_prose` to `src/tagger/corrections.rs` for `check`, `split`, `round`, `prompt`, `fade` and `thinking`.
+  Verify three tagger tests pin it, GUM stays at 92.53% or above, and the 7 true alerts of Vale that `NounStack` lacked are given.
+  Evidence, 2026-11-12 (UTC): GUM is right on 52,298 of 56,516 tokens, 92.54%, as before the change; the judged conflicts count 134 right against 133; `NounStack` gives all 16 true alerts of Vale, 14 of them with a span that runs through a link target.
+
+## 5. Integration
+
+- [ ] 5.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.

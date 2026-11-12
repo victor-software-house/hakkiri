@@ -17,21 +17,24 @@ By that definition a code name before `says` is a thing that speaks, and a code 
 - The square brackets of an intra-doc link, as in ``[`Name`]``, belong to the code span.
 - The rule applies to every `sequence` rule, because the walk reads each word through one function.
 - The tagger corrects the verbs of saying and asking after a noun, for the verb tag that the package puts on the verb token of `ThingsSpeakNoun`.
-- The `sequence-check` and `vale-differences` specs state it.
+- An `existence` rule reads a code span as one `*`, as Vale masks it, and drops a match only when it starts or ends on a span, so a match across a span is a match.
+- The tagger reads `check`, `split`, `round`, `prompt`, `fade` and `thinking` as nouns in a noun phrase, where the model reads a verb, an adverb or an adjective.
+- The `sequence-check`, `scope-selection` and `vale-differences` specs state it.
 
 ## Capabilities
 
 ### Modified Capabilities
 
 - `sequence-check`: a code span is a noun that reads as one capital letter.
-- `vale-differences`: Vale reads the mask of a code span as a run of `*`.
+- `scope-selection`: an `existence` match across a code span is a match.
+- `vale-differences`: Vale reads the mask of a code span as a run of `*`, and hakkiri reads the nouns of technical prose.
 
 ## Impact
 
 - Changed: `src/sequence.rs`, `src/tagger.rs`, `src/tagger/tokens.rs`, `src/tagger/corrections.rs`, the tests of the sequence walk and the tagger, the instructions, the skill and `AGENTS.md`.
-- On nine repositories `ThingsSpeakNoun` gives 225 more alerts than the build that refuses the span, 228 more true and 3 fewer false by the labels, and every true alert of Vale.
-  `NounStack` gives 31 fewer than the build before the refusal, 4 more true and 35 fewer false.
-  GUM stays at 92.53% or above.
-  The design lists the false alerts that remain.
+- On nine repositories `ThingsSpeakNoun` gives 281 of the alerts the tools disagree on, 274 true and 7 false, and every true alert of Vale.
+  `NounStack` gives 232, 43 true and 189 false where Vale gives 278, 16 true and 262 false, and `ClauseChain` gives 1,523 alerts where it gave 1,020 and Vale gives 1,492.
+  GUM stays at 92.54%.
+  The design lists the counts of every state and the false alerts that remain.
 
 [ledger]: ../../../tasks.yaml

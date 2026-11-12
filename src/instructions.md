@@ -232,10 +232,12 @@ hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale
 
 hakkiri tags a sentence with the model of prose at `b33e60d`, where Vale tags with the older model of prose v3.2.2.
 It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a semicolon, a verb after a noun phrase, and the verbs of saying and asking after a noun: `the docs say` and `the flag asks for` read as verbs, and `for the asks that wait` and `a hook told of the file` read as a noun and a participle.
+It also reads `check`, `split`, `round`, `prompt`, `fade` and `thinking` as nouns in a noun phrase, as in `the load split pull request`.
 A `sequence` rule can therefore flag other words than in Vale.
 A title keeps the tags of the model alone.
 
 hakkiri reads a code span in a `sequence` rule as a noun: its tag is `NN`, the tagger reads a noun in its place, and a pattern or a word list reads it as the letter `X`.
 A rule for a noun and a verb, such as `ThingsSpeakNoun`, flags `` `flag` says `` as it flags `the flag says`, and a rule for four lowercase nouns counts no code span.
+An `existence` rule reads a code span as one `*`, as Vale masks it, so a match that runs across a span is a match, and one that starts or ends on a span is not.
 The square brackets of an intra-doc link, as in ``[`Name`]``, belong to the span.
 Vale reads the span as a run of `*`, and a rule with a tag and no pattern flags `` `flag` says `` there too.

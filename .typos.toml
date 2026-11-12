@@ -27,3 +27,8 @@ thm = "thm"
 mor = "mor"
 # The misspelt key `accpt:` that the `yaml-vocabularies` change tests is meant to be wrong.
 accpt = "accpt"
+# The stems of the verbs that take a clause, which `COMPLEMENT_STEMS` in `src/tagger/corrections.rs` matches as prefixes.
+believ = "believ"
+assum = "assum"
+imagin = "imagin"
+decid = "decid"
