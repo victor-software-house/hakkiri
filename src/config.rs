@@ -358,6 +358,9 @@ pub(crate) struct Project {
     formats: Formats,
     /// The package folders, which a walk leaves alone.
     pub(crate) packages: Vec<PathBuf>,
+    /// What the load skipped, such as a package style folder named for a
+    /// built-in style.
+    pub(crate) warnings: Vec<String>,
     /// The project root: the folder that holds the `.ctl` folder of the
     /// config, with symlinks resolved.
     root: PathBuf,
@@ -679,6 +682,9 @@ struct Loaded {
     /// The accepted terms of the project's vocabularies, which the rules read
     /// as exceptions.
     accepted: Vec<String>,
+    /// What the load skipped, each with the config file and line that led to
+    /// it.
+    warnings: Vec<String>,
 }
 
 /// A package folder that was found, and where its entry is written.
@@ -952,15 +958,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         input,
         raw,
     });
-    let level = layers
-        .iter()
-        .rev()
-        .find_map(|layer| layer.raw.level.as_deref().and_then(level_named));
-    let code_span_size = layers
-        .iter()
-        .rev()
-        .find_map(|layer| layer.raw.code_span_size)
-        .and_then(|words| u8::try_from(words).ok());
+    let (level, code_span_size) = last_settings(&layers);
     let mut vocab = Named::default();
     for layer in &layers {
         vocab.add_layer(layer);
@@ -1019,8 +1017,24 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         on_unknown,
         formats,
         packages: loaded.packages,
+        warnings: loaded.warnings,
         root,
     })
+}
+
+/// The `level` and the `code_span_size` of the last config file that sets
+/// each: the project's after its packages'.
+fn last_settings(layers: &[Layer]) -> (Option<Level>, Option<u8>) {
+    let level = layers
+        .iter()
+        .rev()
+        .find_map(|layer| layer.raw.level.as_deref().and_then(level_named));
+    let code_span_size = layers
+        .iter()
+        .rev()
+        .find_map(|layer| layer.raw.code_span_size)
+        .and_then(|words| u8::try_from(words).ok());
+    (level, code_span_size)
 }
 
 /// Makes the `styles` list of `glob` add to the list an earlier config file
@@ -1092,14 +1106,26 @@ fn load_packages(
                 .file_name()
                 .map_or_default(|name| name.to_string_lossy().into_owned());
             let shown = written.join(&name);
+            // Vale reads its own style first and passes over a folder of the
+            // same name, so the folder's rules never run.
             if loaded.styles.contains_key(&name) && !folders.contains_key(&name) {
-                faults.add(
+                let mut skipped = Faults {
+                    file: &origin,
+                    problems: Vec::new(),
+                };
+                skipped.add(
                     line,
                     key,
                     format!(
-                        "the style `{name}` is built in, and `{}` holds a style of that name",
+                        "`{}` is skipped: the built-in style `{name}` wins",
                         shown.display()
                     ),
+                );
+                loaded.warnings.push(
+                    LoadError {
+                        problems: skipped.problems,
+                    }
+                    .to_string(),
                 );
                 continue;
             }

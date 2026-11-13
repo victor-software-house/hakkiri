@@ -408,6 +408,7 @@ queue:
       - A package with styles/Acme and styles/Vale lints with Acme and warns once about styles/Vale, with a test.
     notes:
       - '2026-11-13, operator decision: warn and skip; Vale 66bbb85 skips such a folder without a word, and hakkiri refused the whole config since PR 134.'
+    plan: openspec/changes/vale-style-folder/proposal.md
 
   - id: HKR-068
     title: Read front matter with a parser per format

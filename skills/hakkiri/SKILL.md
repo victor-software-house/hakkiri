@@ -120,6 +120,7 @@ Every long flag reads `HAKKIRI_<LONG>`. A flag wins over its variable, and an em
    Alerts from `Vale.Spelling` mean a word is not in the built-in dictionary. Fix the word, accept it in a vocabulary or in a `.txt` file under a package's `config/ignore` folder, add a dictionary to its `config/dictionaries` folder, or set `Vale.Spelling: off` under the glob. A link under `config/ignore` that reaches outside the package is a fault. A fault in a dictionary stops a run only when a glob lists `Vale` in `styles`, names a rule that starts with `Vale.`, or sets `params` for one.
    Alerts from `Vale.Terms` and `Vale.Avoid` come from a vocabulary: fix the word, or move the term between the accepted and the rejected list, in `accept.txt` and `reject.txt` or in `vocab.yml`.
    A message that names `<package>/.ctl/hakkiri.yaml` means a package ships settings with that fault: ask the package's owner, or pin another version of it.
+   A `warning` that a package's `styles/Vale` is skipped means the package holds a style named for the built-in one. Its rules never run, as in Vale; the other styles of the package lint.
    A folder named `.unpacking-` and a suffix in the cache is left by a killed run: delete it when no hakkiri run is using the cache.
 2. Exit 2 with `failed <path>`: that file could not be read or parsed. The other files were linted.
    Exit 2 with `no path given lies under the project root`: the config names another root than the files you gave. Check `--config` and `HAKKIRI_CONFIG`.
