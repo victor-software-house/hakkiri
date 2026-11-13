@@ -969,9 +969,11 @@ impl Builder<'_> {
     ///
     /// A web address in angle brackets or written bare with a lower-case
     /// scheme is.
-    /// An email address, a `www.` address and a `mailto:` address are not:
-    /// the converter writes a different destination for the first two and
-    /// reads the last as text, so their words stay in the text.
+    /// So is another address in angle brackets that is its own destination,
+    /// such as `<mailto:x>`, which goldmark and Vale drop from the text.
+    /// A bare email address, a bare `www.` address and a bare `mailto:`
+    /// address are not: the converter writes a different destination for the
+    /// first two and reads the last as text, so their words stay in the text.
     fn is_address(node: &Mdast, address: &str, angle: bool) -> bool {
         let Mdast::Link(link) = node else {
             return false;
