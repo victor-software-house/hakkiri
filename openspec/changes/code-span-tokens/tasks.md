@@ -31,23 +31,9 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Verify GUM stays at 92.53% or above.
   Evidence, 2026-11-12 (UTC): GUM is right on 52,298 of 56,516 tokens, 92.54%, against 52,294 before; the judged conflicts count 133 right before and after.
 
-## 4. The pattern check and the technical nouns
+## 4. The nine repositories
 
-- [x] 4.1 Make `run_existence` read a code span as one `*` and drop a match only when it starts or ends on a span.
-  Verify the integration test of a match across a span in `tests/alerts.rs` fails on the source before the change and passes after it.
-  Verify the test of an edge on a span passes, and the departures of `tests/fixtures/html-block` list the two rows the change adds.
-  Evidence, 2026-11-12 (UTC): in a box `cargo test --no-fail-fast` passes and `clippy --lib --bins --tests -D warnings` passes.
-  `ClauseChain` gives 1,536 alerts where it gave 1,020, and Vale gives 1,492, with none that only Vale gives.
-- [x] 4.2 Add `nouns_of_technical_prose` to `src/tagger/corrections.rs`, with one word list for each place a noun is certain.
-  Verify tagger tests pin each list, GUM stays at 92.53% or above, and the 7 true alerts of Vale that `NounStack` lacked are given.
-  Evidence, 2026-11-12 (UTC): GUM is right on 52,298 of 56,516 tokens, 92.54%, as before the change, and the judged conflicts count 134 right against 133.
-  `NounStack` gives all 16 true alerts of Vale, 14 of them with a span that runs through a link target.
-- [x] 4.3 Keep in each list only the words whose sampled readings in that place are all nouns, and put the counts in the design.
-  Verify two readers labelled 530 places of the six words in the nine repositories, and each case and list was run alone.
-  Evidence, 2026-11-12 (UTC): after a determiner `check`, `prompt`, `thinking` and `fade` are nouns in 163 of 163 places, `round` in 41 of 50 and `split` in 40 of 50, so the last two left that list.
-  The title case holds 5 true alerts of `NounStack` and the compound case 1, and the same cases for every word add 98 alerts of which a sample are false.
-  GUM, the judged conflicts and every alert of the nine repositories are the same with the three lists.
-- [x] 4.4 Correct the conversion of the one repository whose configuration named a dropped style and mapped Rust files to Markdown, and rerun the nine repositories.
+- [x] 4.1 Correct the conversion of the one repository whose configuration named a dropped style and mapped Rust files to Markdown, and rerun the nine repositories.
   Verify hakkiri gives the 13 alerts of `ClauseChain` that the run lacked for it, and the 40 new alerts of the two other rules are labelled.
   Evidence, 2026-11-12 (UTC): `ThingsSpeakNoun` gives 31 true and 1 false of 32 new alerts, and `NounStack` 1 true and 7 false of 8.
   The 11 true alerts of Vale that hakkiri seemed to lack were this repository, so the sentence splitter is not their cause.

@@ -17,25 +17,20 @@ By that definition a code name before `says` is a thing that speaks, and a code 
 - The square brackets of an intra-doc link, as in ``[`Name`]``, belong to the code span.
 - The rule applies to every `sequence` rule, because the walk reads each word through one function.
 - The tagger corrects the verbs of saying and asking after a noun, for the verb tag that the package puts on the verb token of `ThingsSpeakNoun`.
-- An `existence` rule reads a code span as one `*`, as Vale masks it, and drops a match only when it starts or ends on a span, so a match across a span is a match.
-- The tagger reads `check`, `prompt`, `thinking` and `fade` as nouns after a determiner, where the model reads a verb, an adverb or an adjective.
-- It reads `prompt`, `round` and `split` as nouns before `pull request` in a title, and `check` as a noun that ends a compound.
-- The `sequence-check`, `scope-selection` and `vale-differences` specs state it.
+- The `sequence-check` and `vale-differences` specs state it.
 
 ## Capabilities
 
 ### Modified Capabilities
 
 - `sequence-check`: a code span is a noun that reads as one capital letter.
-- `scope-selection`: an `existence` match across a code span is a match.
-- `vale-differences`: Vale reads the mask of a code span as a run of `*`, and hakkiri reads the nouns of technical prose.
+- `vale-differences`: Vale reads the mask of a code span as a run of `*`, and hakkiri tags the verbs of saying and asking by their place.
 
 ## Impact
 
 - Changed: `src/sequence.rs`, `src/tagger.rs`, `src/tagger/tokens.rs`, `src/tagger/corrections.rs`, the tests of the sequence walk and the tagger, the instructions, the skill and `AGENTS.md`.
 - On nine repositories `ThingsSpeakNoun` gives 313 of the alerts the tools diverge on, 305 true and 8 false, and every true alert of Vale.
   `NounStack` gives 240, 44 true and 196 false where Vale gives 278, 16 true and 262 false.
-  `ClauseChain` gives 1,536 alerts where it gave 1,020, and Vale gives 1,492.
   GUM stays at 92.54%.
   The design lists the counts of every state and the false alerts that remain.
 

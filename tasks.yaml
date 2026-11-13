@@ -419,14 +419,9 @@ queue:
       - The vale-differences spec lists the difference, since Vale reads the span as a run of stars.
       - The alerts that Vale and hakkiri do not all give are labelled against a written definition of each rule by two readers, and each false alert that remains is listed.
       - The package puts a verb tag on the verb token of ThingsSpeakNoun, the tagger reads a noun, a participle and a verb of saying by the place it stands in, and each correction has a test and keeps GUM at 92.53% or above.
-      - An existence rule reads a code span as one * and drops a match only when it starts or ends on the span, with tests, so a match across a span is an alert as in Vale.
-      - The tagger reads check, prompt, thinking and fade as nouns after a determiner, prompt, round and split as nouns before pull request in a title, and check at the end of a compound, each word in a list only where the sampled readings are nouns, with tests and GUM at 92.53% or above, and NounStack gives every true alert of Vale.
     notes:
       - 2026-11-12, the alerts of ThingsSpeakNoun and NounStack that the tools do not all give were labelled by two readers each, 304 and 550. By the definitions a code name before says is a thing that speaks, so the refusal of the span removed 64 false and 8 true alerts and left 44 of 268 true ones. The two readers of the 415 NounStack alerts that no code span touches differed on 9, all a hyphenated word before three nouns, settled as false since a hyphenated word is an adjective.
       - 2026-11-12, reading the span as a noun gave 264 true and 26 false alerts of ThingsSpeakNoun, 20 of the 26 the noun ask or asks and 6 a participle. The verb tag alone cut 34 true alerts and 4 of Vale's, so the tagger corrections for the verbs of saying and asking were added. The result is 274 true and 7 false, all 21 true alerts of Vale, and GUM at 92.54% against 92.53%. 3 of the 7 false are participles that the package's rule removes, 3 are asked to end twice and asked online, where only the thing that is asked tells the participle from a past tense, and 1 is a literal verb that Vale also flags.
-      - 2026-11-12, the tagger read check, split, round, prompt, fade and thinking as a verb, an adverb or an adjective inside a run of nouns, which cost NounStack 7 true alerts of Vale. nouns_of_technical_prose reads three lists of them as nouns, one for each place a noun is certain, with GUM at 92.54% and 134 of the 200 judged conflicts right against 133. Two readers labelled 530 places of the six words in nine repositories. After a determiner check, prompt, thinking and fade are nouns in 163 of 163, round in 41 of 50 and split in 40 of 50, so round and split left that list. NounStack now gives 240 alerts of the 558 the tools diverge on, 44 true and 196 false, where Vale gives 278, 16 true and 262 false, and every true alert of Vale.
-      - '2026-11-12, run_existence dropped each match that overlapped a code span, which cost about 400 true ClauseChain alerts of Vale. It now reads a span as one * and drops a match only when it starts or ends on the span: ClauseChain gives 1,536 alerts on nine repositories where it gave 1,020, and Vale gives 1,492, with none that only Vale gives. The 11 true alerts of Vale that hakkiri seemed to lack were one repository whose configuration the run converted wrongly, so no splitter explains them. Two readers labelled the 40 alerts that only hakkiri gives, 26 true and 14 false, each false one a list of items joined with semicolons, which Vale also gives in 46 of its 88 alerts that hakkiri lacked before; the package pattern cannot tell a list from a chain.'
-      - 2026-11-12, 12 false NounStack alerts hold a hyphenated word before three nouns, which the pattern [a-z][a-z-]* accepts and the definition counts as an adjective. A tagger rule that reads a hyphenated word as an adjective cost 6 tokens of GUM, so the fix belongs to the package pattern.
     plan: openspec/changes/code-span-tokens/proposal.md
 
   - id: HKR-057
@@ -457,6 +452,34 @@ queue:
       - "2026-11-12, found while probing Vale.Repetition at 66bbb85: ini.go asRuleParam stores Style.Rule.param = value, and defaultRule applies it when the rule compiles. hakkiri's config reads a level, on and off by rule name and no parameter."
       - 2026-11-12, the key Vale 66bbb85 reads is Style.Rule[param] = value, not Style.Rule.param, and it applies a parameter to every file whichever section sets it, with the last section winning everywhere. hakkiri applies it to the files of the glob that sets it, as the rule-parameters change records.
     plan: openspec/changes/rule-parameters/proposal.md
+
+  - id: HKR-060
+    title: Read a code span as one star in an existence rule
+    scope: sequence
+    outcome: >-
+      An existence rule reads a code span as one star and drops a match only when it
+      starts or ends on the span, so a match across a span is an alert, as in Vale.
+    blocked_by: []
+    acceptance:
+      - An existence rule reads a code span as one * and drops a match only when it starts or ends on the span, with tests, so a match across a span is an alert as in Vale.
+    plan: openspec/changes/existence-span-mask/proposal.md
+    notes:
+      - '2026-11-12, run_existence dropped each match that overlapped a code span, which cost about 400 true ClauseChain alerts of Vale. It now reads a span as one * and drops a match only when it starts or ends on the span: ClauseChain gives 1,536 alerts on nine repositories where it gave 1,020, and Vale gives 1,492, with none that only Vale gives. The 11 true alerts of Vale that hakkiri seemed to lack were one repository whose configuration the run converted wrongly, so no splitter explains them. Two readers labelled the 40 alerts that only hakkiri gives, 26 true and 14 false, each false one a list of items joined with semicolons, which Vale also gives in 46 of its 88 alerts that hakkiri lacked before; the package pattern cannot tell a list from a chain.'
+
+  - id: HKR-061
+    title: Read the nouns of technical prose as nouns
+    scope: sequence
+    outcome: >-
+      The tagger reads check, prompt, thinking, fade, round and split as nouns in the
+      places where the sampled readings are nouns, so NounStack gives every true alert
+      of Vale.
+    blocked_by: []
+    acceptance:
+      - The tagger reads check, prompt, thinking and fade as nouns after a determiner, prompt, round and split as nouns before pull request in a title, and check at the end of a compound, each word in a list only where the sampled readings are nouns, with tests and GUM at 92.53% or above, and NounStack gives every true alert of Vale.
+    plan: openspec/changes/technical-nouns/proposal.md
+    notes:
+      - 2026-11-12, the tagger read check, split, round, prompt, fade and thinking as a verb, an adverb or an adjective inside a run of nouns, which cost NounStack 7 true alerts of Vale. nouns_of_technical_prose reads three lists of them as nouns, one for each place a noun is certain, with GUM at 92.54% and 134 of the 200 judged conflicts right against 133. Two readers labelled 530 places of the six words in nine repositories. After a determiner check, prompt, thinking and fade are nouns in 163 of 163, round in 41 of 50 and split in 40 of 50, so round and split left that list. NounStack now gives 240 alerts of the 558 the tools diverge on, 44 true and 196 false, where Vale gives 278, 16 true and 262 false, and every true alert of Vale.
+      - 2026-11-12, 12 false NounStack alerts hold a hyphenated word before three nouns, which the pattern [a-z][a-z-]* accepts and the definition counts as an adjective. A tagger rule that reads a hyphenated word as an adjective cost 6 tokens of GUM, so the fix belongs to the package pattern.
 archive:
   - id: HKR-042
     title: Build Vale.Terms and Vale.Avoid from a vocabulary
