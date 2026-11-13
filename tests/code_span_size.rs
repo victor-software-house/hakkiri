@@ -211,3 +211,57 @@ fn a_size_outside_zero_to_255_is_refused_with_its_line() -> TestResult {
     }
     Ok(())
 }
+
+#[test]
+fn a_package_glob_beats_the_projects_top_level_unless_the_project_forces_it() -> TestResult {
+    let suite = Suite::new("code-span-size-cascade");
+    let package = "files:\n  '*.md': {code_span_size: 0}\n";
+    let ranked = project(&suite, "ranked", &config("code_span_size: 2\n"), package);
+    assert_eq!(
+        lines(&ranked, &[], &[])?,
+        [
+            counted("a.md", "3.00"),
+            counted("b.md", "3.00"),
+            "2 alerts in 2 files".into()
+        ]
+    );
+    let forced = project(
+        &suite,
+        "forced",
+        &config("code_span_size: !override 2\n"),
+        package,
+    );
+    assert_eq!(
+        lines(&forced, &[], &[])?,
+        [
+            counted("a.md", "11.00"),
+            counted("b.md", "11.00"),
+            "2 alerts in 2 files".into()
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn the_settings_of_different_keys_merge_across_globs() -> TestResult {
+    let suite = Suite::new("code-span-size-merge");
+    let root = project(
+        &suite,
+        "merge",
+        &config("  'docs/*.md': {code_span_size: 0}\n"),
+        "files:\n  '*.md': {Team.Words: error}\n",
+    );
+    root.file("docs/a.md", TEXT);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:1: error Team.Words: 7.00 words",
+            "b.md:1:1: error Team.Words: 7.00 words",
+            "docs/a.md:1:1: error Team.Words: 3.00 words",
+            "3 alerts in 3 files"
+        ]
+    );
+    Ok(())
+}

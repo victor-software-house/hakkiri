@@ -1,0 +1,12 @@
+## ADDED Requirements
+
+### Requirement: Settings resolve by specificity, where Vale applies its sections in order
+
+hakkiri SHALL resolve the settings of the globs that match a file by the settings cascade of `project-config`, where Vale 66bbb85 applies its sections in the order written, a later section winning for the file ([file.go][vale-file]).
+
+#### Scenario: A specific glob written first
+
+- **WHEN** the config holds `'docs/*.md': {Team.Filler: error}` and then `'*.md': {Team.Filler: warning}`
+- **THEN** hakkiri reports `Team.Filler` on `docs/a.md` as an error, and Vale, given the same two sections in that order, reports it as a warning
+
+[vale-file]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L185-L215

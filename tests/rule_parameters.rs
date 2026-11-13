@@ -269,12 +269,12 @@ fn a_parameter_reaches_only_the_files_its_glob_matches() -> TestResult {
 }
 
 #[test]
-fn a_later_glob_wins_for_the_same_parameter() -> TestResult {
-    let suite = Suite::new("rule-parameters-later");
+fn a_more_specific_glob_wins_for_the_same_parameter() -> TestResult {
+    let suite = Suite::new("rule-parameters-specific");
     let root = repeated(
         &suite,
-        "later",
-        "files:\n  '*.md':\n    styles: [Vale]\n    params:\n      Vale.Repetition: {max: 1}\n  'a.md':\n    params:\n      Vale.Repetition: {max: 2}\n",
+        "specific",
+        "files:\n  'a.md':\n    params:\n      Vale.Repetition: {max: 2}\n  '*.md':\n    styles: [Vale]\n    params:\n      Vale.Repetition: {max: 1}\n",
     );
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(result.code, 1, "{}{}", result.out, result.err);
@@ -307,12 +307,12 @@ fn a_rule_written_twice_under_params_is_refused() -> TestResult {
 }
 
 #[test]
-fn an_empty_styles_list_drops_the_parameters_before_it() -> TestResult {
+fn an_empty_styles_list_drops_the_parameters_of_a_lower_rank() -> TestResult {
     let suite = Suite::new("rule-parameters-empty");
     let root = repeated(
         &suite,
         "empty",
-        "files:\n  '*.md':\n    styles: [Vale]\n    params:\n      Vale.Repetition: {max: 2}\n  'a.md': {styles: []}\n  'a.*': {styles: [Vale]}\n",
+        "files:\n  '*.md':\n    styles: [Vale]\n    params:\n      Vale.Repetition: {max: 2}\n  'a.md':\n    styles: []\n    Vale.Repetition: on\n",
     );
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(result.code, 1, "{}{}", result.out, result.err);

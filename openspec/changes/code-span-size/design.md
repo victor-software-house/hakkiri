@@ -56,7 +56,7 @@ The metric counts `occurrences` of its `tokens` in the text as before.
 
 ### 5. Package, project, glob, variable, flag
 
-The last setting wins, in this order of rising weight: the package's settings file, the project config, each matching glob in the order written, `HAKKIRI_CODE_SPAN_SIZE`, then `--code-span-size`.
+The last setting wins, in this order of rising weight: the package's settings file, the project config, each matching glob in the rank of the settings cascade (row `HKR-069`), `HAKKIRI_CODE_SPAN_SIZE`, then `--code-span-size`.
 A glob is the more specific of the two config levels, so it beats the project's top level.
 The variable and the flag beat every file, as for the other options of `check`.
 `code_span_size` is a reserved key under a glob, as `styles` and `vocab` are, and no rule name can equal it, since a rule name holds a dot.

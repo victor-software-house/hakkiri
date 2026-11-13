@@ -16,7 +16,7 @@ Vale 3.26.0 at `66bbb85` reads `Style.Rule[param]` and takes `Style.Rule.param` 
 
 - A glob of `files` takes `params`: a mapping from a rule name to a mapping from a parameter name to one value, which is a number, `true` or `false`, or text.
   Each parameter replaces the field of the same name in the rule's file, or in `Vale.Repetition`, and the rule is read again with it.
-- A parameter reaches the files of the glob that sets it, a later glob winning for the same parameter, and an empty `styles` list drops the parameters before it.
+- A parameter reaches the files of the glob that sets it, the more specific glob winning for the same parameter (the settings cascade of row `HKR-069`), and an empty `styles` list drops the parameters before it.
   Vale applies a parameter to every file, whichever section sets it, and the last section wins everywhere.
 - A parameter that Vale refuses is refused, with the config file and the line of the parameter: a level, and the fields `extends`, `name`, `path`, `tests`, `message`, `description`, `link`, `tokens`, `swap`, `exceptions`, `filters`, `ignore`, `raw` and `either`.
 - A parameter that Vale accepts without a word, or fails on without a place, is refused with the file and line.

@@ -16,9 +16,9 @@ A value that is no whole number from 0 to 255, or a glob that gives the key a wo
 - **WHEN** the config holds `code_span_size: 300`, or a glob holds `code_span_size: 300` or `code_span_size: many`
 - **THEN** hakkiri names the file and the line of the key, and exits 2
 
-### Requirement: The last code_span_size wins
+### Requirement: code_span_size resolves by the settings cascade
 
-The last setting SHALL win, in the order of a package's file, the project's top level, then each glob that matches the file, in the order written.  
+`code_span_size` SHALL resolve by the settings cascade: the top levels of a package's file and of the project, then each glob that matches the file in rank order, the last winning.  
 The flag and the variable of the `check` command SHALL win over all of them.
 
 #### Scenario: The project sets zero
@@ -35,6 +35,11 @@ The flag and the variable of the `check` command SHALL win over all of them.
 
 - **WHEN** the project holds `code_span_size: 2` and the glob `a.md` holds `code_span_size: 0`
 - **THEN** the metric of `a.md` reads 3.00 and that of `b.md` reads 11.00
+
+#### Scenario: A package glob beats the project's top level
+
+- **WHEN** a package's settings file holds the glob `'*.md': {code_span_size: 0}`, and the project holds `code_span_size: 2`, then `code_span_size: !override 2`
+- **THEN** the metric of `a.md` reads 3.00, then 11.00
 
 ## MODIFIED Requirements
 

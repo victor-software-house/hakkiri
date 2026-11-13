@@ -5,15 +5,18 @@
 //! [`load`] reads the file once, loads every style folder of every package, and
 //! refuses what it cannot run, with the file and line of the fault.
 //! A package may ship a settings file in the same format, and the settings of
-//! each package apply before the project's own.
+//! each package rank below the project's own at equal specificity.
+//! The globs that match a file apply from the least specific to the most, and
+//! the values the project tags `!override` apply after all the others.
 //! [`Project::plan`] then says which rules run on a file.
 
+use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
 use std::{fmt, fs, io, path, slice};
 
-use ctl_core::input::{FieldPath, Input};
+use ctl_core::input::{FieldPath, Input, Tagged};
 use garde::Validate;
 use globset::{GlobBuilder, GlobMatcher};
 use hakkiri::Language;
@@ -163,11 +166,11 @@ struct Raw {
     vocab: Option<Vec<String>>,
     #[serde(default)]
     #[garde(skip)]
-    files: Ordered<Ordered<Setting>>,
+    files: Ordered<Ordered<Tagged<Setting>>>,
     /// How many words a code span counts as in a word count.
     #[serde(default)]
     #[garde(custom(words_ok))]
-    code_span_size: Option<u64>,
+    code_span_size: Option<Tagged<u64>>,
     /// The options of a run, which only the project's config sets.
     #[serde(default)]
     #[garde(skip)]
@@ -216,9 +219,9 @@ fn level_ok(value: &Option<String>, _: &Known) -> garde::Result {
     clippy::ref_option,
     reason = "garde calls a custom rule with a reference to the field."
 )]
-fn words_ok(value: &Option<u64>, _: &Known) -> garde::Result {
+fn words_ok(value: &Option<Tagged<u64>>, _: &Known) -> garde::Result {
     match value {
-        Some(words) if u8::try_from(*words).is_err() => {
+        Some(Tagged(words, _)) if u8::try_from(*words).is_err() => {
             Err(garde::Error::new(too_many_words(*words)))
         }
         _ => Ok(()),
@@ -299,6 +302,111 @@ fn choice_named(word: &str) -> Option<Choice> {
     }
 }
 
+/// The tag that forces a value, as the YAML text of a config writes it.
+const OVERRIDE: &str = "!override";
+
+/// How specific a glob is: four counts, compared in order, a larger count more
+/// specific.
+/// They are the parts between slashes made of literal characters only, the
+/// parts that hold a literal character and something else, the parts that are
+/// `**` (fewer is more specific, so [`Reverse`]), and the literal characters of
+/// the whole glob.
+type Specificity = (usize, usize, Reverse<usize>, usize);
+
+/// The specificity of the glob `pattern`.
+///
+/// A literal character is one outside a `[…]` class and a `{…}` group that is
+/// not `*` or `?`, and a backslash with the character after it is one literal
+/// character.
+fn specificity(pattern: &str) -> Specificity {
+    let (mut only, mut mixed, mut recursive, mut literals) = (0, 0, 0, 0);
+    let mut close = |raw: &str, held: usize, other: bool| {
+        literals += held;
+        if raw == "**" {
+            recursive += 1;
+        } else if held > 0 {
+            if other {
+                mixed += 1;
+            } else {
+                only += 1;
+            }
+        }
+    };
+    // The members seen in a class so far, and whether it is negated.
+    let mut class: Option<(usize, bool)> = None;
+    let mut group = 0_usize;
+    let (mut start, mut held, mut other) = (0, 0, false);
+    let mut chars = pattern.char_indices();
+    while let Some((at, c)) = chars.next() {
+        if let Some((members, negated)) = class.as_mut() {
+            other = true;
+            match c {
+                '!' | '^' if *members == 0 && !*negated => *negated = true,
+                ']' if *members > 0 => class = None,
+                _ => *members += 1,
+            }
+            continue;
+        }
+        match c {
+            '/' => {
+                close(&pattern[start..at], held, other);
+                (start, held, other) = (at + 1, 0, false);
+            }
+            '\\' => {
+                chars.next();
+                if group > 0 {
+                    other = true;
+                } else {
+                    held += 1;
+                }
+            }
+            '[' => {
+                class = Some((0, false));
+                other = true;
+            }
+            '{' => {
+                group += 1;
+                other = true;
+            }
+            '}' if group > 0 => {
+                group -= 1;
+                other = true;
+            }
+            _ if group > 0 || matches!(c, '*' | '?') => other = true,
+            _ => held += 1,
+        }
+    }
+    close(&pattern[start..], held, other);
+    (only, mixed, Reverse(recursive), literals)
+}
+
+/// What one glob sets for a file that matches it: the settings that carry no
+/// tag, or the ones the project tags `!override`.
+#[derive(Debug, Default)]
+struct Sets {
+    styles: Option<Vec<String>>,
+    /// The vocabularies the glob names, for the files it matches. A list
+    /// written empty drops the lists of the earlier globs of the same text.
+    vocab: Option<Vec<String>>,
+    /// The patterns whose matches are hidden as blocks from the files the glob
+    /// matches.
+    block_ignores: Option<Vec<Pattern>>,
+    /// The patterns whose matches are hidden as inline text.
+    token_ignores: Option<Vec<Pattern>>,
+    /// How many words a code span counts as in the files the glob matches.
+    code_span_size: Option<u8>,
+    choices: Vec<(String, Choice)>,
+    /// The parameters the glob sets, by rule name, in the order written.
+    params: Vec<(String, Params)>,
+}
+
+impl Sets {
+    /// Whether the glob wrote an empty `vocab` list.
+    fn clears_vocab(&self) -> bool {
+        self.vocab.as_ref().is_some_and(Vec::is_empty)
+    }
+}
+
 /// One glob of `files` and what it sets.
 #[derive(Debug)]
 struct Glob {
@@ -306,22 +414,15 @@ struct Glob {
     /// alike.
     pattern: String,
     matcher: GlobMatcher,
-    styles: Option<Vec<String>>,
-    /// The vocabularies the glob names, for the files it matches.
-    vocab: Vec<String>,
-    /// Whether the glob wrote an empty `vocab` list, which drops the lists of
-    /// the earlier globs of the same text.
-    clears_vocab: bool,
-    /// The patterns whose matches are hidden as blocks from the files the glob
-    /// matches.
-    block_ignores: Vec<Pattern>,
-    /// The patterns whose matches are hidden as inline text.
-    token_ignores: Vec<Pattern>,
-    /// How many words a code span counts as in the files the glob matches.
-    code_span_size: Option<u8>,
-    choices: Vec<(String, Choice)>,
-    /// The parameters the glob sets, by rule name, in the order written.
-    params: Vec<(String, Params)>,
+    /// How specific the glob is, which ranks it first.
+    specificity: Specificity,
+    /// The place of its config file among the layers, a package in load order
+    /// and the project last, which ranks it second.
+    origin: usize,
+    /// What it sets without a tag.
+    normal: Sets,
+    /// What it sets with `!override`, which only the project's config holds.
+    forced: Sets,
 }
 
 /// A config with its packages loaded.
@@ -333,6 +434,8 @@ pub(crate) struct Project {
     styles: BTreeMap<String, Vec<usize>>,
     /// The rules that are valid Vale and that hakkiri cannot run.
     unrunnable: Vec<Held>,
+    /// Every glob of the packages and the project, in rank order: the least
+    /// specific first, then by origin, then as written.
     globs: Vec<Glob>,
     /// The rule each set of parameters gives, by the rule's place in `rules`
     /// and the parameters' [`variant_key`]: one for every set that the globs
@@ -342,9 +445,13 @@ pub(crate) struct Project {
     vocabularies: BTreeMap<String, Vocabulary>,
     /// The lowest level an alert reports at.
     pub(crate) level: Option<Level>,
-    /// The `code_span_size` of the last config file that sets it, the project's
-    /// after its packages'.
+    /// The top-level `code_span_size` without a tag of the last config file
+    /// that sets it, the project's after its packages'. It ranks below every
+    /// glob.
     code_span_size: Option<u8>,
+    /// The top-level `code_span_size` the project tags `!override`, which
+    /// applies after every value without the tag.
+    forced_code_span_size: Option<u8>,
     /// The config's `fail_level`.
     pub(crate) fail_level: Option<FailLevel>,
     /// The config's `gitignore`.
@@ -378,15 +485,15 @@ pub(crate) struct Plan<'a> {
     /// fails the run until the config turns it `off`.
     pub(crate) unrunnable: Vec<&'a Unrunnable>,
     /// The exceptions of the vocabularies that the globs matching the file
-    /// name, one for each, in the order the globs are written.
+    /// name, one for each, in rank order.
     pub(crate) accepted: Vec<&'a Exceptions>,
-    /// The block patterns of the globs matching the file, in the order the
-    /// globs are written.
+    /// The block patterns of the globs matching the file, in rank order.
     pub(crate) block_ignores: Vec<&'a Pattern>,
     /// The token patterns of the globs matching the file, in the same order.
     pub(crate) token_ignores: Vec<&'a Pattern>,
-    /// How many words a code span counts as in a word count of the file: the
-    /// last matching glob's `code_span_size`, else the config's, else one.
+    /// How many words a code span counts as in a word count of the file.
+    /// The matching glob of the highest rank gives it, else the config's top
+    /// level, else one, and a forced value beats them all.
     pub(crate) code_span_size: u8,
 }
 
@@ -453,62 +560,48 @@ impl Project {
     /// The rules for `path`, written relative to the project root with `/`
     /// separators, or `None` when no glob matches it or it has no rule to run.
     ///
-    /// The globs that match apply in the order written, a later one winning for
-    /// the same key.
-    /// A `styles` list replaces the earlier one, and an empty list also drops
-    /// every rule setting before it, as Vale's empty `BasedOnStyles` does.
+    /// The globs that match apply in rank order, a higher rank winning for the
+    /// same key, then the values the project tags `!override` apply in the same
+    /// order.
+    /// A `styles` list replaces the one of a lower rank, and an empty list also
+    /// drops every rule setting of a lower rank, as Vale's empty
+    /// `BasedOnStyles` does.
     /// A rule runs when a listed style holds it and the config does not turn it
     /// off, or when the config turns it on or sets its level, whatever style
-    /// holds it. A level once set stays when a later glob turns the rule off or
-    /// on, as in Vale.
-    /// A parameter a glob sets reaches the files that glob matches, a later
-    /// glob winning for the same parameter, and an empty `styles` list drops
-    /// the parameters before it as it drops the levels.
+    /// holds it. A level once set stays when a glob of higher rank turns the
+    /// rule off or on, as in Vale.
+    /// A parameter a glob sets reaches the files that glob matches, a higher
+    /// rank winning for the same parameter, and an empty `styles` list drops
+    /// the parameters of a lower rank as it drops the levels.
+    /// The lists of `vocab`, `block_ignores` and `token_ignores` add up over
+    /// every matching glob; when one forces a list for a key, the forced lists
+    /// of that key replace the others.
     /// A rule hakkiri cannot run is held to the same test, and each one that
     /// passes it is in [`Plan::unrunnable`].
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
-        let mut matched = false;
-        let mut styles: &[String] = &[];
-        let mut switches: HashMap<String, bool> = HashMap::new();
-        let mut set_levels: HashMap<&str, Level> = HashMap::new();
-        let mut set_params: HashMap<&str, BTreeMap<&str, &Written>> = HashMap::new();
-        let mut named: Vec<&str> = Vec::new();
-        let mut block_ignores: Vec<&Pattern> = Vec::new();
-        let mut token_ignores: Vec<&Pattern> = Vec::new();
-        let mut code_span_size = self.code_span_size.unwrap_or(DEFAULT_CODE_SPAN_SIZE);
-        for glob in self.globs.iter().filter(|glob| glob.matcher.is_match(path)) {
-            matched = true;
-            code_span_size = glob.code_span_size.unwrap_or(code_span_size);
-            block_ignores.extend(&glob.block_ignores);
-            token_ignores.extend(&glob.token_ignores);
-            for name in &glob.vocab {
-                if !named.contains(&name.as_str()) {
-                    named.push(name);
-                }
-            }
-            if let Some(listed) = &glob.styles {
-                styles = listed;
-                if listed.is_empty() {
-                    switches.clear();
-                    set_levels.clear();
-                    set_params.clear();
-                }
-            }
-            for (rule, params) in &glob.params {
-                set_params.entry(rule.as_str()).or_default().extend(
-                    params
-                        .iter()
-                        .map(|(name, written)| (name.as_str(), written)),
-                );
-            }
-            choose(&glob.choices, &mut switches, &mut set_levels);
-            // A glob that names a vocabulary runs the rules of that vocabulary
-            // on its files, after the glob's own settings, as in Vale.
-            set_vocabulary_rules(&mut switches, &glob.vocab);
-        }
-        if !matched {
+        let matching: Vec<&Glob> = self
+            .globs
+            .iter()
+            .filter(|glob| glob.matcher.is_match(path))
+            .collect();
+        if matching.is_empty() {
             return None;
         }
+        let fold = Fold::of(
+            &matching,
+            self.code_span_size.unwrap_or(DEFAULT_CODE_SPAN_SIZE),
+            self.forced_code_span_size,
+        );
+        let Fold {
+            styles,
+            switches,
+            set_levels,
+            set_params,
+            named,
+            block_ignores,
+            token_ignores,
+            code_span_size,
+        } = fold;
         let mut rules = Vec::new();
         let mut levels = HashMap::new();
         let mut listed = HashSet::new();
@@ -587,6 +680,108 @@ fn choose<'a>(
                 set_levels.insert(name.as_str(), *level);
             }
         }
+    }
+}
+
+/// Which lists of a set a pass over the globs reads.
+#[derive(Clone, Copy)]
+struct Lists {
+    vocab: bool,
+    block_ignores: bool,
+    token_ignores: bool,
+}
+
+/// What the globs that match a file have set so far.
+struct Fold<'a> {
+    styles: &'a [String],
+    switches: HashMap<String, bool>,
+    set_levels: HashMap<&'a str, Level>,
+    set_params: HashMap<&'a str, BTreeMap<&'a str, &'a Written>>,
+    named: Vec<&'a str>,
+    block_ignores: Vec<&'a Pattern>,
+    token_ignores: Vec<&'a Pattern>,
+    code_span_size: u8,
+}
+
+impl<'a> Fold<'a> {
+    /// What the `globs` that match a file set, in rank order, starting from
+    /// `code_span_size`: first the settings without the tag, then the forced
+    /// ones, with the project's forced `code_span_size` ahead of them.
+    fn of(globs: &[&'a Glob], code_span_size: u8, forced_code_span_size: Option<u8>) -> Self {
+        let mut fold = Self {
+            styles: &[],
+            switches: HashMap::new(),
+            set_levels: HashMap::new(),
+            set_params: HashMap::new(),
+            named: Vec::new(),
+            block_ignores: Vec::new(),
+            token_ignores: Vec::new(),
+            code_span_size,
+        };
+        // A forced list replaces the lists without the tag for its key.
+        let unforced = Lists {
+            vocab: globs.iter().all(|glob| glob.forced.vocab.is_none()),
+            block_ignores: globs.iter().all(|glob| glob.forced.block_ignores.is_none()),
+            token_ignores: globs.iter().all(|glob| glob.forced.token_ignores.is_none()),
+        };
+        for glob in globs {
+            fold.apply(&glob.normal, unforced);
+        }
+        fold.code_span_size = forced_code_span_size.unwrap_or(fold.code_span_size);
+        for glob in globs {
+            fold.apply(
+                &glob.forced,
+                Lists {
+                    vocab: true,
+                    block_ignores: true,
+                    token_ignores: true,
+                },
+            );
+        }
+        fold
+    }
+
+    /// Applies what one glob sets, a later call winning for the same key.
+    /// A list that `lists` leaves out is not read.
+    fn apply(&mut self, sets: &'a Sets, lists: Lists) {
+        self.code_span_size = sets.code_span_size.unwrap_or(self.code_span_size);
+        if lists.block_ignores {
+            self.block_ignores
+                .extend(sets.block_ignores.iter().flatten());
+        }
+        if lists.token_ignores {
+            self.token_ignores
+                .extend(sets.token_ignores.iter().flatten());
+        }
+        let vocab: &[String] = sets
+            .vocab
+            .as_deref()
+            .filter(|_| lists.vocab)
+            .unwrap_or_default();
+        for name in vocab {
+            if !self.named.contains(&name.as_str()) {
+                self.named.push(name);
+            }
+        }
+        if let Some(listed) = &sets.styles {
+            self.styles = listed;
+            if listed.is_empty() {
+                self.switches.clear();
+                self.set_levels.clear();
+                self.set_params.clear();
+            }
+        }
+        for (rule, params) in &sets.params {
+            self.set_params.entry(rule.as_str()).or_default().extend(
+                params
+                    .iter()
+                    .map(|(name, written)| (name.as_str(), written)),
+            );
+        }
+        choose(&sets.choices, &mut self.switches, &mut self.set_levels);
+        // A glob that names a vocabulary runs the rules of that vocabulary on
+        // its files, after the glob's own settings, as in Vale.
+        set_vocabulary_rules(&mut self.switches, vocab);
     }
 }
 
@@ -734,7 +929,7 @@ struct Layer {
 /// files they ship.
 ///
 /// The packages a package lists come before it, in the order written, so its
-/// own settings override theirs.
+/// own settings rank above theirs at equal specificity.
 struct Walk<'a> {
     root: &'a Path,
     cache_dir: Option<&'a Path>,
@@ -916,8 +1111,8 @@ impl<'a> Walk<'a> {
 /// cache folder when there is none, unless that folder already holds it.
 ///
 /// A package whose top folder holds `.ctl/hakkiri.yaml` ships settings in the
-/// format of the config: they apply ahead of the project's, and the packages
-/// that file lists are fetched as the project's are.
+/// format of the config: they rank below the project's at equal specificity,
+/// and the packages that file lists are fetched as the project's are.
 ///
 /// # Errors
 ///
@@ -958,7 +1153,8 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         input,
         raw,
     });
-    let (level, code_span_size) = last_settings(&layers);
+    let (level, code_span_size, forced_code_span_size) = last_settings(&layers);
+    let project = layers.len() - 1;
     let mut vocab = Named::default();
     for layer in &layers {
         vocab.add_layer(layer);
@@ -970,7 +1166,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
     let mut globs: Vec<Glob> = Vec::new();
     let mut listed: HashMap<String, Vec<String>> = HashMap::new();
     let mut formats = Formats::default();
-    for layer in layers {
+    for (origin, layer) in layers.into_iter().enumerate() {
         if let Err(error) = layer.input.check(&layer.raw, &known) {
             faults.problems.extend(LoadError::from(error).problems);
         }
@@ -978,23 +1174,25 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
             file: &layer.name,
             problems: Vec::new(),
         };
+        refuse_top_level_tag(&layer, origin == project, &mut at);
         for (key, reader) in &layer.raw.formats {
             if let Err(message) = formats.insert(key, reader) {
                 let path = FieldPath::root().key("formats").key(key);
                 at.add(line_of(&layer.input, &path), key, message);
             }
         }
-        for mut glob in read_globs(layer.raw.files, &layer.input, &loaded, &mut at) {
-            add_up(&mut glob, &mut listed);
-            if glob.clears_vocab {
-                for earlier in globs.iter_mut().filter(|g| g.pattern == glob.pattern) {
-                    earlier.vocab.clear();
-                }
-            }
-            globs.push(glob);
-        }
+        let read = read_globs(
+            layer.raw.files,
+            &layer.input,
+            &loaded,
+            &mut at,
+            origin,
+            origin == project,
+        );
+        push_globs(&mut globs, read, &mut listed);
         faults.problems.append(&mut at.problems);
     }
+    globs.sort_by_key(|glob| (glob.specificity, glob.origin));
     refuse_names(&globs, &loaded, &mut faults);
     let variants = build_variants(&globs, &loaded, &mut faults);
     if !faults.problems.is_empty() {
@@ -1011,6 +1209,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         vocabularies: loaded.vocabularies,
         level,
         code_span_size,
+        forced_code_span_size,
         fail_level,
         gitignore,
         on_unmatched,
@@ -1022,9 +1221,40 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
     })
 }
 
-/// The `level` and the `code_span_size` of the last config file that sets
-/// each: the project's after its packages'.
-fn last_settings(layers: &[Layer]) -> (Option<Level>, Option<u8>) {
+/// Refuses the tag of the top-level `code_span_size` of `layer` when it is no
+/// `!override` of the project's config, on the line of the key.
+fn refuse_top_level_tag(layer: &Layer, project: bool, faults: &mut Faults<'_>) {
+    if let Some(Tagged(_, Some(tag))) = &layer.raw.code_span_size
+        && let Err(message) = forces(tag, project)
+    {
+        let key = FieldPath::root().key("code_span_size");
+        faults.add(key_line_of(&layer.input, &key), "code_span_size", message);
+    }
+}
+
+/// Adds the globs `read` to `globs`, in the order written, as one config file
+/// gave them.
+///
+/// A `styles` list adds to the one an earlier file gave the same glob text, and
+/// an empty `vocab` list drops the lists of the earlier globs of that text.
+fn push_globs(globs: &mut Vec<Glob>, read: Vec<Glob>, listed: &mut HashMap<String, Vec<String>>) {
+    for mut glob in read {
+        add_up(&mut glob, listed);
+        if glob.normal.clears_vocab() {
+            for earlier in globs.iter_mut().filter(|g| g.pattern == glob.pattern) {
+                if let Some(list) = earlier.normal.vocab.as_mut() {
+                    list.clear();
+                }
+            }
+        }
+        globs.push(glob);
+    }
+}
+
+/// The `level` and the top-level `code_span_size` of the last config file that
+/// sets each: the project's after its packages'.
+/// The third value is the `code_span_size` the project tags `!override`.
+fn last_settings(layers: &[Layer]) -> (Option<Level>, Option<u8>, Option<u8>) {
     let level = layers
         .iter()
         .rev()
@@ -1032,18 +1262,29 @@ fn last_settings(layers: &[Layer]) -> (Option<Level>, Option<u8>) {
     let code_span_size = layers
         .iter()
         .rev()
-        .find_map(|layer| layer.raw.code_span_size)
+        .find_map(|layer| match &layer.raw.code_span_size {
+            Some(Tagged(words, None)) => Some(*words),
+            _ => None,
+        })
         .and_then(|words| u8::try_from(words).ok());
-    (level, code_span_size)
+    let forced = layers
+        .last()
+        .and_then(|layer| match &layer.raw.code_span_size {
+            Some(Tagged(words, Some(tag))) if tag == OVERRIDE => Some(*words),
+            _ => None,
+        })
+        .and_then(|words| u8::try_from(words).ok());
+    (level, code_span_size, forced)
 }
 
 /// Makes the `styles` list of `glob` add to the list an earlier config file
 /// gave the same glob text, as Vale merges the sections of one name.
 ///
 /// An empty list stays empty, which drops the earlier styles and the rule
-/// settings before it. `listed` holds the list each glob text ended with.
+/// settings of a lower rank. `listed` holds the list each glob text ended with.
+/// A list the project forces is taken as written, so it is not added up.
 fn add_up(glob: &mut Glob, listed: &mut HashMap<String, Vec<String>>) {
-    let Some(own) = glob.styles.as_mut() else {
+    let Some(own) = glob.normal.styles.as_mut() else {
         return;
     };
     if !own.is_empty()
@@ -1167,13 +1408,35 @@ fn load_packages(
     loaded
 }
 
+/// Whether a value tagged `tag` is forced, or the fault that its tag is.
+///
+/// Only the project's config forces a value, with `!override`, and no other
+/// tag is read.
+fn forces(tag: &str, project: bool) -> Result<bool, String> {
+    match tag {
+        OVERRIDE if project => Ok(true),
+        OVERRIDE => Err(format!(
+            "`{OVERRIDE}` is not allowed in a package's settings: only the project's config forces a value"
+        )),
+        other => Err(format!(
+            "`{other}` is not a tag hakkiri reads: use `{OVERRIDE}` or none"
+        )),
+    }
+}
+
 /// Reads each glob of `files`, and refuses a style or a rule that names nothing
-/// `loaded` holds, and a level that is none.
+/// `loaded` holds, a level that is none, and a tag that is not `!override` or
+/// that a package's settings file holds.
+///
+/// `origin` is the place of the config file among the layers, and `project`
+/// whether it is the project's.
 fn read_globs(
-    files: Ordered<Ordered<Setting>>,
+    files: Ordered<Ordered<Tagged<Setting>>>,
     input: &Input,
     loaded: &Loaded,
     faults: &mut Faults<'_>,
+    origin: usize,
+    project: bool,
 ) -> Vec<Glob> {
     let known: HashSet<&str> = loaded
         .rules
@@ -1193,32 +1456,37 @@ fn read_globs(
                 continue;
             }
         };
-        let mut listed = None;
-        let mut vocabularies = None;
-        let mut block_ignores = Vec::new();
-        let mut token_ignores = Vec::new();
-        let mut code_span_size = None;
-        let mut choices = Vec::new();
-        let mut params = Vec::new();
-        for (key, setting) in settings.0 {
+        let (mut normal, mut forced) = (Sets::default(), Sets::default());
+        for (key, Tagged(setting, tag)) in settings.0 {
             let at = line_of(input, &glob.clone().key(&key));
+            let force = match tag.as_deref().map(|tag| forces(tag, project)) {
+                None => false,
+                Some(Ok(force)) => force,
+                Some(Err(message)) => {
+                    faults.add(key_line_of(input, &glob.clone().key(&key)), &key, message);
+                    continue;
+                }
+            };
+            let sets = if force { &mut forced } else { &mut normal };
             match (key.as_str(), setting) {
                 ("styles", Setting::List(names)) => {
                     refuse_unknown_styles(&names, input, &glob, loaded, faults);
-                    listed = Some(names);
+                    sets.styles = Some(names);
                 }
-                ("vocab", Setting::List(list)) => vocabularies = Some(list),
+                ("vocab", Setting::List(list)) => sets.vocab = Some(list),
                 ("block_ignores", Setting::List(list)) => {
-                    block_ignores = compile_all(&list, input, &glob, "block_ignores", faults);
+                    sets.block_ignores =
+                        Some(compile_all(&list, input, &glob, "block_ignores", faults));
                 }
                 ("token_ignores", Setting::List(list)) => {
-                    token_ignores = compile_all(&list, input, &glob, "token_ignores", faults);
+                    sets.token_ignores =
+                        Some(compile_all(&list, input, &glob, "token_ignores", faults));
                 }
                 (list @ ("styles" | "vocab" | "block_ignores" | "token_ignores"), _) => {
                     faults.add(at, list, expects_a_list(list).to_owned());
                 }
                 ("params", Setting::Map(rules)) => {
-                    params = read_params(rules, input, &glob, &known, faults);
+                    sets.params = read_params(rules, input, &glob, &known, faults);
                 }
                 ("params", Setting::List(_) | Setting::Word(_) | Setting::Number(_)) => {
                     faults.add(
@@ -1228,7 +1496,7 @@ fn read_globs(
                     );
                 }
                 ("code_span_size", setting) => {
-                    code_span_size = glob_words(&setting, at, faults);
+                    sets.code_span_size = glob_words(&setting, at, faults);
                 }
                 (_, setting) if !known.contains(key.as_str()) => {
                     let message = if matches!(setting, Setting::List(_)) {
@@ -1246,7 +1514,7 @@ fn read_globs(
                     faults.add(at, &key, format!("is set to {LEVELS}, `on` or `off`"));
                 }
                 (_, Setting::Word(word)) => match choice_named(&word) {
-                    Some(choice) => choices.push((key.clone(), choice)),
+                    Some(choice) => sets.choices.push((key.clone(), choice)),
                     None => faults.add(
                         at,
                         &key,
@@ -1258,14 +1526,10 @@ fn read_globs(
         globs.push(Glob {
             pattern: pattern.clone(),
             matcher,
-            styles: listed,
-            clears_vocab: vocabularies.as_ref().is_some_and(Vec::is_empty),
-            vocab: vocabularies.unwrap_or_default(),
-            block_ignores,
-            token_ignores,
-            code_span_size,
-            choices,
-            params,
+            specificity: specificity(&pattern),
+            origin,
+            normal,
+            forced,
         });
     }
     globs
@@ -1420,7 +1684,9 @@ fn compile_all(
 fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
     let mut enabled: BTreeSet<&str> = BTreeSet::new();
     for glob in globs {
-        enabled.extend(glob.styles.iter().flatten().map(String::as_str));
+        for sets in [&glob.normal, &glob.forced] {
+            enabled.extend(sets.styles.iter().flatten().map(String::as_str));
+        }
     }
     for style in enabled {
         if let Some(problems) = loaded.names.get(style) {
@@ -1432,10 +1698,15 @@ fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
 /// Reads each rule again for every set of parameters that the globs matching
 /// some file can give it, and refuses a parameter its rule cannot take.
 ///
-/// A file gets the parameters of the globs that match it, in order, and an
-/// empty `styles` list drops those before it. So each glob either matches a
-/// file or does not, and the sets a rule can get are those that each choice
-/// leaves, without the sets that come out alike counted twice.
+/// A file gets the parameters of the globs that match it, in rank order, and an
+/// empty `styles` list drops those of a lower rank. Then it gets the forced
+/// parameters of the same globs, in the same order, and an empty forced list
+/// drops every parameter before it.
+/// Each glob either matches a file or does not, so the sets a rule can get are
+/// those that each choice leaves, first over the parameters without the tag and
+/// then over the forced ones. Sets that come out alike count once.
+/// A glob is chosen once in each of the two walks, so a set no file gives may
+/// be read too, and its faults are those of its parameters.
 /// A fault is placed on the line of the parameter it names, or of the first
 /// parameter of the set when it names none. When a set of several is refused,
 /// each parameter is read alone, so every fault shows at once.
@@ -1447,38 +1718,43 @@ fn build_variants(
     let mut variants = HashMap::new();
     let names: BTreeSet<&str> = globs
         .iter()
-        .flat_map(|glob| glob.params.iter().map(|(rule, _)| rule.as_str()))
+        .flat_map(|glob| [&glob.normal, &glob.forced])
+        .flat_map(|sets| sets.params.iter().map(|(rule, _)| rule.as_str()))
         .collect();
+    let halves: [fn(&Glob) -> &Sets; 2] = [|glob| &glob.normal, |glob| &glob.forced];
     for name in names {
         let Some(index) = loaded.rules.iter().position(|rule| rule.name == name) else {
             continue;
         };
         let mut sets: Vec<Params> = vec![Params::new()];
-        for glob in globs {
-            let clears = glob.styles.as_ref().is_some_and(Vec::is_empty);
-            let own = glob
-                .params
-                .iter()
-                .find(|(rule, _)| rule == name)
-                .map(|(_, params)| params);
-            if !clears && own.is_none() {
-                continue;
+        for half in halves {
+            for glob in globs {
+                let held = half(glob);
+                let clears = held.styles.as_ref().is_some_and(Vec::is_empty);
+                let own = held
+                    .params
+                    .iter()
+                    .find(|(rule, _)| rule == name)
+                    .map(|(_, params)| params);
+                if !clears && own.is_none() {
+                    continue;
+                }
+                let mut next = sets.clone();
+                for set in &sets {
+                    let mut matched = if clears { Params::new() } else { set.clone() };
+                    matched.extend(
+                        own.into_iter()
+                            .flatten()
+                            .map(|(k, v)| (k.clone(), v.clone())),
+                    );
+                    next.push(matched);
+                }
+                let mut seen = HashSet::new();
+                next.retain(|set| {
+                    seen.insert(variant_key(set.iter().map(|(k, w)| (k.as_str(), &w.param))))
+                });
+                sets = next;
             }
-            let mut next = sets.clone();
-            for set in &sets {
-                let mut matched = if clears { Params::new() } else { set.clone() };
-                matched.extend(
-                    own.into_iter()
-                        .flatten()
-                        .map(|(k, v)| (k.clone(), v.clone())),
-                );
-                next.push(matched);
-            }
-            let mut seen = HashSet::new();
-            next.retain(|set| {
-                seen.insert(variant_key(set.iter().map(|(k, w)| (k.as_str(), &w.param))))
-            });
-            sets = next;
         }
         for set in sets.into_iter().filter(|set| !set.is_empty()) {
             let params: Vec<(String, Param)> = set
@@ -1584,7 +1860,7 @@ impl Named {
         }
         for (pattern, settings) in &layer.raw.files.0 {
             let glob = FieldPath::root().key("files").key(pattern);
-            for (key, setting) in &settings.0 {
+            for (key, Tagged(setting, _)) in &settings.0 {
                 self.uses_vale |= key.starts_with("Vale.")
                     || match (key.as_str(), setting) {
                         ("styles", Setting::List(names)) => names.iter().any(|name| name == "Vale"),
@@ -1775,3 +2051,6 @@ fn style_folders(package: &Path, line: Option<usize>, faults: &mut Faults<'_>) -
     folders.sort();
     folders
 }
+
+#[cfg(test)]
+mod tests;

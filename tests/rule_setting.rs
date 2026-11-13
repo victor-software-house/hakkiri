@@ -229,12 +229,12 @@ fn a_later_list_of_styles_keeps_the_rule_an_earlier_glob_enabled() -> TestResult
 }
 
 #[test]
-fn an_empty_list_of_styles_drops_every_rule_an_earlier_glob_enabled() -> TestResult {
+fn an_empty_list_of_styles_drops_every_rule_a_glob_of_lower_rank_enabled() -> TestResult {
     let suite = Suite::new("rule-setting-empty-list");
     let root = project(
         &suite,
         "empty-list",
-        "  '*.md': {styles: [Other], Team.Filler: warning}\n  'a.md': {styles: []}\n  'b.md': {styles: []}\n  'b?md': {Team.Hint: warning}\n",
+        "  '*.md': {styles: [Other], Team.Filler: warning}\n  'a.md': {styles: []}\n  'b.md': {styles: [], Team.Hint: warning}\n",
     );
     root.file("c.md", TEXT);
     let result = run(root.path(), &["check"], &[])?;
@@ -342,12 +342,101 @@ fn on_turns_a_rule_back_on_after_off_at_the_level_of_its_rule_file() -> TestResu
 }
 
 #[test]
-fn a_level_set_before_stays_when_a_later_glob_turns_the_rule_off_and_on() -> TestResult {
+fn a_folder_beats_a_file_type() -> TestResult {
+    let suite = Suite::new("rule-setting-folder");
+    let root = project(
+        &suite,
+        "folder",
+        "  'docs/*': {Team.Filler: error}\n  '*.mdx': {Team.Filler: warning}\n",
+    );
+    root.file("a.mdx", VERY);
+    root.file("docs/a.mdx", VERY);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.mdx:1:9: warning Team.Filler: Remove 'very'.",
+            "docs/a.mdx:1:9: error Team.Filler: Remove 'very'.",
+            "2 alerts in 2 files"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_deeper_glob_beats_a_shallower_one_written_after_it() -> TestResult {
+    let suite = Suite::new("rule-setting-deeper");
+    let root = project(
+        &suite,
+        "deeper",
+        "  'docs/**/*.md': {Team.Filler: error}\n  '*.md': {Team.Filler: warning}\n",
+    );
+    root.file("docs/api/x.md", VERY);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: warning Team.Filler: Remove 'very'.",
+            "b.md:1:9: warning Team.Filler: Remove 'very'.",
+            "docs/api/x.md:1:9: error Team.Filler: Remove 'very'.",
+            "3 alerts in 3 files"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_glob_with_more_literal_characters_wins() -> TestResult {
+    let suite = Suite::new("rule-setting-literal");
+    let root = project(
+        &suite,
+        "literal",
+        "  '*.md': {Team.Filler: error}\n  '*.{md,txt}': {Team.Filler: warning}\n",
+    );
+    root.file("a.txt", VERY);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: error Team.Filler: Remove 'very'.",
+            "a.txt:1:9: warning Team.Filler: Remove 'very'.",
+            "b.md:1:9: error Team.Filler: Remove 'very'.",
+            "3 alerts in 3 files"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_more_specific_off_written_first_still_wins() -> TestResult {
+    let suite = Suite::new("rule-setting-off-first");
+    let root = project(
+        &suite,
+        "off-first",
+        "  'a.md': {Team.Filler: off}\n  '*.md': {Team.Filler: warning}\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "b.md:1:9: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_level_stays_when_globs_of_higher_rank_turn_the_rule_off_and_on() -> TestResult {
     let suite = Suite::new("rule-setting-level-stays");
     let root = project(
         &suite,
         "level-stays",
-        "  '*.md': {Team.Hint: error}\n  'a.md': {Team.Hint: off}\n  'a?md': {Team.Hint: on}\n",
+        "  '*.md': {Team.Hint: error}\n  'a?md': {Team.Hint: off}\n  'a.md': {Team.Hint: on}\n",
     );
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(result.code, 1, "{}{}", result.out, result.err);
