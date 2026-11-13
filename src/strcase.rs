@@ -10,6 +10,8 @@
 //!
 //! [prose]: https://github.com/jdkato/prose/tree/b33e60dbff0492289b227f3681120ac057d8131b/strcase
 
+use std::cmp::Reverse;
+
 use crate::case::{lower_str, title, upper_str};
 use crate::pattern::{Pattern, PatternError};
 use crate::tagger::Tagger;
@@ -85,7 +87,7 @@ struct Vocab {
 impl Vocab {
     fn new(words: &[String]) -> Self {
         let mut longest_first: Vec<&String> = words.iter().collect();
-        longest_first.sort_by_key(|word| std::cmp::Reverse(word.len()));
+        longest_first.sort_by_key(|word| Reverse(word.len()));
         Self {
             entries: longest_first
                 .into_iter()

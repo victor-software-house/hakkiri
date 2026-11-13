@@ -651,7 +651,7 @@ fn kept_words(terms: &[String]) -> Vec<String> {
 }
 
 /// The error of a pattern that a converter refused, for the field it reads.
-fn refused(source: &Source<'_>, field: &str, error: &crate::pattern::PatternError) -> LoadError {
+fn refused(source: &Source<'_>, field: &str, error: &PatternError) -> LoadError {
     source.problem(field, format!("rule `{}`: {error}", source.name))
 }
 

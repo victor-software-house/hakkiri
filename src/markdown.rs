@@ -2,15 +2,17 @@
 
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
+use std::mem;
 use std::ops::Range;
+use std::slice::Iter;
 
 use markdown::mdast::Node as Mdast;
 use markdown::{Constructs, MdxSignal, ParseOptions};
 use tree_sitter::{InputEdit, Node as SyntaxNode, Parser, Point, Tree};
 
 use crate::error::Error;
-use crate::math;
 use crate::tree::{Comment, Node, Scope};
+use crate::{frontmatter, html, html_text, math};
 
 /// Which constructs the parser reads.
 #[derive(Clone, Copy, Debug)]
@@ -233,7 +235,7 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     if !matches!(flavor, Flavor::Comment) {
         // JSON front matter is no construct of markdown-rs, so its values are
         // read from the start of the file, ahead of the body.
-        let mut front = crate::frontmatter::json_nodes(source);
+        let mut front = frontmatter::json_nodes(source);
         front.append(&mut nodes);
         nodes = front;
     }
@@ -260,7 +262,7 @@ fn comments_of(root: &Mdast, source: &str) -> Vec<Comment> {
             && let Some(span) = span_of(node)
             && let Some(html) = source.get(span.clone())
         {
-            for range in crate::html::comments(html) {
+            for range in html::comments(html) {
                 let written = html.get(range.clone()).unwrap_or_default();
                 let inner = written.strip_prefix("<!--").unwrap_or(written);
                 let inner = inner
@@ -298,7 +300,7 @@ fn comments_of(root: &Mdast, source: &str) -> Vec<Comment> {
 fn leaves_first_place(node: &Mdast) -> bool {
     match node {
         Mdast::ThematicBreak(_) | Mdast::Definition(_) => true,
-        Mdast::Html(html) => !crate::html::resets_scope(&html.value),
+        Mdast::Html(html) => !html::resets_scope(&html.value),
         Mdast::Root(_)
         | Mdast::Blockquote(_)
         | Mdast::FootnoteDefinition(_)
@@ -469,7 +471,7 @@ struct Frame<'n> {
     kind: Kind,
     /// The scope of a table cell found below the node.
     cell: Scope,
-    children: std::slice::Iter<'n, Mdast>,
+    children: Iter<'n, Mdast>,
     index: usize,
     inner: Visited,
     /// Whether the node is the first thing inside the node that gives it a
@@ -547,7 +549,7 @@ impl Builder<'_> {
                 };
                 match step {
                     Step::Done(visited) => {
-                        top.inner = std::mem::take(&mut top.inner).append(visited);
+                        top.inner = mem::take(&mut top.inner).append(visited);
                     }
                     Step::Open(kind) => stack.push(Frame::new(child, kind, cell, first)),
                 }
@@ -559,7 +561,7 @@ impl Builder<'_> {
             let visited = self.finish(frame);
             match stack.last_mut() {
                 Some(parent) => {
-                    parent.inner = std::mem::take(&mut parent.inner).append(visited);
+                    parent.inner = mem::take(&mut parent.inner).append(visited);
                 }
                 None => return visited,
             }
@@ -577,7 +579,7 @@ impl Builder<'_> {
     fn flush_at(&self, block: &Mdast) -> Option<usize> {
         let span = span_of(block)?;
         match block {
-            Mdast::Html(html) => crate::html_text::flushes_at(self.source, &span, &html.value),
+            Mdast::Html(html) => html_text::flushes_at(self.source, &span, &html.value),
             Mdast::ThematicBreak(_)
             | Mdast::Definition(_)
             | Mdast::FootnoteDefinition(_)
@@ -647,7 +649,7 @@ impl Builder<'_> {
         let span = span_of(node);
         let mut visited = Visited::cut(span.clone());
         if let Some(span) = span
-            && let Some(nodes) = crate::html_text::nodes(self.source, &span, value, first, then)
+            && let Some(nodes) = html_text::nodes(self.source, &span, value, first, then)
         {
             visited.nodes = nodes;
         }
@@ -678,7 +680,7 @@ impl Builder<'_> {
             Mdast::Html(html) => {
                 let span = span_of(node);
                 let nodes = span.as_ref().map_or_else(Vec::new, |span| {
-                    crate::html_text::tag_titles(self.source, span, &html.value)
+                    html_text::tag_titles(self.source, span, &html.value)
                 });
                 Step::Done(Visited {
                     nodes,
@@ -732,7 +734,7 @@ impl Builder<'_> {
                         .last_mut()
                         .filter(|node| node.scope == Scope::Link)
                 {
-                    let (titles, rest) = std::mem::take(&mut link.children)
+                    let (titles, rest) = mem::take(&mut link.children)
                         .into_iter()
                         .partition(|child| child.scope == Scope::Title);
                     link.children = rest;
@@ -861,12 +863,12 @@ impl Builder<'_> {
         };
         let inline_html = Self::reads_inline_html(scope);
         let flushes = if inline_html {
-            crate::html::flush_tags(self.source, &tags)
+            html::flush_tags(self.source, &tags)
         } else {
             Vec::new()
         };
         let reads = if inline_html {
-            let (kept, reads) = crate::html::inline_reads(self.source, span.start, segments, &tags);
+            let (kept, reads) = html::inline_reads(self.source, span.start, segments, &tags);
             segments = kept;
             reads
         } else if matches!(scope, Scope::TableRow | Scope::Blockquote | Scope::List) {
@@ -1262,7 +1264,7 @@ impl Builder<'_> {
             // The `title` attribute of the opening tag is a title.
             let opening = span.start..first.as_ref().map_or(span.end, |first| first.start);
             if let Some(tag) = self.source.get(opening.clone()) {
-                let titles = crate::html_text::tag_titles(self.source, &opening, tag);
+                let titles = html_text::tag_titles(self.source, &opening, tag);
                 visited.nodes.splice(0..0, titles);
             }
             if let (Some(first), Some(last)) = (first, last) {

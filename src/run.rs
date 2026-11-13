@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use std::num::NonZeroUsize;
 use std::path::Path;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::{fs, io, thread};
+use std::{fs, io, panic, thread};
 
 use hakkiri::alert::Alert;
 use hakkiri::control::apply_levels;
@@ -189,7 +189,7 @@ fn parallel<T: Sync, R: Send>(items: &[T], work: impl Fn(&T) -> R + Sync) -> io:
         for worker in workers {
             match worker.join() {
                 Ok(out) => done.extend(out),
-                Err(panic) => std::panic::resume_unwind(panic),
+                Err(panic) => panic::resume_unwind(panic),
             }
         }
         Ok(done)

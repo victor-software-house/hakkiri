@@ -32,6 +32,7 @@
 mod tests;
 
 use std::collections::HashMap;
+use std::mem;
 use std::ops::Range;
 
 use crate::entity;
@@ -1320,7 +1321,7 @@ impl Walker {
 
     fn text(&mut self, html: &str, range: Range<usize>) {
         let class_skipped = self.previous_skipped;
-        let href = std::mem::take(&mut self.previous_href);
+        let href = mem::take(&mut self.previous_href);
         self.previous_skipped = false;
         if self.in_block {
             return;
@@ -1336,7 +1337,7 @@ impl Walker {
         ) else {
             return;
         };
-        let code = std::mem::take(&mut self.code_next);
+        let code = mem::take(&mut self.code_next);
         self.walk.resets = true;
         self.nonblank |= reading.masked || body.chars().any(|c| !c.is_whitespace());
         self.last = if reading.masked {
@@ -1363,8 +1364,8 @@ impl Walker {
         self.walk.blocks.push(Block {
             flushed_at: (!at_end).then_some(self.token_at),
             place: Place::of(&self.history),
-            pieces: std::mem::take(&mut self.pieces),
-            captures: std::mem::take(&mut self.captures),
+            pieces: mem::take(&mut self.pieces),
+            captures: mem::take(&mut self.captures),
         });
     }
 

@@ -20,10 +20,12 @@ use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
+use std::{io, iter, thread};
 
 use common::run;
 use ctl_core::fixture::{Root, Suite};
 use sha2::{Digest, Sha256};
+use zip::write::SimpleFileOptions;
 
 type TestResult = Result<(), Box<dyn Error>>;
 
@@ -577,7 +579,7 @@ impl Server {
         let stop = Arc::new(AtomicBool::new(false));
         let held = Arc::clone(&routes);
         let done = Arc::clone(&stop);
-        let thread = std::thread::spawn(move || {
+        let thread = thread::spawn(move || {
             for stream in listener.incoming() {
                 if done.load(Ordering::SeqCst) {
                     break;
@@ -621,7 +623,7 @@ impl Drop for Server {
 }
 
 /// Reads one request from `stream` and writes the body of its route, or 404.
-fn answer(mut stream: TcpStream, routes: &Routes) -> std::io::Result<()> {
+fn answer(mut stream: TcpStream, routes: &Routes) -> io::Result<()> {
     let mut request = Vec::new();
     let mut buffer = [0_u8; 1024];
     while !request.windows(4).any(|window| window == b"\r\n\r\n") {
@@ -655,11 +657,8 @@ fn answer(mut stream: TcpStream, routes: &Routes) -> std::io::Result<()> {
 /// under `Pkg`.
 fn package_zip(files: &[(&str, &str)]) -> Result<Vec<u8>, Box<dyn Error>> {
     let mut writer = zip::ZipWriter::new(Cursor::new(Vec::new()));
-    for (name, text) in std::iter::once(&("styles/.keep", "")).chain(files) {
-        writer.start_file(
-            format!("Pkg/{name}"),
-            zip::write::SimpleFileOptions::default(),
-        )?;
+    for (name, text) in iter::once(&("styles/.keep", "")).chain(files) {
+        writer.start_file(format!("Pkg/{name}"), SimpleFileOptions::default())?;
         writer.write_all(text.as_bytes())?;
     }
     Ok(writer.finish()?.into_inner())

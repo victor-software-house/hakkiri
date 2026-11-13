@@ -15,7 +15,7 @@ use std::{fmt, fs};
 
 use ctl_core::input::{FieldPath, Input};
 use hakkiri::dictionary::Dictionary;
-use hakkiri::rule::{Exceptions, LoadProblem};
+use hakkiri::rule::{Exceptions, LoadError, LoadProblem};
 use serde::Deserialize;
 use serde::de::{self, Deserializer, IgnoredAny, MapAccess, SeqAccess, Visitor};
 
@@ -146,7 +146,7 @@ pub(super) fn read(
     let input = Input::new(&name, text);
     let file: File = input
         .parse()
-        .map_err(|error| hakkiri::rule::LoadError::from(error).problems)?;
+        .map_err(|error| LoadError::from(error).problems)?;
     let mut reading = Reading {
         input: &input,
         problems: Vec::new(),

@@ -11,6 +11,9 @@
 mod common;
 
 use std::error::Error;
+use std::fs;
+use std::os::unix::fs::symlink;
+use std::path::Path;
 
 use common::{binary, run};
 use ctl_core::fixture::{Root, Suite};
@@ -437,8 +440,8 @@ fn a_symlinked_style_folder_is_named_by_its_link() -> TestResult {
     let root = suite.scenario("symlink");
     root.file("shared/TeamStyle/Foo.yml", HEDGE);
     root.file(".ctl/hakkiri.yaml", CONFIG);
-    std::fs::create_dir_all(root.path().join("styles"))?;
-    std::os::unix::fs::symlink("../shared/TeamStyle", root.path().join("styles/Team"))?;
+    fs::create_dir_all(root.path().join("styles"))?;
+    symlink("../shared/TeamStyle", root.path().join("styles/Team"))?;
     root.file(
         "through.test.yml",
         "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Foo\n  absent: Team.Foo.v2\n",
@@ -501,7 +504,7 @@ fn a_rule_path_through_a_symlink_and_back_out_is_read_from_the_folded_path() -> 
         "extends: existence\nmessage: \"Be plain: '%s'.\"\nlevel: warning\ntokens: [truly]\n",
     );
     root.file("shared/elsewhere/deeper/.keep", "");
-    std::os::unix::fs::symlink("shared/elsewhere/deeper", root.path().join("via"))?;
+    symlink("shared/elsewhere/deeper", root.path().join("via"))?;
     root.file(
         "fold.test.yml",
         "- name: through the link and back\n  rule: via/../Team/Foo.yml\n  input: This is very good.\n  want: \"1:9:Team.Foo:Remove 'very'.\"\n",
@@ -597,7 +600,7 @@ fn a_malformed_case_in_a_rule_is_refused_at_load() -> TestResult {
 #[test]
 fn a_style_folder_of_three_rules_covers_every_rule() -> TestResult {
     let result = run(
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR")),
+        Path::new(env!("CARGO_MANIFEST_DIR")),
         &["test", "--coverage", "tests/fixtures/cases"],
         &[],
     )?;
@@ -663,9 +666,9 @@ fn a_project_reached_through_a_link_names_a_nested_rule_as_check_does() -> TestR
         "real/through.test.yml",
         "- name: through the config\n  input: Say perhaps later.\n  contains: Team.Sub.Bar\n",
     );
-    std::fs::create_dir_all(base.path().join("real/styles"))?;
-    std::os::unix::fs::symlink("../shared/Team", base.path().join("real/styles/Team"))?;
-    std::os::unix::fs::symlink("real", base.path().join("link"))?;
+    fs::create_dir_all(base.path().join("real/styles"))?;
+    symlink("../shared/Team", base.path().join("real/styles/Team"))?;
+    symlink("real", base.path().join("link"))?;
     let rule = base.path().join("link/styles/Team/Sub/Bar.yml");
     let result = run(
         &base.path().join("real"),
@@ -732,10 +735,9 @@ fn json_lists_an_uncovered_rule_as_an_object_with_files_only_for_a_shared_name()
 fn the_cases_of_two_rules_with_indexed_verbs_pass() -> TestResult {
     let suite = Suite::new("test-indexed");
     let root = suite.scenario("indexed");
-    let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/sequence-verbs/rules");
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/sequence-verbs/rules");
     for name in ["NounStack", "ThingsSpeakNoun"] {
-        let rule = std::fs::read_to_string(fixture.join(format!("{name}.yml")))?;
+        let rule = fs::read_to_string(fixture.join(format!("{name}.yml")))?;
         root.file(format!("styles/ProseStyle/{name}.yml"), &rule);
     }
     let result = run(root.path(), &["test"], &[])?;
@@ -751,8 +753,8 @@ fn the_cases_of_two_rules_with_indexed_verbs_pass() -> TestResult {
 fn the_cases_of_a_rule_that_reads_a_fence_across_a_blank_line_pass() -> TestResult {
     let suite = Suite::new("test-bare-url-comment");
     let root = suite.scenario("bare-url-comment");
-    let rule = std::fs::read_to_string(
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+    let rule = fs::read_to_string(
+        Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("tests/fixtures/bare-url-comment/BareURLInComment.yml"),
     )?;
     root.file("styles/ProseStyle/BareURLInComment.yml", &rule);

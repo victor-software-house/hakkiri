@@ -4,6 +4,7 @@
 //! [prose] at `b33e60d`, the template the English model was trained with.
 //!
 //! [prose]: https://github.com/jdkato/prose/blob/b33e60dbff0492289b227f3681120ac057d8131b/internal/perceptron/features.go
+use crate::case;
 
 /// The context word before the first word of a sentence.
 pub(super) const START: &str = "-START-";
@@ -32,7 +33,7 @@ pub(super) fn normalize(word: &str) -> String {
     if first.is_ascii_digit() {
         return "!DIGITS".to_owned();
     }
-    crate::case::lower_str(word)
+    case::lower_str(word)
 }
 
 /// Whether `word` is an optional sign and then digits.

@@ -1,7 +1,7 @@
 //! The document tree: scopes, nodes and spans.
 
-use std::fmt;
 use std::ops::Range;
+use std::{fmt, mem};
 
 use crate::language::Language;
 
@@ -458,12 +458,12 @@ pub(crate) fn remap_nodes(
         while let Some(node) = level.get_mut(at) {
             node.remap(map);
             node.closes = place(node.closes).unwrap_or(node.span.end);
-            node.flushes = std::mem::take(&mut node.flushes)
+            node.flushes = mem::take(&mut node.flushes)
                 .into_iter()
                 .filter_map(place)
                 .collect();
             if node.segments.is_empty() {
-                let children = std::mem::take(&mut node.children);
+                let children = mem::take(&mut node.children);
                 level.splice(at..=at, children);
             } else {
                 at += 1;

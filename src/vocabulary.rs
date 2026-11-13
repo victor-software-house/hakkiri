@@ -9,6 +9,7 @@
 
 mod yaml;
 
+use std::path::Component::Normal;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
@@ -40,10 +41,7 @@ pub(crate) struct Vocabulary {
 /// folder holds one.
 pub(crate) fn find(package: &Path, name: &str) -> Option<PathBuf> {
     let mut parts = Path::new(name).components();
-    let is_name = matches!(
-        (parts.next(), parts.next()),
-        (Some(std::path::Component::Normal(_)), None)
-    );
+    let is_name = matches!((parts.next(), parts.next()), (Some(Normal(_)), None));
     let folder = package.join(SETTINGS_FOLDER).join(FOLDER).join(name);
     (is_name && folder.is_dir()).then_some(folder)
 }

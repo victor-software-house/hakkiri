@@ -23,6 +23,7 @@
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
+use std::ops::Range;
 use std::path::Path;
 
 use super::find_tagged;
@@ -147,13 +148,13 @@ const NOUN_SAYS: &str = "extends: sequence\nmessage: \"'%s %s' speaks.\"\ntokens
 fn matches_with_code(
     text: &str,
     sentence: &str,
-    code: std::ops::Range<usize>,
+    code: Range<usize>,
 ) -> Result<Vec<String>, Box<dyn Error>> {
     let rule = Rule::from_text("Seq.Rule", "Rule.yml", text)?;
     let Check::Sequence(check) = &rule.check else {
         return Err("Rule is not a sequence rule".into());
     };
-    let is_code = |range: &std::ops::Range<usize>| range.start < code.end && code.start < range.end;
+    let is_code = |range: &Range<usize>| range.start < code.end && code.start < range.end;
     let tagged = Tagger::english()
         .map_err(ToString::to_string)?
         .tag_code(sentence, is_code);

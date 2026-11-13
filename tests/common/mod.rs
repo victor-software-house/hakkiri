@@ -1,6 +1,7 @@
 //! What every integration test of the binary shares: the binary with a clean
 //! environment, and a run that reads its status and both streams.
 
+use std::env;
 use std::error::Error;
 use std::path::Path;
 use std::process::Command;
@@ -23,7 +24,7 @@ pub(crate) fn binary() -> Command {
     for name in CALLER_ENV {
         command.env_remove(name);
     }
-    for (name, _) in std::env::vars_os() {
+    for (name, _) in env::vars_os() {
         if name.to_string_lossy().starts_with("HAKKIRI_") {
             command.env_remove(name);
         }

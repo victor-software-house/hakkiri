@@ -2,12 +2,14 @@
 //! of `Test_applyPatterns` in Vale, and the places the rewritten text came
 //! from.
 
+use std::ops::Range;
+
 use super::{Changed, rewrite};
 use crate::pattern::Pattern;
 
 /// The places in the file of the bytes `range` of the rewritten text, as pairs
 /// of a start and an end.
-fn places(out: &Changed, range: std::ops::Range<usize>) -> Vec<(usize, usize)> {
+fn places(out: &Changed, range: Range<usize>) -> Vec<(usize, usize)> {
     out.origin(range)
         .into_iter()
         .map(|place| (place.start, place.end))

@@ -2,8 +2,8 @@
 //! package that holds the rule and from no other place.
 
 use std::collections::HashSet;
-use std::fs;
 use std::path::{Component, Path, PathBuf};
+use std::{fs, io};
 
 use super::build::Source;
 use super::schema::SpellingFields;
@@ -344,7 +344,7 @@ fn read_lists(
     listed: &mut HashSet<String>,
     visited: &mut HashSet<PathBuf>,
 ) -> Result<(), LoadError> {
-    let refuse = |path: &Path, error: &std::io::Error| {
+    let refuse = |path: &Path, error: &io::Error| {
         source.problem(
             "ignore",
             format!("rule `{}`: `{}`: {error}", source.name, path.display()),

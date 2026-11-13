@@ -3,9 +3,9 @@
 
 use std::collections::HashSet;
 use std::ffi::OsStr;
-use std::fs;
 use std::io::Read;
 use std::path::{Component, Path, PathBuf};
+use std::{env, fs};
 
 use hakkiri::Language;
 use ignore::WalkBuilder;
@@ -254,7 +254,7 @@ pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf], options: Options
     let mut finder = Finder {
         project,
         options,
-        current: std::env::current_dir().ok(),
+        current: env::current_dir().ok(),
         warnings: Vec::new(),
         seen: HashSet::new(),
         warned: HashSet::new(),

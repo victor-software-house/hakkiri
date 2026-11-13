@@ -5,7 +5,8 @@
 //! `round`. An integer divides as an integer, as in Tengo, and a number with
 //! a point is a float.
 
-use std::fmt;
+use std::f64::consts::{E, GOLDEN_RATIO, LN_2, LN_10, PI, SQRT_2};
+use std::{error, fmt};
 
 /// What a formula gives.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -61,7 +62,7 @@ impl fmt::Display for FormulaError {
     }
 }
 
-impl std::error::Error for FormulaError {}
+impl error::Error for FormulaError {}
 
 /// Why a formula did not give a value.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -81,7 +82,7 @@ impl fmt::Display for EvalError {
     }
 }
 
-impl std::error::Error for EvalError {}
+impl error::Error for EvalError {}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Op {
@@ -165,12 +166,12 @@ const TWO: [(&str, Two); 6] = [
 
 /// The constants of Tengo's `math` module.
 const CONSTANTS: [(&str, f64); 6] = [
-    ("e", std::f64::consts::E),
-    ("pi", std::f64::consts::PI),
-    ("phi", std::f64::consts::GOLDEN_RATIO),
-    ("sqrt2", std::f64::consts::SQRT_2),
-    ("ln2", std::f64::consts::LN_2),
-    ("ln10", std::f64::consts::LN_10),
+    ("e", E),
+    ("pi", PI),
+    ("phi", GOLDEN_RATIO),
+    ("sqrt2", SQRT_2),
+    ("ln2", LN_2),
+    ("ln10", LN_10),
 ];
 
 #[derive(Clone, Debug, PartialEq)]

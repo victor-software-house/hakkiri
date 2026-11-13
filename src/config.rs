@@ -11,7 +11,7 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
-use std::{fmt, fs, io};
+use std::{fmt, fs, io, path, slice};
 
 use ctl_core::input::{FieldPath, Input};
 use garde::Validate;
@@ -433,7 +433,7 @@ impl Project {
     /// its own name is kept: a symlink to a file is matched by the name it is
     /// reached by, as Vale matches it.
     pub(crate) fn relative(&self, file: &Path) -> Option<String> {
-        let absolute = std::path::absolute(file).ok()?;
+        let absolute = path::absolute(file).ok()?;
         let real = fs::canonicalize(absolute.parent()?)
             .ok()?
             .join(absolute.file_name()?);
@@ -1477,7 +1477,7 @@ fn build_variants(
                                     .with_params(
                                         &loaded.packages,
                                         &loaded.accepted,
-                                        std::slice::from_ref(one),
+                                        slice::from_ref(one),
                                     )
                                     .err()
                             })

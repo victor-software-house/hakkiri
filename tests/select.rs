@@ -12,6 +12,7 @@
 use std::error::Error;
 use std::fs;
 use std::path::Path;
+use std::time::{Duration, Instant};
 
 use hakkiri::scope::Selector;
 use hakkiri::select::{Block, select};
@@ -108,11 +109,11 @@ fn title_selects_the_title_of_a_link_an_image_and_a_definition() -> TestResult {
 fn a_title_of_a_long_run_of_backslashes_costs_its_length() -> TestResult {
     let run = "\\\\".repeat(100_000);
     let source = format!("[a](u.html \"{run}\")\n");
-    let started = std::time::Instant::now();
+    let started = Instant::now();
     let found = blocks(&["title"], "a.md", &source)?;
     assert_eq!(texts(&found), [run.as_str()]);
     assert!(
-        started.elapsed() < std::time::Duration::from_secs(5),
+        started.elapsed() < Duration::from_secs(5),
         "{:?}",
         started.elapsed()
     );

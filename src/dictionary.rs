@@ -31,6 +31,7 @@ use affix::{CompoundToken, Flag, has_flag};
 use regex::Regex;
 pub use speller::{Book, Speller};
 
+use crate::case;
 use crate::case::{lower_str, upper_str};
 
 /// The English affix file that ships in the binary.
@@ -225,7 +226,7 @@ fn capitals(word: &str) -> Capitals {
 fn capitalize(word: &str) -> String {
     let mut chars = word.chars();
     chars.next().map_or_else(String::new, |first| {
-        format!("{}{}", crate::case::upper(first), chars.as_str())
+        format!("{}{}", case::upper(first), chars.as_str())
     })
 }
 

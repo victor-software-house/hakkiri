@@ -2,12 +2,12 @@
 //! rules no case made flag anything.
 
 use std::collections::{HashMap, HashSet};
-use std::fs;
 use std::path::{Component, Path, PathBuf};
+use std::{fs, path};
 
 use hakkiri::alert::Alert;
 use hakkiri::rule::{self, LoadError, Rule, TestCase, alert_lines, cases_from_text};
-use hakkiri::{Language, parse, parse_ignoring};
+use hakkiri::{Language, engine, parse, parse_ignoring};
 
 use crate::cli::{OnUnknown, TestArgs};
 use crate::config::{self, DEFAULT, Project};
@@ -192,7 +192,7 @@ fn is_rule_file(file: &Path) -> bool {
 /// given, so a style folder that is a symlink keeps the name of the link.
 fn absolute(file: &Path) -> Option<PathBuf> {
     let mut clean = PathBuf::new();
-    for part in std::path::absolute(file).ok()?.components() {
+    for part in path::absolute(file).ok()?.components() {
         match part {
             Component::ParentDir => {
                 clean.pop();
@@ -503,6 +503,5 @@ fn readable(tree: hakkiri::Tree) -> Result<hakkiri::Tree, String> {
 
 /// Lints the case's input with `rule` alone, at every level.
 fn lint_alone(rule: &Rule, tree: &hakkiri::Tree, case: &TestCase) -> Result<Vec<Alert>, String> {
-    hakkiri::engine::lint(&[rule], tree, &case.input, &case.format)
-        .map_err(|error| error.to_string())
+    engine::lint(&[rule], tree, &case.input, &case.format).map_err(|error| error.to_string())
 }

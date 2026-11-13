@@ -1,6 +1,9 @@
 //! Selection: the blocks of text a rule's scope reads in one file.
 
 use std::borrow::Cow;
+#[cfg(test)]
+use std::cell::Cell;
+use std::cmp::Reverse;
 use std::ops::Range;
 use std::{error, fmt};
 
@@ -13,7 +16,7 @@ use crate::tree::{Node, Reading, Scope, Tree};
 thread_local! {
     /// How many times this thread called [`select`], for the tests that count
     /// the selections a run makes.
-    pub(crate) static SELECTIONS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+    pub(crate) static SELECTIONS: Cell<usize> = const { Cell::new(0) };
 }
 
 /// One piece of text a rule reads.
@@ -384,7 +387,7 @@ pub(crate) fn replacements(node: &Node, blank: &[Inline]) -> Vec<(Range<usize>, 
         }
         pending.extend(child.children.iter());
     }
-    found.sort_by_key(|(range, _)| (range.start, std::cmp::Reverse(range.end)));
+    found.sort_by_key(|(range, _)| (range.start, Reverse(range.end)));
     let mut kept: Vec<(Range<usize>, Replace)> = Vec::new();
     for (range, kind) in found {
         if kept.last().is_none_or(|(last, _)| last.end <= range.start) {

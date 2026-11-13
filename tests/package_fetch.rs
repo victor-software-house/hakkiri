@@ -20,6 +20,7 @@ use std::path::Path;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::thread::JoinHandle;
+use std::{io, thread};
 
 use common::run;
 use ctl_core::fixture::{Root, Suite};
@@ -80,7 +81,7 @@ impl Server {
         let stop = Arc::new(AtomicBool::new(false));
         let seen = Arc::clone(&hits);
         let done = Arc::clone(&stop);
-        let thread = std::thread::spawn(move || {
+        let thread = thread::spawn(move || {
             for stream in listener.incoming() {
                 if done.load(Ordering::SeqCst) {
                     break;
@@ -129,7 +130,7 @@ fn answer(
     mut stream: TcpStream,
     routes: &HashMap<&'static str, Route>,
     hits: &AtomicUsize,
-) -> std::io::Result<()> {
+) -> io::Result<()> {
     let mut request = Vec::new();
     let mut buffer = [0_u8; 1024];
     while !request.windows(4).any(|window| window == b"\r\n\r\n") {

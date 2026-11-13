@@ -10,6 +10,8 @@
 )]
 
 use std::error::Error;
+use std::fs;
+use std::os::unix::fs::symlink;
 
 mod common;
 
@@ -774,7 +776,7 @@ fn a_walk_does_not_enter_a_symlink_to_a_package_folder() -> TestResult {
     let root = project(&suite, "link-package", CONFIG);
     root.file("docs/a.md", "This is very good.\n");
     root.file("styles/Team/notes.md", "This is very good.\n");
-    std::os::unix::fs::symlink("../styles", root.path().join("docs/styles"))?;
+    symlink("../styles", root.path().join("docs/styles"))?;
     let walked = run(root.path(), &["check", "docs"], &[])?;
     assert_eq!(walked.code, 0, "{}", walked.err);
     assert_eq!(walked.lines().last(), Some(&"1 alert in 1 file"));
@@ -831,7 +833,7 @@ fn a_config_elsewhere_puts_the_current_directory_outside_the_root() -> TestResul
 fn a_root_reached_through_a_symlink_still_matches() -> TestResult {
     let suite = Suite::new("check-root-link");
     let root = nested(&suite, "root-link");
-    std::os::unix::fs::symlink(root.path().join("project"), root.path().join("link"))?;
+    symlink(root.path().join("project"), root.path().join("link"))?;
     let result = run(
         root.path(),
         &["check", "link/in.md"],
@@ -855,9 +857,9 @@ fn a_file_symlink_matches_by_the_name_it_is_reached_by() -> TestResult {
     );
     root.file("shared/a.md", "This is very good.\n");
     root.file("outside/b.md", "This is very good.\n");
-    std::fs::create_dir_all(root.path().join("docs"))?;
-    std::os::unix::fs::symlink("../shared/a.md", root.path().join("docs/a.md"))?;
-    std::os::unix::fs::symlink("../outside/b.md", root.path().join("docs/b.md"))?;
+    fs::create_dir_all(root.path().join("docs"))?;
+    symlink("../shared/a.md", root.path().join("docs/a.md"))?;
+    symlink("../outside/b.md", root.path().join("docs/b.md"))?;
     let result = run(root.path(), &["check", "docs", "shared/a.md"], &[])?;
     assert_eq!(result.code, 0, "{}", result.err);
     assert_eq!(
@@ -929,10 +931,10 @@ fn a_walk_from_a_folder_that_holds_the_root_leaves_the_siblings_alone() -> TestR
     let suite = Suite::new("check-prune");
     let root = nested(&suite, "prune");
     let locked = root.path().join("sibling/locked");
-    std::fs::create_dir_all(&locked)?;
-    std::fs::set_permissions(&locked, Permissions::from_mode(0o000))?;
+    fs::create_dir_all(&locked)?;
+    fs::set_permissions(&locked, Permissions::from_mode(0o000))?;
     let result = run(&root.path().join("project"), &["check", ".."], &[]);
-    std::fs::set_permissions(&locked, Permissions::from_mode(0o755))?;
+    fs::set_permissions(&locked, Permissions::from_mode(0o755))?;
     let result = result?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
     assert_eq!(result.lines().last(), Some(&"1 alert in 1 file"));
@@ -1706,12 +1708,12 @@ fn an_unreadable_folder_is_a_failure_that_names_it() -> TestResult {
     let root = project(&suite, "unreadable", CONFIG);
     root.file("docs/a.md", "Fine.\n");
     let locked = root.path().join("docs/locked");
-    std::fs::create_dir_all(&locked)?;
-    std::fs::set_permissions(&locked, Permissions::from_mode(0o000))?;
+    fs::create_dir_all(&locked)?;
+    fs::set_permissions(&locked, Permissions::from_mode(0o000))?;
     // A caller that ignores permissions, such as root, reads the folder.
-    let readable = std::fs::read_dir(&locked).is_ok();
+    let readable = fs::read_dir(&locked).is_ok();
     let result = run(root.path(), &["check", "docs"], &[]);
-    std::fs::set_permissions(&locked, Permissions::from_mode(0o755))?;
+    fs::set_permissions(&locked, Permissions::from_mode(0o755))?;
     if readable {
         return Ok(());
     }

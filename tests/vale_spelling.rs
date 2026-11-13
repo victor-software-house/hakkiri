@@ -32,6 +32,7 @@ mod common;
 use std::collections::BTreeSet;
 use std::error::Error;
 use std::fs;
+use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
 
 use common::run;
@@ -366,7 +367,7 @@ fn a_word_list_link_that_reaches_outside_the_package_is_refused() -> TestResult 
         ".ctl/link.yaml",
         "packages:\n  - path: pack\nfiles:\n  \"text/*.md\":\n    styles: [Vale]\n",
     );
-    std::os::unix::fs::symlink(
+    symlink(
         "../../../outside",
         root.path().join("pack/config/ignore/out"),
     )?;

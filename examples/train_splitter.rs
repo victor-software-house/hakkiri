@@ -16,9 +16,9 @@
 
 use std::error::Error;
 use std::fmt::Write as _;
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
+use std::{env, fs};
 
 use hakkiri::splitter::{Summary, train};
 use hakkiri::{Language, Node, Scope, Tree, parse};
@@ -50,7 +50,7 @@ struct Counts {
 fn arguments() -> Outcome<Arguments> {
     let mut corpora = Vec::new();
     let (mut sources, mut model, mut report) = (None, None, None);
-    let mut args = std::env::args().skip(1);
+    let mut args = env::args().skip(1);
     while let Some(flag) = args.next() {
         let value = args.next().ok_or_else(|| format!("{flag} needs a value"))?;
         match flag.as_str() {

@@ -18,8 +18,9 @@ mod package;
 mod schema;
 
 use std::collections::HashMap;
+use std::ops::Range;
 use std::path::{Path, PathBuf};
-use std::{error, fmt, fs};
+use std::{error, fmt, fs, io};
 
 use ctl_core::input::{Input, InputError};
 use serde::de::DeserializeOwned;
@@ -524,7 +525,7 @@ impl Form {
 
     /// The steps of token `token`.
     #[must_use]
-    pub fn block(&self, token: usize) -> std::ops::Range<usize> {
+    pub fn block(&self, token: usize) -> Range<usize> {
         let begin = token.checked_sub(1).map_or(0, |before| self.ends[before]);
         begin..self.ends[token]
     }
@@ -1024,7 +1025,7 @@ fn is_rule_file(path: &Path) -> bool {
 /// entries by name, a subfolder where it sits, and no folder whose name starts
 /// with `.` or `_`.
 /// A `*.test.yml` file holds cases and is no rule.
-fn rule_files(folder: &Path, files: &mut Vec<PathBuf>) -> Result<(), (PathBuf, std::io::Error)> {
+fn rule_files(folder: &Path, files: &mut Vec<PathBuf>) -> Result<(), (PathBuf, io::Error)> {
     let fail = |error| (folder.to_path_buf(), error);
     let mut entries = fs::read_dir(folder)
         .map_err(fail)?
