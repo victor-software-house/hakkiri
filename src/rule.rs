@@ -100,8 +100,9 @@ pub enum Param {
 }
 
 /// The fields of a rule that a parameter may not set: lists, mappings, the
-/// rule's identity and its prose, as Vale 3.26.0 lists them, and the
-/// `forms` of a `sequence` rule, a list that Vale does not have.
+/// rule's identity and its prose.
+/// They are the fields that Vale 3.26.0 lists, and the `forms` of a
+/// `sequence` rule, a list that Vale does not have.
 /// Changing one is authoring, which a rule that extends another does.
 const NOT_PARAMETERS: [&str; 15] = [
     "extends",

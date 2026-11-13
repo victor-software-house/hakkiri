@@ -1032,11 +1032,11 @@ impl Builder<'_> {
     /// Whether the link `node`, written as `text`, is its own address, which
     /// Vale's converter keeps out of the text.
     ///
-    /// Vale drops a link's text when it equals the link's `href` as goldmark
-    /// writes it, percent-encoded by [`goldmark_href`], so the text is
-    /// compared with that and not with the destination: `[a.md](a.md)` and
-    /// `[a%20b](a%20b)` are their own address, and `[ä.md](ä.md)` and
-    /// `[a b](<a b>)` are not.
+    /// Vale drops the text of a link when it equals the link's `href`.
+    /// goldmark writes that `href` percent-encoded, as [`goldmark_href`]
+    /// does, so the text is compared with it and not with the destination.
+    /// Thus `[a.md](a.md)` and `[a%20b](a%20b)` are their own address, and
+    /// `[ä.md](ä.md)` and `[a b](<a b>)` are not.
     /// A link with brackets is when its text repeats that address, whatever
     /// the destination is, and Vale reads it as a URL.
     /// An autolink is when that address is what is written, which holds for
