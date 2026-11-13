@@ -180,6 +180,19 @@ fn point_at_one_word() -> TestResult {
 }
 
 #[test]
+fn a_target_narrows_the_range_and_the_message_reads_every_word() -> TestResult {
+    let text = rule(
+        "Write '%s%s' as one word.",
+        "tokens: [{pattern: your}, {pattern: self, target: true}]\n",
+    );
+    assert_eq!(
+        found(&text, "Do it your self.\n")?,
+        [pair("self", "Write 'yourself' as one word.")]
+    );
+    Ok(())
+}
+
+#[test]
 fn a_universal_noun() -> TestResult {
     let text = rule("Found.", "tokens: [{pattern: the}, {upos: NOUN}]\n");
     assert_eq!(
