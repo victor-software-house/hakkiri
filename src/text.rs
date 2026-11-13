@@ -256,6 +256,12 @@ impl Text {
         Some(start..last)
     }
 
+    /// The bytes of the text that read a code span, in text order.
+    #[must_use]
+    pub fn code_ranges(&self) -> &[Range<usize>] {
+        &self.code
+    }
+
     /// Whether the bytes `range` of the text overlap a code span.
     #[must_use]
     pub fn overlaps_code(&self, range: &Range<usize>) -> bool {
@@ -324,6 +330,29 @@ impl Text {
         }
         sized.push_str(self.content.get(cursor..).unwrap_or_default());
         Cow::Owned(sized)
+    }
+
+    /// The byte ranges of the code spans in [`Self::code_sized`] at the same
+    /// `size`: each span is the whole of its reading there.
+    pub(crate) fn code_sized_ranges(&self, size: u8) -> Vec<Range<usize>> {
+        if size == 1 {
+            return self.code.clone();
+        }
+        let reading = if size == 0 {
+            1
+        } else {
+            usize::from(size) * 2 - 1
+        };
+        let mut at = 0;
+        let mut previous = 0;
+        let mut ranges = Vec::with_capacity(self.code.len());
+        for code in &self.code {
+            at += code.start.saturating_sub(previous);
+            ranges.push(at..at + reading);
+            at += reading;
+            previous = code.end;
+        }
+        ranges
     }
 
     /// The part of this text in the bytes `range`, or `None` when `range` is

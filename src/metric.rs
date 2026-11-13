@@ -1,6 +1,7 @@
 //! Metrics: the variables a formula reads, and the test of a measured text.
 
 use std::collections::HashMap;
+use std::ops::Range;
 
 use crate::formula::{Formula, Value};
 use crate::readability::{Counts, quoted_words};
@@ -72,9 +73,13 @@ pub(crate) type Variables = HashMap<&'static str, f64>;
 /// counts, the scores and the element counts.
 ///
 /// Returns `None` when the sentence model does not load.
-pub(crate) fn variables(content: &str, elements: Elements) -> Option<Variables> {
+pub(crate) fn variables(
+    content: &str,
+    code: &[Range<usize>],
+    elements: Elements,
+) -> Option<Variables> {
     let model = Model::english().ok()?;
-    let counts = Counts::of(content, model);
+    let counts = Counts::with_code(content, code, model);
     let mut found = HashMap::new();
     for (name, value) in [
         ("words", counts.words),

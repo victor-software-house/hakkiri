@@ -17,6 +17,7 @@ mod tests;
 use std::ops::Range;
 
 pub use model::{FormatError, Model};
+use token::{Mark, NUMBER};
 pub use train::{Summary, Trained, train};
 
 impl Model {
@@ -29,7 +30,18 @@ impl Model {
     /// The cost is linear in the length of `text`.
     #[must_use]
     pub fn split(&self, text: &str) -> Vec<Range<usize>> {
-        let tokens = token::tokens(text);
+        self.split_code(text, &[])
+    }
+
+    /// Cuts `text` into sentences, as [`Model::split`] does, where each of the
+    /// byte ranges `code`, in text order, reads a code span.
+    ///
+    /// A code span is a word with no letter of its own, so a period after it
+    /// ends a sentence, as after any word, and it can begin one, however the
+    /// text before it ends.
+    #[must_use]
+    pub fn split_code(&self, text: &str, code: &[Range<usize>]) -> Vec<Range<usize>> {
+        let tokens = token::tokens(text, code);
         let brackets = rules::Brackets::new(text);
         let mut ends = vec![false; tokens.len()];
         // Whether the token being read opens a sentence, or follows a colon.
@@ -37,8 +49,12 @@ impl Model {
         for (index, pair) in tokens.windows(2).enumerate() {
             let [current, next] = pair else { continue };
             let numbers_an_item = opens && current.is_list_marker();
+            let after_number = index
+                .checked_sub(1)
+                .and_then(|before| tokens.get(before))
+                .is_some_and(|before| before.mark == Mark::None && before.kind() == NUMBER);
             let ends_here = !numbers_an_item
-                && punkt::ends_sentence(self, current, next)
+                && punkt::ends_sentence(self, current, next, after_number)
                 && !brackets.encloses(current.span.end)
                 && !rules::continues_after_ellipsis(current, next);
             if let Some(slot) = ends.get_mut(index) {

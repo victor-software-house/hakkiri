@@ -1,0 +1,6 @@
+extends: occurrence
+message: "Sentence start"
+level: warning
+scope: sentence
+max: 1
+token: '\S'

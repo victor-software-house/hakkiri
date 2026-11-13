@@ -78,6 +78,10 @@ A code span is a noun in a `sequence` run, so a rule of a noun and a verb flags 
 An `existence` rule reads a code span as one `*`, as Vale masks it, so a match that runs across a span is a match, and one that starts or ends on a span is not.
 `hakkiri instructions` lists the difference.
 
+A `sentence` rule reads sentences that differ from Vale's in a few places.
+A code span begins or ends a sentence next to a full stop, `vs.` ends none, a unit after a number ends one before a capital, and a numbered heading is one sentence.
+`hakkiri instructions` lists them.
+
 ## Write a sequence rule with several forms
 
 A `sequence` rule takes `forms`, a list of mappings that each hold `tokens`, where Vale takes one `tokens` list.

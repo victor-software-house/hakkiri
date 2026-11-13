@@ -196,7 +196,7 @@ fn count_types(documents: &[&str]) -> Counted {
         period_tokens: 0,
     };
     for document in documents {
-        for token in tokens(document) {
+        for token in tokens(document, &[]) {
             bump(&mut counted.types, &token.kind());
             counted.tokens = counted.tokens.saturating_add(1);
             if token.mark == Mark::Period {
@@ -266,7 +266,7 @@ fn read_capitalization(documents: &[&str], abbreviations: &HashSet<String>) -> C
     };
     for document in documents {
         let mut position = Position::Internal;
-        for token in tokens(document) {
+        for token in tokens(document, &[]) {
             let note = token.first_look(abbreviations);
             // A blank line is a good sign of a sentence break, unless an
             // abbreviation came immediately before it.
@@ -368,7 +368,7 @@ fn read_pairs(
     };
     let mut pairs = Pairs::default();
     for document in documents {
-        let found = tokens(document);
+        let found = tokens(document, &[]);
         let notes: Vec<Annotation> = found
             .iter()
             .map(|token| token.first_look(abbreviations))

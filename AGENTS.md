@@ -118,6 +118,12 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
     `find_tagged` walks each form over the one tagged sentence, and `merged` joins the matches.
     One form's matches stay as found, which keeps a `tokens` rule at Vale's alerts.
     A match that overlaps one kept from another form is dropped.
+12. **Sentence splitting.**
+    `Model::split_code` takes the byte ranges of the code spans, and `split` is the call with none.
+    A code word is a sentence of its own after a full stop, never an abbreviation, and never an initial.
+    `UNIT_SYMBOLS`, `SI_PREFIXES` and `BINARY_PREFIXES` in `src/splitter/token.rs` cite their sources, and the unit rule needs a number before the unit.
+    `vs.` ends no sentence, and a date is no list number.
+    A change needs a case in `src/splitter/tests.rs` and, where Vale differs, a case in `tests/sentence_differences.rs`.
 
 ## Workflow
 

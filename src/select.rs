@@ -551,7 +551,7 @@ pub fn select(
                     (Some(own), Some(text)) if own == blank => text.clone(),
                     _ => text_for(blank)?,
                 };
-                for range in model.split(built.as_str()) {
+                for range in model.split_code(built.as_str(), built.code_ranges()) {
                     if let Some(text) = built.slice(range) {
                         blocks.push(Block {
                             scope: node.scope,

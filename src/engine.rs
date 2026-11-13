@@ -96,7 +96,7 @@ pub fn lint_accepting<R: Borrow<Rule>>(
                 // (`lint.go` lines 539 to 544 at 66bbb85). That applies once
                 // hakkiri reads a plain-text language, which it does not yet.
                 let summary = summarize(tree, source, code_span_size)?;
-                let base = variables(&summary.content, summary.elements);
+                let base = variables(&summary.content, &summary.code, summary.elements);
                 measured = Some((summary, base));
             }
             let hit = measured.as_ref().map_or(Ok(None), |(summary, base)| {

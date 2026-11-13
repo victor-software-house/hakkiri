@@ -11,6 +11,9 @@ use std::ops::Range;
 /// The type of a token that is a number, whatever its digits.
 pub(super) const NUMBER: &str = "##number##";
 
+/// The type of a token that is a code span, whatever its code.
+pub(super) const CODE: &str = "##code##";
+
 /// What a word ends with.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(super) enum Mark {
@@ -40,6 +43,9 @@ pub(super) struct Token<'a> {
     pub(super) colon_after: bool,
     /// What comes before the token.
     pub(super) gap: Gap,
+    /// The word is the one-letter reading of a code span, with no letter of
+    /// its own: it is no initial, and it has no case.
+    pub(super) code: bool,
 }
 
 /// What separates a token from the one before it.
@@ -63,6 +69,35 @@ pub(super) struct Annotation {
     /// The token is an ellipsis.
     pub(super) ellipsis: bool,
 }
+
+/// SI prefix symbols, from the BIPM SI Brochure, 9th edition (2019, with the
+/// 2022 prefixes), table 7, with `u` for `µ` as ASCII text writes it.
+const SI_PREFIXES: &[&str] = &[
+    "Q", "R", "Y", "Z", "E", "P", "T", "G", "M", "k", "h", "da", "d", "c", "m", "u", "µ", "n", "p",
+    "f", "a", "z", "y", "r", "q",
+];
+
+/// Binary prefix symbols, from IEC 80000-13:2008, table 3.
+const BINARY_PREFIXES: &[&str] = &["Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"];
+
+/// Unit symbols that take a prefix.
+/// They are the base and the named derived units of the SI Brochure (tables 2
+/// and 4), and the non-SI units it accepts that take a prefix (table 8: `L`,
+/// `l`, `t`, `eV`, `Da`, `ha`).
+/// The bit and the byte come from IEC 80000-13.
+const UNIT_SYMBOLS: &[&str] = &[
+    "m", "g", "s", "A", "K", "mol", "cd", "rad", "sr", "Hz", "N", "Pa", "J", "W", "C", "V", "F",
+    "S", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat", "L", "l", "t", "eV", "Da", "ha",
+    "bit", "B",
+];
+
+/// Time units that take no prefix: `min`, `h` and `d` from the SI Brochure
+/// (table 8), and the written forms `sec`, `secs`, `mins`, `hr` and `hrs`.
+/// `px` and `pt` are the pixel and the point of CSS Values and Units Level 4,
+/// section 6.2.
+const BARE_UNITS: &[&str] = &[
+    "min", "h", "d", "sec", "secs", "mins", "hr", "hrs", "px", "pt",
+];
 
 /// Quotes, brackets and Markdown marks that open or close a word.
 const fn is_edge(c: char) -> bool {
@@ -101,7 +136,10 @@ const fn is_closing(c: char) -> bool {
 }
 
 /// The tokens of `text`, in order.
-pub(super) fn tokens(text: &str) -> Vec<Token<'_>> {
+///
+/// `code` holds the byte ranges of `text` that read a code span, in text
+/// order.
+pub(super) fn tokens<'a>(text: &'a str, code: &[Range<usize>]) -> Vec<Token<'a>> {
     let mut tokens = Vec::new();
     let mut previous_end = 0;
     let mut run_start = None;
@@ -109,7 +147,7 @@ pub(super) fn tokens(text: &str) -> Vec<Token<'_>> {
         match (c.is_whitespace(), run_start) {
             (false, None) => run_start = Some(index),
             (true, Some(start)) => {
-                tokens.push(token(text, start..index, previous_end));
+                tokens.push(token(text, start..index, previous_end, code));
                 previous_end = index;
                 run_start = None;
             }
@@ -117,7 +155,7 @@ pub(super) fn tokens(text: &str) -> Vec<Token<'_>> {
         }
     }
     if let Some(start) = run_start {
-        tokens.push(token(text, start..text.len(), previous_end));
+        tokens.push(token(text, start..text.len(), previous_end, code));
     }
     mark_spaced_ellipses(&mut tokens);
     tokens
@@ -145,13 +183,23 @@ fn mark_spaced_ellipses(tokens: &mut [Token<'_>]) {
 
 /// The token for the run `span`, after the whitespace that starts at
 /// `previous_end`.
-fn token(text: &str, span: Range<usize>, previous_end: usize) -> Token<'_> {
+fn token<'a>(
+    text: &'a str,
+    span: Range<usize>,
+    previous_end: usize,
+    code_ranges: &[Range<usize>],
+) -> Token<'a> {
     let gap = text.get(previous_end..span.start).unwrap_or_default();
     let breaks = gap.matches('\n').count();
     let first = previous_end == 0;
     let run = text.get(span.clone()).unwrap_or_default();
     let (core, internal_after) = trim(run);
     let (word, mark) = split_mark(core);
+    let word_start = span.start + (run.len() - run.trim_start_matches(is_edge).len());
+    let reads_code = matches!(word, "x" | "x.")
+        && code_ranges
+            .get(code_ranges.partition_point(|range| range.end <= word_start))
+            .is_some_and(|range| range.start <= word_start);
     Token {
         span,
         word,
@@ -165,6 +213,7 @@ fn token(text: &str, span: Range<usize>, previous_end: usize) -> Token<'_> {
         } else {
             Gap::Space
         },
+        code: reads_code,
     }
 }
 
@@ -212,21 +261,54 @@ impl Token<'_> {
 
     /// Whether the word starts with an upper-case letter.
     pub(super) fn first_upper(&self) -> bool {
-        self.word.chars().next().is_some_and(char::is_uppercase)
+        !self.code && self.word.chars().next().is_some_and(char::is_uppercase)
     }
 
     /// Whether the word starts with a lower-case letter.
     pub(super) fn first_lower(&self) -> bool {
-        self.word.chars().next().is_some_and(char::is_lowercase)
+        !self.code && self.word.chars().next().is_some_and(char::is_lowercase)
     }
 
     /// Whether the word is one letter and a period, such as an initial.
     pub(super) fn is_initial(&self) -> bool {
         let mut chars = self.word.chars();
-        matches!(
-            (chars.next(), chars.next(), chars.next()),
-            (Some(letter), Some('.'), None) if letter.is_alphabetic()
-        )
+        !self.code
+            && matches!(
+                (chars.next(), chars.next(), chars.next()),
+                (Some(letter), Some('.'), None) if letter.is_alphabetic()
+            )
+    }
+
+    /// Whether the word is the symbol of a unit of measure, with its period,
+    /// such as `ms.`, which follows a number and does not stand for a title
+    /// or a name.
+    ///
+    /// A symbol alone, or with an SI or binary prefix, counts. A single
+    /// capital letter is an initial, and `Ms` is the title, so neither does.
+    pub(super) fn is_unit(&self) -> bool {
+        if self.mark != Mark::Period {
+            return false;
+        }
+        let Some(symbol) = self.word.strip_suffix('.') else {
+            return false;
+        };
+        let initial = symbol.len() == 1 && symbol.chars().all(|c| c.is_ascii_uppercase());
+        if initial || symbol == "Ms" {
+            return false;
+        }
+        BARE_UNITS.contains(&symbol)
+            || UNIT_SYMBOLS.contains(&symbol)
+            || SI_PREFIXES.iter().chain(BINARY_PREFIXES).any(|prefix| {
+                symbol
+                    .strip_prefix(prefix)
+                    .is_some_and(|rest| UNIT_SYMBOLS.contains(&rest))
+            })
+    }
+
+    /// Whether the word is `vs.`, which sits between the two things it sets
+    /// against each other and so ends no sentence.
+    pub(super) fn is_versus(&self) -> bool {
+        self.mark == Mark::Period && self.word.eq_ignore_ascii_case("vs.")
     }
 
     /// Whether the word is letters and nothing else.
@@ -237,6 +319,9 @@ impl Token<'_> {
     /// The word in lower case, with every number as [`NUMBER`], and its
     /// period kept.
     pub(super) fn kind(&self) -> String {
+        if self.code {
+            return CODE.to_owned();
+        }
         let lower = self.word.to_lowercase();
         if is_number(&lower) {
             NUMBER.to_owned()
@@ -264,10 +349,14 @@ impl Token<'_> {
         }
     }
 
-    /// Whether the token numbers a list item: a number with a period, or one
-    /// letter with a period.
+    /// Whether the token numbers a list item: digits and periods with a final
+    /// period, as in `1.` or `2.3.`, or one letter with a period. A date such
+    /// as `2026-09-29.` is no list number.
     pub(super) fn is_list_marker(&self) -> bool {
-        self.mark == Mark::Period && (self.is_initial() || self.kind() == NUMBER)
+        self.mark == Mark::Period
+            && (self.is_initial()
+                || (self.kind() == NUMBER
+                    && self.word.chars().all(|c| c.is_ascii_digit() || c == '.')))
     }
 
     /// Whether the token is symbols only, such as a bullet.
@@ -294,7 +383,7 @@ impl Token<'_> {
             Mark::Strong => annotation.sentence_break = true,
             Mark::Ellipsis => annotation.ellipsis = true,
             Mark::Period => {
-                if self.word != "." && is_abbreviation(self.word, abbreviations) {
+                if self.word != "." && !self.code && is_abbreviation(self.word, abbreviations) {
                     annotation.abbreviation = true;
                 } else {
                     annotation.sentence_break = true;
@@ -331,7 +420,7 @@ mod tests {
     use super::{Gap, Mark, tokens};
 
     fn marks(text: &str) -> Vec<(&str, Mark)> {
-        tokens(text)
+        tokens(text, &[])
             .into_iter()
             .map(|token| (token.word, token.mark))
             .collect()
@@ -369,7 +458,7 @@ mod tests {
 
     #[test]
     fn a_comma_after_a_mark_keeps_the_sentence_going() {
-        let found = tokens("etc., and more");
+        let found = tokens("etc., and more", &[]);
         assert_eq!(found[0].word, "etc.");
         assert!(found[0].internal_after);
         assert!(!found[1].internal_after);
@@ -377,7 +466,7 @@ mod tests {
 
     #[test]
     fn counts_line_and_paragraph_starts() {
-        let found = tokens("one\ntwo\n\nthree four");
+        let found = tokens("one\ntwo\n\nthree four", &[]);
         let gaps: Vec<_> = found.iter().map(|token| token.gap).collect();
         assert_eq!(
             gaps,
