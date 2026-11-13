@@ -14,6 +14,10 @@
     reason = "A test returns Result for `?` and fails through an assertion."
 )]
 
+#[expect(
+    dead_code,
+    reason = "This test reads the JSON report whole and never its lines."
+)]
 mod common;
 
 use std::collections::BTreeMap;
