@@ -102,6 +102,31 @@ fn a_link_whose_text_is_its_address_counts_no_word() -> TestResult {
     Ok(())
 }
 
+#[test]
+fn a_link_is_its_address_only_when_its_text_is_the_href_vale_reads() -> TestResult {
+    // goldmark writes the href percent-encoded, and Vale 66bbb85 drops the
+    // text only when it equals that href. Vale counts the numbers below.
+    assert_eq!(printing("words", "See [ä.md](ä.md) now.\n")?, ["4.00"]);
+    assert_eq!(printing("words", "See [a b](<a b>) now.\n")?, ["4.00"]);
+    assert_eq!(printing("words", "See [a%20b](a%20b) now.\n")?, ["2.00"]);
+    assert_eq!(printing("words", "See [a&b](a&b) now.\n")?, ["2.00"]);
+    assert_eq!(printing("words", "See [a|b](a|b) now.\n")?, ["4.00"]);
+    assert_eq!(
+        printing("words", "See [ä.md][a] now.\n\n[a]: ä.md\n")?,
+        ["4.00"]
+    );
+    assert_eq!(
+        printing("words", "Visit <https://b.example/ä> for special thanks.\n")?,
+        ["8.00"]
+    );
+    // Vale counts 5: goldmark's linkify ends a bare address before `ä`.
+    assert_eq!(
+        printing("words", "Visit https://b.example/ä for special thanks.\n")?,
+        ["8.00"]
+    );
+    Ok(())
+}
+
 /// A rule that reports the words of every block of one scope.
 fn words_of(scope: &str) -> String {
     format!("extends: metric\nmessage: \"%s\"\nscope: {scope}\nformula: words\ncondition: '> -1'\n")

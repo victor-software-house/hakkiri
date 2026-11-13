@@ -396,6 +396,43 @@ fn addresses(root: &Mdast) -> HashMap<String, String> {
     found
 }
 
+/// The bytes that goldmark writes into an `href` as they are, from
+/// `urlEscapeTable` in goldmark 1.8.6, the version Vale 66bbb85 pins.
+const HREF_SAFE: &[u8] =
+    b"!#$&'()*+,-./0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~";
+
+/// The `href` that goldmark writes for the link destination `destination`,
+/// as its `util.URLEscape` does: a byte outside `HREF_SAFE` becomes `%` and
+/// two upper-case hex digits, a space becomes `%20`, and a `%` before two hex
+/// digits stays.
+fn goldmark_href(destination: &str) -> String {
+    let bytes = destination.as_bytes();
+    let mut href = String::with_capacity(destination.len());
+    let mut at = 0;
+    while let Some(&byte) = bytes.get(at) {
+        let escape = bytes
+            .get(at + 1..at + 3)
+            .filter(|hex| byte == b'%' && hex.iter().all(u8::is_ascii_hexdigit));
+        if HREF_SAFE.contains(&byte) {
+            href.push(char::from(byte));
+            at += 1;
+        } else if let Some(hex) = escape {
+            href.push('%');
+            href.extend(hex.iter().copied().map(char::from));
+            at += 3;
+        } else {
+            href.push('%');
+            for digit in [byte >> 4, byte & 0xf] {
+                href.extend(
+                    char::from_digit(u32::from(digit), 16).map(|hex| hex.to_ascii_uppercase()),
+                );
+            }
+            at += 1;
+        }
+    }
+    href
+}
+
 /// How a node of the mdast takes part in the tree.
 enum Kind {
     /// A node of this scope over the nodes below it.
@@ -995,11 +1032,15 @@ impl Builder<'_> {
     /// Whether the link `node`, written as `text`, is its own address, which
     /// Vale's converter keeps out of the text.
     ///
-    /// A link with brackets is when its text repeats its destination, as in
-    /// `[a.md](a.md)`, whatever the destination is, and Vale reads it as a
-    /// URL.
-    /// An autolink is when its destination is what is written, which holds
-    /// for a web address in angle brackets or written bare with a lower-case
+    /// Vale drops a link's text when it equals the link's `href` as goldmark
+    /// writes it, percent-encoded by [`goldmark_href`], so the text is
+    /// compared with that and not with the destination: `[a.md](a.md)` and
+    /// `[a%20b](a%20b)` are their own address, and `[ä.md](ä.md)` and
+    /// `[a b](<a b>)` are not.
+    /// A link with brackets is when its text repeats that address, whatever
+    /// the destination is, and Vale reads it as a URL.
+    /// An autolink is when that address is what is written, which holds for
+    /// a web address in angle brackets or written bare with a lower-case
     /// scheme.
     /// So is another address in angle brackets that is its own destination,
     /// such as `<mailto:x>`, which goldmark and Vale drop from the text.
@@ -1016,6 +1057,7 @@ impl Builder<'_> {
         } else {
             return false;
         };
+        let destination = goldmark_href(destination);
         if text.starts_with('[') {
             return matches!(
                 node.children().map(Vec::as_slice),

@@ -13,13 +13,16 @@ A link of this shape is a name that repeats the address, and no prose, so hakkir
 
 - A Markdown link, inline or by reference, whose text is one run of text equal to its address is a gap in the prose around it, as an autolink is, and stays in its `link` node.
 - The address of a reference link is the destination of the first definition of its label.
-- The `node-segments` spec states the rule, and `vale-differences` is unchanged, since hakkiri now matches Vale.
+- The address is compared as goldmark writes it into the `href`, percent-encoded, since Vale compares the text with that `href`.
+- The `node-segments` spec states the rule.
+- The `vale-differences` spec records a bare address with a letter outside ASCII, which goldmark's linkify ends before that letter.
 
 ## Capabilities
 
 ### Modified Capabilities
 
 - `node-segments`: a link that names its address is a gap in the prose around it.
+- `vale-differences`: a bare address ends where GFM ends it.
 
 ## Impact
 
