@@ -1,6 +1,6 @@
 //! Tests for the comments the HTML tokenizer finds.
 
-use super::comments;
+use super::{comments, flushes_at};
 
 #[test]
 fn a_comment_is_found_where_it_stands() {
@@ -40,4 +40,16 @@ fn a_comment_inside_a_script_is_text() {
         .filter_map(|range| html.get(range))
         .collect();
     assert_eq!(found, ["<!-- z -->"]);
+}
+
+#[test]
+fn a_block_tag_inside_an_inline_tag_flushes_nothing() {
+    let html = "<span><div>a</div></span><p>b</p>";
+    assert_eq!(flushes_at(html), Some(25));
+}
+
+#[test]
+fn a_comment_after_a_promoted_block_tag_has_no_flush_before_it() {
+    let html = "<span><div>a</div><!-- vale off --></span>";
+    assert_eq!(flushes_at(html), None);
 }

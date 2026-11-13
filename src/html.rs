@@ -998,26 +998,48 @@ pub(crate) fn walk(html: &str) -> Walk {
 }
 
 /// The byte of `html` where its first token flushes the text before it, a
-/// start tag that is not inline and not void, or an end tag that is not
-/// inline, or `None` when it has none.
+/// start tag that is not inline, not void and not inside an inline element, or
+/// an end tag that is not inline and not promoted to inline, or `None` when it
+/// has none.
+///
+/// It keeps the open inline elements and the promoted tags as `flush_tags`
+/// does, so a block tag read as inline and its end tag flush nothing.
 pub(crate) fn flushes_at(html: &str) -> Option<usize> {
     let mut tokenizer = Tokenizer::new(html);
+    let mut history: Vec<String> = Vec::new();
+    let mut promoted: HashMap<String, usize> = HashMap::new();
     loop {
         let at = tokenizer.at;
         match tokenizer.read_token() {
             Token::Eof => return None,
-            Token::Start(tag)
-                if !INLINE_TAGS.contains(&tag.name.as_str())
-                    && !VOID_TAGS.contains(&tag.name.as_str()) =>
-            {
-                return Some(at);
+            Token::Start(tag) => {
+                let name = tag.name;
+                if INLINE_TAGS.contains(&name.as_str()) {
+                    history.push(name);
+                } else if VOID_TAGS.contains(&name.as_str()) {
+                    // A void tag flushes nothing and stays out of the history.
+                } else if history
+                    .iter()
+                    .any(|open| INLINE_TAGS.contains(&open.as_str()))
+                {
+                    *promoted.entry(name).or_default() += 1;
+                } else {
+                    return Some(at);
+                }
             }
-            Token::End(tag) if !INLINE_TAGS.contains(&tag.name.as_str()) => return Some(at),
-            Token::Text(_)
-            | Token::Comment(_)
-            | Token::Start(_)
-            | Token::SelfClosing(_)
-            | Token::End(_) => {}
+            Token::End(tag) => {
+                let name = tag.name;
+                if INLINE_TAGS.contains(&name.as_str()) {
+                    if let Some(open) = history.iter().rposition(|open| *open == name) {
+                        history.remove(open);
+                    }
+                } else if let Some(count) = promoted.get_mut(&name).filter(|count| **count > 0) {
+                    *count -= 1;
+                } else {
+                    return Some(at);
+                }
+            }
+            Token::Text(_) | Token::Comment(_) | Token::SelfClosing(_) => {}
         }
     }
 }

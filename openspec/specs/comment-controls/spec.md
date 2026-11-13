@@ -99,6 +99,11 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 - **WHEN** a paragraph reads `one very <div>two very <!-- hakkiri off --></div> three very.`
 - **THEN** `one very` draws its alert, and `two very` and `three very` draw none
 
+#### Scenario: A block tag inside an inline tag
+
+- **WHEN** an HTML block reads `<span><div>one very</div><!-- hakkiri off --></span>`
+- **THEN** `one very` draws no alert, since a `div` inside a `span` is read as inline and no tag flushes the text before the comment
+
 #### Scenario: Text left at the end of an HTML block
 
 - **WHEN** an HTML block ends with `one very`, and a comment block that turns the rule off comes before the next paragraph
