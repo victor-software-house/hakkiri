@@ -80,10 +80,11 @@ const SI_PREFIXES: &[&str] = &[
 /// Binary prefix symbols, from IEC 80000-13:2008, table 3.
 const BINARY_PREFIXES: &[&str] = &["Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"];
 
-/// Unit symbols that take a prefix: the base and the named derived units of
-/// the SI Brochure (tables 2 and 4), the non-SI units it accepts that take a
-/// prefix (table 8: `L`, `l`, `t`, `eV`, `Da`, `ha`), and the bit and the
-/// byte of IEC 80000-13.
+/// Unit symbols that take a prefix.
+/// They are the base and the named derived units of the SI Brochure (tables 2
+/// and 4), and the non-SI units it accepts that take a prefix (table 8: `L`,
+/// `l`, `t`, `eV`, `Da`, `ha`).
+/// The bit and the byte come from IEC 80000-13.
 const UNIT_SYMBOLS: &[&str] = &[
     "m", "g", "s", "A", "K", "mol", "cd", "rad", "sr", "Hz", "N", "Pa", "J", "W", "C", "V", "F",
     "S", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat", "L", "l", "t", "eV", "Da", "ha",

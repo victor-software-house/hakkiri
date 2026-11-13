@@ -20,5 +20,3 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 - [ ] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
 - [ ] 3.2 Run the ProseStyle alert diff of `HKR-008` again, and verify LongSentence and SentenceLength are the same as Vale or better.
-
-[ledger]: ../../../tasks.yaml
