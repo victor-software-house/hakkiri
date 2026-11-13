@@ -236,15 +236,21 @@ fn styles_add_up_under_the_same_glob_and_replace_under_another() -> TestResult {
     let root = project(
         &suite,
         "other",
-        "packages:\n  - path: pkg/styles\n  - path: own/styles\nfiles:\n  '*.{md,txt}': {styles: [Other]}\n",
+        "packages:\n  - path: pkg/styles\n  - path: own/styles\nfiles:\n  'docs/*.md': {styles: [Other]}\n",
     );
-    root.file("pkg/.ctl/hakkiri.yaml", settings);
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "files:\n  '*.md': {styles: [Team], Team.Filler: error}\n",
+    );
+    root.file("docs/a.md", TEXT);
     let (_, lines, err) = check(&root)?;
     assert_eq!(
         lines,
         [
-            "a.md:1:14: warning Other.Plain: Drop 'good'.",
-            "1 alert in 1 file"
+            very("a.md", "error").as_str(),
+            very("docs/a.md", "error").as_str(),
+            "docs/a.md:1:14: warning Other.Plain: Drop 'good'.",
+            "3 alerts in 2 files"
         ],
         "{err}"
     );
@@ -259,6 +265,145 @@ fn styles_add_up_under_the_same_glob_and_replace_under_another() -> TestResult {
     assert!(
         lines.iter().all(|line| !line.contains("Team.")),
         "{lines:?}{err}"
+    );
+    Ok(())
+}
+
+#[test]
+fn at_equal_specificity_the_project_beats_a_package() -> TestResult {
+    let suite = Suite::new("package-settings-tie");
+    let root = project(
+        &suite,
+        "tie",
+        "packages:\n  - path: pkg/styles\nfiles:\n  '*.md': {Team.Filler: warning}\n",
+    );
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "files:\n  '*.md': {Team.Filler: error}\n",
+    );
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert_eq!(lines, [very("a.md", "warning"), "1 alert in 1 file".into()]);
+    Ok(())
+}
+
+#[test]
+fn a_forced_level_beats_a_more_specific_off() -> TestResult {
+    let suite = Suite::new("package-settings-forced-level");
+    let root = project(
+        &suite,
+        "forced",
+        "packages:\n  - path: pkg/styles\nfiles:\n  '*.md': {Team.Filler: !override error}\n",
+    );
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "files:\n  'docs/**/*.md': {Team.Filler: off}\n",
+    );
+    root.file("docs/a.md", TEXT);
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 1, "{err}");
+    assert_eq!(
+        lines,
+        [
+            very("a.md", "error"),
+            very("docs/a.md", "error"),
+            "2 alerts in 2 files".into()
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_package_that_forces_a_value_is_an_error_naming_its_line() -> TestResult {
+    let suite = Suite::new("package-settings-package-forces");
+    let root = project(&suite, "forces", "packages:\n  - path: pkg/styles\n");
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "code_span_size: !override 0\nfiles:\n  '*.md':\n    Team.Filler: !override off\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    for expected in [
+        "failed pkg/.ctl/hakkiri.yaml: line 1: code_span_size: `!override` is not allowed in a package's settings",
+        "failed pkg/.ctl/hakkiri.yaml: line 4: Team.Filler: `!override` is not allowed in a package's settings",
+    ] {
+        assert!(result.err.contains(expected), "{expected}: {}", result.err);
+    }
+    Ok(())
+}
+
+#[test]
+fn a_tag_other_than_override_is_an_error_naming_its_line() -> TestResult {
+    let suite = Suite::new("package-settings-other-tag");
+    let root = project(
+        &suite,
+        "tag",
+        "packages:\n  - path: pkg/styles\ncode_span_size: !important 2\nfiles:\n  '*.md':\n    Team.Filler: !important off\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    for expected in [
+        "failed .ctl/hakkiri.yaml: line 3: code_span_size: `!important` is not a tag hakkiri reads",
+        "failed .ctl/hakkiri.yaml: line 6: Team.Filler: `!important` is not a tag hakkiri reads",
+    ] {
+        assert!(result.err.contains(expected), "{expected}: {}", result.err);
+    }
+    Ok(())
+}
+
+/// A project that lists the packages `pkg` and `own`, whose settings hide
+/// `very` in every Markdown file, and the files `a.md` and `docs/a.md`.
+fn ignoring<'a>(suite: &'a Suite, name: &str, files: &str) -> Root<'a> {
+    let root = project(
+        suite,
+        name,
+        &format!("packages:\n  - path: pkg/styles\n  - path: own/styles\nfiles:\n{files}"),
+    );
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "files:\n  '*.md':\n    styles: [Team, Other]\n    token_ignores: ['(very)']\n",
+    );
+    root.file("docs/a.md", TEXT);
+    root
+}
+
+#[test]
+fn the_ignores_of_every_matching_glob_add_up() -> TestResult {
+    let suite = Suite::new("package-settings-ignores-add-up");
+    let root = ignoring(
+        &suite,
+        "add-up",
+        "  'docs/*.md':\n    token_ignores: ['(good)']\n",
+    );
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert_eq!(
+        lines,
+        [
+            "a.md:1:14: warning Other.Plain: Drop 'good'.",
+            "1 alert in 2 files"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_forced_list_replaces_the_ignores_without_the_tag() -> TestResult {
+    let suite = Suite::new("package-settings-ignores-forced");
+    let root = ignoring(
+        &suite,
+        "forced",
+        "  'docs/*.md':\n    token_ignores: !override ['(good)']\n",
+    );
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert_eq!(
+        lines,
+        [
+            "a.md:1:14: warning Other.Plain: Drop 'good'.",
+            very("docs/a.md", "warning").as_str(),
+            "2 alerts in 2 files"
+        ]
     );
     Ok(())
 }
