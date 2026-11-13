@@ -9,3 +9,4 @@ It reads the text of an HTML block before a tag that opens a block, and the text
 A comment after that text does not hide its alerts.
 A comment in a block of its own, after the last text of an HTML block, reaches that text when no tag flushes it first.
 A block tag inside an inline tag, such as a `div` inside a `span`, is read as inline, so it flushes no text.
+A `pre`, `script`, `style`, `noscript` or `iframe` tag, or a block tag with a skipped class, flushes the text at its end tag, not at its start tag.

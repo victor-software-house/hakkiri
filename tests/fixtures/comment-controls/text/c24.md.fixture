@@ -1,0 +1,37 @@
+- A1 very
+  <pre>A2 very <!-- vale off --></pre>
+- A3 very
+
+A4 very really good.
+
+<!-- vale on -->
+
+- C1 very
+  <div class="code">C2 very <!-- vale off --></div>
+- C3 very
+
+C4 very really good.
+
+<!-- vale on -->
+
+- D1 very
+  D2 very <!-- vale off --> <pre>D3 very</pre> D4 very
+- D5 very
+
+D6 very really good.
+
+<!-- vale on -->
+
+- E1 very
+  <span><pre>E2 very <!-- vale off --></pre></span>
+- E3 very
+
+E4 very really good.
+
+<!-- vale on -->
+
+F1 very <!-- vale off --> <span class="code">F2 very</span> F3 very.
+
+F4 very really good.
+
+<!-- vale on -->

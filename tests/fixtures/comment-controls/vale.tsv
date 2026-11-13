@@ -1247,3 +1247,12 @@ all	text/c9.md	7	22	25	warning	Team.Para	Para 'very'	very
 all	text/c9.md	7	22	25	warning	Team.Raw	Raw 'very'	very
 all	text/c9.md	7	22	25	warning	Team.Sent	Sent 'very'	very
 all	text/c9.md	7	22	25	warning	Team.Words	Words 'very'	very
+all	text/c24.md	1	6	9	warning	Team.Raw	Raw 'very'	very
+all	text/c24.md	2	11	14	warning	Team.Raw	Raw 'very'	very
+all	text/c24.md	9	6	9	warning	Team.Raw	Raw 'very'	very
+all	text/c24.md	10	24	27	warning	Team.Raw	Raw 'very'	very
+all	text/c24.md	17	6	9	warning	Team.Raw	Raw 'very'	very
+all	text/c24.md	18	6	9	warning	Team.Raw	Raw 'very'	very
+all	text/c24.md	25	6	9	warning	Team.Raw	Raw 'very'	very
+all	text/c24.md	26	17	20	warning	Team.Raw	Raw 'very'	very
+all	text/c24.md	33	4	7	warning	Team.Raw	Raw 'very'	very

@@ -1000,8 +1000,9 @@ pub(crate) fn walk(html: &str) -> Walk {
 /// The byte of `html` where its first token flushes the text before it, or
 /// `None` when it has none.
 ///
-/// A start tag flushes it unless the tag is inline, void or inside an inline
-/// element.
+/// A start tag flushes it unless the tag is inline, void, inside an inline
+/// element, or opens an element that Vale skips: a tag among `SKIP_TAGS` or
+/// one with a skipped class, whose end tag flushes instead.
 /// An end tag flushes it unless the tag is inline or was promoted to inline.
 /// The open inline elements and the promoted tags are kept as `flush_tags`
 /// keeps them, so a block tag read as inline and its end tag flush nothing.
@@ -1014,6 +1015,7 @@ pub(crate) fn flushes_at(html: &str) -> Option<usize> {
         match tokenizer.read_token() {
             Token::Eof => return None,
             Token::Start(tag) => {
+                let skipped = SKIP_TAGS.contains(&tag.name.as_str()) || tag.skipped_class(html);
                 let name = tag.name;
                 if INLINE_TAGS.contains(&name.as_str()) {
                     history.push(name);
@@ -1024,6 +1026,8 @@ pub(crate) fn flushes_at(html: &str) -> Option<usize> {
                     .any(|open| INLINE_TAGS.contains(&open.as_str()))
                 {
                     *promoted.entry(name).or_default() += 1;
+                } else if skipped {
+                    // Vale flushes a skipped element at its end tag.
                 } else {
                     return Some(at);
                 }
@@ -1048,8 +1052,8 @@ pub(crate) fn flushes_at(html: &str) -> Option<usize> {
 /// The bytes of `source` where a tag among the `tags` of a paragraph flushes
 /// the text before it, as Vale's walk does.
 ///
-/// A start tag flushes it unless the tag is inline, void or inside an inline
-/// element.
+/// A start tag flushes it unless the tag is inline, void, inside an inline
+/// element, or opens an element that Vale skips, as in `flushes_at`.
 /// An end tag flushes it unless the tag is inline or was promoted to inline.
 pub(crate) fn flush_tags(source: &str, tags: &[Range<usize>]) -> Vec<usize> {
     let mut found = Vec::new();
@@ -1061,6 +1065,7 @@ pub(crate) fn flush_tags(source: &str, tags: &[Range<usize>]) -> Vec<usize> {
         };
         match Tokenizer::new(html).read_token() {
             Token::Start(tag) => {
+                let skipped = SKIP_TAGS.contains(&tag.name.as_str()) || tag.skipped_class(html);
                 let name = tag.name;
                 if INLINE_TAGS.contains(&name.as_str()) {
                     history.push(name);
@@ -1071,6 +1076,8 @@ pub(crate) fn flush_tags(source: &str, tags: &[Range<usize>]) -> Vec<usize> {
                     .any(|open| INLINE_TAGS.contains(&open.as_str()))
                 {
                     *promoted.entry(name).or_default() += 1;
+                } else if skipped {
+                    // Vale flushes a skipped element at its end tag.
                 } else {
                     found.push(range.start);
                     history.clear();
