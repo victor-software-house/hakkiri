@@ -320,8 +320,8 @@ fn find_tagged(
 }
 
 /// The runs of `words` that one form matches, with the exceptions of the rule
-/// taken out. `excluded` holds the spans of the exceptions once a match asks
-/// for them, and is shared by the forms of the rule.
+/// taken out. `excluded` holds the spans of the exceptions, found when a match
+/// first needs them, and is shared by the forms of the rule.
 fn find_form(
     sequence: &Sequence,
     form: &Form,
