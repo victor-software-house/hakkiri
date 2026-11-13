@@ -286,6 +286,27 @@ fn a_later_glob_wins_for_the_same_parameter() -> TestResult {
 }
 
 #[test]
+fn a_rule_written_twice_under_params_is_refused() -> TestResult {
+    let suite = Suite::new("rule-parameters-twice");
+    let root = repeated(
+        &suite,
+        "twice",
+        "files:\n  '*.md':\n    styles: [Vale]\n    params:\n      Vale.Repetition: {max: 1}\n      Vale.Repetition: {max: 2}\n",
+    );
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(result.lines().is_empty(), "{}", result.out);
+    assert!(
+        result
+            .err
+            .contains("failed .ctl/hakkiri.yaml: line 6: duplicate mapping key"),
+        "{}",
+        result.err
+    );
+    Ok(())
+}
+
+#[test]
 fn an_empty_styles_list_drops_the_parameters_before_it() -> TestResult {
     let suite = Suite::new("rule-parameters-empty");
     let root = repeated(
