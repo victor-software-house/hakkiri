@@ -353,7 +353,7 @@ queue:
       - The vale-differences spec lists the numbered heading, the version, decimal and task number before a capital, and vs., each with a fixture that pins Vale 66bbb85 and hakkiri.
     notes:
       - '2026-11-12, found while attributing the LongSentence, SentenceLength and FlatRhythm alerts of four public repositories: only-hakkiri LongSentence fell from 27 to 7 and SentenceLength from 97 to 29, and 12 new FlatRhythm alerts are true by the rule.'
-      - 2026-11-13, the ProseStyle v0.0.16 alert diff on hakkiri main still found 75 LongSentence alerts that only hakkiri gave, 68 false; the operator chose to land this row and run the diff again before HKR-008 closes.
+      - 2026-11-13, the ProseStyle v0.0.16 alert diff on hakkiri main 45624f3 with PR 152 still found the 75 LongSentence alerts that only hakkiri gave on 0.0.6, 68 false; the operator chose to land this row and run the diff again before HKR-008 closes.
     plan: openspec/changes/splitter-code-spans/proposal.md
 
   - id: HKR-066
@@ -508,7 +508,7 @@ archive:
       - 2026-11-13, ProseStyle v0.0.16 tagged; every rule and package case passes under hakkiri test in the prose-style CI, and the opt-in rules stay off in its test.
       - '2026-11-13, alert diff over the nine repositories, Vale 3.26.0 with v0.0.14 against hakkiri main f53bfb3 (PRs 152 and 153) with v0.0.16: 4,361 Vale alerts, 5,350 hakkiri, 2,750 the same, 202 only Vale, 1,191 only hakkiri, 1,027 moved, 382 changed.'
       - '2026-11-13, left after the diff: one PrepositionChain match that an accepted word holds back (HKR-073), four alerts from Vale comments that name old rules (HKR-009), and the ThingsSpeakNoun form SHALL say, for ProseStyle v0.0.17.'
-      - 2026-11-13, against hakkiri 0.0.6 the diff lost 460 ClauseChain alerts and gave 75 LongSentence alerts that only hakkiri gave, 68 false; on main ClauseChain matches, LongSentence gives 9 that only hakkiri gives (8 true) and SentenceLength none, and ThingsSpeakNoun gains 202, sampled true, from code spans (HKR-056).
+      - 2026-11-13, against hakkiri 0.0.6, and main 45624f3 alike, the diff gave 75 LongSentence alerts that only hakkiri gave, 68 false, and 0.0.6 lost 460 ClauseChain alerts; on main f53bfb3 ClauseChain matches, LongSentence gives 9 that only hakkiri gives (8 true) and SentenceLength none, and ThingsSpeakNoun gains 202, sampled true, from code spans (HKR-056).
     disposition: completed
 
   - id: HKR-031
