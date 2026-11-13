@@ -294,25 +294,36 @@ fn a_level_for_a_rule_no_term_builds_is_an_error() -> TestResult {
 }
 
 #[test]
-fn a_package_style_named_vale_is_refused_beside_the_built_in_one() -> TestResult {
+fn a_package_style_named_vale_is_skipped_with_a_warning() -> TestResult {
     let suite = Suite::new("vocabulary-rules-collision");
     let root = small(
         &suite,
         "collision",
         &[
-            ("config/vocabularies/Team/accept.txt", "GitHub\n"),
+            (
+                "Acme/Own.yml",
+                "extends: existence\nmessage: \"x '%s'\"\nlevel: error\ntokens: [x]\n",
+            ),
             (
                 "Vale/Own.yml",
-                "extends: existence\nmessage: \"x '%s'\"\ntokens: [x]\n",
+                "extends: existence\nmessage: \"y '%s'\"\nlevel: error\ntokens: [y]\n",
             ),
         ],
-        "packages:\n  - path: styles\nvocab: [Team]\nfiles:\n  '*.md': {styles: [Vale]}\n",
-        "Fine.\n",
+        "packages:\n  - path: styles\nfiles:\n  '*.md': {styles: [Acme, Vale]}\n",
+        "Here x and y.\n",
     );
     let result = run(root.path(), &["check"], &[])?;
-    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert!(result.out.contains("Acme.Own"), "{}", result.out);
+    assert!(!result.out.contains("Vale.Own"), "{}", result.out);
+    let warnings: Vec<&str> = result
+        .err
+        .lines()
+        .filter(|line| line.starts_with("warning "))
+        .collect();
+    assert_eq!(warnings.len(), 1, "{}", result.err);
     assert!(
-        result.err.contains("the style `Vale` is built in, and"),
+        warnings[0].contains("`styles/Vale` is skipped: the built-in style `Vale` wins"),
         "{}",
         result.err
     );

@@ -43,7 +43,7 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
         code_span_size: args.code_span_size,
     };
     let found = find(&project, &args.paths, options);
-    for warning in &found.warnings {
+    for warning in project.warnings.iter().chain(&found.warnings) {
         eprintln!("warning {warning}");
     }
     let (jobs, mut failures) = (found.jobs, found.failures);
