@@ -9,8 +9,8 @@
 )]
 
 use std::error::Error;
-use std::fs;
 use std::path::PathBuf;
+use std::{env, fs, process};
 
 use ctl_core::indoc;
 use hakkiri::rule::{Check, Level, LoadError, Rule, load_style};
@@ -37,7 +37,7 @@ struct Folder(PathBuf);
 
 impl Folder {
     fn new(name: &str) -> Result<Self, Box<dyn Error>> {
-        let path = std::env::temp_dir().join(format!("hakkiri-{}-{name}", std::process::id()));
+        let path = env::temp_dir().join(format!("hakkiri-{}-{name}", process::id()));
         fs::create_dir_all(path.join("Team"))?;
         Ok(Self(path.join("Team")))
     }

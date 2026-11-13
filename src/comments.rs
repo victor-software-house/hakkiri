@@ -5,6 +5,7 @@
 //! The markers of a comment are stripped, and its text is read as Markdown.
 //! Every span the Markdown parser gives maps back to the bytes of the file.
 
+use std::iter;
 use std::ops::Range;
 
 use tree_sitter::{Language as Grammar, Parser, Query, QueryCursor, StreamingIterator};
@@ -206,7 +207,7 @@ fn root(
     let segments = if dialect != Dialect::Rust && group.marker == Marker::DocBlock {
         jsdoc::prose(&stripped.text)
     } else {
-        std::iter::once(0..stripped.text.len()).collect()
+        iter::once(0..stripped.text.len()).collect()
     };
     let mut children = Vec::new();
     for segment in segments {
@@ -249,6 +250,8 @@ fn root(
         children,
         first: false,
         closes: end,
+        flushes: Vec::new(),
+        label: None,
     };
     Ok(Node {
         scope: Scope::Raw,
@@ -258,6 +261,8 @@ fn root(
         children: vec![comment],
         first: false,
         closes: end,
+        flushes: Vec::new(),
+        label: None,
     })
 }
 

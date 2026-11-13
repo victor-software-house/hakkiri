@@ -274,9 +274,9 @@ dependencies = [
 
 [[package]]
 name = "ctl-core"
-version = "0.7.2"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90124649bdb909f77f80d434e162e22a7d7c441243501d4d166c6aeb8d6c0a49"
+checksum = "50ac0a8c768165890c9b4540e3df2fc1ea626e01a0b59a72b135e58615e9ebea"
 dependencies = [
  "anyhow",
  "clap",
@@ -289,24 +289,25 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
+ "toml",
  "vsh-serde-saphyr",
  "yamled",
 ]
 
 [[package]]
 name = "ctl-layout"
-version = "0.7.2"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ebdb48dd555cf52575289a6d2cca481b1ec13d9bb6a277dcda5ad825fead012"
+checksum = "68eef740773bce6c88f3899d2a6e7b67c85fe472945ecf6e08270141ccfdcb78"
 dependencies = [
  "ctl-text",
 ]
 
 [[package]]
 name = "ctl-term"
-version = "0.7.2"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25c9d3facbb6bc63b6be4088c9491036ad2ae98537fd049e86732e285b72144b"
+checksum = "30663ae9d9cfe69e62fccf9bf868c0433245420afd50b20f4430882cc12bc375"
 dependencies = [
  "anstyle",
  "ctl-text",
@@ -315,9 +316,9 @@ dependencies = [
 
 [[package]]
 name = "ctl-text"
-version = "0.7.2"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48936a7a7958cc40576147e54be6a632ccaa64f5a0ce6c11416d50011b5790db"
+checksum = "702c39ed57e2d7b960552d8d83441c3e15e3eb327322b461a6483cdbd8a3908e"
 dependencies = [
  "anstyle",
  "unicode-bidi",
@@ -907,6 +908,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_spanned"
+version = "1.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c187e0a369471c550af028cba56d4f4fa2a489ad28151ae95a4d340a2a8b782"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
 name = "sha2"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1009,6 +1019,45 @@ dependencies = [
  "rustix",
  "windows-sys 0.61.2",
 ]
+
+[[package]]
+name = "toml"
+version = "1.2.1+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d5755c51863cdac711f1956baf8eb9588e060755f7d3c4c979e70ea1e1f32cd7"
+dependencies = [
+ "indexmap",
+ "serde_core",
+ "serde_spanned",
+ "toml_datetime",
+ "toml_parser",
+ "toml_writer",
+ "winnow",
+]
+
+[[package]]
+name = "toml_datetime"
+version = "1.1.3+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "173f25c883cd2176a2d8212155638c0a60d484a9d84546d270866f40f56b6e49"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
+name = "toml_parser"
+version = "1.1.5+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "baa693a8032d7e1cada7d0041e96126df243179ff061456783ac7f12bda4744c"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "toml_writer"
+version = "1.2.0+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "009dbb7700f11c55ef83aebbe4c0e9cf1f1ac0844bd8d6f00dc38f302026e13a"
 
 [[package]]
 name = "tree-sitter"
@@ -1322,10 +1371,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
-name = "yamled"
-version = "0.0.12"
+name = "winnow"
+version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "506b199d71e3c44d04290caa90bd6b4cccd6db78a8f186ba322d909aebae38bc"
+checksum = "8c3b93199df0ab874cdf0c6a94f0a0dc3423fe41f1cafb62b8bd7b1deb277aef"
+
+[[package]]
+name = "yamled"
+version = "0.0.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b14d78267e0b0268009fa9faf8f87bd37368d77aecd2efc277fd67beb51900b"
 dependencies = [
  "granit-parser",
 ]

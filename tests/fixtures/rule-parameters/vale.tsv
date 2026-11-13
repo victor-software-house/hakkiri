@@ -1,0 +1,745 @@
+capitalization-style	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+capitalization-style	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+capitalization-style	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+capitalization-style	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+capitalization-style	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+capitalization-style	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+capitalization-style	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+capitalization-style	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+capitalization-style	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+capitalization-style	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+capitalization-style	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+capitalization-style	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+capitalization-style	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+capitalization-style	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+capitalization-style	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+capitalization-style	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+capitalization-style	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+capitalization-style	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+capitalization-style	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+capitalization-style	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+capitalization-style	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+capitalization-style	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+capitalization-style	text/t2.md	1	4	16	warning	Team.Cap	'A short title' is not sentence case.	A short title
+capitalization-style	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+capitalization-style	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+capitalization-style	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+capitalization-style	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+capitalization-style	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+capitalization-style	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+capitalization-style	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+capitalization-style	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+capitalization-style	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+capitalization-title	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+capitalization-title	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+capitalization-title	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+capitalization-title	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+capitalization-title	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+capitalization-title	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+capitalization-title	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+capitalization-title	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+capitalization-title	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+capitalization-title	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+capitalization-title	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+capitalization-title	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+capitalization-title	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+capitalization-title	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+capitalization-title	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+capitalization-title	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+capitalization-title	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+capitalization-title	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+capitalization-title	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+capitalization-title	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+capitalization-title	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+capitalization-title	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+capitalization-title	text/t2.md	1	4	16	warning	Team.Cap	'A short title' is not sentence case.	A short title
+capitalization-title	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+capitalization-title	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+capitalization-title	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+capitalization-title	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+capitalization-title	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+capitalization-title	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+capitalization-title	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+capitalization-title	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+capitalization-title	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+conditional-first	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+conditional-first	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+conditional-first	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+conditional-first	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+conditional-first	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+conditional-first	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+conditional-first	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+conditional-first	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+conditional-first	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+conditional-first	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+conditional-first	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+conditional-first	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+conditional-first	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+conditional-first	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+conditional-first	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+conditional-first	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+conditional-first	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+conditional-first	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+conditional-first	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+conditional-first	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+conditional-first	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+conditional-first	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+conditional-first	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+conditional-first	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+conditional-first	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+conditional-first	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+conditional-first	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+conditional-first	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+conditional-first	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+conditional-first	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+conditional-first	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+consistency-ignorecase	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+consistency-ignorecase	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+consistency-ignorecase	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+consistency-ignorecase	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+consistency-ignorecase	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+consistency-ignorecase	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+consistency-ignorecase	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+consistency-ignorecase	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+consistency-ignorecase	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+consistency-ignorecase	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+consistency-ignorecase	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+consistency-ignorecase	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+consistency-ignorecase	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+consistency-ignorecase	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+consistency-ignorecase	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+consistency-ignorecase	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+consistency-ignorecase	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+consistency-ignorecase	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+consistency-ignorecase	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+consistency-ignorecase	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+consistency-ignorecase	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+consistency-ignorecase	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+consistency-ignorecase	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+consistency-ignorecase	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+consistency-ignorecase	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+consistency-ignorecase	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+consistency-ignorecase	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+consistency-ignorecase	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+consistency-ignorecase	text/t2.md	3	77	83	warning	Team.Cons	Be consistent: 'Adviser'.	Adviser
+consistency-ignorecase	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+consistency-ignorecase	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+consistency-ignorecase	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+consistency-ignorecase	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+consistency-nonword	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+consistency-nonword	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+consistency-nonword	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+consistency-nonword	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+consistency-nonword	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+consistency-nonword	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+consistency-nonword	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+consistency-nonword	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+consistency-nonword	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+consistency-nonword	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+consistency-nonword	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+consistency-nonword	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+consistency-nonword	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+consistency-nonword	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+consistency-nonword	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+consistency-nonword	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+consistency-nonword	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+consistency-nonword	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+consistency-nonword	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+consistency-nonword	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+consistency-nonword	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+consistency-nonword	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+consistency-nonword	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+consistency-nonword	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+consistency-nonword	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+consistency-nonword	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+consistency-nonword	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+consistency-nonword	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+consistency-nonword	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+consistency-nonword	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+consistency-nonword	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+consistency-nonword	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+consistency-nonword	text/t2.md	6	22	28	warning	Team.Cons	Be consistent: 'adviser'.	adviser
+exist-ignorecase	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+exist-ignorecase	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+exist-ignorecase	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+exist-ignorecase	text/t1.md	3	20	23	warning	Team.Exist	Remove 'Very'.	Very
+exist-ignorecase	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+exist-ignorecase	text/t1.md	3	31	38	warning	Team.Exist	Remove 'terrible'.	terrible
+exist-ignorecase	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+exist-ignorecase	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+exist-ignorecase	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+exist-ignorecase	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+exist-ignorecase	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+exist-ignorecase	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+exist-ignorecase	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+exist-ignorecase	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+exist-ignorecase	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+exist-ignorecase	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+exist-ignorecase	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+exist-ignorecase	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+exist-ignorecase	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+exist-ignorecase	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+exist-ignorecase	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+exist-ignorecase	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+exist-ignorecase	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+exist-ignorecase	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+exist-ignorecase	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+exist-ignorecase	text/t2.md	3	1	4	warning	Team.Exist	Remove 'Very'.	Very
+exist-ignorecase	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+exist-ignorecase	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+exist-ignorecase	text/t2.md	3	21	24	warning	Team.Exist	Remove 'Very'.	Very
+exist-ignorecase	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+exist-ignorecase	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+exist-ignorecase	text/t2.md	3	26	29	warning	Team.Exist	Remove 'Very'.	Very
+exist-ignorecase	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+exist-ignorecase	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+exist-ignorecase	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+exist-ignorecase	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+exist-ignorecase	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+exist-limit	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+exist-limit	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+exist-limit	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+exist-limit	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+exist-limit	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+exist-limit	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+exist-limit	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+exist-limit	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+exist-limit	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+exist-limit	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+exist-limit	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+exist-limit	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+exist-limit	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+exist-limit	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+exist-limit	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+exist-limit	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+exist-limit	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+exist-limit	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+exist-limit	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+exist-limit	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+exist-limit	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+exist-limit	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+exist-limit	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+exist-limit	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+exist-limit	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+exist-limit	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+exist-limit	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+exist-nonword	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+exist-nonword	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+exist-nonword	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+exist-nonword	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+exist-nonword	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+exist-nonword	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+exist-nonword	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+exist-nonword	text/t1.md	5	37	40	warning	Team.Exist	Remove 'very'.	very
+exist-nonword	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+exist-nonword	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+exist-nonword	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+exist-nonword	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+exist-nonword	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+exist-nonword	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+exist-nonword	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+exist-nonword	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+exist-nonword	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+exist-nonword	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+exist-nonword	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+exist-nonword	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+exist-nonword	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+exist-nonword	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+exist-nonword	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+exist-nonword	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+exist-nonword	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+exist-nonword	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+exist-nonword	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+exist-nonword	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+exist-nonword	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+exist-nonword	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+exist-nonword	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+exist-nonword	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+exist-nonword	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+exist-scope	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+exist-scope	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+exist-scope	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+exist-scope	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+exist-scope	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+exist-scope	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+exist-scope	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+exist-scope	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+exist-scope	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+exist-scope	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+exist-scope	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+exist-scope	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+exist-scope	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+exist-scope	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+exist-scope	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+exist-scope	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+exist-scope	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+exist-scope	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+exist-scope	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+exist-scope	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+exist-scope	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+exist-scope	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+exist-scope	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+exist-scope	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+exist-scope	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+levels	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+levels	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+levels	text/t1.md	3	9	12	error	Team.Exist	Remove 'very'.	very
+levels	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+levels	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+levels	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+levels	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+levels	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+levels	text/t1.md	5	53	61	warning	Vale.Repetition	'very' is repeated!	very very
+levels	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+levels	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+levels	text/t1.md	7	46	50	warning	Vale.Repetition	'of' is repeated!	of of
+levels	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+levels	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+levels	text/t2.md	3	6	9	error	Team.Exist	Remove 'very'.	very
+levels	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+levels	text/t2.md	3	21	29	warning	Vale.Repetition	'Very' is repeated!	Very Very
+levels	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+levels	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+levels	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+levels	text/t2.md	4	72	74	warning	Vale.Repetition	'a' is repeated!	A a
+many	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+many	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+many	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+many	text/t1.md	3	9	12	warning	Team.Occ	Too many 'very'.	very
+many	text/t1.md	3	20	23	warning	Team.Exist	Remove 'Very'.	Very
+many	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+many	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+many	text/t1.md	3	52	58	warning	Team.Sub	Use 'use' instead of 'Utilize'.	Utilize
+many	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+many	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+many	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+many	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+many	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+many	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+many	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+many	text/t2.md	1	4	16	warning	Team.Cap	'A short title' is not sentence case.	A short title
+many	text/t2.md	3	1	4	warning	Team.Exist	Remove 'Very'.	Very
+many	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+many	text/t2.md	3	21	24	warning	Team.Exist	Remove 'Very'.	Very
+many	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+many	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+many	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+many	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+many	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+none	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+none	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+none	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+none	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+none	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+none	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+none	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+none	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+none	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+none	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+none	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+none	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+none	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+none	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+none	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+none	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+none	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+none	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+none	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+none	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+none	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+none	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+none	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+none	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+none	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+none	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+none	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+none	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+none	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+none	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+none	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+none	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+occurrence-max	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+occurrence-max	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+occurrence-max	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+occurrence-max	text/t1.md	3	9	12	warning	Team.Occ	Too many 'very'.	very
+occurrence-max	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+occurrence-max	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+occurrence-max	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+occurrence-max	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+occurrence-max	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+occurrence-max	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+occurrence-max	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+occurrence-max	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+occurrence-max	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+occurrence-max	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+occurrence-max	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+occurrence-max	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+occurrence-max	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+occurrence-max	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+occurrence-max	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+occurrence-max	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+occurrence-max	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+occurrence-max	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+occurrence-max	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+occurrence-max	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+occurrence-max	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+occurrence-max	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+occurrence-max	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+occurrence-max	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+occurrence-max	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+occurrence-max	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+occurrence-max	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+occurrence-max	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+occurrence-max	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+occurrence-min	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+occurrence-min	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+occurrence-min	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+occurrence-min	text/t1.md	3	9	12	warning	Team.Occ	Too many 'very'.	very
+occurrence-min	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+occurrence-min	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+occurrence-min	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+occurrence-min	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+occurrence-min	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+occurrence-min	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+occurrence-min	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+occurrence-min	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+occurrence-min	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+occurrence-min	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+occurrence-min	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+occurrence-min	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+occurrence-min	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+occurrence-min	text/t1.md	7	1	3	warning	Team.Occ	Too many 'very'.	Our
+occurrence-min	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+occurrence-min	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+occurrence-min	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+occurrence-min	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+occurrence-min	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+occurrence-min	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+occurrence-min	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+occurrence-min	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+occurrence-min	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+occurrence-min	text/t2.md	3	6	9	warning	Team.Occ	Too many 'very'.	very
+occurrence-min	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+occurrence-min	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+occurrence-min	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+occurrence-min	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+occurrence-min	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+occurrence-min	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+occurrence-min	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+occurrence-min	text/t2.md	6	1	3	warning	Team.Occ	Too many 'very'.	Two
+occurrence-token	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+occurrence-token	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+occurrence-token	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+occurrence-token	text/t1.md	3	9	12	warning	Team.Occ	Too many 'very'.	very
+occurrence-token	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+occurrence-token	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+occurrence-token	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+occurrence-token	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+occurrence-token	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+occurrence-token	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+occurrence-token	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+occurrence-token	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+occurrence-token	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+occurrence-token	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+occurrence-token	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+occurrence-token	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+occurrence-token	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+occurrence-token	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+occurrence-token	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+occurrence-token	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+occurrence-token	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+occurrence-token	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+occurrence-token	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+occurrence-token	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+occurrence-token	text/t2.md	3	1	4	warning	Team.Occ	Too many 'very'.	Very
+occurrence-token	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+occurrence-token	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+occurrence-token	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+occurrence-token	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+occurrence-token	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+occurrence-token	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+occurrence-token	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+occurrence-token	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+occurrence-token	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+off	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+off	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+off	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+off	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+off	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+off	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+off	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+off	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+off	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+off	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+off	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+off	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+off	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+off	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+off	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+off	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+off	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+off	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+off	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+off	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+off	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+off	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+off	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+off	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+off	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+off	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+off	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+off	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+off	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+off	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+off	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+readability-grade	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+readability-grade	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+readability-grade	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+readability-grade	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+readability-grade	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+readability-grade	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+readability-grade	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+readability-grade	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+readability-grade	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+readability-grade	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+readability-grade	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+readability-grade	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+readability-grade	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+readability-grade	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+readability-grade	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+readability-grade	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+readability-grade	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+readability-grade	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+readability-grade	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+readability-grade	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+readability-grade	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+readability-grade	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+readability-grade	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+readability-grade	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+readability-grade	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+readability-grade	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+readability-grade	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+readability-grade	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+readability-grade	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+readability-grade	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+readability-metric	text/t1.md	1	1	1	warning	Team.Read	Grade level 8.97 is too high.	
+readability-metric	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+readability-metric	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+readability-metric	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+readability-metric	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+readability-metric	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+readability-metric	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+readability-metric	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+readability-metric	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+readability-metric	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+readability-metric	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+readability-metric	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+readability-metric	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+readability-metric	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+readability-metric	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+readability-metric	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+readability-metric	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+readability-metric	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+readability-metric	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+readability-metric	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+readability-metric	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+readability-metric	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+readability-metric	text/t2.md	1	1	1	warning	Team.Read	Grade level 10.53 is too high.	
+readability-metric	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+readability-metric	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+readability-metric	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+readability-metric	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+readability-metric	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+readability-metric	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+readability-metric	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+readability-metric	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+readability-metric	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+repetition-case	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+repetition-case	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+repetition-case	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+repetition-case	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+repetition-case	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+repetition-case	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+repetition-case	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+repetition-case	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+repetition-case	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+repetition-case	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+repetition-case	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+repetition-case	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+repetition-case	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+repetition-case	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+repetition-case	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+repetition-case	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+repetition-case	text/t1.md	7	42	44	error	Vale.Repetition	'1' is repeated!	1 1
+repetition-case	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+repetition-case	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+repetition-case	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+repetition-case	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+repetition-case	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+repetition-case	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+repetition-case	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+repetition-case	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+repetition-case	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+repetition-case	text/t2.md	4	51	53	error	Vale.Repetition	'3' is repeated!	3 3
+repetition-case	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+repetition-case	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+repetition-max	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+repetition-max	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+repetition-max	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+repetition-max	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+repetition-max	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+repetition-max	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+repetition-max	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+repetition-max	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+repetition-max	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+repetition-max	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+repetition-max	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+repetition-max	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+repetition-max	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+repetition-max	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+repetition-max	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+repetition-max	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+repetition-max	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+repetition-max	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+repetition-max	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+repetition-max	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+repetition-max	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+repetition-max	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+repetition-max	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+repetition-max	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+repetition-max	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+repetition-max	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+rule-case	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+rule-case	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+rule-case	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+rule-case	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+rule-case	text/t1.md	3	44	58	warning	Team.Rep	'Utilize' is repeated.	utilize Utilize
+rule-case	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+rule-case	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+rule-case	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+rule-case	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+rule-case	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+rule-case	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+rule-case	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+rule-case	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+rule-case	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+rule-case	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+rule-case	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+rule-case	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+rule-case	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+rule-case	text/t1.md	7	30	36	warning	Team.Rep	'the' is repeated.	The the
+rule-case	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+rule-case	text/t1.md	7	42	44	warning	Team.Rep	'1' is repeated.	1 1
+rule-case	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+rule-case	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+rule-case	text/t1.md	7	49	53	warning	Team.Rep	'Of' is repeated.	of Of
+rule-case	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+rule-case	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+rule-case	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+rule-case	text/t2.md	3	1	9	warning	Team.Rep	'very' is repeated.	Very very
+rule-case	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+rule-case	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+rule-case	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+rule-case	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+rule-case	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+rule-case	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+rule-case	text/t2.md	4	51	53	warning	Team.Rep	'3' is repeated.	3 3
+rule-case	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+rule-case	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+rule-case	text/t2.md	4	72	74	warning	Team.Rep	'a' is repeated.	A a
+rule-case	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+rule-max	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+rule-max	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+rule-max	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+rule-max	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+rule-max	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+rule-max	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+rule-max	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+rule-max	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+rule-max	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+rule-max	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+rule-max	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+rule-max	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+rule-max	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+rule-max	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+rule-max	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+rule-max	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+rule-max	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+rule-max	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+rule-max	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+rule-max	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+rule-max	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+rule-max	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+rule-max	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+rule-max	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+rule-max	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+rule-max	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+rule-max	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+rule-max	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+rule-max	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+substitution-capitalize	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+substitution-capitalize	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+substitution-capitalize	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+substitution-capitalize	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+substitution-capitalize	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+substitution-capitalize	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+substitution-capitalize	text/t1.md	3	52	58	warning	Team.Sub	Use 'Use' instead of 'Utilize'.	Utilize
+substitution-capitalize	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+substitution-capitalize	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+substitution-capitalize	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+substitution-capitalize	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+substitution-capitalize	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+substitution-capitalize	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+substitution-capitalize	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+substitution-capitalize	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+substitution-capitalize	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+substitution-capitalize	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+substitution-capitalize	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+substitution-capitalize	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+substitution-capitalize	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+substitution-capitalize	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+substitution-capitalize	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+substitution-capitalize	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+substitution-capitalize	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+substitution-capitalize	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+substitution-capitalize	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+substitution-capitalize	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+substitution-capitalize	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+substitution-capitalize	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+substitution-capitalize	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+substitution-capitalize	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+substitution-capitalize	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+substitution-capitalize	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a
+substitution-ignorecase	text/t1.md	1	1	1	warning	Team.Read	Grade level 5.19 is too high.	
+substitution-ignorecase	text/t1.md	1	3	21	warning	Team.Cap	'the quick brown fox' is not sentence case.	the quick brown fox
+substitution-ignorecase	text/t1.md	3	9	12	warning	Team.Exist	Remove 'very'.	very
+substitution-ignorecase	text/t1.md	3	26	29	warning	Team.Exist	Remove 'very'.	very
+substitution-ignorecase	text/t1.md	3	44	50	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+substitution-ignorecase	text/t1.md	3	44	58	error	Vale.Repetition	'Utilize' is repeated!	utilize Utilize
+substitution-ignorecase	text/t1.md	3	52	58	warning	Team.Sub	Use 'use' instead of 'Utilize'.	Utilize
+substitution-ignorecase	text/t1.md	5	5	8	warning	Team.Cond	Define 'NASA' on its first use.	NASA
+substitution-ignorecase	text/t1.md	5	37	40	warning	Team.Occ	Too many 'very'.	very
+substitution-ignorecase	text/t1.md	5	48	51	warning	Team.Exist	Remove 'very'.	very
+substitution-ignorecase	text/t1.md	5	48	56	warning	Team.Rep	'very' is repeated.	very very
+substitution-ignorecase	text/t1.md	5	48	56	error	Vale.Repetition	'very' is repeated!	very very
+substitution-ignorecase	text/t1.md	5	53	56	warning	Team.Exist	Remove 'very'.	very
+substitution-ignorecase	text/t1.md	5	53	61	warning	Team.Rep	'very' is repeated.	very very
+substitution-ignorecase	text/t1.md	5	53	61	error	Vale.Repetition	'very' is repeated!	very very
+substitution-ignorecase	text/t1.md	5	58	61	warning	Team.Exist	Remove 'very'.	very
+substitution-ignorecase	text/t1.md	5	69	76	warning	Team.Exist	Remove 'Terrible'.	Terrible
+substitution-ignorecase	text/t1.md	7	21	27	warning	Team.Cons	Be consistent: 'advisor'.	advisor
+substitution-ignorecase	text/t1.md	7	30	36	error	Vale.Repetition	'the' is repeated!	The the
+substitution-ignorecase	text/t1.md	7	46	50	warning	Team.Rep	'of' is repeated.	of of
+substitution-ignorecase	text/t1.md	7	46	50	error	Vale.Repetition	'of' is repeated!	of of
+substitution-ignorecase	text/t1.md	7	49	53	error	Vale.Repetition	'Of' is repeated!	of Of
+substitution-ignorecase	text/t1.md	9	3	27	warning	Team.Cap	'The Quick Brown Fox Jumps' is not sentence case.	The Quick Brown Fox Jumps
+substitution-ignorecase	text/t2.md	1	1	1	warning	Team.Read	Grade level 5.47 is too high.	
+substitution-ignorecase	text/t2.md	3	1	9	error	Vale.Repetition	'very' is repeated!	Very very
+substitution-ignorecase	text/t2.md	3	6	9	warning	Team.Exist	Remove 'very'.	very
+substitution-ignorecase	text/t2.md	3	21	29	warning	Team.Rep	'Very' is repeated.	Very Very
+substitution-ignorecase	text/t2.md	3	21	29	error	Vale.Repetition	'Very' is repeated!	Very Very
+substitution-ignorecase	text/t2.md	3	41	47	warning	Team.Sub	Use 'use' instead of 'utilize'.	utilize
+substitution-ignorecase	text/t2.md	4	5	7	warning	Team.Cond	Define 'WHO' on its first use.	WHO
+substitution-ignorecase	text/t2.md	4	60	64	warning	Team.Rep	'is' is repeated.	is is
+substitution-ignorecase	text/t2.md	4	60	64	error	Vale.Repetition	'is' is repeated!	is is
+substitution-ignorecase	text/t2.md	4	72	74	error	Vale.Repetition	'a' is repeated!	A a

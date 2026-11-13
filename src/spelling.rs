@@ -6,11 +6,13 @@
 //! [Vale]: https://github.com/vale-cli/vale/tree/66bbb85a1a78a5b5497331e04d4033357caced4d/internal
 
 use std::borrow::Cow;
+use std::iter;
 use std::ops::Range;
 use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::case;
 use crate::check::{Hit, accepted_hold, accepted_spans};
 use crate::rule::{Exceptions, Spelling};
 use crate::text::Text;
@@ -393,7 +395,7 @@ fn split_identifier(word: &str) -> Vec<Part<'_>> {
 fn part_passes(spelling: &Spelling, part: &str, accepted: &[&Exceptions]) -> bool {
     let letters = part.chars().filter(|c| is(Category::Letter, *c)).count();
     letters < MIN_PART_LETTERS
-        || crate::case::upper_str(part) == part
+        || case::upper_str(part) == part
         || spelling.speller.spell(&spelling.speller.convert(part))
         || accepts_word(spelling, part)
         || accepted.iter().any(|exceptions| {
@@ -428,7 +430,7 @@ fn masked<'a>(spelling: &Spelling, content: &'a str) -> Cow<'a, str> {
     let mut at = 0;
     for range in found {
         out.push_str(content.get(at..range.start).unwrap_or_default());
-        out.extend(std::iter::repeat_n(' ', range.len()));
+        out.extend(iter::repeat_n(' ', range.len()));
         at = range.end;
     }
     out.push_str(content.get(at..).unwrap_or_default());

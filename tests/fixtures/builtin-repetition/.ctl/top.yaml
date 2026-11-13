@@ -1,0 +1,6 @@
+packages:
+  - path: styles
+vocab: [Rep]
+files:
+  "text/*.md": {styles: [Vale], Vale.Spelling: off}
+  "text/*.rs": {styles: [Vale], Vale.Spelling: off}

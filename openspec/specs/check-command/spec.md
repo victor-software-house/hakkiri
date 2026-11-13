@@ -38,21 +38,6 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 - **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ..` runs in `other/` and the package folder `styles/` holds `Team/notes.md`
 - **THEN** hakkiri lints `docs/a.md` and not `styles/Team/notes.md`
 
-### Requirement: A language is read by extension
-
-hakkiri SHALL read a `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` file as Markdown, MDX, Rust, TypeScript, TSX or JavaScript.  
-It SHALL skip any other file a walk finds, and SHALL refuse one named as an argument, with an error that names it.
-
-#### Scenario: A file no language reads, found by a walk
-
-- **WHEN** a walk finds `logo.png` and the glob `*` matches it
-- **THEN** hakkiri skips it and reports nothing about it
-
-#### Scenario: A file no language reads, named
-
-- **WHEN** `hakkiri check notes.txt` runs
-- **THEN** hakkiri reports a failure naming `notes.txt`, and exits 2
-
 ### Requirement: A file that fails does not stop the run
 
 hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL still lint every other file.
@@ -80,13 +65,18 @@ The lines SHALL hold no colour and no frame, and two runs over the same files SH
 ### Requirement: The JSON output is one object
 
 `--format json` SHALL print one object with `alerts`, `failures` and `files`.  
-Each alert SHALL hold `path`, `line`, `column`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
+Each alert SHALL hold `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
 The output SHALL hold no ESC byte, whatever the colour variables hold.
 
 #### Scenario: JSON with colour forced
 
 - **WHEN** `hakkiri check --format json` runs with `CLICOLOR_FORCE=1` and a file draws an alert
 - **THEN** the output parses as JSON with one alert, and holds no ESC byte
+
+#### Scenario: The end of a match
+
+- **WHEN** a file draws an alert for a match on line 1, columns 9 to 12
+- **THEN** the alert holds `line` 1, `column` 9, `end_line` 1 and `end_column` 12
 
 ### Requirement: The exit status shows what happened
 
@@ -132,3 +122,152 @@ Each long flag of `check` SHALL read `HAKKIRI_<FLAG>` when it is not given, with
 
 - **WHEN** `HAKKIRI_FAIL_LEVEL=warning` is set and `--fail-level error` is given
 - **THEN** hakkiri exits 0
+
+### Requirement: A walk skips what git ignores
+
+Inside a git repository, a walk SHALL skip each file and folder that `.gitignore`, `.git/info/exclude` and the global git excludes ignore, unless `gitignore` is false.  
+It SHALL apply the `.gitignore` of each folder from the repository root down.  
+A file named on the command line SHALL be linted whether git ignores it or not.
+
+#### Scenario: An ignored folder and file
+
+- **WHEN** `.gitignore` holds `build/` and `draft.md`, and `a.md`, `draft.md` and `build/b.md` each draw one warning
+- **THEN** `hakkiri check` lints `a.md` alone, and prints `1 alert in 1 file`
+
+#### Scenario: The exclude file and the global excludes
+
+- **WHEN** the same two names are in `.git/info/exclude`, or in the global excludes file
+- **THEN** `hakkiri check` lints `a.md` alone
+
+#### Scenario: A nested gitignore
+
+- **WHEN** `docs/.gitignore` holds `skip.md`, and `docs/skip.md` and `skip.md` exist
+- **THEN** a walk skips `docs/skip.md` and lints `skip.md`
+
+#### Scenario: A named ignored file
+
+- **WHEN** `hakkiri check draft.md build/b.md` runs and git ignores both
+- **THEN** hakkiri lints both
+
+#### Scenario: Git rules off
+
+- **WHEN** `--no-gitignore`, `--gitignore=false`, `HAKKIRI_GITIGNORE=false` or `gitignore: false` is set
+- **THEN** a walk lints `a.md`, `build/b.md` and `draft.md`
+
+### Requirement: A named file that no glob selects draws a warning
+
+A file named on the command line that no glob of `files` matches SHALL draw a warning that names it, or a failure with exit 2 when `on_unmatched` is `error`, or nothing when it is `ignore`.  
+A file that a glob matches whose styles hold no rule, a file found by a walk, and a file named twice SHALL NOT draw more than the one warning.
+
+#### Scenario: A warning
+
+- **WHEN** the only glob is `docs/*.md` and `hakkiri check README.md docs` runs
+- **THEN** hakkiri prints `warning README.md: no glob selects it, so it is not linted` on standard error, lints `docs/a.md`, and exits 0
+
+#### Scenario: An error
+
+- **WHEN** `hakkiri check --on-unmatched error README.md` runs under the same config
+- **THEN** hakkiri prints `failed README.md: no glob selects it, so it is not linted` and exits 2
+
+#### Scenario: Ignored
+
+- **WHEN** `--on-unmatched ignore` is given
+- **THEN** hakkiri prints nothing for `README.md` and exits 0
+
+#### Scenario: No rule to run
+
+- **WHEN** a glob matches `CHANGELOG.md` with `styles: []` and `hakkiri check CHANGELOG.md` runs
+- **THEN** hakkiri prints no warning
+
+#### Scenario: A walk finds an unselected file
+
+- **WHEN** `hakkiri check` walks a folder that holds `README.md`, which no glob selects
+- **THEN** hakkiri prints no warning
+
+### Requirement: A reader is chosen by formats, then by extension
+
+hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by its extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` as Markdown, MDX, Rust, TypeScript, TSX or JavaScript.  
+A file that a glob selects and that no reader reads SHALL be read as plain text, unless `on_unknown` says otherwise.
+
+#### Scenario: A file no reader reads, found by a walk
+
+- **WHEN** a walk finds `notes.txt`, `Cargo.toml` and `Makefile`, and the glob `*` selects them
+- **THEN** hakkiri lints each as plain text
+
+#### Scenario: A file no reader reads, named
+
+- **WHEN** `hakkiri check notes.txt` runs and a glob selects `notes.txt`
+- **THEN** hakkiri lints it as plain text
+
+#### Scenario: The reader of an extension
+
+- **WHEN** `formats` holds `txt: md` and `a.txt` holds a fenced block that holds `very`
+- **THEN** hakkiri reads `a.txt` as Markdown and reports nothing for the fence
+
+### Requirement: Plain text is read as written
+
+A plain-text file SHALL have one `raw` scope over the whole file, and one `paragraph` for each run of lines between blank lines.  
+No marker, escape or entity SHALL change its text.
+
+#### Scenario: Paragraphs
+
+- **WHEN** `notes.txt` holds `This is very good.`, a blank line and `A second very paragraph.` and a rule flags `very`
+- **THEN** hakkiri reports `notes.txt:1:9` and `notes.txt:3:10`
+
+#### Scenario: A fence is text
+
+- **WHEN** `a.txt` holds a fence around `very`
+- **THEN** hakkiri reports `very` on line 2, column 1
+
+### Requirement: A binary file is skipped
+
+A file read as plain text that holds a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.
+This SHALL hold whether a walk finds the file or the command line names it.
+A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
+
+#### Scenario: A picture
+
+- **WHEN** `logo.png` holds a NUL byte and the glob `*` selects it
+- **THEN** hakkiri skips it, counts no file for it, and exits 0
+
+#### Scenario: A Latin-1 file
+
+- **WHEN** `latin.txt` holds a word that has the byte `E9`, then a space and `very`, and no NUL byte, and a rule flags `very`
+- **THEN** hakkiri reports `very` at the column that counts the bytes, and Vale gives the same column
+
+### Requirement: A file has its own extension and its reader's
+
+For the scopes of the rules that run on it, a file SHALL have its own extension and the extension of the reader that reads it.
+A scope part that names an extension SHALL hold for either, and a negated part SHALL leave a block out for either.
+
+#### Scenario: A mapped file
+
+- **WHEN** `formats` maps `txt: md`, `a.txt` holds `# beta`, a blank line and `beta alpha gamma.`, and three rules have `text.md` with `alpha`, `text & ~heading.md` with `beta`, and `text.txt` with `gamma`
+- **THEN** hakkiri reports `beta`, `alpha` and `gamma` on line 3, and none in the heading
+
+### Requirement: on_unknown sets what a selected file with no reader gets
+
+For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.
+`text`, the default, reads it as plain text, and `warn` skips it with a warning that names it.
+`error` fails the run with exit 2, and `ignore` skips it.  
+A file that no glob selects SHALL draw no message.
+
+#### Scenario: Warn
+
+- **WHEN** `--on-unknown warn` is given and `*` selects `x.cfg`
+- **THEN** hakkiri prints ``warning x.cfg: no reader reads this file, so it is not linted: map it in `formats` `` and does not lint it
+
+#### Scenario: Error
+
+- **WHEN** `--on-unknown error` is given
+- **THEN** hakkiri prints ``failed x.cfg: no reader reads this file, so it is not linted: map it in `formats` `` and exits 2
+
+#### Scenario: Ignore
+
+- **WHEN** `--on-unknown ignore` is given
+- **THEN** hakkiri skips `x.cfg` and prints nothing
+
+#### Scenario: A file no glob selects
+
+- **WHEN** `*.md` is the only glob and `--on-unknown warn` is given
+- **THEN** hakkiri prints no warning for `x.cfg`

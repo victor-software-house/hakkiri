@@ -1,0 +1,7 @@
+extends: existence
+message: "Lit '%s'"
+level: warning
+scope: frontmatter
+nonword: true
+tokens:
+  - '\S+'

@@ -212,7 +212,7 @@ fn a_rule_that_looks_in_a_view() {
         &rule(r"\bAPI\b", "interface", "in: glossary\n"),
     )
     .err();
-    let text = error.map(|error| error.to_string()).unwrap_or_default();
+    let text = error.map_or_default(|error| error.to_string());
     assert!(text.contains("Team.Defined"), "{text}");
     assert!(text.contains("`in`"), "{text}");
 }
@@ -222,7 +222,7 @@ fn a_pattern_with_no_text_is_refused() {
     for (first, second, field) in [("", "interface", "first"), (r"\bAPI\b", "", "second")] {
         let error =
             Rule::from_text("Team.Defined", "Team/Defined.yml", &rule(first, second, "")).err();
-        let text = error.map(|error| error.to_string()).unwrap_or_default();
+        let text = error.map_or_default(|error| error.to_string());
         assert!(text.contains("Team.Defined"), "{text}");
         assert!(text.contains(&format!("`{field}` holds nothing")), "{text}");
     }
@@ -240,7 +240,7 @@ fn a_pattern_that_matches_the_empty_string_is_refused() {
     for (first, second, field) in [("x*", "interface", "first"), (r"\bAPI\b", "()", "second")] {
         let error =
             Rule::from_text("Team.Defined", "Team/Defined.yml", &rule(first, second, "")).err();
-        let text = error.map(|error| error.to_string()).unwrap_or_default();
+        let text = error.map_or_default(|error| error.to_string());
         assert!(text.contains("Team.Defined"), "{text}");
         assert!(
             text.contains(&format!("`{field}` matches the empty string")),
@@ -257,6 +257,6 @@ fn a_pattern_that_does_not_compile() {
         &rule(r"\bAPI(", "interface", ""),
     )
     .err();
-    let text = error.map(|error| error.to_string()).unwrap_or_default();
+    let text = error.map_or_default(|error| error.to_string());
     assert!(text.contains("first"), "{text}");
 }

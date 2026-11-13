@@ -6,11 +6,22 @@
 //! [`Tagger::english()`] reads the model once per process, and
 //! [`Tagger::tag()`] tokenizes one sentence and tags each token.
 //!
+//! A few rules then correct the model's tags where it is wrong on the prose of
+//! our documents.
+//! They cover the possessive `'s`, a word in capitals, a modal in capitals, and
+//! a semicolon.
+//! They also cover a verb after a noun phrase, the verbs of saying and asking
+//! after a noun, and the nouns of technical prose.
+//! [`Tagger::tag()`] and [`Tagger::tag_words()`] apply them.
+//! [`Tagger::tag_code()`] reads a noun in place of each code span first.
+//! [`Tagger::tag_treebank()`] does not, so a title is read as prose reads it.
+//!
 //! The model is trained on UD English EWT and is under CC BY-SA 4.0.
 //! Its notice is in `data/tagger/NOTICE.md`.
 //!
 //! [prose]: https://github.com/jdkato/prose/tree/b33e60dbff0492289b227f3681120ac057d8131b
 
+mod corrections;
 mod features;
 mod model;
 mod tokens;
@@ -25,6 +36,10 @@ use std::sync::LazyLock;
 pub use model::FormatError;
 use model::Model;
 use regex::Regex;
+
+/// The word the model reads in place of a code span: a noun it tags `NN` in
+/// every place a noun stands.
+const CODE_NOUN: &str = "name";
 
 /// The English model, in prose's flat format.
 const ENGLISH: &[u8] = include_bytes!("../data/tagger/en.bin");
@@ -105,12 +120,68 @@ impl Tagger {
     /// reads, so `sentence` should be one sentence.
     #[must_use]
     pub fn tag<'a>(&'a self, sentence: &'a str) -> Vec<Tagged<'a>> {
+        self.tag_with(sentence, Self::tag_words)
+    }
+
+    /// The tokens of `sentence`, each with its tag, where `is_code` marks the
+    /// tokens that read a code span.
+    ///
+    /// A code span names a thing, so the model reads the noun `name` in
+    /// its place, with the words around it in context, and the tag of the span
+    /// is `NN`, which the corrections read as well.
+    /// The square brackets of an intra-doc link, as in ``[`Name`]``, belong
+    /// to the span.
+    #[must_use]
+    pub fn tag_code<'a>(
+        &'a self,
+        sentence: &'a str,
+        is_code: impl Fn(&Range<usize>) -> bool,
+    ) -> Vec<Tagged<'a>> {
+        let ranges = tokens::with_link_brackets(sentence, &tokens::tokens(sentence), &is_code);
+        let code: Vec<bool> = ranges.iter().map(&is_code).collect();
+        let words: Vec<&str> = ranges
+            .iter()
+            .zip(&code)
+            .map(|(range, code)| {
+                if *code {
+                    CODE_NOUN
+                } else {
+                    sentence.get(range.clone()).unwrap_or_default()
+                }
+            })
+            .collect();
+        let mut tags = self.model_tags(&words);
+        for (tag, code) in tags.iter_mut().zip(&code) {
+            if *code {
+                *tag = "NN";
+            }
+        }
+        corrections::apply(&words, &mut tags);
+        ranges
+            .into_iter()
+            .zip(tags)
+            .map(|(range, tag)| Tagged { range, tag })
+            .collect()
+    }
+
+    /// The tokens of `sentence` with the tags of the model alone.
+    #[cfg(test)]
+    pub(crate) fn tag_model<'a>(&'a self, sentence: &'a str) -> Vec<Tagged<'a>> {
+        self.tag_with(sentence, Self::model_tags)
+    }
+
+    /// The tokens of `sentence`, each with the tag that `tag_words` gives it.
+    fn tag_with<'a>(
+        &'a self,
+        sentence: &'a str,
+        tag_words: fn(&'a Self, &[&'a str]) -> Vec<&'a str>,
+    ) -> Vec<Tagged<'a>> {
         let ranges = tokens::tokens(sentence);
         let words: Vec<&str> = ranges
             .iter()
             .map(|range| sentence.get(range.clone()).unwrap_or_default())
             .collect();
-        let tags = self.tag_words(&words);
+        let tags = tag_words(self, &words);
         ranges
             .into_iter()
             .zip(tags)
@@ -120,19 +191,29 @@ impl Tagger {
 
     /// The words of `sentence` as prose's Treebank tokenizer cuts them, the
     /// way a title is tagged, each with its tag.
+    ///
+    /// The tags are the model's, with no correction, as prose gives them.
     #[must_use]
     pub fn tag_treebank(&self, sentence: &str) -> Vec<String> {
         let words = treebank::tokenize(sentence);
         let refs: Vec<&str> = words.iter().map(String::as_str).collect();
-        self.tag_words(&refs)
+        self.model_tags(&refs)
             .into_iter()
             .map(str::to_owned)
             .collect()
     }
 
-    /// The tag of each of `words`, which are already cut.
+    /// The tag of each of `words`, which are already cut, after the
+    /// corrections.
     #[must_use]
     pub fn tag_words<'a>(&'a self, words: &[&'a str]) -> Vec<&'a str> {
+        let mut tags = self.model_tags(words);
+        corrections::apply(words, &mut tags);
+        tags
+    }
+
+    /// The tag the model gives each of `words`, which are already cut.
+    fn model_tags<'a>(&'a self, words: &[&'a str]) -> Vec<&'a str> {
         let mut context = vec![features::START.to_owned(), features::START2.to_owned()];
         context.extend(words.iter().map(|word| features::normalize(word)));
         context.push(features::END.to_owned());

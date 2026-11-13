@@ -1,0 +1,55 @@
+M1 very <div>M2 very <!-- vale off --></div> M3 very.
+
+M4 very really good.
+
+<!-- vale on -->
+
+N1 very <p>N2 very</p> <!-- vale off --> N3 very.
+
+N4 very really good.
+
+<!-- vale on -->
+
+O1 very <!-- vale off --> <div>O2 very</div> O3 very.
+
+O4 very really good.
+
+<!-- vale on -->
+
+P1 very <ul><li>P2 very <!-- vale off --></li></ul> P3 very.
+
+P4 very really good.
+
+<!-- vale on -->
+
+Q1 very
+<div>Q2 very</div>
+<!-- vale off -->
+Q3 very
+
+Q4 very really good.
+
+<!-- vale on -->
+
+R1 very <b>R2 very <div>R3 very <!-- vale off --></div></b> R4 very.
+
+R5 very really good.
+
+<!-- vale on -->
+
+S1 very <br> S2 very <!-- vale off --> S3 very <hr> S4 very.
+
+S5 very really good.
+
+<!-- vale on -->
+
+> T1 very <div>T2 very <!-- vale off --></div> T3 very.
+
+T4 very really good.
+
+<!-- vale on -->
+
+- U1 very <div>U2 very <!-- vale off --></div> U3 very.
+- U4 very
+
+U5 very really good.

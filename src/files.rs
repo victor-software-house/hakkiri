@@ -3,9 +3,9 @@
 
 use std::collections::HashSet;
 use std::ffi::OsStr;
-use std::fs;
 use std::io::Read;
 use std::path::{Component, Path, PathBuf};
+use std::{env, fs};
 
 use hakkiri::Language;
 use ignore::WalkBuilder;
@@ -56,7 +56,8 @@ fn is_binary(path: &Path) -> bool {
     file.take(SNIFF).read_to_end(&mut head).is_ok() && head.contains(&0)
 }
 
-/// How a run chooses its files.
+/// How a run chooses its files, and the `code_span_size` that overrides every
+/// file's.
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Options {
     /// Whether a walk skips what git ignores.
@@ -65,6 +66,9 @@ pub(crate) struct Options {
     pub(crate) on_unmatched: OnUnmatched,
     /// What to do with a selected file that no reader reads.
     pub(crate) on_unknown: OnUnknown,
+    /// The words a code span counts as, from the flag or its variable, which
+    /// win over the plan of each file.
+    pub(crate) code_span_size: Option<u8>,
 }
 
 /// What a walk finds, in the order it finds it.
@@ -106,13 +110,17 @@ impl Finder<'_> {
     /// extension names. A selected file that no reader reads is plain text,
     /// unless `on_unknown` says otherwise, and a plain-text file that holds a
     /// NUL byte is binary and skipped, with no message.
+    ///
+    /// The job's extension is the file's own. The tree records the reader, and
+    /// a scope may name either extension, so `text.md` selects text in a `.txt`
+    /// file that `formats` maps to `md`, and `text.txt` still does.
     fn file(&mut self, file: &Path, named: bool) {
         let path = display(file, self.current.as_deref());
         let Some(relative) = self.project.relative(file) else {
             return;
         };
         let first = self.seen.insert(relative.clone());
-        let Some(plan) = self.project.plan(&relative) else {
+        let Some(mut plan) = self.project.plan(&relative) else {
             // A walk may reach the file before the command line names it, so
             // the warning has its own set.
             if named && !self.project.selects(&relative) && self.warned.insert(relative) {
@@ -122,6 +130,9 @@ impl Finder<'_> {
         };
         if !first {
             return;
+        }
+        if let Some(words) = self.options.code_span_size {
+            plan.code_span_size = words;
         }
         let language = match self
             .project
@@ -147,8 +158,7 @@ impl Finder<'_> {
         }
         let extension = file
             .extension()
-            .map(|extension| extension.to_string_lossy().into_owned())
-            .unwrap_or_default();
+            .map_or_default(|extension| extension.to_string_lossy().into_owned());
         self.jobs.push(Job {
             path,
             file: file.to_path_buf(),
@@ -243,7 +253,7 @@ pub(crate) fn find<'a>(project: &'a Project, paths: &[PathBuf], options: Options
     let mut finder = Finder {
         project,
         options,
-        current: std::env::current_dir().ok(),
+        current: env::current_dir().ok(),
         warnings: Vec::new(),
         seen: HashSet::new(),
         warned: HashSet::new(),

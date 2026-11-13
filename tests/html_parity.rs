@@ -28,8 +28,8 @@
 
 use std::collections::BTreeSet;
 use std::error::Error;
-use std::fs;
 use std::path::{Path, PathBuf};
+use std::{fs, slice};
 
 use hakkiri::engine::lint;
 use hakkiri::rule::Rule;
@@ -113,7 +113,7 @@ fn html_block_text_reads_as_vale_does_but_where_decided() -> TestResult {
         for input in &inputs {
             let source = fs::read_to_string(input)?;
             let tree = parse(Language::Markdown, &source)?;
-            for alert in lint(std::slice::from_ref(&rule), &tree, &source, "md")? {
+            for alert in lint(slice::from_ref(&rule), &tree, &source, "md")? {
                 hakkiri.insert(alert_row(
                     &name,
                     name_of(input)?.trim_end_matches(".fixture"),

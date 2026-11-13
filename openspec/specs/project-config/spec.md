@@ -486,3 +486,133 @@ hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Ter
 
 - **WHEN** a glob lists `styles: [Vale]` and no named vocabulary holds a term
 - **THEN** hakkiri reports that `Vale` is not a style in any package, and exits with a failure status
+
+### Requirement: The run options are config keys
+
+`fail_level`, `gitignore` and `on_unmatched` SHALL be keys of the project's config, with the values of `--fail-level`, `--gitignore` and `--on-unmatched`.  
+Each SHALL be resolved as the flag, then its variable, then the config, then the default: `error`, `true` and `warn`.  
+An unknown value SHALL be an error that names the line.
+
+#### Scenario: The config sets the fail level
+
+- **WHEN** the config holds `fail_level: warning` and a file draws one warning
+- **THEN** `hakkiri check` exits 1
+
+#### Scenario: The variable beats the config
+
+- **WHEN** the same config runs with `HAKKIRI_FAIL_LEVEL=error`
+- **THEN** `hakkiri check` exits 0
+
+#### Scenario: The flag beats the variable
+
+- **WHEN** `--fail-level warning` is given with `HAKKIRI_FAIL_LEVEL=error`
+- **THEN** `hakkiri check` exits 1
+
+#### Scenario: The same order for the other two
+
+- **WHEN** `on_unmatched: error` is set, then `HAKKIRI_ON_UNMATCHED=ignore`, then `--on-unmatched warn`
+- **THEN** a named file that no glob selects fails the run, then draws nothing, then draws a warning
+
+#### Scenario: An unknown word
+
+- **WHEN** the config holds `on_unmatched: loud` or `fail_level: loud`
+- **THEN** hakkiri reports an error that names `loud`, and exits 2
+
+#### Scenario: Not a boolean
+
+- **WHEN** the config holds `gitignore: maybe`
+- **THEN** hakkiri reports an error on line 1, and exits 2
+
+### Requirement: formats maps a file to a reader
+
+`formats` SHALL map an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`.  
+An entry named by the file's extension SHALL come first, then, in the order of the keys as text, an entry whose key is the file's name or a glob that matches its name or its path.  
+A key that holds `*`, `?`, `[`, `{` or `/` SHALL be a glob.  
+An entry SHALL beat the extension table.
+
+#### Scenario: An extension
+
+- **WHEN** `formats` holds `txt: md`
+- **THEN** `a.txt` is read as Markdown
+
+#### Scenario: Over the table
+
+- **WHEN** `formats` holds `md: text`
+- **THEN** `a.md` is read as plain text
+
+#### Scenario: A name and a glob
+
+- **WHEN** `formats` holds `NOTES: md` and `conf/*.cfg: md`
+- **THEN** `NOTES` and `conf/x.cfg` are read as Markdown, and `other.cfg` as plain text
+
+#### Scenario: The extension first
+
+- **WHEN** `formats` holds `txt: text` and `'*': md`
+- **THEN** `a.txt` is read as plain text and `b.cfg` as Markdown
+
+### Requirement: formats refuses a bad entry
+
+A reader that is not one of the seven SHALL be an error that lists them, and a key that holds a glob mark and is not a glob SHALL be an error.
+
+#### Scenario: An unknown reader
+
+- **WHEN** `formats` holds `toml: loud`
+- **THEN** hakkiri reports `` `loud` is not a reader: use md, mdx, rs, ts, tsx, js, text `` and exits 2
+
+#### Scenario: A bad glob
+
+- **WHEN** `formats` holds the key `a[`
+- **THEN** hakkiri reports that it is not a glob and exits 2
+
+### Requirement: on_unknown is a config key
+
+`on_unknown` SHALL be a key of the project's config with the values of `--on-unknown`.  
+It SHALL be resolved as the flag, then `HAKKIRI_ON_UNKNOWN`, then the config, then `text`, and an unknown word SHALL be an error.
+
+#### Scenario: The order
+
+- **WHEN** the config holds `on_unknown: error`, then `HAKKIRI_ON_UNKNOWN=ignore` is set, then `--on-unknown warn` is given
+- **THEN** a selected file with no reader fails the run, then draws nothing, then draws a warning
+
+#### Scenario: An unknown word
+
+- **WHEN** the config holds `on_unknown: loud`
+- **THEN** hakkiri reports an error that names `loud` and exits 2
+
+### Requirement: A fault names the line of its own key
+
+A fault about a key of the config SHALL name the line where the config writes that key.  
+A fault about the value of a key SHALL name the line where the value starts.  
+Both hold whatever characters the key holds and however the config is written.  
+A fault about one item of a list SHALL name the line of that item.  
+A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{` split nothing.
+
+#### Scenario: Globs and settings that hold special characters
+
+- **WHEN** `files` holds `'docs/**/*.md': {Team.Hint: yes}` on line 4, `'src/{a,b}/lib.rs'` on line 5 with `styles: [Other]` on line 6 and `Team.Hint: maybe` on line 7, and `'x[1].md': {styles: [Nope]}` on line 8
+- **THEN** hakkiri names line 4 for the first fault, line 7 for the second and line 8 for the third
+
+#### Scenario: A config written in flow style
+
+- **WHEN** `files` is `{'docs/**/*.md': {Team.Hint: yes}, 'a.md': {styles: [Nope]}}` on line 4
+- **THEN** both faults name line 4
+
+#### Scenario: A later item of a list
+
+- **WHEN** `styles` holds `Other` on line 6 and `Nope` on line 7, and `Nope` is no style
+- **THEN** hakkiri names line 7, the line of the item, and not line 6
+
+#### Scenario: An unknown vocabulary of a glob and a pattern that does not compile
+
+- **WHEN** a glob's `vocab` holds `Team` and then `Nope`, or `token_ignores` holds `(z)` and then `(`, one item to a line
+- **THEN** the fault names the line of `Nope`, or of `(`
+
+#### Scenario: A glob or a setting with a block value
+
+- **WHEN** a glob that is no glob has a block mapping below it, or a setting that names no rule has a block list below it
+- **THEN** hakkiri names the line of the key, and not the line below it
+
+#### Scenario: A refused key of a package's settings file
+
+- **WHEN** a package's settings file writes `fail_level:` or a package `path:` with its value on the next line
+- **THEN** hakkiri names the line of the key

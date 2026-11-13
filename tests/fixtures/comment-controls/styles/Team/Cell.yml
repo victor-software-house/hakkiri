@@ -1,0 +1,6 @@
+extends: existence
+message: "Cell '%s'"
+level: warning
+scope: table
+tokens:
+  - 'very'

@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use std::num::NonZeroUsize;
 use std::path::Path;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::{fs, io, thread};
+use std::{fs, io, panic, thread};
 
 use hakkiri::alert::Alert;
 use hakkiri::control::apply_levels;
@@ -40,6 +40,7 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
             .or(project.on_unmatched)
             .unwrap_or_default(),
         on_unknown: args.on_unknown.or(project.on_unknown).unwrap_or_default(),
+        code_span_size: args.code_span_size,
     };
     let found = find(&project, &args.paths, options);
     for warning in &found.warnings {
@@ -77,8 +78,11 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
     let mut linted = 0;
     for (job, outcome) in jobs.iter().zip(outcomes) {
         match outcome {
-            Ok(found) => {
+            Ok((found, fault)) => {
                 linted += 1;
+                if let Some(fault) = fault {
+                    failures.push(Failure::file(&job.path, format!("front matter: {fault}")));
+                }
                 alerts.extend(
                     found
                         .into_iter()
@@ -92,9 +96,26 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
     Check::new(alerts, failures, linted, fail_level)
 }
 
+/// The text of the file at `path`, with each byte that is not valid UTF-8 read
+/// as a `?`.
+///
+/// Vale lints such a file, a Latin-1 one for example, and reads each bad byte
+/// as a character that is no letter. One `?` for one byte keeps every other
+/// byte at the offset it has in the file, so a line and a column still name
+/// the place Vale names.
+fn read_text(path: &Path) -> io::Result<String> {
+    let bytes = fs::read(path)?;
+    let mut text = String::with_capacity(bytes.len());
+    for chunk in bytes.utf8_chunks() {
+        text.push_str(chunk.valid());
+        text.extend(chunk.invalid().iter().map(|_| '?'));
+    }
+    Ok(text)
+}
+
 /// The alerts of one file, at the levels the config sets, or why it gave none.
-fn lint_file(job: &Job<'_>) -> Result<Vec<Alert>, String> {
-    let source = fs::read_to_string(&job.file).map_err(|error| error.to_string())?;
+fn lint_file(job: &Job<'_>) -> Result<(Vec<Alert>, Option<String>), String> {
+    let source = read_text(&job.file).map_err(|error| error.to_string())?;
     let tree = parse_ignoring(
         job.language,
         &source,
@@ -102,7 +123,8 @@ fn lint_file(job: &Job<'_>) -> Result<Vec<Alert>, String> {
         &job.plan.token_ignores,
     )
     .map_err(|error| error.to_string())?;
-    lint_planned(&job.plan, &tree, &source, &job.extension)
+    let alerts = lint_planned(&job.plan, &tree, &source, &job.extension)?;
+    Ok((alerts, tree.front_matter_fault))
 }
 
 /// The alerts of `source` under `plan`, at the levels the config sets.
@@ -112,8 +134,15 @@ pub(crate) fn lint_planned(
     source: &str,
     extension: &str,
 ) -> Result<Vec<Alert>, String> {
-    let mut alerts = lint_accepting(&plan.rules, tree, source, extension, &plan.accepted)
-        .map_err(|error| error.to_string())?;
+    let mut alerts = lint_accepting(
+        &plan.rules,
+        tree,
+        source,
+        extension,
+        &plan.accepted,
+        plan.code_span_size,
+    )
+    .map_err(|error| error.to_string())?;
     for alert in alerts.iter_mut().filter(|alert| !alert.fault) {
         if let Some(level) = plan.levels.get(alert.rule.as_str()) {
             alert.level = *level;
@@ -160,7 +189,7 @@ fn parallel<T: Sync, R: Send>(items: &[T], work: impl Fn(&T) -> R + Sync) -> io:
         for worker in workers {
             match worker.join() {
                 Ok(out) => done.extend(out),
-                Err(panic) => std::panic::resume_unwind(panic),
+                Err(panic) => panic::resume_unwind(panic),
             }
         }
         Ok(done)

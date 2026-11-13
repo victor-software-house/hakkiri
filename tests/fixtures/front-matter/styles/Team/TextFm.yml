@@ -1,0 +1,6 @@
+extends: existence
+message: "TextFm '%s'"
+level: warning
+scope: text.frontmatter
+tokens:
+  - 'very'

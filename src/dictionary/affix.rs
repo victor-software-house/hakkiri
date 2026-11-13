@@ -7,6 +7,7 @@
 //!
 //! [Vale]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell/aff.go
 
+use std::cmp::Reverse;
 use std::collections::HashMap;
 
 use super::DictionaryError;
@@ -284,7 +285,7 @@ impl AffixFile {
             }
         }
         file.conversions
-            .sort_by_key(|(from, _)| std::cmp::Reverse(from.len()));
+            .sort_by_key(|(from, _)| Reverse(from.len()));
         file.conversions.retain(|(from, _)| !from.is_empty());
         file.drop_ignored();
         Ok(file)

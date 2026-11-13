@@ -12,6 +12,7 @@ use serde::Deserialize;
 
 use super::field::{Text, Texts, valid};
 use super::{LoadError, at_tab};
+use crate::alert::Alert;
 
 /// One case, as a file writes it.
 #[derive(Debug, Deserialize, Validate)]
@@ -172,8 +173,8 @@ impl TestCase {
 /// The alerts of a case as it sees them: one line each,
 /// `line:column:Rule:message`, in order of line and column.
 #[must_use]
-pub fn alert_lines(alerts: &[crate::alert::Alert]) -> String {
-    let mut rows: Vec<&crate::alert::Alert> = alerts.iter().collect();
+pub fn alert_lines(alerts: &[Alert]) -> String {
+    let mut rows: Vec<&Alert> = alerts.iter().collect();
     rows.sort_by_key(|alert| (alert.line, alert.first_column));
     let lines: Vec<String> = rows
         .iter()

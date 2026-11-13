@@ -1,7 +1,9 @@
 //! The document tree: scopes, nodes and spans.
 
-use std::fmt;
 use std::ops::Range;
+use std::{fmt, mem};
+
+use crate::language::Language;
 
 /// The scope of a node, named as a rule's `scope` names it.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -55,6 +57,9 @@ pub enum Scope {
     /// The title of a link, an image or a link reference definition, which
     /// no prose scope reads, as in Vale, where only `raw` does.
     Title,
+    /// An inline image, read as its alt text, and the element a `title & image`
+    /// part names to select the title of an image.
+    Image,
     /// The text of a `meta` tag that describes the page.
     Description,
     /// The content of a `data` element: a name or an identifier that is in
@@ -70,11 +75,13 @@ pub enum Scope {
     CommentDocLine,
     /// A `/** */` comment, or a Rust `/*! */` comment.
     CommentDocBlock,
+    /// A string value of a Markdown file's front matter, such as the `title`.
+    FrontMatter,
 }
 
 impl Scope {
     /// Every scope.
-    pub const ALL: [Self; 31] = [
+    pub const ALL: [Self; 33] = [
         Self::Paragraph,
         Self::Heading1,
         Self::Heading2,
@@ -99,6 +106,7 @@ impl Scope {
         Self::Emphasis,
         Self::Alt,
         Self::Title,
+        Self::Image,
         Self::Description,
         Self::Meta,
         Self::Raw,
@@ -106,6 +114,7 @@ impl Scope {
         Self::CommentBlock,
         Self::CommentDocLine,
         Self::CommentDocBlock,
+        Self::FrontMatter,
     ];
 
     /// The lowercase dotted name a rule's `scope` uses, such as `heading.h1`.
@@ -136,6 +145,7 @@ impl Scope {
             Self::Emphasis => "emphasis",
             Self::Alt => "alt",
             Self::Title => "title",
+            Self::Image => "image",
             Self::Description => "description",
             Self::Meta => "meta",
             Self::Raw => "raw",
@@ -143,6 +153,7 @@ impl Scope {
             Self::CommentBlock => "text.comment.block",
             Self::CommentDocLine => "text.comment.doc.line",
             Self::CommentDocBlock => "text.comment.doc.block",
+            Self::FrontMatter => "frontmatter",
         }
     }
 
@@ -225,12 +236,21 @@ pub struct Node {
     /// table row around it, ahead of any fenced block, thematic break or other
     /// element that holds no prose.
     pub first: bool,
+    /// What follows the scope name in the node's scope: the key of a front
+    /// matter value. Every other node has none.
+    pub label: Option<String>,
     /// The byte where the element that holds the node's text ends.
     ///
     /// A comment inside the element, after the text, is before this byte.
     /// It is the end of the node's span unless the element goes on, as a
     /// paragraph in a tight list item does with the item.
     pub closes: usize,
+    /// The bytes, in order, where a tag of the element that is not inline
+    /// flushes the text before it, so that text is read at that byte and the
+    /// text after the last one at [`closes`](Self::closes).
+    ///
+    /// A paragraph that holds a `<div>` has one.
+    pub flushes: Vec<usize>,
 }
 
 impl Node {
@@ -241,9 +261,11 @@ impl Node {
             segments: vec![span.clone()],
             reads: Vec::new(),
             closes: span.end,
+            flushes: Vec::new(),
             span,
             children,
             first: false,
+            label: None,
         }
     }
 
@@ -257,11 +279,13 @@ impl Node {
         Some(Self {
             scope,
             closes: span.end,
+            flushes: Vec::new(),
             span,
             segments,
             reads: Vec::new(),
             children,
             first: false,
+            label: None,
         })
     }
 
@@ -434,8 +458,12 @@ pub(crate) fn remap_nodes(
         while let Some(node) = level.get_mut(at) {
             node.remap(map);
             node.closes = place(node.closes).unwrap_or(node.span.end);
+            node.flushes = mem::take(&mut node.flushes)
+                .into_iter()
+                .filter_map(place)
+                .collect();
             if node.segments.is_empty() {
-                let children = std::mem::take(&mut node.children);
+                let children = mem::take(&mut node.children);
                 level.splice(at..=at, children);
             } else {
                 at += 1;
@@ -448,6 +476,9 @@ pub(crate) fn remap_nodes(
 /// The tree of one file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Tree {
+    /// The language the file was read as, whose extension a scope such as
+    /// `text.md` may name beside the extension the file has.
+    pub language: Language,
     /// The `raw` roots: one for a Markdown or MDX file, one per comment group
     /// for a source file.
     pub roots: Vec<Node>,
@@ -458,6 +489,11 @@ pub struct Tree {
     /// MDX file, in file order, which may turn rules off and on. A source file
     /// gives none.
     pub comments: Vec<Comment>,
+    /// Why the front matter of a Markdown or MDX file is no YAML, TOML or JSON
+    /// that its parser reads, as the line of the file and the parser's words.
+    /// The tree holds no value of such a block, and the rest of the file is
+    /// read as written.
+    pub front_matter_fault: Option<String>,
 }
 
 /// One HTML comment of a Markdown file.

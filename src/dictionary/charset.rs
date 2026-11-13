@@ -5,6 +5,8 @@
 //!
 //! [Vale]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell/encoding.go
 
+use std::str;
+
 use super::DictionaryError;
 
 /// The byte order mark some dictionaries start with.
@@ -39,7 +41,7 @@ pub(super) fn decode(aff: &[u8], dic: &[u8]) -> Result<(String, String), Diction
             .collect::<String>()
     };
     match declared(aff) {
-        None if std::str::from_utf8(aff).is_ok() && std::str::from_utf8(dic).is_ok() => {
+        None if str::from_utf8(aff).is_ok() && str::from_utf8(dic).is_ok() => {
             Ok((utf8(aff)?, utf8(dic)?))
         }
         None => Ok((latin1(aff), latin1(dic))),

@@ -1,0 +1,8 @@
+reject:
+  - foo
+  - ba+r:
+      regex: true
+  - Baz:
+      ignorecase: true
+  - utilize:
+      flags: D

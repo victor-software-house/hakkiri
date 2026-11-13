@@ -1,0 +1,220 @@
+//! Tests for the string values of front matter: which entries are text, and
+//! where the text lies in the file.
+
+use super::{fault, json_nodes, leading, nodes};
+use crate::tree::Node;
+
+/// The label and the text of each value that `nodes` gives for `source`, whose
+/// front matter fills it.
+fn values(source: &str, toml: bool) -> Vec<(String, String)> {
+    let span = 0..source.trim_end().len();
+    read(&nodes(source, &span, toml), source)
+}
+
+fn read<'a>(found: impl IntoIterator<Item = &'a Node>, source: &str) -> Vec<(String, String)> {
+    found
+        .into_iter()
+        .map(|node| {
+            (
+                node.label.clone().unwrap_or_default(),
+                node.text(source).unwrap_or_default(),
+            )
+        })
+        .collect()
+}
+
+fn pair(key: &str, text: &str) -> (String, String) {
+    (key.to_owned(), text.to_owned())
+}
+
+#[test]
+fn the_values_of_yaml_are_the_top_level_strings() {
+    let source = "---\ntitle: A very title\ncount: 3\ndraft: false\ntags: [a, b]\nauthor:\n  name: very nested\nquoted: \"a very quoted\"\nsingle: 'a very single'\nplain: two # comment\n---\n";
+    assert_eq!(
+        values(source, false),
+        [
+            pair("title", "A very title"),
+            pair("quoted", "a very quoted"),
+            pair("single", "a very single"),
+            pair("plain", "two"),
+        ]
+    );
+}
+
+#[test]
+fn a_scalar_that_resolves_to_a_string_is_text() {
+    let source =
+        "---\na: yes\nb: no\nc: on\nd: off\ne: 12:30\nf: 1,000\ng: v1.0\nh: 1.2.3\ni: a:b\n---\n";
+    let keys: Vec<_> = values(source, false)
+        .into_iter()
+        .map(|(key, _)| key)
+        .collect();
+    assert_eq!(keys, ["a", "b", "c", "d", "e", "f", "g", "h", "i"]);
+}
+
+#[test]
+fn a_block_scalar_reads_each_of_its_lines() {
+    let source = "---\nfolded: >-\n  one very\n  two\nliteral: |\n  three\n  four\n---\n";
+    assert_eq!(
+        values(source, false),
+        [
+            pair("folded", "one very two"),
+            pair("literal", "three\nfour")
+        ]
+    );
+}
+
+#[test]
+fn a_scalar_goes_on_over_the_lines_under_it() {
+    let source = "---\nplain: one\n  two\nquoted: \"three\n  four\"\n---\n";
+    assert_eq!(
+        values(source, false),
+        [pair("plain", "one two"), pair("quoted", "three four")]
+    );
+}
+
+#[test]
+fn a_value_on_the_line_after_its_key_is_read_unless_it_is_a_collection() {
+    let source = "---\nplain:\n  text here\nlist:\n  - a\nmap:\n  k: v\nempty:\n---\n";
+    assert_eq!(values(source, false), [pair("plain", "text here")]);
+}
+
+#[test]
+fn an_explicit_string_tag_is_text_and_another_tag_is_not() {
+    assert_eq!(
+        values("---\na: !!str tagged\nb: !!int 3\n---\n", false),
+        [pair("a", "tagged")]
+    );
+}
+
+#[test]
+fn a_date_and_a_merge_key_are_no_text_unless_tagged_or_quoted() {
+    let source = "---\na: 2024-01-01\nb: 2024-01-01 10:00:00\nc: <<\nd: !!str 2024-01-01\ne: '2024-01-01'\n---\n";
+    assert_eq!(
+        values(source, false),
+        [pair("d", "2024-01-01"), pair("e", "2024-01-01")]
+    );
+}
+
+#[test]
+fn an_anchor_before_a_value_or_a_key_leaves_the_text() {
+    let source = "---\na: &x anchored\n&k b: keyed\n---\n";
+    assert_eq!(
+        values(source, false),
+        [pair("a", "anchored"), pair("b", "keyed")]
+    );
+}
+
+#[test]
+fn an_alias_and_a_complex_key_hold_no_text_and_drop_no_entry_after_them() {
+    let source = "---\na: &x text\nb: *x\n? [k, l]\n: v\nc: after\n---\n";
+    assert_eq!(
+        values(source, false),
+        [pair("a", "text"), pair("c", "after")]
+    );
+}
+
+#[test]
+fn a_repeated_key_and_a_merge_key_keep_their_values() {
+    assert_eq!(
+        values("---\na: x\na: y\nb: z\n---\n", false),
+        [pair("a", "x"), pair("a", "y"), pair("b", "z")]
+    );
+    let merge = "---\nbase: &b {x: 1}\n<<: *b\nt: text\n---\n";
+    assert_eq!(values(merge, false), [pair("t", "text")]);
+}
+
+#[test]
+fn a_number_key_a_null_key_and_a_non_finite_float_keep_their_values() {
+    let source = "---\n1: one\nnull: two\nup: .inf\nnone: .NaN\ntitle: three\n---\n";
+    assert_eq!(
+        values(source, false),
+        [
+            pair("1", "one"),
+            pair("null", "two"),
+            pair("title", "three")
+        ]
+    );
+}
+
+#[test]
+fn front_matter_that_no_parser_reads_has_a_fault_with_its_line() {
+    for (source, line) in [
+        ("---\ntitle: ok\nother: [open\n---\n\nBody.\n", "line 3"),
+        ("---\nkey: x\n  bad: indent\n---\n", "line 3"),
+        ("+++\ntitle = \"open\n+++\n", "line 2"),
+        (";;;\n{\"title\": \"x\", \n;;;\n", "line 2"),
+    ] {
+        let Some(fault) = fault(source) else {
+            panic!("{source:?} has no fault");
+        };
+        assert!(fault.starts_with(line), "{source:?}: {fault}");
+    }
+}
+
+#[test]
+fn front_matter_that_a_parser_reads_or_that_never_closes_has_no_fault() {
+    for source in [
+        "---\ntitle: ok\n---\n",
+        "---\n? [a, b]\n: x\ntitle: y\n---\n",
+        "+++\ntitle = \"ok\"\n+++\n",
+        ";;;\n{\"title\": \"ok\"}\n;;;\n",
+        "---\ntitle: [open\n",
+        "Body.\n",
+        "",
+    ] {
+        assert_eq!(fault(source), None, "{source:?}");
+    }
+}
+
+#[test]
+fn the_strings_before_the_first_table_are_the_values_of_toml() {
+    let source = "+++\ntitle = \"A very title\"\ncount = 3\ntags = [\"a\"]\nliteral = 'x y'\n[params]\nsub = \"in a table\"\n+++\n";
+    assert_eq!(
+        values(source, true),
+        [pair("title", "A very title"), pair("literal", "x y")]
+    );
+}
+
+#[test]
+fn a_toml_string_may_go_over_lines() {
+    let source = "+++\nbody = \"\"\"\none\ntwo\"\"\"\n+++\n";
+    assert_eq!(values(source, true), [pair("body", "one\ntwo")]);
+}
+
+#[test]
+fn an_opening_fence_may_carry_blanks_after_it() {
+    let source = "--- \t\ntitle: A very title\n---\n\nBody.\n";
+    assert_eq!(
+        read(&leading(source), source),
+        [pair("title", "A very title")]
+    );
+    let toml = "+++  \ntitle = \"A very title\"\n+++\n";
+    assert_eq!(read(&leading(toml), toml), [pair("title", "A very title")]);
+}
+
+#[test]
+fn the_strings_of_a_json_object_are_values_and_its_other_members_are_not() {
+    let source = ";;;\n{\"title\": \"A very json\", \"n\": 3, \"tags\": [\"x\"], \"o\": {\"k\": \"y\"}, \"s\": \"z\"}\n;;;\n\nBody.\n";
+    assert_eq!(
+        read(&json_nodes(source), source),
+        [pair("title", "A very json"), pair("s", "z")]
+    );
+    let none = Vec::<(String, String)>::new();
+    assert_eq!(read(&json_nodes("Body.\n"), "Body.\n"), none);
+    let open = ";;;\n{\"a\": \"b\"}\n";
+    assert_eq!(read(&json_nodes(open), open), none);
+}
+
+#[test]
+fn a_file_whose_fence_carries_blanks_has_its_values_in_the_tree() {
+    use crate::markdown::{Flavor, build};
+    for source in [
+        "--- \t\ntitle: A very title\n---\n\nBody.\n",
+        "+++ \ntitle = \"A very title\"\n+++\n\nBody.\n",
+    ] {
+        let built = build(source, Flavor::Markdown).unwrap();
+        let values = built.nodes.iter().filter(|node| node.label.is_some());
+        assert_eq!(read(values, source), [pair("title", "A very title")]);
+    }
+}

@@ -1,0 +1,86 @@
+BF1 very really good.
+
+<!-- vale  off -->
+
+BF2 very really good.
+
+<!-- vale on -->
+
+<!--	vale off	-->
+
+BF3 very really good.
+
+<!-- vale on -->
+
+<!-- vale off. -->
+
+BF4 very really good.
+
+<!-- vale Team.Words = no -->
+
+BF5 very really good.
+
+<!-- vale Team.Words = No -->
+
+BF6 very really good.
+
+<!-- vale  Team.Words = NO -->
+
+BF7 very really good.
+
+<!-- vale Team.Words =NO -->
+
+BF8 very really good.
+
+<!-- vale Team. Words = NO -->
+
+BF9 very really good.
+
+<!-- vale Team.Words[] = NO -->
+
+BG1 very really good.
+
+<!-- vale Team.Words["very"] = YES -->
+
+BG2 very really good.
+
+<!-- vale Team.Words["very"] = NO -->
+
+BG3 very really good.
+
+<!-- vale Team.Words["very", "really"] = NO -->
+
+BG4 very really good.
+
+<!-- vale Team.Words["a\"b"] = NO -->
+
+BG5 very really good.
+
+<!-- vale VALE OFF -->
+
+BG6 very really good.
+
+<!-- vale Team.Words = NO --> <!-- vale off -->
+
+BG7 very really good.
+
+<!-- vale on -->
+
+BG8 very really good.
+
+<!-- outer <!-- vale off --> -->
+
+BG9 very really good.
+
+<!-- vale off
+
+BH1 very really good.
+
+-->
+
+BH2 very really good.
+
+<!-- vale Team.Words = NO
+-->
+
+BH3 very really good.

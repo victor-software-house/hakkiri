@@ -2,13 +2,15 @@
 
 use std::{error, fmt};
 
+use markdown::message::Message;
+
 use crate::pattern::SearchError;
 
 /// Why a file gave no tree.
 #[derive(Debug)]
 pub enum Error {
     /// The MDX parser refused the file.
-    Mdx(markdown::message::Message),
+    Mdx(Message),
     /// A tree-sitter grammar could not load.
     Grammar(tree_sitter::LanguageError),
     /// The comment query did not compile.

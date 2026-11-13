@@ -1,0 +1,6 @@
+extends: existence
+message: "Em '%s'"
+level: warning
+scope: emphasis
+tokens:
+  - 'very'

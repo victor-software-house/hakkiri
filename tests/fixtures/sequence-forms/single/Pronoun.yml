@@ -1,0 +1,9 @@
+extends: sequence
+message: "'%[1]s %[2]s' gives a thing speech or thought: name what it holds, shows, marks or matches."
+level: error
+ignorecase: true
+exceptions:
+  - '(?i)\b(?:operator|operators|user|users|reviewer|reviewers|team|teams|student|students|agent|agents)\b'
+tokens:
+  - pattern: it|both|which
+  - pattern: says?|said|tells?|told|knows?|knew|thinks?|thought|wants?|agrees?|asks?|asked

@@ -1,0 +1,5 @@
+packages:
+  - path: styles
+vocab: [Shapes, Bad, Mixed, Affix]
+files:
+  "text/*.md": {styles: [Team, Vale], Vale.Spelling: off, Vale.Repetition: off}

@@ -56,6 +56,18 @@ impl Lines {
         Some(Self { lines })
     }
 
+    /// The byte of the file at the byte `at` of the block.
+    fn offset(&self, at: usize) -> usize {
+        self.lines
+            .iter()
+            .rev()
+            .find(|line| line.value.start <= at)
+            .or(self.lines.first())
+            .map_or(0, |line| {
+                line.source + at.clamp(line.value.start, line.value.end) - line.value.start
+            })
+    }
+
     /// The ranges of the file that hold the bytes `range` of the block, one
     /// for each line.
     fn map(&self, range: &Range<usize>) -> Vec<Range<usize>> {
@@ -114,7 +126,7 @@ impl Lines {
 
     /// The node for one block of text, or `None` when it holds no text, or
     /// hakkiri has no scope for it.
-    fn block(&self, block: &Block, first: bool) -> Option<Node> {
+    fn block(&self, block: &Block, first: bool, then: usize) -> Option<Node> {
         let whole = self.run(block, 0..block.pieces.len());
         let mut children: Vec<Node> = block
             .captures
@@ -152,8 +164,30 @@ impl Lines {
                     .map(|node| node.with_reads(whole.reads.clone()))
             }
         };
-        node.map(|node| Node { first, ..node })
+        let closes = block.flushed_at.map_or(then, |at| self.offset(at));
+        node.map(|mut node| {
+            node.first = first;
+            close_at(&mut node, closes);
+            node
+        })
     }
+}
+
+/// Makes `node` and the nodes inside it close at the byte `at`: Vale reads
+/// the text of a block, and the elements inside it, when a tag flushes it.
+fn close_at(node: &mut Node, at: usize) {
+    node.closes = at;
+    for child in &mut node.children {
+        close_at(child, at);
+    }
+}
+
+/// The byte of the file where the first token of the HTML block `html`,
+/// which `span` covers in `source`, flushes the text before it, or `None`
+/// when no token does.
+pub(crate) fn flushes_at(source: &str, span: &Range<usize>, html: &str) -> Option<usize> {
+    let at = html::flushes_at(html)?;
+    Some(Lines::new(source, span, html).map_or(span.start, |lines| lines.offset(at)))
 }
 
 /// The nodes for the text of the HTML block `html`, which `span` covers in
@@ -162,20 +196,27 @@ impl Lines {
 ///
 /// `first` is whether the block is the first thing inside the item or quote
 /// around it, which gives its first text the scope of that item or quote.
+/// `then` is the byte of the file where the tag after the block flushes the
+/// text that no tag inside it does.
 pub(crate) fn nodes(
     source: &str,
     span: &Range<usize>,
     html: &str,
     first: bool,
+    then: usize,
 ) -> Option<Vec<Node>> {
     let walk = html::walk(html);
-    if walk.blocks.is_empty() && walk.alts.is_empty() && walk.descriptions.is_empty() {
+    if walk.blocks.is_empty()
+        && walk.alts.is_empty()
+        && walk.descriptions.is_empty()
+        && walk.titles.is_empty()
+    {
         return Some(Vec::new());
     }
     let lines = Lines::new(source, span, html)?;
     let mut nodes = Vec::new();
     for (index, block) in walk.blocks.iter().enumerate() {
-        nodes.extend(lines.block(block, first && index == 0));
+        nodes.extend(lines.block(block, first && index == 0, then));
     }
     for (scope, ranges) in [
         (Scope::Alt, &walk.alts),
@@ -185,6 +226,42 @@ pub(crate) fn nodes(
             nodes.extend(Node::from_segments(scope, lines.map(range), Vec::new()));
         }
     }
+    nodes.extend(title_nodes(&lines, &walk.titles));
     nodes.sort_by_key(|node| node.span.start);
     Some(nodes)
+}
+
+/// The nodes for the `title` attributes of the tags `titles` lists.
+///
+/// A title of an `a` or an `img` tag sits in an empty node of the element, so
+/// `title & link` and `title & image` select it as they select the title of a
+/// Markdown link and image.
+fn title_nodes(lines: &Lines, titles: &[(Range<usize>, Option<Scope>)]) -> Vec<Node> {
+    titles
+        .iter()
+        .filter_map(|(range, holder)| {
+            let title = Node::from_segments(Scope::Title, lines.map(range), Vec::new())?;
+            Some(match holder {
+                Some(element) => {
+                    let at = title.span.start;
+                    Node::new(*element, at..at, vec![title])
+                }
+                None => title,
+            })
+        })
+        .collect()
+}
+
+/// The nodes for the `title` attributes of the tag text `tag`, which `span`
+/// covers in `source`: an inline HTML tag in a line of text, or the opening
+/// tag of a JSX element.
+///
+/// Vale reads such an attribute only through `raw`. The `title` scope reads it
+/// too, so a rule on `title` sees what a rule on `raw` sees in a title.
+pub(crate) fn tag_titles(source: &str, span: &Range<usize>, tag: &str) -> Vec<Node> {
+    let walk = html::walk(tag);
+    if walk.titles.is_empty() {
+        return Vec::new();
+    }
+    Lines::new(source, span, tag).map_or_else(Vec::new, |lines| title_nodes(&lines, &walk.titles))
 }

@@ -20,6 +20,7 @@ mod tests;
 use std::ops::Range;
 
 use crate::error::Error;
+use crate::frontmatter;
 use crate::markdown::{self, Flavor};
 use crate::pattern::{FirstGroup, Pattern, SearchError};
 use crate::tree::{Comment, Node, Scope, remap_nodes};
@@ -222,6 +223,11 @@ pub(crate) fn document(
     let changed = rewrite(source, blocks, tokens).map_err(Error::Ignore)?;
     let mut built = markdown::build(changed.text(), flavor)?;
     restore(&mut built.nodes, &changed);
+    // The front matter is read from the file as written.
+    built.nodes.retain(|node| node.scope != Scope::FrontMatter);
+    let mut nodes = frontmatter::leading(source);
+    nodes.append(&mut built.nodes);
+    built.nodes = nodes;
     // A comment the rewrite added or hid is no comment of the file.
     let comments = built
         .comments

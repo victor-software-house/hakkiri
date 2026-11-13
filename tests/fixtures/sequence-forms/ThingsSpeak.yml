@@ -1,0 +1,24 @@
+extends: sequence
+message: "'%[1]s %[2]s' gives a thing speech or thought: name what it holds, shows, marks or matches."
+level: error
+ignorecase: true
+exceptions:
+  - '(?i)\b(?:operator|operators|user|users|reviewer|reviewers|team|teams|student|students|agent|agents)\b'
+forms:
+  - tokens:
+      - tag: NN|NNS
+        pattern: '[A-Za-z][\w-]*'
+      - tag: VB|VBP|VBZ
+        pattern: says?|tells?|knows?|thinks?|wants?|agrees?|asks?|believes?|hopes?|understands?|insists?
+  - tokens:
+      - tag: NN|NNS
+        pattern: '[A-Za-z][\w-]*'
+        target: true
+      - tag: VBD
+        pattern: said|told|knew|thought|wanted|agreed|asked|believed|hoped|understood|insisted
+        target: true
+      - tag: '^(?:TO|RB|RBR|RBS)$'
+        negate: true
+  - tokens:
+      - pattern: it|both|which
+      - pattern: says?|said|tells?|told|knows?|knew|thinks?|thought|wants?|agrees?|asks?|asked

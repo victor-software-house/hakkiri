@@ -1,0 +1,5 @@
+extends: capitalization
+message: "'%s' is not sentence case."
+level: warning
+scope: heading
+match: $sentence

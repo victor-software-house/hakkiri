@@ -1,0 +1,5 @@
+packages:
+  - path: styles
+files:
+  "text/*.md": {styles: [Vale], Vale.Spelling: off, Vale.Repetition: warning}
+  "text/*.rs": {styles: [Vale], Vale.Spelling: off, Vale.Repetition: warning}

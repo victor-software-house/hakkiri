@@ -23,12 +23,15 @@ An editor server follows in the second release.
   String literals are never read as prose.
 - A project pins rule packages by version and hash in `.ctl/hakkiri.yaml`; hakkiri fetches and caches them.
 - A package may ship its own settings in `.ctl/hakkiri.yaml`, which apply before the project's and yield to them.
-- A package's vocabularies hold back the matches of the words a project accepts, at the top level or for a glob, and build the rules `Vale.Terms` and `Vale.Avoid`.
+- A package's vocabularies hold back the matches of the words a project accepts, at the top level or for a glob, and build the rules `Vale.Terms` and `Vale.Avoid`. A vocabulary is text lists or a YAML file with `regex`, `ignorecase` and `flags` options, as in Vale.
+- The built-in style `Vale` runs `Vale.Repetition`, which reports a repeated word such as `the the`, and `Vale.Spelling`, which reports a word the built-in dictionary lacks, as in Vale.
+- A glob's `params` set fields of rules by name, such as `Vale.Repetition: {max: 1}`, as Vale's `Style.Rule[param]` does, for the files of that glob.
 - A glob can hide the text its block and token patterns match from the prose rules in Markdown and MDX, as Vale's `BlockIgnores` and `TokenIgnores` do.
 - An HTML comment in a Markdown file, such as `<!-- hakkiri Style.Rule: off -->`, or `{/* hakkiri Style.Rule: off */}` in an MDX file, turns rules off and on for the text after it, with Vale's reach, and Vale's own `<!-- vale off -->` comments work too.
 - A walk skips what git ignores, as ripgrep does, and a file named on the command line draws a warning when no glob selects it. The config, a flag and a variable each set both.
 - Inline `$…$` and display `$$…$$` math reads as code in Markdown and MDX, by Pandoc's delimiter rules, as in Vale.
 - A file that no language reads is linted as plain text when a glob selects it, and `formats` maps an extension, a file name or a glob to a reader.
+- The string values of a Markdown file's YAML, TOML and JSON front matter are linted as text, with the scope of their key, as in Vale.
 - Files are checked in parallel.
 
 ## Install
@@ -63,7 +66,8 @@ hakkiri instructions
 
 Copyright (c) 2026 Victor Software House.  
 [AGPL-3.0-or-later](LICENSE): GNU Affero General Public License, version 3 or any later version.
-The embedded part-of-speech model is [CC BY-SA 4.0](data/tagger/NOTICE.md), trained on UD English EWT, and stays a separate data file.
+The embedded part-of-speech model is [CC BY-SA 4.0](data/tagger/NOTICE.md), trained on UD English EWT, and stays a separate data file.  
+A few rules correct its tags where it is wrong on our prose.  
 The embedded English dictionary is under the [terms of the English Speller Database](data/dictionary/NOTICE.md), which allow any use if its copyright notice ships with every copy.
 
 [ProseStyle]: https://github.com/victor-software-house/prose-style

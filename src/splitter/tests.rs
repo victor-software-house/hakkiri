@@ -9,6 +9,7 @@
 
 use std::error::Error;
 use std::fmt::Write as _;
+use std::time::Instant;
 
 use super::{Model, train};
 
@@ -210,7 +211,7 @@ fn a_50000_character_paragraph_splits() -> TestResult {
     let model = Model::english().map_err(ToString::to_string)?;
     let text = MIXED.repeat(50_000 / MIXED.len() + 1);
     assert!(text.len() >= 50_000);
-    let start = std::time::Instant::now();
+    let start = Instant::now();
     let found = model.split(&text);
     eprintln!(
         "{} characters, {} sentences, {:?}",
@@ -243,7 +244,7 @@ fn a_60000_line_input_splits() -> TestResult {
     for line in 0..60_000 {
         writeln!(text, "Line {line} ends here. Does the next one?")?;
     }
-    let start = std::time::Instant::now();
+    let start = Instant::now();
     let found = model.split(&text);
     eprintln!(
         "{} lines, {} sentences, {:?}",

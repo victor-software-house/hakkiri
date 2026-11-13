@@ -689,6 +689,26 @@ fn a_code_span_is_no_match() -> TestResult {
 }
 
 #[test]
+fn a_match_across_a_code_span_is_a_match() -> TestResult {
+    let rule = "extends: existence\nmessage: m\nnonword: true\ntokens: ['Run [^.]*now']\n";
+    let found = markdown(rule, "Run `cargo test` now.")?;
+    let [alert] = found.as_slice() else {
+        return Err(format!("expected one alert: {found:?}").into());
+    };
+    assert_eq!(alert.matched, "Run x now");
+    Ok(())
+}
+
+#[test]
+fn a_match_that_starts_or_ends_on_a_code_span_is_no_match() -> TestResult {
+    for token in [r"[^ ]+ now", r"Run [^ ]+"] {
+        let rule = format!("extends: existence\nmessage: m\nnonword: true\ntokens: ['{token}']\n");
+        assert_eq!(markdown(&rule, "Run `cargo` now.")?, Vec::<Alert>::new());
+    }
+    Ok(())
+}
+
+#[test]
 fn an_occurrence_counts_no_code_span() -> TestResult {
     let rule = |token: &str| {
         format!("extends: occurrence\nmessage: \"%d\"\nscope: sentence\nmax: 2\ntoken: '{token}'\n")

@@ -1,0 +1,33 @@
+[link O1 very <!-- vale off --> O2 very](http://a.example) O3 very.
+
+<!-- vale on -->
+
+*em P1 very <!-- vale off --> P2 very* P3 very.
+
+<!-- vale on -->
+
+![alt R1 very <!-- vale off -->](x.png) R2 very.
+
+<!-- vale on -->
+
+[ref]: http://a.example "S1 very <!-- vale off -->"
+
+S2 [ref] very really good.
+
+<!-- vale on -->
+
+S3 very [x](http://a.example "title <!-- vale off -->") S4 very.
+
+<!-- vale on -->
+
+S5 very <http://a.example> <!-- vale off --> S6 very.
+
+<!-- vale on -->
+
+U1 very  
+<!-- vale off -->  
+U2 very<br>U3 very <!-- vale on --> U4 very.
+
+U5 very\
+<!-- vale off -->\
+U6 very

@@ -1,0 +1,6 @@
+extends: consistency
+message: "Be consistent: '%s'."
+level: warning
+nonword: true
+either:
+  advisor: adviser

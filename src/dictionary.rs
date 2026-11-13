@@ -31,6 +31,7 @@ use affix::{CompoundToken, Flag, has_flag};
 use regex::Regex;
 pub use speller::{Book, Speller};
 
+use crate::case;
 use crate::case::{lower_str, upper_str};
 
 /// The English affix file that ships in the binary.
@@ -225,7 +226,7 @@ fn capitals(word: &str) -> Capitals {
 fn capitalize(word: &str) -> String {
     let mut chars = word.chars();
     chars.next().map_or_else(String::new, |first| {
-        format!("{}{}", crate::case::upper(first), chars.as_str())
+        format!("{}{}", case::upper(first), chars.as_str())
     })
 }
 
@@ -319,8 +320,7 @@ impl Dictionary {
             }
             let flags = written
                 .as_deref()
-                .map(|flags| dictionary.affixes.parse_flags(flags))
-                .unwrap_or_default();
+                .map_or_default(|flags| dictionary.affixes.parse_flags(flags));
             if has_flag(&flags, dictionary.affixes.forbidden.as_ref()) {
                 dictionary.add_forbidden(&word, flags);
                 continue;
@@ -384,7 +384,7 @@ impl Dictionary {
                 match token {
                     CompoundToken::Repeat(mark) => text.push(mark),
                     CompoundToken::Flag(flag) => {
-                        let words = flagged.get(&flag).map(Vec::as_slice).unwrap_or_default();
+                        let words = flagged.get(&flag).map_or_default(Vec::as_slice);
                         if words.is_empty() {
                             // Nothing carries the flag.
                             text.push_str(r"([^\s\S])");
@@ -539,7 +539,7 @@ impl Dictionary {
                 let first = word.chars().next().map_or(0, char::len_utf8);
                 !dotted_first(word)
                     && word.get(first..).is_some_and(|rest| {
-                        let head = word.get(..first).map(lower_str).unwrap_or_default();
+                        let head = word.get(..first).map_or_default(lower_str);
                         self.is_word(&format!("{head}{rest}"), true)
                     })
             }

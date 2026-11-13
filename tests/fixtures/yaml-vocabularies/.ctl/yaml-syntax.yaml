@@ -1,0 +1,5 @@
+packages:
+  - path: styles
+vocab: [yaml-syntax]
+files:
+  "text/*.md": {styles: [Team]}

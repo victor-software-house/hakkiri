@@ -206,6 +206,20 @@ fn an_autolink_is_a_gap_around_itself() -> TestResult {
 }
 
 #[test]
+fn an_email_or_a_www_address_stays_in_the_text_around_it() -> TestResult {
+    let fixture = load("addresses.md")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        ["Mail me@b.example, me@b.example or www.b.example now."]
+    );
+    assert_eq!(
+        fixture.texts(Scope::Link),
+        ["me@b.example", "me@b.example", "www.b.example"]
+    );
+    Ok(())
+}
+
+#[test]
 fn a_pipe_in_a_link_destination_outside_a_table_is_no_space() -> TestResult {
     let fixture = load("pipe-link.md")?;
     assert_eq!(fixture.texts(Scope::Paragraph), ["Open the page now."]);
@@ -300,11 +314,7 @@ fn a_table() -> TestResult {
 #[test]
 fn a_url_in_a_fenced_block() -> TestResult {
     let fixture = load("code-and-markup.md")?;
-    for url in [
-        "https://example.com",
-        "https://definition.example",
-        "A title",
-    ] {
+    for url in ["https://example.com", "https://definition.example"] {
         assert!(
             !fixture.prose().iter().any(|text| text.contains(url)),
             "{url} reached a prose node"
@@ -314,6 +324,16 @@ fn a_url_in_a_fenced_block() -> TestResult {
     assert_eq!(raw.len(), 1);
     assert_eq!(raw[0].span, 0..fixture.source.len());
     assert!(fixture.text(raw[0]).contains("https://example.com"));
+    Ok(())
+}
+
+#[test]
+fn a_front_matter_value_is_a_node_of_its_own() -> TestResult {
+    let fixture = load("code-and-markup.md")?;
+    let values = fixture.nodes(Scope::FrontMatter);
+    assert_eq!(values.len(), 1);
+    assert_eq!(fixture.text(values[0]), "A title");
+    assert_eq!(values[0].label.as_deref(), Some("title"));
     Ok(())
 }
 

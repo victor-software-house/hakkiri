@@ -1,0 +1,13 @@
+packages:
+  - path: styles
+files:
+  "text/*.md":
+    styles: [Team, Vale]
+    Vale.Spelling: off
+    Team.Exist: error
+    Vale.Repetition: warning
+    params:
+      Team.Exist:
+        limit: 1
+      Vale.Repetition:
+        max: 1

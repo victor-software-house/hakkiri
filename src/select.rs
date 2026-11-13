@@ -1,5 +1,9 @@
 //! Selection: the blocks of text a rule's scope reads in one file.
 
+use std::borrow::Cow;
+#[cfg(test)]
+use std::cell::Cell;
+use std::cmp::Reverse;
 use std::ops::Range;
 use std::{error, fmt};
 
@@ -12,7 +16,7 @@ use crate::tree::{Node, Reading, Scope, Tree};
 thread_local! {
     /// How many times this thread called [`select`], for the tests that count
     /// the selections a run makes.
-    pub(crate) static SELECTIONS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+    pub(crate) static SELECTIONS: Cell<usize> = const { Cell::new(0) };
 }
 
 /// One piece of text a rule reads.
@@ -26,6 +30,20 @@ pub struct Block {
     pub text: Text,
     /// The byte where the element that holds the text ends.
     pub closes: usize,
+    /// The bytes where a tag inside the element flushes the text before it.
+    pub flushes: Vec<usize>,
+}
+
+impl Block {
+    /// The byte where the text that holds the byte `at` is read: the first
+    /// tag after it that flushes it, or the end of the element.
+    pub(crate) fn closes_for(&self, at: usize) -> usize {
+        self.flushes
+            .iter()
+            .copied()
+            .find(|flush| *flush > at)
+            .unwrap_or(self.closes)
+    }
 }
 
 /// Why a selection failed.
@@ -79,8 +97,10 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
+        | Scope::FrontMatter
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -118,8 +138,10 @@ fn opens(parent: &Node, child: &Node) -> bool {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
+        | Scope::FrontMatter
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -156,8 +178,10 @@ const fn is_prose(scope: Scope) -> bool {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
+        | Scope::FrontMatter
         | Scope::Raw
         | Scope::CommentLine
         | Scope::CommentBlock
@@ -196,9 +220,10 @@ const fn decodes(scope: Scope) -> Decode {
         | Scope::Strong
         | Scope::Emphasis
         | Scope::Meta => Decode::Text,
-        Scope::Alt | Scope::Title | Scope::Description => Decode::Attribute,
+        Scope::Alt | Scope::Title | Scope::Image | Scope::Description => Decode::Attribute,
         Scope::Code
         | Scope::Raw
+        | Scope::FrontMatter
         | Scope::CommentLine
         | Scope::CommentBlock
         | Scope::CommentDocLine
@@ -215,9 +240,11 @@ const fn decodes(scope: Scope) -> Decode {
 /// A block of text has one scope, as in Vale ([`select`] explains which).
 /// `chain` is that scope when an element around the node gives it, and a
 /// paragraph with none is a `paragraph`.
-fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
+fn names(node: &Node, chain: Option<&'static str>) -> Vec<Cow<'static, str>> {
+    let scope = node.scope;
+    let held = |names: &[&'static str]| names.iter().copied().map(Cow::Borrowed).collect();
     match scope {
-        Scope::Paragraph => vec![chain.unwrap_or("paragraph"), "text"],
+        Scope::Paragraph => held(&[chain.unwrap_or("paragraph"), "text"]),
         Scope::Blockquote | Scope::List => Vec::new(),
         Scope::Heading1
         | Scope::Heading2
@@ -232,9 +259,18 @@ fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
         | Scope::TableHeader
         | Scope::TableCell
         | Scope::TableCaption
-        | Scope::FigureCaption => vec![chain.unwrap_or_else(|| scope.name()), "text"],
-        Scope::Alt | Scope::Description => vec![scope.name(), "text"],
+        | Scope::FigureCaption => held(&[chain.unwrap_or_else(|| scope.name()), "text"]),
+        Scope::Alt | Scope::Description => held(&[scope.name(), "text"]),
+        Scope::FrontMatter => {
+            let key = node.label.as_deref().unwrap_or_default();
+            vec![
+                Cow::Borrowed("text"),
+                Cow::Owned(format!("frontmatter.{key}")),
+                Cow::Owned(format!("text.frontmatter.{key}")),
+            ]
+        }
         Scope::Title
+        | Scope::Image
         | Scope::TableRow
         | Scope::Link
         | Scope::Code
@@ -245,7 +281,7 @@ fn names(scope: Scope, chain: Option<&'static str>) -> Vec<&'static str> {
         | Scope::CommentLine
         | Scope::CommentBlock
         | Scope::CommentDocLine
-        | Scope::CommentDocBlock => vec![scope.name()],
+        | Scope::CommentDocBlock => held(&[scope.name()]),
     }
 }
 
@@ -286,8 +322,10 @@ fn segments(node: &Node) -> Vec<Range<usize>> {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
+        | Scope::FrontMatter
         | Scope::Raw => node.segments.clone(),
     }
 }
@@ -327,8 +365,10 @@ fn readings(node: &Node) -> Vec<Reading> {
         | Scope::Emphasis
         | Scope::Alt
         | Scope::Title
+        | Scope::Image
         | Scope::Description
         | Scope::Meta
+        | Scope::FrontMatter
         | Scope::Raw => node.reads.clone(),
     }
 }
@@ -347,7 +387,7 @@ pub(crate) fn replacements(node: &Node, blank: &[Inline]) -> Vec<(Range<usize>, 
         }
         pending.extend(child.children.iter());
     }
-    found.sort_by_key(|(range, _)| (range.start, std::cmp::Reverse(range.end)));
+    found.sort_by_key(|(range, _)| (range.start, Reverse(range.end)));
     let mut kept: Vec<(Range<usize>, Replace)> = Vec::new();
     for (range, kind) in found {
         if kept.last().is_none_or(|(last, _)| last.end <= range.start) {
@@ -361,6 +401,47 @@ pub(crate) fn replacements(node: &Node, blank: &[Inline]) -> Vec<(Range<usize>, 
 struct Step<'t> {
     node: &'t Node,
     chain: Option<&'static str>,
+    /// The scope of the node that holds this one.
+    parent: Option<Scope>,
+}
+
+/// The steps for the children of `node`, last first, so that a stack pops them
+/// in order.
+///
+/// A child passes the scope on when it is the first thing inside `node`.
+/// In a list, a quote or a table row that is the child's `first` flag.
+/// An HTML block with an attribute but no text can sit before it as a child.
+/// Elsewhere it is the first child.
+fn children<'t>(node: &'t Node, chain: Option<&'static str>) -> impl Iterator<Item = Step<'t>> {
+    let container = matches!(
+        node.scope,
+        Scope::List | Scope::Blockquote | Scope::TableRow
+    );
+    node.children
+        .iter()
+        .enumerate()
+        .rev()
+        .map(move |(index, child)| Step {
+            node: child,
+            chain: if (container || index == 0) && opens(node, child) {
+                chain
+            } else {
+                None
+            },
+            parent: Some(node.scope),
+        })
+}
+
+/// The scope names of the element around a node that a part may name next to
+/// the node's own: the link or the image that holds a title.
+///
+/// `title & link` selects the title of a link, and `link` alone selects none,
+/// because the context is not the node's own scope.
+fn context(node: &Node, parent: Option<Scope>) -> Vec<&'static str> {
+    match (node.scope, parent) {
+        (Scope::Title, Some(parent @ (Scope::Link | Scope::Image))) => vec![parent.name()],
+        _ => Vec::new(),
+    }
 }
 
 /// The blocks of `tree`, a file of `source` with `extension`, that `selector`
@@ -389,6 +470,10 @@ pub fn select(
 ) -> Result<Vec<Block>, SelectError> {
     #[cfg(test)]
     SELECTIONS.with(|count| count.set(count.get() + 1));
+    // A scope may name the extension the file has or the one of its reader, so
+    // `text.md` reaches a `.txt` file that `formats` maps to `md`, and
+    // `text.txt` still reaches it as in Vale.
+    let extensions = [extension, tree.language.extension()];
     let model = if selector.wants_sentences() {
         Some(Model::english().map_err(SelectError::Model)?)
     } else {
@@ -399,17 +484,28 @@ pub fn select(
         .roots
         .iter()
         .rev()
-        .map(|node| Step { node, chain: None })
+        .map(|node| Step {
+            node,
+            chain: None,
+            parent: None,
+        })
         .collect();
-    while let Some(Step { node, chain }) = steps.pop() {
+    while let Some(Step {
+        node,
+        chain,
+        parent,
+    }) = steps.pop()
+    {
         let chain = chain.or_else(|| named_scope(node.scope));
-        let held = names(node.scope, chain);
-        let own = selector.reads(&held, extension, false);
+        let named = names(node, chain);
+        let held: Vec<&str> = named.iter().map(AsRef::as_ref).collect();
+        let around = context(node, parent);
+        let own = selector.reads(&held, &around, &extensions, false);
         let prose = is_prose(node.scope);
         let sentences = if prose && model.is_some() {
             let mut with_sentence = vec!["sentence"];
             with_sentence.extend(&held);
-            selector.reads(&with_sentence, extension, true)
+            selector.reads(&with_sentence, &around, &extensions, true)
         } else {
             None
         };
@@ -447,6 +543,7 @@ pub fn select(
                     sentence: false,
                     text: text.clone(),
                     closes: node.closes,
+                    flushes: node.flushes.clone(),
                 });
             }
             if let (Some(blank), Some(model)) = (&sentences, model) {
@@ -461,25 +558,13 @@ pub fn select(
                             sentence: true,
                             text,
                             closes: node.closes,
+                            flushes: node.flushes.clone(),
                         });
                     }
                 }
             }
         }
-        steps.extend(
-            node.children
-                .iter()
-                .enumerate()
-                .rev()
-                .map(|(index, child)| Step {
-                    node: child,
-                    chain: if index == 0 && opens(node, child) {
-                        chain
-                    } else {
-                        None
-                    },
-                }),
-        );
+        steps.extend(children(node, chain));
     }
     Ok(blocks)
 }

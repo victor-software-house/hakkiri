@@ -1,0 +1,29 @@
+extends: existence
+message: "Found '%s'."
+level: warning
+ignorecase: false
+tokens:
+  - GitHub
+  - github
+  - GITHUB
+  - Gith
+  - 'Node.js'
+  - Nodexjs
+  - 'C\+\+'
+  - Cxx
+  - 'harness(?:es|ed)?'
+  - zebra
+  - Zebra
+  - ZEBRA
+  - 'utiliz\w+'
+  - Kubernetes
+  - kubernetes
+  - 'Zeb\(ra\)'
+  - '(?i)colours?'
+  - Alpha
+  - Beta
+  - Gamma
+  - Delta
+  - 'foo(?:zz|z)?'
+  - '3\.10'
+  - '3\.1\b'

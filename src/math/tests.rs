@@ -1,6 +1,8 @@
 //! Tests for the math spans: the cases of `TestMathInline` and
 //! `TestMathDisplay` in Vale, and the ones the probe of Vale added.
 
+use std::time::{Duration, Instant};
+
 use markdown::{ParseOptions, to_mdast};
 
 use super::{find, inline_spans, mask};
@@ -194,7 +196,7 @@ fn the_indentation_of_a_container_is_not_the_indentation_of_a_line() {
 
 #[test]
 fn a_paragraph_of_unclosed_openers_costs_its_length() {
-    let started = std::time::Instant::now();
+    let started = Instant::now();
     for text in [
         "$a ".repeat(100_000),
         "<a".repeat(100_000),
@@ -203,7 +205,7 @@ fn a_paragraph_of_unclosed_openers_costs_its_length() {
         let _ = inline_spans(&text, 0, false);
     }
     assert!(
-        started.elapsed() < std::time::Duration::from_secs(5),
+        started.elapsed() < Duration::from_secs(5),
         "{:?}",
         started.elapsed()
     );
@@ -214,6 +216,13 @@ fn a_line_without_the_marker_of_a_quote_keeps_its_spaces() {
     let open = |text: &str| !masked(text).contains('z');
     assert!(open("> Quote\n   $$\n   z\n   $$\n"));
     assert!(!open("> Quote\n      $$\n      z\n      $$\n"));
+}
+
+#[test]
+fn a_line_without_the_marker_of_a_quote_is_outside_the_items_in_the_quote() {
+    let open = |text: &str| !masked(text).contains('z');
+    assert!(open("> - Item\n   $$\n   z\n   $$\n"));
+    assert!(!open("> - Item\n      $$\n      z\n      $$\n"));
 }
 
 #[test]

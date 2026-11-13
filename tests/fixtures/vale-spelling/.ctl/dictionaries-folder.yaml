@@ -1,0 +1,15 @@
+packages:
+  - path: dicts
+files:
+  "text/*.md":
+    styles: [Vale]
+    Vale.Repetition: off
+  "text/*.rs":
+    styles: [Vale]
+    Vale.Repetition: off
+  "text/*.mdx":
+    styles: [Vale]
+    Vale.Repetition: off
+  "text/*.ts":
+    styles: [Vale]
+    Vale.Repetition: off

@@ -38,13 +38,34 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A package may hold vocabularies in `config/vocabularies/<name>/`, which the `vocab` key names at the top level and in a glob of `files` (operator, 2026-11-11).  
    The top level reaches every check that reads accepted terms, and a glob's list reaches the files it matches, as Vale's `Vocab` does.  
    The lists build `Vale.Terms` and `Vale.Avoid` in a built-in style `Vale`, and a glob's vocabulary builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` for its files.  
+   The style `Vale` always exists and holds `Vale.Repetition`, and `Vale.Spelling` when a glob uses the style, each read from Vale's definition as text by `vale_repetition` and `vale_spelling` (rows `HKR-038` and `HKR-026`).  
+   A glob uses the style when it lists `Vale` in `styles`, names a rule that starts with `Vale.`, or sets `params` for one.  
+   `Named::add_layer` finds it before the packages load, so a dictionary that cannot load fails no run of a config that spells nothing.  
+   `Vale.Spelling` is the one rule named for Vale in `rule/package.rs`: it reads `config/dictionaries` and `config/ignore` of every package, where a rule file reads its own.  
+   `read_lists` refuses an entry that a link sends outside the package, as `find` does, and reads each real folder once, so a link loop ends.  
+   A hakkiri config that lists `Vale` and whose Vale config turns spelling off sets `Vale.Spelling: off` too, or the fixture gives alerts that Vale does not.  
+   Repetition compares words by simple case folding, as Go's `EqualFold` does, never by lowercasing the whole word.  
+   A glob's `params` set fields of rules by name, as Vale's `Style.Rule[param] = value` does (row `HKR-059`).  
+   `Rule::with_params` reads a rule again from the text it came from, with the parameters laid over its fields as `extends` lays a child over its parent, so each check accepts the fields it defines and the rule file's kinds.  
+   A parameter belongs to its glob, where Vale applies it to every file and lets the last section win everywhere.  
+   `Project::plan` picks the rule read with the parameters that add up for the file, from the sets `build_variants` read when the config loaded.  
+   A vocabulary folder holds `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml`, all read (row `HKR-041`).  
+   `src/vocabulary/yaml.rs` parses a YAML file through ctl-core's input and checks each entry on its node, so one run reports every wrong entry on Vale's line.  
+   A plain YAML term is literal, `affix` names an affix file in the packages' `config/dictionaries` folders (the holder first, never `$DICPATH`), and a key the file does not define is an error.  
+   With `ignorecase` the period of a term is literal too, where Vale keeps it a wildcard.  
    A glob's `block_ignores` and `token_ignores` hide what their patterns match from the prose rules, as Vale's `BlockIgnores` and `TokenIgnores` do (row `HKR-043`).  
    hakkiri rewrites a Markdown or MDX file as Vale does, parses the result, and gives every node the bytes of the file it came from, so alerts point at the file as written.  
    A source file takes them in the Markdown of each comment, where Vale applies none.  
    An HTML comment of a Markdown file, or a `{/* */}` comment of an MDX file, turns rules off and on with Vale's reach (row `HKR-031`, operator, 2026-11-11).  
    The forms are `hakkiri off` and `on`, `hakkiri Style.Rule: off` and `on`, a level, and Vale's own.  
-   `src/control.rs` reads the comments, leaves the text between `off` and `on` out of the tree, gates each block when its element ends, and drops an alert that lies between two comments.  
+   `src/control.rs` reads the comments, leaves the text between `off` and `on` out of the tree, gates each block where Vale reads it, and drops an alert that lies between two comments.  
+   Vale reads a block when its element ends, or earlier where a tag that opens a block flushes the text so far: a nested list in a tight item, a `div` inside a paragraph.  
+   `Node::closes` and `Node::flushes` hold those bytes, and the engine gates each alert at its own.  
    Math reads as code by Pandoc's rules, as in Vale: `src/math.rs` finds each `$…$` span and `$$…$$` block, masks the file at the same length, and parses it again (row `HKR-048`).  
+   Front matter values are nodes of the scope `frontmatter`, with their key as label (row `HKR-049`).  
+   `src/frontmatter.rs` takes the top-level strings of YAML, TOML and JSON from ctl-core's `Input::top_level`, which refuses nothing that YAML allows.  
+   A block that no parser reads gives no value and fails the file with the line of the parser's problem, and the rest of the file is linted, where Vale lints none of it.  
+   The ignore rewrite leaves the front matter as written.  
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
    Vale matches the path as given; the departure is in the `vale-differences` spec.
 6. **Exit status.**
@@ -53,7 +74,15 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` are flags, variables and config keys, resolved in that order and then the default; only the project's config holds the keys, and a package's settings file that does is an error.  
    A walk is the `ignore` crate's, with git rules only: it skips what git ignores unless `gitignore` is false, and a named file is never filtered.  
    A selected file with no reader is plain text (`Language::Text`, one `raw` root of paragraphs), unless `on_unknown` changes that.  
+   `code_span_size` is the words a code span counts as, 1 by default and 0 as Vale counts it.  
+   It is a key of a package's file, the project and a glob, then `HAKKIRI_CODE_SPAN_SIZE`, then `--code-span-size`, each beating the one before.  
+   `Plan` holds the value of each file, and `Text::code_sized` reads the text of a `metric` or `readability` rule with it.  
+   A rule that reads a match never sees it.  
    `formats` looks a file up as Vale's `formatFor` does: the extension, then the name or a glob, in key order.  
+   A file it maps has two extensions for a scope such as `text.md`, its own and its reader's, where Vale keeps the file's own.  
+   The tree records the reader, and a scope may name either extension.  
+   A plain-text file is binary, and skipped, when its first 8192 bytes hold a NUL byte.  
+   A byte that is not UTF-8 reads as one `?`, so a Latin-1 file is linted at the byte offsets Vale gives.  
    The pretty output is a line per alert with no colour and no frame, because tools read it.
 7. **Test cases.**
    A rule file holds its cases under `tests`, and a `*.test.yml` file is a list of them. `check` loads cases and never runs them.  
@@ -71,6 +100,19 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    No other build links it.  
    Each change that ships behaviour adds a `.changeset/` fragment; merging the Version PR is the release.  
    The README's install line and the skill's `version:` line are version pins, so never edit their numbers by hand.
+10. **Tags.**
+    The English tagger is the model of prose at `b33e60d` with the corrections of `src/tagger/corrections.rs` applied after it, each a rule with its reason.
+    `tag_treebank` skips them, so a title is tagged as prose tags it.
+    A new correction needs a test, and a measure on UD English GUM, on the judged conflicts of our documents and on the alerts of a rule that reads tags.
+    A `sequence` rule reads a code span as a noun: the tagger reads the word `name` in its place, its tag is `NN`, and a pattern reads it as `X`, so a lowercase pattern refuses it.
+    An `existence` rule reads a code span as one `*` and drops a match only when it starts or ends on the span.
+    `nouns_of_technical_prose` reads three lists of nouns that the model tags as another part of speech, one for each place a noun is certain.
+    Add a word to a list only with the sampled readings of that word in that place and the alerts that need it, and run the GUM count.
+11. **Sequence forms.**
+    A `Sequence` holds `forms`, each a `Form` with its own anchor and candidate starts, and the rule's `exceptions`.
+    `find_tagged` walks each form over the one tagged sentence, and `merged` joins the matches.
+    One form's matches stay as found, which keeps a `tokens` rule at Vale's alerts.
+    A match that overlaps one kept from another form is dropped.
 
 ## Workflow
 

@@ -1,0 +1,122 @@
+- A1 very
+  <!-- vale off -->
+  - A2 very
+- A3 very
+
+A4 very really good.
+
+<!-- vale on -->
+
+- B1 very
+  <!-- vale off -->
+  <div>B2 very</div>
+- B3 very
+
+B4 very really good.
+
+<!-- vale on -->
+
+- C1 very
+  <!-- vale off --><p>C2 very</p>
+- C3 very
+
+C4 very really good.
+
+<!-- vale on -->
+
+<div>D1 very
+
+<!-- vale off -->
+
+---
+
+D2 very
+</div>
+
+D3 very really good.
+
+<!-- vale on -->
+
+<div>E1 very
+
+<!-- vale off -->
+
+[x]: http://a.example
+
+<!-- vale on -->
+
+# E2 very
+
+E3 very really good.
+
+<div>F1 very
+
+<!-- vale off -->
+
+| a |
+|:--|
+| F2 very |
+
+F3 very really good.
+
+<!-- vale on -->
+
+- <div>G1 very
+
+  <!-- vale off -->
+
+  G2 very
+
+- G3 very
+
+G4 very really good.
+
+<!-- vale on -->
+
+> <div>H1 very
+> <!-- vale off -->
+> </div>
+>
+> H2 very
+
+H3 very really good.
+
+<!-- vale on -->
+
+- I1 very
+  <!-- vale off -->
+  ```
+  code
+  ```
+- I2 very
+
+I3 very really good.
+
+<!-- vale on -->
+
+- J1 very
+  | a |
+  |:--|
+  | J2 very |
+  <!-- vale off -->
+- J3 very
+
+J4 very really good.
+
+<!-- vale on -->
+
+- K1 very
+  <!-- vale off -->
+  # K2 very
+- K3 very
+
+K4 very really good.
+
+<!-- vale on -->
+
+- L1 very
+  <!-- vale off -->
+  > L2 very
+- L3 very
+
+L4 very really good.

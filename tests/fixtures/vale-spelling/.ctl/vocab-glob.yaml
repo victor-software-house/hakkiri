@@ -1,0 +1,19 @@
+packages:
+  - path: plain
+files:
+  "text/*.md":
+    styles: [Vale]
+    Vale.Repetition: off
+    vocab: [Team]
+  "text/*.rs":
+    styles: [Vale]
+    Vale.Repetition: off
+    vocab: [Team]
+  "text/*.mdx":
+    styles: [Vale]
+    Vale.Repetition: off
+    vocab: [Team]
+  "text/*.ts":
+    styles: [Vale]
+    Vale.Repetition: off
+    vocab: [Team]

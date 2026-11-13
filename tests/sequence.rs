@@ -180,6 +180,19 @@ fn point_at_one_word() -> TestResult {
 }
 
 #[test]
+fn a_target_narrows_the_range_and_the_message_reads_every_word() -> TestResult {
+    let text = rule(
+        "Write '%s%s' as one word.",
+        "tokens: [{pattern: your}, {pattern: self, target: true}]\n",
+    );
+    assert_eq!(
+        found(&text, "Do it your self.\n")?,
+        [pair("self", "Write 'yourself' as one word.")]
+    );
+    Ok(())
+}
+
+#[test]
 fn a_universal_noun() -> TestResult {
     let text = rule("Found.", "tokens: [{pattern: the}, {upos: NOUN}]\n");
     assert_eq!(
@@ -267,5 +280,46 @@ fn a_huge_skip_and_min_cost_nothing() -> TestResult {
         none()
     );
     assert!(started.elapsed() < Duration::from_secs(10));
+    Ok(())
+}
+
+fn noun_says() -> String {
+    rule(
+        "'%s %s' gives a thing speech.",
+        "tokens:\n  - tag: NN|NNS\n  - pattern: says\n",
+    )
+}
+
+#[test]
+fn a_code_span_is_the_noun_it_names() -> TestResult {
+    assert_eq!(
+        found(&noun_says(), "The call fails as the flag says.\n")?,
+        [pair("flag says", "'flag says' gives a thing speech.")]
+    );
+    assert_eq!(
+        found(&noun_says(), "The call fails as `flag` says.\n")?,
+        [pair("x says", "'x says' gives a thing speech.")]
+    );
+    assert_eq!(
+        found(&noun_says(), "The call fails as [`flag`] says.\n")?,
+        [pair("[x] says", "'[x] says' gives a thing speech.")]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_code_span_is_no_lowercase_word_of_a_stack() -> TestResult {
+    let text = rule(
+        "A stack of nouns.",
+        "tokens:\n  - tag: NN|NNS\n    pattern: '[a-z][a-z-]*'\n    min: 4\n",
+    );
+    assert_eq!(
+        found(&text, "The session lake store path is long.\n")?,
+        [pair("session lake store path", "A stack of nouns.")]
+    );
+    assert_eq!(
+        found(&text, "The session lake `store` path is long.\n")?,
+        none()
+    );
     Ok(())
 }

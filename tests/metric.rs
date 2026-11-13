@@ -12,7 +12,7 @@
 use std::error::Error;
 
 use ctl_core::indoc;
-use hakkiri::engine::lint;
+use hakkiri::engine::{lint, lint_accepting};
 use hakkiri::rule::Rule;
 use hakkiri::{Language, parse};
 
@@ -53,6 +53,157 @@ fn a_code_span_counts_one_word_in_a_metric() -> TestResult {
         messages(WORDS_OVER_TWO, "Two words `four word span` more.\n")?,
         ["4.00"]
     );
+    Ok(())
+}
+
+/// The messages of the alerts that `rule` gives for `source` when a code span
+/// counts as `size` words.
+fn sized(rule: &str, source: &str, size: u8) -> Result<Vec<String>, Box<dyn Error>> {
+    let rule = Rule::from_text("Team.Rule", "Team/Rule.yml", rule)?;
+    let tree = parse(Language::Markdown, source)?;
+    Ok(lint_accepting(&[rule], &tree, source, "md", &[], size)?
+        .into_iter()
+        .map(|alert| alert.message)
+        .collect())
+}
+
+#[test]
+fn a_code_span_counts_as_many_words_as_its_size() -> TestResult {
+    let first = "Run `a`, `b`, `c` and `one two three` today.\n";
+    let second = "Two words `four word span` more.\n";
+    // Vale counts no word for a code span: 3.00 and 3.00 at 66bbb85.
+    for (size, wanted) in [
+        (0, ["3.00", "3.00"]),
+        (1, ["7.00", "4.00"]),
+        (2, ["11.00", "5.00"]),
+    ] {
+        assert_eq!(
+            [
+                sized(WORDS_OVER_TWO, first, size)?,
+                sized(WORDS_OVER_TWO, second, size)?
+            ]
+            .concat(),
+            wanted,
+            "size {size}"
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn a_link_whose_text_is_its_address_counts_no_word() -> TestResult {
+    // Vale 66bbb85 counts 2 and 4 for the first two, and 2 for the third.
+    assert_eq!(printing("words", "See [a.md](a.md) now.\n")?, ["2.00"]);
+    assert_eq!(printing("words", "See [a.md](b.md) now.\n")?, ["4.00"]);
+    assert_eq!(
+        printing("words", "See [a.md][a] now.\n\n[a]: a.md\n")?,
+        ["2.00"]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_link_is_its_address_only_when_its_text_is_the_href_vale_reads() -> TestResult {
+    // goldmark writes the href percent-encoded, and Vale 66bbb85 drops the
+    // text only when it equals that href. Vale counts the numbers below.
+    assert_eq!(printing("words", "See [ä.md](ä.md) now.\n")?, ["4.00"]);
+    assert_eq!(printing("words", "See [a b](<a b>) now.\n")?, ["4.00"]);
+    assert_eq!(printing("words", "See [a%20b](a%20b) now.\n")?, ["2.00"]);
+    assert_eq!(printing("words", "See [a&b](a&b) now.\n")?, ["2.00"]);
+    assert_eq!(printing("words", "See [a|b](a|b) now.\n")?, ["4.00"]);
+    assert_eq!(
+        printing("words", "See [ä.md][a] now.\n\n[a]: ä.md\n")?,
+        ["4.00"]
+    );
+    assert_eq!(
+        printing("words", "Visit <https://b.example/ä> for special thanks.\n")?,
+        ["8.00"]
+    );
+    // Vale counts 5: goldmark's linkify ends a bare address before `ä`.
+    assert_eq!(
+        printing("words", "Visit https://b.example/ä for special thanks.\n")?,
+        ["8.00"]
+    );
+    Ok(())
+}
+
+/// A rule that reports the words of every block of one scope.
+fn words_of(scope: &str) -> String {
+    format!("extends: metric\nmessage: \"%s\"\nscope: {scope}\nformula: words\ncondition: '> -1'\n")
+}
+
+#[test]
+fn each_alert_keeps_its_place_where_vale_drops_it() -> TestResult {
+    // Each case lists what Vale 66bbb85 gives: the same alerts less the ones
+    // that share a line and a column with an earlier alert of the rule.
+    let table = "| Head | Other |\n|:--|:--|\n| one | two words |\n";
+    // Vale: 1.00.
+    assert_eq!(sized(&words_of("table.cell"), table, 0)?, ["1.00", "2.00"]);
+    // Vale: 2.00 and 2.00.
+    assert_eq!(
+        sized(
+            &words_of("sentence"),
+            "First sentence. `Second` starts with code. Third one.\n",
+            0
+        )?,
+        ["2.00", "3.00", "2.00"]
+    );
+    // Vale: 1.00, on the line of the definition.
+    assert_eq!(
+        sized(
+            &words_of("paragraph"),
+            "See [`a/b`][r].\n\nTwo words here.\n\nThree words go here.\n\n[r]: a/b\n",
+            0
+        )?,
+        ["1.00", "3.00", "4.00"]
+    );
+    // Vale: 4.00.
+    assert_eq!(
+        sized(
+            &words_of("paragraph"),
+            "First a paragraph holds `&amp;lt; marker`\n\nSecond paragraph here reads `&lt; marker`\n",
+            0
+        )?,
+        ["4.00", "4.00"]
+    );
+    Ok(())
+}
+
+#[test]
+fn an_autolink_counts_the_words_that_vale_counts() -> TestResult {
+    // Vale counts 8 for the first, since the address of an email autolink is
+    // not its text, and 4 for the second.
+    assert_eq!(
+        printing(
+            "words",
+            "Alan Beale <a@b.example> deserves special thanks.\n"
+        )?,
+        ["8.00"]
+    );
+    assert_eq!(
+        printing("words", "Visit <https://b.example/a> for special thanks.\n")?,
+        ["4.00"]
+    );
+    Ok(())
+}
+
+#[test]
+fn the_size_of_a_code_span_reaches_a_metric_of_the_whole_file() -> TestResult {
+    let whole = "extends: metric\nmessage: \"%s\"\nformula: words\ncondition: '> 2'\n";
+    let text = "Run `a`, `b`, `c` and `one two three` today.\n";
+    assert_eq!(sized(whole, text, 0)?, ["3.00"]);
+    assert_eq!(sized(whole, text, 1)?, ["7.00"]);
+    assert_eq!(sized(whole, text, 2)?, ["11.00"]);
+    Ok(())
+}
+
+#[test]
+fn the_size_of_a_code_span_reaches_a_readability_score() -> TestResult {
+    let rule = "extends: readability\nmessage: \"%s\"\ngrade: -100\nmetrics:\n  - Flesch-Kincaid\n";
+    let text = "Run `a`, `b`, `c` and `one two three` today.\n";
+    let none = sized(rule, text, 0)?;
+    let one = sized(rule, text, 1)?;
+    assert_ne!(none, one);
     Ok(())
 }
 

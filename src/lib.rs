@@ -16,6 +16,7 @@ pub mod engine;
 mod entity;
 mod error;
 pub mod formula;
+mod frontmatter;
 mod html;
 mod html_text;
 mod ignore;
@@ -88,6 +89,11 @@ pub fn parse_ignoring(
     blocks: &[&Pattern],
     tokens: &[&Pattern],
 ) -> Result<Tree, Error> {
+    let front_matter_fault = if matches!(language, Language::Markdown | Language::Mdx) {
+        frontmatter::fault(source)
+    } else {
+        None
+    };
     let (roots, code_blocks, comments) = match language {
         Language::Markdown => ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?,
         Language::Mdx => ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?,
@@ -119,8 +125,10 @@ pub fn parse_ignoring(
         control::cut(&mut root.children, &comments, source.len());
     }
     Ok(Tree {
+        language,
         roots,
         code_blocks,
         comments,
+        front_matter_fault,
     })
 }

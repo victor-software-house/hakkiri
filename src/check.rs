@@ -68,6 +68,8 @@ pub(crate) struct Memory {
 /// An `existence`, `repetition`, `spelling` or `substitution` rule holds back
 /// the matches they name, besides its own exceptions, whatever it sets for
 /// `vocab` and `nonword`.
+/// A `metric` or `readability` rule counts each code span as `code_span_size`
+/// words.
 ///
 /// # Errors
 ///
@@ -78,16 +80,17 @@ pub(crate) fn run(
     memory: &mut Memory,
     extension: &str,
     accepted: &[&Exceptions],
+    code_span_size: u8,
 ) -> Result<Vec<Hit>, SearchError> {
     match check {
         Check::Existence(existence) => run_existence(existence, text, accepted),
         Check::Substitution(substitution) => run_substitution(substitution, text, accepted),
         Check::Occurrence(occurrence) => run_occurrence(occurrence, text),
-        Check::Metric(metric) => run_metric(metric, text),
+        Check::Metric(metric) => run_metric(metric, text, code_span_size),
         Check::Consistency(consistency) => run_consistency(consistency, text, memory),
         Check::Conditional(conditional) => run_conditional(conditional, text, memory),
         Check::Repetition(repetition) => run_repetition(repetition, text, accepted),
-        Check::Readability(readability) => Ok(run_readability(readability, text)),
+        Check::Readability(readability) => Ok(run_readability(readability, text, code_span_size)),
         Check::Capitalization(capitalization) => Ok(run_capitalization(capitalization, text)),
         Check::Sequence(sequence) => run_sequence(sequence, text),
         Check::Spelling(spelling) => Ok(run_spelling(spelling, text, extension, accepted)),
@@ -195,20 +198,23 @@ pub(crate) fn accepted_hold(
     Ok(false)
 }
 
-/// Each match of the tokens that no exception holds back and no code span
-/// overlaps.
+/// Each match of the tokens that no exception holds back and that neither
+/// starts nor ends on a code span.
+///
+/// The pattern reads a code span as `*`, so a match runs across one when
+/// there is text on both sides of it.
 fn run_existence(
     existence: &Existence,
     text: &Text,
     accepted: &[&Exceptions],
 ) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
-    let found = existence.pattern.find_all(content)?;
+    let found = existence.pattern.find_all(text.pattern_reading())?;
     let phrases = phrase_spans(&existence.exceptions, content, !found.is_empty())?;
     let held = accepted_spans(accepted, content, !found.is_empty())?;
     let mut hits = Vec::new();
     for range in found {
-        if text.overlaps_code(&range) {
+        if text.edge_in_code(&range) {
             continue;
         }
         let Some(matched) = content.get(range.clone()) else {
@@ -382,14 +388,14 @@ fn count_tokens(existence: &Existence, content: &str) -> Result<usize, SearchErr
 
 /// One hit at the start of `text` when the metric holds for it, measured
 /// apart from the rest of the file.
-fn run_metric(metric: &Metric, text: &Text) -> Result<Vec<Hit>, SearchError> {
+fn run_metric(metric: &Metric, text: &Text, code_span_size: u8) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
     let occurrences = metric
         .tokens
         .as_ref()
         .map(|tokens| count_tokens(tokens, content))
         .transpose()?;
-    let Some(base) = variables(content, Elements::default()) else {
+    let Some(base) = variables(&text.code_sized(code_span_size), Elements::default()) else {
         return Ok(Vec::new());
     };
     Ok(measure(metric, &base, occurrences)
@@ -505,10 +511,36 @@ fn run_consistency(
 /// Whether the matches `before` and `current` are the same word.
 fn same(repetition: &Repetition, before: &str, current: &str) -> bool {
     if repetition.ignorecase {
-        before.to_lowercase() == current.to_lowercase()
+        equal_fold(before, current)
     } else {
         before == current
     }
+}
+
+/// Whether `left` and `right` are equal without regard to case, as Go's
+/// `strings.EqualFold` reads them: character by character, each by its simple
+/// case folding. Lowercasing the whole text is not that, since it gives a
+/// final `ς` for a `Σ` at the end of a word and a `σ` for one inside it, so
+/// `ΣΑΣ` and `σασ` differ.
+fn equal_fold(left: &str, right: &str) -> bool {
+    left.chars().map(fold).eq(right.chars().map(fold))
+}
+
+/// The simple case folding of `character`, found as the lowercase of its
+/// uppercase when each is one character: `Σ`, `σ` and `ς` all give `σ`, and
+/// `K` of the Kelvin sign gives `k`. A character with a longer case mapping,
+/// such as `ß` or `İ`, keeps it out of that step. The dotless `ı` is the one
+/// character whose uppercase is not in its folding, so it stays as it is.
+fn fold(character: char) -> char {
+    fn single(mut mapped: impl Iterator<Item = char>) -> Option<char> {
+        let first = mapped.next()?;
+        mapped.next().is_none().then_some(first)
+    }
+    if character == '\u{131}' {
+        return character;
+    }
+    let upper = single(character.to_uppercase()).unwrap_or(character);
+    single(upper.to_lowercase()).unwrap_or(upper)
 }
 
 /// Each match of the tokens that repeats the one before it, once the repeats
@@ -610,7 +642,7 @@ fn run_capitalization(capitalization: &Capitalization, text: &Text) -> Vec<Hit> 
 /// One hit for each run of words in `text`, a sentence, that the rule's tokens
 /// match. The message's `%s` read the words of the run.
 fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchError> {
-    Ok(find(sequence, text.as_str())?
+    Ok(find(sequence, text)?
         .into_iter()
         .map(|matched| Hit {
             message: None,
@@ -623,8 +655,8 @@ fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchErro
 
 /// One hit at the start of `text` when the average grade of the text is over
 /// the rule's grade, measured apart from the rest of the file.
-fn run_readability(readability: &Readability, text: &Text) -> Vec<Hit> {
-    let Some(base) = variables(text.as_str(), Elements::default()) else {
+fn run_readability(readability: &Readability, text: &Text, code_span_size: u8) -> Vec<Hit> {
+    let Some(base) = variables(&text.code_sized(code_span_size), Elements::default()) else {
         return Vec::new();
     };
     graded(readability, &base)

@@ -1,1 +1,2 @@
 tests/fixtures/*.fixture -text
+tests/fixtures/comment-controls/text/c23.md.fixture -text

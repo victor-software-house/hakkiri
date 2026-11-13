@@ -1,0 +1,11 @@
+packages:
+  - path: styles
+files:
+  "text/*.md":
+    styles: [Team, Vale]
+    Vale.Spelling: off
+    params:
+      Team.Occ:
+        token: 'Very'
+        ignorecase: true
+        max: 1

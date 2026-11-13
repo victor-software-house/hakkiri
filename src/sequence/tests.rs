@@ -7,6 +7,8 @@
 //! text of one alert and its message, for each alert Vale gave, in order. The
 //! rows come from Vale at `66bbb85` run in Go on each text as one sentence,
 //! with prose `b33e60d` tagging it.
+//! The walk reads the tags of the model alone here, since the corrections that
+//! hakkiri makes after the model would change the tags that Vale walked.
 //!
 //! Vale cuts each text again with prose's segmenter and tags each part apart,
 //! where hakkiri tags the sentence its own splitter gave whole. `inputs.txt`
@@ -21,11 +23,13 @@
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
+use std::ops::Range;
 use std::path::Path;
 
-use super::find;
+use super::find_tagged;
 use crate::alert::fill;
 use crate::rule::{Check, Rule};
+use crate::tagger::Tagger;
 
 type TestResult = Result<(), Box<dyn Error>>;
 
@@ -35,7 +39,10 @@ fn alerts(name: &str, text: &str, sentence: &str) -> Result<Vec<(String, String)
     let Check::Sequence(check) = &rule.check else {
         return Err(format!("{name} is not a sequence rule").into());
     };
-    Ok(find(check, sentence)?
+    let tagged = Tagger::english()
+        .map_err(ToString::to_string)?
+        .tag_model(sentence);
+    Ok(find_tagged(check, sentence, tagged, |_| false)?
         .into_iter()
         .map(|matched| {
             let values: Vec<&str> = matched.words.iter().map(String::as_str).collect();
@@ -112,5 +119,85 @@ fn fills_indexed_verbs_as_vale_does() -> TestResult {
     let (with_alerts, wrong) = compare("sequence-verbs")?;
     assert_eq!(with_alerts, 9, "{with_alerts} texts with an alert");
     assert_eq!(wrong, Vec::<String>::new());
+    Ok(())
+}
+
+/// A rule that reads four nouns in a row, as `NounStack` does.
+const FOUR_NOUNS: &str = "extends: sequence\nmessage: \"Noun stack '%s'.\"\ntokens:\n  - tag: NN|NNS\n    pattern: '[a-z][a-z-]*'\n    min: 4\n";
+
+#[test]
+fn a_verb_after_a_noun_phrase_ends_a_noun_stack() -> TestResult {
+    let rule = Rule::from_text("Seq.FourNouns", "FourNouns.yml", FOUR_NOUNS)?;
+    let Check::Sequence(check) = &rule.check else {
+        return Err("FourNouns is not a sequence rule".into());
+    };
+    let sentence = "The freshness harness reads stdout.";
+    let tagger = Tagger::english().map_err(ToString::to_string)?;
+    let model = tagger.tag_model(sentence);
+    assert_eq!(find_tagged(check, sentence, model, |_| false)?.len(), 1);
+    let corrected = tagger.tag(sentence);
+    assert_eq!(find_tagged(check, sentence, corrected, |_| false)?, []);
+    Ok(())
+}
+
+/// A rule that gives a noun the verb `says`, as `ThingsSpeakNoun` does.
+const NOUN_SAYS: &str = "extends: sequence\nmessage: \"'%s %s' speaks.\"\ntokens:\n  - tag: NN|NNS\n  - pattern: says\n";
+
+/// The matches of the rule `text` in `sentence`, where the bytes `code` read a
+/// code span.
+fn matches_with_code(
+    text: &str,
+    sentence: &str,
+    code: Range<usize>,
+) -> Result<Vec<String>, Box<dyn Error>> {
+    let rule = Rule::from_text("Seq.Rule", "Rule.yml", text)?;
+    let Check::Sequence(check) = &rule.check else {
+        return Err("Rule is not a sequence rule".into());
+    };
+    let is_code = |range: &Range<usize>| range.start < code.end && code.start < range.end;
+    let tagged = Tagger::english()
+        .map_err(ToString::to_string)?
+        .tag_code(sentence, is_code);
+    Ok(find_tagged(check, sentence, tagged, is_code)?
+        .into_iter()
+        .map(|matched| sentence.get(matched.range).unwrap_or_default().to_owned())
+        .collect())
+}
+
+#[test]
+fn a_code_span_is_the_noun_it_names() -> TestResult {
+    let sentence = "The call fails as the flag says.";
+    let at = sentence.find("flag says").ok_or("no code span")?;
+    assert_eq!(
+        matches_with_code(NOUN_SAYS, sentence, at..at + "flag".len())?,
+        ["flag says"]
+    );
+    assert_eq!(matches_with_code(NOUN_SAYS, sentence, 0..0)?, ["flag says"]);
+    Ok(())
+}
+
+#[test]
+fn a_code_span_reads_as_one_capital_letter_to_a_pattern() -> TestResult {
+    let sentence = "The session lake store path is long.";
+    let at = sentence.find("store").ok_or("no code span")?;
+    assert_eq!(
+        matches_with_code(FOUR_NOUNS, sentence, at..at + "store".len())?,
+        Vec::<String>::new()
+    );
+    assert_eq!(
+        matches_with_code(FOUR_NOUNS, sentence, 0..0)?,
+        ["session lake store path"]
+    );
+    Ok(())
+}
+
+#[test]
+fn the_brackets_of_an_intra_doc_link_belong_to_the_code_span() -> TestResult {
+    let sentence = "The call fails as [flag] says.";
+    let at = sentence.find("flag").ok_or("no code span")?;
+    assert_eq!(
+        matches_with_code(NOUN_SAYS, sentence, at..at + "flag".len())?,
+        ["[flag] says"]
+    );
     Ok(())
 }

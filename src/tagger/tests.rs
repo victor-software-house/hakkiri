@@ -1,5 +1,6 @@
 //! Tests for the tagger: the scenarios of the sequence and capitalization
-//! specs that read a tag, and a comparison with prose.
+//! specs that read a tag, the corrections made after the model, and a
+//! comparison of the model with prose.
 //!
 //! `tests/fixtures/tagger/prose.tsv` holds one sentence a line, then the tokens
 //! and tags that prose `b33e60d` gives it, as `start:end:tag` in bytes.
@@ -97,21 +98,353 @@ fn a_sentence_with_no_word_has_no_token() -> TestResult {
 }
 
 #[test]
-fn tags_equal_prose_on_its_sentences() -> TestResult {
+fn the_model_tags_equal_prose_on_its_sentences() -> TestResult {
     let tagger = english()?;
     let fixture = include_str!("../../tests/fixtures/tagger/prose.tsv");
     let mut checked = 0;
     for line in fixture.lines() {
         let (sentence, expected) = line.split_once('\t').ok_or("a line has no tab")?;
-        let found: Vec<String> = tagger
-            .tag(sentence)
-            .into_iter()
-            .map(|tagged| format!("{}:{}:{}", tagged.range.start, tagged.range.end, tagged.tag))
+        let ranges = super::tokens::tokens(sentence);
+        let words: Vec<&str> = ranges
+            .iter()
+            .map(|range| sentence.get(range.clone()).unwrap_or_default())
+            .collect();
+        let found: Vec<String> = ranges
+            .iter()
+            .zip(tagger.model_tags(&words))
+            .map(|(range, tag)| format!("{}:{}:{}", range.start, range.end, tag))
             .collect();
         assert_eq!(found.join(" "), expected.trim(), "{sentence}");
         checked += 1;
     }
     assert_eq!(checked, 188);
+    Ok(())
+}
+
+/// The tag `tag()` gives the token `word` of `sentence`.
+fn tag_of(sentence: &str, word: &str) -> Result<String, Box<dyn Error>> {
+    let wanted = format!("{word}/");
+    pairs(sentence)?
+        .into_iter()
+        .find_map(|pair| pair.strip_prefix(&wanted).map(str::to_owned))
+        .ok_or_else(|| format!("{word} is no token of {sentence}").into())
+}
+
+#[test]
+fn a_modal_in_capitals_is_a_modal() -> TestResult {
+    for modal in ["SHALL", "MUST", "MAY", "SHOULD", "WILL", "CAN"] {
+        let sentence = format!("The loop {modal} keep its context.");
+        assert_eq!(tag_of(&sentence, modal)?, "MD", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_word_in_capitals_is_a_proper_noun() -> TestResult {
+    let sentence = "The CSS file reads the SSH keys at UTC.";
+    for word in ["CSS", "SSH", "UTC"] {
+        assert_eq!(tag_of(sentence, word)?, "NNP", "{word}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_function_word_or_a_unit_in_capitals_keeps_its_tag() -> TestResult {
+    let tagger = english()?;
+    for (sentence, word) in [
+        ("The file MUST NOT be read.", "NOT"),
+        ("THE ANSWER AND THE QUESTION.", "AND"),
+        ("Read the first 10 MB of the file.", "MB"),
+    ] {
+        let ranges = super::tokens::tokens(sentence);
+        let words: Vec<&str> = ranges
+            .iter()
+            .map(|range| sentence.get(range.clone()).unwrap_or_default())
+            .collect();
+        let model = tagger.model_tags(&words);
+        let index = words.iter().position(|each| *each == word).ok_or(word)?;
+        assert_eq!(
+            tag_of(sentence, word)?,
+            model.get(index).copied().unwrap_or_default()
+        );
+        assert_ne!(tag_of(sentence, word)?, "NNP", "{word}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_letter_in_capitals_and_a_word_in_mixed_case_keep_the_model_tag() -> TestResult {
+    let tagger = english()?;
+    for sentence in ["Open the Css file as A.", "Read the file in the repo."] {
+        let ranges = super::tokens::tokens(sentence);
+        let words: Vec<&str> = ranges
+            .iter()
+            .map(|range| sentence.get(range.clone()).unwrap_or_default())
+            .collect();
+        assert_eq!(
+            tagger.tag_words(&words),
+            tagger.model_tags(&words),
+            "{sentence}"
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn the_possessive_after_a_noun_is_a_possessive() -> TestResult {
+    for sentence in [
+        "The checkpoint's pages per window show that cost.",
+        "Copy the session's subagent and advisor.",
+        "Read the operator\u{2019}s own plan.",
+        "Each flow's pid is in the log.",
+    ] {
+        let ending = if sentence.contains('\u{2019}') {
+            "\u{2019}s"
+        } else {
+            "'s"
+        };
+        assert_eq!(tag_of(sentence, ending)?, "POS", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn the_possessive_after_a_proper_noun_in_capitals_is_a_possessive() -> TestResult {
+    assert_eq!(tag_of("The SSH's keys are old.", "'s")?, "POS");
+    Ok(())
+}
+
+#[test]
+fn the_ending_of_a_pronoun_is_not_a_possessive() -> TestResult {
+    assert_ne!(tag_of("It's fine.", "'s")?, "POS");
+    Ok(())
+}
+
+#[test]
+fn a_semicolon_is_a_colon_tag() -> TestResult {
+    assert_eq!(
+        tag_of("The file holds rows; each row has a key.", ";")?,
+        ":"
+    );
+    Ok(())
+}
+
+#[test]
+fn a_plural_noun_after_a_noun_phrase_is_the_verb() -> TestResult {
+    for (sentence, verb) in [
+        ("The freshness harness reads stdout.", "reads"),
+        ("Each entry names its line.", "names"),
+        ("A role owns one coherent host.", "owns"),
+        ("A request line names its repository first.", "names"),
+        ("The client draws the count of new rows.", "draws"),
+        ("The log holds no such line.", "holds"),
+    ] {
+        assert_eq!(tag_of(sentence, verb)?, "VBZ", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_preposition_after_a_plural_noun_makes_it_a_verb_only_in_a_clause_with_no_other_verb()
+-> TestResult {
+    assert_eq!(tag_of("The store parses from the disk.", "parses")?, "VBZ");
+    assert_ne!(
+        tag_of("The layout rules of the widgets are short.", "rules")?,
+        "VBZ"
+    );
+    assert_ne!(tag_of("The layout rules of the widgets.", "rules")?, "VBZ");
+    Ok(())
+}
+
+#[test]
+fn only_the_first_plural_noun_of_a_clause_with_no_verb_becomes_one() -> TestResult {
+    let sentence = "The store parses user files from the disk.";
+    assert_eq!(tag_of(sentence, "parses")?, "VBZ");
+    assert_eq!(tag_of(sentence, "files")?, "NNS");
+    Ok(())
+}
+
+#[test]
+fn a_plural_noun_in_a_compound_or_after_a_possessive_stays_a_noun() -> TestResult {
+    assert_eq!(
+        tag_of("It reads the session notes and the user files.", "files")?,
+        "NNS"
+    );
+    assert_eq!(
+        tag_of("A member's features unify across a workspace.", "features")?,
+        "NNS"
+    );
+    Ok(())
+}
+
+#[test]
+fn a_verb_of_saying_after_a_noun_is_a_verb() -> TestResult {
+    assert_eq!(tag_of("The docs say so.", "say")?, "VBP");
+    assert_eq!(
+        tag_of("The CI builds agree with each other.", "agree")?,
+        "VB"
+    );
+    assert_eq!(
+        tag_of("The CI builds agree with each other.", "builds")?,
+        "NNS"
+    );
+    assert_eq!(tag_of("The report agree with the log.", "agree")?, "VBP");
+    assert_eq!(tag_of("The report agree with the log.", "report")?, "NN");
+    assert_eq!(tag_of("The state says it is not done.", "says")?, "VBZ");
+    Ok(())
+}
+
+#[test]
+fn a_noun_after_a_determiner_is_no_verb_of_saying() -> TestResult {
+    assert_eq!(tag_of("They have a say in it.", "say")?, "NN");
+    Ok(())
+}
+
+#[test]
+fn a_base_form_after_a_possessive_is_a_noun() -> TestResult {
+    assert_eq!(
+        tag_of("The client's resolver asks the server's cache.", "resolver")?,
+        "NN"
+    );
+    assert_eq!(
+        tag_of("The client's resolver asks the server's cache.", "asks")?,
+        "VBZ"
+    );
+    assert_eq!(tag_of("The tool's own timing shows a size.", "own")?, "JJ");
+    assert_ne!(tag_of("No, let's stay longer.", "stay")?, "NN");
+    Ok(())
+}
+
+#[test]
+fn a_lowercase_name_that_starts_a_sentence_before_a_verb_of_asking_is_a_noun() -> TestResult {
+    assert_eq!(tag_of("cargo asks again with a header.", "cargo")?, "NN");
+    assert_eq!(tag_of("git asks for a name.", "asks")?, "VBZ");
+    assert_eq!(tag_of("Run tests for the name.", "Run")?, "VB");
+    Ok(())
+}
+
+#[test]
+fn a_plural_noun_at_the_start_before_a_determiner_is_the_verb() -> TestResult {
+    assert_eq!(tag_of("Takes every waiting item.", "Takes")?, "VBZ");
+    assert_eq!(tag_of("Cats that spend time sleep.", "Cats")?, "NNS");
+    Ok(())
+}
+
+#[test]
+fn asks_is_a_noun_after_a_preposition_a_gerund_or_an_imperative() -> TestResult {
+    for sentence in [
+        "Compact the idle session for the name asks that wait.",
+        "Answering the name asks that wait.",
+        "Answers the name asks it leaves, which no run will answer.",
+        "The person's text from the name asks it answers, joined.",
+        "Each ask waits.",
+    ] {
+        let tag = tag_of(
+            sentence,
+            if sentence.contains("Each") {
+                "ask"
+            } else {
+                "asks"
+            },
+        )?;
+        assert!(tag.starts_with("NN"), "{sentence}: {tag}");
+    }
+    Ok(())
+}
+
+#[test]
+fn asks_is_a_verb_in_the_clause_of_its_subject() -> TestResult {
+    for sentence in [
+        "A request asks for the rows.",
+        "As the name asks, the file is read.",
+        "The name asks for.",
+        "Starts the compaction name asks for, unless the connection holds one.",
+        "The test asks whether the file exists.",
+    ] {
+        assert_eq!(tag_of(sentence, "asks")?, "VBZ", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn asked_after_a_noun_phrase_is_a_participle_or_a_past_tense_by_its_place() -> TestResult {
+    assert_eq!(
+        tag_of(
+            "It is stated as the spec says, with the cache hook told of the new file.",
+            "told"
+        )?,
+        "VBN"
+    );
+    assert_eq!(
+        tag_of("How long a batch a request asked for waits.", "asked")?,
+        "VBD"
+    );
+    assert_eq!(
+        tag_of(
+            "The offset of the one asked for, or the first byte.",
+            "asked"
+        )?,
+        "VBN"
+    );
+    Ok(())
+}
+
+#[test]
+fn pull_before_request_is_a_noun() -> TestResult {
+    assert_eq!(
+        tag_of("The queue load split pull request ended it.", "pull")?,
+        "NN"
+    );
+    Ok(())
+}
+
+#[test]
+fn a_technical_noun_in_a_pull_request_title_is_a_noun() -> TestResult {
+    for (sentence, word) in [
+        ("The queue load split pull request ended it.", "split"),
+        ("The final mask round pull request fixed it.", "round"),
+        ("Before the fade removal pull request removed it.", "fade"),
+        ("It is merged (the prompt template pull request).", "prompt"),
+    ] {
+        assert_eq!(tag_of(sentence, word)?, "NN", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_technical_noun_after_a_determiner_or_a_compound_is_a_noun() -> TestResult {
+    for (sentence, word) in [
+        (
+            "The patch and its notes stay as the thinking mode fields decision set them.",
+            "thinking",
+        ),
+        ("Review the peer user id check against real files.", "check"),
+    ] {
+        assert_eq!(tag_of(sentence, word)?, "NN", "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_technical_word_that_is_a_verb_stays_a_verb() -> TestResult {
+    for (sentence, word, tag) in [
+        ("The tests check the cache against the spec.", "check", "VB"),
+        ("The gas stations had repair shops in town.", "had", "VBD"),
+        ("The final mask round pull request fixed it.", "final", "JJ"),
+    ] {
+        assert_eq!(tag_of(sentence, word)?, tag, "{sentence}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_title_is_tagged_as_the_model_tags_it() -> TestResult {
+    let tagger = english()?;
+    let sentence = "The SSH keys; the user's files MUST stay.";
+    let words = treebank::tokenize(sentence);
+    let refs: Vec<&str> = words.iter().map(String::as_str).collect();
+    assert_eq!(tagger.tag_treebank(sentence), tagger.model_tags(&refs));
+    assert_ne!(tagger.tag_words(&refs), tagger.model_tags(&refs));
     Ok(())
 }
 

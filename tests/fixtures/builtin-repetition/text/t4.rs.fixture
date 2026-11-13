@@ -1,0 +1,14 @@
+//! A crate crate doc.
+
+/// Adds the the numbers, and returns returns a sum.
+///
+/// A second paragraph paragraph here, with `code code` inside.
+pub fn add(a: u32, b: u32) -> u32 {
+    // A plain plain comment.
+    let s = "string string literal"; /* block block comment */
+    a + b + s.len() as u32
+}
+
+/** Block doc doc comment
+ * with a star star line. */
+fn other() {}

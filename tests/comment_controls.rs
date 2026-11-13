@@ -1,17 +1,19 @@
 //! Comment controls: the scenarios of the comment-controls change.
 //!
-//! `tests/fixtures/comment-controls` holds one package of four rules
-//! (`styles`), nine Markdown files and one MDX file (`text`, with `.fixture`
-//! after the extension), and one config for each tool: `vale/all.ini` and
+//! `tests/fixtures/comment-controls` holds one package of twelve rules
+//! (`styles`), 23 Markdown files and one MDX file (`text`, with `.fixture`
+//! after the extension), two Markdown files where Vale places a comment
+//! wrongly (`differences`), and one config for each tool: `vale/all.ini` and
 //! `.ctl/all.yaml`.
-//! Each paragraph of a file holds `very`, `really` and `good`, which three
-//! rules flag, so the alerts that a comment leaves show which of them it
-//! turned off.
+//! Each paragraph of a file holds `very`, `really` and `good`, which the
+//! rules flag by scope (text, sentence, paragraph, heading, table, link,
+//! emphasis, strong and raw), so the alerts that a comment leaves show which
+//! of them it turned off.
 //! `vale.tsv` holds one row for each alert Vale gave on the files: the config,
 //! the file, the line, the first and last column, the level, the rule, the
 //! message and the matched text.
 //! The rows come from Vale at `66bbb85`, run from the fixture folder as
-//! `vale --config=vale/all.ini --output=JSON text`.
+//! `vale --config=vale/all.ini --output=JSON text differences`.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -54,8 +56,8 @@ fn copy_into(root: &Root<'_>, from: &Path, to: &Path) -> TestResult {
     Ok(())
 }
 
-/// The rows Vale gave.
-fn vale_rows() -> Result<BTreeSet<Row>, Box<dyn Error>> {
+/// The rows Vale gave for the files below the folder `folder`.
+fn vale_rows(folder: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
     let mut rows = BTreeSet::new();
     for line in fs::read_to_string(fixture().join("vale.tsv"))?.lines() {
         let cells: Vec<&str> = line.split('\t').collect();
@@ -73,7 +75,7 @@ fn vale_rows() -> Result<BTreeSet<Row>, Box<dyn Error>> {
         else {
             return Err(format!("a row of vale.tsv has {} cells", cells.len()).into());
         };
-        if config == "all" {
+        if config == "all" && file.starts_with(folder) {
             let matched = matched.replace("\\n", "\n");
             let last = if matched.contains('\n') {
                 0
@@ -133,6 +135,11 @@ fn project<'a>(suite: &'a Suite, name: &str, hakkiri: bool) -> Result<Root<'a>, 
     let root = suite.scenario(name);
     copy_into(&root, &fixture().join("styles"), Path::new("styles"))?;
     copy_into(&root, &fixture().join(".ctl"), Path::new(".ctl"))?;
+    copy_into(
+        &root,
+        &fixture().join("differences"),
+        Path::new("differences"),
+    )?;
     if hakkiri {
         for entry in fs::read_dir(fixture().join("text"))? {
             let entry = entry?;
@@ -212,7 +219,7 @@ fn every_file_gives_the_alerts_vale_gives() -> TestResult {
         result.err
     );
     let ours = rows_of(&result.out)?;
-    let vale = vale_rows()?;
+    let vale = vale_rows("text/")?;
     let only_vale: Vec<_> = vale.difference(&ours).collect();
     let only_ours: Vec<_> = ours.difference(&vale).collect();
     assert!(
@@ -220,6 +227,22 @@ fn every_file_gives_the_alerts_vale_gives() -> TestResult {
         "only Vale gave {only_vale:#?}, only hakkiri gave {only_ours:#?}"
     );
     Ok(())
+}
+
+/// The row of an alert of a rule of the fixture, whose message is the rule's
+/// name, a space and the matched text in quotes.
+fn row(file: &str, line: usize, (first, last): (usize, usize), rule: &str, matched: &str) -> Row {
+    let name = rule.rsplit('.').next().unwrap_or(rule);
+    (
+        file.to_owned(),
+        line,
+        first,
+        last,
+        "warning".to_owned(),
+        rule.to_owned(),
+        format!("{name} '{matched}'"),
+        matched.to_owned(),
+    )
 }
 
 /// The line, the rule and the matched text of each alert, with a repeat kept.
@@ -254,7 +277,7 @@ fn hakkiri_comments_reach_as_vale_comments_do() -> TestResult {
         result.err
     );
     let ours: BTreeSet<Row> = rows_of(&result.out)?;
-    let vale: BTreeSet<Row> = vale_rows()?
+    let vale: BTreeSet<Row> = vale_rows("text/")?
         .into_iter()
         .filter(|row| !row.0.ends_with("c6.md"))
         .collect();
@@ -264,6 +287,60 @@ fn hakkiri_comments_reach_as_vale_comments_do() -> TestResult {
     assert!(
         only_vale.is_empty() && only_ours.is_empty(),
         "only the Vale comments gave {only_vale:#?}, only the hakkiri comments gave {only_ours:#?}"
+    );
+    Ok(())
+}
+
+#[test]
+fn vale_places_a_comment_wrongly_where_hakkiri_places_it_right() -> TestResult {
+    let suite = Suite::new("comment-controls-differences");
+    let root = project(&suite, "differences", false)?;
+    let result = run(
+        root.path(),
+        &[
+            "check",
+            "--config",
+            ".ctl/all.yaml",
+            "--format",
+            "json",
+            "differences",
+        ],
+        &[],
+    )?;
+    assert!(
+        result.code == 0 || result.code == 1,
+        "{}{}",
+        result.out,
+        result.err
+    );
+    let ours = rows_of(&result.out)?;
+    let vale = vale_rows("differences/")?;
+    let only_vale: Vec<_> = vale.difference(&ours).cloned().collect();
+    let only_ours: Vec<_> = ours.difference(&vale).cloned().collect();
+    // Vale takes the place of a real `vale off` comment from the text of a
+    // multi-line code span that holds the same words, and hides the alerts
+    // between them: `D2 very` on line 2 of `d1.md`.
+    let hidden = |rule: &str| row("differences/d1.md", 2, (9, 12), rule, "very");
+    // Vale puts the alert of a strong element that holds a comment on the
+    // comment: columns 16 to 19 of `d2.md`, where `D6 very` stands at 46 to 49.
+    assert_eq!(
+        only_vale,
+        [row("differences/d2.md", 1, (16, 19), "Team.Strong", "very")],
+        "only Vale gave"
+    );
+    let expected: BTreeSet<Row> = [
+        hidden("Team.Para"),
+        hidden("Team.Raw"),
+        hidden("Team.Sent"),
+        hidden("Team.Words"),
+        row("differences/d2.md", 1, (46, 49), "Team.Strong", "very"),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(
+        only_ours.into_iter().collect::<BTreeSet<Row>>(),
+        expected,
+        "only hakkiri gave"
     );
     Ok(())
 }

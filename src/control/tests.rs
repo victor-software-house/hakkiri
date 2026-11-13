@@ -1,6 +1,8 @@
 //! Tests for the comments that turn rules off and on: the forms Vale reads and
 //! the ones hakkiri adds, and where each one reaches.
 
+use std::ops::Range;
+
 use super::{Controls, Setting, cut, outside, setting};
 use crate::rule::Level;
 use crate::tree::{Comment, Node, Scope};
@@ -211,7 +213,7 @@ fn a_level_holds_until_a_later_comment_names_the_rule() {
 #[test]
 fn outside_keeps_the_parts_no_range_holds() {
     let ranges = [10..20, 30..40];
-    let kept = |span: std::ops::Range<usize>| -> Vec<(usize, usize)> {
+    let kept = |span: Range<usize>| -> Vec<(usize, usize)> {
         outside(&span, &ranges)
             .into_iter()
             .map(|part| (part.start, part.end))

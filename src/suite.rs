@@ -2,12 +2,12 @@
 //! rules no case made flag anything.
 
 use std::collections::{HashMap, HashSet};
-use std::fs;
 use std::path::{Component, Path, PathBuf};
+use std::{fs, path};
 
 use hakkiri::alert::Alert;
 use hakkiri::rule::{self, LoadError, Rule, TestCase, alert_lines, cases_from_text};
-use hakkiri::{Language, parse, parse_ignoring};
+use hakkiri::{Language, engine, parse, parse_ignoring};
 
 use crate::cli::{OnUnknown, TestArgs};
 use crate::config::{self, DEFAULT, Project};
@@ -192,7 +192,7 @@ fn is_rule_file(file: &Path) -> bool {
 /// given, so a style folder that is a symlink keeps the name of the link.
 fn absolute(file: &Path) -> Option<PathBuf> {
     let mut clean = PathBuf::new();
-    for part in std::path::absolute(file).ok()?.components() {
+    for part in path::absolute(file).ok()?.components() {
         match part {
             Component::ParentDir => {
                 clean.pop();
@@ -338,11 +338,15 @@ impl Runner {
         let by_extension = known.unwrap_or(Language::Text);
         match setup {
             Setup::Rule(rule) => {
-                let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
+                let tree = parse(by_extension, &case.input)
+                    .map_err(|error| error.to_string())
+                    .and_then(readable)?;
                 lint_alone(rule, &tree, case)
             }
             Setup::File(path) => {
-                let tree = parse(by_extension, &case.input).map_err(|error| error.to_string())?;
+                let tree = parse(by_extension, &case.input)
+                    .map_err(|error| error.to_string())
+                    .and_then(readable)?;
                 let rule = self.rule_at(&path)?;
                 lint_alone(rule, &tree, case)
             }
@@ -369,7 +373,8 @@ impl Runner {
                     &plan.block_ignores,
                     &plan.token_ignores,
                 )
-                .map_err(|error| error.to_string())?;
+                .map_err(|error| error.to_string())
+                .and_then(readable)?;
                 if !plan.unrunnable.is_empty() {
                     let names: Vec<&str> = plan
                         .unrunnable
@@ -381,6 +386,8 @@ impl Runner {
                         names.join(", ")
                     ));
                 }
+                // The extension is the file's own, as `check` gives it, and the
+                // tree records the reader.
                 let mut alerts = lint_planned(&plan, &tree, &case.input, &case.format)?;
                 alerts.retain(|alert| project.level.is_none_or(|lowest| alert.level >= lowest));
                 Ok(alerts)
@@ -403,8 +410,7 @@ impl Runner {
     /// folder it sits in. None when there is no readable config.
     fn packages(&mut self) -> Vec<PathBuf> {
         self.project()
-            .map(|project| project.packages.clone())
-            .unwrap_or_default()
+            .map_or_default(|project| project.packages.clone())
     }
 
     /// The name and the package of the rule at `file`, as the style loader
@@ -485,8 +491,16 @@ impl Runner {
     }
 }
 
+/// `tree`, or why a case with it cannot run: its front matter is no YAML, TOML
+/// or JSON that its parser reads, which fails a file under `check`.
+fn readable(tree: hakkiri::Tree) -> Result<hakkiri::Tree, String> {
+    match tree.front_matter_fault {
+        Some(fault) => Err(format!("front matter: {fault}")),
+        None => Ok(tree),
+    }
+}
+
 /// Lints the case's input with `rule` alone, at every level.
 fn lint_alone(rule: &Rule, tree: &hakkiri::Tree, case: &TestCase) -> Result<Vec<Alert>, String> {
-    hakkiri::engine::lint(&[rule], tree, &case.input, &case.format)
-        .map_err(|error| error.to_string())
+    engine::lint(&[rule], tree, &case.input, &case.format).map_err(|error| error.to_string())
 }

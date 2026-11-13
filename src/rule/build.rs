@@ -5,7 +5,7 @@
 //! `raw` text before or after it, and one flag for case.
 
 use std::cmp::Reverse;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use super::schema::{
     CapitalizationFields, ConditionalFields, ConsistencyFields, ExistenceFields, MetricFields,
@@ -13,9 +13,9 @@ use super::schema::{
     SubstitutionFields, TokenFields,
 };
 use super::{
-    Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence,
-    LoadError, LoadProblem, Metric, Occurrence, Readability, Repetition, Rule, Score, Sequence,
-    Spelling, Substitution, Swap, TestCase, Token, affix, level_of, package,
+    Action, Capitalization, Case, Check, Conditional, Consistency, Exceptions, Existence, Form,
+    LoadError, LoadProblem, Metric, Occurrence, Readability, Recipe, Repetition, Rule, Score,
+    Sequence, Spelling, Substitution, Swap, TestCase, Token, affix, level_of, package,
 };
 use crate::formula::Formula;
 use crate::metric;
@@ -34,6 +34,9 @@ pub(super) struct Source<'a> {
     pub(super) file: &'a str,
     /// The package that holds the rule, when it was read in one.
     pub(super) package: Option<&'a Path>,
+    /// The package folders of the project, which the built-in rule
+    /// `Vale.Spelling` reads its dictionaries and word lists from.
+    pub(super) folders: &'a [PathBuf],
     /// The accepted terms of the project's vocabularies, which a rule that
     /// reads them takes as exceptions.
     pub(super) accepted: &'a [String],
@@ -648,7 +651,7 @@ fn kept_words(terms: &[String]) -> Vec<String> {
 }
 
 /// The error of a pattern that a converter refused, for the field it reads.
-fn refused(source: &Source<'_>, field: &str, error: &crate::pattern::PatternError) -> LoadError {
+fn refused(source: &Source<'_>, field: &str, error: &PatternError) -> LoadError {
     source.problem(field, format!("rule `{}`: {error}", source.name))
 }
 
@@ -737,6 +740,7 @@ macro_rules! rule_of {
             }),
             tests: fields.tests.iter().map(TestCase::from).collect(),
             check: $check,
+            recipe: Recipe::Fixed,
         }
     }};
 }
@@ -841,12 +845,12 @@ pub(super) fn capitalization_rule(
 /// names a word, a tag or a universal tag, which makes a step that must match.
 fn sequence_token(
     source: &Source<'_>,
-    number: usize,
+    place: &str,
     written: &TokenFields,
     flag: &str,
 ) -> Result<Token, LoadError> {
     let name = source.name;
-    let at = |part: &str| format!("tokens[{number}].{part}");
+    let at = |part: &str| format!("{place}.{part}");
     let pattern = written.pattern.value();
     let universal = written.upos.value();
     let mut tag = written.tag.value().to_owned();
@@ -903,7 +907,80 @@ fn sequence_token(
     })
 }
 
-/// The tokens of a `sequence` rule as steps, and the patterns they match with.
+/// The tokens of one list of a `sequence` rule as steps, and the patterns they
+/// match with. `place` is where the list sits in the rule file, as `tokens` or
+/// `forms[1].tokens`.
+fn form(
+    source: &Source<'_>,
+    place: &str,
+    written: &[TokenFields],
+    flag: &str,
+) -> Result<Form, LoadError> {
+    let name = source.name;
+    let mut tokens = Vec::new();
+    let mut patterns: Vec<&str> = Vec::new();
+    let mut ends: Vec<usize> = Vec::new();
+    for (number, token_fields) in written.iter().enumerate() {
+        let at = format!("{place}[{number}]");
+        let token = sequence_token(source, &at, token_fields, flag)?;
+        // The steps are counted, never stored, so a large `skip` or `min` is
+        // cheap. Only a count that does not fit a number is refused.
+        let end = token
+            .skip
+            .checked_add(usize::from(token.required))
+            .and_then(|width| width.checked_mul(token.copies))
+            .and_then(|made| made.checked_add(ends.last().copied().unwrap_or(0)))
+            .ok_or_else(|| {
+                source.problem(
+                    &format!("{at}.skip"),
+                    format!("rule `{name}`: `skip` and `min` make more steps than a count holds"),
+                )
+            })?;
+        ends.push(end);
+        patterns.push(token_fields.pattern.value());
+        tokens.push(token);
+    }
+    let mut form = Form {
+        tokens,
+        ends,
+        anchor: 0,
+        candidates: None,
+    };
+    let first = |has: fn(&Token) -> bool| {
+        (0..form.tokens.len()).find(|index| {
+            let token = &form.tokens[*index];
+            !token.negate && has(token) && !form.block(*index).is_empty()
+        })
+    };
+    let anchor_token = first(|token| token.word.is_some())
+        .or_else(|| first(|token| token.tag.is_some()))
+        .ok_or_else(|| {
+            source.problem(
+                place,
+                format!(
+                    "rule `{name}`: no token has a `pattern`, `tag` or `upos` without `negate`, \
+                     so the rule would never match: add one"
+                ),
+            )
+        })?;
+    let anchor = form.block(anchor_token).start;
+    let candidates = if form.tokens[anchor_token].word.is_some() {
+        let pattern = patterns[anchor_token];
+        Some(source.compile(
+            &format!("{place}[{anchor_token}].pattern"),
+            &format!("{flag}(?m)(?:{pattern})"),
+            &[pattern],
+        )?)
+    } else {
+        None
+    };
+    form.anchor = anchor;
+    form.candidates = candidates;
+    Ok(form)
+}
+
+/// The forms of a `sequence` rule and its exceptions: the one list of `tokens`,
+/// or each list of `forms`.
 fn sequence(source: &Source<'_>, fields: &SequenceFields) -> Result<Sequence, LoadError> {
     let name = source.name;
     if !fields.model.value().is_empty() {
@@ -919,63 +996,39 @@ fn sequence(source: &Source<'_>, fields: &SequenceFields) -> Result<Sequence, Lo
     } else {
         ""
     };
-    let mut tokens = Vec::new();
-    let mut patterns: Vec<&str> = Vec::new();
-    let mut ends: Vec<usize> = Vec::new();
-    for (number, written) in fields.tokens.iter().enumerate() {
-        let token = sequence_token(source, number, written, flag)?;
-        // The steps are counted, never stored, so a large `skip` or `min` is
-        // cheap. Only a count that does not fit a number is refused.
-        let end = token
-            .skip
-            .checked_add(usize::from(token.required))
-            .and_then(|width| width.checked_mul(token.copies))
-            .and_then(|made| made.checked_add(ends.last().copied().unwrap_or(0)))
-            .ok_or_else(|| {
-                source.problem(
-                    &format!("tokens[{number}].skip"),
-                    format!("rule `{name}`: `skip` and `min` make more steps than a count holds"),
-                )
-            })?;
-        ends.push(end);
-        patterns.push(written.pattern.value());
-        tokens.push(token);
-    }
-    let mut sequence = Sequence {
-        tokens,
-        ends,
-        anchor: 0,
-        candidates: None,
-        exceptions: Vec::new(),
-    };
-    let first = |has: fn(&Token) -> bool| {
-        (0..sequence.tokens.len()).find(|index| {
-            let token = &sequence.tokens[*index];
-            !token.negate && has(token) && !sequence.block(*index).is_empty()
-        })
-    };
-    let anchor_token = first(|token| token.word.is_some())
-        .or_else(|| first(|token| token.tag.is_some()))
-        .ok_or_else(|| {
-            source.problem(
+    let forms = match (fields.tokens.is_empty(), fields.forms.is_empty()) {
+        (false, false) => {
+            return Err(source.problem(
+                "forms",
+                format!(
+                    "rule `{name}`: `tokens` and `forms` are both set: write one list as \
+                     `tokens`, or each list as a form under `forms`"
+                ),
+            ));
+        }
+        (true, true) => {
+            return Err(source.problem(
                 "tokens",
                 format!(
-                    "rule `{name}`: no token has a `pattern`, `tag` or `upos` without `negate`, \
-                     so the rule would never match: add one"
+                    "rule `{name}`: no `tokens` or `forms` to match: write a list of tokens, \
+                     or a list of forms that each hold `tokens`"
                 ),
-            )
-        })?;
-    let anchor = sequence.block(anchor_token).start;
-    let tokens = &sequence.tokens;
-    let candidates = if tokens[anchor_token].word.is_some() {
-        let pattern = patterns[anchor_token];
-        Some(source.compile(
-            &format!("tokens[{anchor_token}].pattern"),
-            &format!("{flag}(?m)(?:{pattern})"),
-            &[pattern],
-        )?)
-    } else {
-        None
+            ));
+        }
+        (false, true) => vec![form(source, "tokens", &fields.tokens, flag)?],
+        (true, false) => fields
+            .forms
+            .iter()
+            .enumerate()
+            .map(|(number, written)| {
+                form(
+                    source,
+                    &format!("forms[{number}].tokens"),
+                    &written.tokens,
+                    flag,
+                )
+            })
+            .collect::<Result<Vec<_>, _>>()?,
     };
     let exceptions = fields
         .exceptions
@@ -983,10 +1036,7 @@ fn sequence(source: &Source<'_>, fields: &SequenceFields) -> Result<Sequence, Lo
         .iter()
         .map(|exception| source.compile("exceptions", exception, &[]))
         .collect::<Result<Vec<_>, _>>()?;
-    sequence.anchor = anchor;
-    sequence.candidates = candidates;
-    sequence.exceptions = exceptions;
-    Ok(sequence)
+    Ok(Sequence { forms, exceptions })
 }
 
 pub(super) fn sequence_rule(
@@ -1116,6 +1166,7 @@ fn vocabulary_rule(name: &str, message: &str, check: Check) -> Result<Rule, Load
         action: None,
         tests: Vec::new(),
         check,
+        recipe: Recipe::Fixed,
     })
 }
 
@@ -1125,6 +1176,7 @@ fn vocabulary_source(name: &str) -> Source<'_> {
         name,
         file: "a vocabulary",
         package: None,
+        folders: &[],
         accepted: &[],
     }
 }

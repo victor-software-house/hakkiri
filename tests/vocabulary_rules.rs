@@ -8,7 +8,7 @@
 //! level, the rule, the message and the matched text. The rows come from Vale
 //! at `66bbb85` run from the fixture folder as `vale --config=vale/<name>.ini
 //! --output=JSON text`, with `Vale.Spelling` and `Vale.Repetition` turned off,
-//! which hakkiri has no rule for yet.
+//! as the hakkiri configs turn them off.
 //!
 //! A match that spans lines ends where its last character is in hakkiri, as
 //! `end_line` and `end_column`. Vale prints the first column plus the number of
@@ -250,22 +250,23 @@ fn small<'a>(
 const ACCEPT_ONLY: &[(&str, &str)] = &[("config/vocabularies/Team/accept.txt", "GitHub\n")];
 
 #[test]
-fn the_style_vale_is_refused_when_no_vocabulary_holds_a_term() -> TestResult {
+fn the_style_vale_holds_the_repetition_rule_when_no_vocabulary_holds_a_term() -> TestResult {
     let suite = Suite::new("vocabulary-rules-none");
     let root = small(
         &suite,
         "none",
         &[("config/vocabularies/Team/accept.txt", "# nothing\n")],
         "packages:\n  - path: styles\nvocab: [Team]\nfiles:\n  '*.md': {styles: [Vale]}\n",
-        "Fine.\n",
+        "Fine, fine and the the.\n",
     );
     let result = run(root.path(), &["check"], &[])?;
-    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
-    assert!(result.lines().is_empty(), "{}", result.out);
-    assert!(
-        result.err.contains("`Vale` is not a style in any package"),
-        "{}",
-        result.err
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:16: error Vale.Repetition: 'the' is repeated!",
+            "1 alert in 1 file",
+        ]
     );
     Ok(())
 }
@@ -311,9 +312,7 @@ fn a_package_style_named_vale_is_refused_beside_the_built_in_one() -> TestResult
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     assert!(
-        result
-            .err
-            .contains("the style `Vale` is built in from a vocabulary"),
+        result.err.contains("the style `Vale` is built in, and"),
         "{}",
         result.err
     );

@@ -1,0 +1,102 @@
+C1 very <!-- vale off --> C2 very <!-- vale on --> C3 very really good.
+
+C4 very really <!-- vale Team.Words = NO --> C5 very really <!-- vale Team.Words = YES --> C6 very really good.
+
+C7 very really <!-- vale Team.Words = NO --> C8 very really good.
+
+C9 very really good.
+
+<!-- vale Team.Words = YES -->
+
+C10 very really good.
+
+C11 very <!-- vale off --> C12 very really good.
+
+C13 very really good.
+
+<!-- vale on -->
+
+C14 very really good.
+
+*C15 very* <!-- vale off -->*C16 very*<!-- vale on --> C17 very.
+
+Line C18 very
+<!-- vale off -->
+line C19 very
+<!-- vale on -->
+line C20 very.
+I1 very really good.
+
+<div>
+I2 very really good.
+<!-- vale off -->
+I3 very really good.
+<!-- vale on -->
+I4 very really good.
+</div>
+
+I5 very really good.
+
+<p>I6 very <!-- vale off --> I7 very <!-- vale on --> I8 very really good.</p>
+
+I9 very really good.
+
+<div>
+
+I10 very really good.
+
+<!-- vale Team.Words = NO -->
+
+I11 very really good.
+
+</div>
+
+I12 very really good.
+
+<!-- vale Team.Words = YES -->
+
+I13 very really good.
+
+<table><tr><td>I14 very really good</td>
+<!-- vale off -->
+<td>I15 very really good</td></tr></table>
+
+I16 very really good.
+
+<!-- vale on -->
+
+I17 very really good.
+- D1 very really good.
+- D2 very really good.
+  <!-- vale off -->
+- D3 very really good.
+- D4 very really good.
+  <!-- vale on -->
+- D5 very really good.
+
+> E1 very really good.
+>
+> <!-- vale off -->
+>
+> E2 very really good.
+>
+> <!-- vale on -->
+>
+> E3 very really good.
+
+| H1 | H2 |
+|:--|:--|
+| F1 very really good | F2 very <!-- vale off --> F3 very |
+| F4 very <!-- vale on --> F5 very | F6 very |
+
+# Head G1 <!-- vale Team.Head = NO -->
+
+G2 very really good.
+
+# Head G3 <!-- vale Team.Head = YES -->
+
+1. H1 very really good.
+   <!-- vale Team.Words = NO -->
+2. H2 very really good.
+   <!-- vale Team.Words = YES -->
+3. H3 very really good.

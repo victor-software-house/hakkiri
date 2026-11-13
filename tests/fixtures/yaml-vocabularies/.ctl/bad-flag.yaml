@@ -1,0 +1,5 @@
+packages:
+  - path: styles
+vocab: [bad-flag]
+files:
+  "text/*.md": {styles: [Team]}

@@ -22,6 +22,7 @@ hakkiri check --fail-level warning
 hakkiri check --no-gitignore
 hakkiri check --on-unmatched error README.md
 hakkiri check --on-unknown warn
+hakkiri check --code-span-size 0
 hakkiri check --format json
 ```
 
@@ -31,7 +32,8 @@ hakkiri check --format json
 - A file named on the command line that no glob selects draws a warning on standard error and is not linted. `--on-unmatched` or `on_unmatched` takes `warn`, the default, `error`, which fails the run with exit 2, or `ignore`. A file that a glob selects but whose styles hold no rule draws nothing, and nor does a file a walk found.
 - Readers come from the extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` and `.js`, or from a `formats` entry. A file that a glob selects and that no reader reads is plain text: one block per run of lines between blank lines, read as written.
 - `--on-unknown` or `on_unknown` takes `text`, the default, `warn`, which skips the file with a warning, `error`, which fails the run with exit 2, or `ignore`. A file that no glob selects draws no message.
-- A plain-text file that holds a NUL byte in its first 8192 bytes is binary, and a run skips it with no message.
+- `--code-span-size` or `code_span_size` sets how many words a code span counts as, in words. It reaches a word count and the metrics built on it: the `words`, `sentences` and `syllables` of a `metric` or `readability` rule, and the scores. It is 1 by default, and 0 counts as Vale does, 2 or more counts that many. `HAKKIRI_CODE_SPAN_SIZE` is its variable. A rule that reads a match, such as `existence` or `occurrence`, ignores it.
+- A plain-text file that holds a NUL byte in its first 8192 bytes is binary, and a run skips it with no message. A byte that is not valid UTF-8, in a Latin-1 file for example, reads as one `?`, so the file is linted and a column counts bytes, as in Vale.
 - Files lint in parallel. The report is sorted by path, then line, then column, so two runs print the same text.
 - A file that cannot be read or parsed is a failure. The other files still lint.
 
@@ -125,8 +127,10 @@ files:
 - A key the config does not define is an error that names the key and its line.
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
 - `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` set the options of the same names for `check`. Only the project's config holds them, and a package's settings file that does is an error.
+- `code_span_size` is a key of the project config, of a package's settings file and of a glob under `files`, a whole number of words from 0 to 255. A package's file applies first, then the project's top level, then each matching glob, and `HAKKIRI_CODE_SPAN_SIZE` and then `--code-span-size` beat them all. A value outside 0 to 255, or a word or a list under a glob, is an error with its line.
 - `formats` maps an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`. A key that holds `*`, `?`, `[`, `{` or `/` is a glob.
   An entry named by the file's extension wins, then the first key in text order that is the file's name or a glob that matches its name or path. An entry beats the extension table, so `md: text` reads Markdown files as text.
+  A file that an entry maps has two extensions for a scope such as `text.md`: its own and its reader's. With `txt: md`, `text.txt` and `text.md` both select text in `a.txt`. Vale compares the scope with the file's own extension only, so `text.md` selects nothing there. A case that runs through the config has the same two extensions.
 - `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule, in the folder or under it. A folder that starts with `.` or `_` and a `*.test.yml` file are skipped, and so is a folder named `config`, where Vale keeps vocabularies and other settings.
   Two folders that hold one style name are refused. So are two files that give one rule name, and a name with a bracket, when a glob lists the style: a style no glob lists is not refused, as in Vale.
   A `url` entry holds the `url` of a zip, which starts with `https://` or `http://`, and its `sha256`, 64 lowercase hex digits. The first run downloads the zip, checks the hash, and unpacks it into the cache folder under that hash, and a later run reads it from there and asks for nothing.
@@ -137,12 +141,15 @@ files:
   A killed run leaves a folder named `.unpacking-` and a suffix in the cache. Delete it when no hakkiri run is using the cache.
   A Vale style folder loads as it is. `extends: Style.Rule` names a parent rule in any loaded package, `key+` adds to a list or mapping of the parent, and `key-` removes from one.
 - `vocab` lists vocabularies by name, at the top level and in a glob of `files`. A vocabulary is the folder `config/vocabularies/<name>/` of a package.
-  hakkiri reads every `accept.txt` and `reject.txt` below it, one term to a line, and skips a blank line and a line that starts with `# `. A term is plain text, with literal periods, or a pattern.
+  hakkiri reads every `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml` below it. A text list has one term to a line, and hakkiri skips a blank line and a line that starts with `# `. A term is plain text, with literal periods, or a pattern.
+  A YAML file holds `affix`, `accept` and `reject`. An entry is a term, a term with nothing after its colon, or a term mapped to the options `regex`, `ignorecase` and `flags`. A YAML term is literal, with `C++` matching `C++`. `regex: true` keeps a pattern, `flags: DSG` adds the forms those affix flags give, and `ignorecase: true` matches without regard to case, and a period in such a term is literal, where Vale reads it as any character. `regex` and `flags` do not mix. `affix` names `<name>.aff` in `config/dictionaries` of the package that holds the vocabulary, then of every other package in order; with no `affix`, or `en_US-web`, the built-in dictionary expands the flags. Vale also looks in `$DICPATH`, which hakkiri never reads.
+  A key the file does not define is an error, where Vale ignores it. Every wrong entry is reported with its file and line, where Vale stops at the first.
   The accepted terms of the top level hold back matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules. A rule with `vocab: false` reads none, and nor does an `existence` rule with `nonword`.
   A glob's list holds back matches in `existence`, `repetition`, `spelling` and `substitution` rules in the files that glob matches, whatever the rule sets. A file takes the lists of every glob that matches it.
-  An unknown vocabulary, a name in two packages and a term that is not a pattern are errors.
-  The lists build rules, as in Vale. `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term, both at `error`. They belong to a style `Vale` that exists only while a top-level vocabulary holds a term. `Terms` matches a term without regard to case and keeps the escapes of a pattern term, so `data\Wset` keeps its `\W`, where Vale lowercases it to `\w`. It also keeps the names of groups, the backreferences to them and the flags, such as `(?U)`.
-  List `Vale` in `styles` to run them, or set them by name. A vocabulary that a glob lists builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no setting.
+  An unknown vocabulary, a name in two packages, a term that is not a pattern and a wrong YAML entry are errors.
+  The lists build rules, as in Vale. `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term, both at `error`. They belong to the built-in style `Vale`, which holds them only while a top-level vocabulary holds a term. `Terms` matches a term without regard to case and keeps the escapes of a pattern term, so `data\Wset` keeps its `\W`, where Vale lowercases it to `\w`. It also keeps the names of groups, the backreferences to them and the flags, such as `(?U)`.
+  The style `Vale` also holds `Vale.Repetition`, which reports a word that repeats, such as `the the`, at `error`, with Vale's defaults. It ignores case, reads letters only, and ignores two words in different sentences, a code span between them, and a repeat that an accepted term holds back. List `Vale` in `styles` to run them, or set them by name. A vocabulary that a glob lists builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no setting.
+  The style `Vale` also holds `Vale.Spelling`, which reports a word the built-in dictionary lacks, at `error`, with the message `Did you really mean '%s'?`. A package's `config/dictionaries` folder adds each dictionary in it, and every `.txt` file under its `config/ignore` folder adds the words it lists, as in Vale, for each package of the project. A link under `config/ignore` that reaches outside the package is a fault. A glob turns it off with `Vale.Spelling: off`, and `params: {Vale.Spelling: {split: true}}` sets a field, such as `custom`, `append` or `dictionaries`. The accepted terms of a vocabulary pass. hakkiri builds the rule only when a glob lists `Vale` in `styles`, names a rule that starts with `Vale.`, or sets `params` for one. A dictionary that cannot load fails no run of a config that uses none of these.
 - A package may hold `.ctl/hakkiri.yaml` in its top folder, the folder that holds `styles`, in the format of the config. A `path` entry that names a folder called `styles` has its top in the parent of that folder. When the parent is the project root or holds it, there is no top, so the project's own config is never read as a package's. For a zip the top is the top folder of the zip.
   The settings of each package apply before the project's own, in the order of `packages`, so the project overrides a package and a later package overrides an earlier one.
   The file holds `level`, `vocab`, `files`, `formats` and `packages`. A `styles` list under the same glob text as a package's adds to its list, and under another glob it replaces it. `level` is the project's when it sets one.
@@ -170,6 +177,10 @@ files:
 - Math in a Markdown or MDX file reads as code, as in Vale, so no text rule reports it and a `code` rule reads it.
   An inline span runs from a `$` that a non-space follows to a `$` that follows a non-space and is no digit's neighbour: `$5 and $10` is money and `$x$` is math. A span may wrap over lines of a paragraph.
   A display block opens at a line that starts with `$$`, even in the middle of a paragraph, and closes at a line that ends with `$$`, a blank line or the end of the paragraph. The text before and after reads as separate paragraphs. A line indented four columns or more past its container opens no block.
+- The top-level string values of a Markdown or MDX file's front matter are text, as in Vale: YAML between `---` lines, TOML between `+++` lines and JSON between `;;;` lines.
+  A rule scoped `text`, `frontmatter`, `text.frontmatter`, `frontmatter.<key>` or `text.frontmatter.<key>` reads a value, and a `paragraph` or `sentence` rule does not.
+  A key, a number, a boolean, a null, a date, a list and a nested mapping are not read, nor is a string below a TOML table or a YAML alias. A key written twice keeps each of its values, and a number or null key does not hide the values after it. An anchor or a tag before a value changes nothing. A block or token pattern leaves the front matter as written.
+  A block that no parser reads fails the file with `front matter: line N: …` and exit 2, and the rest of the file is linted, where Vale lints none of it. A `hakkiri test` case with such a block cannot run.
 - `styles` lists the styles whose rules run. A later list replaces the earlier one. An empty list turns linting off for those files, and drops every rule setting before it.
 - A rule name, such as `ProseStyle.BareURL`, sets that rule's level to `suggestion`, `warning` or `error`, turns it `on` at the level of its rule file, or turns it `off`.
   A level or `on` also runs the rule when no glob lists its style, as `Team.Terms: warning` does, and `off` on such a rule changes nothing.
@@ -177,6 +188,31 @@ files:
   A name that no loaded style holds is an error that names it and its line.
   A rule hakkiri cannot run, a `script` rule or one with a `doc()` scope, loads no rule, and the rest of its style runs.
   Each such rule in a style a glob lists, or that a level or `on` turns on, makes the run exit 2 with a `failed` line, until the config turns it `off`. In a style no glob lists it is ignored.
+- `params` sets fields of rules, as Vale's `Style.Rule[param] = value` does: a mapping from a rule name to a mapping from a field name to one value, a number, `true` or `false`, or text.
+  `Vale.Repetition: {max: 1}` lets one repeat pass. The rule is read again with the field replaced, and a value reads as the field's kind, so `metrics: Gunning Fog` is a list of one.
+  A parameter reaches the files of the glob that sets it, a later glob winning for the same parameter, a package's settings first, and an empty `styles` list drops the parameters before it. Vale applies a parameter to every file whichever section sets it, and the last section wins everywhere.
+  Some parameters are errors that name the line, and every one is reported at once.
+  They are a level, and a field that holds a list, a mapping, the rule's identity or its prose: `tokens`, `forms`, `swap`, `exceptions`, `raw`, `either`, `filters`, `ignore`, `message`, `description`, `link`, `extends`, `name`, `path` and `tests`.
+  They are also a field the rule's check does not define, a value of the wrong kind, a flag that is not `true` or `false`, and a missing value.
+  So are a rule no loaded style holds, and any parameter of `Vale.Terms` or `Vale.Avoid`.
+  Vale takes some of them without a word and names no line for others.
+
+## Rule scopes
+
+A rule's `scope` is Vale's: lowercase dotted names such as `text`, `heading.h1` and `sentence`, joined by `~`, `&` and lists.
+`&` keeps the blocks that hold every name, so `sentence & paragraph` selects the sentences of paragraphs.
+
+hakkiri adds two scopes that Vale lacks.
+`title` selects the title of a Markdown link, of an image and of a link reference definition, and the `title` attribute of an HTML tag, in a block or in a line of text, and of a JSX element.
+`image` selects the alt text of an image.
+
+A title is selected by what holds it too.
+`title & link` selects the title of a link, `title & image` the title of an image, and only `title` selects the title of a definition.
+In HTML, `title & link` selects the `title` attribute of an `a` tag and `title & image` that of an `img` tag.
+`title & ~link` leaves out the titles of links, and `title & ~image` those of images.
+The title of a tag in the text of a link is that tag's, so `title & link` leaves it out.
+`link` and `image` alone never select a title, and no other scope reads one, as in Vale, where only `raw` does.
+`raw` still reads every title.
 
 ## Differences from Vale
 
@@ -196,4 +232,30 @@ hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.
 A key that names no rule, or a word that is neither a level, `on` nor `off`, is an error.
 Vale ignores the key, and warns and turns the rule off for the word.
 
-hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini` and no built-in `Vale` style.
+hakkiri reads the `config/dictionaries` and `config/ignore` folders of each package for `Vale.Spelling`, where Vale reads one styles path.
+It reads no word in a code span of a code comment, which Vale reads when `custom` turns the filters off, and no name after `@param`, which Vale reads.
+
+hakkiri runs no `script` rule, no `doc()` scope and no View, and reads no `.vale.ini`. Its built-in style `Vale` holds `Vale.Repetition` and `Vale.Spelling`, as Vale's does.
+
+hakkiri reads a `sequence` rule with `forms` in place of `tokens`: a list of mappings that each hold `tokens`.
+The rule matches where any form does, and every alert carries the one rule name.
+Two forms that match overlapping words give the match that starts first, and the earlier form at a tie.
+A rule holds `tokens` or `forms`, never both.
+Vale stops with a panic on a rule with `forms` and no `tokens`, so a package that must load in both tools keeps one rule for each form.
+
+hakkiri tags a sentence with the model of prose at `b33e60d`, where Vale tags with the older model of prose v3.2.2.
+It then corrects the tags of a possessive `'s`, a modal or a name in capitals, a semicolon, and a verb after a noun phrase.
+It also corrects the verbs of saying and asking after a noun.
+The words in `the docs say` and `the flag asks for` read as verbs.
+The words in `for the asks that wait` and `a hook told of the file` read as a noun and a participle.
+It also reads `check`, `prompt`, `thinking` and `fade` as nouns after a determiner.
+It reads `prompt`, `round` and `split` as nouns in `the load split pull request`.
+It reads `check` as a noun that ends a compound, as in `the peer user id check`.
+A `sequence` rule can therefore flag other words than in Vale.
+A title keeps the tags of the model alone.
+
+hakkiri reads a code span in a `sequence` rule as a noun: its tag is `NN`, the tagger reads a noun in its place, and a pattern or a word list reads it as the letter `X`.
+A rule for a noun and a verb, such as `ThingsSpeakNoun`, flags `` `flag` says `` as it flags `the flag says`, and a rule for four lowercase nouns counts no code span.
+An `existence` rule reads a code span as one `*`, as Vale masks it, so a match that runs across a span is a match, and one that starts or ends on a span is not.
+The square brackets of an intra-doc link, as in ``[`Name`]``, belong to the span.
+Vale reads the span as a run of `*`, and a rule with a tag and no pattern flags `` `flag` says `` there too.

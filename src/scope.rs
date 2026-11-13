@@ -11,10 +11,10 @@ use crate::tree::Scope as NodeScope;
 
 /// The file extensions a scope part may end in. A rule for a language
 /// hakkiri does not read loads and selects nothing.
-const EXTENSIONS: [&str; 33] = [
+const EXTENSIONS: [&str; 34] = [
     "adoc", "c", "cc", "cjs", "cpp", "cs", "css", "go", "h", "hpp", "html", "java", "js", "jsx",
     "kt", "lua", "md", "mdx", "mjs", "org", "php", "pl", "py", "r", "rb", "rs", "rst", "sass",
-    "scala", "scss", "swift", "ts", "tsx",
+    "scala", "scss", "swift", "ts", "tsx", "txt",
 ];
 
 /// An inline element whose text a scope reads as spaces.
@@ -75,12 +75,12 @@ struct Part {
 }
 
 impl Part {
-    /// Whether the part holds in a file with `extension`: it names no
-    /// extension, or the file's.
-    fn applies_to(&self, extension: &str) -> bool {
+    /// Whether the part holds in a file with `extensions`: it names no
+    /// extension, or one of the file's.
+    fn applies_to(&self, extensions: &[&str]) -> bool {
         self.extension
             .as_deref()
-            .is_none_or(|wanted| wanted == extension)
+            .is_none_or(|wanted| extensions.contains(&wanted))
     }
 }
 
@@ -148,7 +148,15 @@ impl Selector {
                     _ => vec![name],
                 };
                 for (index, name) in named_parts.iter().enumerate() {
-                    let known = matches!(*name, "text" | "sentence")
+                    // A key of the front matter completes `frontmatter` and
+                    // `text.frontmatter`, so any name below them is one.
+                    let front = |prefix: &str| {
+                        name.strip_prefix(prefix)
+                            .is_some_and(|rest| rest.starts_with('.'))
+                    };
+                    let known = matches!(*name, "text" | "sentence" | "text.frontmatter")
+                        || front("frontmatter")
+                        || front("text.frontmatter")
                         || NodeScope::ALL.iter().any(|scope| named(name, scope.name()));
                     if !known {
                         return Err(refuse("is not a scope hakkiri defines"));
@@ -195,23 +203,27 @@ impl Selector {
 
     /// What a block reads, or `None` when no item selects it.
     ///
-    /// `names` are the scope names the block holds, and `extension` the file's
-    /// extension.
+    /// `names` are the scope names the block holds, and `extensions` the
+    /// extensions the file has: its own and its reader's.
+    /// `around` are the names of the element around the block that a part may
+    /// name beside the block's own, as `link` does in `title & link`: an item
+    /// still needs a part that names the block itself.
     /// The block reads as spaces the inline elements that the selecting items
     /// leave out, such as `~link`; an item that does not select the block
     /// leaves out nothing.
     pub(crate) fn reads(
         &self,
         names: &[&str],
-        extension: &str,
+        around: &[&str],
+        extensions: &[&str],
         sentence: bool,
     ) -> Option<Vec<Inline>> {
         let mut blank = Vec::new();
         let mut selected = false;
         for item in &self.alternatives {
-            if item.selects(names, extension, sentence) {
+            if item.selects(names, around, extensions, sentence) {
                 selected = true;
-                for inline in item.blank(extension) {
+                for inline in item.blank(extensions) {
                     if !blank.contains(&inline) {
                         blank.push(inline);
                     }
@@ -223,11 +235,11 @@ impl Selector {
 }
 
 impl Alternative {
-    /// The inline elements the item leaves out in a file with `extension`.
-    fn blank(&self, extension: &str) -> impl Iterator<Item = Inline> {
+    /// The inline elements the item leaves out in a file with `extensions`.
+    fn blank(&self, extensions: &[&str]) -> impl Iterator<Item = Inline> {
         self.parts
             .iter()
-            .filter(move |part| part.negated && part.applies_to(extension))
+            .filter(move |part| part.negated && part.applies_to(extensions))
             .filter_map(|part| Inline::of(&part.name))
     }
 
@@ -237,7 +249,13 @@ impl Alternative {
             .any(|part| !part.negated && part.name == "sentence")
     }
 
-    fn selects(&self, names: &[&str], extension: &str, sentence: bool) -> bool {
+    fn selects(
+        &self,
+        names: &[&str],
+        around: &[&str],
+        extensions: &[&str],
+        sentence: bool,
+    ) -> bool {
         // A sentence is read for an item that names sentences, and only that
         // one: an item such as `heading` reads the whole heading.
         if sentence && !self.wants_sentences() {
@@ -245,10 +263,11 @@ impl Alternative {
         }
         // An item whose every part names another language selects nothing,
         // whether its parts are negated or not.
-        if self.parts.iter().all(|part| !part.applies_to(extension)) {
+        if self.parts.iter().all(|part| !part.applies_to(extensions)) {
             return false;
         }
         let mut has_positive = false;
+        let mut names_the_block = false;
         for part in &self.parts {
             if part.negated {
                 continue;
@@ -258,21 +277,38 @@ impl Alternative {
                 if !sentence {
                     return false;
                 }
-            } else if !names.iter().any(|name| named(&part.name, name)) {
+                names_the_block = true;
+            } else if names.iter().any(|name| named(&part.name, name)) {
+                names_the_block = true;
+            } else if !around.iter().any(|name| named(&part.name, name)) {
                 return false;
             }
-            if !part.applies_to(extension) {
+            if !part.applies_to(extensions) {
                 return false;
             }
         }
         if !has_positive && !names.contains(&"text") {
             return false;
         }
-        self.parts
-            .iter()
-            .filter(|part| {
-                part.negated && Inline::of(&part.name).is_none() && part.applies_to(extension)
-            })
-            .all(|part| !names.iter().any(|name| named(&part.name, name)))
+        if has_positive && !names_the_block {
+            return false;
+        }
+        // A negated part that names the element around the block leaves the
+        // block out, so `title & ~link` selects no title of a link.
+        // The names of inline elements are read as blank in a block that
+        // holds them, and only the element around a block excludes it here.
+        let excluded_by_around = self.parts.iter().any(|part| {
+            part.negated
+                && part.applies_to(extensions)
+                && around.iter().any(|name| named(&part.name, name))
+        });
+        !excluded_by_around
+            && self
+                .parts
+                .iter()
+                .filter(|part| {
+                    part.negated && Inline::of(&part.name).is_none() && part.applies_to(extensions)
+                })
+                .all(|part| !names.iter().any(|name| named(&part.name, name)))
     }
 }

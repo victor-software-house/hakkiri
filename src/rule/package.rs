@@ -2,12 +2,12 @@
 //! package that holds the rule and from no other place.
 
 use std::collections::HashSet;
-use std::fs;
 use std::path::{Component, Path, PathBuf};
+use std::{fs, io};
 
-use super::LoadError;
 use super::build::Source;
 use super::schema::SpellingFields;
+use super::{LoadError, VALE_SPELLING_NAME};
 use crate::dictionary::{AffixFile, Book, Dictionary, DictionaryError, Speller, read_affixes};
 
 /// Where a package keeps its dictionaries.
@@ -146,12 +146,7 @@ fn lists(
             };
             let text =
                 fs::read_to_string(&path).map_err(|error| refuse(format!("`{entry}`: {error}")))?;
-            listed.extend(
-                text.lines()
-                    .map(str::trim)
-                    .filter(|word| !word.is_empty() && *word != "#")
-                    .map(str::to_owned),
-            );
+            listed.extend(words(&text));
         }
     }
     Ok(listed)
@@ -163,7 +158,20 @@ fn lists(
 /// dictionaries folder, and `append` adds the built-in one to them.
 /// `aff` and `dic` name one dictionary and nothing else.
 /// A rule that names none uses the built-in dictionary.
+///
+/// The rule `Vale.Spelling` has no package of its own: it reads the folders of
+/// every package of the project, as Vale reads its styles path, and the first
+/// that holds a file a field names is the one it reads.
+/// It adds to the built-in dictionary each dictionary of their dictionaries
+/// folders, unless it names dictionaries or files of its own, and it accepts
+/// the words of every `.txt` file under their word list folders.
 pub(super) fn speller(source: &Source<'_>, fields: &SpellingFields) -> Result<Speller, LoadError> {
+    let internal = source.name == VALE_SPELLING_NAME;
+    let folders: Vec<&Path> = if internal {
+        source.folders.iter().map(PathBuf::as_path).collect()
+    } else {
+        source.package.into_iter().collect()
+    };
     let (aff, dic, dicpath) = (
         fields.aff.value(),
         fields.dic.value(),
@@ -174,7 +182,7 @@ pub(super) fn speller(source: &Source<'_>, fields: &SpellingFields) -> Result<Sp
     let reads_files = [aff, dic, dicpath].iter().any(|text| !text.is_empty())
         || !names.is_empty()
         || !ignore.is_empty();
-    let Some(package) = source.package else {
+    let Some(package) = holder(&folders, [aff, dic, dicpath], names) else {
         if reads_files {
             return Err(source.problem(
                 "dictionaries",
@@ -231,12 +239,154 @@ pub(super) fn speller(source: &Source<'_>, fields: &SpellingFields) -> Result<Sp
         if names.is_empty() || fields.append.value() {
             books.push(builtin(source)?);
         }
+        if internal && names.is_empty() {
+            for folder in &folders {
+                books.extend(default_dictionaries(source, folder)?);
+            }
+        }
     } else {
         let affix = dictionary_file(source, package, "aff", aff)?;
         let words = dictionary_file(source, package, "dic", dic)?;
         books.push(read_dictionary(source, "aff", aff, &affix, &words)?);
     }
-    Ok(Speller::new(books, lists(source, package, ignore)?))
+    let listed = if internal {
+        ignored_words(source, &folders)?
+    } else {
+        lists(source, package, ignore)?
+    };
+    Ok(Speller::new(books, listed))
+}
+
+/// The package folder a rule reads: the only one it has, or for `Vale.Spelling`
+/// the first folder that holds a file the fields name, or else the first.
+/// `None` when the rule has no folder.
+fn holder<'a>(folders: &[&'a Path], files: [&str; 3], names: &[String]) -> Option<&'a Path> {
+    if folders.len() < 2 {
+        return folders.first().copied();
+    }
+    let wanted: Vec<String> = files
+        .iter()
+        .filter(|file| !file.is_empty())
+        .flat_map(|file| [(*file).to_owned(), format!("{DICTIONARIES}/{file}")])
+        .chain(
+            names
+                .iter()
+                .flat_map(|name| [format!("{DICTIONARIES}/{name}.dic")]),
+        )
+        .collect();
+    for folder in folders {
+        for candidate in &wanted {
+            if matches!(find(folder, candidate), Ok(Some(_))) {
+                return Some(folder);
+            }
+        }
+    }
+    folders.first().copied()
+}
+
+/// Each dictionary in the dictionaries folder of `package`, in name order, as
+/// `Vale.Spelling` adds them to the built-in one.
+fn default_dictionaries(source: &Source<'_>, package: &Path) -> Result<Vec<Book>, LoadError> {
+    let Some(folder) = find(package, DICTIONARIES)
+        .map_err(|message| source.problem("dictionaries", message))?
+        .filter(|path| path.is_dir())
+    else {
+        return Ok(Vec::new());
+    };
+    let mut stems: Vec<String> = fs::read_dir(&folder)
+        .map_err(|error| source.problem("dictionaries", format!("`{DICTIONARIES}`: {error}")))?
+        .filter_map(Result::ok)
+        .filter_map(|entry| {
+            let name = entry.file_name().to_string_lossy().into_owned();
+            name.strip_suffix(".dic").map(str::to_owned)
+        })
+        .collect();
+    stems.sort();
+    stems
+        .iter()
+        .map(|stem| named(source, package, DICTIONARIES, stem))
+        .collect()
+}
+
+/// The words of every `.txt` file under the word list folder of each package
+/// of `folders`, one word to a line.
+fn ignored_words(source: &Source<'_>, folders: &[&Path]) -> Result<HashSet<String>, LoadError> {
+    let mut listed = HashSet::new();
+    for package in folders {
+        let Some(folder) = find(package, IGNORE)
+            .map_err(|message| source.problem("ignore", message))?
+            .filter(|path| path.is_dir())
+        else {
+            continue;
+        };
+        let root = package.canonicalize().map_err(|error| {
+            source.problem(
+                "ignore",
+                format!("rule `{}`: the package: {error}", source.name),
+            )
+        })?;
+        read_lists(source, &root, &folder, &mut listed, &mut HashSet::new())?;
+    }
+    Ok(listed)
+}
+
+/// Adds the words of each `.txt` file in `folder` and the folders under it to
+/// `listed`.
+///
+/// `root` is the real path of the package. An entry that a link sends outside
+/// it is refused, as `find` refuses a path that leaves the package. `visited`
+/// holds the real path of each folder read, so a link back to a folder read
+/// before stops there.
+fn read_lists(
+    source: &Source<'_>,
+    root: &Path,
+    folder: &Path,
+    listed: &mut HashSet<String>,
+    visited: &mut HashSet<PathBuf>,
+) -> Result<(), LoadError> {
+    let refuse = |path: &Path, error: &io::Error| {
+        source.problem(
+            "ignore",
+            format!("rule `{}`: `{}`: {error}", source.name, path.display()),
+        )
+    };
+    let inside = |path: &Path| -> Result<PathBuf, LoadError> {
+        let reached = path.canonicalize().map_err(|error| refuse(path, &error))?;
+        if reached.starts_with(root) {
+            Ok(reached)
+        } else {
+            let shown = path.strip_prefix(root).unwrap_or(path);
+            Err(source.problem(
+                "ignore",
+                format!(
+                    "rule `{}`: `{}` leaves the package",
+                    source.name,
+                    shown.display()
+                ),
+            ))
+        }
+    };
+    if !visited.insert(folder.to_path_buf()) {
+        return Ok(());
+    }
+    for entry in fs::read_dir(folder).map_err(|error| refuse(folder, &error))? {
+        let path = entry.map_err(|error| refuse(folder, &error))?.path();
+        if path.is_dir() {
+            read_lists(source, root, &inside(&path)?, listed, visited)?;
+        } else if path.extension().is_some_and(|extension| extension == "txt") {
+            let text = fs::read_to_string(inside(&path)?).map_err(|error| refuse(&path, &error))?;
+            listed.extend(words(&text));
+        }
+    }
+    Ok(())
+}
+
+/// The words of a list: one to a line, with no blank line and no lone `#`.
+fn words(text: &str) -> impl Iterator<Item = String> + '_ {
+    text.lines()
+        .map(str::trim)
+        .filter(|word| !word.is_empty() && *word != "#")
+        .map(str::to_owned)
 }
 
 /// An affix file that names the forms of a word.

@@ -1,0 +1,26 @@
+É1 very <!-- vale off --> É2 very <!-- vale on --> É3 very really good.
+
+日本1 very <!-- vale Team.Words = NO --> 日本2 very <!-- vale Team.Words = YES --> 日本3 very.
+
+😀1 very <!-- vale off --> 😀2 very
+<!-- vale on --> 😀3 very.
+
+É4 very <!-- vale Team.Really = NO --> É5 very really
+
+É6 very really good.
+
+<!-- vale Team.Really = YES -->
+
+> É7 very
+> <!-- vale off -->
+> É8 very
+
+É9 very really good.
+
+<!-- vale on -->
+
+| É10 very | É11 very <!-- vale off --> É12 very |
+|:--|:--|
+| É13 very | É14 very |
+
+É15 very really good.

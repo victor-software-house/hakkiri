@@ -1,0 +1,16 @@
+a-list	8	max: takes one value: a number, `true` or `false`, or text	[internal]:E100:1 error(s) decoding:
+an-action	8	rule `Team.Exist`: expected mapping start	styles/Team/Exist.yml:0:E201:expected a map, got 'string'
+bad-scope	8	scope: rule `Team.Exist`: `bogus` is not a scope hakkiri defines	(no error)
+decimal	8	max: rule `Vale.Repetition`: must be a whole number of 0 or more, found `1.5`	[internal]:E100:1 error(s) decoding:
+flag-number	8	ignorecase: rule `Team.Exist`: must be true or false, found `1`	(no error)
+flag-yes	8	ignorecase: rule `Team.Exist`: must be true or false, found `YES`	(no error)
+level	8	level: rule `Vale.Repetition`: is not a parameter: set the level with the rule's own setting, such as `Vale.Repetition: warning`	vale-faults/level.ini:7:E201:set a level with 'Vale.Repetition = warning'
+negative	8	max: rule `Vale.Repetition`: must be a whole number of 0 or more, found `-1`	(no error)
+no-such-rule	7	Nope.Rule: names no rule in any style the config loads	(no error)
+not-a-flag	8	ignorecase: rule `Team.Exist`: must be true or false, found `maybe`	styles/Team/Exist.yml:1:E201:1 error(s) decoding:
+not-a-number	8	max: rule `Vale.Repetition`: must be a whole number of 0 or more, found `abc`	[internal]:E100:1 error(s) decoding:
+no-value	8	max: needs a value	(no error)
+other-check	8	rule `Team.Exist`: unknown field `max`, expected one of	styles/Team/Exist.yml:0:E201:has invalid keys: 'max'
+tokens	8	tokens: rule `Vale.Repetition`: is not adjustable as a parameter: extend `Vale.Repetition` in a style instead	vale-faults/tokens.ini:7:E201:'tokens' is not adjustable from configuration; extend 'Vale.Repetition' in a style instead
+unknown-parameter	8	rule `Vale.Repetition`: unknown field `bogus`, expected one of	[internal]:E100:has invalid keys: 'bogus'
+wrong-case	8	rule `Team.Exist`: unknown field `IGNORECASE`, expected one of	(no error)

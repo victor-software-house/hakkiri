@@ -1,0 +1,6 @@
+accept:
+  - GitHub
+  - a:
+      regex: true
+    b:
+      regex: true

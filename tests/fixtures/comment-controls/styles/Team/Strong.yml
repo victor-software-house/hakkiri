@@ -1,0 +1,6 @@
+extends: existence
+message: "Strong '%s'"
+level: warning
+scope: strong
+tokens:
+  - 'very'
