@@ -1532,6 +1532,9 @@ struct Named {
     written: Vec<String>,
     /// The names that a glob lists, each once.
     globs: Vec<String>,
+    /// Whether a glob uses the style `Vale`: it lists the style, names a rule
+    /// of it, or sets the parameters of one.
+    uses_vale: bool,
 }
 
 impl Named {
@@ -1557,6 +1560,14 @@ impl Named {
         for (pattern, settings) in &layer.raw.files.0 {
             let glob = FieldPath::root().key("files").key(pattern);
             for (key, setting) in &settings.0 {
+                self.uses_vale |= key.starts_with("Vale.")
+                    || match (key.as_str(), setting) {
+                        ("styles", Setting::List(names)) => names.iter().any(|name| name == "Vale"),
+                        ("params", Setting::Map(rules)) => {
+                            rules.0.iter().any(|(rule, _)| rule.starts_with("Vale."))
+                        }
+                        _ => false,
+                    };
                 if let ("vocab", Setting::List(names)) = (key.as_str(), setting) {
                     let list = glob.clone().key("vocab");
                     for (index, name) in names.iter().enumerate() {
@@ -1648,10 +1659,10 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
 
 /// Builds the rules of the style `Vale` and of the vocabularies the config
 /// names, as Vale builds them.
-/// The style `Vale` holds `Vale.Repetition` and `Vale.Spelling`, and the lists
-/// of the top level give it `Vale.Terms` and `Vale.Avoid`. Each vocabulary a
-/// glob lists gives `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which that
-/// glob runs on its files.
+/// The style `Vale` holds `Vale.Repetition`, and `Vale.Spelling` when a glob
+/// uses the style, and the lists of the top level give it `Vale.Terms` and
+/// `Vale.Avoid`. Each vocabulary a glob lists gives `Vale.<Name>.Terms` and
+/// `Vale.<Name>.Avoid`, which that glob runs on its files.
 fn build_vocabulary_rules(
     loaded: &mut Loaded,
     vocab: &Named,
@@ -1676,11 +1687,15 @@ fn build_vocabulary_rules(
         }
     }
     for (prefix, own_accepted, own_rejected, style) in built {
-        // The style `Vale` always holds `Vale.Repetition` and `Vale.Spelling`,
-        // as in Vale.
+        // The style `Vale` holds `Vale.Repetition`, and `Vale.Spelling` when a
+        // glob uses the style, as Vale builds a rule when it is used.
         let built_in = if style {
             vale_repetition(accepted).and_then(|repetition| {
-                Ok(vec![repetition, vale_spelling(&loaded.packages, accepted)?])
+                let mut rules = vec![repetition];
+                if vocab.uses_vale {
+                    rules.push(vale_spelling(&loaded.packages, accepted)?);
+                }
+                Ok(rules)
             })
         } else {
             Ok(Vec::new())

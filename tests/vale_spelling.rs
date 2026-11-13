@@ -299,3 +299,51 @@ fn a_dictionary_no_package_holds_is_an_error_on_the_line_of_the_parameter() -> T
     );
     Ok(())
 }
+
+/// A project whose package `pack` holds the style `Team` and a dictionary with
+/// no affix file, and whose config lists `styles` for the Markdown files.
+fn stray_dictionary<'a>(suite: &'a Suite, name: &str, styles: &str) -> Root<'a> {
+    let root = suite.scenario(name);
+    root.file(
+        "pack/Team/Bad.yml",
+        "extends: existence\nmessage: \"Avoid '%s'.\"\nlevel: warning\ntokens: [blorft]\n",
+    );
+    root.file("pack/config/dictionaries/stray.dic", "1\nblorft\n");
+    root.file("text/plain.md", "A short plain line.\n");
+    root.file(
+        ".ctl/stray.yaml",
+        format!("packages:\n  - path: pack\nfiles:\n  \"text/*.md\":\n    styles: [{styles}]\n"),
+    );
+    root
+}
+
+#[test]
+fn a_dictionary_with_no_affix_file_fails_no_run_that_does_not_spell() -> TestResult {
+    let suite = Suite::new("vale-spelling-stray-unused");
+    let root = stray_dictionary(&suite, "unused", "Team");
+    let result = run(
+        root.path(),
+        &["check", "--config", ".ctl/stray.yaml", "text/plain.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    Ok(())
+}
+
+#[test]
+fn a_dictionary_with_no_affix_file_fails_a_run_that_lists_the_style_vale() -> TestResult {
+    let suite = Suite::new("vale-spelling-stray-used");
+    let root = stray_dictionary(&suite, "used", "Vale");
+    let result = run(
+        root.path(),
+        &["check", "--config", ".ctl/stray.yaml", "text/plain.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    let shown = format!("{}{}", result.out, result.err);
+    assert!(
+        shown.contains("`stray.aff` is not in `config/dictionaries`"),
+        "{shown}"
+    );
+    Ok(())
+}

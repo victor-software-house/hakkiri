@@ -54,6 +54,15 @@ hakkiri gives the same, with these exceptions, which it keeps on purpose:
 - A code span in a code comment is no word, where Vale reads its backticks as part of a word when `custom` turns the filters off.
 - A name after `@param` is no prose, where Vale reads it, and reads the tag itself with `custom`.
 
+### 6. The rule is built when a glob uses it
+
+Vale builds a rule when a config uses it, so a dictionary that cannot load fails no run of a config that never spells.
+hakkiri builds `Vale.Spelling` only when a glob of some config file lists `Vale` in `styles`, names a rule that starts with `Vale.`, or sets `params` for one.
+A project with a package style and a stray `.dic` file in `config/dictionaries` loads and lints.
+The same project fails with a fault that names the missing `.aff` file once a glob lists `Vale`.
+Alternative: build it on every load.
+It lost because a package with a broken dictionary then failed every run, including runs that never spell.
+
 [v-definition]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/definition.go#L170-L182
 [v-spelling]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L142-L173
 [v-multi]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell/multi.go#L138-L152
