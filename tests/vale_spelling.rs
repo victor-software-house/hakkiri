@@ -1,16 +1,18 @@
 //! The built-in rule `Vale.Spelling`: the scenarios of the vale-spelling
 //! change.
 //!
-//! `tests/fixtures/vale-spelling` holds three packages (`plain`, with a
-//! vocabulary `Team`; `lists`, with word lists under `config/ignore`; and
-//! `dicts`, with a dictionary under `config/dictionaries`), three Markdown
-//! files and one Rust file (`text`, with `.fixture` after the extension), and
-//! one config for each tool and scenario: `vale/<name>.ini` and
-//! `.ctl/<name>.yaml`.
+//! `tests/fixtures/vale-spelling` holds three packages, three Markdown files,
+//! one Rust file and one config for each tool and scenario.
+//! The packages are `plain`, with a vocabulary `Team`; `lists`, with word lists
+//! under `config/ignore`; and `dicts`, with a dictionary under
+//! `config/dictionaries`.
+//! The files are in `text`, with `.fixture` after the extension.
+//! The configs are `vale/<name>.ini` and `.ctl/<name>.yaml`.
 //! `vale.tsv` holds one row for each alert Vale gave on the files under each
-//! config: the config, the file, the line, the first and last column, the
-//! level, the rule, the message and the matched text, with a line feed written
-//! `\n` and a tab `\t`.
+//! config.
+//! A row holds the config, the file, the line, the first and last column, the
+//! level, the rule, the message and the matched text.
+//! A line feed is written `\n` and a tab `\t`.
 //! The rows come from Vale at `66bbb85` run from the fixture folder as `vale
 //! --config=vale/<name>.ini --output=JSON text`, with `Vale.Repetition`
 //! turned off, which `tests/builtin_repetition.rs` compares.

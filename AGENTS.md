@@ -39,7 +39,8 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    The top level reaches every check that reads accepted terms, and a glob's list reaches the files it matches, as Vale's `Vocab` does.  
    The lists build `Vale.Terms` and `Vale.Avoid` in a built-in style `Vale`, and a glob's vocabulary builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` for its files.  
    The style `Vale` always exists and holds `Vale.Repetition`, and `Vale.Spelling` when a glob uses the style, each read from Vale's definition as text by `vale_repetition` and `vale_spelling` (rows `HKR-038` and `HKR-026`).  
-   A glob uses the style when it lists `Vale` in `styles`, names a rule that starts with `Vale.`, or sets `params` for one; `Named::add_layer` finds it before the packages load, so a dictionary that cannot load fails no run of a config that spells nothing.  
+   A glob uses the style when it lists `Vale` in `styles`, names a rule that starts with `Vale.`, or sets `params` for one.  
+   `Named::add_layer` finds it before the packages load, so a dictionary that cannot load fails no run of a config that spells nothing.  
    `Vale.Spelling` is the one rule named for Vale in `rule/package.rs`: it reads `config/dictionaries` and `config/ignore` of every package, where a rule file reads its own.  
    `read_lists` refuses an entry that a link sends outside the package, as `find` does, and reads each real folder once, so a link loop ends.  
    A hakkiri config that lists `Vale` and whose Vale config turns spelling off sets `Vale.Spelling: off` too, or the fixture gives alerts that Vale does not.  

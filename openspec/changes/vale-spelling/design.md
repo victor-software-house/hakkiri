@@ -56,7 +56,7 @@ hakkiri gives the same, with these exceptions, which it keeps on purpose:
 - A code span in a code comment is no word, where Vale reads its backticks as part of a word when `custom` turns the filters off.
 - A name after `@param` is no prose, where Vale reads it, and reads the tag itself with `custom`.
 
-### 6. The rule is built when a glob uses it
+### 6. The rule is built on use
 
 Vale builds a rule when a config uses it, so a dictionary that cannot load fails no run of a config that never spells.
 hakkiri builds `Vale.Spelling` only when a glob of some config file lists `Vale` in `styles`, names a rule that starts with `Vale.`, or sets `params` for one.
