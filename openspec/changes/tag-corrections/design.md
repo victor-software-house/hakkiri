@@ -2,7 +2,7 @@
 
 ## Decisions
 
-### 1. Keep the model and correct its tags afterwards
+### 1. Keep the model and correct the tags afterwards
 
 The older model was right more often on the conflicts of our documents and wrong more often on general English, and it needs the `bytes` feature template that hakkiri does not read.
 The alternative was to ship that model, which needs a second reader and scores 1.9 points lower on GUM, 90.26% against 92.16%.
@@ -22,7 +22,7 @@ A rule that reads the tag before a word reads the corrected one.
 The capitalization check tags a title through `tag_treebank` and ports Vale's result, so the rules do not run there.
 The alternative was to correct titles too, which changes a check that no measurement here covers.
 
-### 5. A word in capitals is a name unless it is a function word or a unit
+### 5. Words in capitals are names, except units or function words
 
 The model reads an acronym such as `CSS` or `SSH` as a noun, an adjective or a verb, and the old model reads it as a proper noun.
 It reads a heading such as `THE ANSWER` correctly, and GUM has capital headings of ordinary words such as `THE` and `OF`, so a function word keeps its tag.

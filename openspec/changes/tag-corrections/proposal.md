@@ -16,7 +16,7 @@ ProseStyle's `NounStack` and `ThingsSpeakNoun` read tags, and a verb read as a n
 
 - A possessive `'s` after a noun reads `POS`.
 - A modal written in capitals, `SHALL`, `MUST`, `MAY`, `SHOULD`, `WILL` or `CAN`, reads `MD`.
-- A token of two or more capital letters reads `NNP`, unless the model gives it the tag of a function word, or it is `KB`, `MB`, `GB`, `TB` or `PB`.
+- A token of two or more capital letters reads `NNP`, unless it is `KB`, `MB`, `GB`, `TB` or `PB`, or the model gives it the tag of a function word.
 - A semicolon reads `:`.
 - A plural noun after a noun reads `VBZ` before an object, and before a noun, an adjective or a preposition other than `of` when no other word of the sentence is a verb.
 - `Tagger::tag` and `Tagger::tag_words` apply the rules.

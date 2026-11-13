@@ -46,8 +46,8 @@ hakkiri SHALL apply to the tags of a sentence the corrections below, in this ord
 - **THEN** `reads` reads `VBZ`, and the model alone reads `NNS`, which gives `NounStack` a false alert ([tag-corrections 6][tag-corrections-6])
 - **AND** in `The layout rules of the widgets.`, `rules` stays `NNS`
 
-[tag-corrections-1]: ../../design.md#1-keep-the-model-and-correct-its-tags-afterwards
+[tag-corrections-1]: ../../design.md#1-keep-the-model-and-correct-the-tags-afterwards
 [tag-corrections-2]: ../../design.md#measures
 [tag-corrections-4]: ../../design.md#4-a-title-keeps-the-models-tags
-[tag-corrections-5]: ../../design.md#5-a-word-in-capitals-is-a-name-unless-it-is-a-function-word-or-a-unit
+[tag-corrections-5]: ../../design.md#5-words-in-capitals-are-names-except-units-or-function-words
 [tag-corrections-6]: ../../design.md#6-a-plural-noun-is-a-verb-when-an-object-follows
