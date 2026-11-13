@@ -507,8 +507,8 @@ archive:
     evidence:
       - 2026-11-13, ProseStyle v0.0.16 tagged; every rule and package case passes under hakkiri test in the prose-style CI, and the opt-in rules stay off in its test.
       - '2026-11-13, alert diff over the nine repositories, Vale 3.26.0 with v0.0.14 against hakkiri main f53bfb3 (PRs 152 and 153) with v0.0.16: 4,361 Vale alerts, 5,350 hakkiri, 2,750 the same, 202 only Vale, 1,191 only hakkiri, 1,027 moved, 382 changed.'
-      - 2026-11-13, against hakkiri 0.0.6 the diff lost 460 ClauseChain alerts and gave 75 false LongSentence alerts; on main ClauseChain matches, LongSentence gives 9 that only hakkiri gives (8 true) and SentenceLength none, and ThingsSpeakNoun gains 202, sampled true, from code spans (HKR-056).
       - '2026-11-13, left after the diff: one PrepositionChain match that an accepted word holds back (HKR-073), four alerts from Vale comments that name old rules (HKR-009), and the ThingsSpeakNoun form SHALL say, for ProseStyle v0.0.17.'
+      - 2026-11-13, against hakkiri 0.0.6 the diff lost 460 ClauseChain alerts and gave 75 LongSentence alerts that only hakkiri gave, 68 false; on main ClauseChain matches, LongSentence gives 9 that only hakkiri gives (8 true) and SentenceLength none, and ThingsSpeakNoun gains 202, sampled true, from code spans (HKR-056).
     disposition: completed
 
   - id: HKR-031
