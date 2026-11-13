@@ -67,17 +67,18 @@ The variable and the flag beat every file, as for the other options of `check`.
 Vale keeps each alert under the key of its line, its column and its rule, and drops a later alert with the same key ([history key][v-history]).
 A block that is not a sentence is reported at the first column of its line, so a table row of three cells gives one alert, the one of its first cell.
 A sentence that starts with a code span has no place in its block, so Vale reports it at the line the block was found on, and an earlier sentence often holds that place.
-Vale also finds the line of a block by searching the file for its text ([walker.advance][v-advance]), so a block whose text is not in the file as written can land on the line of another block, and the later alert is dropped.
+Vale also finds the line of a block by searching the file for its text ([walker.advance][v-advance]), so a block whose text is not in the file as written can land on the line of another block.
+The later alert is dropped.
 A reference definition that repeats the text of a code span, and an entity such as `&amp;lt;` in a code span, are two ways to get there.
 
 The probe at 0 differed from Vale in 1,910 alerts.
-A build of Vale with that check off, in a box, differs in 860: the drop is the cause of 1,050.
+A build of Vale with that check off, in a box, differs in 860, so the drop is the cause of the other 1,050 alerts.
 Table cells fall from 584 to 0, headings from 19 to 0, and list items from 71 to 2.
-hakkiri keeps each alert at its own place, since each block was measured, and the alert is as true as the others.
+In hakkiri each alert stays at its own place, since each block was measured, and the alert is as true as the others.
 Alternative: drop the alert the way Vale does.
 It lost because it loses a measurement that exists, and it needs Vale's search to know which blocks collide.
 
-### 7. A link that repeats its address
+### 7. A link that repeats the address
 
 Vale replaces the text of an element whose address equals its text with asterisks ([clean][v-clean]), so `[a.md](a.md)` counts no word.
 hakkiri did not, and now does, in [HKR-064][ledger].

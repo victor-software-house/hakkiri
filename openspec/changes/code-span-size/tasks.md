@@ -23,7 +23,8 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 - [x] 3.1 Read `code_span_size` from the package's settings file, the project config and a glob, and from `--code-span-size` and its variable, and pass it to the word counts.  
   Verify `tests/code_span_size.rs` and `a_code_span_counts_as_many_words_as_its_size` pass.  
   Evidence, 2026-11-12 (UTC): in a box, `fmt`, `clippy --all-targets -D warnings` and `cargo test --no-fail-fast` pass, 835 tests.
-- [x] 3.2 Probe Vale at `66bbb85` and hakkiri with the setting at 0 and at its default on the same files, for the `metric` and `readability` rules over each scope that holds a code span, and give a cause to each difference.  
+- [x] 3.2 Probe Vale at `66bbb85` and hakkiri with the setting at 0 and at its default on the same files, for the `metric` and `readability` rules over each scope that holds a code span.  
+  Give a cause to each difference.  
   Verify at 0 the alerts equal Vale's apart from the differences that `vale-differences` records and that rows [HKR-064][ledger] and [HKR-065][ledger] take, and by default they equal the alerts before the change.  
   Evidence, 2026-11-12 (UTC), Vale built from `66bbb85` in a box, 16 `metric` and `readability` rules over the scopes sentence, paragraph, list, table cell, heading and file.  
   By default hakkiri gives the alerts of the build before the change, 0 differing of 28,645 over 5 hand-written files and 211 Markdown files.  

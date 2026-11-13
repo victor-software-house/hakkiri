@@ -36,7 +36,7 @@ hakkiri SHALL report each alert of a `metric` or `readability` rule at the place
 #### Scenario: A sentence that starts with a code span
 
 - **WHEN** a rule has `extends: metric`, `scope: sentence`, `formula: words` and `condition: '> -1'`, with `code_span_size: 0`, and the input is ``First sentence. `Second` starts with code. Third one.``
-- **THEN** hakkiri reports 2.00, 3.00 and 2.00, and Vale reports 2.00 and 2.00, with no alert for the middle sentence, which starts with the code span and has the place of the first ([code-span-size 6][code-span-size-6])
+- **THEN** hakkiri reports 2.00, 3.00 and 2.00 for the three sentences, where Vale reports 2.00 and 2.00 for the first and the last. Vale gives no alert for the middle sentence, which starts with the code span and has the place of the first ([code-span-size 6][code-span-size-6])
 
 #### Scenario: A reference definition that repeats a code span
 
