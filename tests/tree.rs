@@ -206,6 +206,19 @@ fn an_autolink_is_a_gap_around_itself() -> TestResult {
 }
 
 #[test]
+fn a_tag_whose_closing_tag_is_past_its_element_opens_none() -> TestResult {
+    // `</i>` lies past the `<b>` element that holds `<i>`, so `<i>` is a tag
+    // and no element, and the text after `</b>` stays in the paragraph once.
+    let fixture = load("crossed-tags.md")?;
+    assert_eq!(fixture.nodes(Scope::Strong).len(), 1);
+    assert_eq!(fixture.nodes(Scope::Emphasis).len(), 0);
+    let paragraph = fixture.texts(Scope::Paragraph).join("");
+    assert_eq!(paragraph.matches("end.").count(), 1);
+    assert_eq!(paragraph.matches(" y").count(), 1);
+    Ok(())
+}
+
+#[test]
 fn an_email_or_a_www_address_stays_in_the_text_around_it() -> TestResult {
     let fixture = load("addresses.md")?;
     assert_eq!(
@@ -216,6 +229,28 @@ fn an_email_or_a_www_address_stays_in_the_text_around_it() -> TestResult {
         fixture.texts(Scope::Link),
         ["me@b.example", "me@b.example", "www.b.example"]
     );
+    Ok(())
+}
+
+#[test]
+fn markdown_reads_as_vales_converter_reads_it() -> TestResult {
+    let fixture = load("markdown-readings.md")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        [
+            "Get . now.",
+            "A well-known word.",
+            "First\nsecond.",
+            "A claim stands.",
+            "The source.",
+            "Use this and that now.",
+            "See  now.",
+        ]
+    );
+    assert_eq!(fixture.texts(Scope::TableCell), ["a", "b"]);
+    assert_eq!(fixture.texts(Scope::List), ["The source."]);
+    assert_eq!(fixture.texts(Scope::Strong), ["this"]);
+    assert_eq!(fixture.texts(Scope::Link), ["that", "https://a.example"]);
     Ok(())
 }
 

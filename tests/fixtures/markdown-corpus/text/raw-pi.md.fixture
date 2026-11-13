@@ -1,0 +1,11 @@
+<?php echo "w160"; ?>
+
+w161 after pi.
+
+<!DOCTYPE html>
+
+w162 after doctype.
+
+<![CDATA[ w163 ]]>
+
+w164 after cdata.

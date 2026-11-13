@@ -1,0 +1,11 @@
+w10 ref[^g1] here.
+
+[^g1]: w11 alpha.
+
+    w12 beta.
+
+    ```
+    w13 code in note
+    ```
+
+w14 last.

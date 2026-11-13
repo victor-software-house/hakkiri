@@ -1,0 +1,5 @@
+w1 first[^f1] and w2 second[^f2] and again[^f1] and missing[^f9] refs.
+
+[^f2]: w3 beta.
+[^f1]: w4 alpha.
+[^f3]: w5 gamma.

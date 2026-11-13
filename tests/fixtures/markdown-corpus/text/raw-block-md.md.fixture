@@ -1,0 +1,11 @@
+<div>
+
+Markdown **w120** inside html block.
+
+</div>
+
+<div>Same line **w121** text.</div>
+
+<p>
+Paragraph **w122** and <b>w123</b> text.
+</p>

@@ -1,13 +1,17 @@
 //! Markdown and MDX text into nodes, through markdown-rs.
 
 use std::cell::{Cell, RefCell};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::mem;
 use std::ops::Range;
+use std::rc::Rc;
 use std::slice::Iter;
+use std::sync::LazyLock;
 
-use markdown::mdast::Node as Mdast;
+use markdown::mdast::{Node as Mdast, Strong, Text};
+use markdown::unist::Position;
 use markdown::{Constructs, MdxSignal, ParseOptions};
+use regex::Regex;
 use tree_sitter::{InputEdit, Node as SyntaxNode, Parser, Point, Tree};
 
 use crate::error::Error;
@@ -229,6 +233,7 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
         source,
         code_blocks: Cell::new(0),
         addresses: addresses(&root),
+        referenced: footnotes_referenced(&root),
     };
     let mut nodes = builder.visit(&root, Scope::TableCell).nodes;
     math::include_delimiters(&mut nodes, &spans);
@@ -378,6 +383,8 @@ struct Builder<'a> {
     code_blocks: Cell<usize>,
     /// The address each link definition gives its label.
     addresses: HashMap<String, String>,
+    /// The identifiers of the footnotes that some reference names.
+    referenced: HashSet<String>,
 }
 
 /// The address of each link definition below `root`, by label.
@@ -443,6 +450,16 @@ enum Kind {
     Cell,
     /// A JSX element: its tags are gaps in the text around it.
     Jsx,
+    /// An inline HTML element, from its opening tag to its closing tag, of the
+    /// scope Vale gives its tag. Its tags are gaps in its text, and the
+    /// `title` nodes of its opening tag sit beside it, as they do beside a
+    /// tag that opens no element.
+    Raw {
+        scope: Scope,
+        open: Range<usize>,
+        close: Range<usize>,
+        titles: Vec<Node>,
+    },
     /// No node of its own: the nodes below it go to its parent.
     Transparent,
 }
@@ -480,6 +497,15 @@ struct Frame<'n> {
     first: bool,
     /// Whether a child that takes the first place has been visited.
     taken: bool,
+    /// How many cells the header of the table around a row has, or none.
+    columns: usize,
+    /// The index among the children of `node` of the first child this frame
+    /// visits: not the first for an inline HTML element.
+    base: usize,
+    /// For each child of `node`, the index of the closing tag that ends the
+    /// inline HTML element it opens, found on the first look; an inline HTML
+    /// element shares the list of its parent.
+    pairs: Option<Rc<[Option<usize>]>>,
 }
 
 impl<'n> Frame<'n> {
@@ -493,7 +519,28 @@ impl<'n> Frame<'n> {
             inner: Visited::default(),
             first,
             taken: false,
+            columns: 0,
+            base: 0,
+            pairs: None,
         }
+    }
+
+    /// The inline HTML element that the latest child taken opens, when its
+    /// closing tag is a later child inside this frame.
+    ///
+    /// A closing tag past the frame belongs to an element around it, as in
+    /// `<b><i>x</b></i>`, so the inner tag opens no element.
+    fn raw_element(&mut self) -> Option<(Scope, usize, Range<usize>, Range<usize>)> {
+        let at = (self.base + self.index).checked_sub(1)?;
+        let end = self.base + self.index + self.children.len();
+        let node = self.node;
+        let pairs = self.pairs.get_or_insert_with(|| raw_pairs(node));
+        let close = pairs
+            .get(at)
+            .copied()
+            .flatten()
+            .filter(|&close| close < end)?;
+        Builder::raw_pair(node, at, close)
     }
 
     /// The next child, the scope of a table cell below it, and whether it is
@@ -514,7 +561,7 @@ impl<'n> Frame<'n> {
         };
         let first = !self.taken
             && match self.kind {
-                Kind::Scoped(_) | Kind::Cell => true,
+                Kind::Scoped(_) | Kind::Cell | Kind::Raw { .. } => true,
                 Kind::Jsx | Kind::Transparent => self.first,
             };
         self.taken |= !leaves_first_place(child);
@@ -544,6 +591,37 @@ impl Builder<'_> {
                 {
                     let then = self.flush_after(top.node, top.index);
                     Step::Done(self.html_block(child, &html.value, first, then))
+                } else if matches!(top.node, Mdast::TableRow(_)) && top.index > top.columns {
+                    // A cell past the last of the header is no part of the row.
+                    Step::Done(Visited::cut(span_of(child)))
+                } else if !Self::holds_blocks(top.node)
+                    && let Some((scope, close, open_span, close_span)) = top.raw_element()
+                {
+                    // The siblings through the closing tag are the element's.
+                    let at = top.base + top.index - 1;
+                    let siblings = top.node.children().map_or(&[][..], Vec::as_slice);
+                    let inside = siblings.get(at + 1..close).unwrap_or_default();
+                    top.children.nth(close - at - 1);
+                    top.index = close + 1 - top.base;
+                    let titles = match siblings.get(at) {
+                        Some(Mdast::Html(html)) => {
+                            html_text::tag_titles(self.source, &open_span, &html.value)
+                        }
+                        _ => Vec::new(),
+                    };
+                    let kind = Kind::Raw {
+                        scope,
+                        open: open_span,
+                        close: close_span,
+                        titles,
+                    };
+                    let mut frame = Frame::new(top.node, kind, cell, first);
+                    frame.children = inside.iter();
+                    frame.base = at + 1;
+                    frame.columns = top.columns;
+                    frame.pairs.clone_from(&top.pairs);
+                    stack.push(frame);
+                    continue;
                 } else {
                     self.step(child)
                 };
@@ -551,7 +629,19 @@ impl Builder<'_> {
                     Step::Done(visited) => {
                         top.inner = mem::take(&mut top.inner).append(visited);
                     }
-                    Step::Open(kind) => stack.push(Frame::new(child, kind, cell, first)),
+                    Step::Open(kind) => {
+                        let columns = if let Mdast::Table(table) = top.node {
+                            table
+                                .children
+                                .first()
+                                .map_or(0, |row| row.children().map_or(0, Vec::len))
+                        } else {
+                            top.columns
+                        };
+                        let mut frame = Frame::new(child, kind, cell, first);
+                        frame.columns = columns;
+                        stack.push(frame);
+                    }
                 }
                 continue;
             }
@@ -656,6 +746,96 @@ impl Builder<'_> {
         visited
     }
 
+    /// The element of the inline HTML tag at `at` among the children of
+    /// `parent`, which the tag at `close` ends: the scope Vale gives its tag,
+    /// and the spans of the two tags.
+    ///
+    /// Vale scopes `b` and `strong` as strong text, `i` and `em` as emphasis,
+    /// `code` and `tt` as code, and `a` as a link, as it does the elements
+    /// its Markdown converter writes.
+    fn raw_pair(
+        parent: &Mdast,
+        at: usize,
+        close: usize,
+    ) -> Option<(Scope, usize, Range<usize>, Range<usize>)> {
+        let children = parent.children()?;
+        let Mdast::Html(opening) = children.get(at)? else {
+            return None;
+        };
+        let scope = raw_scope(&raw_tag(&opening.value, false)?)?;
+        Some((
+            scope,
+            close,
+            span_of(children.get(at)?)?,
+            span_of(children.get(close)?)?,
+        ))
+    }
+
+    /// A node that holds the span of an inline HTML element.
+    ///
+    /// Its first and last children are empty text at the end of its opening
+    /// tag and at the start of its closing tag, so that the tags are its
+    /// markers.
+    fn carrier(span: Range<usize>, inner_start: usize, inner_end: usize) -> Mdast {
+        let position = |from: usize, to: usize| Position::new(1, 1, from, 1, 1, to);
+        let marker = |offset: usize| {
+            Mdast::Text(Text {
+                value: String::new(),
+                position: Some(position(offset, offset)),
+            })
+        };
+        Mdast::Strong(Strong {
+            children: vec![marker(inner_start), marker(inner_end)],
+            position: Some(position(span.start, span.end)),
+        })
+    }
+
+    /// A text node: its escapes lose their backslash, and an `ftp://` address
+    /// is a gap, as Vale's converter makes a link of it.
+    fn text(&self, node: &Mdast) -> Visited {
+        let Some(span) = span_of(node) else {
+            return Visited::default();
+        };
+        let Some(text) = self.source.get(span.clone()) else {
+            return Visited::default();
+        };
+        let before = self
+            .source
+            .get(..span.start)
+            .and_then(|head| head.chars().next_back());
+        let addresses = ftp_addresses(text, before)
+            .into_iter()
+            .map(|found| span.start + found.start..span.start + found.end)
+            .collect::<Vec<_>>();
+        let mut cuts = addresses.clone();
+        let bytes = text.as_bytes();
+        let mut at = 0;
+        while let Some(&byte) = bytes.get(at) {
+            if byte == b'\\' && bytes.get(at + 1).is_some_and(u8::is_ascii_punctuation) {
+                let start = span.start + at;
+                // Escapes never overlap, so only an address can hold one.
+                if !addresses.iter().any(|cut| cut.contains(&start)) {
+                    cuts.push(start..start + 1);
+                }
+                at += 2;
+            } else {
+                at += 1;
+            }
+        }
+        cuts.sort_by_key(|cut| cut.start);
+        Visited {
+            cuts,
+            ..Visited::default()
+        }
+    }
+
+    /// A hard break written with a backslash loses the backslash.
+    fn hard_break(&self, node: &Mdast) -> Visited {
+        let span =
+            span_of(node).filter(|span| self.source.as_bytes().get(span.start) == Some(&b'\\'));
+        Visited::cut(span.map(|span| span.start..span.start + 1))
+    }
+
     fn step(&self, node: &Mdast) -> Step {
         match node {
             Mdast::Paragraph(_) => Step::Open(Kind::Scoped(Scope::Paragraph)),
@@ -663,9 +843,20 @@ impl Builder<'_> {
                 Step::Open(Scope::heading(heading.depth).map_or(Kind::Transparent, Kind::Scoped))
             }
             Mdast::Blockquote(_) => Step::Open(Kind::Scoped(Scope::Blockquote)),
-            Mdast::ListItem(_) => Step::Open(Kind::Scoped(Scope::List)),
+            // A reference is a number that Vale places elsewhere, and a
+            // definition that nothing references is not rendered.
+            Mdast::FootnoteReference(_) => Step::Done(Visited::cut(span_of(node))),
+            Mdast::FootnoteDefinition(definition)
+                if !self.referenced.contains(&definition.identifier) =>
+            {
+                Step::Done(Visited::cut(span_of(node)))
+            }
+            Mdast::ListItem(_) | Mdast::FootnoteDefinition(_) => {
+                Step::Open(Kind::Scoped(Scope::List))
+            }
             Mdast::TableRow(_) => Step::Open(Kind::Scoped(Scope::TableRow)),
             Mdast::TableCell(_) => Step::Open(Kind::Cell),
+            Mdast::Link(_) if !self.is_linked(node) => Step::Open(Kind::Transparent),
             Mdast::Link(_) | Mdast::LinkReference(_) => Step::Open(Kind::Scoped(Scope::Link)),
             Mdast::InlineCode(_) => Step::Open(Kind::Scoped(Scope::Code)),
             Mdast::Strong(_) => Step::Open(Kind::Scoped(Scope::Strong)),
@@ -707,15 +898,12 @@ impl Builder<'_> {
             Mdast::Definition(definition) => {
                 Step::Done(self.definition(node, definition.title.is_some()))
             }
-            Mdast::Root(_)
-            | Mdast::FootnoteDefinition(_)
-            | Mdast::List(_)
-            | Mdast::Delete(_)
-            | Mdast::Table(_) => Step::Open(Kind::Transparent),
-            Mdast::Break(_)
-            | Mdast::FootnoteReference(_)
-            | Mdast::Text(_)
-            | Mdast::ThematicBreak(_) => Step::Done(Visited::default()),
+            Mdast::Root(_) | Mdast::List(_) | Mdast::Delete(_) | Mdast::Table(_) => {
+                Step::Open(Kind::Transparent)
+            }
+            Mdast::Break(_) => Step::Done(self.hard_break(node)),
+            Mdast::Text(_) => Step::Done(self.text(node)),
+            Mdast::ThematicBreak(_) => Step::Done(Visited::default()),
         }
     }
 
@@ -760,6 +948,22 @@ impl Builder<'_> {
                 visited
             }
             Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner, frame.first),
+            Kind::Raw {
+                scope,
+                open,
+                close,
+                titles,
+            } => {
+                let inner = Visited::tag(Some(open.clone()))
+                    .append(frame.inner)
+                    .append(Visited::tag(Some(close.clone())));
+                let tags = inner.tags.clone();
+                let carrier = Self::carrier(open.start..close.end, open.end, close.start);
+                let mut visited = self.scoped(&carrier, scope, inner, frame.first);
+                visited.tags = tags;
+                visited.nodes.splice(0..0, titles);
+                visited
+            }
             Kind::Jsx => self.jsx(frame.node, frame.inner),
             Kind::Transparent => Self::strikethrough(frame.node, frame.inner),
         }
@@ -948,9 +1152,10 @@ impl Builder<'_> {
             }
             Scope::Link => {
                 let text = self.source.get(span.clone()).unwrap_or_default();
-                if text.starts_with('[') {
+                if text.starts_with('[') || matches!(node, Mdast::Strong(_)) {
                     let cuts = Self::wrapper(node, &span);
-                    let up = if self.is_address(node, text, false) {
+                    let address = self.is_address(node, text, false);
+                    let up = if address {
                         vec![span.clone()]
                     } else {
                         cuts.clone()
@@ -1030,6 +1235,31 @@ impl Builder<'_> {
         }
     }
 
+    /// Whether a link is one that Vale's converter makes.
+    ///
+    /// A link written with brackets or angle brackets is.
+    /// A bare address is when it starts with a lower-case `http://`,
+    /// `https://` or `www.`, or is an email address.
+    /// markdown-rs also reads an address with an upper-case scheme or a
+    /// `mailto:` prefix as a link, which Vale's converter leaves as text.
+    fn is_linked(&self, node: &Mdast) -> bool {
+        let text = span_of(node)
+            .and_then(|span| self.source.get(span))
+            .unwrap_or_default();
+        if text.starts_with(['[', '<']) {
+            return true;
+        }
+        text.starts_with("http://")
+            || text.starts_with("https://")
+            || text.starts_with("www.")
+            || text.split_once('@').is_some_and(|(name, _)| {
+                !name.is_empty()
+                    && name.bytes().all(|c| {
+                        c.is_ascii_alphanumeric() || matches!(c, b'.' | b'_' | b'+' | b'-')
+                    })
+            })
+    }
+
     /// Whether the link `node`, written as `text`, is its own address, which
     /// Vale's converter keeps out of the text.
     ///
@@ -1104,6 +1334,12 @@ impl Builder<'_> {
     /// one.
     fn code_content(&self, span: &Range<usize>) -> Range<usize> {
         let text = self.source.get(span.clone()).unwrap_or_default();
+        if text.starts_with('<')
+            && let (Some(open), Some(close)) = (text.find('>'), text.rfind('<'))
+            && open < close
+        {
+            return span.start + open + 1..span.start + close;
+        }
         let ticks = text.len() - text.trim_start_matches('`').len();
         if text.len() < ticks * 2 {
             return span.clone();
@@ -1417,6 +1653,160 @@ fn title_range(source: &str, from: usize, to: usize, paren: bool) -> Option<Rang
         }
     }
     None
+}
+
+/// The lower-case name of the tag `html`, which is one inline HTML tag, when
+/// it opens an element (`closing` false) or closes one (`closing` true).
+///
+/// A tag with attributes opens an element, and a tag that ends in `/>` does
+/// not.
+fn raw_tag(html: &str, closing: bool) -> Option<String> {
+    let rest = html.strip_prefix('<')?;
+    let rest = if closing {
+        rest.strip_prefix('/')?
+    } else if rest.starts_with('/') || html.ends_with("/>") {
+        return None;
+    } else {
+        rest
+    };
+    let name: String = rest
+        .chars()
+        .take_while(char::is_ascii_alphanumeric)
+        .collect();
+    let after = rest.get(name.len()..)?;
+    let valid = if closing {
+        after.trim() == ">"
+    } else {
+        after.starts_with(['>', ' ', '\t', '\n']) && html.ends_with('>')
+    };
+    (!name.is_empty() && valid).then(|| name.to_ascii_lowercase())
+}
+
+/// The scope Vale gives the inline HTML element of tag `name`, if any.
+fn raw_scope(name: &str) -> Option<Scope> {
+    match name {
+        "b" | "strong" => Some(Scope::Strong),
+        "i" | "em" => Some(Scope::Emphasis),
+        "code" | "tt" => Some(Scope::Code),
+        "a" => Some(Scope::Link),
+        _ => None,
+    }
+}
+
+/// For each child of `parent`, the index of the closing tag that ends the
+/// inline HTML element it opens, among the elements `raw_scope` scopes.
+///
+/// One pass pairs the tags: a closing tag ends the latest open element of
+/// its name, so `<b>x<b>y</b>z</b>` nests.
+fn raw_pairs(parent: &Mdast) -> Rc<[Option<usize>]> {
+    let children = parent.children().map_or(&[][..], Vec::as_slice);
+    let mut pairs = vec![None; children.len()];
+    let mut open: HashMap<String, Vec<usize>> = HashMap::new();
+    for (index, child) in children.iter().enumerate() {
+        let Mdast::Html(html) = child else {
+            continue;
+        };
+        if let Some(name) = raw_tag(&html.value, false) {
+            if raw_scope(&name).is_some() {
+                open.entry(name).or_default().push(index);
+            }
+        } else if let Some(name) = raw_tag(&html.value, true)
+            && let Some(at) = open.get_mut(&name).and_then(Vec::pop)
+            && let Some(pair) = pairs.get_mut(at)
+        {
+            *pair = Some(index);
+        }
+    }
+    pairs.into()
+}
+
+/// The identifiers of the footnotes that a reference in `root` names.
+fn footnotes_referenced(root: &Mdast) -> HashSet<String> {
+    let mut found = HashSet::new();
+    let mut pending = vec![root];
+    while let Some(node) = pending.pop() {
+        if let Mdast::FootnoteReference(reference) = node {
+            found.insert(reference.identifier.clone());
+        }
+        pending.extend(node.children().into_iter().flatten());
+    }
+    found
+}
+
+/// Where `text` holds an `ftp://` address that Vale's converter links.
+///
+/// Its linkify extension reads an address that starts at a line start or after
+/// a space or one of `*`, `_`, `~` and `(`, and ends at the last byte its
+/// pattern takes, less the closing punctuation.
+/// `before` is the character in the file before `text`.
+fn ftp_addresses(text: &str, before: Option<char>) -> Vec<Range<usize>> {
+    static FTP: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(
+            r#"^ftp://[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]+(?::\d+)?(?:[/#?][-a-zA-Z0-9@:%_+.~#$!?&/=\(\);,'">\^{}\[\]`]*)?"#,
+        )
+        .unwrap_or_else(|_| unreachable!("the pattern is a literal"))
+    });
+    let mut found = Vec::new();
+    let mut from = 0;
+    while let Some(offset) = text.get(from..).and_then(|rest| rest.find("ftp://")) {
+        let start = from + offset;
+        from = start + 1;
+        let previous = text
+            .get(..start)
+            .and_then(|head| head.chars().next_back())
+            .or(before);
+        if previous.is_some_and(|c| !c.is_whitespace() && !matches!(c, '*' | '_' | '~' | '(')) {
+            continue;
+        }
+        let Some(hit) = text.get(start..).and_then(|rest| FTP.find(rest)) else {
+            continue;
+        };
+        let end = start + trimmed_address(hit.as_str());
+        found.push(start..end);
+        from = end.max(from);
+    }
+    found
+}
+
+/// The length of the address `matched` that Vale's converter keeps: closing
+/// punctuation, an unbalanced `)` and a trailing character reference are not
+/// part of it.
+fn trimmed_address(matched: &str) -> usize {
+    let bytes = matched.as_bytes();
+    let mut end = bytes.len().saturating_sub(1);
+    while end > 0
+        && matches!(
+            bytes.get(end),
+            Some(b'?' | b'!' | b'.' | b',' | b':' | b'*' | b'_' | b'~')
+        )
+    {
+        end -= 1;
+    }
+    end += 1;
+    let head = bytes.get(..end).unwrap_or_default();
+    let text = matched.get(..end).unwrap_or_default();
+    match head.last() {
+        Some(b')') => {
+            let closing = text.matches(')').count();
+            let opening = text.matches('(').count();
+            end - closing.saturating_sub(opening)
+        }
+        Some(b';') => {
+            let name = head.get(..end - 1).unwrap_or_default();
+            let letters = name
+                .iter()
+                .rev()
+                .take_while(|c| c.is_ascii_alphanumeric())
+                .count();
+            let amp = end - 2 - letters;
+            if letters > 0 && head.get(amp) == Some(&b'&') {
+                amp
+            } else {
+                end
+            }
+        }
+        _ => end,
+    }
 }
 
 fn span_of(node: &Mdast) -> Option<Range<usize>> {

@@ -127,6 +127,7 @@ queue:
     notes:
       - '2026-11-10, found while matching HTML-block text: a Markdown paragraph `a*b*c` reads `abc` in hakkiri and `a bc` in Vale, which reads the HTML its converter writes, where an opening inline tag puts a space before its text. The corpus covers inline markup between letters.'
       - '2026-11-12, found while probing comment controls: Vale 66bbb85 renders a footnote definition at the end of the document, in the order of its references, and lints no definition that nothing references; hakkiri reads each definition where it stands and lints an unreferenced one. A comment inside a definition acts at the end of the document in Vale. Vale also loses an alert in one probe: for `A1 very[^a] A2 very.` it reports `A1 very` and `C1 very` and not `A2 very` when the definition reads `[^a]: C1 very.`, and it reports `A2 very` when the definition reads `[^a]: C1 really.` or `[^a]: very C1.`. The cause is not found. The corpus covers footnotes.'
+    plan: openspec/changes/markdown-probe/proposal.md
 
   - id: HKR-010
     title: Release 1
