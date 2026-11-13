@@ -187,7 +187,7 @@ fn token<'a>(
     text: &'a str,
     span: Range<usize>,
     previous_end: usize,
-    code: &[Range<usize>],
+    code_ranges: &[Range<usize>],
 ) -> Token<'a> {
     let gap = text.get(previous_end..span.start).unwrap_or_default();
     let breaks = gap.matches('\n').count();
@@ -197,8 +197,8 @@ fn token<'a>(
     let (word, mark) = split_mark(core);
     let word_start = span.start + (run.len() - run.trim_start_matches(is_edge).len());
     let reads_code = matches!(word, "x" | "x.")
-        && code
-            .get(code.partition_point(|range| range.end <= word_start))
+        && code_ranges
+            .get(code_ranges.partition_point(|range| range.end <= word_start))
             .is_some_and(|range| range.start <= word_start);
     Token {
         span,
