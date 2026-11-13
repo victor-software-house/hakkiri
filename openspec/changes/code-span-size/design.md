@@ -46,7 +46,7 @@ It lost because the operator asked for a count, and a boolean cannot say two.
 Alternative: a list of scopes to ignore, as Vale does.
 It lost because it would reach every rule, where this setting reaches word counts only.
 
-### 4. It reaches word counts only
+### 4. Word counts only
 
 The setting changes the text that a `metric` or `readability` rule counts words in, and so every variable and score built on that text: `words`, `sentences`, `syllables`, `complex_words`, and the scores.
 A rule that reads a match, an `existence` or an `occurrence` rule for one, still reads a code span as one `x`, and a match that overlaps it is still none.

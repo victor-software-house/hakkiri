@@ -16,4 +16,4 @@ The count of `occurrences` SHALL not change with the size.
 - **WHEN** the rule has no `scope`
 - **THEN** it reads the same counts of the prose of the whole file
 
-[code-span-size-4]: ../../design.md#4-it-reaches-word-counts-only
+[code-span-size-4]: ../../design.md#4-word-counts-only

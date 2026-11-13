@@ -25,7 +25,7 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Evidence, 2026-11-12 (UTC): in a box, `fmt`, `clippy --all-targets -D warnings` and `cargo test --no-fail-fast` pass, 835 tests.
 - [ ] 3.2 Probe Vale at `66bbb85` and hakkiri with the setting at 0 and at its default on the same files, for the `metric` and `readability` rules over each scope that holds a code span.  
   Verify at 0 the alerts equal Vale's, and by default they equal the alerts before the change.  
-  Evidence, 2026-11-12 (UTC), Vale built from `66bbb85` in a box, 16 `metric` and `readability` rules over the scopes sentence, paragraph, list, table cell, heading and file:  
+  Evidence, 2026-11-12 (UTC), Vale built from `66bbb85` in a box, 16 `metric` and `readability` rules over the scopes sentence, paragraph, list, table cell, heading and file.  
   By default hakkiri gives the alerts of the build before the change, 0 differing of 28,645 over 5 hand-written files and 211 Markdown files.  
   With `--code-span-size 0` it gives Vale's alerts on 8 hand-written files, apart from 4 that Vale lacks.  
   Three are table header cells, which hakkiri measures with or without a code span, and one is a sentence that starts with a code span in the middle of a paragraph.  
