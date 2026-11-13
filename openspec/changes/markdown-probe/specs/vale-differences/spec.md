@@ -52,6 +52,11 @@ hakkiri SHALL read Markdown as each scenario below says, where Vale 3.26.0 reads
 - **WHEN** a paragraph holds `Text <unclosed one tag and <b>two bold.` and the next holds `three </b>stray.`
 - **THEN** hakkiri finishes the file, and Vale panics with a slice out of range ([markdown-probe 8][markdown-probe-8])
 
+#### Scenario: A link that is its own address
+
+- **WHEN** a paragraph holds `Read <https://b.example> first.`, `Read https://b.example first.` or `See [https://b.example](https://b.example) now.`
+- **THEN** hakkiri's `link` scope reads `https://b.example`, so ProseStyle's `BareURL` can flag it, and Vale's reads no word ([markdown-probe 2][markdown-probe-2])
+
 ### Requirement: The alt text of an inline img is a known gap
 
 hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
@@ -62,6 +67,7 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 - **THEN** hakkiri reads no word of `the badge`, and Vale reads them as words of the paragraph and not of the link (row [HKR-027][ledger], [markdown-probe 9][markdown-probe-9])
 
 [ledger]: ../../../../../tasks.yaml
+[markdown-probe-2]: ../../design.md#2-a-link-keeps-its-address-for-the-link-scope
 [markdown-probe-4]: ../../design.md#4-a-backslash-escape-loses-its-backslash
 [markdown-probe-6]: ../../design.md#6-a-footnote-reads-as-vale-renders-it
 [markdown-probe-8]: ../../design.md#8-what-hakkiri-keeps-from-the-reading-it-had

@@ -2,27 +2,27 @@
 
 ### Requirement: A URL is a gap in the prose around the link
 
-The text of an autolink or a bare URL that is its own destination SHALL be a gap in the nodes around it, and its `link` node SHALL hold no text.  
-A link written with brackets whose text is its destination SHALL hold no text in its `link` node.  
+The text of an autolink or a bare URL that is its own destination SHALL stay in its `link` node, and SHALL be a gap in the nodes around it.  
+A link written with brackets whose text is its destination SHALL keep that text in its `link` node and in the nodes around it.  
 A link whose destination differs from its text, such as a bare email address or a `www.` address, SHALL stay in the nodes around it.
 
 #### Scenario: An autolink
 
 - **WHEN** a Markdown file holds `Read <https://b.example> first.`
 - **THEN** the `paragraph` node has the text `Read  first.`
-- **AND** the file has no `link` node for it
+- **AND** a `link` node has the text `https://b.example`
 
 #### Scenario: A bare URL in a comment
 
 - **WHEN** a Rust file holds `// Read https://bare.example first.`
 - **THEN** the `text.comment.line` node has the text `Read  first.`
-- **AND** the file has no `link` node for it
+- **AND** a `link` node has the text `https://bare.example`
 
 #### Scenario: A link that shows its destination
 
 - **WHEN** a Markdown file holds `See [https://a.example](https://a.example) now.`
 - **THEN** the `paragraph` node has the text `See https://a.example now.`
-- **AND** the file has no `link` node for it
+- **AND** a `link` node has the text `https://a.example`
 
 #### Scenario: An email address and a www address
 

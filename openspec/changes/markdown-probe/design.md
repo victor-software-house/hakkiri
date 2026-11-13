@@ -29,14 +29,15 @@ The probe style has a rule for each scope a construct reaches, and one rule that
 Alternative: lint the repositories' own documents.
 It lost because each document repeats words, and a difference could not be traced to one construct.
 
-### 2. A link loses its text for the `link` scope when Vale's converter masks it
+### 2. A link keeps its address for the `link` scope
 
 Vale masks the destination of a link out of the text where it first stands, so a link whose text is its destination gives the `link` scope no word.
 That holds for an autolink, for a bare URL that goldmark links, and for `[https://a.example](https://a.example)`.
+hakkiri keeps that address in the `link` node and keeps it a gap in the text around it, as it did before the probe.
+ProseStyle v0.0.16's `BareURL` rule reads the `link` scope to find a bare URL without lookbehinds, so following Vale here would leave the rule with no text to flag.
 goldmark links a bare address that starts with a lower-case `http://`, `https://`, `ftp://` or `www.` and an email address, and markdown-rs also links `HTTP://` and `mailto:` text, which hakkiri reads as text.
 An email address, a `www.` address and `<me@a.example>` keep their text, since the destination the converter writes, `mailto:me@a.example`, is not their text.
-Alternative: keep the text of every link in its node, as the tree spec did.
-It lost because the probe showed `link` alerts that Vale does not give.
+The `vale-differences` spec lists the kept address.
 
 ### 3. An `ftp://` address is a gap
 

@@ -17,7 +17,7 @@ hakkiri before this change gave most of them, and each difference below came fro
 - hakkiri reads each construct below as Vale does, where it read it otherwise:
   - A table row has the cells of its header, and a cell past the last one is a gap.
   - A bare email address, a `www.` address, an address with an upper-case scheme and a `mailto:` address are text, and an `ftp://` address is a gap.
-  - The `link` scope holds no text for an autolink, a bare URL or a bracket link whose text is its destination.
+  - The `link` scope keeps the address of an autolink, a bare URL and a bracket link whose text is its destination, where Vale gives it no text, because ProseStyle's `BareURL` rule reads the address there.
   - An inline HTML element that Vale scopes, `b`, `strong`, `i`, `em`, `code`, `tt` or `a`, has that scope.
   - A footnote reference is a gap, a definition no reference names is a gap, and a definition that one names is a `list` node.
 - hakkiri reads a backslash escape and a hard break written with a backslash without the backslash, where Vale gives no alert for a word that holds an escape.
@@ -35,7 +35,7 @@ hakkiri before this change gave most of them, and each difference below came fro
 
 - New: `tests/markdown_corpus.rs` and `tests/fixtures/markdown-corpus`.
 - Changed: `src/markdown.rs`, and the link tests of `tests/tree.rs` and its snapshots.
-- A `link` rule no longer sees the address of an autolink, as in Vale.
+- A `link` rule still sees the address of an autolink and a bare URL, and `vale-differences` lists it.
 - No new dependency.
 
 [ledger]: ../../../tasks.yaml

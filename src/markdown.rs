@@ -1129,11 +1129,11 @@ impl Builder<'_> {
                     } else {
                         cuts.clone()
                     };
-                    let mut own = cuts;
-                    if address {
-                        own.push(span.clone());
-                    }
-                    return Markup { span, own, up };
+                    return Markup {
+                        span,
+                        own: cuts,
+                        up,
+                    };
                 }
                 let angle = text.starts_with('<') && text.ends_with('>') && text.len() >= 2;
                 let inner = if angle {
@@ -1143,8 +1143,8 @@ impl Builder<'_> {
                 };
                 if self.is_address(node, text, angle) {
                     return Markup {
-                        own: vec![inner.clone()],
                         span: inner,
+                        own: Vec::new(),
                         up: vec![span],
                     };
                 }
