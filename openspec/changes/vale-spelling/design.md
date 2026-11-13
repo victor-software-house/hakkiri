@@ -44,6 +44,8 @@ The probe at `66bbb85` shows both: a dictionary of two words in `config/dictiona
 
 The lists are read from the folder and the folders below it, and a file with another extension is no list.
 A word of a list passes in the case the list gives it and in the case of its capitalised form, as it does in a rule's own `ignore`.
+A link under `config/ignore` that reaches a path outside the package is refused, as `find` refuses it for every other path of a package.
+A link back to a folder already read stops the walk at that folder.
 
 ### 5. What the probe shows and hakkiri differs on
 

@@ -347,3 +347,37 @@ fn a_dictionary_with_no_affix_file_fails_a_run_that_lists_the_style_vale() -> Te
     );
     Ok(())
 }
+
+#[cfg(unix)]
+#[test]
+fn a_word_list_link_that_reaches_outside_the_package_is_refused() -> TestResult {
+    let suite = Suite::new("vale-spelling-link");
+    let root = suite.scenario("link");
+    root.file("outside/words.txt", "xyz\n");
+    root.file(
+        "pack/Team/Bad.yml",
+        "extends: existence\nmessage: \"Avoid '%s'.\"\nlevel: warning\ntokens: [blorft]\n",
+    );
+    root.file("pack/config/ignore/own.txt", "foxs\n");
+    root.file("text/plain.md", "A short plain line.\n");
+    root.file(
+        ".ctl/link.yaml",
+        "packages:\n  - path: pack\nfiles:\n  \"text/*.md\":\n    styles: [Vale]\n",
+    );
+    std::os::unix::fs::symlink(
+        "../../../outside",
+        root.path().join("pack/config/ignore/out"),
+    )?;
+    let result = run(
+        root.path(),
+        &["check", "--config", ".ctl/link.yaml", "text/plain.md"],
+        &[],
+    )?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    let shown = format!("{}{}", result.out, result.err);
+    assert!(
+        shown.contains("`config/ignore/out` leaves the package"),
+        "{shown}"
+    );
+    Ok(())
+}

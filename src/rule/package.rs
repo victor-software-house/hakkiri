@@ -319,17 +319,30 @@ fn ignored_words(source: &Source<'_>, folders: &[&Path]) -> Result<HashSet<Strin
         else {
             continue;
         };
-        read_lists(source, &folder, &mut listed)?;
+        let root = package.canonicalize().map_err(|error| {
+            source.problem(
+                "ignore",
+                format!("rule `{}`: the package: {error}", source.name),
+            )
+        })?;
+        read_lists(source, &root, &folder, &mut listed, &mut HashSet::new())?;
     }
     Ok(listed)
 }
 
 /// Adds the words of each `.txt` file in `folder` and the folders under it to
 /// `listed`.
+///
+/// `root` is the real path of the package. An entry that a link sends outside
+/// it is refused, as `find` refuses a path that leaves the package. `visited`
+/// holds the real path of each folder read, so a link back to a folder read
+/// before stops there.
 fn read_lists(
     source: &Source<'_>,
+    root: &Path,
     folder: &Path,
     listed: &mut HashSet<String>,
+    visited: &mut HashSet<PathBuf>,
 ) -> Result<(), LoadError> {
     let refuse = |path: &Path, error: &std::io::Error| {
         source.problem(
@@ -337,12 +350,31 @@ fn read_lists(
             format!("rule `{}`: `{}`: {error}", source.name, path.display()),
         )
     };
+    let inside = |path: &Path| -> Result<PathBuf, LoadError> {
+        let reached = path.canonicalize().map_err(|error| refuse(path, &error))?;
+        if reached.starts_with(root) {
+            Ok(reached)
+        } else {
+            let shown = path.strip_prefix(root).unwrap_or(path);
+            Err(source.problem(
+                "ignore",
+                format!(
+                    "rule `{}`: `{}` leaves the package",
+                    source.name,
+                    shown.display()
+                ),
+            ))
+        }
+    };
+    if !visited.insert(folder.to_path_buf()) {
+        return Ok(());
+    }
     for entry in fs::read_dir(folder).map_err(|error| refuse(folder, &error))? {
         let path = entry.map_err(|error| refuse(folder, &error))?.path();
         if path.is_dir() {
-            read_lists(source, &path, listed)?;
+            read_lists(source, root, &inside(&path)?, listed, visited)?;
         } else if path.extension().is_some_and(|extension| extension == "txt") {
-            let text = fs::read_to_string(&path).map_err(|error| refuse(&path, &error))?;
+            let text = fs::read_to_string(inside(&path)?).map_err(|error| refuse(&path, &error))?;
             listed.extend(words(&text));
         }
     }
