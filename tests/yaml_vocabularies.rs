@@ -310,3 +310,27 @@ fn an_affix_name_is_a_file_name() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn a_period_in_a_term_with_ignorecase_is_literal() -> TestResult {
+    let suite = Suite::new("yaml-vocabularies-ignorecase-period");
+    let root = small(
+        &suite,
+        "ignorecase-period",
+        "accept:\n  - Node.js:\n      ignorecase: true\n",
+        "Use Nodexjs.\n",
+    );
+    root.file(
+        "styles/Team/Probe.yml",
+        "extends: existence\nmessage: \"Found '%s'.\"\nlevel: warning\ntokens: [Nodexjs, 'node\\.js']\n",
+    );
+    let result = run(root.path(), &["check", "--format", "json"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    let matched: Vec<String> = rows_of(&result.out)?.into_iter().map(|row| row.7).collect();
+    assert_eq!(matched, ["Nodexjs"], "{}", result.out);
+    root.file("a.md", "Use node.js.\n");
+    let result = run(root.path(), &["check", "--format", "json"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    assert!(rows_of(&result.out)?.is_empty(), "{}", result.out);
+    Ok(())
+}

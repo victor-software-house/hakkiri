@@ -52,6 +52,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A vocabulary folder holds `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml`, all read (row `HKR-041`).  
    `src/vocabulary/yaml.rs` parses a YAML file through ctl-core's input and checks each entry on its node, so one run reports every wrong entry on Vale's line.  
    A plain YAML term is literal, `affix` names an affix file in the packages' `config/dictionaries` folders (the holder first, never `$DICPATH`), and a key the file does not define is an error.  
+   With `ignorecase` the period of a term is literal too, where Vale keeps it a wildcard.  
    A glob's `block_ignores` and `token_ignores` hide what their patterns match from the prose rules, as Vale's `BlockIgnores` and `TokenIgnores` do (row `HKR-043`).  
    hakkiri rewrites a Markdown or MDX file as Vale does, parses the result, and gives every node the bytes of the file it came from, so alerts point at the file as written.  
    A source file takes them in the Markdown of each comment, where Vale applies none.  

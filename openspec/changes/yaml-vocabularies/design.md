@@ -43,9 +43,12 @@ It lost because serde reports only that no variant matched, with no word of what
 
 A term with no regex option stands for itself.
 A term whose only special character is a period stays as written, which a text list reads as plain text with a literal period.
+With `ignorecase` the pattern starts with `(?i)`, and a text list then reads the line as a regular expression, so the period would match any character.
+A term with `ignorecase` is therefore quoted whole, and `Node.js` matches `Node.js` and not `Nodexjs`.
+Vale keeps the period of such a term as a wildcard, and hakkiri differs there.
 Any other term is quoted, as Go's `QuoteMeta` quotes it, so `C++` matches `C++` and not a run of `C`.
 `regex: true` keeps the term as a pattern and compiles it as a `.txt` line would.
-`flags` expands the term and quotes each form, and `ignorecase` puts `(?i)` before each pattern.
+`flags` expands the term and quotes each form, and `ignorecase` puts `(?i)` before each pattern, after the quoting.
 The patterns are then the lines a text list would hold, so the rules built from a vocabulary read them as before.
 Alternative: read a plain YAML term as a text-list line, which treats `C++` as a pattern.
 It lost because Vale quotes it, and the alerts of `C++` differ.

@@ -19,7 +19,7 @@ hakkiri skipped the YAML files, so a package that moves to them lost its accepte
 - `affix` names an affix file in the `config/dictionaries` folder of the package that holds the vocabulary, then of every other loaded package in order, and never in `$DICPATH`.
 - The file parses through ctl-core's input, which refuses a key the file does not define.
   Every wrong entry is reported with its file and line, where Vale stops at the first.
-- The `vale-differences` spec records the five places where hakkiri differs, and drops the gap for YAML vocabularies.
+- The `vale-differences` spec records the six places where hakkiri differs, and drops the gap for YAML vocabularies.
 
 ## Capabilities
 
@@ -30,7 +30,7 @@ None.
 ### Modified Capabilities
 
 - `vocabularies`: a vocabulary folder holds YAML files, and how their entries read.
-- `vale-differences`: the gap closes, and its five differences are listed.
+- `vale-differences`: the gap closes, and its six differences are listed.
 
 ## Impact
 

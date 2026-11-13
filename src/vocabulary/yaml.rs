@@ -335,7 +335,7 @@ impl Reading<'_> {
             }
             vec![term.to_owned()]
         } else if entry.flags.is_empty() {
-            vec![literal(term)]
+            vec![literal(term, entry.ignorecase)]
         } else {
             // A problem with the affix file was reported when it was read.
             let words = match expander?.expand(term, &entry.flags) {
@@ -345,7 +345,10 @@ impl Reading<'_> {
                     return None;
                 }
             };
-            words.iter().map(|word| literal(word)).collect()
+            words
+                .iter()
+                .map(|word| literal(word, entry.ignorecase))
+                .collect()
         };
         if entry.ignorecase {
             for pattern in &mut patterns {
@@ -447,11 +450,13 @@ fn is_file_name(name: &str) -> bool {
 
 /// The pattern that matches `term` as written. A term whose only special
 /// character is a period stays as it is, which a text list reads as plain
-/// text with a literal period, as Vale does.
-fn literal(term: &str) -> String {
+/// text with a literal period, as Vale does. With `ignorecase` the pattern
+/// starts with `(?i)`, which makes a text list read it as a regular
+/// expression, so the period is quoted as well.
+fn literal(term: &str, ignorecase: bool) -> String {
     const SPECIAL: &str = "\\.+*?()|[]{}^$";
     let bare = term.replace('.', "");
-    if bare.chars().all(|character| !SPECIAL.contains(character)) {
+    if !ignorecase && bare.chars().all(|character| !SPECIAL.contains(character)) {
         return term.to_owned();
     }
     let mut quoted = String::with_capacity(term.len() * 2);
