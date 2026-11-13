@@ -2,7 +2,7 @@
 
 ## Decisions
 
-### 1. A pattern check reads a code span as one `*` and drops a match only at its edges
+### 1. A pattern check reads a code span as one `*` and drops a match only at the edges of the match
 
 `run_existence` searched the text where a code span is the letter `x`, and dropped each match that overlapped a span.
 Vale masks a span as a run of `*`, and a match that runs across one is a match.

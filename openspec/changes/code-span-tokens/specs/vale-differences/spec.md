@@ -27,4 +27,4 @@ Vale tags the same words with the older model, and its rule has no verb tag.
 - **THEN** `asks` reads `NNS`, and `told` reads `VBN`, so a rule with the tag `^(?:VB|VBD|VBP|VBZ)$` on its verb flags neither ([code-span-tokens 6][code-span-tokens-6])
 
 [code-span-tokens-1]: ../../design.md#1-the-model-reads-a-noun-in-place-of-a-code-span
-[code-span-tokens-6]: ../../design.md#6-the-verb-token-of-thingsspeaknoun-carries-a-tag-and-the-tagger-corrections-make-it-hold
+[code-span-tokens-6]: ../../design.md#6-the-verb-token-of-thingsspeaknoun-carries-a-tag-and-the-tagger-corrections-make-the-tag-hold

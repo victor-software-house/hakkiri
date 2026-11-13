@@ -33,7 +33,7 @@ Refusing the span gives 44 of the 268 true alerts of `ThingsSpeakNoun` that the 
 Letting a preposition attach the span to the noun before it gives 56, and a head noun with two cues gives 81.
 Reading the span as a noun gives 264, and no rule about prepositions.
 
-### 6. The verb token of `ThingsSpeakNoun` carries a tag, and the tagger corrections make it hold
+### 6. The verb token of `ThingsSpeakNoun` carries a tag, and the tagger corrections make the tag hold
 
 Without a tag the rule flags a noun or a participle that has the shape of a verb.
 Of its 26 false alerts, 20 read `asks` as a verb where it names a request, and 6 read `asked about` or `told of` as a past tense.

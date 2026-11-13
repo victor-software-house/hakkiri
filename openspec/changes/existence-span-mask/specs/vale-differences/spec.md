@@ -11,4 +11,4 @@ The matched text differs: hakkiri prints `x` for the span, and Vale prints the m
 - **WHEN** the input is ``The loop reads `a`; the store keeps `b`, which is slow.`` under `ClauseChain`
 - **THEN** hakkiri and Vale both give an alert, and the two print the span differently in the matched text ([existence-span-mask 1][existence-span-mask-1])
 
-[existence-span-mask-1]: ../../design.md#1-a-pattern-check-reads-a-code-span-as-one--and-drops-a-match-only-at-its-edges
+[existence-span-mask-1]: ../../design.md#1-a-pattern-check-reads-a-code-span-as-one--and-drops-a-match-only-at-the-edges-of-the-match
