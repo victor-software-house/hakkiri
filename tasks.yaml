@@ -1,41 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/victor-software-house/qctl/main/schema/tasks.schema.json
 schema_version: 5
 prefix: HKR
-active: HKR-008
+active: HKR-009
 queue:
-  - id: HKR-008
-    title: Run ProseStyle on hakkiri
-    scope: prose-style
-    outcome: >-
-      prose-style publishes a hakkiri package with its own rules, the native ports of the upstream rules worth keeping, and the rate rules.
-    blocked_by: []
-    acceptance:
-      - Every rule case and package case passes under hakkiri test.
-      - An alert diff against Vale with ProseStyle v0.0.14 over our public repositories shows only the intended differences.
-      - The 14 opt-in rules do not run until a project turns them on, in a test.
-      - The release is a patch tag, v0.0.16, only when the alert diff shows hakkiri gives the same or better alerts than Vale with v0.0.14; otherwise it waits.
-    notes:
-      - '2026-11-11, operator decision: ProseStyle owns its rules. The 36 upstream rule files that ProseStyle.zip copies today (Voices, Direct, Readability, and the Abbreviations, DateTime, Grammar, Punctuation and Usage rules of Std) are reviewed one by one. Each valuable one becomes a native hakkiri rule in the one style ProseStyle, with tests, and the MIT sources are credited in a NOTICE. The rest are dropped with a reason. upstream.toml and the copying go.'
-      - '2026-11-11, operator decision: from its next release ProseStyle.zip is the hakkiri package. Vale projects stay pinned to v0.0.14, and the templates pin stays there until HKR-009. There is no second asset.'
-      - '2026-11-11, the six script rules of ProseStyle v0.0.14 (FlatRhythm, BareWorkItem, SameSentenceStart, HardBreak, SentencePerLine and PrepositionChain) port to native rules: five existence rules and one metric rule pass the 18 cases of the tag under hakkiri test in a probe. Readability.Polysyllables ports to one existence rule that gave the same 170,781 alerts as Vale 66bbb85 running the script over 238,342 words.'
-      - "2026-11-11, operator decision, ports: ProseStyle takes 17 upstream rules that always run. They are Banned, BinaryContrast, InflatedWords, Puffery, Recap, SuperficialAnalysis, ThroatClearing, WeakVerbs and Weasel of Voices, Hedging, Length and Preamble of Direct, FleschKincaid of Readability, and Latin, Spacing, GenderedPronouns and GenderedTerms of Std. Fourteen more ship off through the package settings, for a project to turn on: AutomatedReadability, ColemanLiau, FleschReadingEase, GunningFog, LIX, SMOG, Polysyllables (an existence rule that gave the same alerts as Vale's script over 238,342 words), PassiveVoice, OxfordComma, Contractions, FirstPersonPlural, FirstPersonSingular, DateFormat and TimeFormat. ProseStyle then holds 44 + 31 = 75 rules."
-      - "2026-11-11, operator decision, drops: ColonReveal, Ease, Acronyms (UndefinedAcronym covers it) and Ellipses (it flags the … that Emoji allows). Std's SentenceLength folds into Length."
-      - '2026-11-11, operator decision, renames: Banned becomes SlopWords, Recap RecapOpener, Weasel VagueAttribution, Latin LatinAbbreviation, Spacing SentenceSpacing, Length SentenceLength and FleschKincaid GradeLevel. Hedging and Preamble keep their names, and every other port keeps its upstream name.'
-      - "2026-11-11, operator decision, overlaps: no text draws two alerts for one fault. Drop 'harness the power' from StockPhrases, since SlopWords covers it, and make 'stands as a testament' draw only the Puffery alert. SentenceLength at 25 words as a suggestion beside LongSentence at 40 as an error stays by design."
-      - '2026-11-11, operator decision: the opt-in rules ship off through a package settings file, so this row waits for HKR-040.'
-      - '2026-11-11, operator decision: the tag stays a patch while the package works the same or better, and every rule is validated. prose-style v0.0.15 goes to PullRequestStyle, a Vale package (prose-style PR 32), so this package takes v0.0.16.'
-      - '2026-11-11, the package settings carry the OpenSpec proposal entry under block_ignores, so the release waits for HKR-043 in a hakkiri release; the alert diff covers the nine repositories that run Vale today: nishiki, hakkiri, verctl, ctl-core and five private ones.'
-      - '2026-11-12, found while judging the NounStack alerts of nine repositories for HKR-052: the rule says each noun is a lowercase word, but its pattern [a-z][a-z-]* has no anchor, so a capitalised name such as GitHub counts as a noun of a stack. The package branch owner is asked to anchor it; row HKR-057 tracks it.'
-      - '2026-11-12, correction to the note on NounStack: an anchor matches nothing in hakkiri 0.0.5 or Vale 3.26.0, so the package pattern is a lookaround, (?<![A-Za-z])[a-z][a-z-]*(?![A-Za-z]), that counts a word only when it is lowercase from its first to its last letter. Row HKR-057 tracks it.'
-
   - id: HKR-009
     title: Switch the template to hakkiri
     scope: template
     outcome: >-
       The lint_prose piece runs hakkiri from mise and a pre-commit hook, with no Vale
       left.
-    blocked_by:
-      - HKR-008
+    blocked_by: []
     acceptance:
       - The templates Template check passes, and one pilot project passes CI on its update.
       - The lint_prose piece renders .ctl/hakkiri.yaml with level warning, the ProseStyle url and sha256 from the pins, styles [] for each generated path, and fail_level from prose_fail_level; mise installs hakkiri; .vale.ini, .vale/.gitignore, prose:sync and the Vale pin are gone.
@@ -43,6 +17,7 @@ queue:
     notes:
       - '2026-11-11, operator decision: the switch is orchestrated with the templates repository. Order: hakkiri closes HKR-043, HKR-044, HKR-030 and HKR-031 and releases; prose-style tags v0.0.16 (HKR-008); the template change is tagged and piloted on hakkiri; then one update pull request per consumer, each moving its .vale.ini sections into .ctl/hakkiri.yaml and its vale comments to the hakkiri form.'
       - 2026-11-11, the local editor hook sends text on standard input with --ext=.md, which hakkiri does not read; it writes a temporary .md file instead, or a later row adds standard input.
+      - 2026-11-13, the ProseStyle v0.0.16 alert diff found Vale comments that turn off Direct.Preamble and Voices.WeakVerbs by their old names; the switch renames each to its ProseStyle name.
 
   - id: HKR-041
     title: Read YAML vocabularies
@@ -63,8 +38,7 @@ queue:
     title: Read comments in more languages
     scope: tree
     outcome: Comment prose is linted, built in, in the languages Vale reads and in six more.
-    blocked_by:
-      - HKR-008
+    blocked_by: []
     acceptance:
       - Comment prose is linted, built in, in Vale's 26 languages and in Bash, HCL, Kotlin, Nix, Solidity and YAML, with a test for each language.
       - The release binary's size before and after is measured and recorded before the change ships.
@@ -119,8 +93,7 @@ queue:
     outcome: >-
       A script rule runs as Vale runs its Tengo program, and a style that holds one
       needs no off in the config.
-    blocked_by:
-      - HKR-008
+    blocked_by: []
     acceptance:
       - Readability.Polysyllables flags the same words as Vale 3.26.0 in a parity test.
       - A script that never ends stops after a step budget, with an error that names the rule.
@@ -485,7 +458,59 @@ queue:
       - 2026-11-13, the ProseStyle v0.0.16 alert diff on hakkiri main found skip lists ranked as *, because the specificity of HKR-069 read a {…} group as no literal character.
       - 2026-11-13, the operator chose the matched alternative over the most and the least specific alternative fixed at load, and asked that the most specific match win and that it stay fast.
 
+  - id: HKR-073
+    title: Hold back a match only for the accepted term it is
+    scope: engine
+    outcome: >-
+      An existence match is held back only when it is an accepted term or lies inside
+      an accepted phrase, as the vocabularies spec says and Vale does.
+    blocked_by: []
+    acceptance:
+      - A PrepositionChain match that holds the accepted word harness alerts, as Vale 3.26.0 alerts it, with a test.
+      - A match that is an accepted term, or lies inside an accepted phrase, is still held back, with a test.
+    notes:
+      - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: src/check.rs excepted holds back any existence match whose text holds an accepted word, which is wider than vocabularies/spec.md says. A sentence with the harness in a bench folder alerts in Vale and not in hakkiri.'
+
+  - id: HKR-074
+    title: Correct where Vale places a block alert and how it matches */**
+    scope: docs
+    outcome: >-
+      The vale-differences spec states where Vale places a Paragraph or ListItem
+      alert, how a nested list item counts, and how Vale and hakkiri match a */** glob.
+    blocked_by: []
+    acceptance:
+      - The spec says Vale places a multi-line block alert on its last line, and hakkiri on its first, as measured on 504 paragraphs.
+      - A ListItem scenario covers a nested item, and a */** scenario covers a file directly under the folder, each with a fixture pinned to Vale 66bbb85.
+    notes:
+      - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: of 504 paired paragraphs Vale placed 500 on the last line, where vale-differences/spec.md and the rule-engine design say first. Vale matches tests/oracle/*/** for a file directly in tests/oracle, and hakkiri does not; whether hakkiri follows Vale is an open decision.'
+
 archive:
+  - id: HKR-008
+    title: Run ProseStyle on hakkiri
+    scope: prose-style
+    outcome: >-
+      prose-style publishes a hakkiri package with its own rules, the native ports of the upstream rules worth keeping, and the rate rules.
+    notes:
+      - '2026-11-11, operator decision: ProseStyle owns its rules. The 36 upstream rule files that ProseStyle.zip copies today (Voices, Direct, Readability, and the Abbreviations, DateTime, Grammar, Punctuation and Usage rules of Std) are reviewed one by one. Each valuable one becomes a native hakkiri rule in the one style ProseStyle, with tests, and the MIT sources are credited in a NOTICE. The rest are dropped with a reason. upstream.toml and the copying go.'
+      - '2026-11-11, operator decision: from its next release ProseStyle.zip is the hakkiri package. Vale projects stay pinned to v0.0.14, and the templates pin stays there until HKR-009. There is no second asset.'
+      - '2026-11-11, the six script rules of ProseStyle v0.0.14 (FlatRhythm, BareWorkItem, SameSentenceStart, HardBreak, SentencePerLine and PrepositionChain) port to native rules: five existence rules and one metric rule pass the 18 cases of the tag under hakkiri test in a probe. Readability.Polysyllables ports to one existence rule that gave the same 170,781 alerts as Vale 66bbb85 running the script over 238,342 words.'
+      - "2026-11-11, operator decision, ports: ProseStyle takes 17 upstream rules that always run. They are Banned, BinaryContrast, InflatedWords, Puffery, Recap, SuperficialAnalysis, ThroatClearing, WeakVerbs and Weasel of Voices, Hedging, Length and Preamble of Direct, FleschKincaid of Readability, and Latin, Spacing, GenderedPronouns and GenderedTerms of Std. Fourteen more ship off through the package settings, for a project to turn on: AutomatedReadability, ColemanLiau, FleschReadingEase, GunningFog, LIX, SMOG, Polysyllables (an existence rule that gave the same alerts as Vale's script over 238,342 words), PassiveVoice, OxfordComma, Contractions, FirstPersonPlural, FirstPersonSingular, DateFormat and TimeFormat. ProseStyle then holds 44 + 31 = 75 rules."
+      - "2026-11-11, operator decision, drops: ColonReveal, Ease, Acronyms (UndefinedAcronym covers it) and Ellipses (it flags the … that Emoji allows). Std's SentenceLength folds into Length."
+      - '2026-11-11, operator decision, renames: Banned becomes SlopWords, Recap RecapOpener, Weasel VagueAttribution, Latin LatinAbbreviation, Spacing SentenceSpacing, Length SentenceLength and FleschKincaid GradeLevel. Hedging and Preamble keep their names, and every other port keeps its upstream name.'
+      - "2026-11-11, operator decision, overlaps: no text draws two alerts for one fault. Drop 'harness the power' from StockPhrases, since SlopWords covers it, and make 'stands as a testament' draw only the Puffery alert. SentenceLength at 25 words as a suggestion beside LongSentence at 40 as an error stays by design."
+      - '2026-11-11, operator decision: the opt-in rules ship off through a package settings file, so this row waits for HKR-040.'
+      - '2026-11-11, operator decision: the tag stays a patch while the package works the same or better, and every rule is validated. prose-style v0.0.15 goes to PullRequestStyle, a Vale package (prose-style PR 32), so this package takes v0.0.16.'
+      - '2026-11-11, the package settings carry the OpenSpec proposal entry under block_ignores, so the release waits for HKR-043 in a hakkiri release; the alert diff covers the nine repositories that run Vale today: nishiki, hakkiri, verctl, ctl-core and five private ones.'
+      - '2026-11-12, found while judging the NounStack alerts of nine repositories for HKR-052: the rule says each noun is a lowercase word, but its pattern [a-z][a-z-]* has no anchor, so a capitalised name such as GitHub counts as a noun of a stack. The package branch owner is asked to anchor it; row HKR-057 tracks it.'
+      - '2026-11-12, correction to the note on NounStack: an anchor matches nothing in hakkiri 0.0.5 or Vale 3.26.0, so the package pattern is a lookaround, (?<![A-Za-z])[a-z][a-z-]*(?![A-Za-z]), that counts a word only when it is lowercase from its first to its last letter. Row HKR-057 tracks it.'
+    completed: 2026-11-13T21:06:51
+    evidence:
+      - 2026-11-13, ProseStyle v0.0.16 tagged; every rule and package case passes under hakkiri test in the prose-style CI, and the opt-in rules stay off in its test.
+      - '2026-11-13, alert diff over the nine repositories, Vale 3.26.0 with v0.0.14 against hakkiri main f53bfb3 (PRs 152 and 153) with v0.0.16: 4,361 Vale alerts, 5,350 hakkiri, 2,750 the same, 202 only Vale, 1,191 only hakkiri, 1,027 moved, 382 changed.'
+      - 2026-11-13, against hakkiri 0.0.6 the diff lost 460 ClauseChain alerts and gave 75 false LongSentence alerts; on main ClauseChain matches, LongSentence gives 9 that only hakkiri gives (8 true) and SentenceLength none, and ThingsSpeakNoun gains 202, sampled true, from code spans (HKR-056).
+      - '2026-11-13, left after the diff: one PrepositionChain match that an accepted word holds back (HKR-073), four alerts from Vale comments that name old rules (HKR-009), and the ThingsSpeakNoun form SHALL say, for ProseStyle v0.0.17.'
+    disposition: completed
+
   - id: HKR-031
     title: Turn rules off and on with comments
     scope: engine
