@@ -1,6 +1,10 @@
 # Changes here will be overwritten by Copier; edit with `copier update --data`.
-_commit: v0.0.99
+_commit: v0.0.102
 _src_path: https://github.com/victor-software-house/templates.git
+build_os: linux
+cargo_min_publish_age: 3 days
+cargo_trusted_owners:
+- any-victor
 ci_runner: github-hosted
 clippy_disallowed_methods: []
 clippy_disallowed_types: []
@@ -18,12 +22,12 @@ deny_licenses:
     reason: ring, rustls-webpki and untrusted, through ureq's rustls
 -   license: CDLA-Permissive-2.0
     reason: webpki-roots, the root certificates of ureq's rustls
-deny_skip: []
 feature_sets: []
 generated_paths: []
 github_owner: victor-software-house
 layout: crate
 library: false
+linux_image: ubuntu-26.04
 max_width: 100
 merge_queue: false
 merge_queue_cancel_lower: true
@@ -55,7 +59,7 @@ prose_fail_level: error
 published: false
 repository_visibility: public
 rust_nightly: nightly-2026-11-01
-rust_version: 1.99.1
+rust_version: 1.100.0
 test_profiles: []
 tokio: false
 verify_timeout: 8
