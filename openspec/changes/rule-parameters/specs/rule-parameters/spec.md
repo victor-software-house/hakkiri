@@ -23,23 +23,23 @@ It SHALL read the rule again with each parameter replacing the field of that nam
 ### Requirement: A parameter reaches the files of its glob
 
 A parameter SHALL apply to the files that the glob setting it matches.
-Every glob that matches a file SHALL apply in the order written, a later glob winning for the same parameter of the same rule, and a package's settings SHALL apply before the project's.
-An empty `styles` list SHALL drop the parameters set before it.
+The globs that match a file SHALL apply in the order of the settings cascade of `project-config`, a more specific glob winning for the same parameter of the same rule.
+An empty `styles` list SHALL drop the parameters of the globs that rank below it.
 
 #### Scenario: A file outside the glob
 
 - **WHEN** `'*.md'` lists `styles: [Vale]` and only `'a.md'` sets `max: 1` for `Vale.Repetition`
 - **THEN** `a.md` reports the second repeat of `the the the` and `b.md` reports both
 
-#### Scenario: A later glob
+#### Scenario: A more specific glob
 
-- **WHEN** `'*.md'` sets `max: 1` and `'a.md'` sets `max: 2`
+- **WHEN** `'a.md'` sets `max: 2` and then `'*.md'` sets `max: 1`
 - **THEN** `a.md` reports no repeat of `the the the` and `b.md` reports the second
 
 #### Scenario: An empty styles list
 
-- **WHEN** `'*.md'` sets `max: 2`, then `'a.md'` has `styles: []`, then `'a.*'` lists `styles: [Vale]`
-- **THEN** `a.md` runs with `max` 0 and `b.md` with `max` 2
+- **WHEN** `'*.md'` lists `styles: [Vale]` and sets `max: 2`, and `'a.md'` has `styles: []` and `Vale.Repetition: on`
+- **THEN** `a.md` runs `Vale.Repetition` with `max` 0 and `b.md` with `max` 2
 
 #### Scenario: A package and the project
 

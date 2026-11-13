@@ -442,6 +442,8 @@ queue:
     notes:
       - '2026-11-13, operator decisions: merge per key, specificity first, origin breaks ties, a marker like !important that only the project may use; the marker spelling is still to be agreed.'
       - '2026-11-13, found by the Kody thread on PR 141: a package glob beat the project top-level code_span_size.'
+      - '2026-11-13, operator decisions: the tag is !override, after the merge tag of the Compose specification; specificity counts the literal path parts first (design.md section 1).'
+    plan: openspec/changes/settings-cascade/proposal.md
 
   - id: HKR-070
     title: Keep ProseStyle.BareURL under the backtrack limit on long files
