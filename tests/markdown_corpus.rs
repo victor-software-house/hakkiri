@@ -5,9 +5,9 @@
 //! under `text`, with `.fixture` after `.md`.
 //! The style `Probe` has one rule for each scope that a construct reaches
 //! (`text`, `paragraph`, `heading`, `list`, `blockquote`, `table.cell`,
-//! `link`, `strong`, `emphasis` and `code`) and `Probe.Word`, which matches
-//! each run of non-space characters that holds a letter or a digit, so that
-//! where a construct joins or splits words shows.
+//! `link`, `strong`, `emphasis` and `code`).
+//! `Probe.Word` matches each run of non-space characters that holds a letter
+//! or a digit, so that where a construct joins or splits words shows.
 //! Each input uses words no other line of its file uses, since Vale places a
 //! repeated word at another copy of it.
 //! `vale.tsv` holds one row for each alert Vale gave: the file, the line, the

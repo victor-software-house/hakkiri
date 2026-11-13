@@ -4,7 +4,7 @@
 
 hakkiri reads Markdown with markdown-rs and cuts the syntax that is not prose out of the source text.
 Vale reads the HTML that goldmark writes from the same file, and finds each word of that HTML again in the file.
-The first reads constructs as the CommonMark and GFM specs say.
+The first reads constructs as the CommonMark and GFM specs define them.
 The second also keeps what its converter and its search for a word do to a construct.
 
 ## Goals / Non-Goals
@@ -29,7 +29,7 @@ The probe style has a rule for each scope a construct reaches, and one rule that
 Alternative: lint the repositories' own documents.
 It lost because each document repeats words, and a difference could not be traced to one construct.
 
-### 2. A link keeps its address for the `link` scope
+### 2. A link keeps the address for the `link` scope
 
 Vale masks the destination of a link out of the text where it first stands, so a link whose text is its destination gives the `link` scope no word.
 That holds for an autolink, for a bare URL that goldmark links, and for `[https://a.example](https://a.example)`.
@@ -47,7 +47,7 @@ hakkiri finds an `ftp://` address with goldmark's pattern and trims its end as g
 Alternative: read bare addresses with a port of the whole of goldmark's linkify parser.
 It lost because the probe found no other difference to pay for it.
 
-### 4. A backslash escape loses its backslash
+### 4. A backslash escape loses the backslash
 
 markdown-rs reads `\*` as `*`, and hakkiri kept the backslash in the text, so a word held it: `well\-known`.
 Vale reads the character, cannot find a word that holds it in the file, and gives no alert for that word.
@@ -56,7 +56,7 @@ A hard break written with a backslash loses it the same way.
 Alternative: keep the text as written.
 It lost because a rule then matched a backslash that no reader sees.
 
-### 5. A table row has the cells of its header
+### 5. A table row has the cells of the header
 
 The GFM spec ignores a cell past the last of the header, and goldmark does.
 markdown-rs lists it, so its words were prose.
@@ -64,7 +64,7 @@ hakkiri cuts a cell past the header's last one.
 Alternative: keep the cell.
 It lost because the spec and Vale both leave it out.
 
-### 6. A footnote reads as Vale renders it
+### 6. A footnote reads as in Vale's HTML
 
 Vale renders a reference as a number that it places at the first matching digit of the line, and a definition as a list item at the end of the document, for each definition that a reference names.
 hakkiri reads a reference as a gap, since the number is no prose, a definition that no reference names as a gap, and one that a reference names as a `list` node where it stands.
@@ -72,7 +72,7 @@ Alternative: read each reference as its number.
 It lost because Vale gives that number an alert at a place that is not the reference, so no reading could match it.
 The order of the definitions does not change an alert, so hakkiri keeps them where they stand.
 
-### 7. An inline HTML element has the scope of its tag
+### 7. An inline HTML element has the scope of the tag
 
 Vale scopes `b` and `strong` as `strong`, `i` and `em` as `emphasis`, `code` and `tt` as `code`, and `a` as `link`, whether the converter or the file wrote the tag.
 markdown-rs gives one HTML node for each tag, so hakkiri pairs an opening tag with the closing tag among the same siblings and reads the nodes between them as the element.
@@ -80,7 +80,7 @@ A tag with no closing tag among its siblings is a gap, as it was.
 Alternative: find the pairs in the HTML of the paragraph.
 It lost because the paragraph's HTML is not parsed anywhere in the tree builder.
 
-### 8. What hakkiri keeps from the reading it had
+### 8. What hakkiri keeps from the earlier reading
 
 The probe found nine places where Vale's own reading loses or invents text.
 The `vale-differences` spec lists them, each with the input, so that none is read as a gap to close.

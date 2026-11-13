@@ -760,9 +760,11 @@ impl Builder<'_> {
         None
     }
 
-    /// A node that holds the span of an inline HTML element and, as its first
-    /// and last children, empty text at the end of its opening tag and the
-    /// start of its closing tag, so that the tags are its markers.
+    /// A node that holds the span of an inline HTML element.
+    ///
+    /// Its first and last children are empty text at the end of its opening
+    /// tag and at the start of its closing tag, so that the tags are its
+    /// markers.
     fn carrier(span: Range<usize>, inner_start: usize, inner_end: usize) -> Mdast {
         let position = |from: usize, to: usize| Position::new(1, 1, from, 1, 1, to);
         let marker = |offset: usize| {

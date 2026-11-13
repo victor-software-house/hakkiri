@@ -65,7 +65,7 @@ hakkiri SHALL read Markdown as each scenario below says, where Vale 3.26.0 reads
 
 #### Scenario: A paragraph line starts with a number
 
-- **WHEN** a line that continues a paragraph starts with `1986. `
+- **WHEN** a line that continues a paragraph starts with `1986.` and a space
 - **THEN** hakkiri reads `1986` as a word of the paragraph, and Vale masks every line start that holds digits and a dot, so it reads no such word ([markdown-probe 8][markdown-probe-8])
 
 #### Scenario: A reference that nothing defines
@@ -112,8 +112,8 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 [html-5]: ../../../archive/2026-11-10-html-block-text/design.md#5-a-character-reference-reads-once
 [html-6]: ../../../archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
 [ledger]: ../../../../../tasks.yaml
-[markdown-probe-2]: ../../design.md#2-a-link-keeps-its-address-for-the-link-scope
-[markdown-probe-4]: ../../design.md#4-a-backslash-escape-loses-its-backslash
-[markdown-probe-6]: ../../design.md#6-a-footnote-reads-as-vale-renders-it
-[markdown-probe-8]: ../../design.md#8-what-hakkiri-keeps-from-the-reading-it-had
+[markdown-probe-2]: ../../design.md#2-a-link-keeps-the-address-for-the-link-scope
+[markdown-probe-4]: ../../design.md#4-a-backslash-escape-loses-the-backslash
+[markdown-probe-6]: ../../design.md#6-a-footnote-reads-as-in-vales-html
+[markdown-probe-8]: ../../design.md#8-what-hakkiri-keeps-from-the-earlier-reading
 [markdown-probe-9]: ../../design.md#9-known-gap-the-alt-text-of-an-inline-img
