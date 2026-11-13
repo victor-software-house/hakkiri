@@ -40,6 +40,11 @@ It SHALL refuse a form with no token that has a `pattern`, `tag` or `upos` witho
 - **WHEN** the second of two forms has the tokens `[{pattern: green}, {pattern: '('}]`
 - **THEN** hakkiri reports an error naming `forms[1].tokens[1].pattern`
 
+#### Scenario: Forms set as a parameter
+
+- **WHEN** a config sets `params` with `Team.Seq: {forms: x}` for a `sequence` rule `Team.Seq`
+- **THEN** hakkiri reports that `forms` is not adjustable as a parameter, as it reports for `tokens`, and exits with a failure status
+
 ### Requirement: Forms read a noun, a pronoun and a guard
 
 A form SHALL read the tokens a `tokens` list reads, so a negated token that follows the verb guards the match.

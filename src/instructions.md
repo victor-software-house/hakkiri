@@ -192,7 +192,7 @@ files:
   `Vale.Repetition: {max: 1}` lets one repeat pass. The rule is read again with the field replaced, and a value reads as the field's kind, so `metrics: Gunning Fog` is a list of one.
   A parameter reaches the files of the glob that sets it, a later glob winning for the same parameter, a package's settings first, and an empty `styles` list drops the parameters before it. Vale applies a parameter to every file whichever section sets it, and the last section wins everywhere.
   Some parameters are errors that name the line, and every one is reported at once.
-  They are a level, and a field that holds a list, a mapping, the rule's identity or its prose: `tokens`, `swap`, `exceptions`, `raw`, `either`, `filters`, `ignore`, `message`, `description`, `link`, `extends`, `name`, `path` and `tests`.
+  They are a level, and a field that holds a list, a mapping, the rule's identity or its prose: `tokens`, `forms`, `swap`, `exceptions`, `raw`, `either`, `filters`, `ignore`, `message`, `description`, `link`, `extends`, `name`, `path` and `tests`.
   They are also a field the rule's check does not define, a value of the wrong kind, a flag that is not `true` or `false`, and a missing value.
   So are a rule no loaded style holds, and any parameter of `Vale.Terms` or `Vale.Avoid`.
   Vale takes some of them without a word and names no line for others.

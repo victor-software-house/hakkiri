@@ -100,9 +100,10 @@ pub enum Param {
 }
 
 /// The fields of a rule that a parameter may not set: lists, mappings, the
-/// rule's identity and its prose, as Vale 3.26.0 lists them.
+/// rule's identity and its prose, as Vale 3.26.0 lists them, and the
+/// `forms` of a `sequence` rule, a list that Vale does not have.
 /// Changing one is authoring, which a rule that extends another does.
-const NOT_PARAMETERS: [&str; 14] = [
+const NOT_PARAMETERS: [&str; 15] = [
     "extends",
     "name",
     "path",
@@ -111,6 +112,7 @@ const NOT_PARAMETERS: [&str; 14] = [
     "description",
     "link",
     "tokens",
+    "forms",
     "swap",
     "exceptions",
     "filters",
@@ -738,7 +740,7 @@ impl Rule {
     /// level, which the rule's own setting carries, and for each that is not
     /// adjustable.
     /// The parameters that are not adjustable are `extends`, `name`, `path`,
-    /// `tests`, `message`, `description`, `link`, `tokens`, `swap`,
+    /// `tests`, `message`, `description`, `link`, `tokens`, `forms`, `swap`,
     /// `exceptions`, `filters`, `ignore`, `raw` and `either`.
     /// A parameter the rule's check does not define, or whose value is of the
     /// wrong kind, is refused as the same field of a rule file is, naming the

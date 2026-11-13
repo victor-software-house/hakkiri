@@ -415,3 +415,28 @@ fn every_fault_of_a_config_is_reported_at_once() -> TestResult {
     assert_eq!(result.err.matches("failed ").count(), 4, "{}", result.err);
     Ok(())
 }
+
+#[test]
+fn forms_are_not_adjustable_as_a_parameter() -> TestResult {
+    let suite = Suite::new("rule-parameters-forms");
+    let root = suite.scenario("forms");
+    root.file(
+        "styles/Team/Seq.yml",
+        "extends: sequence\nmessage: \"found '%s'\"\ntokens:\n  - pattern: marker\n",
+    );
+    root.file(
+        ".ctl/hakkiri.yaml",
+        "packages:\n  - path: styles\nfiles:\n  'a.md':\n    styles: [Team]\n    params:\n      Team.Seq: {forms: x}\n",
+    );
+    root.file("a.md", "A marker.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result.err.contains(
+            "failed .ctl/hakkiri.yaml: line 7: forms: rule `Team.Seq`: is not adjustable as a parameter: extend `Team.Seq` in a style instead"
+        ),
+        "{}",
+        result.err
+    );
+    Ok(())
+}
