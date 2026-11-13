@@ -206,7 +206,7 @@ fn run_existence(
     accepted: &[&Exceptions],
 ) -> Result<Vec<Hit>, SearchError> {
     let content = text.as_str();
-    let found = existence.pattern.find_all(&text.pattern_reading())?;
+    let found = existence.pattern.find_all(text.pattern_reading())?;
     let phrases = phrase_spans(&existence.exceptions, content, !found.is_empty())?;
     let held = accepted_spans(accepted, content, !found.is_empty())?;
     let mut hits = Vec::new();

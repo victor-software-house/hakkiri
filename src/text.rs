@@ -1,7 +1,7 @@
 //! The text a check reads, and where each byte of it lies in the file.
 
-use std::borrow::Cow;
 use std::ops::Range;
+use std::sync::OnceLock;
 
 use crate::entity;
 use crate::tree::{Join, Node, Reading};
@@ -35,7 +35,7 @@ pub(crate) enum Decode {
 /// Each code span is one `x`.
 /// A character reference such as `&amp;` reads as the character it stands for,
 /// and one of its characters is placed at the whole reference.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct Text {
     content: String,
     /// The file byte of each byte of `text`, and one more entry that ends the
@@ -45,7 +45,23 @@ pub struct Text {
     ends: Vec<usize>,
     /// The bytes of `text` that read a code span.
     code: Vec<Range<usize>>,
+    /// The text as a pattern reads it, built by the first call of
+    /// `pattern_reading` on a text that holds a code span.
+    masked: OnceLock<String>,
 }
+
+/// Two texts are equal when their content and places are, whether or not
+/// either has built its pattern reading.
+impl PartialEq for Text {
+    fn eq(&self, other: &Self) -> bool {
+        self.content == other.content
+            && self.origin == other.origin
+            && self.ends == other.ends
+            && self.code == other.code
+    }
+}
+
+impl Eq for Text {}
 
 /// The parts of a node that decide how its text reads.
 #[derive(Clone, Copy, Debug)]
@@ -72,6 +88,7 @@ impl Text {
             origin: Vec::new(),
             ends: Vec::new(),
             code: Vec::new(),
+            masked: OnceLock::new(),
         };
         let mut previous_end: Option<usize> = None;
         for (index, segment) in parts.segments.iter().enumerate() {
@@ -252,15 +269,17 @@ impl Text {
     ///
     /// A `*` and an `x` are one byte each, so every offset of the text holds.
     #[must_use]
-    pub fn pattern_reading(&self) -> Cow<'_, str> {
+    pub fn pattern_reading(&self) -> &str {
         if self.code.is_empty() {
-            return Cow::Borrowed(&self.content);
+            return &self.content;
         }
-        let mut masked = self.content.clone();
-        for code in &self.code {
-            masked.replace_range(code.clone(), "*");
-        }
-        Cow::Owned(masked)
+        self.masked.get_or_init(|| {
+            let mut masked = self.content.clone();
+            for code in &self.code {
+                masked.replace_range(code.clone(), "*");
+            }
+            masked
+        })
     }
 
     /// Whether the first or the last byte of the bytes `range` of the text
@@ -300,6 +319,7 @@ impl Text {
             origin,
             ends,
             code,
+            masked: OnceLock::new(),
         })
     }
 }
