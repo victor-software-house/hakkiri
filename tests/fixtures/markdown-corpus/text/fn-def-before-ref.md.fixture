@@ -1,0 +1,3 @@
+[^j1]: w50 def first.
+
+w51 ref later[^j1] here.

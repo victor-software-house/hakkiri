@@ -1,0 +1,4 @@
+w70 ref[^l1] here.
+
+[^l1]: w71 alpha with nested[^l2] marker.
+[^l2]: w72 beta.

@@ -1,0 +1,7 @@
+packages:
+  - path: styles
+files:
+  "text/*.md":
+    styles: [Probe]
+  "panics/*.md":
+    styles: [Probe]

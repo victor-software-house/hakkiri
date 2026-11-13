@@ -201,7 +201,7 @@ fn a_code_span_and_an_image() -> TestResult {
 fn an_autolink_is_a_gap_around_itself() -> TestResult {
     let fixture = load("markup.md")?;
     assert_eq!(fixture.texts(Scope::Paragraph)[2], "Read  first.");
-    assert_eq!(fixture.texts(Scope::Link)[1], "https://b.example");
+    assert_eq!(fixture.texts(Scope::Link), ["link"]);
     Ok(())
 }
 
@@ -220,6 +220,27 @@ fn an_email_or_a_www_address_stays_in_the_text_around_it() -> TestResult {
 }
 
 #[test]
+fn markdown_reads_as_vales_converter_reads_it() -> TestResult {
+    let fixture = load("markdown-readings.md")?;
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        [
+            "Get . now.",
+            "A well-known word.",
+            "First\nsecond.",
+            "A claim stands.",
+            "Use this and that now.",
+            "See https://a.example now.",
+        ]
+    );
+    assert_eq!(fixture.texts(Scope::TableCell), ["a", "b"]);
+    assert_eq!(fixture.texts(Scope::List), ["The source."]);
+    assert_eq!(fixture.texts(Scope::Strong), ["this"]);
+    assert_eq!(fixture.texts(Scope::Link), ["that"]);
+    Ok(())
+}
+
+#[test]
 fn a_pipe_in_a_link_destination_outside_a_table_is_no_space() -> TestResult {
     let fixture = load("pipe-link.md")?;
     assert_eq!(fixture.texts(Scope::Paragraph), ["Open the page now."]);
@@ -234,7 +255,7 @@ fn a_bare_url_in_a_comment_is_a_gap_around_itself() -> TestResult {
         [fixture.source.trim_end()]
     );
     assert_eq!(fixture.texts(Scope::Paragraph), ["Read  first."]);
-    assert_eq!(fixture.texts(Scope::Link), ["https://bare.example"]);
+    assert!(fixture.texts(Scope::Link).is_empty());
     Ok(())
 }
 
@@ -355,7 +376,7 @@ fn spans_are_bytes_not_characters() -> TestResult {
     let fixture = load("inline.md")?;
     assert_eq!(
         fixture.texts(Scope::Link),
-        ["link", "a reference", "https://bare.example", "naïve link",]
+        ["link", "a reference", "naïve link"]
     );
     assert_eq!(fixture.texts(Scope::Code), ["code"]);
     assert_eq!(fixture.texts(Scope::Strong), ["strong"]);
@@ -466,9 +487,9 @@ fn a_link_in_an_indented_doc_comment() -> TestResult {
 }
 
 #[test]
-fn a_bare_url_in_a_plain_comment_is_a_link() -> TestResult {
+fn a_bare_url_in_a_plain_comment_has_no_link_text() -> TestResult {
     let fixture = load("bare-url.rs")?;
-    assert_eq!(fixture.texts(Scope::Link), ["https://bare.example"]);
+    assert!(fixture.texts(Scope::Link).is_empty());
     assert_eq!(fixture.texts(Scope::Code), ["https://span.example"]);
     Ok(())
 }
