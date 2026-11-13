@@ -341,9 +341,8 @@ impl Title {
         } else {
             format!("{rest}.")
         };
-        let tags: Vec<String> = Tagger::english()
-            .map(|tagger| tagger.tag_treebank(&for_tagging))
-            .unwrap_or_default();
+        let tags: Vec<String> =
+            Tagger::english().map_or_default(|tagger| tagger.tag_treebank(&for_tagging));
         let mut out = String::with_capacity(rest.len());
         let mut copied = 0;
         let mut index = 0_isize;

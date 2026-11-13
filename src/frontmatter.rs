@@ -51,9 +51,7 @@ impl Kind {
 /// `source`, fences included.
 pub(crate) fn nodes(source: &str, span: &Range<usize>, toml: bool) -> Vec<Node> {
     let kind = if toml { Kind::Toml } else { Kind::Yaml };
-    content_of(source, span)
-        .map(|content| entry_nodes(source, content, kind))
-        .unwrap_or_default()
+    content_of(source, span).map_or_default(|content| entry_nodes(source, content, kind))
 }
 
 /// The nodes for the string values of the front matter that starts `source`,
@@ -62,9 +60,7 @@ pub(crate) fn nodes(source: &str, span: &Range<usize>, toml: bool) -> Vec<Node> 
 /// A rewrite of the text, such as the block and token patterns do, leaves the
 /// front matter as it is: Vale lints the metadata before it rewrites the body.
 pub(crate) fn leading(source: &str) -> Vec<Node> {
-    block(source)
-        .map(|(kind, content)| entry_nodes(source, content, kind))
-        .unwrap_or_default()
+    block(source).map_or_default(|(kind, content)| entry_nodes(source, content, kind))
 }
 
 /// The nodes for the string values of JSON front matter, which a file holds

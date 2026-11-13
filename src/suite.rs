@@ -410,8 +410,7 @@ impl Runner {
     /// folder it sits in. None when there is no readable config.
     fn packages(&mut self) -> Vec<PathBuf> {
         self.project()
-            .map(|project| project.packages.clone())
-            .unwrap_or_default()
+            .map_or_default(|project| project.packages.clone())
     }
 
     /// The name and the package of the rule at `file`, as the style loader

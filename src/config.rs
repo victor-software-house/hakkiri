@@ -819,7 +819,7 @@ impl<'a> Walk<'a> {
             let top = if is_download {
                 written.clone()
             } else {
-                written.parent().map(Path::to_path_buf).unwrap_or_default()
+                written.parent().map_or_default(Path::to_path_buf)
             };
             self.settings(&real, &top, depth);
             self.packages.push(real);
@@ -1090,8 +1090,7 @@ fn load_packages(
         for style in style_folders(&folder, line, &mut at) {
             let name = style
                 .file_name()
-                .map(|name| name.to_string_lossy().into_owned())
-                .unwrap_or_default();
+                .map_or_default(|name| name.to_string_lossy().into_owned());
             let shown = written.join(&name);
             if loaded.styles.contains_key(&name) && !folders.contains_key(&name) {
                 faults.add(

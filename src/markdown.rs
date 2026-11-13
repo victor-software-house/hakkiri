@@ -692,8 +692,7 @@ impl Builder<'_> {
                 let toml = matches!(node, Mdast::Toml(_));
                 let nodes = span
                     .as_ref()
-                    .map(|span| crate::frontmatter::nodes(self.source, span, toml))
-                    .unwrap_or_default();
+                    .map_or_default(|span| frontmatter::nodes(self.source, span, toml));
                 Step::Done(Visited {
                     nodes,
                     ..Visited::cut(span)

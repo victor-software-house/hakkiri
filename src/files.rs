@@ -158,8 +158,7 @@ impl Finder<'_> {
         }
         let extension = file
             .extension()
-            .map(|extension| extension.to_string_lossy().into_owned())
-            .unwrap_or_default();
+            .map_or_default(|extension| extension.to_string_lossy().into_owned());
         self.jobs.push(Job {
             path,
             file: file.to_path_buf(),

@@ -128,10 +128,7 @@ impl Failure {
             .problems
             .iter()
             .map(|problem| {
-                let line = problem
-                    .line
-                    .map(|line| format!("line {line}: "))
-                    .unwrap_or_default();
+                let line = problem.line.map_or_default(|line| format!("line {line}: "));
                 let field = if problem.field.is_empty() {
                     String::new()
                 } else {

@@ -1227,8 +1227,7 @@ impl Walker {
             .iter()
             .find(|attribute| attribute.key == "href")
             .and_then(|attribute| html.get(attribute.value.clone()))
-            .map(|href| entity::unescape(href, true).into_owned())
-            .unwrap_or_default();
+            .map_or_default(|href| entity::unescape(href, true).into_owned());
         if !skipped_class && !self.enclosing.iter().any(|(_, skipped)| *skipped) {
             self.attributes(html, tag);
         }
