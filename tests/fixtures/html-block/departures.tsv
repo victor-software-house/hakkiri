@@ -5,12 +5,7 @@ vale	Scope.dump-text	masks.md	0	0	0	a * b
 vale	Scope.dump-text	references.md	0	0	0	****************
 vale	Scope.dump-text	references.md	0	0	0	< marker
 vale	Scope.existence-code	references.md	49	38	43	marker
-vale	Scope.existence-emphasis	joins-in-markdown.md	7	6	11	marker
-vale	Scope.existence-emphasis	promoted-blocks.md	15	13	18	marker
-vale	Scope.existence-link	promoted-blocks.md	5	16	21	marker
 vale	Scope.existence-link	references.md	43	13	18	marker
-vale	Scope.existence-strong	joins-in-markdown.md	3	5	10	marker
-vale	Scope.existence-strong	promoted-blocks.md	9	8	13	marker
 hakkiri	Scope.amp	entities.md	1	4	4	&
 hakkiri	Scope.amp	entities.md	1	69	69	&
 hakkiri	Scope.amp	reference-spaces.md	13	8	8	&

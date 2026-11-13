@@ -229,8 +229,9 @@ fn markdown_reads_as_vales_converter_reads_it() -> TestResult {
             "A well-known word.",
             "First\nsecond.",
             "A claim stands.",
+            "The source.",
             "Use this and that now.",
-            "See https://a.example now.",
+            "See  now.",
         ]
     );
     assert_eq!(fixture.texts(Scope::TableCell), ["a", "b"]);
