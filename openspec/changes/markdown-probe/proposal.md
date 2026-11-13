@@ -12,8 +12,8 @@ hakkiri before this change gave most of them, and each difference below came fro
 
 ## Changes
 
-- A new fixture, `tests/fixtures/markdown-corpus`, holds the inputs, Vale's rows and the 157 rows that only one side gives, with a test that fails on any change to them.
-  hakkiri gives 2056 of Vale's 2155 rows and 58 of its own.
+- A new fixture, `tests/fixtures/markdown-corpus`, holds the inputs, Vale's rows and the 201 rows that only one side gives, with a test that fails on any change to them.
+  hakkiri gives 2056 of Vale's 2155 rows and 102 of its own, 44 of them the kept addresses of the `link` scope.
 - hakkiri reads each construct below as Vale does, where it read it otherwise:
   - A table row has the cells of its header, and a cell past the last one is a gap.
   - A bare email address, a `www.` address, an address with an upper-case scheme and a `mailto:` address are text, and an `ftp://` address is a gap.
@@ -21,7 +21,7 @@ hakkiri before this change gave most of them, and each difference below came fro
   - An inline HTML element that Vale scopes, `b`, `strong`, `i`, `em`, `code`, `tt` or `a`, has that scope.
   - A footnote reference is a gap, a definition no reference names is a gap, and a definition that one names is a `list` node.
 - hakkiri reads a backslash escape and a hard break written with a backslash without the backslash, where Vale gives no alert for a word that holds an escape.
-- The `vale-differences` spec drops the known gap of the Markdown parser, and lists the nine places where hakkiri differs on purpose.
+- The `vale-differences` spec drops the known gap of the Markdown parser and the scenario where inline HTML has no element scope, and lists the nine places where hakkiri differs on purpose.
 - The text of an inline `img` tag stays unread, which `vale-differences` lists as a known gap, and the row stays open for it.
 
 ## Capabilities
