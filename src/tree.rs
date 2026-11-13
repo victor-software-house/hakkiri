@@ -460,7 +460,7 @@ pub(crate) fn remap_nodes(
             node.closes = place(node.closes).unwrap_or(node.span.end);
             node.flushes = std::mem::take(&mut node.flushes)
                 .into_iter()
-                .map(|at| place(at).unwrap_or(at))
+                .filter_map(place)
                 .collect();
             if node.segments.is_empty() {
                 let children = std::mem::take(&mut node.children);
