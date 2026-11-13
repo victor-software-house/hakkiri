@@ -450,11 +450,14 @@ enum Kind {
     /// A JSX element: its tags are gaps in the text around it.
     Jsx,
     /// An inline HTML element, from its opening tag to its closing tag, of the
-    /// scope Vale gives its tag. Its tags are gaps in its text.
+    /// scope Vale gives its tag. Its tags are gaps in its text, and the
+    /// `title` nodes of its opening tag sit beside it, as they do beside a
+    /// tag that opens no element.
     Raw {
         scope: Scope,
         open: Range<usize>,
         close: Range<usize>,
+        titles: Vec<Node>,
     },
     /// No node of its own: the nodes below it go to its parent.
     Transparent,
@@ -577,10 +580,17 @@ impl Builder<'_> {
                     let inside = siblings.get(at + 1..close).unwrap_or_default();
                     top.children.nth(close - at - 1);
                     top.index = close + 1 - top.base;
+                    let titles = match siblings.get(at) {
+                        Some(Mdast::Html(html)) => {
+                            html_text::tag_titles(self.source, &open_span, &html.value)
+                        }
+                        _ => Vec::new(),
+                    };
                     let kind = Kind::Raw {
                         scope,
                         open: open_span,
                         close: close_span,
+                        titles,
                     };
                     let mut frame = Frame::new(top.node, kind, cell, first);
                     frame.children = inside.iter();
@@ -923,7 +933,12 @@ impl Builder<'_> {
                 visited
             }
             Kind::Cell => self.scoped(frame.node, frame.cell, frame.inner, frame.first),
-            Kind::Raw { scope, open, close } => {
+            Kind::Raw {
+                scope,
+                open,
+                close,
+                titles,
+            } => {
                 let inner = Visited::tag(Some(open.clone()))
                     .append(frame.inner)
                     .append(Visited::tag(Some(close.clone())));
@@ -931,6 +946,7 @@ impl Builder<'_> {
                 let carrier = Self::carrier(open.start..close.end, open.end, close.start);
                 let mut visited = self.scoped(&carrier, scope, inner, frame.first);
                 visited.tags = tags;
+                visited.nodes.splice(0..0, titles);
                 visited
             }
             Kind::Jsx => self.jsx(frame.node, frame.inner),
