@@ -14,7 +14,7 @@ use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
-use std::{fmt, fs, io, path, slice};
+use std::{fmt, fs, io, mem, path, slice};
 
 use ctl_core::input::{FieldPath, Input, Tagged};
 use garde::Validate;
@@ -442,6 +442,24 @@ fn first_group(glob: &str) -> Option<(usize, usize, Vec<usize>)> {
     None
 }
 
+/// The [`alternatives`] of the glob `pattern`, each compiled with its
+/// specificity, or the message of the fault that refuses `pattern`.
+fn compile(pattern: &str) -> Result<Vec<(globset::Glob, Specificity)>, String> {
+    let not_a_glob = |error: globset::Error| format!("is not a glob: {error}");
+    GlobBuilder::new(pattern).build().map_err(not_a_glob)?;
+    let all = alternatives(pattern).ok_or_else(|| {
+        format!("has more than {MAX_ALTERNATIVES} alternatives: split it into several globs")
+    })?;
+    all.iter()
+        .map(|alternative| {
+            GlobBuilder::new(alternative)
+                .build()
+                .map(|compiled| (compiled, specificity(alternative)))
+                .map_err(not_a_glob)
+        })
+        .collect()
+}
+
 /// What one glob sets for a file that matches it: the settings that carry no
 /// tag, or the ones the project tags `!override`.
 #[derive(Debug, Default)]
@@ -496,10 +514,8 @@ pub(crate) struct Project {
     styles: BTreeMap<String, Vec<usize>>,
     /// The rules that are valid Vale and that hakkiri cannot run.
     unrunnable: Vec<Held>,
-    /// Every glob of the packages and the project, in load order: each
-    /// package's, then the project's, each as written.
-    globs: Vec<Glob>,
-    /// Where each glob's alternatives rank.
+    /// Every glob of the packages and the project, and where each of their
+    /// alternatives ranks.
     ranking: Ranking,
     /// The rule each set of parameters gives, by the rule's place in `rules`
     /// and the parameters' [`variant_key`]: one for every set that the globs
@@ -541,6 +557,9 @@ pub(crate) struct Project {
 /// origin, then in load order.
 #[derive(Debug)]
 struct Ranking {
+    /// Every glob of the packages and the project, in load order: each
+    /// package's, then the project's, each as written.
+    globs: Vec<Glob>,
     /// Every alternative of every glob, so one pass over a path finds all
     /// those that match it.
     set: GlobSet,
@@ -553,10 +572,12 @@ struct Ranking {
 
 impl Ranking {
     /// Ranks the alternatives of `globs`, which [`load`] holds in load order.
-    fn of(globs: &mut [Glob]) -> Result<Self, globset::Error> {
+    /// Alternatives that do not compile into one set are a fault, and then no
+    /// glob matches.
+    fn of(mut globs: Vec<Glob>, faults: &mut Faults<'_>) -> Self {
         let mut all = Vec::new();
         for (index, glob) in globs.iter_mut().enumerate() {
-            for (branch, specificity) in std::mem::take(&mut glob.branches) {
+            for (branch, specificity) in mem::take(&mut glob.branches) {
                 all.push((specificity, glob.origin, index, branch));
             }
         }
@@ -573,20 +594,39 @@ impl Ranking {
         for (_, _, _, branch) in &all {
             set.add(branch.clone());
         }
-        Ok(Self {
-            set: set.build()?,
-            branches: all
-                .iter()
-                .zip(rank)
-                .map(|((_, _, index, _), rank)| (*index, rank))
-                .collect(),
-            order: order.into_iter().map(|branch| all[branch].2).collect(),
-        })
+        match set.build() {
+            Ok(set) => Self {
+                globs,
+                set,
+                branches: all
+                    .iter()
+                    .zip(rank)
+                    .map(|((_, _, index, _), rank)| (*index, rank))
+                    .collect(),
+                order: order.into_iter().map(|branch| all[branch].2).collect(),
+            },
+            Err(error) => {
+                let message = format!("the globs do not compile together: {error}");
+                faults.add(None, "files", message);
+                Self {
+                    globs,
+                    set: GlobSet::empty(),
+                    branches: Vec::new(),
+                    order: Vec::new(),
+                }
+            }
+        }
+    }
+
+    /// Every glob in the rank of its alternatives, from the lowest, a glob once
+    /// for each of its alternatives.
+    fn ranked(&self) -> Vec<&Glob> {
+        self.order.iter().map(|&index| &self.globs[index]).collect()
     }
 
     /// The globs that match `path`, from the lowest rank to the highest, each
     /// once at the rank of its most specific alternative that matches.
-    fn matching<'a>(&self, globs: &'a [Glob], path: &str) -> Vec<&'a Glob> {
+    fn matching(&self, path: &str) -> Vec<&Glob> {
         let mut best: HashMap<usize, usize> = HashMap::new();
         for branch in self.set.matches(path) {
             let (index, rank) = self.branches[branch];
@@ -598,7 +638,10 @@ impl Ranking {
             .map(|(index, rank)| (rank, index))
             .collect();
         ranked.sort_unstable();
-        ranked.into_iter().map(|(_, index)| &globs[index]).collect()
+        ranked
+            .into_iter()
+            .map(|(_, index)| &self.globs[index])
+            .collect()
     }
 }
 
@@ -708,7 +751,7 @@ impl Project {
     /// A rule hakkiri cannot run is held to the same test, and each one that
     /// passes it is in [`Plan::unrunnable`].
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
-        let matching = self.ranking.matching(&self.globs, path);
+        let matching = self.ranking.matching(path);
         if matching.is_empty() {
             return None;
         }
@@ -1317,21 +1360,9 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         push_globs(&mut globs, read, &mut listed);
         faults.problems.append(&mut at.problems);
     }
-    let ranking = Ranking::of(&mut globs).unwrap_or_else(|error| {
-        faults.add(
-            None,
-            "files",
-            format!("the globs do not compile together: {error}"),
-        );
-        Ranking {
-            set: GlobSet::empty(),
-            branches: Vec::new(),
-            order: Vec::new(),
-        }
-    });
-    refuse_names(&globs, &loaded, &mut faults);
-    let ranked: Vec<&Glob> = ranking.order.iter().map(|&index| &globs[index]).collect();
-    let variants = build_variants(&ranked, &loaded, &mut faults);
+    let ranking = Ranking::of(globs, &mut faults);
+    refuse_names(&ranking.globs, &loaded, &mut faults);
+    let variants = build_variants(&ranking.ranked(), &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
             problems: faults.problems,
@@ -1341,7 +1372,6 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         rules: loaded.rules,
         styles: loaded.styles,
         unrunnable: loaded.unrunnable,
-        globs,
         ranking,
         variants,
         vocabularies: loaded.vocabularies,
@@ -1587,32 +1617,10 @@ fn read_globs(
         // One key of the path, whatever dots, stars and slashes the glob holds.
         let glob = FieldPath::root().key("files").key(&pattern);
         let line = key_line_of(input, &glob);
-        if let Err(error) = GlobBuilder::new(&pattern).build() {
-            faults.add(line, &pattern, format!("is not a glob: {error}"));
-            continue;
-        }
-        let Some(all) = alternatives(&pattern) else {
-            faults.add(
-                line,
-                &pattern,
-                format!(
-                    "has more than {MAX_ALTERNATIVES} alternatives: split it into several globs"
-                ),
-            );
-            continue;
-        };
-        let branches = match all
-            .iter()
-            .map(|alternative| {
-                GlobBuilder::new(alternative)
-                    .build()
-                    .map(|compiled| (compiled, specificity(alternative)))
-            })
-            .collect::<Result<Vec<_>, _>>()
-        {
+        let branches = match compile(&pattern) {
             Ok(branches) => branches,
-            Err(error) => {
-                faults.add(line, &pattern, format!("is not a glob: {error}"));
+            Err(message) => {
+                faults.add(line, &pattern, message);
                 continue;
             }
         };
