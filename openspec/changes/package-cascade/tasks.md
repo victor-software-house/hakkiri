@@ -11,7 +11,8 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 2. Origin and the forced pass
 
-- [x] 2.1 Rank a package's globs below the project's at equal specificity and the top level below every glob, fold the forced values after the others in `plan` and `build_variants`, and let a forced list replace the unforced ones.  
+- [x] 2.1 Rank a package's globs below the project's at equal specificity, and the top level below every glob.  
+  Fold the forced values after the others in `plan` and `build_variants`, and let a forced list replace the unforced ones.  
   Verify a test for each scenario of the `project-config` delta of this change.  
   Evidence: the origin, forced and list tests of `tests/package_settings.rs` and `tests/code_span_size.rs` pass in a 4x8 box, with the whole suite.
 

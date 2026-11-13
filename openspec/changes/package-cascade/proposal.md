@@ -5,7 +5,8 @@ Queue row: `HKR-071` in [tasks.yaml][ledger].
 ## Motivation
 
 With the settings cascade of [settings-cascade][settings-cascade] (row `HKR-069`), the most specific glob wins for a key.  
-Two parts remain: what breaks a tie between a package and the project, and how the project keeps a value that a more specific package glob would replace.  
+Two parts remain: what breaks a tie between a package and the project, and how the project keeps a value that a more specific package glob would replace.
+
 The Kody thread on pull request 141 found that a package glob `'*.md': {code_span_size: 0}` beats the project's top-level `code_span_size: 2`, and the project had no way to keep its value.  
 The operator ruled on 2026-11-13 that the project breaks a tie with a package, as an author's stylesheet beats a library's in CSS.  
 The project may force a value with the YAML tag `!override`, the spelling of the Compose specification's merge tag, and a forced value beats every unforced one.
@@ -28,7 +29,8 @@ The project may force a value with the YAML tag `!override`, the spelling of the
 ## Impact
 
 - Changed: `src/config.rs`, the config tests, `src/instructions.md`, the skill and `AGENTS.md`, in the same pull request as `settings-cascade`.
-- ctl-core 0.7.5 re-exports serde-saphyr's `Tagged<T>`, which reads the tag of a setting beside its value; hakkiri moves its ctl-core pin to it.
+- ctl-core 0.7.5 re-exports serde-saphyr's `Tagged<T>`, so a setting keeps its tag beside its value.  
+  hakkiri moves its ctl-core pin to that release.
 - The design is sections 2 to 4 of the [settings-cascade design][design].
 
 [ledger]: ../../../tasks.yaml
