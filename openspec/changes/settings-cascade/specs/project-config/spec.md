@@ -18,18 +18,35 @@ More SHALL be more specific for each count but the third, where fewer SHALL be m
 
 ### Requirement: A literal character matches only itself
 
-A literal character SHALL be one outside a `[…]` class and a `{…}` group that is not `*` or `?`.  
+A literal character SHALL be one outside a `[…]` class that is not `*` or `?`.  
 A backslash and the character after it SHALL count as one literal character.
 
 #### Scenario: More literal characters
 
-- **WHEN** `files` holds `'*.md': {Team.Filler: error}` and then `'*.{md,txt}': {Team.Filler: warning}`
-- **THEN** `a.md` reports `Team.Filler` as an error, and `a.txt` as a warning
+- **WHEN** `files` holds `'a*.md': {Team.Filler: error}` and then `'*.md': {Team.Filler: warning}`
+- **THEN** `a.md` reports `Team.Filler` as an error, and `b.md` as a warning
+
+### Requirement: A glob with alternatives ranks as the alternative that matches
+
+A glob with `{…}` groups SHALL be read as its alternatives, one for each choice in each group, each with its own specificity.  
+For one file, the glob SHALL rank as the most specific of its alternatives that match that file.  
+A glob with more than 256 alternatives SHALL be a fault that asks to split it into several globs.
+
+#### Scenario: The alternative that matches
+
+- **WHEN** `files` holds `'{*.md,docs/a.md}': {Team.Filler: error}` and then `'docs/*.md': {Team.Filler: warning}`
+- **THEN** `a.md` and `docs/a.md` report `Team.Filler` as an error, and `docs/b.md` as a warning
+
+#### Scenario: A skip list beats a package's file types
+
+- **WHEN** a package sets `'*.{md,mdx,rs}': {styles: [Team]}` and the project sets `'{CHANGELOG.md,notes/**}': {styles: []}`
+- **THEN** `a.md` runs `Team`, and `CHANGELOG.md` and `notes/b.md` run nothing
 
 ### Requirement: The settings cascade applies the globs in rank order
 
 hakkiri SHALL rank every glob of the project and its packages once, by specificity, then by origin, then as written.  
 It SHALL apply the globs that match a file from the lowest rank to the highest, a higher rank winning for the same key.  
+A glob with alternatives SHALL take, for each file, the rank of its most specific alternative that matches that file.  
 Only settings of the same key SHALL compete: the settings of every matching glob merge.
 
 #### Scenario: Different keys merge

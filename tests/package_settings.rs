@@ -288,6 +288,26 @@ fn at_equal_specificity_the_project_beats_a_package() -> TestResult {
 }
 
 #[test]
+fn a_skip_list_with_alternatives_ranks_as_the_alternative_that_matches() -> TestResult {
+    let suite = Suite::new("package-settings-skip-list");
+    let root = project(
+        &suite,
+        "skip-list",
+        "packages:\n  - path: pkg/styles\nfiles:\n  '{CHANGELOG.md,notes/**}': {styles: []}\n",
+    );
+    root.file(
+        "pkg/.ctl/hakkiri.yaml",
+        "files:\n  '*.{md,mdx,rs}': {styles: [Team]}\n",
+    );
+    root.file("CHANGELOG.md", TEXT);
+    root.file("notes/b.md", TEXT);
+    let (code, lines, err) = check(&root)?;
+    assert_eq!(code, 0, "{err}");
+    assert_eq!(lines, [very("a.md", "warning"), "1 alert in 1 file".into()]);
+    Ok(())
+}
+
+#[test]
 fn a_forced_level_beats_a_more_specific_off() -> TestResult {
     let suite = Suite::new("package-settings-forced-level");
     let root = project(

@@ -13,6 +13,7 @@ The operator ruled on 2026-11-13 that settings resolve as CSS rules do: every se
 - Each glob has a specificity, read from its text, and the globs that match a file apply from the least specific to the most, so the more specific wins for the same key.
 - Turning a rule on or off and its level resolve as two keys, so a more specific `off` keeps a level set by a less specific glob, as a later `off` keeps it today.
 - An empty `styles` list drops the rule settings of the globs that rank below it.
+- A glob with `{…}` groups ranks, for each file, as the most specific of its alternatives that matches that file (row `HKR-072`).
 - The `project-config` and `vale-differences` specs state the rank, and the open `code-span-size` and `rule-parameters` changes drop their written-order wording.
 - How a tie between a package and the project breaks, and how the project forces a value with `!override`, is the change [package-cascade][package-cascade] (row `HKR-071`), which builds on this one.
 

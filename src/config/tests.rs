@@ -2,7 +2,7 @@
 
 use std::cmp::Reverse;
 
-use super::specificity;
+use super::{MAX_ALTERNATIVES, alternatives, specificity};
 
 /// A glob and its specificity: the parts of literal characters only, the parts
 /// of a literal character and something else, the parts that are `**`, and the
@@ -15,7 +15,6 @@ fn a_glob_counts_its_parts_and_its_literal_characters() {
         ("docs/**/*.md", (1, 1, 1, 7)),
         ("*.md", (0, 1, 0, 3)),
         ("CHANGELOG.md", (1, 0, 0, 12)),
-        ("*.{md,txt}", (0, 1, 0, 1)),
         ("openspec/changes/**/proposal.md", (3, 0, 1, 26)),
         ("**/openspec/changes/**/*.md", (2, 1, 2, 18)),
         ("a.md", (1, 0, 0, 4)),
@@ -44,7 +43,7 @@ fn the_more_specific_glob_ranks_above_the_other() {
         ("docs/*", "*.mdx"),
         ("docs/**/*.md", "*.md"),
         ("CHANGELOG.md", "*.md"),
-        ("*.md", "*.{md,txt}"),
+        ("a*.md", "*.md"),
         (
             "openspec/changes/**/proposal.md",
             "**/openspec/changes/**/*.md",
@@ -59,4 +58,40 @@ fn the_more_specific_glob_ranks_above_the_other() {
         );
     }
     assert_eq!(specificity("a?md"), specificity("*.md"));
+}
+
+/// A glob with `{…}` groups expands to one glob per choice, and a brace in a
+/// class or after a backslash is no group.
+#[test]
+fn a_glob_expands_to_its_alternatives() {
+    for (pattern, expected) in [
+        ("*.{md,mdx,rs}", vec!["*.md", "*.mdx", "*.rs"]),
+        ("{CHANGELOG.md,docs/**}", vec!["CHANGELOG.md", "docs/**"]),
+        (
+            "{a,b}/{c,d}.md",
+            vec!["a/c.md", "a/d.md", "b/c.md", "b/d.md"],
+        ),
+        ("{a,{b,c}}.md", vec!["a.md", "b.md", "c.md"]),
+        ("{,x}.md", vec![".md", "x.md"]),
+        ("\\{a,b\\}.md", vec!["\\{a,b\\}.md"]),
+        ("[{]a,b}.md", vec!["[{]a,b}.md"]),
+        ("docs/*.md", vec!["docs/*.md"]),
+    ] {
+        let mut got = alternatives(pattern).unwrap_or_default();
+        got.sort_unstable();
+        let mut want: Vec<String> = expected.into_iter().map(String::from).collect();
+        want.sort_unstable();
+        assert_eq!(got, want, "{pattern}");
+    }
+}
+
+/// A glob that expands past the limit has no alternatives: eight groups of two
+/// give 256, the limit, and nine give 512.
+#[test]
+fn a_glob_over_the_limit_of_alternatives_is_refused() {
+    assert_eq!(
+        alternatives(&"{a,b}".repeat(8)).map(|all| all.len()),
+        Some(MAX_ALTERNATIVES)
+    );
+    assert_eq!(alternatives(&"{a,b}".repeat(9)), None);
 }

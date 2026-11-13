@@ -14,11 +14,11 @@ use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
-use std::{fmt, fs, io, path, slice};
+use std::{fmt, fs, io, mem, path, slice};
 
 use ctl_core::input::{FieldPath, Input, Tagged};
 use garde::Validate;
-use globset::{GlobBuilder, GlobMatcher};
+use globset::{GlobBuilder, GlobSet, GlobSetBuilder};
 use hakkiri::Language;
 use hakkiri::engine::DEFAULT_CODE_SPAN_SIZE;
 use hakkiri::pattern::Pattern;
@@ -313,11 +313,11 @@ const OVERRIDE: &str = "!override";
 /// the whole glob.
 type Specificity = (usize, usize, Reverse<usize>, usize);
 
-/// The specificity of the glob `pattern`.
+/// The specificity of the glob `pattern`, one of the [`alternatives`] of a
+/// glob, so it holds no `{…}` group.
 ///
-/// A literal character is one outside a `[…]` class and a `{…}` group that is
-/// not `*` or `?`, and a backslash with the character after it is one literal
-/// character.
+/// A literal character is one outside a `[…]` class that is not `*` or `?`,
+/// and a backslash with the character after it is one literal character.
 fn specificity(pattern: &str) -> Specificity {
     let (mut only, mut mixed, mut recursive, mut literals) = (0, 0, 0, 0);
     let mut close = |raw: &str, held: usize, other: bool| {
@@ -334,7 +334,6 @@ fn specificity(pattern: &str) -> Specificity {
     };
     // The members seen in a class so far, and whether it is negated.
     let mut class: Option<(usize, bool)> = None;
-    let mut group = 0_usize;
     let (mut start, mut held, mut other) = (0, 0, false);
     let mut chars = pattern.char_indices();
     while let Some((at, c)) = chars.next() {
@@ -354,30 +353,111 @@ fn specificity(pattern: &str) -> Specificity {
             }
             '\\' => {
                 chars.next();
-                if group > 0 {
-                    other = true;
-                } else {
-                    held += 1;
-                }
+                held += 1;
             }
             '[' => {
                 class = Some((0, false));
                 other = true;
             }
-            '{' => {
-                group += 1;
-                other = true;
-            }
-            '}' if group > 0 => {
-                group -= 1;
-                other = true;
-            }
-            _ if group > 0 || matches!(c, '*' | '?') => other = true,
+            '*' | '?' => other = true,
             _ => held += 1,
         }
     }
     close(&pattern[start..], held, other);
     (only, mixed, Reverse(recursive), literals)
+}
+
+/// The most alternatives one glob may expand to.
+const MAX_ALTERNATIVES: usize = 256;
+
+/// The alternatives of the glob `pattern`: one glob for each choice of every
+/// `{…}` group, which together match what `pattern` matches.
+///
+/// A brace in a `[…]` class or after a backslash is no group. More than
+/// [`MAX_ALTERNATIVES`] is `None`.
+fn alternatives(pattern: &str) -> Option<Vec<String>> {
+    let mut done = Vec::new();
+    let mut pending = vec![pattern.to_owned()];
+    while let Some(glob) = pending.pop() {
+        match first_group(&glob) {
+            None => done.push(glob),
+            Some((open, close, commas)) => {
+                let mut from = open + 1;
+                for until in commas.into_iter().chain([close]) {
+                    pending.push(format!(
+                        "{}{}{}",
+                        &glob[..open],
+                        &glob[from..until],
+                        &glob[close + 1..]
+                    ));
+                    from = until + 1;
+                }
+            }
+        }
+        if done.len() + pending.len() > MAX_ALTERNATIVES {
+            return None;
+        }
+    }
+    done.reverse();
+    Some(done)
+}
+
+/// The byte offsets of the first `{…}` group of `glob`: its opening brace, its
+/// closing brace, and the commas between its choices, those of a group inside
+/// it left out.
+fn first_group(glob: &str) -> Option<(usize, usize, Vec<usize>)> {
+    let (mut open, mut depth, mut commas) = (None, 0_usize, Vec::new());
+    // The members seen in a class so far, and whether it is negated, as
+    // `specificity` reads a class.
+    let mut class: Option<(usize, bool)> = None;
+    let mut chars = glob.char_indices();
+    while let Some((at, c)) = chars.next() {
+        if let Some((members, negated)) = class.as_mut() {
+            match c {
+                '!' | '^' if *members == 0 && !*negated => *negated = true,
+                ']' if *members > 0 => class = None,
+                _ => *members += 1,
+            }
+            continue;
+        }
+        match c {
+            '\\' => {
+                chars.next();
+            }
+            '[' => class = Some((0, false)),
+            '{' => {
+                open.get_or_insert(at);
+                depth += 1;
+            }
+            '}' if depth > 0 => {
+                depth -= 1;
+                if depth == 0 {
+                    return open.map(|open| (open, at, commas));
+                }
+            }
+            ',' if depth == 1 => commas.push(at),
+            _ => {}
+        }
+    }
+    None
+}
+
+/// The [`alternatives`] of the glob `pattern`, each compiled with its
+/// specificity, or the message of the fault that refuses `pattern`.
+fn compile(pattern: &str) -> Result<Vec<(globset::Glob, Specificity)>, String> {
+    let not_a_glob = |error: globset::Error| format!("is not a glob: {error}");
+    GlobBuilder::new(pattern).build().map_err(not_a_glob)?;
+    let all = alternatives(pattern).ok_or_else(|| {
+        format!("has more than {MAX_ALTERNATIVES} alternatives: split it into several globs")
+    })?;
+    all.iter()
+        .map(|alternative| {
+            GlobBuilder::new(alternative)
+                .build()
+                .map(|compiled| (compiled, specificity(alternative)))
+                .map_err(not_a_glob)
+        })
+        .collect()
 }
 
 /// What one glob sets for a file that matches it: the settings that carry no
@@ -413,9 +493,9 @@ struct Glob {
     /// The glob as written, which two config files share when they write it
     /// alike.
     pattern: String,
-    matcher: GlobMatcher,
-    /// How specific the glob is, which ranks it first.
-    specificity: Specificity,
+    /// The [`alternatives`] of the glob, each compiled, with its specificity.
+    /// The most specific one that matches a file ranks the glob for that file.
+    branches: Vec<(globset::Glob, Specificity)>,
     /// The place of its config file among the layers, a package in load order
     /// and the project last, which ranks it second.
     origin: usize,
@@ -434,9 +514,9 @@ pub(crate) struct Project {
     styles: BTreeMap<String, Vec<usize>>,
     /// The rules that are valid Vale and that hakkiri cannot run.
     unrunnable: Vec<Held>,
-    /// Every glob of the packages and the project, in rank order: the least
-    /// specific first, then by origin, then as written.
-    globs: Vec<Glob>,
+    /// Every glob of the packages and the project, and where each of their
+    /// alternatives ranks.
+    ranking: Ranking,
     /// The rule each set of parameters gives, by the rule's place in `rules`
     /// and the parameters' [`variant_key`]: one for every set that the globs
     /// matching some file can add up to.
@@ -471,6 +551,98 @@ pub(crate) struct Project {
     /// The project root: the folder that holds the `.ctl` folder of the
     /// config, with symlinks resolved.
     root: PathBuf,
+}
+
+/// Where the alternatives of every glob rank: the least specific first, then by
+/// origin, then in load order.
+#[derive(Debug)]
+struct Ranking {
+    /// Every glob of the packages and the project, in load order: each
+    /// package's, then the project's, each as written.
+    globs: Vec<Glob>,
+    /// Every alternative of every glob, so one pass over a path finds all
+    /// those that match it.
+    set: GlobSet,
+    /// For each alternative of `set`, its glob in load order and its rank.
+    branches: Vec<(usize, usize)>,
+    /// The glob of each rank, from the lowest, a glob once for each of its
+    /// alternatives.
+    order: Vec<usize>,
+}
+
+impl Ranking {
+    /// Ranks the alternatives of `globs`, which [`load`] holds in load order.
+    /// Alternatives that do not compile into one set are a fault, and then no
+    /// glob matches.
+    fn of(mut globs: Vec<Glob>, faults: &mut Faults<'_>) -> Self {
+        let mut all = Vec::new();
+        for (index, glob) in globs.iter_mut().enumerate() {
+            for (branch, specificity) in mem::take(&mut glob.branches) {
+                all.push((specificity, glob.origin, index, branch));
+            }
+        }
+        let mut order: Vec<usize> = (0..all.len()).collect();
+        order.sort_by_key(|&branch| {
+            let (specificity, origin, index, _) = &all[branch];
+            (*specificity, *origin, *index)
+        });
+        let mut rank = vec![0; all.len()];
+        for (place, &branch) in order.iter().enumerate() {
+            rank[branch] = place;
+        }
+        let mut set = GlobSetBuilder::new();
+        for (_, _, _, branch) in &all {
+            set.add(branch.clone());
+        }
+        match set.build() {
+            Ok(set) => Self {
+                globs,
+                set,
+                branches: all
+                    .iter()
+                    .zip(rank)
+                    .map(|((_, _, index, _), rank)| (*index, rank))
+                    .collect(),
+                order: order.into_iter().map(|branch| all[branch].2).collect(),
+            },
+            Err(error) => {
+                let message = format!("the globs do not compile together: {error}");
+                faults.add(None, "files", message);
+                Self {
+                    globs,
+                    set: GlobSet::empty(),
+                    branches: Vec::new(),
+                    order: Vec::new(),
+                }
+            }
+        }
+    }
+
+    /// Every glob in the rank of its alternatives, from the lowest, a glob once
+    /// for each of its alternatives.
+    fn ranked(&self) -> Vec<&Glob> {
+        self.order.iter().map(|&index| &self.globs[index]).collect()
+    }
+
+    /// The globs that match `path`, from the lowest rank to the highest, each
+    /// once at the rank of its most specific alternative that matches.
+    fn matching(&self, path: &str) -> Vec<&Glob> {
+        let mut best: HashMap<usize, usize> = HashMap::new();
+        for branch in self.set.matches(path) {
+            let (index, rank) = self.branches[branch];
+            let top = best.entry(index).or_insert(rank);
+            *top = (*top).max(rank);
+        }
+        let mut ranked: Vec<(usize, usize)> = best
+            .into_iter()
+            .map(|(index, rank)| (rank, index))
+            .collect();
+        ranked.sort_unstable();
+        ranked
+            .into_iter()
+            .map(|(_, index)| &self.globs[index])
+            .collect()
+    }
 }
 
 /// The rules that run on one file, and the levels the config sets for some.
@@ -523,7 +695,7 @@ impl Project {
     /// Whether some glob matches `path`, written relative to the project root
     /// with `/` separators, whatever rules the globs give it.
     pub(crate) fn selects(&self, path: &str) -> bool {
-        self.globs.iter().any(|glob| glob.matcher.is_match(path))
+        self.ranking.set.is_match(path)
     }
 
     /// Whether `argument` can lead to a file under the project root: a file
@@ -579,11 +751,7 @@ impl Project {
     /// A rule hakkiri cannot run is held to the same test, and each one that
     /// passes it is in [`Plan::unrunnable`].
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
-        let matching: Vec<&Glob> = self
-            .globs
-            .iter()
-            .filter(|glob| glob.matcher.is_match(path))
-            .collect();
+        let matching = self.ranking.matching(path);
         if matching.is_empty() {
             return None;
         }
@@ -1192,9 +1360,9 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         push_globs(&mut globs, read, &mut listed);
         faults.problems.append(&mut at.problems);
     }
-    globs.sort_by_key(|glob| (glob.specificity, glob.origin));
-    refuse_names(&globs, &loaded, &mut faults);
-    let variants = build_variants(&globs, &loaded, &mut faults);
+    let ranking = Ranking::of(globs, &mut faults);
+    refuse_names(&ranking.globs, &loaded, &mut faults);
+    let variants = build_variants(&ranking.ranked(), &loaded, &mut faults);
     if !faults.problems.is_empty() {
         return Err(LoadError {
             problems: faults.problems,
@@ -1204,7 +1372,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         rules: loaded.rules,
         styles: loaded.styles,
         unrunnable: loaded.unrunnable,
-        globs,
+        ranking,
         variants,
         vocabularies: loaded.vocabularies,
         level,
@@ -1449,10 +1617,10 @@ fn read_globs(
         // One key of the path, whatever dots, stars and slashes the glob holds.
         let glob = FieldPath::root().key("files").key(&pattern);
         let line = key_line_of(input, &glob);
-        let matcher = match GlobBuilder::new(&pattern).build() {
-            Ok(glob) => glob.compile_matcher(),
-            Err(error) => {
-                faults.add(line, &pattern, format!("is not a glob: {error}"));
+        let branches = match compile(&pattern) {
+            Ok(branches) => branches,
+            Err(message) => {
+                faults.add(line, &pattern, message);
                 continue;
             }
         };
@@ -1525,8 +1693,7 @@ fn read_globs(
         }
         globs.push(Glob {
             pattern: pattern.clone(),
-            matcher,
-            specificity: specificity(&pattern),
+            branches,
             origin,
             normal,
             forced,
@@ -1705,13 +1872,15 @@ fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
 /// Each glob either matches a file or does not, so the sets a rule can get are
 /// those that each choice leaves, first over the parameters without the tag and
 /// then over the forced ones. Sets that come out alike count once.
-/// A glob is chosen once in each of the two walks, so a set no file gives may
-/// be read too, and its faults are those of its parameters.
+/// `globs` holds a glob once at the rank of each of its alternatives, so the
+/// place it takes for any file is among the choices.
+/// A set no file gives may be read too, and its faults are those of its
+/// parameters.
 /// A fault is placed on the line of the parameter it names, or of the first
 /// parameter of the set when it names none. When a set of several is refused,
 /// each parameter is read alone, so every fault shows at once.
 fn build_variants(
-    globs: &[Glob],
+    globs: &[&Glob],
     loaded: &Loaded,
     faults: &mut Faults<'_>,
 ) -> HashMap<(usize, String), Rule> {
