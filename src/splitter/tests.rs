@@ -101,6 +101,31 @@ fn a_unit_after_a_number_ends_a_sentence_before_a_capital() -> TestResult {
         sentences("It waits 5 ms. then stops.")?,
         ["It waits 5 ms. then stops."]
     );
+    assert_eq!(
+        sentences("The file takes 2 GiB. The cache takes 3 kHz. Then it stops.")?,
+        [
+            "The file takes 2 GiB.",
+            "The cache takes 3 kHz.",
+            "Then it stops."
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_word_that_is_no_unit_after_a_number_ends_nothing() -> TestResult {
+    assert_eq!(
+        sentences("Chapter 2 Dr. Smith spoke.")?,
+        ["Chapter 2 Dr. Smith spoke."]
+    );
+    assert_eq!(
+        sentences("Page 5 J. Smith wrote it.")?,
+        ["Page 5 J. Smith wrote it."]
+    );
+    assert_eq!(
+        sentences("Ask 2 Ms. Smith about it.")?,
+        ["Ask 2 Ms. Smith about it."]
+    );
     Ok(())
 }
 
@@ -340,6 +365,19 @@ fn a_list_number_ends_nothing() -> TestResult {
 }
 
 #[test]
+fn a_date_is_no_list_number() -> TestResult {
+    assert_eq!(
+        code_sentences("2026-09-29. `mise run verify` passes.")?,
+        ["2026-09-29.", "x passes."]
+    );
+    assert_eq!(
+        sentences("2026-09-29. The build passed.")?,
+        ["2026-09-29.", "The build passed."]
+    );
+    Ok(())
+}
+
+#[test]
 fn a_chain_of_initials_goes_on() -> TestResult {
     assert_eq!(
         sentences("J. R. R. Tolkien wrote books. Many people read them.")?,
@@ -352,5 +390,22 @@ fn a_chain_of_initials_goes_on() -> TestResult {
 fn spaced_periods_are_one_ellipsis() -> TestResult {
     let text = "Wait . . . it works now.";
     assert_eq!(sentences(text)?, [text]);
+    Ok(())
+}
+
+#[test]
+fn versus_ends_no_sentence() -> TestResult {
+    assert_eq!(
+        sentences("Rust 1.99 vs. Go 1.25 differ.")?,
+        ["Rust 1.99 vs. Go 1.25 differ."]
+    );
+    assert_eq!(
+        sentences("It uses 5 vs. 6 workers. Then it stops.")?,
+        ["It uses 5 vs. 6 workers.", "Then it stops."]
+    );
+    assert_eq!(
+        sentences("Rust vs. Go differ in speed.")?,
+        ["Rust vs. Go differ in speed."]
+    );
     Ok(())
 }

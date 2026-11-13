@@ -266,3 +266,10 @@ A rule for a noun and a verb, such as `ThingsSpeakNoun`, flags `` `flag` says ``
 An `existence` rule reads a code span as one `*`, as Vale masks it, so a match that runs across a span is a match, and one that starts or ends on a span is not.
 The square brackets of an intra-doc link, as in ``[`Name`]``, belong to the span.
 Vale reads the span as a run of `*`, and a rule with a tag and no pattern flags `` `flag` says `` there too.
+
+hakkiri splits sentences where Vale does not in a few places, and keeps whole what Vale splits in others.
+A full stop after a code span ends a sentence, and a code span begins one after a full stop, so ``Use `a`. Then use `b`. `c` is last.`` is three sentences.
+A unit of measure after a number ends a sentence before a capital word, as in `92 ms. Tests`.
+`vs.` ends no sentence, before a capital or a number, so `Rust 1.99 vs. Go 1.25 differ.` is one sentence, where Vale ends the first after `vs.`.
+A date such as `2026-09-29.` is no list number, so the sentence after it begins a new one.
+Vale reads the `1.` of a numbered heading or item as a sentence of its own, and keeps a version, a decimal or a task number whole before a capital, as in `ctl-core 0.5.2. ctl-core 0.6.3 ships`, where hakkiri ends the sentence.

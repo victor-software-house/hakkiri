@@ -380,6 +380,8 @@ queue:
       - The vale-differences spec lists the numbered heading, the version, decimal and task number before a capital, and vs., each with a fixture that pins Vale 66bbb85 and hakkiri.
     notes:
       - '2026-11-12, found while attributing the LongSentence, SentenceLength and FlatRhythm alerts of four public repositories: only-hakkiri LongSentence fell from 27 to 7 and SentenceLength from 97 to 29, and 12 new FlatRhythm alerts are true by the rule.'
+      - 2026-11-13, the ProseStyle v0.0.16 alert diff on hakkiri main still found 75 LongSentence alerts that only hakkiri gave, 68 false; the operator chose to land this row and run the diff again before HKR-008 closes.
+    plan: openspec/changes/splitter-code-spans/proposal.md
 
   - id: HKR-066
     title: Give each file and segment a language from langdex

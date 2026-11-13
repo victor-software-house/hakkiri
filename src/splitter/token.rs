@@ -70,14 +70,32 @@ pub(super) struct Annotation {
     pub(super) ellipsis: bool,
 }
 
-/// The abbreviations of units of measure.
-///
-/// A unit follows a number, and the word after it can begin a sentence, as in
-/// `the call took 5 ms. Then it ended.`
-const UNITS: &[&str] = &[
-    "ns", "us", "ms", "s", "sec", "secs", "min", "mins", "h", "hr", "hrs", "b", "kb", "mb", "gb",
-    "tb", "kib", "mib", "gib", "tib", "hz", "khz", "mhz", "ghz", "mm", "cm", "km", "mg", "kg",
-    "ml", "px", "pt", "mph",
+/// SI prefix symbols, from the BIPM SI Brochure, 9th edition (2019, with the
+/// 2022 prefixes), table 7, with `u` for `µ` as ASCII text writes it.
+const SI_PREFIXES: &[&str] = &[
+    "Q", "R", "Y", "Z", "E", "P", "T", "G", "M", "k", "h", "da", "d", "c", "m", "u", "µ", "n", "p",
+    "f", "a", "z", "y", "r", "q",
+];
+
+/// Binary prefix symbols, from IEC 80000-13:2008, table 3.
+const BINARY_PREFIXES: &[&str] = &["Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"];
+
+/// Unit symbols that take a prefix: the base and the named derived units of
+/// the SI Brochure (tables 2 and 4), the non-SI units it accepts that take a
+/// prefix (table 8: `L`, `l`, `t`, `eV`, `Da`, `ha`), and the bit and the
+/// byte of IEC 80000-13.
+const UNIT_SYMBOLS: &[&str] = &[
+    "m", "g", "s", "A", "K", "mol", "cd", "rad", "sr", "Hz", "N", "Pa", "J", "W", "C", "V", "F",
+    "S", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat", "L", "l", "t", "eV", "Da", "ha",
+    "bit", "B",
+];
+
+/// Time units that take no prefix: `min`, `h` and `d` from the SI Brochure
+/// (table 8), and the written forms `sec`, `secs`, `mins`, `hr` and `hrs`.
+/// `px` and `pt` are the pixel and the point of CSS Values and Units Level 4,
+/// section 6.2.
+const BARE_UNITS: &[&str] = &[
+    "min", "h", "d", "sec", "secs", "mins", "hr", "hrs", "px", "pt",
 ];
 
 /// Quotes, brackets and Markdown marks that open or close a word.
@@ -260,15 +278,36 @@ impl Token<'_> {
             )
     }
 
-    /// Whether the word is the abbreviation of a unit of measure, such as
-    /// `ms.`, which follows a number and does not stand for a title or a
-    /// name.
+    /// Whether the word is the symbol of a unit of measure, with its period,
+    /// such as `ms.`, which follows a number and does not stand for a title
+    /// or a name.
+    ///
+    /// A symbol alone, or with an SI or binary prefix, counts. A single
+    /// capital letter is an initial, and `Ms` is the title, so neither does.
     pub(super) fn is_unit(&self) -> bool {
-        self.mark == Mark::Period
-            && self
-                .word
-                .strip_suffix('.')
-                .is_some_and(|unit| UNITS.contains(&unit))
+        if self.mark != Mark::Period {
+            return false;
+        }
+        let Some(symbol) = self.word.strip_suffix('.') else {
+            return false;
+        };
+        let initial = symbol.len() == 1 && symbol.chars().all(|c| c.is_ascii_uppercase());
+        if initial || symbol == "Ms" {
+            return false;
+        }
+        BARE_UNITS.contains(&symbol)
+            || UNIT_SYMBOLS.contains(&symbol)
+            || SI_PREFIXES.iter().chain(BINARY_PREFIXES).any(|prefix| {
+                symbol
+                    .strip_prefix(prefix)
+                    .is_some_and(|rest| UNIT_SYMBOLS.contains(&rest))
+            })
+    }
+
+    /// Whether the word is `vs.`, which sits between the two things it sets
+    /// against each other and so ends no sentence.
+    pub(super) fn is_versus(&self) -> bool {
+        self.mark == Mark::Period && self.word.eq_ignore_ascii_case("vs.")
     }
 
     /// Whether the word is letters and nothing else.
@@ -309,10 +348,14 @@ impl Token<'_> {
         }
     }
 
-    /// Whether the token numbers a list item: a number with a period, or one
-    /// letter with a period.
+    /// Whether the token numbers a list item: digits and periods with a final
+    /// period, as in `1.` or `2.3.`, or one letter with a period. A date such
+    /// as `2026-09-29.` is no list number.
     pub(super) fn is_list_marker(&self) -> bool {
-        self.mark == Mark::Period && (self.is_initial() || self.kind() == NUMBER)
+        self.mark == Mark::Period
+            && (self.is_initial()
+                || (self.kind() == NUMBER
+                    && self.word.chars().all(|c| c.is_ascii_digit() || c == '.')))
     }
 
     /// Whether the token is symbols only, such as a bullet.

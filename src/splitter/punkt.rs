@@ -33,6 +33,11 @@ pub(super) fn ends_sentence(
 
 /// The decision for a token that ends in a period or an ellipsis.
 fn after_period(model: &Model, current: &Token<'_>, next: &Token<'_>, after_number: bool) -> bool {
+    // `vs.` sets two things against each other, so a capital or a number after
+    // it goes on with the same sentence.
+    if current.is_versus() {
+        return false;
+    }
     let first = current.first_look(model.abbreviations());
     let next_first = next.first_look(model.abbreviations());
     let kind = current.kind_without_period();
