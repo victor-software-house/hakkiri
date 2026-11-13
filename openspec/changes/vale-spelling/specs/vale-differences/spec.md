@@ -72,7 +72,6 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 - **WHEN** a project checks text in a language other than English
 - **THEN** hakkiri does not support it, which the spelling change states as a non-goal, and Vale reads a dictionary for the language ([spelling goals][spelling-goals])
 
-
 [vale-spelling-2]: ../../design.md#2-the-built-in-rule-reads-the-settings-of-every-package
 [vale-spelling-5]: ../../design.md#5-what-the-probe-shows-and-hakkiri-differs-on
 [case-3]: ../../../archive/2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
