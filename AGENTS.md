@@ -35,6 +35,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    hakkiri reads the settings of each package under the project's own, as Vale reads a package's `.vale.ini` under the project's.  
    The globs that match a file apply as a cascade (operator, 2026-11-13): settings of different keys merge, and for one key the highest rank wins.  
    Rank is specificity, then origin (each package in load order, the project last), then the order written, and each file's top level ranks below every glob.  
+   A glob with `{…}` groups ranks, for each file, as the most specific of its alternatives that matches that file (row `HKR-072`).  
    Only the project forces a value, with the YAML tag `!override`, read through ctl-core's `Tagged` and applied after every value without the tag. A package's file that holds it, or any other tag, is a fault.  
    A `styles` list adds to a package's under the same glob text and replaces it under another by rank, where Vale applies its sections in the order written.  
    A package's `packages` are fetched, pinned by `url` and `sha256`, to a depth of 10.  

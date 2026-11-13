@@ -393,18 +393,41 @@ fn a_glob_with_more_literal_characters_wins() -> TestResult {
     let root = project(
         &suite,
         "literal",
-        "  '*.md': {Team.Filler: error}\n  '*.{md,txt}': {Team.Filler: warning}\n",
+        "  'a*.md': {Team.Filler: error}\n  '*.md': {Team.Filler: warning}\n",
     );
-    root.file("a.txt", VERY);
     let result = run(root.path(), &["check"], &[])?;
     assert_eq!(result.code, 1, "{}{}", result.out, result.err);
     assert_eq!(
         result.lines(),
         [
             "a.md:1:9: error Team.Filler: Remove 'very'.",
-            "a.txt:1:9: warning Team.Filler: Remove 'very'.",
+            "b.md:1:9: warning Team.Filler: Remove 'very'.",
+            "2 alerts in 2 files"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_glob_with_alternatives_ranks_as_its_most_specific_alternative_that_matches() -> TestResult {
+    let suite = Suite::new("rule-setting-alternatives");
+    let root = project(
+        &suite,
+        "alternatives",
+        "  '{*.md,docs/a.md}': {Team.Filler: error}\n  'docs/*.md': {Team.Filler: warning}\n",
+    );
+    root.file("docs/a.md", VERY);
+    root.file("docs/b.md", VERY);
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 1, "{}{}", result.out, result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.md:1:9: error Team.Filler: Remove 'very'.",
             "b.md:1:9: error Team.Filler: Remove 'very'.",
-            "3 alerts in 3 files"
+            "docs/a.md:1:9: error Team.Filler: Remove 'very'.",
+            "docs/b.md:1:9: warning Team.Filler: Remove 'very'.",
+            "4 alerts in 4 files"
         ]
     );
     Ok(())

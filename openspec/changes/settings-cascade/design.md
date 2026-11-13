@@ -3,7 +3,7 @@
 ## 1. Specificity
 
 A glob's text is split at each `/` into parts.  
-A literal character is one outside a `[…]` class and a `{…}` group that is not `*` or `?`; a backslash and the character after it count as one literal character.  
+A literal character is one outside a `[…]` class that is not `*` or `?`; a backslash and the character after it count as one literal character.  
 The specificity is four counts, compared in order, a larger count more specific, except the third:
 
 1. The parts made of literal characters only, such as `docs` and `CHANGELOG.md`.
@@ -16,22 +16,34 @@ The specificity is four counts, compared in order, a larger count more specific,
 | `docs/a.mdx` | `docs/*`, then `*.mdx` | 1 literal part against none |
 | `docs/api/x.md` | `docs/**/*.md`, then `*.md` | 1 literal part against none |
 | `CHANGELOG.md` | `CHANGELOG.md`, then `*.md` | 1 literal part against none |
-| `a.md` | `*.md`, then `*.{md,txt}` | 3 literal characters against 1 |
+| `a.md` | `a*.md`, then `*.md` | 4 literal characters against 3 |
 | `openspec/changes/x/proposal.md` | `openspec/changes/**/proposal.md`, then `**/openspec/changes/**/*.md` | 3 literal parts against 2 |
 | `a.md` | `a.md`, then whichever of `a?md` and `*.md` is written later | 1 literal part; then 3 literal characters each |
+| `docs/a.md` | `{*.md,docs/a.md}`, then `docs/*.md` | the alternative `docs/a.md` has 2 literal parts against 1 |
+| `docs/b.md` | `docs/*.md`, then `{*.md,docs/a.md}` | the alternative `*.md` has no literal part |
 
 The operator chose this measure on 2026-11-13 over one that counts literal characters first, because a folder narrows a glob by its place.  
 
+A glob with `{…}` groups is read as its alternatives, one for each choice in each group, such as `*.md` and `docs/a.md` for `{*.md,docs/a.md}`.  
+Each alternative has its own specificity, and for one file the glob ranks as the most specific alternative that matches that file (row `HKR-072`).  
+A skip list such as `{CHANGELOG.md,notes/**}` therefore ranks as `CHANGELOG.md` for the changelog and as `notes/**` for a note, and beats a package's `*.{md,mdx,rs}`.  
+The operator chose this on 2026-11-13 over two measures fixed when the config loads, the most specific alternative and the least specific one.  
+The first ranks `{*.md,docs/a.md}` as `docs/a.md` for every Markdown file; the second ranks `{CHANGELOG.md,notes/**}` as `notes/**` for the changelog.  
+A glob may expand to 256 alternatives at most, and one with more is a fault that asks to split it.
+
 ## 2. Order
 
-The globs are ranked once, when the config loads, by specificity, then by origin, then as written.  
+The alternatives of every glob are ranked once, when the config loads, by specificity, then by origin, then as written.  
 Origin is the config file: each package in the order it loads, then the project, so the project wins a tie.  
-A stable sort over the globs in load order gives that rank, so a glob's written place breaks the last tie.  
+A sort by those three keys over the alternatives in load order gives that rank, so a glob's written place breaks the last tie.  
+All the alternatives compile into one `GlobSet`, so one pass over a path finds every alternative that matches it.  
+Each glob that matches takes the highest rank among its matching alternatives, and the matching globs sort by that rank.  
 The top level of each config file ranks below every glob, in the same origin order.
 
 `plan` folds the matching globs in rank order, a later one winning for the same key, as it folds them in written order today.  
 Then it folds the forced values of the matching globs in the same order.  
-`build_variants` walks the globs in the same rank, the unforced parameters of every glob and then the forced ones, so each set of parameters a file can get is read once.
+`build_variants` walks the globs in the rank of the alternatives, a glob once for each of its alternatives, the unforced parameters of every glob and then the forced ones.  
+The place a glob takes for any file is then among the choices, so each set of parameters a file can get is read once.
 
 ## 3. Keys
 

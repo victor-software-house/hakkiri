@@ -17,6 +17,13 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Verify `operator_docs` and `openspec validate --all --strict` pass.  
   Evidence: `operator_docs` passes in the box, and the `specs` task validates every change.
 
-## 3. Integration
+## 3. Alternatives (row `HKR-072`)
 
-- [ ] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+- [ ] 3.1 Read a glob with `{…}` groups as its alternatives, rank each alternative at load, and give each glob, for one file, the rank of its most specific alternative that matches, as `design.md` sections 1 and 2 say.  
+  Verify unit tests of the expansion and its limit of 256, and a test for each new scenario of the `project-config` delta.
+- [ ] 3.2 Update `src/instructions.md`, `AGENTS.md` and the `settings-cascade` changeset, which is not released yet.  
+  Verify `operator_docs` passes.
+
+## 4. Integration
+
+- [ ] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
