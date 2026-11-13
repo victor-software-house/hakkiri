@@ -4,6 +4,7 @@ use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
 use std::mem;
 use std::ops::Range;
+use std::rc::Rc;
 use std::slice::Iter;
 use std::sync::LazyLock;
 
@@ -501,6 +502,10 @@ struct Frame<'n> {
     /// The index among the children of `node` of the first child this frame
     /// visits: not the first for an inline HTML element.
     base: usize,
+    /// For each child of `node`, the index of the closing tag that ends the
+    /// inline HTML element it opens, found on the first look; an inline HTML
+    /// element shares the list of its parent.
+    pairs: Option<Rc<[Option<usize>]>>,
 }
 
 impl<'n> Frame<'n> {
@@ -516,7 +521,26 @@ impl<'n> Frame<'n> {
             taken: false,
             columns: 0,
             base: 0,
+            pairs: None,
         }
+    }
+
+    /// The inline HTML element that the latest child taken opens, when its
+    /// closing tag is a later child inside this frame.
+    ///
+    /// A closing tag past the frame belongs to an element around it, as in
+    /// `<b><i>x</b></i>`, so the inner tag opens no element.
+    fn raw_element(&mut self) -> Option<(Scope, usize, Range<usize>, Range<usize>)> {
+        let at = (self.base + self.index).checked_sub(1)?;
+        let end = self.base + self.index + self.children.len();
+        let node = self.node;
+        let pairs = self.pairs.get_or_insert_with(|| raw_pairs(node));
+        let close = pairs
+            .get(at)
+            .copied()
+            .flatten()
+            .filter(|&close| close < end)?;
+        Builder::raw_pair(node, at, close)
     }
 
     /// The next child, the scope of a table cell below it, and whether it is
@@ -571,8 +595,7 @@ impl Builder<'_> {
                     // A cell past the last of the header is no part of the row.
                     Step::Done(Visited::cut(span_of(child)))
                 } else if !Self::holds_blocks(top.node)
-                    && let Some((scope, close, open_span, close_span)) =
-                        Self::raw_pair(top.node, top.base + top.index - 1)
+                    && let Some((scope, close, open_span, close_span)) = top.raw_element()
                 {
                     // The siblings through the closing tag are the element's.
                     let at = top.base + top.index - 1;
@@ -596,6 +619,7 @@ impl Builder<'_> {
                     frame.children = inside.iter();
                     frame.base = at + 1;
                     frame.columns = top.columns;
+                    frame.pairs.clone_from(&top.pairs);
                     stack.push(frame);
                     continue;
                 } else {
@@ -723,41 +747,28 @@ impl Builder<'_> {
     }
 
     /// The element of the inline HTML tag at `at` among the children of
-    /// `parent`: the scope Vale gives its tag, the index of the closing tag
-    /// among the siblings, and the spans of the two tags.
+    /// `parent`, which the tag at `close` ends: the scope Vale gives its tag,
+    /// and the spans of the two tags.
     ///
     /// Vale scopes `b` and `strong` as strong text, `i` and `em` as emphasis,
     /// `code` and `tt` as code, and `a` as a link, as it does the elements
-    /// its Markdown converter writes. Only a closing tag among the siblings
-    /// ends the element.
-    fn raw_pair(parent: &Mdast, at: usize) -> Option<(Scope, usize, Range<usize>, Range<usize>)> {
+    /// its Markdown converter writes.
+    fn raw_pair(
+        parent: &Mdast,
+        at: usize,
+        close: usize,
+    ) -> Option<(Scope, usize, Range<usize>, Range<usize>)> {
         let children = parent.children()?;
         let Mdast::Html(opening) = children.get(at)? else {
             return None;
         };
-        let name = raw_tag(&opening.value, false)?;
-        let scope = match name.as_str() {
-            "b" | "strong" => Scope::Strong,
-            "i" | "em" => Scope::Emphasis,
-            "code" | "tt" => Scope::Code,
-            "a" => Scope::Link,
-            _ => return None,
-        };
-        let mut depth = 0_usize;
-        for (index, sibling) in children.iter().enumerate().skip(at + 1) {
-            let Mdast::Html(html) = sibling else {
-                continue;
-            };
-            if raw_tag(&html.value, false).as_deref() == Some(name.as_str()) {
-                depth += 1;
-            } else if raw_tag(&html.value, true).as_deref() == Some(name.as_str()) {
-                if depth == 0 {
-                    return Some((scope, index, span_of(children.get(at)?)?, span_of(sibling)?));
-                }
-                depth -= 1;
-            }
-        }
-        None
+        let scope = raw_scope(&raw_tag(&opening.value, false)?)?;
+        Some((
+            scope,
+            close,
+            span_of(children.get(at)?)?,
+            span_of(children.get(close)?)?,
+        ))
     }
 
     /// A node that holds the span of an inline HTML element.
@@ -792,16 +803,18 @@ impl Builder<'_> {
             .source
             .get(..span.start)
             .and_then(|head| head.chars().next_back());
-        let mut cuts = ftp_addresses(text, before)
+        let addresses = ftp_addresses(text, before)
             .into_iter()
             .map(|found| span.start + found.start..span.start + found.end)
             .collect::<Vec<_>>();
+        let mut cuts = addresses.clone();
         let bytes = text.as_bytes();
         let mut at = 0;
         while let Some(&byte) = bytes.get(at) {
             if byte == b'\\' && bytes.get(at + 1).is_some_and(u8::is_ascii_punctuation) {
                 let start = span.start + at;
-                if !cuts.iter().any(|cut| cut.contains(&start)) {
+                // Escapes never overlap, so only an address can hold one.
+                if !addresses.iter().any(|cut| cut.contains(&start)) {
                     cuts.push(start..start + 1);
                 }
                 at += 2;
@@ -1667,6 +1680,44 @@ fn raw_tag(html: &str, closing: bool) -> Option<String> {
         after.starts_with(['>', ' ', '\t', '\n']) && html.ends_with('>')
     };
     (!name.is_empty() && valid).then(|| name.to_ascii_lowercase())
+}
+
+/// The scope Vale gives the inline HTML element of tag `name`, if any.
+fn raw_scope(name: &str) -> Option<Scope> {
+    match name {
+        "b" | "strong" => Some(Scope::Strong),
+        "i" | "em" => Some(Scope::Emphasis),
+        "code" | "tt" => Some(Scope::Code),
+        "a" => Some(Scope::Link),
+        _ => None,
+    }
+}
+
+/// For each child of `parent`, the index of the closing tag that ends the
+/// inline HTML element it opens, among the elements `raw_scope` scopes.
+///
+/// One pass pairs the tags: a closing tag ends the latest open element of
+/// its name, so `<b>x<b>y</b>z</b>` nests.
+fn raw_pairs(parent: &Mdast) -> Rc<[Option<usize>]> {
+    let children = parent.children().map_or(&[][..], Vec::as_slice);
+    let mut pairs = vec![None; children.len()];
+    let mut open: HashMap<String, Vec<usize>> = HashMap::new();
+    for (index, child) in children.iter().enumerate() {
+        let Mdast::Html(html) = child else {
+            continue;
+        };
+        if let Some(name) = raw_tag(&html.value, false) {
+            if raw_scope(&name).is_some() {
+                open.entry(name).or_default().push(index);
+            }
+        } else if let Some(name) = raw_tag(&html.value, true)
+            && let Some(at) = open.get_mut(&name).and_then(Vec::pop)
+            && let Some(pair) = pairs.get_mut(at)
+        {
+            *pair = Some(index);
+        }
+    }
+    pairs.into()
 }
 
 /// The identifiers of the footnotes that a reference in `root` names.
