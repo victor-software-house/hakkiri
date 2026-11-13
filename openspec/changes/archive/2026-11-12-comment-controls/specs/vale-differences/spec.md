@@ -94,7 +94,7 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 - **THEN** hakkiri turns off the styles of the rules the config runs on the file, and Vale turns off its `BasedOnStyles` ([comment-controls 3][comment-controls-3])
 
 [check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
-[comment-controls-8]: ../../design.md#8-where-vale-places-a-comment-wrongly-hakkiri-places-it-right
+[comment-controls-8]: ../../design.md#8-a-comment-that-vale-places-wrongly
 [comment-controls-3]: ../../design.md#3-a-style-comment-reads-the-styles-of-the-rules
 [comment-controls-4]: ../../design.md#4-a-source-file-holds-no-comment-control
 [engine-14]: ../../../2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser

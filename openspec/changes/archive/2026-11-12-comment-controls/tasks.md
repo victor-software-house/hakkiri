@@ -21,8 +21,14 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Evidence, 2026-11-11 (UTC): Vale 66bbb85 gave 46 alerts over `c10.mdx`, and the 350 rows of the fixture match.
 - [x] 1.5 Probe the cases of the first probe that it left open, and fix each one where hakkiri read less than Vale.  
   Verify `every_file_gives_the_alerts_vale_gives` passes over the 23 files and 1,238 rows of the `text` folder, and `vale_places_a_comment_wrongly_where_hakkiri_places_it_right` passes.  
-  Evidence, 2026-11-12 (UTC): Vale `66bbb85` and hakkiri over setext and ATX headings, links, images, references, nested quotes and lists, task lists, inline HTML, `details`, `pre`, nested `div`, fenced and indented code, tables in lists, odd comment spellings, non-ASCII text, CRLF lines and footnotes differed in six ways, apart from footnotes.  
-  Four were fixed: the text of a tight item before a block that opens in it, the text of an HTML block at the tag that flushes it, the text left at the end of an HTML block, and the text of a paragraph before a `div` tag inside it.  
+  Evidence, 2026-11-12 (UTC): Vale `66bbb85` and hakkiri ran over setext and ATX headings, links, images, references, nested quotes and lists, task lists and inline HTML.  
+  They also ran over `details`, `pre`, nested `div`, fenced and indented code, tables in lists, odd comment spellings, non-ASCII text, CRLF lines and footnotes.  
+  The two differed in six ways, apart from footnotes.  
+  Four were fixed.  
+  The first is the text of a tight item before a block that opens in it.  
+  The second is the text of an HTML block at the tag that flushes it.  
+  The third is the text left at the end of an HTML block.  
+  The fourth is the text of a paragraph before a `div` tag inside it.  
   Two are Vale's flaws, recorded in the `vale-differences` spec.  
   Footnote definitions differ for reasons that are not comments, and move to row `HKR-027`.
 

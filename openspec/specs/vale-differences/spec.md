@@ -813,7 +813,7 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 - **WHEN** a comment limits the styles to `Other`
 - **THEN** hakkiri turns off the styles of the rules the config runs on the file, and Vale turns off its `BasedOnStyles` ([comment-controls 3][comment-controls-3])
 
-[comment-controls-8]: ../../changes/archive/2026-11-12-comment-controls/design.md#8-where-vale-places-a-comment-wrongly-hakkiri-places-it-right
+[comment-controls-8]: ../../changes/archive/2026-11-12-comment-controls/design.md#8-a-comment-that-vale-places-wrongly
 [comment-controls-3]: ../../changes/archive/2026-11-12-comment-controls/design.md#3-a-style-comment-reads-the-styles-of-the-rules
 [comment-controls-4]: ../../changes/archive/2026-11-12-comment-controls/design.md#4-a-source-file-holds-no-comment-control
 

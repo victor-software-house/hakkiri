@@ -997,13 +997,14 @@ pub(crate) fn walk(html: &str) -> Walk {
     walker.walk
 }
 
-/// The byte of `html` where its first token flushes the text before it, a
-/// start tag that is not inline, not void and not inside an inline element, or
-/// an end tag that is not inline and not promoted to inline, or `None` when it
-/// has none.
+/// The byte of `html` where its first token flushes the text before it, or
+/// `None` when it has none.
 ///
-/// It keeps the open inline elements and the promoted tags as `flush_tags`
-/// does, so a block tag read as inline and its end tag flush nothing.
+/// A start tag flushes it unless the tag is inline, void or inside an inline
+/// element.
+/// An end tag flushes it unless the tag is inline or was promoted to inline.
+/// The open inline elements and the promoted tags are kept as `flush_tags`
+/// keeps them, so a block tag read as inline and its end tag flush nothing.
 pub(crate) fn flushes_at(html: &str) -> Option<usize> {
     let mut tokenizer = Tokenizer::new(html);
     let mut history: Vec<String> = Vec::new();
