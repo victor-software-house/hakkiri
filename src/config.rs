@@ -958,15 +958,7 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         input,
         raw,
     });
-    let level = layers
-        .iter()
-        .rev()
-        .find_map(|layer| layer.raw.level.as_deref().and_then(level_named));
-    let code_span_size = layers
-        .iter()
-        .rev()
-        .find_map(|layer| layer.raw.code_span_size)
-        .and_then(|words| u8::try_from(words).ok());
+    let (level, code_span_size) = last_settings(&layers);
     let mut vocab = Named::default();
     for layer in &layers {
         vocab.add_layer(layer);
@@ -1028,6 +1020,21 @@ pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, Loa
         warnings: loaded.warnings,
         root,
     })
+}
+
+/// The `level` and the `code_span_size` of the last config file that sets
+/// each: the project's after its packages'.
+fn last_settings(layers: &[Layer]) -> (Option<Level>, Option<u8>) {
+    let level = layers
+        .iter()
+        .rev()
+        .find_map(|layer| layer.raw.level.as_deref().and_then(level_named));
+    let code_span_size = layers
+        .iter()
+        .rev()
+        .find_map(|layer| layer.raw.code_span_size)
+        .and_then(|words| u8::try_from(words).ok());
+    (level, code_span_size)
 }
 
 /// Makes the `styles` list of `glob` add to the list an earlier config file
