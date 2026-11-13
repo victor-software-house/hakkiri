@@ -274,9 +274,9 @@ dependencies = [
 
 [[package]]
 name = "ctl-core"
-version = "0.7.4"
+version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50ac0a8c768165890c9b4540e3df2fc1ea626e01a0b59a72b135e58615e9ebea"
+checksum = "492782f3eed458121a97dfb8fe41b14af7c3d2d25e5a89a2105c0815f9cd9d45"
 dependencies = [
  "anyhow",
  "clap",
@@ -296,18 +296,18 @@ dependencies = [
 
 [[package]]
 name = "ctl-layout"
-version = "0.7.4"
+version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68eef740773bce6c88f3899d2a6e7b67c85fe472945ecf6e08270141ccfdcb78"
+checksum = "c382d53e0332eb7c5723fcf05a474d0ca8c11fde457f7881c65fe7b556d5c2fd"
 dependencies = [
  "ctl-text",
 ]
 
 [[package]]
 name = "ctl-term"
-version = "0.7.4"
+version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30663ae9d9cfe69e62fccf9bf868c0433245420afd50b20f4430882cc12bc375"
+checksum = "80b029031c4905624f36dfd971ba6afebb077371f4de7bac110b08a8c9e3eeb9"
 dependencies = [
  "anstyle",
  "ctl-text",
@@ -316,9 +316,9 @@ dependencies = [
 
 [[package]]
 name = "ctl-text"
-version = "0.7.4"
+version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "702c39ed57e2d7b960552d8d83441c3e15e3eb327322b461a6483cdbd8a3908e"
+checksum = "91c997b6abb8ab2bbef73e6b95dab2fa8a852331e420cb593b26ea2e57a542d5"
 dependencies = [
  "anstyle",
  "unicode-bidi",
@@ -1192,9 +1192,9 @@ checksum = "b8c0a043c9540bae7c578c88f91dda8bd82e59ae27c21baca69c8b191aaf5a6e"
 
 [[package]]
 name = "vsh-serde-saphyr"
-version = "0.0.3"
+version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5515ffe30379241c0d7d0e3a50c6b5eb3409f6f08cd37b992858b6fa7092d9c3"
+checksum = "2c0fbec743e31350016610c642f4d7c7c72c08ecea2771c91b6a8b0b9e1fb227"
 dependencies = [
  "annotate-snippets",
  "encoding_rs_io",
