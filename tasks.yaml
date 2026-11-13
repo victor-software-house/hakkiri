@@ -367,6 +367,93 @@ queue:
     notes:
       - '2026-11-12, found by the HKR-063 attribution: Vale replaces the text of an element whose href equals its text with a run of asterisks.'
 
+  - id: HKR-065
+    title: Split sentences around code spans, units and vs.
+    scope: splitter
+    outcome: >-
+      The splitter reads code spans, a unit after a number, vs. and a date as a
+      reader does, and each place where Vale splits otherwise is a vale-differences row with
+      a fixture.
+    blocked_by: []
+    acceptance:
+      - A code span begins and ends a sentence next to a full stop, a unit after a number ends one before a capital, and vs. ends none, each with a test.
+      - The vale-differences spec lists the numbered heading, the version, decimal and task number before a capital, and vs., each with a fixture that pins Vale 66bbb85 and hakkiri.
+    notes:
+      - '2026-11-12, found while attributing the LongSentence, SentenceLength and FlatRhythm alerts of four public repositories: only-hakkiri LongSentence fell from 27 to 7 and SentenceLength from 97 to 29, and 12 new FlatRhythm alerts are true by the rule.'
+
+  - id: HKR-066
+    title: Give each file and segment a language from langdex
+    scope: engine
+    outcome: >-
+      A file, a fenced code block and a comment each have one language, found by any
+      name, extension, file name or interpreter that langdex knows, and a scope names a
+      language, not an extension.
+    blocked_by: []
+    acceptance:
+      - A scope part such as text.js reaches a .js, .jsx, .mjs or .cjs file, and text.txt reaches a file read as plain text, each with a test.
+      - A fenced code block reads its language from the first word of its info string, so md and markdown name the same language.
+      - READERS, Language::from_path, Language::extension and the scope extension list read from langdex and no longer list extensions of their own.
+    notes:
+      - '2026-11-13, operator decision: a language has a name, aliases and extensions, distinct from a file extension, as prettier and oxlint map them; langdex holds the table, generated from GitHub Linguist.'
+      - '2026-11-13, found by the Kody thread on PR 131: a file with no reader also took the extension txt, so a rule scoped text.txt reached .rst and README files.'
+
+  - id: HKR-067
+    title: Skip a package style folder named Vale with a warning
+    scope: config
+    outcome: >-
+      A package that holds styles/Vale loads, its other styles lint, and one warning
+      names the folder and says the built-in style Vale wins.
+    blocked_by: []
+    acceptance:
+      - A package with styles/Acme and styles/Vale lints with Acme and warns once about styles/Vale, with a test.
+    notes:
+      - '2026-11-13, operator decision: warn and skip; Vale 66bbb85 skips such a folder without a word, and hakkiri refused the whole config since PR 134.'
+
+  - id: HKR-068
+    title: Read front matter with a parser per format
+    scope: engine
+    outcome: >-
+      A front-matter crate in this workspace finds a YAML, TOML or JSON block and
+      gives each value its key, byte span and string, and hakkiri reads front matter
+      through it instead of ctl-core Input.
+    blocked_by: []
+    acceptance:
+      - The crate reads ---, +++, ;;;, ---yaml, ---toml, ---json and a bare { object, and a YAML block may close with ..., each with a test.
+      - 'A ;;; block that is not JSON, such as {title: Install guide}, fails the file with a message that names its line, and the body is still linted.'
+      - JSON is read by struson and passes the JSONTestSuite cases the crate pins.
+    notes:
+      - '2026-11-13, operator decisions: front matter is document content, not CLI config; the crate is MIT OR Apache-2.0; JSON is read as JSON with struson, picked by a trial against JSONTestSuite; YAML may close with ....'
+      - '2026-11-13, found by the Kody thread on PR 133: JSON front matter went through the YAML reader of ctl-core.'
+
+  - id: HKR-069
+    title: Resolve settings by specificity, as CSS does
+    scope: config
+    outcome: >-
+      Every setting that matches a file merges, and for one key the most specific
+      selector wins, then the project over a package, then the later one; a value the
+      project forces wins over all.
+    blocked_by: []
+    acceptance:
+      - For one key, docs/**/*.md beats *.md, which beats the top level, whatever their order and layer, each with a test.
+      - At equal specificity a project setting beats a package setting.
+      - A forced value in the project beats every unforced one, and a package that forces a value is refused at load.
+      - On or off and the level of a rule resolve as two keys.
+    notes:
+      - '2026-11-13, operator decisions: merge per key, specificity first, origin breaks ties, a marker like !important that only the project may use; the marker spelling is still to be agreed.'
+      - '2026-11-13, found by the Kody thread on PR 141: a package glob beat the project top-level code_span_size.'
+
+  - id: HKR-070
+    title: Keep ProseStyle.BareURL under the backtrack limit on long files
+    scope: engine
+    outcome: >-
+      ProseStyle.BareURL runs on long files without reaching the backtrack limit, so
+      no file fails at 1:1 for it.
+    blocked_by: []
+    acceptance:
+      - A long file that failed at 1:1 under hakkiri 0.0.6 lints with its BareURL alerts, with a test.
+    notes:
+      - '2026-11-13, found in the dotfiles skill lint with hakkiri 0.0.6 and ProseStyle v0.0.14: BareURL reaches the limit of 1,000,000 steps on long files, so the dotfiles turned the rule off.'
+
 archive:
   - id: HKR-031
     title: Turn rules off and on with comments
