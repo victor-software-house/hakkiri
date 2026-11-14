@@ -2,7 +2,7 @@
 
 ### Requirement: Source files give the tree their comments only
 
-For Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and shell files, hakkiri SHALL put only comment text in the tree, scoped `text.comment.line`, `text.comment.block`, `text.comment.doc.line` or `text.comment.doc.block` as the rule-files spec states.  
+For Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL put only comment text in the tree, scoped `text.comment.line`, `text.comment.block`, `text.comment.doc.line` or `text.comment.doc.block` as the rule-files spec states.  
 Each language SHALL find its comments with its tree-sitter grammar, so a comment marker inside a string, a raw string, a multi-line string, a heredoc or a block scalar opens no comment.  
 A Swift block comment SHALL nest.  
 The `#!` line that opens a script SHALL be no comment.
@@ -19,7 +19,7 @@ The `#!` line that opens a script SHALL be no comment.
 
 #### Scenario: A shell comment beside a heredoc
 
-- **WHEN** a shell file holds `#!/usr/bin/env bash`, `echo ${#a} # count`, and a heredoc whose body is `# text`
+- **WHEN** a Shell file holds `#!/usr/bin/env bash`, `echo ${#a} # count`, and a heredoc whose body is `# text`
 - **THEN** the tree holds one comment node for `count`
 
 #### Scenario: A nested Swift comment
@@ -69,7 +69,7 @@ A directive SHALL end a run of line comments, so the line after it starts a new 
 
 #### Scenario: A shell lint switch
 
-- **WHEN** a shell file holds `# shellcheck disable=SC2086`
+- **WHEN** a Shell file holds `# shellcheck disable=SC2086`
 - **THEN** the tree holds no node for it
 
 ### Requirement: A doc link and a doc name draw no alert
@@ -120,7 +120,7 @@ In a `/** */` comment, the name after a tag SHALL carry no prose scope for `@see
 
 ### Requirement: A line comment keeps the indentation of its text
 
-For Go, YAML, TOML and shell files, hakkiri SHALL remove from each line of a line comment only the first space after its marker.  
+For Go, YAML, TOML and Shell files, hakkiri SHALL remove from each line of a line comment only the first space after its marker.  
 A line indented further SHALL stay indented, so Markdown reads four spaces or a tab as a code block.  
 For Rust, TypeScript, JavaScript and Swift it SHALL keep removing the indentation that every line shares.
 

@@ -135,6 +135,15 @@ Each difference that is left has a cause, found on its own input:
 
 A comment that opens a function body is the one place where the two grammars of Go differ, as decision 6 says, and the probe found it as a `hit` that only hakkiri reported.
 
+### 10. A file reaches its reader through its language
+
+A reader reads one language of langdex, and a file reaches it by the language of its path or interpreter, as the `language-model` change sets.
+So the readers hold no extension list: `.yml`, `.bash`, `.zsh`, a script that starts `#!/bin/sh` and a `bashrc` file reach YAML and Shell with no line of this change naming them.
+A fenced code block of the five languages gives its comments through the same dialects, so a ```` ```yaml ```` fence in a Markdown file reads its `#` comments.
+
+Alternative: an extension table for the new readers.
+It lost because langdex already holds every name, extension, file name and interpreter, and a second table drifts from it.
+
 [comments]: https://github.com/victor-software-house/hakkiri/blob/main/src/comments.rs
 [code-span-size-6]: ../code-span-size/design.md#6-vale-drops-an-alert-that-has-the-place-of-another
 [v-names]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/lang.go#L59

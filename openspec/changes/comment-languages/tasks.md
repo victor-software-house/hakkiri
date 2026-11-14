@@ -16,7 +16,7 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 2. The readers
 
-- [x] 2.1 Add the readers `go`, `swift`, `yaml`, `toml` and `sh`, their extensions, and one dialect row each.  
+- [x] 2.1 Add the languages Go, Swift, YAML, TOML and Shell to `Language`, which reach their readers through langdex, and one dialect row each.  
   Verify `a_toml_file_gives_its_comments_only`, `formats_read_a_script_with_no_extension_as_shell`, `a_swift_doc_comment_has_the_doc_scope`, `a_hash_comment_is_a_line_comment` and the error text in `tests/check.rs` pass.
 - [x] 2.2 Drop the comments that tools read, in every dialect, and the `#!` line.  
   Verify `tests/fixtures/comment-languages` rows for `ts-directives`, `js-directives`, `go` and `sh` show no departure, and those of `swift-directive`, `yaml-directive` and `toml-directive` show Vale-only rows.
