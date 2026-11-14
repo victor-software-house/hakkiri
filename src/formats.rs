@@ -4,8 +4,10 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use globset::{GlobBuilder, GlobMatcher};
+use globset::GlobSet;
 use hakkiri::Language;
+
+use crate::config::glob_set;
 
 /// A key that holds one of these is a glob, as in Vale's `[formats]`.
 const GLOB_MARKS: [char; 4] = ['*', '?', '[', '{'];
@@ -15,7 +17,7 @@ const GLOB_MARKS: [char; 4] = ['*', '?', '[', '{'];
 #[derive(Debug)]
 struct Entry {
     language: Language,
-    glob: Option<GlobMatcher>,
+    glob: Option<GlobSet>,
 }
 
 /// The `formats` of a config, which map an extension, a file name or a glob to
@@ -44,10 +46,7 @@ impl Formats {
             )
         })?;
         let glob = if key.contains(GLOB_MARKS) || key.contains('/') {
-            let compiled = GlobBuilder::new(key)
-                .build()
-                .map_err(|error| format!("is not a glob: {error}"))?;
-            Some(compiled.compile_matcher())
+            Some(glob_set(key)?)
         } else {
             None
         };
@@ -61,7 +60,7 @@ impl Formats {
     ///
     /// An entry named by the file's extension comes first. Then, in the order
     /// of the keys as text, an entry whose key is the file's name, or a glob
-    /// that matches its name or its path.
+    /// that matches its path by the rules of gitignore.
     pub(crate) fn language_of(&self, path: &str) -> Option<Language> {
         let extension = Path::new(path)
             .extension()
@@ -73,10 +72,13 @@ impl Formats {
         let name = path.rsplit('/').next().unwrap_or(path);
         self.entries.iter().find_map(|(key, entry)| {
             let hit = match &entry.glob {
-                Some(glob) => glob.is_match(name) || glob.is_match(path),
+                Some(glob) => glob.is_match(path),
                 None => key == name,
             };
             hit.then_some(entry.language)
         })
     }
 }
+
+#[cfg(test)]
+mod tests;

@@ -442,18 +442,50 @@ fn first_group(glob: &str) -> Option<(usize, usize, Vec<usize>)> {
     None
 }
 
+/// The glob `pattern`, read by the rules of gitignore and `EditorConfig`.
+///
+/// `*`, `?` and a class stay inside one folder, and `**` spans folders.
+/// A pattern with no `/` matches the file name in any folder, and a leading `/`
+/// ties a pattern to the project root. A trailing `/` matches every file the
+/// folder holds, and a trailing `/**` every file below the folder, never the
+/// folder's own name.
+pub(crate) fn standard_glob(pattern: &str) -> Result<globset::Glob, globset::Error> {
+    let rooted = pattern.strip_prefix('/');
+    let body = rooted.unwrap_or(pattern);
+    let mut text = if rooted.is_none() && !body.trim_end_matches('/').contains('/') {
+        format!("**/{body}")
+    } else {
+        body.to_owned()
+    };
+    if text.ends_with('/') {
+        text.push_str("**");
+    }
+    GlobBuilder::new(&text).literal_separator(true).build()
+}
+
+/// The glob `pattern` as one set of its [`alternatives`], each read by
+/// [`standard_glob`], or the message of the fault that refuses it.
+pub(crate) fn glob_set(pattern: &str) -> Result<GlobSet, String> {
+    let mut builder = GlobSetBuilder::new();
+    for (glob, _) in compile(pattern)? {
+        builder.add(glob);
+    }
+    builder
+        .build()
+        .map_err(|error| format!("is not a glob: {error}"))
+}
+
 /// The [`alternatives`] of the glob `pattern`, each compiled with its
 /// specificity, or the message of the fault that refuses `pattern`.
 fn compile(pattern: &str) -> Result<Vec<(globset::Glob, Specificity)>, String> {
     let not_a_glob = |error: globset::Error| format!("is not a glob: {error}");
-    GlobBuilder::new(pattern).build().map_err(not_a_glob)?;
+    standard_glob(pattern).map_err(not_a_glob)?;
     let all = alternatives(pattern).ok_or_else(|| {
         format!("has more than {MAX_ALTERNATIVES} alternatives: split it into several globs")
     })?;
     all.iter()
         .map(|alternative| {
-            GlobBuilder::new(alternative)
-                .build()
+            standard_glob(alternative)
                 .map(|compiled| (compiled, specificity(alternative)))
                 .map_err(not_a_glob)
         })

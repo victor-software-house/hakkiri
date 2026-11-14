@@ -78,6 +78,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A block that no parser reads gives no value and fails the file with the line of the parser's problem, and the rest of the file is linted, where Vale lints none of it.  
    The ignore rewrite leaves the front matter as written.  
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
+   A glob reads by the rules of gitignore through `config::standard_glob`, for `files` and `formats` alike: `*` stays inside one folder, and a glob with no `/` matches the file name in any folder (operator, 2026-11-14).  
    Vale matches the path as given; the departure is in the `vale-differences` spec.
 6. **Exit status.**
    `hakkiri check` exits as Vale does: 2 when the config, a rule or a file failed, then 1 when a reported alert reaches `--fail-level` (default `error`), then 0.  

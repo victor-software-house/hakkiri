@@ -218,17 +218,17 @@ queue:
       - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: src/check.rs excepted holds back any existence match whose text holds an accepted word, which is wider than vocabularies/spec.md says. A sentence with the harness in a bench folder alerts in Vale and not in hakkiri.'
 
   - id: HKR-074
-    title: Correct where Vale places a block alert and how it matches */**
+    title: Correct where Vale places a block alert
     scope: docs
     outcome: >-
-      The vale-differences spec states where Vale places a Paragraph or ListItem
-      alert, how a nested list item counts, and how Vale and hakkiri match a */** glob.
+      The vale-differences spec states where Vale places a Paragraph or ListItem alert, and how a nested list item counts.
     blocked_by: []
     acceptance:
       - The spec says Vale places a multi-line block alert on its last line, and hakkiri on its first, as measured on 504 paragraphs.
-      - A ListItem scenario covers a nested item, and a */** scenario covers a file directly under the folder, each with a fixture pinned to Vale 66bbb85.
+      - A ListItem scenario covers a nested item, with a fixture pinned to Vale 66bbb85.
     notes:
       - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: of 504 paired paragraphs Vale placed 500 on the last line, where vale-differences/spec.md and the rule-engine design say first. Vale matches tests/oracle/*/** for a file directly in tests/oracle, and hakkiri does not; whether hakkiri follows Vale is an open decision.'
+      - '2026-11-14, the */** question moved to HKR-076: globs follow gitignore by operator decision.'
 
   - id: HKR-075
     title: Read the alt text of an inline img tag as Vale does
@@ -240,6 +240,18 @@ queue:
       - The vale-differences spec no longer lists the inline img text as a known gap.
     notes:
       - The Markdown probe of HKR-027 left this gap open, and vale-differences lists it.
+
+  - id: HKR-076
+    title: Match globs by the rules of gitignore
+    scope: config
+    outcome: "A files or formats glob matches the files gitignore would match: * inside one folder, ** across folders, a glob with no / by file name in any folder."
+    blocked_by: []
+    acceptance:
+      - docs/*.md matches docs/a.md and not docs/x/a.md, *.md matches a Markdown file in any folder, and tests/oracle/*/** matches no file directly in tests/oracle, each with a test.
+      - The vale-differences spec records where Vale 66bbb85 matches more.
+    plan: openspec/changes/standard-globs/proposal.md
+    notes:
+      - '2026-11-14, operator decision: globs follow the standard rules, whether Vale is looser or stricter.'
 
 archive:
   - id: HKR-072
