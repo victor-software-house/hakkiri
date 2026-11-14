@@ -36,7 +36,8 @@ With no path, `check` walks the current directory.
 A walk skips `node_modules`, `.git` and package folders, and what git ignores in a git repository.
 `--no-gitignore` reads the ignored files, and a file named on the command line is read whether git ignores it or not.
 A file named on the command line that no glob selects draws a warning, and `--on-unmatched error` fails the run for it.
-A file has the language of its path, or of the interpreter on its first line, and is read by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text, so `.yml`, `.bash` and a `#!/bin/sh` script have a reader.
+A file has the language of its path, or of the interpreter on its first line, and is read by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text.
+So `.yml`, `.bash` and a `#!/bin/sh` script have a reader.
 A file that a glob selects and that no reader reads is linted as plain text, and a binary file is skipped. A byte that is not UTF-8, in a Latin-1 file for example, reads as one `?`, so a column still counts bytes.
 The comments are all that a source, YAML, TOML or Shell file gives, read as Markdown, and a comment addressed to a tool, such as `eslint-disable` or `swiftlint:`, is left out.
 `formats` in the config maps an extension, a file name or a glob to a reader, named by any name of its language, and `--on-unknown` turns the plain-text default into a warning, a failure or nothing.

@@ -20,11 +20,12 @@ All five new languages are on the list of the row: Go and Swift are among Vale's
 Rego files and Nushell scripts also appear in the repositories, and no crate on crates.io holds a grammar for either, so those files stay plain text until one exists.
 
 The five grammars add 5.9 MB to the release binary, 15,264,456 to 21,171,528 bytes, and 6 seconds to a 76 second release build in a box with 4 vCPUs.
-By the size of each crate's archive Swift weighs 5.8 MB, Bash 1.5 MB, Go 0.36 MB, YAML 0.24 MB and TOML 0.06 MB, against 3.4 MB for TypeScript with TSX, 1.4 MB for Rust and 0.6 MB for JavaScript, which hakkiri already links.
+By the size of each crate's archive Swift weighs 5.8 MB, Bash 1.5 MB, Go 0.36 MB, YAML 0.24 MB and TOML 0.06 MB.
+TypeScript with TSX weighs 3.4 MB, Rust 1.4 MB and JavaScript 0.6 MB, and hakkiri already links them.
 The archives overstate the binary, whose growth is 5.9 of their 8.0 MB, and the order is the same.
 
 Alternative: every language of the row in one change.
-It lost because the row asks for the size to be measured before it ships, and one grammar, Swift, is 70 percent of this tranche.
+It lost because the size must be measured before the row ships, and one grammar, Swift, is 70 percent of this tranche.
 Each of the other languages is one row of the dialect table and one fixture, and the numbers above are the cost to expect.
 
 ### 2. A dialect is one table row
@@ -37,7 +38,8 @@ It lost because the five modules would repeat the same grouping and stripping co
 
 ### 3. The lexer is the grammar's, probed against Vale
 
-Over fixtures with line, block, doc and nested comments, strings that look like comments, raw strings and heredocs, hakkiri and Vale gave the same alerts for Go, YAML, TOML, TypeScript and JavaScript, apart from the drop of decision 9 and the cases of decisions 5, 7 and 8.
+Over fixtures with line, block, doc and nested comments, strings that look like comments, raw strings and heredocs, hakkiri and Vale gave the same alerts for Go, YAML, TOML, TypeScript and JavaScript.
+The exceptions are the drop of decision 9 and the cases of decisions 5, 7 and 8.
 The strings that hold a comment marker were a Go string, raw string and rune, a YAML quoted scalar, block scalar and plain scalar with `#`, and a TOML string, literal string and multi-line strings.
 
 Swift differs.
@@ -73,7 +75,8 @@ It lost because `Note: this holds` is prose.
 
 ### 6. A doc link and a doc name are masked at the alert
 
-Vale drops an alert whose match lies wholly in a mask ([Masked][v-masked]): the name a Go doc comment opens with, taken from the declaration the comment precedes ([goDocName][v-docname]), a link in brackets ([GoDoc][v-godoc]), a rustdoc link, and the inline tags and names of JSDoc.
+Vale drops an alert whose match lies wholly in a mask ([Masked][v-masked]).
+A mask is the name a Go doc comment opens with, taken from the declaration the comment precedes ([goDocName][v-docname]), a link in brackets ([GoDoc][v-godoc]), a rustdoc link, or the inline tags and names of JSDoc.
 hakkiri did this for JSDoc tags only, by cutting them out of the text.
 
 hakkiri now keeps the masked file ranges on the tree, and the engine drops an alert whose match lies wholly in one.
@@ -87,7 +90,7 @@ It lost because `See [Stop] for more.` would read as two sentences, one that end
 The grammar of the Go crate puts the first comment of a block before the list of statements, where the grammar of Vale puts it before the first statement.
 A comment above `var hit string` inside a function is a doc comment of `hit` in Vale, so hakkiri reads through the list.
 
-### 7. A line comment keeps the indentation of its text
+### 7. A line comment keeps the indentation of the text
 
 Go removes the first space of a line comment and no more, and a line indented further is a code block of the comment.
 Vale takes every leading space off each line of a run after the first ([appendLine][v-append]), so `///     cargo run` is a sentence.
@@ -129,13 +132,14 @@ Each difference that is left has a cause, found on its own input:
 - Indented examples: Vale reads them as sentences, 315 Vale-only rows of Swift in 100 lines, and a line of Go and 3 lines of TOML (decision 7).
 - Tool directives: the 110 Vale-only rows of YAML are the `yaml-language-server` line of 7 files (decision 5).
 - Columns after a multi-byte character: 10 rows of Go and 12 of Swift, in comments that trail code (decision 8).
-- Markdown reading, the same as in Markdown files: the Go rows hold inline HTML such as `<script>`, a code span beside a word, and a triple backtick in a sentence, and the Rust rows hold a code span beside a word.
+- Markdown reading, the same as in Markdown files: the Go rows hold inline HTML such as `<script>`, a code span beside a word, and a triple backtick in a sentence.
+  The Rust rows hold a code span beside a word.
   Vale's converter and hakkiri's parser read these otherwise, and `vale-differences` already records the Markdown cases.
 - One line of a workflow holds a `${{ }}` expression and gives 3 rows, and 4 TOML rows hold a reference link and a code span.
 
 A comment that opens a function body is the one place where the two grammars of Go differ, as decision 6 says, and the probe found it as a `hit` that only hakkiri reported.
 
-### 10. A file reaches its reader through its language
+### 10. Readers follow the language
 
 A reader reads one language of langdex, and a file reaches it by the language of its path or interpreter, as the `language-model` change sets.
 So the readers hold no extension list: `.yml`, `.bash`, `.zsh`, a script that starts `#!/bin/sh` and a `bashrc` file reach YAML and Shell with no line of this change naming them.
@@ -144,7 +148,7 @@ A fenced code block of the five languages gives its comments through the same di
 Alternative: an extension table for the new readers.
 It lost because langdex already holds every name, extension, file name and interpreter, and a second table drifts from it.
 
-[comments]: https://github.com/victor-software-house/hakkiri/blob/main/src/comments.rs
+[comments]: https://github.com/victor-software-house/hakkiri/blob/962f38348478048ad7e3f5b0464a8bfb29224f44/src/comments.rs
 [code-span-size-6]: ../code-span-size/design.md#6-vale-drops-an-alert-that-has-the-place-of-another
 [v-names]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/lang.go#L59
 [v-lang]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/lang.go#L122

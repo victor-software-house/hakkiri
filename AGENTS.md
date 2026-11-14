@@ -25,7 +25,8 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    A file, a fenced code block and a comment have a language from langdex, the table of languages, and a node has its own in `Node.language` when it has one.  
    A reader is one of the twelve parsers, and `Language` maps each to the langdex language it reads, by name.  
    A file reaches the reader of its langdex language, so `.yml`, `.bash`, a `#!/bin/sh` script and a `bashrc` file reach the YAML and Shell readers, and no table lists extensions.  
-   A fenced code block of Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML or Shell is parsed by that grammar, and `src/fence.rs` puts each comment in the tree at its place in the Markdown or MDX file, with the language of the fence.  
+   A fenced code block of Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML or Shell is parsed by that grammar.  
+   `src/fence.rs` puts each comment in the tree at its place in the Markdown or MDX file, with the language of the fence.  
    Each line of the fence's code must end the line of the file it came from, or the fence gives no nodes.  
    A fence of Markdown, MDX or text, a fence with no info string, a fence of another language and an indented block stay gaps.  
    The text of a comment in a source file reads its fences as gaps.

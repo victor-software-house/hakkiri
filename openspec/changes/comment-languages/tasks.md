@@ -6,7 +6,8 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 - [x] 1.1 Probe Vale at `66bbb85`, built with the grammars of its `grammars/build.sh`, and hakkiri over 23 files that each hold one kind of comment, and record Vale's alerts in `tests/fixtures/comment-languages`.  
   Verify `comments_read_as_vale_reads_them_but_where_decided` passes: every difference from Vale is a row of `departures.tsv`.  
-  Evidence, 2026-11-12 (UTC), in a box: Go, YAML, TOML, TypeScript and JavaScript gave Vale's alerts on the fixtures apart from the departures, and those are Swift, shell, directives, indentation, columns, and 3 words that Vale's duplicate-position check drops.
+  Evidence, 2026-11-12 (UTC), in a box: Go, YAML, TOML, TypeScript and JavaScript gave Vale's alerts on the fixtures apart from the departures.
+  The departures are Swift, Shell, directives, indentation, columns, and 3 words that Vale's duplicate-position check drops.
 - [x] 1.2 Probe the same tools over 640 files of the ctl repositories, 278 Go files and 122 Swift files, and give a cause to each difference that is left.  
   Verify the table of [design 9][design-9] holds the counts.  
   Evidence, 2026-11-12 (UTC): with Vale's check off, the differences fall to 92 rows for Go, 18 for Rust and 4 for TOML, each a Markdown reading, an indented example, a directive or a column.

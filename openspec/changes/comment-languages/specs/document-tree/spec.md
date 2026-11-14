@@ -74,7 +74,9 @@ A directive SHALL end a run of line comments, so the line after it starts a new 
 
 ### Requirement: A doc link and a doc name draw no alert
 
-hakkiri SHALL drop an alert whose match lies wholly in the name of a declaration that a Go doc comment opens with, in a link in brackets of a Go or Rust comment, or in an inline link tag of a TypeScript or JavaScript comment.  
+hakkiri SHALL drop an alert whose match lies wholly in a doc name or a doc link.  
+A doc name is the name of the declaration that a Go doc comment opens with.  
+A doc link is a link in brackets of a Go or Rust comment, or an inline link tag of a TypeScript or JavaScript comment.  
 It SHALL leave the text of the node as written, so counts and sentences do not change.  
 A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 
@@ -106,7 +108,8 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 
 ### Requirement: More JSDoc tags name something
 
-In a `/** */` comment, the name after a tag SHALL carry no prose scope for `@see`, `@event`, `@member`, `@var`, `@name`, `@alias`, `@memberof`, `@augments`, `@extends`, `@mixes`, `@borrows`, `@function`, `@func`, `@method`, `@class`, `@constructor`, `@namespace`, `@module`, `@enum`, `@external`, `@host`, `@kind`, `@listens`, `@fires`, `@emits`, `@this`, `@requires`, `@implements` and `@satisfies`, as it does after `@param`.
+In a `/** */` comment, the name after a tag SHALL carry no prose scope for `@see`, `@event`, `@member`, `@var`, `@name`, `@alias`, `@memberof`, `@augments`, `@extends`, `@mixes`, `@borrows`, `@function`, `@func`, `@method`, `@class`, `@constructor`, `@namespace` and `@module`, as it does after `@param`.  
+The same SHALL hold for `@enum`, `@external`, `@host`, `@kind`, `@listens`, `@fires`, `@emits`, `@this`, `@requires`, `@implements` and `@satisfies`.
 
 #### Scenario: A see tag
 

@@ -6,7 +6,9 @@ Queue row: `HKR-017` in [tasks.yaml][ledger].
 
 [HKR-017][ledger] promises the comments of Vale's languages and of Bash, HCL, Kotlin, Nix, Solidity, YAML and TOML, with the cost in binary size measured before it ships (operator, 2026-11-11).
 This change is its first tranche, and builds what the rest reuse.
-The first tranche is Go, Swift, Bash, YAML and TOML, because the repositories of the ctl group use them: a count on 2026-11-12 found 140 TOML, 118 YAML and 69 shell files in the eleven repositories, with test fixtures and snapshots left out, and the project types of the shared template add Go modules and Swift packages.
+The first tranche is Go, Swift, Bash, YAML and TOML, because the repositories of the ctl group use them.
+A count on 2026-11-12 found 140 TOML, 118 YAML and 69 shell files in the eleven repositories, with test fixtures and snapshots left out.
+The project types of the shared template add Go modules and Swift packages.
 
 hakkiri reads the comments of Rust, TypeScript and JavaScript files only, and of fenced blocks of those languages.
 It reads every other file the config selects as plain text, so a `Cargo.toml`, a workflow or a script is linted as prose from its first line to its last.
@@ -22,7 +24,8 @@ A probe of Vale at `66bbb85` against hakkiri, in a box, found each of these diff
   A fenced code block of one of these languages gives its comments too.
 - Each reads only comments, through its tree-sitter grammar, so a string, a raw string, a heredoc and a block scalar are never prose.
 - A comment addressed to a tool is not prose: Vale's patterns for Go, TypeScript and JavaScript, and the directives of the tools of the other languages.
-- A link in brackets in a Go or Rust doc comment, the name a Go doc comment opens with, and an inline `{@link}` of JSDoc draw no alert, as in Vale, and more JSDoc tags take a name, as in Vale.
+- A link in brackets in a Go or Rust doc comment, the name a Go doc comment opens with, and an inline `{@link}` of JSDoc draw no alert, as in Vale.
+  More JSDoc tags take a name, as in Vale.
 - A line comment of a Go, YAML, TOML or Shell file keeps the indentation of its text after the first space, so an indented example stays code.
 - Swift is read by the Swift grammar, which Vale does not use, and the cases where the two differ are recorded in `vale-differences`.
 - The row stays open for the other languages of its list, each one a row of the dialect table with its fixture.

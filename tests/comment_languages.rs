@@ -1,13 +1,14 @@
-//! The comments of Go, Swift, YAML, TOML and shell files, and the directives
-//! and doc links of every source language, against Vale: the alerts of an
-//! `existence` rule that matches every word, over files that hold one kind of
-//! comment each.
+//! The comments of Go, Swift, YAML, TOML and Shell files, and the directives
+//! and doc links of every source language, against Vale.
+//! The alerts are those of an `existence` rule that matches every word, over
+//! files that hold one kind of comment each.
 //!
 //! `tests/fixtures/comment-languages/rules` holds the rule, `inputs` the files
 //! with `.fixture` after the extension, and `vale.tsv` one row for each alert
 //! Vale gave: the rule, the file, the line, the first and last column, and the
 //! matched text. The rows come from Vale at `66bbb85` with the grammars of its
-//! `grammars/build.sh`, run on the inputs with the rule as one style, a `View`
+//! `grammars/build.sh`.
+//! Vale ran on the inputs with the rule as one style, a `View`
 //! that reads the comments of YAML and TOML files as Markdown, and `[formats]`
 //! that reads the comments of the other files as Markdown.
 //!

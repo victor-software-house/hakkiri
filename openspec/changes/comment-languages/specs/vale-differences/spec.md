@@ -7,7 +7,8 @@ hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files, and th
 #### Scenario: Swift is read by its own grammar
 
 - **WHEN** a Swift file holds `/* outer /* inner */ still outer */`, a raw string `##"x "# // y"##`, a multi-line string whose line is `// z`, or `/* c */` inside a string interpolation
-- **THEN** hakkiri reads `still outer` and `c` as comment text and reads nothing from the strings, and Vale reads the file with its C grammar, so it stops the first comment at the first `*/`, reads `y"##` and `z` as comments, and reads no comment inside an interpolation ([comment-languages 3][comment-languages-3])
+- **THEN** hakkiri reads `still outer` and `c` as comment text and reads nothing from the strings
+- **AND** Vale reads the file with its C grammar, so it stops the first comment at the first `*/`, reads `y"##` and `z` as comments, and reads no comment inside an interpolation ([comment-languages 3][comment-languages-3])
 
 #### Scenario: A comment that a tool reads
 
@@ -17,7 +18,7 @@ hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files, and th
 #### Scenario: A shell file has comments
 
 - **WHEN** a glob selects a `.sh` file
-- **THEN** hakkiri reads its `#` comments, and Vale has no reader for Shell, so it reads the file as plain text, or as Markdown when `formats` says so ([comment-languages 3][comment-languages-3])
+- **THEN** hakkiri reads its `#` comments, and Vale has no reader for Shell, so it reads the file as plain text, or as Markdown when `formats` maps it there ([comment-languages 3][comment-languages-3])
 
 #### Scenario: A YAML or TOML file needs no view
 
@@ -43,5 +44,5 @@ hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files, and th
 [comment-languages-4]: ../../design.md#4-yaml-and-toml-comments-need-no-view
 [comment-languages-5]: ../../design.md#5-a-comment-for-a-tool-is-not-prose
 [comment-languages-6]: ../../design.md#6-a-doc-link-and-a-doc-name-are-masked-at-the-alert
-[comment-languages-7]: ../../design.md#7-a-line-comment-keeps-the-indentation-of-its-text
+[comment-languages-7]: ../../design.md#7-a-line-comment-keeps-the-indentation-of-the-text
 [comment-languages-8]: ../../design.md#8-a-column-counts-characters
