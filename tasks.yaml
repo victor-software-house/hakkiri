@@ -161,36 +161,36 @@ queue:
       - '2026-11-12, operator decision: a code span counts as one word by default, a setting sets it to zero, at the package, project and glob levels, with a flag and a variable. The key is code_span_size, and its unit is words.'
       - It applies only to word counts and to the metrics built on words. HKR-051 keeps the rule form of LongSentence; this row gives a project the way to count as Vale does.
 
-  - id: HKR-073
-    title: State which matches an accepted word holds back
-    scope: docs
-    outcome: >-
-      The vocabularies spec states that a match holding an accepted word as a whole word with its case is held back, as Vale 3.26.0 and hakkiri both do, and a test pins it.
-    blocked_by: []
-    acceptance:
-      - The vocabularies spec states the rule in its top-level and glob requirements, with a scenario.
-      - A test gives the alerts Vale 3.26.0 gives with ProseStyle.PrepositionChain and Vocab = ProseStyle on a chain holding harness, Harness, harnessing and no accepted word.
-    notes:
-      - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: src/check.rs excepted holds back any existence match whose text holds an accepted word, which is wider than vocabularies/spec.md says. A sentence with the harness in a bench folder alerts in Vale and not in hakkiri.'
-      - 2026-11-14, a probe of Vale 3.26.0 found that it holds the harness chain back once Vocab = ProseStyle is set, at the top level or in a glob. The alert diff ran Vale with no vocabulary, because the ProseStyle package has no .vale.ini. hakkiri matches Vale; the spec was narrower than both.
-    plan: openspec/changes/vocab-hold-back/proposal.md
-
+archive:
   - id: HKR-074
     title: Correct where Vale places a block alert
     scope: docs
     outcome: >-
       The vale-differences spec states where Vale places a Paragraph or ListItem alert, and how a nested list item counts.
-    blocked_by: []
-    acceptance:
-      - The spec says Vale places a multi-line block alert on its last line, and hakkiri on its first, as measured on 504 paragraphs.
-      - A ListItem scenario covers a nested item, with a fixture pinned to Vale 66bbb85.
     notes:
       - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: of 504 paired paragraphs Vale placed 500 on the last line, where vale-differences/spec.md and the rule-engine design say first. Vale matches tests/oracle/*/** for a file directly in tests/oracle, and hakkiri does not; whether hakkiri follows Vale is an open decision.'
       - '2026-11-14, the */** question moved to HKR-076: globs follow gitignore by operator decision.'
       - '2026-11-14, a probe ran Vale 3.26.0 and Vale 66bbb85 with metric rules over paragraphs and list items: both place each alert at column 1 of the block last line and count a nested item as its own block. An occurrence alert is placed as hakkiri places it.'
-    plan: openspec/changes/block-alert-placement/proposal.md
+    plan: openspec/changes/archive/2026-11-14-block-alert-placement/proposal.md
+    completed: 2026-11-14T11:37:07
+    evidence:
+      - openspec/changes/archive/2026-11-14-block-alert-placement/
+    disposition: completed
 
-archive:
+  - id: HKR-073
+    title: State which matches an accepted word holds back
+    scope: docs
+    outcome: >-
+      The vocabularies spec states that a match holding an accepted word as a whole word with its case is held back, as Vale 3.26.0 and hakkiri both do, and a test pins it.
+    notes:
+      - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: src/check.rs excepted holds back any existence match whose text holds an accepted word, which is wider than vocabularies/spec.md says. A sentence with the harness in a bench folder alerts in Vale and not in hakkiri.'
+      - 2026-11-14, a probe of Vale 3.26.0 found that it holds the harness chain back once Vocab = ProseStyle is set, at the top level or in a glob. The alert diff ran Vale with no vocabulary, because the ProseStyle package has no .vale.ini. hakkiri matches Vale; the spec was narrower than both.
+    plan: openspec/changes/archive/2026-11-14-vocab-hold-back/proposal.md
+    completed: 2026-11-14T11:37:07
+    evidence:
+      - openspec/changes/archive/2026-11-14-vocab-hold-back/
+    disposition: completed
+
   - id: HKR-068
     title: Read front matter with a parser per format
     scope: engine

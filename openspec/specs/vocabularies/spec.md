@@ -73,13 +73,19 @@ A run of whitespace in a term SHALL match any run of whitespace.
 ### Requirement: Accepted terms hold back matches of the checks that read them
 
 hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule, before it rewrites and sorts them.
-It SHALL hold back a match that is an accepted term or lies inside an accepted phrase.
+It SHALL hold back a match that holds an accepted word as a whole word, with its case, anywhere in the matched text, as Vale does.
+It SHALL also hold back a match that lies inside an accepted phrase.
 A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonword` SHALL read none.
 
 #### Scenario: An existence rule
 
 - **WHEN** `Team.Filler` is an `existence` rule with the tokens `really`, `GitHub`, `harness`, `mea` and `culpa`, the vocabulary accepts `GitHub`, `harness(?:es)?` and `mea culpa`, and the text is `Use GitHub and harness. The mea culpa stands, and mea alone.`
 - **THEN** the only alert is ``warning Team.Filler: Remove 'mea'.`` for the lone `mea`, and with no vocabulary every token draws one
+
+#### Scenario: A match that holds an accepted word
+
+- **WHEN** `Team.Chain` is an `existence` rule with `ignorecase: true` and the raw pattern `with the \w+ in a folder`, the vocabulary accepts `harness(?:es)?`, and the text holds the paragraphs `Run it with the harness in a folder.`, `Run it with the Harness in a folder.`, `Run it with the harnessing in a folder.` and `Run it with the parser in a folder.`
+- **THEN** the rule alerts on the second, third and fourth paragraphs and holds back the first, as Vale 3.26.0 does with `ProseStyle.PrepositionChain` and `Vocab = ProseStyle`
 
 #### Scenario: A capitalization rule
 
@@ -109,7 +115,7 @@ It SHALL mask an accepted phrase before it checks the words.
 ### Requirement: A glob adds vocabularies for its files
 
 hakkiri SHALL hold back, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.
-The match SHALL be an accepted term of a vocabulary that a matching glob names, or lie inside an accepted phrase of one.
+The match SHALL hold an accepted word of a vocabulary that a matching glob names, as a whole word with its case, or lie inside an accepted phrase of one.
 It SHALL do so whatever the rule's `vocab` and `nonword` say, and a `capitalization` or `conditional` rule SHALL read none.
 A file SHALL take the vocabularies of every glob that matches it, besides the top-level ones.
 
@@ -132,9 +138,6 @@ A file SHALL take the vocabularies of every glob that matches it, besides the to
 
 - **WHEN** `zorbl` is accepted, and a `spelling` rule reads `Zorbl, zorbl and ZORBL.`
 - **THEN** a vocabulary at the top level holds back all three words, and a glob's vocabulary holds back `zorbl` only, and the rule reports ``Did you really mean 'Zorbl'?``
-
-[vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
-[vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
 
 ### Requirement: A YAML entry is a term, or a term with options
 
@@ -223,3 +226,5 @@ A name that is not one file name SHALL be refused.
 [yaml-vocabularies-5]: ../../changes/archive/2026-11-14-yaml-vocabularies/design.md#5-null-and-the-words-of-yaml-11
 [yaml-vocabularies-6]: ../../changes/archive/2026-11-14-yaml-vocabularies/design.md#6-the-affix-file-comes-from-the-packages-never-from-dicpath
 [yaml-vocabularies-7]: ../../changes/archive/2026-11-14-yaml-vocabularies/design.md#7-every-file-of-the-folder-joins
+[vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
+[vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
