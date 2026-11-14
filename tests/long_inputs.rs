@@ -10,6 +10,9 @@
 //! One more test reads a single sentence of 50,000 characters with a
 //! `sequence` rule, where the walk starts once for each word the anchor
 //! accepts.
+//! The last lints a long file with the `BareURL` rule of ProseStyle v0.0.16,
+//! which reached the backtrack limit at 1:1 under hakkiri 0.0.6 with the rule
+//! of ProseStyle v0.0.14 (row `HKR-070`).
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -17,6 +20,7 @@
 )]
 
 use std::error::Error;
+use std::slice;
 use std::time::{Duration, Instant};
 
 use hakkiri::alert::Alert;
@@ -187,5 +191,42 @@ fn spelling_and_affix_over_a_file_of_sixty_thousand_lines() -> TestResult {
     for (name, _) in SPELLING_RULES {
         assert_eq!(count(&alerts, name), 30_000, "{name}");
     }
+    Ok(())
+}
+
+/// The `BareURL` rule of ProseStyle v0.0.16, which reads the address of each
+/// link and alt text.
+const BARE_URL: &str = "extends: existence\nmessage: \"Bare URL '%s'\"\nlevel: error\nscope:\n  - link\n  - alt\nnonword: true\nraw:\n  - 'https?://[^\\s<>]*[^\\s<>.,;:!?\"'']'\n";
+
+#[test]
+fn a_long_file_with_bare_urls_lints_each_one() -> TestResult {
+    let rule = Rule::from_text("ProseStyle.BareURL", "ProseStyle/BareURL.yml", BARE_URL)?;
+    let count = 3_000;
+    let source: String = (0..count)
+        .map(|at| {
+            format!(
+                "See https://bare.example/page/{at} and [the docs](https://ok.example/{at}), or <https://auto.example/{at}>.\n\n"
+            )
+        })
+        .collect();
+    let tree = parse(Language::Markdown, &source)?;
+    let start = Instant::now();
+    let alerts = lint(
+        slice::from_ref(&rule),
+        &tree,
+        &source,
+        tree.language.langdex().as_slice(),
+    )?;
+    eprintln!("{} alerts in {:?}", alerts.len(), start.elapsed());
+    assert_eq!(
+        alerts.len(),
+        2 * count,
+        "one alert for each bare URL and autolink, and no failure"
+    );
+    assert!(
+        alerts
+            .iter()
+            .all(|alert| alert.rule == "ProseStyle.BareURL" && alert.line > 0)
+    );
     Ok(())
 }
