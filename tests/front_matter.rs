@@ -280,23 +280,7 @@ fn front_matter_no_parser_reads_fails_the_file_and_leaves_the_rest_linted() -> T
     for dir in ["styles", ".ctl"] {
         copy_into(&root, &fixture().join(dir), Path::new(dir))?;
     }
-    root.file(
-        "text/ok.md",
-        "---\ntitle: A very title\n---\n\nBody very.\n",
-    );
-    root.file(
-        "text/yaml.md",
-        "---\ntitle: very\nother: [open\n---\n\nBody very.\n",
-    );
-    root.file("text/toml.md", "+++\ntitle = \"open\n+++\n\nBody very.\n");
-    root.file(
-        "text/json.md",
-        ";;;\n{\"title\": \"very\", \n;;;\n\nBody very.\n",
-    );
-    root.file(
-        "text/seq.md",
-        "---\n? [a, b]\n: very seq\ntitle: very after\n---\n\nBody very.\n",
-    );
+    copy_into(&root, &fixture().join("broken"), Path::new("text"))?;
     let result = run(
         root.path(),
         &[
@@ -371,8 +355,10 @@ fn front_matter_no_parser_reads_fails_the_file_and_leaves_the_rest_linted() -> T
 /// Every form of front matter is metadata: its values are lints of the
 /// `frontmatter` scope, and no line of the block is a paragraph.
 ///
-/// Each file holds a title and the body `Body very.`, after a blank line.
-/// The last file holds a JSON key `very` and no string value.
+/// The `form-*` cases hold a title and the body `Body very.`, after a blank
+/// line. `json-key-only` holds a JSON key `very` and no string value.
+/// The snapshot lists each `Team.Para`, `Team.FmTitle` and `Team.Text` alert
+/// as its file and line.
 #[test]
 fn every_form_of_block_is_front_matter_and_no_body_text() -> TestResult {
     let suite = Suite::new("front-matter-forms");
@@ -380,35 +366,15 @@ fn every_form_of_block_is_front_matter_and_no_body_text() -> TestResult {
     for dir in ["styles", ".ctl"] {
         copy_into(&root, &fixture().join(dir), Path::new(dir))?;
     }
-    let yaml = "title: A very title";
-    let toml = "title = \"A very title\"";
-    let json = "{\"title\": \"A very title\"}";
-    let forms = [
-        ("fence", format!("---\n{yaml}\n---"), 2),
-        ("yaml", format!("---yaml\n{yaml}\n---"), 2),
-        ("toml", format!("---toml\n{toml}\n---"), 2),
-        ("json", format!("---json\n{json}\n---"), 2),
-        ("semicolons", format!(";;;\n{json}\n;;;"), 2),
-        ("plus", format!("+++\n{toml}\n+++"), 2),
-        ("bare", json.to_owned(), 1),
-        (
-            "bare-lines",
-            "{\n\"title\": \"A very title\"\n}".to_owned(),
-            2,
-        ),
-        ("dots", format!("---\n{yaml}\n..."), 2),
-    ];
-    let mut expected = Vec::new();
-    for (name, block, title) in forms {
-        let file = format!("text/{name}.md");
-        let body = block.lines().count() + 2;
-        root.file(&file, format!("{block}\n\nBody very.\n"));
-        expected.push((
-            file,
-            BTreeSet::from([(title, "Team.FmTitle"), (body, "Team.Para")]),
-        ));
+    let cases = fixture().join("cases");
+    for entry in fs::read_dir(&cases)? {
+        let entry = entry?;
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if name.starts_with("form-") || name.starts_with("json-key-only.") {
+            let target = Path::new("text").join(name.strip_suffix(".fixture").unwrap_or(&name));
+            root.file(target, fs::read(entry.path())?);
+        }
     }
-    root.file("text/key.md", ";;;\n{\"very\": 1}\n;;;\n\nBody very.\n");
     let result = run(
         root.path(),
         &[
@@ -427,28 +393,11 @@ fn every_form_of_block_is_front_matter_and_no_body_text() -> TestResult {
         result.out,
         result.err
     );
-    let rows = rows_of(&result.out)?;
-    let lines_of = |file: &str, rules: &[&str]| -> BTreeSet<(usize, String)> {
-        rows.iter()
-            .filter(|row| row.0 == file && rules.contains(&row.5.as_str()))
-            .map(|row| (row.1, row.5.clone()))
-            .collect()
-    };
-    for (file, lines) in expected {
-        let wanted = lines
-            .into_iter()
-            .map(|(line, rule)| (line, rule.to_owned()))
-            .collect();
-        assert_eq!(
-            lines_of(&file, &["Team.Para", "Team.FmTitle"]),
-            wanted,
-            "{file}: {rows:#?}"
-        );
-    }
-    assert_eq!(
-        lines_of("text/key.md", &["Team.Para", "Team.Text"]),
-        BTreeSet::from([(5, "Team.Para".to_owned()), (5, "Team.Text".to_owned())]),
-        "{rows:#?}"
-    );
+    let alerts: BTreeSet<String> = rows_of(&result.out)?
+        .into_iter()
+        .filter(|row| ["Team.Para", "Team.FmTitle", "Team.Text"].contains(&row.5.as_str()))
+        .map(|row| format!("{}:{} {}", row.0, row.1, row.5))
+        .collect();
+    insta::assert_snapshot!(alerts.into_iter().collect::<Vec<_>>().join("\n"));
     Ok(())
 }
