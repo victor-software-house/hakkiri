@@ -109,8 +109,10 @@ impl Placement {
 }
 
 /// The nodes of the comments in the fenced code block `code`, which spans
-/// `span` of `source`, or none when hakkiri reads no comments of its language,
-/// the block has none, or its code does not map line for line onto `source`.
+/// `span` of `source`.
+///
+/// There are none when hakkiri reads no comments of its language, when the
+/// block has none, and when its code does not map line for line onto `source`.
 ///
 /// Each comment node, and every node inside it, has the language of the fence.
 pub(crate) fn nodes(source: &str, span: &Range<usize>, code: &Code) -> Vec<Node> {
