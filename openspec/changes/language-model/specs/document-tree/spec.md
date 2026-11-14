@@ -2,8 +2,13 @@
 
 ### Requirement: A fenced code block takes a language
 
-A fenced code block SHALL take the langdex language that the first word of its info string names, so `rs` and `rust`, or `md` and `markdown`, name one language.  
+A fenced code block SHALL take the langdex language that the first word of its info string names, up to a comma, so `rs` and `rust`, or `md` and `markdown`, name one language, and `rust,no_run` names Rust.  
 The fence SHALL stay a gap in the prose around it.
+
+#### Scenario: A rustdoc fence
+
+- **WHEN** a Markdown file holds a fence opened with ```` ```rust,no_run ```` around `// A very good start.`, and a rule flags `very`
+- **THEN** hakkiri reports `very` in the comment
 
 #### Scenario: An alias of the language
 

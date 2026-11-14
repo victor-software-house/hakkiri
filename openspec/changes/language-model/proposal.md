@@ -4,7 +4,7 @@ Queue row: `HKR-066` in [tasks.yaml][ledger].
 
 ## Motivation
 
-hakkiri knew a file by its extension, from tables of its own in three places: the readers, the scope parser and the extension a reader gives.
+hakkiri chose the reader of a file by its extension, from tables of its own in three places: the readers, the scope parser and the extension a reader gives.
 A scope such as `text.js` compared strings, so it named an extension and not a language.
 A file with no reader took the extension `txt`, so a rule scoped `text.txt` reached `.rst` and `README` files (row [HKR-066][ledger], found by a review of pull request 131).
 A fenced code block was a gap with no language, so the comments of a ```` ```rust ```` example in a Markdown file were never read.

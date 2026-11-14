@@ -44,9 +44,10 @@ A file that `on_unknown` reads as plain text has only its own language, so `text
 
 Alternative: count the reader's language for every file. It is the defect of row `HKR-066`: every file read as plain text would be Text.
 
-### 5. A fenced code block is parsed as its language
+### 5. Fenced code is parsed with the grammar of the fence language
 
-The info string of a fenced code block names its language through `langdex::by_fence`, so ```` ```rs ```` and ```` ```rust ```` are both Rust.
+The info string of a fenced code block names its language through `langdex::by_fence`, so ```` ```rs ```` and ```` ```rust ```` are both Rust.  
+The first word counts up to a comma, as rustdoc writes ```` ```rust,no_run ````.
 When hakkiri reads the comments of that language, it parses the code of the fence with that grammar, and the comments become nodes inside the node that holds the fence, as the comments of a source file become roots.
 Each such node, and every node inside it, has that language, and a comment reads as Markdown, as decision 3 of `AGENTS.md` sets for every comment.
 The fence stays a gap in the prose around it.

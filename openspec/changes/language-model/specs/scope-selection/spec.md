@@ -2,7 +2,7 @@
 
 ### Requirement: A file extension narrows a scope
 
-**Reason**: A scope part names a language, not an extension.
+**Reason**: A scope part names a language, which may have several extensions.
 **Migration**: Read "A language narrows a scope" below.
 
 ## ADDED Requirements

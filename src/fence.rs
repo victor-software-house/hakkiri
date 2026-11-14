@@ -108,6 +108,12 @@ impl Placement {
     }
 }
 
+/// The word of the info string `lang` that names the language: all of it up to
+/// a comma, since rustdoc writes `rust,no_run`.
+fn language_word(lang: &str) -> &str {
+    lang.split_once(',').map_or(lang, |(word, _)| word)
+}
+
 /// The nodes of the comments in the fenced code block `code`, which spans
 /// `span` of `source`.
 ///
@@ -116,7 +122,12 @@ impl Placement {
 ///
 /// Each comment node, and every node inside it, has the language of the fence.
 pub(crate) fn nodes(source: &str, span: &Range<usize>, code: &Code) -> Vec<Node> {
-    let Some((language, _)) = code.lang.as_deref().and_then(langdex::by_fence) else {
+    let Some((language, _)) = code
+        .lang
+        .as_deref()
+        .map(language_word)
+        .and_then(langdex::by_fence)
+    else {
         return Vec::new();
     };
     let Some(dialect) = Language::of(language).and_then(Dialect::of) else {

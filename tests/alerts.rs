@@ -939,6 +939,13 @@ fn a_rust_fence() -> TestResult {
 }
 
 #[test]
+fn a_rustdoc_fence() -> TestResult {
+    let source = "```rust,no_run\n// A very good start.\n```\n";
+    assert_eq!(very_in("a.md", source)?, [(2, 6)]);
+    Ok(())
+}
+
+#[test]
 fn a_rust_fence_in_mdx() -> TestResult {
     let source = "Intro.\n\n```rust\n// A very good start.\nlet x = 1;\n```\n";
     assert_eq!(very_in("a.mdx", source)?, [(4, 6)]);

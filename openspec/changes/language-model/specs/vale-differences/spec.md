@@ -33,4 +33,4 @@ Vale 66bbb85 finds no format for such a file and lints nothing in it.
 
 [language-model-2]: ../../design.md#2-the-language-of-a-file
 [language-model-4]: ../../design.md#4-a-scope-part-names-a-language
-[language-model-5]: ../../design.md#5-a-fenced-code-block-is-parsed-as-its-language
+[language-model-5]: ../../design.md#5-fenced-code-is-parsed-with-the-grammar-of-the-fence-language
