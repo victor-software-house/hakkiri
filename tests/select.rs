@@ -786,6 +786,16 @@ fn a_front_matter_part_ends_in_the_extension_of_a_language() -> TestResult {
 }
 
 #[test]
+fn a_front_matter_part_that_names_markdown_limits_every_value() -> TestResult {
+    let source = "---\ntitle: A start.\nsummary: An end.\n---\n\nBody.\n";
+    let markdown = blocks(&["frontmatter.md"], "a.md", source)?;
+    let mdx = blocks(&["frontmatter.md"], "a.mdx", source)?;
+    assert_eq!(markdown.len(), 2, "every value of the Markdown file");
+    assert_eq!(mdx.len(), 0, "no value of an MDX file");
+    Ok(())
+}
+
+#[test]
 fn a_front_matter_key_that_is_an_extension_stays_a_key() -> TestResult {
     let source = "---\ntoc: A very good start.\n---\n\nBody.\n";
     let found = blocks(&["frontmatter.toc"], "a.md", source)?;

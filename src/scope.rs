@@ -8,7 +8,7 @@
 
 use std::{error, fmt};
 
-use crate::language::Language;
+use crate::language::Language as Reader;
 use crate::tree::Scope as NodeScope;
 
 /// A language a scope part names.
@@ -168,10 +168,8 @@ impl Selector {
                     && let Some(named_parts) = scope_names(rest, negated)
                     && let Some(language) =
                         langdex::by_extension(piece).or_else(|| langdex::by_name(piece))
-                    && matches!(
-                        Language::of(language),
-                        Some(Language::Markdown | Language::Mdx)
-                    ) {
+                    && matches!(Reader::of(language), Some(Reader::Markdown | Reader::Mdx))
+                {
                     (named_parts, Some(language))
                 } else if let Some(named_parts) = scope_names(written, negated) {
                     (named_parts, None)
