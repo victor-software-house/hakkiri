@@ -1,0 +1,9 @@
+---
+plain:
+  text here
+list:
+  - a
+map:
+  k: v
+empty:
+---

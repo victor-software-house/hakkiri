@@ -1,0 +1,11 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/json-object.md.fixture
+---
+block: lines 1 to 3
+values:
+  title: "A very json"
+  s: "z"
+fault: none
+body: line 5

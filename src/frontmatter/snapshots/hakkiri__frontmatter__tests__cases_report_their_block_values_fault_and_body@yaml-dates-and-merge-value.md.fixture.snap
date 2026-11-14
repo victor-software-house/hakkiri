@@ -1,0 +1,11 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-dates-and-merge-value.md.fixture
+---
+block: lines 1 to 7
+values:
+  d: "2024-01-01"
+  e: "2024-01-01"
+fault: none
+body: none

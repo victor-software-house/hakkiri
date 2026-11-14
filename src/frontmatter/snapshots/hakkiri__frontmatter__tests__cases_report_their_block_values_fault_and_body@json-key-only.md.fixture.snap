@@ -1,0 +1,9 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/json-key-only.md.fixture
+---
+block: lines 1 to 3
+values: none
+fault: none
+body: line 5

@@ -1,0 +1,13 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-strings.md.fixture
+---
+block: lines 1 to 11
+values:
+  title: "A very title"
+  quoted: "a very quoted"
+  single: "a very single"
+  plain: "two"
+fault: none
+body: none

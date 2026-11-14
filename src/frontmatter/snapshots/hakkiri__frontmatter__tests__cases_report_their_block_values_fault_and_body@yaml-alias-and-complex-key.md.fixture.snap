@@ -1,0 +1,11 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-alias-and-complex-key.md.fixture
+---
+block: lines 1 to 7
+values:
+  a: "text"
+  c: "after"
+fault: none
+body: none

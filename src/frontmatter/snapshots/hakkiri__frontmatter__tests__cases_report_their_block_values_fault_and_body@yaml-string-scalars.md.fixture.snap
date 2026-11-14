@@ -1,0 +1,18 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-string-scalars.md.fixture
+---
+block: lines 1 to 11
+values:
+  a: "yes"
+  b: "no"
+  c: "on"
+  d: "off"
+  e: "12:30"
+  f: "1,000"
+  g: "v1.0"
+  h: "1.2.3"
+  i: "a:b"
+fault: none
+body: none

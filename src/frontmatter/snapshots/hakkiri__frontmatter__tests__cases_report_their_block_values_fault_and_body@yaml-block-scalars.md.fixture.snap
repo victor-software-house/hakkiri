@@ -1,0 +1,11 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-block-scalars.md.fixture
+---
+block: lines 1 to 8
+values:
+  folded: "one very two"
+  literal: "three\nfour"
+fault: none
+body: none

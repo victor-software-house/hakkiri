@@ -1,0 +1,12 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-number-and-null-keys.md.fixture
+---
+block: lines 1 to 7
+values:
+  1: "one"
+  null: "two"
+  title: "three"
+fault: none
+body: none
