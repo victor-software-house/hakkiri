@@ -1,0 +1,3 @@
+let c = #"charlie // not comment"#
+let d = ##"delta "# // still raw"##
+let e = 1

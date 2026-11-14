@@ -1,0 +1,17 @@
+//! Inner alpha doc line [Name] link.
+//! Second [`Code`] inner line.
+
+// bravo plain line
+/// charlie outer doc [crate::Name] link.
+/// delta [Name](url) with target and [Name][ref] ref.
+pub fn f() {}
+let s = "juliet // not comment";
+let r = r#"kilo // not "# comment"#;
+let c = '/'; // lima after char
+let l: &'static str = "mike"; // november trailing
+#[doc = "oscar // not a comment"]
+//// papa quad
+///romeo nospace
+/// sierra [Name]
+/// tango
+/// uniform [`Name`] link

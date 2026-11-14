@@ -1,0 +1,7 @@
+extends: existence
+message: "W '%s'"
+level: warning
+scope: text
+nonword: true
+tokens:
+  - '[A-Za-z][A-Za-z0-9]+'

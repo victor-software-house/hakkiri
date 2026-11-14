@@ -1,0 +1,4 @@
+/// Run it like this:
+///
+///     swift run tool
+func f() {}

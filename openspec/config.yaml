@@ -3,7 +3,7 @@ schema: spec-driven
 
 context: |
   hakkiri is a prose linter in Rust for Markdown, MDX, and the comments of
-  Rust, TypeScript and JavaScript. It replaces Vale in projects that use the
+  Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell. It replaces Vale in projects that use the
   ProseStyle rule package. Rules pick nodes in a document tree first, and a
   pattern only narrows that pick. Each source language has a profile that maps
   its comments and doc comments into the tree.

@@ -27,7 +27,12 @@ fn a_language_hakkiri_has_no_reader_for_maps_to_none() {
 #[test]
 fn extension_gives_the_first_extension_of_each_reader() {
     let got: Vec<&str> = Language::ALL.into_iter().map(Language::extension).collect();
-    assert_eq!(got, ["md", "mdx", "rs", "ts", "tsx", "js", "txt"]);
+    assert_eq!(
+        got,
+        [
+            "md", "mdx", "rs", "ts", "tsx", "js", "go", "swift", "yml", "toml", "sh", "txt"
+        ]
+    );
 }
 
 #[test]
@@ -40,7 +45,7 @@ fn from_path_reads_the_langdex_language_of_the_path() {
     assert_eq!(of("a.tsx"), Some(Language::Tsx));
     assert_eq!(of("LICENSE"), Some(Language::Text));
     assert_eq!(of("notes.txt"), Some(Language::Text));
-    assert_eq!(of("Cargo.toml"), None);
+    assert_eq!(of("Cargo.toml"), Some(Language::Toml));
     assert_eq!(of("README"), None);
 }
 

@@ -1,0 +1,12 @@
+// line comment
+/// doc line
+/* block */
+/** doc block */
+let a = "alpha // not comment"
+let f = 1 // trailing
+//: playground markup
+// MARK: - Section
+// TODO: thing
+/*:
+ playground block
+ */

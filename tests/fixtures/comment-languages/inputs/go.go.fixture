@@ -1,0 +1,45 @@
+// Package demo has a line comment here.
+package demo
+
+/* A block comment
+   over two lines. */
+var a = "alpha // not comment"
+var b = `bravo // not comment`
+var c = '/' // after rune
+/* outer /* inner */ tail
+var d = 1 /* inline block */ + 2
+
+// Name does a thing.
+// Second line [Other] link.
+//
+// Third para.
+func Name() {}
+
+//go:build linux
+//nolint:all
+//export foo
+//lint:ignore X reason
+//line foo.go:10
+// regular after directives
+
+/*
+ * Starred block
+ * with lines
+ */
+func f() {
+	s := "/* charlie not a block */"
+	_ = s
+	r := `
+// delta still raw
+/* echo also raw */
+`
+	_ = r
+}
+//nospace
+//	tabbed
+///triple
+////quad
+/**/
+/***/
+var e = "esc \" // foxtrot"
+var g = "back\\" // golf trailing

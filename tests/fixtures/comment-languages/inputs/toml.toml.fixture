@@ -1,0 +1,21 @@
+# top
+key = "value" # trailing
+s = "a # alpha"
+l = 'lit # bravo'
+ml = """
+# charlie inside multi-line
+text # more
+"""
+lml = '''
+# delta inside literal
+'''
+arr = [1, # c1
+  2, # c2
+]
+[table] # table comment
+inline = { a = 1, b = "#" } # inline comment
+#nospace
+## double
+emptyc = 1 #
+esc = "a \" # echo"
+[[arr2]] # array table

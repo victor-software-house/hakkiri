@@ -1,0 +1,1 @@
+let b = "bravo \(1 /* inside interp */) end"

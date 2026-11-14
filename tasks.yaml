@@ -31,6 +31,9 @@ queue:
     notes:
       - "2026-11-11, operator decision: this row moves from the horizon to the queue, after HKR-008. It promises Vale's 26 languages plus Bash, HCL, Kotlin, Nix, Solidity and YAML, with the binary-size cost measured before it ships."
       - '2026-11-11, operator request: TOML is read, which neither Vale nor the earlier list covered.'
+      - '2026-11-12, first tranche in openspec/changes/comment-languages: Go, Swift, Bash, YAML and TOML, the languages the eleven repositories of the group use (140 TOML, 118 YAML and 69 shell files, and Go modules and Swift packages in the template), each one dialect row with a fixture, and the tool directives, doc masks and line-comment indentation that every dialect shares. Rego and Nushell files also appear and have no crate. The other languages of the list stay open.'
+      - '2026-11-12, size of the first tranche, release builds in a box: 15,264,456 bytes before and 21,171,528 after, and 76 and 82 seconds. By the size of each grammar crate archive Swift is 5.8 MB, Bash 1.5 MB, Go 0.36 MB, YAML 0.24 MB and TOML 0.06 MB, against 3.4 MB for TypeScript with TSX, 1.4 MB for Rust and 0.6 MB for JavaScript, so the grammars of the other languages are the cost to expect.'
+    plan: openspec/changes/comment-languages/proposal.md
 
   - id: HKR-035
     title: Import a Vale config

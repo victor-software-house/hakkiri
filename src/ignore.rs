@@ -20,10 +20,10 @@ mod tests;
 use std::ops::Range;
 
 use crate::error::Error;
-use crate::frontmatter;
 use crate::markdown::{self, Flavor};
 use crate::pattern::{FirstGroup, Pattern, SearchError};
 use crate::tree::{Comment, Node, Scope, remap_nodes};
+use crate::{Parsed, frontmatter};
 
 /// What a block pattern's match turns into, on each side of its first group.
 const BLOCK: (&str, &str) = ("\n```\n", "\n```\n");
@@ -205,7 +205,8 @@ pub(crate) fn restore(nodes: &mut Vec<Node>, changed: &Changed) {
 }
 
 /// The tree of a whole Markdown or MDX file that the patterns rewrote: one
-/// `raw` root over the prose nodes, and the number of its code blocks.
+/// `raw` root over the prose nodes, the number of its code blocks, its HTML
+/// comments, and the masks of the doc links in its fences.
 ///
 /// # Errors
 ///
@@ -216,7 +217,7 @@ pub(crate) fn document(
     flavor: Flavor,
     blocks: &[&Pattern],
     tokens: &[&Pattern],
-) -> Result<(Vec<Node>, usize, Vec<Comment>), Error> {
+) -> Result<Parsed, Error> {
     if blocks.is_empty() && tokens.is_empty() {
         return markdown::document(source, flavor);
     }
@@ -237,9 +238,16 @@ pub(crate) fn document(
             Some(Comment { at, ..comment })
         })
         .collect();
+    // A mask the rewrite moved lies where the file has its text.
+    let masks = built
+        .masks
+        .into_iter()
+        .flat_map(|mask| changed.origin(mask))
+        .collect();
     Ok((
         vec![Node::new(Scope::Raw, 0..source.len(), built.nodes)],
         built.code_blocks,
         comments,
+        masks,
     ))
 }

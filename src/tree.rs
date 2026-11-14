@@ -494,11 +494,28 @@ pub struct Tree {
     /// MDX file, in file order, which may turn rules off and on. A source file
     /// gives none.
     pub comments: Vec<Comment>,
+    /// The file bytes of the text that a doc comment marks as no prose, such
+    /// as a Go doc link. An alert whose match lies wholly in one is dropped.
+    /// A Markdown or MDX file gives those of the comments in its fences.
+    pub masks: Vec<Range<usize>>,
     /// Why the front matter of a Markdown or MDX file is no YAML, TOML or JSON
     /// that its parser reads, as the line of the file and the parser's words.
     /// The tree holds no value of such a block, and the rest of the file is
     /// read as written.
     pub front_matter_fault: Option<String>,
+}
+
+impl Tree {
+    /// Whether the file bytes `range` lie wholly in text that a doc comment
+    /// marks as no prose.
+    ///
+    /// Vale drops an alert whose match lies wholly in such text, and hakkiri
+    /// does the same, so the words around it keep their counts.
+    pub(crate) fn is_masked(&self, range: &Range<usize>) -> bool {
+        self.masks
+            .iter()
+            .any(|mask| mask.start <= range.start && range.end <= mask.end)
+    }
 }
 
 /// One HTML comment of a Markdown file.

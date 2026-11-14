@@ -68,13 +68,42 @@ impl Tag {
         if matches!(
             name,
             "param"
-                | "typedef"
-                | "property"
-                | "prop"
                 | "arg"
                 | "argument"
-                | "template"
+                | "prop"
+                | "property"
+                | "typedef"
                 | "callback"
+                | "event"
+                | "member"
+                | "var"
+                | "name"
+                | "alias"
+                | "memberof"
+                | "augments"
+                | "extends"
+                | "mixes"
+                | "borrows"
+                | "function"
+                | "func"
+                | "method"
+                | "class"
+                | "constructor"
+                | "namespace"
+                | "module"
+                | "enum"
+                | "external"
+                | "host"
+                | "kind"
+                | "listens"
+                | "fires"
+                | "emits"
+                | "this"
+                | "requires"
+                | "template"
+                | "implements"
+                | "satisfies"
+                | "see"
         ) {
             at = skip_name(line, at);
         }
@@ -101,6 +130,10 @@ fn skip_type(line: &str, at: usize) -> usize {
 /// The offset in `line` after the name at `at` and the hyphen that follows it.
 fn skip_name(line: &str, at: usize) -> usize {
     let rest = line.get(at..).unwrap_or_default();
+    // `@see {@link X} for more` names nothing: the link is an inline tag.
+    if rest.starts_with("{@") {
+        return at;
+    }
     let name = if rest.starts_with('[') {
         closing(rest, '[', ']').map_or(0, |closed| closed + 1)
     } else {
