@@ -4,8 +4,10 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use globset::{GlobBuilder, GlobMatcher};
+use globset::GlobMatcher;
 use hakkiri::Language;
+
+use crate::config::standard_glob;
 
 /// A key that holds one of these is a glob, as in Vale's `[formats]`.
 const GLOB_MARKS: [char; 4] = ['*', '?', '[', '{'];
@@ -44,9 +46,7 @@ impl Formats {
             )
         })?;
         let glob = if key.contains(GLOB_MARKS) || key.contains('/') {
-            let compiled = GlobBuilder::new(key)
-                .build()
-                .map_err(|error| format!("is not a glob: {error}"))?;
+            let compiled = standard_glob(key).map_err(|error| format!("is not a glob: {error}"))?;
             Some(compiled.compile_matcher())
         } else {
             None

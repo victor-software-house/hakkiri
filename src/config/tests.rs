@@ -2,7 +2,7 @@
 
 use std::cmp::Reverse;
 
-use super::{MAX_ALTERNATIVES, alternatives, specificity};
+use super::{MAX_ALTERNATIVES, alternatives, specificity, standard_glob};
 
 /// A glob and its specificity: the parts of literal characters only, the parts
 /// of a literal character and something else, the parts that are `**`, and the
@@ -94,4 +94,48 @@ fn a_glob_over_the_limit_of_alternatives_is_refused() {
         Some(MAX_ALTERNATIVES)
     );
     assert_eq!(alternatives(&"{a,b}".repeat(9)), None);
+}
+
+/// Whether the glob `pattern` matches `path`.
+fn matches(pattern: &str, path: &str) -> bool {
+    standard_glob(pattern).is_ok_and(|glob| glob.compile_matcher().is_match(path))
+}
+
+#[test]
+fn a_star_stays_inside_one_folder() {
+    assert!(matches("docs/*.md", "docs/a.md"));
+    assert!(!matches("docs/*.md", "docs/x/a.md"));
+}
+
+#[test]
+fn a_pattern_with_no_slash_matches_the_file_name_in_any_folder() {
+    assert!(matches("*.md", "a.md"));
+    assert!(matches("*.md", "docs/x/a.md"));
+    assert!(matches("README.md", "docs/README.md"));
+}
+
+#[test]
+fn a_trailing_double_star_matches_below_the_folder_only() {
+    assert!(matches("tests/oracle/*/**", "tests/oracle/x/a.md"));
+    assert!(!matches("tests/oracle/*/**", "tests/oracle/a.md"));
+}
+
+#[test]
+fn a_leading_slash_ties_the_pattern_to_the_root() {
+    assert!(matches("/a.md", "a.md"));
+    assert!(!matches("/a.md", "docs/a.md"));
+}
+
+#[test]
+fn a_trailing_slash_matches_what_the_folder_holds() {
+    assert!(matches("docs/", "docs/a.md"));
+    assert!(matches("docs/", "docs/x/a.md"));
+    assert!(!matches("docs/", "docs.md"));
+}
+
+#[test]
+fn a_double_star_spans_folders() {
+    assert!(matches("**/*.md", "a.md"));
+    assert!(matches("docs/**/a.md", "docs/a.md"));
+    assert!(matches("docs/**/a.md", "docs/x/y/a.md"));
 }

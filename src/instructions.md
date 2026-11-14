@@ -124,7 +124,7 @@ files:
   CHANGELOG.md: {styles: []}
 ```
 
-- The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every `path` and glob is relative to the project root, the folder that holds `.ctl`, and a file outside it matches no glob. A path given outside the root draws a warning on standard error, and a run where no path lies under the root exits 2.
+- The config is `.ctl/hakkiri.yaml` in the current directory, or the file `--config` names. Every `path` and glob is relative to the project root, the folder that holds `.ctl`, and a file outside it matches no glob. A glob reads as gitignore reads one: `*`, `?` and a class stay inside one folder, and `**` spans folders. A glob with no `/` matches the file name in any folder, a leading `/` ties it to the root, and a trailing `/` matches every file the folder holds. So `docs/*.md` matches `docs/a.md` and not `docs/x/a.md`. A path given outside the root draws a warning on standard error, and a run where no path lies under the root exits 2.
 - A key the config does not define is an error that names the key and its line.
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
 - `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` set the options of the same names for `check`. Only the project's config holds them, and a package's settings file that does is an error.
