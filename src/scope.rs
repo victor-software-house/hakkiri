@@ -156,18 +156,18 @@ impl Selector {
                 let (negated, written) = written
                     .strip_prefix('~')
                     .map_or((false, written), |rest| (true, rest.trim()));
-                // A key of the front matter may be any name, so a front matter
-                // part ends in a language when its last piece is the extension
-                // of Markdown or MDX, the languages that hold front matter, as
-                // `frontmatter.title.md` does. Any other part ends
-                // in a language only when the whole part is no scope, and the
-                // rest of it is one.
+                // A key of the front matter may be any name. So a front matter
+                // part ends in a language when its last piece names Markdown or
+                // MDX, the languages that hold front matter. Any other part
+                // ends in a language only when the whole part is no scope, and
+                // the rest of it is one.
                 let front =
                     written.starts_with("frontmatter.") || written.starts_with("text.frontmatter.");
                 let (named_parts, language) = if front
                     && let Some((rest, piece)) = written.rsplit_once('.')
                     && let Some(named_parts) = scope_names(rest, negated)
-                    && let Some(language) = langdex::by_extension(piece)
+                    && let Some(language) =
+                        langdex::by_extension(piece).or_else(|| langdex::by_name(piece))
                     && matches!(
                         Language::of(language),
                         Some(Language::Markdown | Language::Mdx)

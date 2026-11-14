@@ -778,6 +778,8 @@ fn a_front_matter_part_ends_in_the_extension_of_a_language() -> TestResult {
     let source = "---\ntitle: A very good start.\n---\n\nBody.\n";
     let markdown = blocks(&["frontmatter.title.md"], "a.md", source)?;
     let mdx = blocks(&["frontmatter.title.md"], "a.mdx", source)?;
+    let named = blocks(&["frontmatter.title.markdown"], "a.md", source)?;
+    assert_eq!(named.len(), 1, "a name of Markdown ends the part too");
     assert_eq!(markdown.len(), 1, "the title of the Markdown file");
     assert_eq!(mdx.len(), 0, "no block of an MDX file");
     Ok(())
