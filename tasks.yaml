@@ -114,7 +114,7 @@ queue:
       - The ProseStyle v0.0.14 BareURL case for a URL in a link title gives the same alert under hakkiri as under Vale, with the rule reading the new scope.
     notes:
       - '2026-11-11, found by the BareURL comparison of the ProseStyle port: on 24 planted Markdown shapes hakkiri and Vale 3.26.0 with the v0.0.14 rules alerted on the same lines except two. hakkiri flags a URL in plain parentheses or double quotes that v0.0.14 passes, which is right. v0.0.14 flags the URL in [t](https://a.example/a "see https://b.example/b"), a link title, which no scope hakkiri reads holds.'
-    plan: openspec/changes/link-title/proposal.md
+      - 2026-11-14, the title scope shipped in pull request 120 and the link-title change is archived. Acceptance 2 waits for ProseStyle BareURL to read title, in the prose-style package.
 
   - id: HKR-058
     title: Build the text of a long block in time that grows with its length
