@@ -9,10 +9,10 @@ Each top-level string of a file's YAML, TOML or JSON front matter is a node of t
 ### Requirement: A top-level string of front matter is text
 
 In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
-The front matter is YAML between `---` lines, TOML between `+++` lines, or JSON between `;;;` lines.  
+The front matter is the block at the top of the file, in a form of the next requirement.  
 A key, a list, a nested mapping and a value that is not a string SHALL not be read.  
 A TOML string below a table and a member of a nested JSON object SHALL not be read.  
-An opening fence line MAY carry blanks after the dashes or pluses.
+A YAML key that is a list, a mapping or an alias SHALL give no value, and the entries after it SHALL be read.
 
 #### Scenario: Values of several kinds
 
@@ -22,7 +22,7 @@ An opening fence line MAY carry blanks after the dashes or pluses.
 #### Scenario: Scalars that resolve to a string
 
 - **WHEN** the values are `yes`, `no`, `on`, `off`, `y`, `n`, `12:30`, `1,000`, `1.2.3`, `v1.0`, `1e`, `0xZZ`, `a:b` and `!!str tagged`
-- **THEN** each is read as text, and `null`, `~`, `true`, `0x1f`, `1_000`, `1e3`, `.inf`, `2024-01-01`, `<<` and `!!int 3` are not
+- **THEN** each is read as text, and `null`, `~`, `true`, `0x1f`, `1_000`, `0b11`, `1e3`, `.inf`, `2024-01-01`, `<<` and `!!int 3` are not
 
 #### Scenario: Dates and the merge key
 
@@ -63,6 +63,24 @@ An opening fence line MAY carry blanks after the dashes or pluses.
 
 - **WHEN** an MDX file starts with YAML front matter that holds a title
 - **THEN** a text rule reads the title as it does in a Markdown file
+
+### Requirement: Front matter takes every form of block
+
+YAML front matter SHALL sit between `---` lines, after a `---yaml` line, or before a closing `...` line.  
+TOML front matter SHALL sit between `+++` lines or after a `---toml` line.  
+JSON front matter SHALL sit between `;;;` lines, after a `---json` line, or in an object that opens with `{` on the first line.  
+An opening fence line MAY carry blanks after the dashes or pluses.  
+The block SHALL be no part of the body: no rule reads its lines as a paragraph, a heading or a sentence.
+
+#### Scenario: Every form of block
+
+- **WHEN** a Markdown file starts with `---yaml`, `---toml`, `---json`, a bare `{"title": "Install guide"}` line, or a YAML block closed by `...`, and the title holds `Install`
+- **THEN** a text rule that flags `Install` reports it once, in the title
+
+#### Scenario: The block is no body text
+
+- **WHEN** a Markdown file starts with `;;;`, `{"Install": 1}` and `;;;`, and a rule scoped `paragraph` flags `Install`
+- **THEN** the rule reports nothing, since the key is no value and the block is no paragraph
 
 ### Requirement: A value has the scope of its key
 

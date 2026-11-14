@@ -48,7 +48,7 @@ hakkiri SHALL read the front matter values as Vale does, and put each alert at t
 - **THEN** hakkiri reads the values of the block
 - **AND** Vale 3.26.0 fails the file with `E201` on line 1, since it reads the fence line as YAML ([front-matter-crate 2][front-matter-crate-2])
 
-[front-matter-values-5]: ../../../archive/2026-11-14-front-matter-values/design.md#5-where-vale-puts-an-alert
-[front-matter-values-6]: ../../../archive/2026-11-14-front-matter-values/design.md#6-a-block-no-parser-reads-is-a-fault-of-the-file
+[front-matter-values-5]: ../../../2026-11-14-front-matter-values/design.md#5-where-vale-puts-an-alert
+[front-matter-values-6]: ../../../2026-11-14-front-matter-values/design.md#6-a-block-no-parser-reads-is-a-fault-of-the-file
 [front-matter-crate-2]: ../../design.md#2-every-form-the-crate-finds-is-front-matter
 [front-matter-crate-3]: ../../design.md#3-the-block-is-cut-from-the-body-for-every-form

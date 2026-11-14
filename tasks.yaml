@@ -161,24 +161,6 @@ queue:
       - '2026-11-12, operator decision: a code span counts as one word by default, a setting sets it to zero, at the package, project and glob levels, with a flag and a variable. The key is code_span_size, and its unit is words.'
       - It applies only to word counts and to the metrics built on words. HKR-051 keeps the rule form of LongSentence; this row gives a project the way to count as Vale does.
 
-  - id: HKR-068
-    title: Read front matter with a parser per format
-    scope: engine
-    outcome: >-
-      A front-matter crate in its own repository finds a YAML, TOML or JSON block and gives each value its key, byte span and string, and hakkiri reads front matter through it instead of ctl-core Input.
-    blocked_by: []
-    acceptance:
-      - The crate reads ---, +++, ;;;, ---yaml, ---toml, ---json and a bare { object, and a YAML block may close with ..., each with a test.
-      - 'A ;;; block that is not JSON, such as {title: Install guide}, fails the file with a message that names its line, and the body is still linted.'
-      - JSON is read by struson and passes the JSONTestSuite cases the crate pins.
-      - hakkiri cuts the block of every form from the body, so no paragraph, heading or sentence rule reads its lines.
-    notes:
-      - '2026-11-13, operator decisions: front matter is document content, not CLI config; the crate is MIT OR Apache-2.0; JSON is read as JSON with struson, picked by a trial against JSONTestSuite; YAML may close with ....'
-      - '2026-11-13, found by the Kody thread on PR 133: JSON front matter went through the YAML reader of ctl-core.'
-      - '2026-11-14, operator decision: the crate lives in its own public repository, like langdex, released to crates.io, instead of a hakkiri workspace.'
-      - '2026-11-14, a Vale 3.26.0 probe: it lints the lines of a ;;;, ---toml or bare { block, and of YAML closed by ..., as a paragraph too, and fails ---yaml and ---json with E201. hakkiri reads all eight forms and cuts each block from the body.'
-    plan: openspec/changes/front-matter-crate/proposal.md
-
   - id: HKR-073
     title: State which matches an accepted word holds back
     scope: docs
@@ -209,6 +191,22 @@ queue:
     plan: openspec/changes/block-alert-placement/proposal.md
 
 archive:
+  - id: HKR-068
+    title: Read front matter with a parser per format
+    scope: engine
+    outcome: >-
+      A front-matter crate in its own repository finds a YAML, TOML or JSON block and gives each value its key, byte span and string, and hakkiri reads front matter through it instead of ctl-core Input.
+    notes:
+      - '2026-11-13, operator decisions: front matter is document content, not CLI config; the crate is MIT OR Apache-2.0; JSON is read as JSON with struson, picked by a trial against JSONTestSuite; YAML may close with ....'
+      - '2026-11-13, found by the Kody thread on PR 133: JSON front matter went through the YAML reader of ctl-core.'
+      - '2026-11-14, operator decision: the crate lives in its own public repository, like langdex, released to crates.io, instead of a hakkiri workspace.'
+      - '2026-11-14, a Vale 3.26.0 probe: it lints the lines of a ;;;, ---toml or bare { block, and of YAML closed by ..., as a paragraph too, and fails ---yaml and ---json with E201. hakkiri reads all eight forms and cuts each block from the body.'
+    plan: openspec/changes/archive/2026-11-14-front-matter-crate/proposal.md
+    completed: 2026-11-14T11:06:15
+    evidence:
+      - openspec/changes/archive/2026-11-14-front-matter-crate/
+    disposition: completed
+
   - id: HKR-075
     title: Read the alt text of an inline img tag as Vale does
     scope: tree

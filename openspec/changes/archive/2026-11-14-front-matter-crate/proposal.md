@@ -27,4 +27,4 @@ This change is row `HKR-068` of the [ledger].
 - `src/frontmatter.rs` and `src/markdown.rs` change; markdown-rs's front matter construct is off.
 
 [front-matter]: https://crates.io/crates/front-matter
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml

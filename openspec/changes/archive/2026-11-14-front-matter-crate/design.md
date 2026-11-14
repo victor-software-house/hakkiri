@@ -81,5 +81,5 @@ A key alerts only where Vale lints the block as a paragraph.
 
 [front-matter]: https://crates.io/crates/front-matter
 [fm-keys]: https://github.com/victor-software-house/front-matter/pull/9
-[front-matter-values]: ../archive/2026-11-14-front-matter-values/design.md
+[front-matter-values]: ../2026-11-14-front-matter-values/design.md
 [v-meta]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/metadata.go
