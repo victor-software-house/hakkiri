@@ -192,6 +192,40 @@ fn leave_out_the_misplaced(vale: &mut BTreeSet<Row>, ours: &mut BTreeSet<Row>) {
     }
 }
 
+/// The alerts that Vale gives on the lines of a `;;;` block and hakkiri does
+/// not, each as a file, a line, a column and a rule.
+///
+/// Vale lints the lines of a `;;;` block as a paragraph too (design decision 3
+/// of `front-matter-crate`), where hakkiri cuts every block from the body.
+/// The `Team.Text` alert at line 2, column 14 of `text/f8.md` stays, because
+/// the title is a value of the front matter, which that rule reads.
+const BLOCK_AS_PARAGRAPH: [(&str, usize, usize, &str); 7] = [
+    ("text/f8.md", 2, 14, "Team.Para"),
+    ("text/f8.md", 2, 54, "Team.Para"),
+    ("text/f8.md", 2, 79, "Team.Para"),
+    ("text/f8.md", 2, 54, "Team.Text"),
+    ("text/f8.md", 2, 79, "Team.Text"),
+    ("text/f9.md", 3, 15, "Team.Para"),
+    ("text/f9.md", 4, 20, "Team.Para"),
+];
+
+/// Takes the alerts of the `;;;` blocks as a paragraph out of Vale's set,
+/// after asserting that Vale holds each, and asserts that hakkiri holds none.
+fn leave_out_the_block_as_paragraph(vale: &mut BTreeSet<Row>, ours: &BTreeSet<Row>) {
+    for (file, line, column, rule) in BLOCK_AS_PARAGRAPH {
+        let is = |row: &Row| row.0 == file && row.1 == line && row.2 == column && row.5 == rule;
+        assert!(
+            vale.iter().any(is),
+            "Vale gave no {rule} at {file}:{line}:{column}"
+        );
+        vale.retain(|row| !is(row));
+        assert!(
+            !ours.iter().any(is),
+            "hakkiri gave {rule} at {file}:{line}:{column}"
+        );
+    }
+}
+
 /// The configs of the fixture: no pattern, a token pattern with no group and a
 /// token pattern with a group. Vale reads the metadata before it rewrites the
 /// body, so the patterns change no value of the front matter.
@@ -221,6 +255,7 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
         let mut ours = rows_of(&result.out)?;
         let mut vale = vale_rows(name)?;
         leave_out_the_misplaced(&mut vale, &mut ours);
+        leave_out_the_block_as_paragraph(&mut vale, &ours);
         let only_vale: Vec<_> = vale.difference(&ours).collect();
         let only_ours: Vec<_> = ours.difference(&vale).collect();
         assert!(
@@ -330,5 +365,90 @@ fn front_matter_no_parser_reads_fails_the_file_and_leaves_the_rest_linted() -> T
         "very".to_owned(),
     );
     assert!(rows.contains(&after), "{rows:#?}");
+    Ok(())
+}
+
+/// Every form of front matter is metadata: its values are lints of the
+/// `frontmatter` scope, and no line of the block is a paragraph.
+///
+/// Each file holds a title and the body `Body very.`, after a blank line.
+/// The last file holds a JSON key `very` and no string value.
+#[test]
+fn every_form_of_block_is_front_matter_and_no_body_text() -> TestResult {
+    let suite = Suite::new("front-matter-forms");
+    let root = suite.scenario("forms");
+    for dir in ["styles", ".ctl"] {
+        copy_into(&root, &fixture().join(dir), Path::new(dir))?;
+    }
+    let yaml = "title: A very title";
+    let toml = "title = \"A very title\"";
+    let json = "{\"title\": \"A very title\"}";
+    let forms = [
+        ("fence", format!("---\n{yaml}\n---"), 2),
+        ("yaml", format!("---yaml\n{yaml}\n---"), 2),
+        ("toml", format!("---toml\n{toml}\n---"), 2),
+        ("json", format!("---json\n{json}\n---"), 2),
+        ("semicolons", format!(";;;\n{json}\n;;;"), 2),
+        ("plus", format!("+++\n{toml}\n+++"), 2),
+        ("bare", json.to_owned(), 1),
+        (
+            "bare-lines",
+            "{\n\"title\": \"A very title\"\n}".to_owned(),
+            2,
+        ),
+        ("dots", format!("---\n{yaml}\n..."), 2),
+    ];
+    let mut expected = Vec::new();
+    for (name, block, title) in forms {
+        let file = format!("text/{name}.md");
+        let body = block.lines().count() + 2;
+        root.file(&file, format!("{block}\n\nBody very.\n"));
+        expected.push((
+            file,
+            BTreeSet::from([(title, "Team.FmTitle"), (body, "Team.Para")]),
+        ));
+    }
+    root.file("text/key.md", ";;;\n{\"very\": 1}\n;;;\n\nBody very.\n");
+    let result = run(
+        root.path(),
+        &[
+            "check",
+            "--config",
+            ".ctl/all.yaml",
+            "--format",
+            "json",
+            "text",
+        ],
+        &[],
+    )?;
+    assert!(
+        result.code == 0 || result.code == 1,
+        "{}{}",
+        result.out,
+        result.err
+    );
+    let rows = rows_of(&result.out)?;
+    let lines_of = |file: &str, rules: &[&str]| -> BTreeSet<(usize, String)> {
+        rows.iter()
+            .filter(|row| row.0 == file && rules.contains(&row.5.as_str()))
+            .map(|row| (row.1, row.5.clone()))
+            .collect()
+    };
+    for (file, lines) in expected {
+        let wanted = lines
+            .into_iter()
+            .map(|(line, rule)| (line, rule.to_owned()))
+            .collect();
+        assert_eq!(
+            lines_of(&file, &["Team.Para", "Team.FmTitle"]),
+            wanted,
+            "{file}: {rows:#?}"
+        );
+    }
+    assert_eq!(
+        lines_of("text/key.md", &["Team.Para", "Team.Text"]),
+        BTreeSet::from([(5, "Team.Para".to_owned()), (5, "Team.Text".to_owned())]),
+        "{rows:#?}"
+    );
     Ok(())
 }
