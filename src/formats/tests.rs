@@ -1,5 +1,10 @@
 //! The unit tests of the `formats` entries.
 
+#![expect(
+    clippy::panic_in_result_fn,
+    reason = "A test returns Result for `?` and fails through an assertion."
+)]
+
 use hakkiri::Language;
 
 use super::Formats;
