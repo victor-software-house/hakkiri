@@ -192,6 +192,40 @@ fn leave_out_the_misplaced(vale: &mut BTreeSet<Row>, ours: &mut BTreeSet<Row>) {
     }
 }
 
+/// The alerts that Vale gives on the lines of a `;;;` block and hakkiri does
+/// not, each as a file, a line, a column and a rule.
+///
+/// Vale lints the lines of a `;;;` block as a paragraph too (design decision 3
+/// of `front-matter-crate`), where hakkiri cuts every block from the body.
+/// The `Team.Text` alert at line 2, column 14 of `text/f8.md` stays, because
+/// the title is a value of the front matter, which that rule reads.
+const BLOCK_AS_PARAGRAPH: [(&str, usize, usize, &str); 7] = [
+    ("text/f8.md", 2, 14, "Team.Para"),
+    ("text/f8.md", 2, 54, "Team.Para"),
+    ("text/f8.md", 2, 79, "Team.Para"),
+    ("text/f8.md", 2, 54, "Team.Text"),
+    ("text/f8.md", 2, 79, "Team.Text"),
+    ("text/f9.md", 3, 15, "Team.Para"),
+    ("text/f9.md", 4, 20, "Team.Para"),
+];
+
+/// Takes the alerts of the `;;;` blocks as a paragraph out of Vale's set,
+/// after asserting that Vale holds each, and asserts that hakkiri holds none.
+fn leave_out_the_block_as_paragraph(vale: &mut BTreeSet<Row>, ours: &BTreeSet<Row>) {
+    for (file, line, column, rule) in BLOCK_AS_PARAGRAPH {
+        let is = |row: &Row| row.0 == file && row.1 == line && row.2 == column && row.5 == rule;
+        assert!(
+            vale.iter().any(is),
+            "Vale gave no {rule} at {file}:{line}:{column}"
+        );
+        vale.retain(|row| !is(row));
+        assert!(
+            !ours.iter().any(is),
+            "hakkiri gave {rule} at {file}:{line}:{column}"
+        );
+    }
+}
+
 /// The configs of the fixture: no pattern, a token pattern with no group and a
 /// token pattern with a group. Vale reads the metadata before it rewrites the
 /// body, so the patterns change no value of the front matter.
@@ -221,6 +255,7 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
         let mut ours = rows_of(&result.out)?;
         let mut vale = vale_rows(name)?;
         leave_out_the_misplaced(&mut vale, &mut ours);
+        leave_out_the_block_as_paragraph(&mut vale, &ours);
         let only_vale: Vec<_> = vale.difference(&ours).collect();
         let only_ours: Vec<_> = ours.difference(&vale).collect();
         assert!(
@@ -245,23 +280,7 @@ fn front_matter_no_parser_reads_fails_the_file_and_leaves_the_rest_linted() -> T
     for dir in ["styles", ".ctl"] {
         copy_into(&root, &fixture().join(dir), Path::new(dir))?;
     }
-    root.file(
-        "text/ok.md",
-        "---\ntitle: A very title\n---\n\nBody very.\n",
-    );
-    root.file(
-        "text/yaml.md",
-        "---\ntitle: very\nother: [open\n---\n\nBody very.\n",
-    );
-    root.file("text/toml.md", "+++\ntitle = \"open\n+++\n\nBody very.\n");
-    root.file(
-        "text/json.md",
-        ";;;\n{\"title\": \"very\", \n;;;\n\nBody very.\n",
-    );
-    root.file(
-        "text/seq.md",
-        "---\n? [a, b]\n: very seq\ntitle: very after\n---\n\nBody very.\n",
-    );
+    copy_into(&root, &fixture().join("broken"), Path::new("text"))?;
     let result = run(
         root.path(),
         &[
@@ -330,5 +349,55 @@ fn front_matter_no_parser_reads_fails_the_file_and_leaves_the_rest_linted() -> T
         "very".to_owned(),
     );
     assert!(rows.contains(&after), "{rows:#?}");
+    Ok(())
+}
+
+/// Every form of front matter is metadata: its values are lints of the
+/// `frontmatter` scope, and no line of the block is a paragraph.
+///
+/// The `form-*` cases hold a title and the body `Body very.`, after a blank
+/// line. `json-key-only` holds a JSON key `very` and no string value.
+/// The snapshot lists each `Team.Para`, `Team.FmTitle` and `Team.Text` alert
+/// as its file and line.
+#[test]
+fn every_form_of_block_is_front_matter_and_no_body_text() -> TestResult {
+    let suite = Suite::new("front-matter-forms");
+    let root = suite.scenario("forms");
+    for dir in ["styles", ".ctl"] {
+        copy_into(&root, &fixture().join(dir), Path::new(dir))?;
+    }
+    let cases = fixture().join("cases");
+    for entry in fs::read_dir(&cases)? {
+        let entry = entry?;
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if name.starts_with("form-") || name.starts_with("json-key-only.") {
+            let target = Path::new("text").join(name.strip_suffix(".fixture").unwrap_or(&name));
+            root.file(target, fs::read(entry.path())?);
+        }
+    }
+    let result = run(
+        root.path(),
+        &[
+            "check",
+            "--config",
+            ".ctl/all.yaml",
+            "--format",
+            "json",
+            "text",
+        ],
+        &[],
+    )?;
+    assert!(
+        result.code == 0 || result.code == 1,
+        "{}{}",
+        result.out,
+        result.err
+    );
+    let alerts: BTreeSet<String> = rows_of(&result.out)?
+        .into_iter()
+        .filter(|row| ["Team.Para", "Team.FmTitle", "Team.Text"].contains(&row.5.as_str()))
+        .map(|row| format!("{}:{} {}", row.0, row.1, row.5))
+        .collect();
+    insta::assert_snapshot!(alerts.into_iter().collect::<Vec<_>>().join("\n"));
     Ok(())
 }

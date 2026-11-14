@@ -1,0 +1,11 @@
+---
+title: A very title
+count: 3
+draft: false
+tags: [a, b]
+author:
+  name: very nested
+quoted: "a very quoted"
+single: 'a very single'
+plain: two # comment
+---

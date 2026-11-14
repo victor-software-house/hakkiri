@@ -43,7 +43,7 @@ deny = [
 ]
 skip = [
     { crate = "getrandom@0.2", reason = "ring 0.17.14, the latest, requires getrandom 0.2" },
-    { crate = "syn@2", reason = "garde_derive 0.23.0 and zeroize_derive 1.5.0, the latest, require syn 2" },
+    { crate = "syn@2", reason = "garde_derive 0.23.0 and zeroize_derive 1.5.0, the latest, and strum_macros 0.27.2 and proc-macro2-diagnostics 0.10.1, which struson 0.7.2 requires through strum 0.27.2 and duplicate 2.0.1, require syn 2" },
     { crate = "windows-sys@0.52", reason = "ring 0.17.14, the latest, requires windows-sys 0.52" },
 ]
 

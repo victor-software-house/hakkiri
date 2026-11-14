@@ -792,8 +792,22 @@ hakkiri SHALL read the front matter values as Vale does, and put each alert at t
 - **THEN** hakkiri lints the values of the other entries
 - **AND** Vale fails the file with its error on line 1 and lints none of it ([front-matter-values 6][front-matter-values-6])
 
+#### Scenario: A block that Vale also lints as body text
+
+- **WHEN** a Markdown file starts with a `;;;`, `---toml` or bare `{` block, or a YAML block closed by `...`, such as `;;;`, `{"Install": 1}` and `;;;`, and a rule scoped `text` flags `Install`
+- **THEN** hakkiri reports nothing, since the key is no value and the block is no body text
+- **AND** Vale 3.26.0 reports `Install` on line 2, since it lints the lines of the block as a paragraph too ([front-matter-crate 3][front-matter-crate-3])
+
+#### Scenario: A named YAML or JSON fence
+
+- **WHEN** a Markdown file starts with `---yaml` or `---json`, a block that its parser reads, and `---`
+- **THEN** hakkiri reads the values of the block
+- **AND** Vale 3.26.0 fails the file with `E201` on line 1, since it reads the fence line as YAML ([front-matter-crate 2][front-matter-crate-2])
+
 [front-matter-values-5]: ../../changes/archive/2026-11-14-front-matter-values/design.md#5-where-vale-puts-an-alert
 [front-matter-values-6]: ../../changes/archive/2026-11-14-front-matter-values/design.md#6-a-block-no-parser-reads-is-a-fault-of-the-file
+[front-matter-crate-2]: ../../changes/archive/2026-11-14-front-matter-crate/design.md#2-every-form-the-crate-finds-is-front-matter
+[front-matter-crate-3]: ../../changes/archive/2026-11-14-front-matter-crate/design.md#3-the-block-is-cut-from-the-body-for-every-form
 
 ### Requirement: A YAML vocabulary differs from Vale in six places
 

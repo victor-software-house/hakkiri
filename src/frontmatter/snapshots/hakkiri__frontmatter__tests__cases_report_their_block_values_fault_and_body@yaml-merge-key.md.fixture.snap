@@ -1,0 +1,10 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-merge-key.md.fixture
+---
+block: lines 1 to 5
+values:
+  t: "text"
+fault: none
+body: none

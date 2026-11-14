@@ -1,0 +1,13 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-numbers-of-yaml-v3.md.fixture
+---
+block: lines 1 to 11
+values:
+  f: "_1000"
+  g: "1_000a"
+  h: "0b12"
+  i: "v1_0"
+fault: none
+body: none

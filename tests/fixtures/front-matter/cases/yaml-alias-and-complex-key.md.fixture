@@ -1,0 +1,7 @@
+---
+a: &x text
+b: *x
+? [k, l]
+: v
+c: after
+---

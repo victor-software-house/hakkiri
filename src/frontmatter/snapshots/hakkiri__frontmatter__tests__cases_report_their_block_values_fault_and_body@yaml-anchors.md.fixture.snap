@@ -1,0 +1,11 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-anchors.md.fixture
+---
+block: lines 1 to 4
+values:
+  a: "anchored"
+  b: "keyed"
+fault: none
+body: none

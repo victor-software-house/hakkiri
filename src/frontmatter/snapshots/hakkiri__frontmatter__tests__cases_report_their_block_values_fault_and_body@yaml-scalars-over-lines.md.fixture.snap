@@ -1,0 +1,11 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/yaml-scalars-over-lines.md.fixture
+---
+block: lines 1 to 6
+values:
+  plain: "one two"
+  quoted: "three four"
+fault: none
+body: none

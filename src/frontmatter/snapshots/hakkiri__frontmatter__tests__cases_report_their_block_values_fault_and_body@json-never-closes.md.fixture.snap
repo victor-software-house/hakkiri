@@ -1,0 +1,9 @@
+---
+source: src/frontmatter/tests.rs
+expression: report(&source)
+input_file: tests/fixtures/front-matter/cases/json-never-closes.md.fixture
+---
+block: none
+values: none
+fault: none
+body: line 1
