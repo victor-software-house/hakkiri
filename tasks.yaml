@@ -161,24 +161,6 @@ queue:
       - '2026-11-12, operator decision: a code span counts as one word by default, a setting sets it to zero, at the package, project and glob levels, with a flag and a variable. The key is code_span_size, and its unit is words.'
       - It applies only to word counts and to the metrics built on words. HKR-051 keeps the rule form of LongSentence; this row gives a project the way to count as Vale does.
 
-  - id: HKR-066
-    title: Give each file and segment a language from langdex
-    scope: engine
-    outcome: >-
-      A file, a fenced code block and a comment each have one language, found by any
-      name, extension, file name or interpreter that langdex knows, and a scope names a
-      language, not an extension.
-    blocked_by: []
-    acceptance:
-      - READERS, Language::from_path, Language::extension and the scope extension list read from langdex and no longer list extensions of their own.
-      - A fenced code block reads its language from its info string through langdex, so rs and rust name one language, and a fence of a language whose comments hakkiri reads gives those comments to the tree.
-      - A scope part such as text.comment.js reaches a .js, .jsx, .mjs or .cjs file, and text.txt reaches a Text file but no .rst or README file read as plain text, each with a test.
-    notes:
-      - '2026-11-13, operator decision: a language has a name, aliases and extensions, distinct from a file extension, as prettier and oxlint map them; langdex holds the table, generated from GitHub Linguist.'
-      - '2026-11-13, found by the Kody thread on PR 131: a file with no reader also took the extension txt, so a rule scoped text.txt reached .rst and README files.'
-      - '2026-11-14, operator decision: a fenced block is parsed as its own language.'
-    plan: openspec/changes/language-model/proposal.md
-
   - id: HKR-068
     title: Read front matter with a parser per format
     scope: engine
@@ -235,19 +217,36 @@ queue:
     notes:
       - The Markdown probe of HKR-027 left this gap open, and vale-differences lists it.
 
+archive:
   - id: HKR-076
     title: Match globs by the rules of gitignore
     scope: config
     outcome: "A files or formats glob matches the files gitignore would match: * inside one folder, ** across folders, a glob with no / by file name in any folder."
-    blocked_by: []
-    acceptance:
-      - docs/*.md matches docs/a.md and not docs/x/a.md, *.md matches a Markdown file in any folder, and tests/oracle/*/** matches no file directly in tests/oracle, each with a test.
-      - The vale-differences spec records where Vale 66bbb85 matches more.
-    plan: openspec/changes/standard-globs/proposal.md
+    plan: openspec/changes/archive/2026-11-14-standard-globs/proposal.md
     notes:
       - '2026-11-14, operator decision: globs follow the standard rules, whether Vale is looser or stricter.'
+    completed: 2026-11-14T09:38:39
+    evidence:
+      - openspec/changes/archive/2026-11-14-standard-globs/
+    disposition: completed
 
-archive:
+  - id: HKR-066
+    title: Give each file and segment a language from langdex
+    scope: engine
+    outcome: >-
+      A file, a fenced code block and a comment each have one language, found by any
+      name, extension, file name or interpreter that langdex knows, and a scope names a
+      language, not an extension.
+    notes:
+      - '2026-11-13, operator decision: a language has a name, aliases and extensions, distinct from a file extension, as prettier and oxlint map them; langdex holds the table, generated from GitHub Linguist.'
+      - '2026-11-13, found by the Kody thread on PR 131: a file with no reader also took the extension txt, so a rule scoped text.txt reached .rst and README files.'
+      - '2026-11-14, operator decision: a fenced block is parsed as its own language.'
+    plan: openspec/changes/archive/2026-11-14-language-model/proposal.md
+    completed: 2026-11-14T09:38:39
+    evidence:
+      - openspec/changes/archive/2026-11-14-language-model/
+    disposition: completed
+
   - id: HKR-070
     title: Keep ProseStyle.BareURL under the backtrack limit on long files
     scope: engine

@@ -1219,3 +1219,103 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 [test-7]: ../../changes/archive/2026-11-10-test-command/design.md#7-the-report-and-the-exit-status
 [vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
+
+### Requirement: The comments of a fenced code block are read
+
+hakkiri SHALL read the comments of a fenced code block whose language it reads the comments of, as the `document-tree` spec sets.  
+Vale 66bbb85 reads no text inside a fence.
+
+#### Scenario: A Rust fence in Markdown
+
+- **WHEN** a Markdown file holds a fence opened with ```` ```rust ```` around `// A very good start.`, and a rule flags `very`
+- **THEN** hakkiri reports `very` in the comment, and Vale reports nothing ([decision 5][language-model-5])
+
+### Requirement: A scope part names a Linguist language
+
+hakkiri SHALL read the last piece of a scope part as a language of the GitHub Linguist table that langdex holds.  
+Vale 66bbb85 compares it with the file's extension after its own table folds some extensions together, such as `.tsx`, `.mts` and `.cts` into `.ts`.  
+Linguist keeps TSX apart from TypeScript, so a scope that names `ts` does not reach a `.tsx` file.
+
+#### Scenario: A TSX file
+
+- **WHEN** a rule has `scope: text.comment.ts` and `tokens: [marker]`, and `a.tsx` holds `// A marker.`
+- **THEN** Vale reports one alert, and hakkiri reports none ([decision 4][language-model-4])
+
+### Requirement: A file with no extension is read by its interpreter
+
+hakkiri SHALL read a file whose path names no language by the language of the interpreter on its first line.  
+Vale 66bbb85 finds no format for such a file and lints nothing in it.
+
+#### Scenario: A script
+
+- **WHEN** `bin/tool` has no extension, starts with `#!/usr/bin/env node`, holds `// A very good start.`, and a rule flags `very`
+- **THEN** hakkiri reads it as JavaScript and reports `very`, and Vale reports nothing ([decision 2][language-model-2])
+
+[language-model-2]: ../../changes/archive/2026-11-14-language-model/design.md#2-the-language-of-a-file
+[language-model-4]: ../../changes/archive/2026-11-14-language-model/design.md#4-a-scope-part-names-a-language
+[language-model-5]: ../../changes/archive/2026-11-14-language-model/design.md#5-fenced-code-is-parsed-with-the-grammar-of-the-fence-language
+
+### Requirement: A glob follows gitignore, where Vale matches more
+
+hakkiri SHALL match a glob by the rules of gitignore, as the `project-root` spec sets.  
+Vale 66bbb85 reads a glob with no `**` through gobwas with no separator, so its `*` crosses `/`.  
+It reads a glob with `**` through doublestar, whose trailing `/**` also matches zero folders.
+
+#### Scenario: A star across folders
+
+- **WHEN** a glob is `docs/*.md` and the project holds `docs/x/a.md`
+- **THEN** Vale lints the file, and hakkiri does not ([decision 1][standard-globs-1])
+
+#### Scenario: A trailing double star
+
+- **WHEN** a glob is `tests/oracle/*/**` and the project holds `tests/oracle/a.md`
+- **THEN** Vale lints the file, and hakkiri does not ([decision 1][standard-globs-1])
+
+[standard-globs-1]: ../../changes/archive/2026-11-14-standard-globs/design.md#1-globs-follow-gitignore
+
+### Requirement: Comments of more languages differ from Vale in these ways
+
+hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files, and the directives and doc links of every source language, as each scenario below says, where Vale 3.26.0 reads them otherwise.
+
+#### Scenario: Swift is read by its own grammar
+
+- **WHEN** a Swift file holds `/* outer /* inner */ still outer */`, a raw string `##"x "# // y"##`, a multi-line string whose line is `// z`, or `/* c */` inside a string interpolation
+- **THEN** hakkiri reads `still outer` and `c` as comment text and reads nothing from the strings
+- **AND** Vale reads the file with its C grammar, so it stops the first comment at the first `*/`, reads `y"##` and `z` as comments, and reads no comment inside an interpolation ([comment-languages 3][comment-languages-3])
+
+#### Scenario: A comment that a tool reads
+
+- **WHEN** a Swift file holds `// swiftlint:disable all`, a YAML file holds `# yaml-language-server: $schema=./a.json` or `# yamllint disable`, or a TOML file holds `#:schema ./a.json`
+- **THEN** hakkiri reads none of them as prose, and Vale reads each as a sentence ([comment-languages 5][comment-languages-5])
+
+#### Scenario: A shell file has comments
+
+- **WHEN** a glob selects a `.sh` file
+- **THEN** hakkiri reads its `#` comments, and Vale has no reader for Shell, so it reads the file as plain text, or as Markdown when `formats` maps it there ([comment-languages 3][comment-languages-3])
+
+#### Scenario: A YAML or TOML file needs no view
+
+- **WHEN** a glob selects a YAML or TOML file and no view names it
+- **THEN** hakkiri reads its comments, and Vale reads the whole file as plain lines, since it reads the comments of a data file only when a view names the file ([comment-languages 4][comment-languages-4])
+
+#### Scenario: An indented line of a comment
+
+- **WHEN** a run of line comments holds a prose line, an empty comment line, and a line indented four spaces more, such as `///     cargo run`
+- **THEN** hakkiri reads the indented line as code, and Vale takes the leading spaces off every line after the first, so it reads the line as prose ([comment-languages 7][comment-languages-7])
+
+#### Scenario: A see tag that opens with a link
+
+- **WHEN** a JavaScript file holds `@see {@link Other} for more.` in a doc comment
+- **THEN** hakkiri reads `for` as prose, and Vale reads the link as a type and `for` as the name of the tag, so it drops `for` ([comment-languages 6][comment-languages-6])
+
+#### Scenario: A column after a character of many bytes
+
+- **WHEN** a Go file holds `var s = "’" // note`
+- **THEN** hakkiri gives the columns of `note` in characters, and Vale adds the extra bytes of `’` to each column of a comment that trails code ([comment-languages 8][comment-languages-8])
+
+[comment-languages-3]: ../../changes/archive/2026-11-14-comment-languages/design.md#3-the-lexer-is-the-grammars-probed-against-vale
+[comment-languages-4]: ../../changes/archive/2026-11-14-comment-languages/design.md#4-yaml-and-toml-comments-need-no-view
+[comment-languages-5]: ../../changes/archive/2026-11-14-comment-languages/design.md#5-a-comment-for-a-tool-is-not-prose
+[comment-languages-6]: ../../changes/archive/2026-11-14-comment-languages/design.md#6-a-doc-link-and-a-doc-name-are-masked-at-the-alert
+[comment-languages-7]: ../../changes/archive/2026-11-14-comment-languages/design.md#7-a-line-comment-keeps-the-indentation-of-the-text
+[comment-languages-8]: ../../changes/archive/2026-11-14-comment-languages/design.md#8-a-column-counts-characters

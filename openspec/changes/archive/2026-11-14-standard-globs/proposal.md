@@ -30,4 +30,4 @@ Vale 66bbb85 reads a glob with `**` through doublestar and every other glob thro
 - Changed: `src/config.rs`, `src/formats.rs`, `src/config/tests.rs`, `src/instructions.md` and `AGENTS.md`.
 - A config with a glob such as `docs/*.md` lints fewer files: write `docs/**/*.md` for every file below `docs`.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml

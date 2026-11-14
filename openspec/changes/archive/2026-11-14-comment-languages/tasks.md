@@ -40,4 +40,4 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 [design-1]: design.md#1-the-first-tranche-is-the-languages-the-repositories-use
 [design-9]: design.md#9-what-the-files-show
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
