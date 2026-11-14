@@ -216,6 +216,8 @@ queue:
       - The vale-differences spec no longer lists the inline img text as a known gap.
     notes:
       - The Markdown probe of HKR-027 left this gap open, and vale-differences lists it.
+      - 2026-11-14, a probe of Vale 3.26.0 gave each inline img alt text an alt alert and a text alert, and no link or sentence alert. hakkiri 0.0.6 gave none.
+    plan: openspec/changes/inline-img-alt/proposal.md
 
 archive:
   - id: HKR-076
