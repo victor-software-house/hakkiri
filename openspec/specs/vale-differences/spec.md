@@ -79,8 +79,14 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 
 #### Scenario: A measurement alert points at its node
 
-- **WHEN** a measurement alert fires on a list item
-- **THEN** hakkiri points at the first byte of the measured node, past its bullet, and Vale points at column 1 of the block's first line ([engine 16][engine-16])
+- **WHEN** a `metric` rule with `scope: paragraph`, `formula: words` and `condition: '> 3'` reads the paragraph `One two three`, `four five six`, `seven eight.` on lines 1 to 3
+- **THEN** hakkiri gives line 1, column 1, the first byte of the paragraph, and Vale gives line 3, column 1, the start of the block's last line ([engine 16][engine-16])
+
+#### Scenario: A metric alert on a nested list item
+
+- **WHEN** the same rule with `scope: list` reads the items `Item one two` / `three four five.`, `Short.` with the nested item `Nested one two` / `three four five.`, and `Last item one` / `two three four.`, from line 5
+- **THEN** both count the nested item as its own block, so `Short.` gives no alert
+- **AND** hakkiri gives lines 5, 8 and 10 past each bullet, at columns 3, 5 and 3, where Vale gives lines 6, 9 and 11 at column 1 ([engine 16][engine-16])
 
 #### Scenario: Word and space classes are Unicode
 
@@ -111,6 +117,10 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 
 - **WHEN** the text is `a b c`, the exceptions are the phrases `a b` and `b c`, and a rule matches `c`
 - **THEN** hakkiri holds back the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
+
+[engine-16]: ../../changes/archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
+[engine-18]: ../../changes/archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
+[engine-7]: ../../changes/archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
 
 ### Requirement: Measurements differ from Vale
 
@@ -1307,11 +1317,8 @@ hakkiri SHALL select as each scenario below says, where Vale 3.26.0 has no such 
 [engine-11]: ../../changes/archive/2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
 [engine-12]: ../../changes/archive/2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
 [engine-14]: ../../changes/archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
-[engine-16]: ../../changes/archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
 [engine-17]: ../../changes/archive/2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-the-scope-item
-[engine-18]: ../../changes/archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
 [engine-3]: ../../changes/archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
-[engine-7]: ../../changes/archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
 [engine-8]: ../../changes/archive/2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
 [format-4]: ../../changes/archive/2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
 [format-6]: ../../changes/archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
