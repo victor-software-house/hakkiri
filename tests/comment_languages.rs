@@ -181,6 +181,19 @@ fn a_go_link_with_a_target_is_prose() -> TestResult {
     Ok(())
 }
 
+#[test]
+fn a_go_comment_apart_from_its_declaration_keeps_the_name() -> TestResult {
+    let words = "extends: existence\nmessage: \"found '%s'\"\nnonword: true\nscope: text\ntokens:\n  - '[A-Za-z]+'\n";
+    let found = alerts(
+        Language::Go,
+        words,
+        "package x\n\n// Run starts.\n\nfunc Run() {}\n\nvar a = 1 // b counts.\nvar b = 2\n",
+    )?;
+    let matched: Vec<&str> = found.iter().map(|(_, word)| word.as_str()).collect();
+    assert_eq!(matched, ["Run", "starts", "b", "counts"]);
+    Ok(())
+}
+
 /// A rule that flags each bracketed word, which Markdown reads as text when no
 /// definition makes it a link.
 const BRACKETS: &str = "extends: existence\nmessage: \"found '%s'\"\nnonword: true\nscope: text\ntokens:\n  - '\\[[^\\]]*\\]'\n";

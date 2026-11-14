@@ -315,6 +315,13 @@ fn declared_name(dialect: Dialect, node: SyntaxNode<'_>, source: &str) -> Option
     if next.kind() == "statement_list" {
         next = next.named_child(0)?;
     }
+    // Go reads a comment as the doc of a declaration only when it starts its
+    // own line and ends on the line before the declaration.
+    if !starts_line(source, node.start_byte())
+        || node.end_position().row + 1 != next.start_position().row
+    {
+        return None;
+    }
     let text = |name: SyntaxNode<'_>| source.get(name.byte_range()).map(str::to_owned);
     match next.kind() {
         "package_clause" => text(next.named_child(0)?).map(|name| format!("Package {name}")),
