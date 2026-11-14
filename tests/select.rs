@@ -782,3 +782,11 @@ fn a_front_matter_part_ends_in_the_extension_of_a_language() -> TestResult {
     assert_eq!(mdx.len(), 0, "no block of an MDX file");
     Ok(())
 }
+
+#[test]
+fn a_front_matter_key_that_is_an_extension_stays_a_key() -> TestResult {
+    let source = "---\ntoc: A very good start.\n---\n\nBody.\n";
+    let found = blocks(&["frontmatter.toc"], "a.md", source)?;
+    assert_eq!(found.len(), 1, "the value of the key toc");
+    Ok(())
+}
