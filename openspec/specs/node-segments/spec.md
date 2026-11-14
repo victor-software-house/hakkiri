@@ -138,7 +138,7 @@ A link node SHALL hold the segments of its text, a code node those of its conten
 ### Requirement: A URL is a gap in the prose around the link
 
 The text of an autolink or a bare URL that is its own destination SHALL stay in its `link` node, and SHALL be a gap in the nodes around it.  
-A link written with brackets whose text is its destination SHALL keep that text in its `link` node and in the nodes around it.  
+A link written with brackets whose text is its address follows the requirement "A link that names its address is a gap in the prose around it".  
 A link whose destination differs from its text, such as a bare email address or a `www.` address, SHALL stay in the nodes around it.
 
 #### Scenario: An autolink
@@ -152,12 +152,6 @@ A link whose destination differs from its text, such as a bare email address or 
 - **WHEN** a Rust file holds `// Read https://bare.example first.`
 - **THEN** the `text.comment.line` node has the text `Read  first.`
 - **AND** a `link` node has the text `https://bare.example`
-
-#### Scenario: A link that shows its destination
-
-- **WHEN** a Markdown file holds `See [https://a.example](https://a.example) now.`
-- **THEN** the `paragraph` node has the text `See https://a.example now.`
-- **AND** a `link` node has the text `https://a.example`
 
 #### Scenario: An email address and a www address
 
