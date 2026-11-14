@@ -3,7 +3,10 @@
 ### Requirement: A top-level string of front matter is text
 
 In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
-The front matter is the block at the top of the file: YAML between `---` lines, after a `---yaml` line, or closed by a `...` line; TOML between `+++` lines or after a `---toml` line; and JSON between `;;;` lines, after a `---json` line, or as an object that opens on the first line with `{`.  
+The front matter is the block at the top of the file.  
+YAML sits between `---` lines, after a `---yaml` line, or before a closing `...` line.  
+TOML sits between `+++` lines or after a `---toml` line.  
+JSON sits between `;;;` lines, after a `---json` line, or in an object that opens with `{` on the first line.  
 The block SHALL be no part of the body: no rule reads its lines as a paragraph, a heading or a sentence.  
 A key, a list, a nested mapping and a value that is not a string SHALL not be read.  
 A TOML string below a table and a member of a nested JSON object SHALL not be read.  
@@ -18,7 +21,7 @@ A YAML key that is a list, a mapping or an alias SHALL give no value, and the en
 #### Scenario: Scalars that resolve to a string
 
 - **WHEN** the values are `yes`, `no`, `on`, `off`, `y`, `n`, `12:30`, `1,000`, `1.2.3`, `v1.0`, `1e`, `0xZZ`, `a:b` and `!!str tagged`
-- **THEN** each is read as text, and `null`, `~`, `true`, `0x1f`, `1_000`, `1e3`, `.inf`, `2024-01-01`, `<<` and `!!int 3` are not
+- **THEN** each is read as text, and `null`, `~`, `true`, `0x1f`, `1_000`, `0b11`, `1e3`, `.inf`, `2024-01-01`, `<<` and `!!int 3` are not
 
 #### Scenario: Dates and the merge key
 

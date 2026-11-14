@@ -26,7 +26,10 @@ Non-goals:
 
 `src/frontmatter.rs` calls `front_matter::find` and `front_matter::read`.
 It maps each value's style to the bytes of its text, as before: a quoted string or a JSON string loses its quotes, a block scalar its header line and indent, and a TOML multi-line string its delimiters.
-yaml.v3, which Vale reads with, reads a plain date and the merge key `<<` as no string, so hakkiri still leaves those two out unless a tag or a quote makes them strings.
+The crate follows the YAML 1.2 core schema, and leaves to its caller the rules of a reader such as yaml.v3, which Vale reads with.
+yaml.v3 reads a plain date, the merge key `<<`, and an integer with `_` between its digits or a `0b` prefix, such as `1_000` and `0b11`, as no string.
+js-yaml 4, the reader of most JavaScript site tools, does the same.
+hakkiri leaves them out unless a tag or a quote makes them strings, as it did with ctl-core's reader.
 A YAML key that is a list, a mapping or an alias gives no value and drops none of the entries after it, which [front-matter 0.0.2][fm-keys] gives.
 
 Alternative considered: keep ctl-core's `Input`. It lost because it reads JSON as YAML, so a block that is no JSON passes as JSON.
@@ -53,7 +56,7 @@ In markdown-rs, a `---toml` block is a paragraph that the closing `---` turns in
 Alternative considered: keep markdown-rs's construct and lint the other blocks as body, as Vale does.
 It lost because a block is metadata: a JSON key or a TOML table header is no prose.
 
-### 4. A fault keeps its form
+### 4. A fault names the line where reading stopped
 
 A block its parser refuses fails the file with `front matter: line N: …`, where the line is where the parser stopped, and the rest of the file is linted.
 The crate's line counts from the top of the file.
