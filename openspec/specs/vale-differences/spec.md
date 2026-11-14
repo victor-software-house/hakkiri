@@ -1150,76 +1150,6 @@ hakkiri SHALL read Markdown as each scenario below says, where Vale 3.26.0 reads
 - **WHEN** a paragraph holds `Read <https://b.example> first.`, `Read https://b.example first.` or `See [https://b.example](https://b.example) now.`
 - **THEN** hakkiri's `link` scope reads `https://b.example`, so ProseStyle's `BareURL` can flag it, and Vale's reads no word ([markdown-probe 2][markdown-probe-2])
 
-### Requirement: The alt text of an inline img is a known gap
-
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
-
-#### Scenario: An img tag in a line of text
-
-- **WHEN** a paragraph holds `Build <a href="u"><img src="b.svg" alt="the badge"></a> now.`
-- **THEN** hakkiri reads no word of `the badge`, and Vale reads them as words of the paragraph and not of the link (row [HKR-027][ledger], [markdown-probe 9][markdown-probe-9])
-
-[html-1]: ../../changes/archive/2026-11-10-html-block-text/design.md#1-one-walk-follows-vales
-[html-3]: ../../changes/archive/2026-11-10-html-block-text/design.md#3-masked-text-reads-as-asterisks
-[html-5]: ../../changes/archive/2026-11-10-html-block-text/design.md#5-a-character-reference-reads-once
-[html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
-[ledger]: ../../../tasks.yaml
-[markdown-probe-2]: ../../changes/archive/2026-11-14-markdown-probe/design.md#2-a-link-keeps-the-address-for-the-link-scope
-[markdown-probe-4]: ../../changes/archive/2026-11-14-markdown-probe/design.md#4-a-backslash-escape-loses-the-backslash
-[markdown-probe-6]: ../../changes/archive/2026-11-14-markdown-probe/design.md#6-a-footnote-reads-as-in-vales-html
-[markdown-probe-8]: ../../changes/archive/2026-11-14-markdown-probe/design.md#8-what-hakkiri-keeps-from-the-earlier-reading
-[markdown-probe-9]: ../../changes/archive/2026-11-14-markdown-probe/design.md#9-known-gap-the-alt-text-of-an-inline-img
-[test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
-[bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
-[bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
-[case-1]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
-[case-4]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#4-model-is-refused
-[case-8]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#8-a-style-other-than-ap-or-chicago-is-refused
-[case-9]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
-[check-1]: ../../changes/archive/2026-11-10-check-command/design.md#1-one-binary-on-ctl-cores-app
-[check-3]: ../../changes/archive/2026-11-10-check-command/design.md#3-globs-and-paths-are-relative-to-the-project-root
-[check-7]: ../../changes/archive/2026-11-10-check-command/design.md#7-output-is-a-line-per-alert-or-json
-[check-8]: ../../changes/archive/2026-11-10-check-command/design.md#8-exit-status-follows-vales-with-a-level-flag
-[engine-11]: ../../changes/archive/2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
-[engine-12]: ../../changes/archive/2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
-[engine-14]: ../../changes/archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
-[engine-16]: ../../changes/archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
-[engine-17]: ../../changes/archive/2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-the-scope-item
-[engine-18]: ../../changes/archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
-[engine-3]: ../../changes/archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
-[engine-7]: ../../changes/archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
-[engine-8]: ../../changes/archive/2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
-[format-4]: ../../changes/archive/2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
-[format-6]: ../../changes/archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
-[format-7]: ../../changes/archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[format-8]: ../../changes/archive/2026-11-10-rule-format/design.md#8-every-comment-reads-as-markdown
-[format-9]: ../../changes/archive/2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
-[package-fetch-1]: ../../changes/archive/2026-11-11-package-fetch/design.md#1-vales-sync-is-the-reference-for-the-source
-[package-fetch-3]: ../../changes/archive/2026-11-11-package-fetch/design.md#3-the-checks-a-download-passes
-[pattern-1]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
-[pattern-3]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#3-conditional-has-two-modes-chosen-by-the-second-pattern
-[pattern-6]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#6-an-unknown-or-empty-metrics-list-is-refused
-[pattern-7]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#7-ignorecase-on-a-conditional-applies-to-both-patterns
-[pattern-8]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#8-a-score-listed-twice-counts-once
-[pattern-9]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
-[rule-names-4]: ../../changes/archive/2026-11-10-rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
-[rule-setting-7]: ../../changes/archive/2026-11-11-rule-setting/design.md#7-what-stays-different
-[settings-2]: ../../changes/archive/2026-11-11-package-settings/design.md#2-the-files-name-and-place-in-the-package
-[settings-3]: ../../changes/archive/2026-11-11-package-settings/design.md#3-which-keys-a-package-may-set-and-nested-packages
-[settings-4]: ../../changes/archive/2026-11-11-package-settings/design.md#4-a-styles-list-under-a-glob-the-package-also-writes
-[settings-5]: ../../changes/archive/2026-11-11-package-settings/design.md#5-scalars-the-project-wins
-[settings-6]: ../../changes/archive/2026-11-11-package-settings/design.md#6-order-across-packages
-[settings-7]: ../../changes/archive/2026-11-11-package-settings/design.md#7-errors-name-the-package-file
-[spelling-2]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
-[spelling-3]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses
-[splitter-5]: ../../changes/archive/2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-instead-of-vale
-[styles-1]: ../../changes/archive/2026-11-11-vale-styles/design.md#1-the-loader-resolves-inheritance
-[styles-4]: ../../changes/archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
-[test-5]: ../../changes/archive/2026-11-10-test-command/design.md#5-finding-cases
-[test-7]: ../../changes/archive/2026-11-10-test-command/design.md#7-the-report-and-the-exit-status
-[vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
-[vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
-
 ### Requirement: The comments of a fenced code block are read
 
 hakkiri SHALL read the comments of a fenced code block whose language it reads the comments of, as the `document-tree` spec sets.  
@@ -1319,3 +1249,93 @@ hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files, and th
 [comment-languages-6]: ../../changes/archive/2026-11-14-comment-languages/design.md#6-a-doc-link-and-a-doc-name-are-masked-at-the-alert
 [comment-languages-7]: ../../changes/archive/2026-11-14-comment-languages/design.md#7-a-line-comment-keeps-the-indentation-of-the-text
 [comment-languages-8]: ../../changes/archive/2026-11-14-comment-languages/design.md#8-a-column-counts-characters
+
+### Requirement: hakkiri adds the scopes title and image
+
+hakkiri SHALL select as each scenario below says, where Vale 3.26.0 has no such scope.
+
+#### Scenario: A link title
+
+- **WHEN** a rule has `scope: title` and a link holds the token in its title
+- **THEN** hakkiri reports the alert, and Vale reports it only for a rule on `raw` ([link-title 1][link-title], row [HKR-054][ledger])
+
+#### Scenario: A title selected by the element that holds it
+
+- **WHEN** a rule has `scope: title & link` or `scope: title & image`
+- **THEN** hakkiri selects only the titles of links, or only those of images, and Vale has no scope that reads a title ([link-title 5][link-title])
+
+#### Scenario: An HTML title attribute
+
+- **WHEN** a Markdown file holds `<p title="a marker">Some text.</p>`, a line of text with an inline tag that has a title, or an MDX file holds a JSX element with `title`, and a rule has `scope: title`
+- **THEN** hakkiri selects each title, and Vale reads the attribute only in a rule on `raw` ([link-title 6][link-title])
+
+#### Scenario: A title attribute of an a tag and an img tag
+
+- **WHEN** an HTML block holds `<a href="u" title="a marker">x</a>` and a rule has `scope: title & link`, or `<img src="i.png" title="a marker">` and `scope: title & image`
+- **THEN** hakkiri selects `a marker`, and Vale loads the rule and selects nothing, since only `raw` reads the attribute ([link-title 6][link-title])
+
+#### Scenario: The alt text of an image
+
+- **WHEN** a rule has `scope: image`
+- **THEN** hakkiri selects the alt text of each image, and Vale loads the rule and selects nothing, since no block has an `image` part ([link-title 5][link-title])
+
+[link-title]: ../../changes/archive/2026-11-14-link-title/design.md#decisions
+[bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
+[bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
+[case-1]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[case-4]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#4-model-is-refused
+[case-8]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#8-a-style-other-than-ap-or-chicago-is-refused
+[case-9]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[check-1]: ../../changes/archive/2026-11-10-check-command/design.md#1-one-binary-on-ctl-cores-app
+[check-3]: ../../changes/archive/2026-11-10-check-command/design.md#3-globs-and-paths-are-relative-to-the-project-root
+[check-7]: ../../changes/archive/2026-11-10-check-command/design.md#7-output-is-a-line-per-alert-or-json
+[check-8]: ../../changes/archive/2026-11-10-check-command/design.md#8-exit-status-follows-vales-with-a-level-flag
+[engine-11]: ../../changes/archive/2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
+[engine-12]: ../../changes/archive/2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
+[engine-14]: ../../changes/archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
+[engine-16]: ../../changes/archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
+[engine-17]: ../../changes/archive/2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-the-scope-item
+[engine-18]: ../../changes/archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
+[engine-3]: ../../changes/archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
+[engine-7]: ../../changes/archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
+[engine-8]: ../../changes/archive/2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
+[format-4]: ../../changes/archive/2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
+[format-6]: ../../changes/archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
+[format-7]: ../../changes/archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[format-8]: ../../changes/archive/2026-11-10-rule-format/design.md#8-every-comment-reads-as-markdown
+[format-9]: ../../changes/archive/2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
+[ledger]: ../../../tasks.yaml
+[package-fetch-1]: ../../changes/archive/2026-11-11-package-fetch/design.md#1-vales-sync-is-the-reference-for-the-source
+[package-fetch-3]: ../../changes/archive/2026-11-11-package-fetch/design.md#3-the-checks-a-download-passes
+[pattern-1]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
+[pattern-3]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#3-conditional-has-two-modes-chosen-by-the-second-pattern
+[pattern-6]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#6-an-unknown-or-empty-metrics-list-is-refused
+[pattern-7]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#7-ignorecase-on-a-conditional-applies-to-both-patterns
+[pattern-8]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#8-a-score-listed-twice-counts-once
+[pattern-9]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
+[rule-names-4]: ../../changes/archive/2026-11-10-rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
+[rule-setting-7]: ../../changes/archive/2026-11-11-rule-setting/design.md#7-what-stays-different
+[settings-2]: ../../changes/archive/2026-11-11-package-settings/design.md#2-the-files-name-and-place-in-the-package
+[settings-3]: ../../changes/archive/2026-11-11-package-settings/design.md#3-which-keys-a-package-may-set-and-nested-packages
+[settings-4]: ../../changes/archive/2026-11-11-package-settings/design.md#4-a-styles-list-under-a-glob-the-package-also-writes
+[settings-5]: ../../changes/archive/2026-11-11-package-settings/design.md#5-scalars-the-project-wins
+[settings-6]: ../../changes/archive/2026-11-11-package-settings/design.md#6-order-across-packages
+[settings-7]: ../../changes/archive/2026-11-11-package-settings/design.md#7-errors-name-the-package-file
+[spelling-2]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
+[spelling-3]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses
+[splitter-5]: ../../changes/archive/2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-instead-of-vale
+[styles-1]: ../../changes/archive/2026-11-11-vale-styles/design.md#1-the-loader-resolves-inheritance
+[styles-4]: ../../changes/archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
+[test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
+[test-5]: ../../changes/archive/2026-11-10-test-command/design.md#5-finding-cases
+[test-7]: ../../changes/archive/2026-11-10-test-command/design.md#7-the-report-and-the-exit-status
+[vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
+[vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
+[html-1]: ../../changes/archive/2026-11-10-html-block-text/design.md#1-one-walk-follows-vales
+[html-3]: ../../changes/archive/2026-11-10-html-block-text/design.md#3-masked-text-reads-as-asterisks
+[html-5]: ../../changes/archive/2026-11-10-html-block-text/design.md#5-a-character-reference-reads-once
+[html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
+[markdown-probe-2]: ../../changes/archive/2026-11-14-markdown-probe/design.md#2-a-link-keeps-the-address-for-the-link-scope
+[markdown-probe-4]: ../../changes/archive/2026-11-14-markdown-probe/design.md#4-a-backslash-escape-loses-the-backslash
+[markdown-probe-6]: ../../changes/archive/2026-11-14-markdown-probe/design.md#6-a-footnote-reads-as-in-vales-html
+[markdown-probe-8]: ../../changes/archive/2026-11-14-markdown-probe/design.md#8-what-hakkiri-keeps-from-the-earlier-reading

@@ -15,8 +15,9 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 2. The rule
 
-- [ ] 2.1 Write `LongSentence` in the prose-style package as a `metric` rule with the `words` formula.  
-  Verify its case `counts each code span as a word` passes under `hakkiri test`.
+- [x] 2.1 Write `LongSentence` in the prose-style package as a `metric` rule with the `words` formula.  
+  Verify its case `counts each code span as a word` passes under `hakkiri test`.  
+  Evidence, 2026-11-14 (UTC): ProseStyle v0.0.16 ships `LongSentence` as a `metric` rule with `formula: words`, and `hakkiri test` 0.0.6 passes its 3 cases, `counts each code span as a word` among them.
 
 ## 3. The setting
 

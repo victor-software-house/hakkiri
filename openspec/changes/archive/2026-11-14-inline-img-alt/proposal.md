@@ -31,5 +31,5 @@ It gave no `link` alert and no `sentence` alert on it, and the paragraph's word 
 - Changed: `src/html_text.rs`, `src/markdown.rs` and `tests/select.rs`, and a patch changeset.
 
 [ledger]: https://github.com/victor-software-house/hakkiri/blob/3c1bcb3cf953470019771ff7a2e89d478e63b8aa/tasks.yaml
-[probe-9]: ../archive/2026-11-14-markdown-probe/design.md#9-known-gap-the-alt-text-of-an-inline-img
+[probe-9]: ../2026-11-14-markdown-probe/design.md#9-known-gap-the-alt-text-of-an-inline-img
 [walk]: https://github.com/victor-software-house/hakkiri/blob/3c1bcb3cf953470019771ff7a2e89d478e63b8aa/src/html.rs#L708-L721

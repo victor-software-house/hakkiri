@@ -29,5 +29,5 @@ hakkiri SHALL select as each scenario below says, where Vale 3.26.0 has no such 
 - **WHEN** a rule has `scope: image`
 - **THEN** hakkiri selects the alt text of each image, and Vale loads the rule and selects nothing, since no block has an `image` part ([link-title 5][link-title])
 
-[ledger]: ../../../../../tasks.yaml
+[ledger]: ../../../../../../tasks.yaml
 [link-title]: ../../design.md#decisions
