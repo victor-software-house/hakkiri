@@ -189,9 +189,13 @@ files:
 - Math in a Markdown or MDX file reads as code, as in Vale, so no text rule reports it and a `code` rule reads it.
   An inline span runs from a `$` that a non-space follows to a `$` that follows a non-space and is no digit's neighbour: `$5 and $10` is money and `$x$` is math. A span may wrap over lines of a paragraph.
   A display block opens at a line that starts with `$$`, even in the middle of a paragraph, and closes at a line that ends with `$$`, a blank line or the end of the paragraph. The text before and after reads as separate paragraphs. A line indented four columns or more past its container opens no block.
-- The top-level string values of a Markdown or MDX file's front matter are text, as in Vale: YAML between `---` lines, TOML between `+++` lines and JSON between `;;;` lines.
+- The top-level string values of a Markdown or MDX file's front matter are text, as in Vale.
+  YAML sits between `---` lines, after a `---yaml` line or closed by `...`.
+  TOML sits between `+++` lines or after a `---toml` line.
+  JSON sits between `;;;` lines, after a `---json` line, or as an object that opens with `{` on the first line.
+  The block is no body text, so no rule of the body reads it.
   A rule scoped `text`, `frontmatter`, `text.frontmatter`, `frontmatter.<key>` or `text.frontmatter.<key>` reads a value, and a `paragraph` or `sentence` rule does not.
-  A key, a number, a boolean, a null, a date, a list and a nested mapping are not read, nor is a string below a TOML table or a YAML alias. A key written twice keeps each of its values, and a number or null key does not hide the values after it. An anchor or a tag before a value changes nothing. A block or token pattern leaves the front matter as written.
+  A key, a number, a boolean, a null, a date, a list and a nested mapping are not read, nor is a string below a TOML table or a YAML alias. A YAML key that is a list, a mapping or an alias gives no value and drops none of the entries after it. A key written twice keeps each of its values, and a number or null key does not hide the values after it. An anchor or a tag before a value changes nothing. A block or token pattern leaves the front matter as written.
   A block that no parser reads fails the file with `front matter: line N: …` and exit 2, and the rest of the file is linted, where Vale lints none of it. A `hakkiri test` case with such a block cannot run.
 - `styles` lists the styles whose rules run. A list replaces the one of a lower rank. An empty list turns linting off for those files, and drops every rule setting of a lower rank.
 - A rule name, such as `ProseStyle.BareURL`, sets that rule's level to `suggestion`, `warning` or `error`, turns it `on` at the level of its rule file, or turns it `off`.

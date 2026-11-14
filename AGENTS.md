@@ -77,7 +77,7 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    `Node::closes` and `Node::flushes` hold those bytes, and the engine gates each alert at its own.  
    Math reads as code by Pandoc's rules, as in Vale: `src/math.rs` finds each `$…$` span and `$$…$$` block, masks the file at the same length, and parses it again (row `HKR-048`).  
    Front matter values are nodes of the scope `frontmatter`, with their key as label (row `HKR-049`).  
-   `src/frontmatter.rs` takes the top-level strings of YAML, TOML and JSON from ctl-core's `Input::top_level`, which refuses nothing that YAML allows.  
+   `src/frontmatter.rs` finds the block and reads its top-level values through the `front-matter` crate, one parser per format, in every form it finds, and blanks the block out of the text before markdown-rs parses the body.  
    A block that no parser reads gives no value and fails the file with the line of the parser's problem, and the rest of the file is linted, where Vale lints none of it.  
    The ignore rewrite leaves the front matter as written.  
    Every `path` and `files` glob is relative to the project root, the folder that holds `.ctl`, so a file matches the same glob however it is named.  
