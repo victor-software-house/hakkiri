@@ -19,21 +19,6 @@ queue:
       - 2026-11-11, the local editor hook sends text on standard input with --ext=.md, which hakkiri does not read; it writes a temporary .md file instead, or a later row adds standard input.
       - 2026-11-13, the ProseStyle v0.0.16 alert diff found Vale comments that turn off Direct.Preamble and Voices.WeakVerbs by their old names; the switch renames each to its ProseStyle name.
 
-  - id: HKR-041
-    title: Read YAML vocabularies
-    scope: config
-    outcome: >-
-      A vocabulary folder may hold vocab.yml, whose accept and reject entries take
-      the options regex, ignorecase and flags, as in Vale.
-    blocked_by: []
-    acceptance:
-      - A vocab.yml entry that is a term, or a term mapped to regex, ignorecase or flags, is read as Vale reads it, in tests against Vale's alerts.
-      - An entry Vale refuses is refused with the file and the line, in a test for each fault.
-    plan: openspec/changes/yaml-vocabularies/proposal.md
-    notes:
-      - "2026-11-12, measured on Vale 66bbb85 over 12 faulty vocabularies and 4 alert configs: yaml.v3 reads regex: yes as true, skips a null entry, and ignores a key the file does not define; Vale finds the affix file in each search path's dictionaries folder, then in DICPATH."
-      - '2026-11-12, lead decision: affix looks in the package that holds the vocabulary, then in every other loaded package in order, never in DICPATH; every problem is reported with its file and line, where Vale stops at the first; a folder with vocab.yml and vocab.yaml reads both.'
-
   - id: HKR-017
     title: Read comments in more languages
     scope: tree
@@ -60,19 +45,6 @@ queue:
     notes:
       - "2026-11-11, command shape decided (operator): hakkiri import vale [SOURCE]. With no argument it uses Vale's upward lookup for .vale.ini or _vale.ini. It writes the file --config names, default .ctl/hakkiri.yaml, and refuses an existing file unless --force (-F, as qctl init). The --dry-run flag is ctl-core's preview flag. --force is the only new flag; --config, --format and --color already exist on the other verbs."
       - A .vale.ini package URL needs a sha256 the file does not hold; HKR-006 decides whether the import fetches it.
-
-  - id: HKR-038
-    title: Run the built-in Vale.Repetition rule
-    scope: rules
-    outcome: >-
-      A glob that lists the style Vale runs the built-in Vale.Repetition rule with
-      Vale defaults.
-    blocked_by: []
-    acceptance:
-      - A repeated word is reported as Vale reports it, in a test, and the vale-differences scenario for the built-in rules names Terms, Avoid and Spelling only.
-    notes:
-      - '2026-11-11, size: one embedded rule, extends repetition, level error, scope text, ignorecase, alpha, tokens [^\s.!?]+. Vale.Terms and Vale.Avoid belong to HKR-019, and Vale.Spelling to HKR-026.'
-    plan: openspec/changes/vale-repetition/proposal.md
 
   - id: HKR-037
     title: Read metric formulas past arithmetic
@@ -103,32 +75,6 @@ queue:
       - HKR-008 ports the six script rules of ProseStyle v0.0.14 to native rules, so this row is not on its path.
       - "2026-11-11, operator decision: hakkiri's interpreter must run scripts measurably faster than Vale does, and the row stays queued."
 
-  - id: HKR-026
-    title: Run Vale's built-in spelling rule
-    scope: engine
-    outcome: >-
-      A project that enables Vale.Spelling gets its alerts from hakkiri, with Vale's default ignore list.
-    blocked_by: []
-    acceptance:
-      - A rule named Vale.Spelling runs with the built-in dictionary and the default ignore list, and gives the alerts Vale 66bbb85 gives on the spelling parity inputs.
-      - Any alert that differs is fixed or recorded as an intended difference in the vale-differences spec.
-    plan: openspec/changes/vale-spelling/proposal.md
-
-  - id: HKR-027
-    title: Probe the Markdown parser against Vale's converter
-    scope: tree
-    outcome: >-
-      The differences between hakkiri's Markdown parser and Vale's converter are
-      measured on one corpus.
-    blocked_by: []
-    acceptance:
-      - A corpus of Markdown inputs runs through hakkiri and Vale 66bbb85, and each text or scope that differs is listed.
-      - Each difference found is fixed, or recorded as an intended difference in the vale-differences spec.
-    notes:
-      - '2026-11-10, found while matching HTML-block text: a Markdown paragraph `a*b*c` reads `abc` in hakkiri and `a bc` in Vale, which reads the HTML its converter writes, where an opening inline tag puts a space before its text. The corpus covers inline markup between letters.'
-      - '2026-11-12, found while probing comment controls: Vale 66bbb85 renders a footnote definition at the end of the document, in the order of its references, and lints no definition that nothing references; hakkiri reads each definition where it stands and lints an unreferenced one. A comment inside a definition acts at the end of the document in Vale. Vale also loses an alert in one probe: for `A1 very[^a] A2 very.` it reports `A1 very` and `C1 very` and not `A2 very` when the definition reads `[^a]: C1 very.`, and it reports `A2 very` when the definition reads `[^a]: C1 really.` or `[^a]: very C1.`. The cause is not found. The corpus covers footnotes.'
-    plan: openspec/changes/markdown-probe/proposal.md
-
   - id: HKR-010
     title: Release 1
     scope: release
@@ -137,23 +83,6 @@ queue:
       - HKR-009
     acceptance:
       - Every adopted project passes CI on hakkiri.
-
-  - id: HKR-049
-    title: Lint front matter values
-    scope: markdown
-    outcome: The values in a Markdown file's front matter are linted as text, as Vale does.
-    blocked_by: []
-    acceptance:
-      - A text rule reports a word in a front matter value, with the alerts Vale 66bbb85 gives on the probe files in tests/fixtures/front-matter, less the nine alerts Vale places at the wrong text.
-      - The values of YAML and TOML front matter come from ctl-core Input::top_level, and no line reader of our own reads them.
-    notes:
-      - '2026-11-11, found while probing comment controls: Vale flags the word very in the title value of a front matter block, and hakkiri skips the whole block. The probe is tests/fixtures/markup-differences/text/m2.md. Which keys Vale lints is not measured yet.'
-      - '2026-11-12, measured on Vale 66bbb85 over ten files and three configs (590 alerts): it lints the top-level string values only, as the front-matter spec lists, and places 4 alerts at the wrong text per config: the second line of a folded scalar, a TOML value found by searching the block, and a !!str value.'
-      - 2026-11-12, an earlier reader of our own (PR 106, reverted in PR 113) skipped anchors, aliases and complex keys. The rebuild reads YAML and TOML through ctl-core Input::top_level, and only dates and the plain value << need a filter in hakkiri, since yaml.v3 reads them as no string and serde-saphyr as one.
-      - '2026-11-12, measured in a box: the release binary grew from 14,375,208 to 15,038,184 bytes (662,976, 4.6%) with ctl-core 0.7.3 and its input-toml feature, which adds the toml crate.'
-      - '2026-11-12, ctl-core 0.7.3 refused a whole YAML block that held a repeated key, a merge key, .inf, -.inf or .NaN as a value, and left out a number or null key, where Vale lints the other values. ctl-core 0.7.4 (CTC-055) lists them all, so the probe file f7 holds its three original values again, and f11 to f15 record the 306 more alerts of Vale for an alias, a repeated key, a merge key, number and null keys and the three non-finite floats.'
-      - '2026-11-12, Vale fails a file whose front matter no parser reads, and a sequence key as well, with E201 on line 1, and lints none of it. hakkiri fails the file with the line of the parser problem and lints the rest, and lints the rest of a block with a sequence key, which a parser reads. Vale puts a value after an anchor at the anchor, as it does after a tag, so the four misplaced alerts per config are nine.'
-    plan: openspec/changes/front-matter-values/proposal.md
 
   - id: HKR-051
     title: Count code spans in LongSentence under hakkiri
@@ -169,28 +98,6 @@ queue:
       - '2026-11-11, decision: the engine stays as the match-checks spec states, since a metric words rule counts each code span once. The rule moves to a metric words form, with its message and cases, in the prose-style package.'
       - '2026-11-12, operator decision: a setting code_span_size sets how many words a code span counts as, 1 by default and 0 as Vale counts it. HKR-063 builds it in the same change, now named code-span-size.'
     plan: openspec/changes/code-span-size/proposal.md
-
-  - id: HKR-052
-    title: Correct the tags that the model gets wrong on our prose
-    scope: tagger
-    outcome: >-
-      hakkiri reads the cases that the model tags wrongly on our prose as the old model does, so NounStack and ThingsSpeakNoun give no alert for a verb read as a noun.
-    blocked_by: []
-    acceptance:
-      - A test per correction pins the tags of a possessive, a modal in capitals, a name in capitals, a semicolon and a verb after a noun phrase, and fails on the source before the change.
-      - The corrected tags match UD English GUM at least as well as the model alone, 92.16%.
-      - On the 200 judged conflicts of our documents the corrected tags are right at least as often as the old model.
-      - The corrections remove no true NounStack or ThingsSpeakNoun alert, judged by hand, and add none.
-      - The vale-differences spec lists the corrections with their numbers.
-    notes:
-      - "2026-11-11, found by the ProseStyle port: hakkiri's tagger is faithful to prose at b33e60d, the version Vale 66bbb85 builds on, and gives the tags a Go program on that version gives. Vale 3.26.0 ships prose v3.2.2, whose model is older (3,411,804 bytes, the bytes feature template, MIT) and tags 'reads' in 'The freshness harness reads stdout.' as VBZ, where the b33e60d model (1,877,993 bytes, UD English EWT, CC BY-SA 4.0, the runes template) gives NNS."
-      - '2026-11-11, on 1,296 sentences of our documents the two models give a different tag for 3,395 of 18,431 tokens, 18.4%. The most common changes from the older to the newer are JJ to NN (545), NNS to VBZ (405) and VBZ to NNS (128). Two ways to close it: ship the v3.2.2 model, with the bytes template that hakkiri does not read yet, or keep the model and accept the difference in the vale-differences spec.'
-      - '2026-11-12, decided by the lead: keep the b33e60d model and correct its tags after it, each correction a rule with a reason, not a second model. UD English GUM gives 92.16% for the model and 90.26% for the old one.'
-      - 2026-11-12, of 200 conflicts drawn at random from our documents and judged by hand, the old model was right in 131 and the model alone in 103, counting a capital modal as right when it reads MD. The corrections bring the model to 140 and GUM to 92.53%.
-      - 2026-11-12, the corrections removed 68 alerts of NounStack and ThingsSpeakNoun on nine repositories and added none. All 68 were false by hand, each a verb read as a plural noun.
-      - Judged on the rule text, which asks for four lowercase nouns, hakkiri has more true NounStack alerts than Vale (about 30 against 14). If a capitalised noun counts, Vale has more (about 46), because the rule pattern is unanchored; HKR-057 records the mismatch.
-      - ThingsSpeakNoun gives more true alerts under hakkiri and a precision 6 points lower, most of it from a code span read as the noun of a verb in both tools; HKR-056 records it.
-    plan: openspec/changes/tag-corrections/proposal.md
 
   - id: HKR-054
     title: Read the title of a link as text
@@ -221,23 +128,6 @@ queue:
       - '2026-11-11, found by profiling the package on that file: the selection of a scope took 4.1 s of the 5.3 s of the engine, and the six selections that build the text of the one paragraph took 0.37 to 0.8 s each. Text::build looped over every replacement for each segment and tested every replacement at each line break, so its time grew with the segments times the code spans and links of the block (24,000 spans for 12,000 segments).'
       - 2026-11-11, with binary searches over the replacements, which lie in file order with no overlap, a release build ran the package on the same file in 1.8 s with the same 24,490 alerts, against 5.8 s for the build before it and 24.6 s for the 0.0.5 release binary.
 
-  - id: HKR-056
-    title: Read a code span as a noun in a sequence rule
-    scope: sequence
-    outcome: >-
-      A sequence rule reads a code span as a noun: a rule of a noun and a verb flags a code name that says, and a rule for four lowercase nouns counts none.
-    blocked_by: []
-    acceptance:
-      - A ThingsSpeakNoun case with a code span before says gives an alert under hakkiri, and a NounStack case with a code span in a stack gives none, with tests.
-      - The sequence-check spec states that a code span has the tag NN and reads as the letter X, with tests.
-      - The vale-differences spec lists the difference, since Vale reads the span as a run of stars.
-      - The alerts that Vale and hakkiri do not all give are labelled against a written definition of each rule by two readers, and each false alert that remains is listed.
-      - The package puts a verb tag on the verb token of ThingsSpeakNoun, the tagger reads a noun, a participle and a verb of saying by the place it stands in, and each correction has a test and keeps GUM at 92.53% or above.
-    notes:
-      - 2026-11-12, the alerts of ThingsSpeakNoun and NounStack that the tools do not all give were labelled by two readers each, 304 and 550. By the definitions a code name before says is a thing that speaks, so the refusal of the span removed 64 false and 8 true alerts and left 44 of 268 true ones. The two readers of the 415 NounStack alerts that no code span touches differed on 9, all a hyphenated word before three nouns, settled as false since a hyphenated word is an adjective.
-      - 2026-11-12, reading the span as a noun gave 264 true and 26 false alerts of ThingsSpeakNoun, 20 of the 26 the noun ask or asks and 6 a participle. The verb tag alone cut 34 true alerts and 4 of Vale's, so the tagger corrections for the verbs of saying and asking were added. The result is 274 true and 7 false, all 21 true alerts of Vale, and GUM at 92.54% against 92.53%. 3 of the 7 false are participles that the package's rule removes, 3 are asked to end twice and asked online, where only the thing that is asked tells the participle from a past tense, and 1 is a literal verb that Vale also flags.
-    plan: openspec/changes/code-span-tokens/proposal.md
-
   - id: HKR-057
     title: Make the NounStack pattern match its text
     scope: package
@@ -251,65 +141,6 @@ queue:
       - The result of judging 100 alerts only Vale gives, by the rule text, is 3 true and, with a capitalised noun counted, 15 true. The 100 that only hakkiri gives hold 10 true by either reading.
       - '2026-11-12, an anchor cannot do it: with the pattern ^[a-z][a-z-]*$ neither hakkiri 0.0.5 nor Vale 3.26.0 matches The session lake store path is long., because the pattern is not matched against the token alone. A lookaround, (?<![A-Za-z])[a-z][a-z-]*(?![A-Za-z]), gives the same result in both tools, and the package branch carries it with a case for a stack of capitalised names.'
       - '2026-11-12, found by judging the NounStack alerts of nine repositories: the text of the rule says each noun is a lowercase word, but the pattern [a-z][a-z-]* matches the lowercase letters inside a capitalised name, so both tools count GitHub as a noun of a stack.'
-
-  - id: HKR-059
-    title: Set rule parameters from the config
-    scope: config
-    outcome: >-
-      A glob sets a scalar parameter of a rule by name, as Vale does with
-      Style.Rule.param.
-    blocked_by: []
-    acceptance:
-      - A glob that sets Vale.Repetition.max to 1 lets one repeat pass and reports the next, as Vale does, in a test against its alerts.
-      - A parameter that Vale refuses, a level spelled as a parameter and a structural key such as tokens, is refused with the file and the line.
-    notes:
-      - "2026-11-12, found while probing Vale.Repetition at 66bbb85: ini.go asRuleParam stores Style.Rule.param = value, and defaultRule applies it when the rule compiles. hakkiri's config reads a level, on and off by rule name and no parameter."
-      - 2026-11-12, the key Vale 66bbb85 reads is Style.Rule[param] = value, not Style.Rule.param, and it applies a parameter to every file whichever section sets it, with the last section winning everywhere. hakkiri applies it to the files of the glob that sets it, as the rule-parameters change records.
-    plan: openspec/changes/rule-parameters/proposal.md
-
-  - id: HKR-060
-    title: Read a code span as one star in an existence rule
-    scope: sequence
-    outcome: >-
-      An existence rule reads a code span as one star and drops a match only when it
-      starts or ends on the span, so a match across a span is an alert, as in Vale.
-    blocked_by: []
-    acceptance:
-      - An existence rule reads a code span as one * and drops a match only when it starts or ends on the span, with tests, so a match across a span is an alert as in Vale.
-    plan: openspec/changes/existence-span-mask/proposal.md
-    notes:
-      - '2026-11-12, run_existence dropped each match that overlapped a code span, which cost about 400 true ClauseChain alerts of Vale. It now reads a span as one * and drops a match only when it starts or ends on the span: ClauseChain gives 1,536 alerts on nine repositories where it gave 1,020, and Vale gives 1,492, with none that only Vale gives. The 11 true alerts of Vale that hakkiri seemed to lack were one repository whose configuration the run converted wrongly, so no splitter explains them. Two readers labelled the 40 alerts that only hakkiri gives, 26 true and 14 false, each false one a list of items joined with semicolons, which Vale also gives in 46 of its 88 alerts that hakkiri lacked before; the package pattern cannot tell a list from a chain.'
-
-  - id: HKR-061
-    title: Read the nouns of technical prose as nouns
-    scope: sequence
-    outcome: >-
-      The tagger reads check, prompt, thinking, fade, round and split as nouns in the
-      places where the sampled readings are nouns, so NounStack gives every true alert
-      of Vale.
-    blocked_by: []
-    acceptance:
-      - The tagger reads check, prompt, thinking and fade as nouns after a determiner, prompt, round and split as nouns before pull request in a title, and check at the end of a compound, each word in a list only where the sampled readings are nouns, with tests and GUM at 92.53% or above, and NounStack gives every true alert of Vale.
-    plan: openspec/changes/technical-nouns/proposal.md
-    notes:
-      - 2026-11-12, the tagger read check, split, round, prompt, fade and thinking as a verb, an adverb or an adjective inside a run of nouns, which cost NounStack 7 true alerts of Vale. nouns_of_technical_prose reads three lists of them as nouns, one for each place a noun is certain, with GUM at 92.54% and 134 of the 200 judged conflicts right against 133. Two readers labelled 530 places of the six words in nine repositories. After a determiner check, prompt, thinking and fade are nouns in 163 of 163, round in 41 of 50 and split in 40 of 50, so round and split left that list. NounStack now gives 240 alerts of the 558 the tools diverge on, 44 true and 196 false, where Vale gives 278, 16 true and 262 false, and every true alert of Vale.
-      - 2026-11-12, 12 false NounStack alerts hold a hyphenated word before three nouns, which the pattern [a-z][a-z-]* accepts and the definition counts as an adjective. A tagger rule that reads a hyphenated word as an adjective cost 6 tokens of GUM, so the fix belongs to the package pattern.
-
-  - id: HKR-062
-    title: Give a sequence rule alternative token lists (forms)
-    scope: engine
-    outcome: >-
-      A sequence rule takes forms, a list of token lists, matches where any list
-      matches, and gives every alert the one rule name, so the three shapes of
-      ProseStyle.ThingsSpeak are one rule.
-    blocked_by: []
-    acceptance:
-      - A rule with forms matches where any form does, an alert carries the rule name once, and two forms that match overlapping words give the earlier match.
-      - A rule with one tokens list gives the alerts it gave before, and a rule that sets both tokens and forms, or neither, is refused, with a fault in a form placed on forms[N].tokens.
-      - The sequence-check spec, the instructions, the skill and AGENTS.md state forms, vale-differences records that Vale panics on a rule with forms, and a test equals the three one-list rules of ThingsSpeak to the merged rule.
-    notes:
-      - '2026-11-12, operator decision: the key is forms, a list of mappings that each hold tokens; overlapping matches keep the earlier one.'
-    plan: openspec/changes/sequence-forms/proposal.md
 
   - id: HKR-063
     title: Set how many words a code span counts as
@@ -327,36 +158,6 @@ queue:
       - '2026-11-12, operator decision: a code span counts as one word by default, a setting sets it to zero, at the package, project and glob levels, with a flag and a variable. The key is code_span_size, and its unit is words.'
       - It applies only to word counts and to the metrics built on words. HKR-051 keeps the rule form of LongSentence; this row gives a project the way to count as Vale does.
 
-  - id: HKR-064
-    title: Read a link that names its address as a URL
-    scope: engine
-    outcome: >-
-      A Markdown link whose text equals its address counts no word, as Vale counts
-      none for it, so the word counts of a paragraph and a file with such a link equal Vale's.
-    blocked_by: []
-    acceptance:
-      - A link whose text is its address, inline or by reference, is a gap in the prose around it, and a link with another address counts its words.
-      - With code_span_size 0 and Vale's duplicate-position drop off, no word-count difference over the HKR-063 probes comes from link text.
-    plan: openspec/changes/link-address/proposal.md
-    notes:
-      - '2026-11-12, found by the HKR-063 attribution: Vale replaces the text of an element whose href equals its text with a run of asterisks.'
-
-  - id: HKR-065
-    title: Split sentences around code spans, units and vs.
-    scope: splitter
-    outcome: >-
-      The splitter reads code spans, a unit after a number, vs. and a date as a
-      reader does, and each place where Vale splits otherwise is a vale-differences row with
-      a fixture.
-    blocked_by: []
-    acceptance:
-      - A code span begins and ends a sentence next to a full stop, a unit after a number ends one before a capital, and vs. ends none, each with a test.
-      - The vale-differences spec lists the numbered heading, the version, decimal and task number before a capital, and vs., each with a fixture that pins Vale 66bbb85 and hakkiri.
-    notes:
-      - '2026-11-12, found while attributing the LongSentence, SentenceLength and FlatRhythm alerts of four public repositories: only-hakkiri LongSentence fell from 27 to 7 and SentenceLength from 97 to 29, and 12 new FlatRhythm alerts are true by the rule.'
-      - 2026-11-13, the ProseStyle v0.0.16 alert diff on hakkiri main 45624f3 with PR 152 still found the 75 LongSentence alerts that only hakkiri gave on 0.0.6, 68 false; the operator chose to land this row and run the diff again before HKR-008 closes.
-    plan: openspec/changes/splitter-code-spans/proposal.md
-
   - id: HKR-066
     title: Give each file and segment a language from langdex
     scope: engine
@@ -372,19 +173,6 @@ queue:
     notes:
       - '2026-11-13, operator decision: a language has a name, aliases and extensions, distinct from a file extension, as prettier and oxlint map them; langdex holds the table, generated from GitHub Linguist.'
       - '2026-11-13, found by the Kody thread on PR 131: a file with no reader also took the extension txt, so a rule scoped text.txt reached .rst and README files.'
-
-  - id: HKR-067
-    title: Skip a package style folder named Vale with a warning
-    scope: config
-    outcome: >-
-      A package that holds styles/Vale loads, its other styles lint, and one warning
-      names the folder and says the built-in style Vale wins.
-    blocked_by: []
-    acceptance:
-      - A package with styles/Acme and styles/Vale lints with Acme and warns once about styles/Vale, with a test.
-    notes:
-      - '2026-11-13, operator decision: warn and skip; Vale 66bbb85 skips such a folder without a word, and hakkiri refused the whole config since PR 134.'
-    plan: openspec/changes/vale-style-folder/proposal.md
 
   - id: HKR-068
     title: Read front matter with a parser per format
@@ -402,21 +190,6 @@ queue:
       - '2026-11-13, operator decisions: front matter is document content, not CLI config; the crate is MIT OR Apache-2.0; JSON is read as JSON with struson, picked by a trial against JSONTestSuite; YAML may close with ....'
       - '2026-11-13, found by the Kody thread on PR 133: JSON front matter went through the YAML reader of ctl-core.'
 
-  - id: HKR-069
-    title: Resolve settings by specificity, as CSS does
-    scope: config
-    outcome: >-
-      Every setting that matches a file merges, and for one key the most specific glob wins.
-    blocked_by: []
-    acceptance:
-      - For one key, docs/**/*.md beats *.md, which beats the top level, whatever their order and layer, each with a test.
-      - On or off and the level of a rule resolve as two keys.
-    notes:
-      - '2026-11-13, operator decisions: merge per key, specificity first, origin breaks ties, a marker like !important that only the project may use; the marker spelling is still to be agreed.'
-      - '2026-11-13, found by the Kody thread on PR 141: a package glob beat the project top-level code_span_size.'
-      - '2026-11-13, operator decisions: the tag is !override, after the merge tag of the Compose specification; specificity counts the literal path parts first (design.md section 1).'
-    plan: openspec/changes/settings-cascade/proposal.md
-
   - id: HKR-070
     title: Keep ProseStyle.BareURL under the backtrack limit on long files
     scope: engine
@@ -428,36 +201,6 @@ queue:
       - A long file that failed at 1:1 under hakkiri 0.0.6 lints with its BareURL alerts, with a test.
     notes:
       - '2026-11-13, found in the dotfiles skill lint with hakkiri 0.0.6 and ProseStyle v0.0.14: BareURL reaches the limit of 1,000,000 steps on long files, so the dotfiles turned the rule off.'
-
-  - id: HKR-071
-    title: Break a tie for the project and force a value with !override
-    scope: config
-    outcome: >-
-      At equal specificity the project beats a package, and a value the project tags
-      !override beats every value without the tag.
-    blocked_by:
-      - HKR-069
-    acceptance:
-      - At equal specificity a project setting beats a package setting, and the top level ranks below every glob, each with a test.
-      - A forced value in the project beats every unforced one, and a package that forces a value or any other tag is refused at load, each with a test.
-    plan: openspec/changes/package-cascade/proposal.md
-    notes:
-      - 2026-11-13, split from HKR-069 when its spec went over the 1200-word budget; both changes land in one pull request.
-
-  - id: HKR-072
-    title: Rank a glob with alternatives as the alternative that matches
-    scope: config
-    outcome: >-
-      A glob with {…} groups ranks, for each file, as the most specific of its
-      alternatives that matches that file.
-    blocked_by: []
-    acceptance:
-      - A skip list such as {CHANGELOG.md,notes/**} beats a package glob such as *.{md,mdx,rs} for the files it names, with a test.
-      - A glob ranks as its most specific matching alternative, one GlobSet pass per file finds them, and a glob over 256 alternatives is refused, each with a test.
-    plan: openspec/changes/settings-cascade/proposal.md
-    notes:
-      - 2026-11-13, the ProseStyle v0.0.16 alert diff on hakkiri main found skip lists ranked as *, because the specificity of HKR-069 read a {…} group as no literal character.
-      - 2026-11-13, the operator chose the matched alternative over the most and the least specific alternative fixed at load, and asked that the most specific match win and that it stay fast.
 
   - id: HKR-073
     title: Hold back a match only for the accepted term it is
@@ -497,6 +240,259 @@ queue:
       - The Markdown probe of HKR-027 left this gap open, and vale-differences lists it.
 
 archive:
+  - id: HKR-072
+    title: Rank a glob with alternatives as the alternative that matches
+    scope: config
+    outcome: >-
+      A glob with {…} groups ranks, for each file, as the most specific of its
+      alternatives that matches that file.
+    plan: openspec/changes/archive/2026-11-14-settings-cascade/proposal.md
+    notes:
+      - 2026-11-13, the ProseStyle v0.0.16 alert diff on hakkiri main found skip lists ranked as *, because the specificity of HKR-069 read a {…} group as no literal character.
+      - 2026-11-13, the operator chose the matched alternative over the most and the least specific alternative fixed at load, and asked that the most specific match win and that it stay fast.
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-settings-cascade/
+    disposition: completed
+
+  - id: HKR-071
+    title: Break a tie for the project and force a value with !override
+    scope: config
+    outcome: >-
+      At equal specificity the project beats a package, and a value the project tags
+      !override beats every value without the tag.
+    plan: openspec/changes/archive/2026-11-14-package-cascade/proposal.md
+    notes:
+      - 2026-11-13, split from HKR-069 when its spec went over the 1200-word budget; both changes land in one pull request.
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-package-cascade/
+    disposition: completed
+
+  - id: HKR-069
+    title: Resolve settings by specificity, as CSS does
+    scope: config
+    outcome: >-
+      Every setting that matches a file merges, and for one key the most specific glob wins.
+    notes:
+      - '2026-11-13, operator decisions: merge per key, specificity first, origin breaks ties, a marker like !important that only the project may use; the marker spelling is still to be agreed.'
+      - '2026-11-13, found by the Kody thread on PR 141: a package glob beat the project top-level code_span_size.'
+      - '2026-11-13, operator decisions: the tag is !override, after the merge tag of the Compose specification; specificity counts the literal path parts first (design.md section 1).'
+    plan: openspec/changes/archive/2026-11-14-settings-cascade/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-settings-cascade/
+    disposition: completed
+
+  - id: HKR-067
+    title: Skip a package style folder named Vale with a warning
+    scope: config
+    outcome: >-
+      A package that holds styles/Vale loads, its other styles lint, and one warning
+      names the folder and says the built-in style Vale wins.
+    notes:
+      - '2026-11-13, operator decision: warn and skip; Vale 66bbb85 skips such a folder without a word, and hakkiri refused the whole config since PR 134.'
+    plan: openspec/changes/archive/2026-11-14-vale-style-folder/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-vale-style-folder/
+    disposition: completed
+
+  - id: HKR-065
+    title: Split sentences around code spans, units and vs.
+    scope: splitter
+    outcome: >-
+      The splitter reads code spans, a unit after a number, vs. and a date as a
+      reader does, and each place where Vale splits otherwise is a vale-differences row with
+      a fixture.
+    notes:
+      - '2026-11-12, found while attributing the LongSentence, SentenceLength and FlatRhythm alerts of four public repositories: only-hakkiri LongSentence fell from 27 to 7 and SentenceLength from 97 to 29, and 12 new FlatRhythm alerts are true by the rule.'
+      - 2026-11-13, the ProseStyle v0.0.16 alert diff on hakkiri main 45624f3 with PR 152 still found the 75 LongSentence alerts that only hakkiri gave on 0.0.6, 68 false; the operator chose to land this row and run the diff again before HKR-008 closes.
+    plan: openspec/changes/archive/2026-11-14-splitter-code-spans/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-splitter-code-spans/
+    disposition: completed
+
+  - id: HKR-064
+    title: Read a link that names its address as a URL
+    scope: engine
+    outcome: >-
+      A Markdown link whose text equals its address counts no word, as Vale counts
+      none for it, so the word counts of a paragraph and a file with such a link equal Vale's.
+    plan: openspec/changes/archive/2026-11-14-link-address/proposal.md
+    notes:
+      - '2026-11-12, found by the HKR-063 attribution: Vale replaces the text of an element whose href equals its text with a run of asterisks.'
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-link-address/
+    disposition: completed
+
+  - id: HKR-062
+    title: Give a sequence rule alternative token lists (forms)
+    scope: engine
+    outcome: >-
+      A sequence rule takes forms, a list of token lists, matches where any list
+      matches, and gives every alert the one rule name, so the three shapes of
+      ProseStyle.ThingsSpeak are one rule.
+    notes:
+      - '2026-11-12, operator decision: the key is forms, a list of mappings that each hold tokens; overlapping matches keep the earlier one.'
+    plan: openspec/changes/archive/2026-11-14-sequence-forms/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-sequence-forms/
+    disposition: completed
+
+  - id: HKR-061
+    title: Read the nouns of technical prose as nouns
+    scope: sequence
+    outcome: >-
+      The tagger reads check, prompt, thinking, fade, round and split as nouns in the
+      places where the sampled readings are nouns, so NounStack gives every true alert
+      of Vale.
+    plan: openspec/changes/archive/2026-11-14-technical-nouns/proposal.md
+    notes:
+      - 2026-11-12, the tagger read check, split, round, prompt, fade and thinking as a verb, an adverb or an adjective inside a run of nouns, which cost NounStack 7 true alerts of Vale. nouns_of_technical_prose reads three lists of them as nouns, one for each place a noun is certain, with GUM at 92.54% and 134 of the 200 judged conflicts right against 133. Two readers labelled 530 places of the six words in nine repositories. After a determiner check, prompt, thinking and fade are nouns in 163 of 163, round in 41 of 50 and split in 40 of 50, so round and split left that list. NounStack now gives 240 alerts of the 558 the tools diverge on, 44 true and 196 false, where Vale gives 278, 16 true and 262 false, and every true alert of Vale.
+      - 2026-11-12, 12 false NounStack alerts hold a hyphenated word before three nouns, which the pattern [a-z][a-z-]* accepts and the definition counts as an adjective. A tagger rule that reads a hyphenated word as an adjective cost 6 tokens of GUM, so the fix belongs to the package pattern.
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-technical-nouns/
+    disposition: completed
+
+  - id: HKR-060
+    title: Read a code span as one star in an existence rule
+    scope: sequence
+    outcome: >-
+      An existence rule reads a code span as one star and drops a match only when it
+      starts or ends on the span, so a match across a span is an alert, as in Vale.
+    plan: openspec/changes/archive/2026-11-14-existence-span-mask/proposal.md
+    notes:
+      - '2026-11-12, run_existence dropped each match that overlapped a code span, which cost about 400 true ClauseChain alerts of Vale. It now reads a span as one * and drops a match only when it starts or ends on the span: ClauseChain gives 1,536 alerts on nine repositories where it gave 1,020, and Vale gives 1,492, with none that only Vale gives. The 11 true alerts of Vale that hakkiri seemed to lack were one repository whose configuration the run converted wrongly, so no splitter explains them. Two readers labelled the 40 alerts that only hakkiri gives, 26 true and 14 false, each false one a list of items joined with semicolons, which Vale also gives in 46 of its 88 alerts that hakkiri lacked before; the package pattern cannot tell a list from a chain.'
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-existence-span-mask/
+    disposition: completed
+
+  - id: HKR-059
+    title: Set rule parameters from the config
+    scope: config
+    outcome: >-
+      A glob sets a scalar parameter of a rule by name, as Vale does with
+      Style.Rule.param.
+    notes:
+      - "2026-11-12, found while probing Vale.Repetition at 66bbb85: ini.go asRuleParam stores Style.Rule.param = value, and defaultRule applies it when the rule compiles. hakkiri's config reads a level, on and off by rule name and no parameter."
+      - 2026-11-12, the key Vale 66bbb85 reads is Style.Rule[param] = value, not Style.Rule.param, and it applies a parameter to every file whichever section sets it, with the last section winning everywhere. hakkiri applies it to the files of the glob that sets it, as the rule-parameters change records.
+    plan: openspec/changes/archive/2026-11-14-rule-parameters/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-rule-parameters/
+    disposition: completed
+
+  - id: HKR-056
+    title: Read a code span as a noun in a sequence rule
+    scope: sequence
+    outcome: >-
+      A sequence rule reads a code span as a noun: a rule of a noun and a verb flags a code name that says, and a rule for four lowercase nouns counts none.
+    notes:
+      - 2026-11-12, the alerts of ThingsSpeakNoun and NounStack that the tools do not all give were labelled by two readers each, 304 and 550. By the definitions a code name before says is a thing that speaks, so the refusal of the span removed 64 false and 8 true alerts and left 44 of 268 true ones. The two readers of the 415 NounStack alerts that no code span touches differed on 9, all a hyphenated word before three nouns, settled as false since a hyphenated word is an adjective.
+      - 2026-11-12, reading the span as a noun gave 264 true and 26 false alerts of ThingsSpeakNoun, 20 of the 26 the noun ask or asks and 6 a participle. The verb tag alone cut 34 true alerts and 4 of Vale's, so the tagger corrections for the verbs of saying and asking were added. The result is 274 true and 7 false, all 21 true alerts of Vale, and GUM at 92.54% against 92.53%. 3 of the 7 false are participles that the package's rule removes, 3 are asked to end twice and asked online, where only the thing that is asked tells the participle from a past tense, and 1 is a literal verb that Vale also flags.
+    plan: openspec/changes/archive/2026-11-14-code-span-tokens/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-code-span-tokens/
+    disposition: completed
+
+  - id: HKR-052
+    title: Correct the tags that the model gets wrong on our prose
+    scope: tagger
+    outcome: >-
+      hakkiri reads the cases that the model tags wrongly on our prose as the old model does, so NounStack and ThingsSpeakNoun give no alert for a verb read as a noun.
+    notes:
+      - "2026-11-11, found by the ProseStyle port: hakkiri's tagger is faithful to prose at b33e60d, the version Vale 66bbb85 builds on, and gives the tags a Go program on that version gives. Vale 3.26.0 ships prose v3.2.2, whose model is older (3,411,804 bytes, the bytes feature template, MIT) and tags 'reads' in 'The freshness harness reads stdout.' as VBZ, where the b33e60d model (1,877,993 bytes, UD English EWT, CC BY-SA 4.0, the runes template) gives NNS."
+      - '2026-11-11, on 1,296 sentences of our documents the two models give a different tag for 3,395 of 18,431 tokens, 18.4%. The most common changes from the older to the newer are JJ to NN (545), NNS to VBZ (405) and VBZ to NNS (128). Two ways to close it: ship the v3.2.2 model, with the bytes template that hakkiri does not read yet, or keep the model and accept the difference in the vale-differences spec.'
+      - '2026-11-12, decided by the lead: keep the b33e60d model and correct its tags after it, each correction a rule with a reason, not a second model. UD English GUM gives 92.16% for the model and 90.26% for the old one.'
+      - 2026-11-12, of 200 conflicts drawn at random from our documents and judged by hand, the old model was right in 131 and the model alone in 103, counting a capital modal as right when it reads MD. The corrections bring the model to 140 and GUM to 92.53%.
+      - 2026-11-12, the corrections removed 68 alerts of NounStack and ThingsSpeakNoun on nine repositories and added none. All 68 were false by hand, each a verb read as a plural noun.
+      - Judged on the rule text, which asks for four lowercase nouns, hakkiri has more true NounStack alerts than Vale (about 30 against 14). If a capitalised noun counts, Vale has more (about 46), because the rule pattern is unanchored; HKR-057 records the mismatch.
+      - ThingsSpeakNoun gives more true alerts under hakkiri and a precision 6 points lower, most of it from a code span read as the noun of a verb in both tools; HKR-056 records it.
+    plan: openspec/changes/archive/2026-11-14-tag-corrections/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-tag-corrections/
+    disposition: completed
+
+  - id: HKR-049
+    title: Lint front matter values
+    scope: markdown
+    outcome: The values in a Markdown file's front matter are linted as text, as Vale does.
+    notes:
+      - '2026-11-11, found while probing comment controls: Vale flags the word very in the title value of a front matter block, and hakkiri skips the whole block. The probe is tests/fixtures/markup-differences/text/m2.md. Which keys Vale lints is not measured yet.'
+      - '2026-11-12, measured on Vale 66bbb85 over ten files and three configs (590 alerts): it lints the top-level string values only, as the front-matter spec lists, and places 4 alerts at the wrong text per config: the second line of a folded scalar, a TOML value found by searching the block, and a !!str value.'
+      - 2026-11-12, an earlier reader of our own (PR 106, reverted in PR 113) skipped anchors, aliases and complex keys. The rebuild reads YAML and TOML through ctl-core Input::top_level, and only dates and the plain value << need a filter in hakkiri, since yaml.v3 reads them as no string and serde-saphyr as one.
+      - '2026-11-12, measured in a box: the release binary grew from 14,375,208 to 15,038,184 bytes (662,976, 4.6%) with ctl-core 0.7.3 and its input-toml feature, which adds the toml crate.'
+      - '2026-11-12, ctl-core 0.7.3 refused a whole YAML block that held a repeated key, a merge key, .inf, -.inf or .NaN as a value, and left out a number or null key, where Vale lints the other values. ctl-core 0.7.4 (CTC-055) lists them all, so the probe file f7 holds its three original values again, and f11 to f15 record the 306 more alerts of Vale for an alias, a repeated key, a merge key, number and null keys and the three non-finite floats.'
+      - '2026-11-12, Vale fails a file whose front matter no parser reads, and a sequence key as well, with E201 on line 1, and lints none of it. hakkiri fails the file with the line of the parser problem and lints the rest, and lints the rest of a block with a sequence key, which a parser reads. Vale puts a value after an anchor at the anchor, as it does after a tag, so the four misplaced alerts per config are nine.'
+    plan: openspec/changes/archive/2026-11-14-front-matter-values/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-front-matter-values/
+    disposition: completed
+
+  - id: HKR-027
+    title: Probe the Markdown parser against Vale's converter
+    scope: tree
+    outcome: >-
+      The differences between hakkiri's Markdown parser and Vale's converter are
+      measured on one corpus.
+    notes:
+      - '2026-11-10, found while matching HTML-block text: a Markdown paragraph `a*b*c` reads `abc` in hakkiri and `a bc` in Vale, which reads the HTML its converter writes, where an opening inline tag puts a space before its text. The corpus covers inline markup between letters.'
+      - '2026-11-12, found while probing comment controls: Vale 66bbb85 renders a footnote definition at the end of the document, in the order of its references, and lints no definition that nothing references; hakkiri reads each definition where it stands and lints an unreferenced one. A comment inside a definition acts at the end of the document in Vale. Vale also loses an alert in one probe: for `A1 very[^a] A2 very.` it reports `A1 very` and `C1 very` and not `A2 very` when the definition reads `[^a]: C1 very.`, and it reports `A2 very` when the definition reads `[^a]: C1 really.` or `[^a]: very C1.`. The cause is not found. The corpus covers footnotes.'
+    plan: openspec/changes/archive/2026-11-14-markdown-probe/proposal.md
+    completed: 2026-11-14T07:34:09
+    evidence:
+      - openspec/changes/archive/2026-11-14-markdown-probe/
+    disposition: completed
+
+  - id: HKR-026
+    title: Run Vale's built-in spelling rule
+    scope: engine
+    outcome: >-
+      A project that enables Vale.Spelling gets its alerts from hakkiri, with Vale's default ignore list.
+    plan: openspec/changes/archive/2026-11-14-vale-spelling/proposal.md
+    completed: 2026-11-14T07:34:08
+    evidence:
+      - openspec/changes/archive/2026-11-14-vale-spelling/
+    disposition: completed
+
+  - id: HKR-038
+    title: Run the built-in Vale.Repetition rule
+    scope: rules
+    outcome: >-
+      A glob that lists the style Vale runs the built-in Vale.Repetition rule with
+      Vale defaults.
+    notes:
+      - '2026-11-11, size: one embedded rule, extends repetition, level error, scope text, ignorecase, alpha, tokens [^\s.!?]+. Vale.Terms and Vale.Avoid belong to HKR-019, and Vale.Spelling to HKR-026.'
+    plan: openspec/changes/archive/2026-11-14-vale-repetition/proposal.md
+    completed: 2026-11-14T07:34:08
+    evidence:
+      - openspec/changes/archive/2026-11-14-vale-repetition/
+    disposition: completed
+
+  - id: HKR-041
+    title: Read YAML vocabularies
+    scope: config
+    outcome: >-
+      A vocabulary folder may hold vocab.yml, whose accept and reject entries take
+      the options regex, ignorecase and flags, as in Vale.
+    plan: openspec/changes/archive/2026-11-14-yaml-vocabularies/proposal.md
+    notes:
+      - "2026-11-12, measured on Vale 66bbb85 over 12 faulty vocabularies and 4 alert configs: yaml.v3 reads regex: yes as true, skips a null entry, and ignores a key the file does not define; Vale finds the affix file in each search path's dictionaries folder, then in DICPATH."
+      - '2026-11-12, lead decision: affix looks in the package that holds the vocabulary, then in every other loaded package in order, never in DICPATH; every problem is reported with its file and line, where Vale stops at the first; a folder with vocab.yml and vocab.yaml reads both.'
+    completed: 2026-11-14T07:34:08
+    evidence:
+      - openspec/changes/archive/2026-11-14-yaml-vocabularies/
+    disposition: completed
+
   - id: HKR-008
     title: Run ProseStyle on hakkiri
     scope: prose-style
