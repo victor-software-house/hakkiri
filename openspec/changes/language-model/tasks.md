@@ -43,4 +43,5 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 6. Integration
 
-- [ ] 6.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+- [x] 6.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+  Evidence, 2026-11-14 (UTC): The CI of [pull request 160](https://github.com/victor-software-house/hakkiri/pull/160) passed, and it merged as `962f383`.

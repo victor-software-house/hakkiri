@@ -33,8 +33,10 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 4. Integration
 
-- [ ] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
-- [ ] 4.2 Take up the other languages of [HKR-017][ledger] in later changes, each with its fixture and its size.
+- [x] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+  Evidence, 2026-11-14 (UTC): The CI of [pull request 163](https://github.com/victor-software-house/hakkiri/pull/163) passed, and it merged as `66f2cb3`.
+- [x] 4.2 Take up the other languages of [HKR-017][ledger] in later changes, each with its fixture and its size.  
+  Evidence, 2026-11-14 (UTC): The row stays queued for the languages this change leaves, with no plan until the next change.
 
 [design-1]: design.md#1-the-first-tranche-is-the-languages-the-repositories-use
 [design-9]: design.md#9-what-the-files-show
