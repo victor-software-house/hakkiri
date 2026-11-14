@@ -105,10 +105,11 @@ clap = { version = "4.6.7", default-features = false, features = [
 ctl-core = { version = "0.7.5", default-features = false, features = [
   "app",
   "input",
-  # Front matter in TOML.
-  "input-toml",
 ] }
 fancy-regex = "0.20.1"
+# The front matter of a Markdown file: its block and its top-level values, one
+# parser per format.
+front-matter = "0.0.2"
 globset = { version = "0.4.21", default-features = false }
 # A walk that skips what .gitignore, .git/info/exclude and the global git
 # excludes ignore, as ripgrep does.
