@@ -110,8 +110,8 @@ fn value_node(source: &str, value: &Value) -> Option<Node> {
 /// number that yaml.v3 reads and the YAML 1.2 core schema does not.
 ///
 /// yaml.v3, the parser Vale reads front matter with, reads them as no string.
-/// serde-saphyr reads them as strings, unless a tag such as `!!str` says
-/// otherwise.
+/// The front-matter crate reads them as strings, by the YAML 1.2 core schema,
+/// so hakkiri leaves them out unless a tag such as `!!str` says otherwise.
 fn plain_non_string(source: &str, value: &Range<usize>) -> bool {
     let line_start = source
         .get(..value.start)
