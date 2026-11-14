@@ -442,7 +442,7 @@ fn first_group(glob: &str) -> Option<(usize, usize, Vec<usize>)> {
     None
 }
 
-/// The glob `pattern`, read by the rules of gitignore and EditorConfig.
+/// The glob `pattern`, read by the rules of gitignore and `EditorConfig`.
 ///
 /// `*`, `?` and a class stay inside one folder, and `**` spans folders.
 /// A pattern with no `/` matches the file name in any folder, and a leading `/`

@@ -61,7 +61,7 @@ impl Formats {
     ///
     /// An entry named by the file's extension comes first. Then, in the order
     /// of the keys as text, an entry whose key is the file's name, or a glob
-    /// that matches its name or its path.
+    /// that matches its path by the rules of gitignore.
     pub(crate) fn language_of(&self, path: &str) -> Option<Language> {
         let extension = Path::new(path)
             .extension()
@@ -73,10 +73,13 @@ impl Formats {
         let name = path.rsplit('/').next().unwrap_or(path);
         self.entries.iter().find_map(|(key, entry)| {
             let hit = match &entry.glob {
-                Some(glob) => glob.is_match(name) || glob.is_match(path),
+                Some(glob) => glob.is_match(path),
                 None => key == name,
             };
             hit.then_some(entry.language)
         })
     }
 }
+
+#[cfg(test)]
+mod tests;
