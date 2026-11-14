@@ -284,3 +284,17 @@ fn blanking_keeps_each_line_and_each_byte_offset() {
     );
     assert_eq!(blank(source, &block), expected);
 }
+
+#[test]
+fn a_line_that_opens_with_a_brace_and_is_no_json_object_is_no_block() {
+    for source in [
+        "{/* note */}\n\nBody.\n",
+        "{props.title}\n\nBody.\n",
+        "{% raw %}\nBody.\n{% endraw %}\n",
+        "{{< shortcode >}}\n\nBody.\n",
+        "{\"title\": \"x\"} trailing\n\nBody.\n",
+    ] {
+        assert_eq!(span(source), None, "{source:?}");
+        assert_eq!(fault(source), None, "{source:?}");
+    }
+}
