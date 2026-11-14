@@ -21,9 +21,11 @@ use crate::{Parsed, fence, frontmatter, html, html_text, math};
 /// Which constructs the parser reads.
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum Flavor {
-    /// A `.md` file: GFM and front matter.
+    /// A `.md` file: GFM. hakkiri cuts the front matter before parsing, and
+    /// markdown-rs reads none.
     Markdown,
-    /// An `.mdx` file: MDX, GFM and front matter.
+    /// An `.mdx` file: MDX and GFM. hakkiri cuts the front matter before
+    /// parsing, and markdown-rs reads none.
     Mdx,
     /// The text of a comment: GFM, with no front matter.
     Comment,
@@ -32,17 +34,9 @@ pub(crate) enum Flavor {
 impl Flavor {
     fn options(self) -> ParseOptions {
         match self {
-            Self::Markdown => ParseOptions {
-                constructs: Constructs {
-                    frontmatter: true,
-                    ..Constructs::gfm()
-                },
-                ..ParseOptions::default()
-            },
-            Self::Comment => ParseOptions::gfm(),
+            Self::Markdown | Self::Comment => ParseOptions::gfm(),
             Self::Mdx => ParseOptions {
                 constructs: Constructs {
-                    frontmatter: true,
                     gfm_autolink_literal: true,
                     gfm_footnote_definition: true,
                     gfm_label_start_footnote: true,
@@ -214,6 +208,17 @@ pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
 /// The prose nodes of `source`, its number of code blocks, and the HTML
 /// comments of a Markdown file.
 pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
+    // The front matter is metadata, whatever its form, so it is blanked out of
+    // the text that markdown-rs parses, and its values come from the file.
+    let file = source;
+    let blanked;
+    let source = match frontmatter::span(file) {
+        Some(span) if !matches!(flavor, Flavor::Comment) => {
+            blanked = frontmatter::blank(file, &span);
+            &blanked
+        }
+        _ => file,
+    };
     let mut root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
     // Vale reads math as code, which markdown-rs reads by other rules, so the
     // text is parsed again with each math span marked as code.
@@ -243,9 +248,9 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     let mut nodes = builder.visit(&root, Scope::TableCell).nodes;
     math::include_delimiters(&mut nodes, &spans);
     if !matches!(flavor, Flavor::Comment) {
-        // JSON front matter is no construct of markdown-rs, so its values are
-        // read from the start of the file, ahead of the body.
-        let mut front = frontmatter::json_nodes(source);
+        // The block is no body text, so its values are read from the file as
+        // written, ahead of the body.
+        let mut front = frontmatter::leading(file);
         front.append(&mut nodes);
         nodes = front;
     }
@@ -855,9 +860,15 @@ impl Builder<'_> {
                 Step::Open(Scope::heading(heading.depth).map_or(Kind::Transparent, Kind::Scoped))
             }
             Mdast::Blockquote(_) => Step::Open(Kind::Scoped(Scope::Blockquote)),
-            // A reference is a number that Vale places elsewhere, and a
-            // definition that nothing references is not rendered.
-            Mdast::FootnoteReference(_) => Step::Done(Visited::cut(span_of(node))),
+            // A reference is a number that Vale places elsewhere, math and
+            // ESM are code, and markdown-rs reads no front matter.
+            Mdast::FootnoteReference(_)
+            | Mdast::MdxjsEsm(_)
+            | Mdast::InlineMath(_)
+            | Mdast::Math(_)
+            | Mdast::Yaml(_)
+            | Mdast::Toml(_) => Step::Done(Visited::cut(span_of(node))),
+            // A definition that nothing references is not rendered.
             Mdast::FootnoteDefinition(definition)
                 if !self.referenced.contains(&definition.identifier) =>
             {
@@ -901,22 +912,8 @@ impl Builder<'_> {
                     ..Visited::tag(span)
                 })
             }
-            Mdast::Yaml(_) | Mdast::Toml(_) => {
-                let span = span_of(node);
-                let toml = matches!(node, Mdast::Toml(_));
-                let nodes = span
-                    .as_ref()
-                    .map_or_default(|span| frontmatter::nodes(self.source, span, toml));
-                Step::Done(Visited {
-                    nodes,
-                    ..Visited::cut(span)
-                })
-            }
             Mdast::MdxFlowExpression(_) | Mdast::MdxTextExpression(_) => {
                 Step::Done(self.expression(node))
-            }
-            Mdast::MdxjsEsm(_) | Mdast::InlineMath(_) | Mdast::Math(_) => {
-                Step::Done(Visited::cut(span_of(node)))
             }
             Mdast::Definition(definition) => {
                 Step::Done(self.definition(node, definition.title.is_some()))
