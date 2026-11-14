@@ -496,7 +496,7 @@ pub struct Tree {
     pub comments: Vec<Comment>,
     /// The file bytes of the text that a doc comment marks as no prose, such
     /// as a Go doc link. An alert whose match lies wholly in one is dropped.
-    /// A Markdown or MDX file gives none.
+    /// A Markdown or MDX file gives those of the comments in its fences.
     pub masks: Vec<Range<usize>>,
     /// Why the front matter of a Markdown or MDX file is no YAML, TOML or JSON
     /// that its parser reads, as the line of the file and the parser's words.

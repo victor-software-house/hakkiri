@@ -98,16 +98,8 @@ pub fn parse_ignoring(
         None
     };
     let (roots, code_blocks, comments, masks) = match language {
-        Language::Markdown => {
-            let (roots, code_blocks, comments) =
-                ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?;
-            (roots, code_blocks, comments, Vec::new())
-        }
-        Language::Mdx => {
-            let (roots, code_blocks, comments) =
-                ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?;
-            (roots, code_blocks, comments, Vec::new())
-        }
+        Language::Markdown => ignore::document(source, markdown::Flavor::Markdown, blocks, tokens)?,
+        Language::Mdx => ignore::document(source, markdown::Flavor::Mdx, blocks, tokens)?,
         Language::Rust => source_roots(comments::Dialect::Rust, source, blocks, tokens)?,
         Language::TypeScript => {
             source_roots(comments::Dialect::TypeScript, source, blocks, tokens)?
@@ -139,7 +131,7 @@ pub fn parse_ignoring(
 }
 
 /// The roots, the code block count, the HTML comments and the masks of a file.
-type SourceRoots = (Vec<Node>, usize, Vec<Comment>, Vec<Range<usize>>);
+pub(crate) type Parsed = (Vec<Node>, usize, Vec<Comment>, Vec<Range<usize>>);
 
 /// The roots of a source file in `dialect`, with no code blocks and no HTML
 /// comments, which only a Markdown file holds.
@@ -148,7 +140,7 @@ fn source_roots(
     source: &str,
     blocks: &[&Pattern],
     tokens: &[&Pattern],
-) -> Result<SourceRoots, Error> {
+) -> Result<Parsed, Error> {
     let (roots, masks) = comments::roots(dialect, source, blocks, tokens)?;
     Ok((roots, 0, Vec::new(), masks))
 }

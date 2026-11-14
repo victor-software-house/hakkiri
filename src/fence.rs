@@ -115,34 +115,37 @@ fn language_word(lang: &str) -> &str {
 }
 
 /// The nodes of the comments in the fenced code block `code`, which spans
-/// `span` of `source`.
+/// `span` of `source`, and the file bytes of the doc links and names in them
+/// that no prose reads, as a source file gives its masks.
 ///
 /// There are none when hakkiri reads no comments of its language, when the
 /// block has none, and when its code does not map line for line onto `source`.
 ///
 /// Each comment node, and every node inside it, has the language of the fence.
-pub(crate) fn nodes(source: &str, span: &Range<usize>, code: &Code) -> Vec<Node> {
+pub(crate) fn nodes(
+    source: &str,
+    span: &Range<usize>,
+    code: &Code,
+) -> (Vec<Node>, Vec<Range<usize>>) {
     let Some((language, _)) = code
         .lang
         .as_deref()
         .map(language_word)
         .and_then(langdex::by_fence)
     else {
-        return Vec::new();
+        return (Vec::new(), Vec::new());
     };
     let Some(dialect) = Language::of(language).and_then(Dialect::of) else {
-        return Vec::new();
+        return (Vec::new(), Vec::new());
     };
     if code.value.is_empty() {
-        return Vec::new();
+        return (Vec::new(), Vec::new());
     }
     let Some(placement) = Placement::new(source, span, &code.value) else {
-        return Vec::new();
+        return (Vec::new(), Vec::new());
     };
-    // The masks of doc links hold offsets of the fence's code, which the file
-    // does not have, so a fence has none.
-    let Ok((roots, _masks)) = comments::roots(dialect, &code.value, &[], &[]) else {
-        return Vec::new();
+    let Ok((roots, masks)) = comments::roots(dialect, &code.value, &[], &[]) else {
+        return (Vec::new(), Vec::new());
     };
     let mut nodes: Vec<Node> = roots.into_iter().flat_map(|root| root.children).collect();
     for comment in &mut nodes {
@@ -160,7 +163,11 @@ pub(crate) fn nodes(source: &str, span: &Range<usize>, code: &Code) -> Vec<Node>
             pending.extend(node.children.iter_mut());
         }
     }
-    nodes
+    let masks = masks
+        .into_iter()
+        .flat_map(|mask| placement.ranges(mask))
+        .collect();
+    (nodes, masks)
 }
 
 #[cfg(test)]

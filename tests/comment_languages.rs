@@ -180,3 +180,27 @@ fn a_go_link_with_a_target_is_prose() -> TestResult {
     assert_eq!(matched, ["starts", "it", "see", "See", "Stop", "now"]);
     Ok(())
 }
+
+/// A rule that flags each bracketed word, which Markdown reads as text when no
+/// definition makes it a link.
+const BRACKETS: &str = "extends: existence\nmessage: \"found '%s'\"\nnonword: true\nscope: text\ntokens:\n  - '\\[[^\\]]*\\]'\n";
+
+#[test]
+fn a_go_doc_link_in_a_fence_is_masked_as_in_a_go_file() -> TestResult {
+    let source =
+        "See [Name] in prose.\n\n```go\n// Run starts it, see [Name].\nfunc Run() {}\n```\n";
+    let found = alerts(Language::Markdown, BRACKETS, source)?;
+    let lines: Vec<usize> = found.iter().map(|(line, _)| *line).collect();
+    assert_eq!(lines, [1], "{found:?}");
+    Ok(())
+}
+
+#[test]
+fn a_rust_doc_link_in_a_fence_is_masked_as_in_a_rust_file() -> TestResult {
+    let source =
+        "See [`Name`] in prose.\n\n```rust\n/// Runs it, see [`Name`].\nfn run() {}\n```\n";
+    let found = alerts(Language::Markdown, BRACKETS, source)?;
+    let lines: Vec<usize> = found.iter().map(|(line, _)| *line).collect();
+    assert_eq!(lines, [1], "{found:?}");
+    Ok(())
+}

@@ -16,7 +16,7 @@ use tree_sitter::{InputEdit, Node as SyntaxNode, Parser, Point, Tree};
 
 use crate::error::Error;
 use crate::tree::{Comment, Node, Scope};
-use crate::{fence, frontmatter, html, html_text, math};
+use crate::{Parsed, fence, frontmatter, html, html_text, math};
 
 /// Which constructs the parser reads.
 #[derive(Clone, Copy, Debug)]
@@ -186,20 +186,23 @@ pub(crate) struct Built {
     pub(crate) code_blocks: usize,
     /// The HTML comments of a Markdown file, in file order.
     pub(crate) comments: Vec<Comment>,
+    /// The file bytes of the doc links and names in the comments of fenced
+    /// code blocks that no prose reads.
+    pub(crate) masks: Vec<Range<usize>>,
 }
 
 /// The tree of a whole Markdown or MDX file: one `raw` root over the prose
 /// nodes, the number of its fenced and indented code blocks, and its HTML
 /// comments.
-pub(crate) fn document(
-    source: &str,
-    flavor: Flavor,
-) -> Result<(Vec<Node>, usize, Vec<Comment>), Error> {
+/// It also gives the doc links and names in the comments of its fences that no
+/// prose reads.
+pub(crate) fn document(source: &str, flavor: Flavor) -> Result<Parsed, Error> {
     let built = build(source, flavor)?;
     Ok((
         vec![Node::new(Scope::Raw, 0..source.len(), built.nodes)],
         built.code_blocks,
         built.comments,
+        built.masks,
     ))
 }
 
@@ -233,6 +236,7 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
         source,
         fences: !matches!(flavor, Flavor::Comment),
         code_blocks: Cell::new(0),
+        masks: RefCell::new(Vec::new()),
         addresses: addresses(&root),
         referenced: footnotes_referenced(&root),
     };
@@ -253,6 +257,7 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
         nodes,
         code_blocks: builder.code_blocks.get(),
         comments,
+        masks: builder.masks.into_inner(),
     })
 }
 
@@ -385,6 +390,9 @@ struct Builder<'a> {
     fences: bool,
     /// The fenced and indented code blocks seen so far.
     code_blocks: Cell<usize>,
+    /// The doc links and names in the comments of the fences seen so far, as
+    /// file bytes.
+    masks: RefCell<Vec<Range<usize>>>,
     /// The address each link definition gives its label.
     addresses: HashMap<String, String>,
     /// The identifiers of the footnotes that some reference names.
@@ -873,10 +881,11 @@ impl Builder<'_> {
             Mdast::Code(code) => {
                 self.code_blocks.set(self.code_blocks.get() + 1);
                 let span = span_of(node);
-                let nodes = span
+                let (nodes, masks) = span
                     .as_ref()
                     .filter(|_| self.fences)
                     .map_or_default(|span| fence::nodes(self.source, span, code));
+                self.masks.borrow_mut().extend(masks);
                 Step::Done(Visited {
                     nodes,
                     ..Visited::cut(span)
