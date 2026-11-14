@@ -32,4 +32,4 @@ hakkiri's package moves that rule onto the scopes it can read cheaply, and no sc
 - Changed: the Markdown builder, `tests/select.rs`, the `scope-selection` spec and a patch changeset.
 - Not changed: the alerts of any rule that names no `title` scope.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
