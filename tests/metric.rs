@@ -398,3 +398,56 @@ fn a_semicolon_with_word_boundaries() -> TestResult {
     );
     Ok(())
 }
+
+/// Where a `metric` alert on a block points, for a paragraph and for list
+/// items, a nested one among them.
+///
+/// hakkiri points at the first byte of the measured node, past its bullet.
+/// Vale 66bbb85 points at column 1 of the block's last line, at lines 3, 6, 9
+/// and 11 of this input. Both count the nested item as its own block, so the
+/// item `Short.` stays under the limit.
+#[test]
+fn a_metric_alert_points_at_the_first_byte_of_its_node() -> TestResult {
+    let source = indoc! {"
+        One two three
+        four five six
+        seven eight.
+
+        - Item one two
+          three four five.
+        - Short.
+          - Nested one two
+            three four five.
+        - Last item one
+          two three four.
+    "};
+    let rules = [
+        Rule::from_text(
+            "Team.Paragraph",
+            "Team/Paragraph.yml",
+            "extends: metric\nmessage: \"%s\"\nscope: paragraph\nformula: words\ncondition: '> 3'\n",
+        )?,
+        Rule::from_text(
+            "Team.ListItem",
+            "Team/ListItem.yml",
+            "extends: metric\nmessage: \"%s\"\nscope: list\nformula: words\ncondition: '> 3'\n",
+        )?,
+    ];
+    let tree = parse(Language::Markdown, source)?;
+    let mut found: Vec<(String, usize, usize)> =
+        lint(&rules, &tree, source, tree.language.langdex().as_slice())?
+            .into_iter()
+            .map(|alert| (alert.rule, alert.line, alert.first_column))
+            .collect();
+    found.sort_by_key(|(_, line, _)| *line);
+    assert_eq!(
+        found,
+        [
+            ("Team.Paragraph".to_owned(), 1, 1),
+            ("Team.ListItem".to_owned(), 5, 3),
+            ("Team.ListItem".to_owned(), 8, 5),
+            ("Team.ListItem".to_owned(), 10, 3),
+        ]
+    );
+    Ok(())
+}
