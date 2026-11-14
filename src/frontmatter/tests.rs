@@ -93,6 +93,13 @@ fn a_date_and_a_merge_key_are_no_text_unless_tagged_or_quoted() {
 }
 
 #[test]
+fn a_number_that_yaml_v3_reads_is_no_text_and_a_near_miss_is() {
+    let source = "---\na: 1_000\nb: 0b11\nc: -0b11\nd: 1_000.5\ne: 0x_1F\nf: _1000\ng: 1_000a\nh: 0b12\ni: v1_0\n---\n";
+    let keys: Vec<_> = values(source).into_iter().map(|(key, _)| key).collect();
+    assert_eq!(keys, ["f", "g", "h", "i"]);
+}
+
+#[test]
 fn an_anchor_before_a_value_or_a_key_leaves_the_text() {
     let source = "---\na: &x anchored\n&k b: keyed\n---\n";
     assert_eq!(values(source), [pair("a", "anchored"), pair("b", "keyed")]);

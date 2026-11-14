@@ -106,7 +106,8 @@ fn value_node(source: &str, value: &Value) -> Option<Node> {
     node(&value.key, segments, join)
 }
 
-/// Whether the plain scalar at `value` is a date or the merge key `<<`.
+/// Whether the plain scalar at `value` is a date, the merge key `<<` or a
+/// number that yaml.v3 reads and the YAML 1.2 core schema does not.
 ///
 /// yaml.v3, the parser Vale reads front matter with, reads them as no string.
 /// serde-saphyr reads them as strings, unless a tag such as `!!str` says
@@ -121,7 +122,65 @@ fn plain_non_string(source: &str, value: &Range<usize>) -> bool {
         .and_then(|before| before.split_whitespace().next_back())
         .is_some_and(|token| token.starts_with('!'));
     let scalar = text(source, value).trim();
-    !tagged && (scalar == "<<" || is_timestamp(scalar))
+    !tagged && (scalar == "<<" || is_timestamp(scalar) || is_yaml_v3_number(scalar))
+}
+
+/// A number as yaml.v3 reads a plain scalar, in
+/// [`resolve.go`](https://github.com/go-yaml/yaml/blob/v3/resolve.go): it
+/// starts with a digit, `+` or `-`, and with every `_` removed it is an
+/// integer by the rules of Go's `strconv.ParseInt(s, 0, 64)`, or a float.
+/// The front-matter crate reads the YAML 1.2 core schema, which has no `_` and
+/// no `0b`.
+/// An integer too large for 64 bits is still a number here.
+fn is_yaml_v3_number(scalar: &str) -> bool {
+    if !scalar.starts_with(|first: char| first.is_ascii_digit() || first == '+' || first == '-') {
+        return false;
+    }
+    let number: String = scalar
+        .chars()
+        .filter(|&character| character != '_')
+        .collect();
+    let unsigned = number.strip_prefix(['+', '-']).unwrap_or(&number);
+    is_go_integer(unsigned) || is_go_float(unsigned)
+}
+
+/// Whether the unsigned `text` is an integer that `ParseInt` reads with base 0:
+/// `0x` hex, `0o` octal, `0b` binary, a leading `0` octal, or decimal.
+fn is_go_integer(text: &str) -> bool {
+    let prefixed = |lower: &str, upper: &str| {
+        text.strip_prefix(lower)
+            .or_else(|| text.strip_prefix(upper))
+    };
+    let (radix, digits) = if let Some(digits) = prefixed("0x", "0X") {
+        (16, digits)
+    } else if let Some(digits) = prefixed("0o", "0O") {
+        (8, digits)
+    } else if let Some(digits) = prefixed("0b", "0B") {
+        (2, digits)
+    } else if text.len() > 1 && text.starts_with('0') {
+        (8, text.get(1..).unwrap_or_default())
+    } else {
+        (10, text)
+    };
+    !digits.is_empty() && digits.chars().all(|digit| digit.is_digit(radix))
+}
+
+/// Whether the unsigned `text` matches yaml.v3's float expression
+/// `(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?`.
+fn is_go_float(text: &str) -> bool {
+    let decimal = |part: &str| !part.is_empty() && part.chars().all(|digit| digit.is_ascii_digit());
+    let (mantissa, exponent) = match text.split_once(['e', 'E']) {
+        Some((mantissa, exponent)) => (mantissa, Some(exponent)),
+        None => (text, None),
+    };
+    let mantissa_ok = match mantissa.split_once('.') {
+        Some(("", fraction)) => decimal(fraction),
+        Some((whole, fraction)) => decimal(whole) && (fraction.is_empty() || decimal(fraction)),
+        None => decimal(mantissa),
+    };
+    mantissa_ok
+        && exponent
+            .is_none_or(|exponent| decimal(exponent.strip_prefix(['+', '-']).unwrap_or(exponent)))
 }
 
 /// A date, or a date and a time: `2024-01-01`, `2024-01-01T10:00:00Z`.
