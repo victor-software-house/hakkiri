@@ -62,7 +62,7 @@ fn lint_four(source: &str) -> Result<Vec<Alert>, Box<dyn Error>> {
         .collect::<Result<Vec<_>, _>>()?;
     let tree = parse(Language::Markdown, source)?;
     let start = Instant::now();
-    let alerts = lint(&rules, &tree, source, "md")?;
+    let alerts = lint(&rules, &tree, source, tree.language.langdex().as_slice())?;
     eprintln!("{} alerts in {:?}", alerts.len(), start.elapsed());
     Ok(alerts)
 }
@@ -114,7 +114,7 @@ fn lint_rules(
         .collect::<Result<Vec<_>, _>>()?;
     let tree = parse(Language::Markdown, source)?;
     let start = Instant::now();
-    let alerts = lint(&rules, &tree, source, "md")?;
+    let alerts = lint(&rules, &tree, source, tree.language.langdex().as_slice())?;
     let took = start.elapsed();
     eprintln!("{} alerts in {took:?}", alerts.len());
     Ok((alerts, took))

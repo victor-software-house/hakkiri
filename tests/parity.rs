@@ -46,7 +46,7 @@ fn measure(source: &str) -> Result<[f64; 4], Box<dyn Error>> {
         value_rule("Metrics.Syllables", "syllables")?,
     ];
     let tree = parse(Language::Markdown, source)?;
-    let alerts = lint(&rules, &tree, source, "md")?;
+    let alerts = lint(&rules, &tree, source, tree.language.langdex().as_slice())?;
     let mut values = [0.0; 4];
     for (slot, rule) in values.iter_mut().zip(&rules) {
         let alert = alerts
@@ -136,7 +136,7 @@ const RUST_WITHOUT_COMMENTS: [&str; 4] = [
 fn rust_words(source: &str) -> Result<Option<f64>, Box<dyn Error>> {
     let rule = value_rule("Metrics.Words", "words")?;
     let tree = parse(Language::Rust, source)?;
-    let alerts = lint(&[rule], &tree, source, "rs")?;
+    let alerts = lint(&[rule], &tree, source, tree.language.langdex().as_slice())?;
     alerts
         .first()
         .map(|alert| alert.message.parse::<f64>())

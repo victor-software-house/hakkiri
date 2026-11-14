@@ -83,7 +83,12 @@ fn scopes_select_as_vale_does_but_where_decided() -> TestResult {
         for input in &inputs {
             let source = fs::read_to_string(input)?;
             let tree = parse(Language::Markdown, &source)?;
-            for alert in lint(slice::from_ref(&rule), &tree, &source, "md")? {
+            for alert in lint(
+                slice::from_ref(&rule),
+                &tree,
+                &source,
+                tree.language.langdex().as_slice(),
+            )? {
                 hakkiri.insert((
                     name.clone(),
                     name_of(input)?.trim_end_matches(".fixture").to_owned(),

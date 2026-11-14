@@ -28,11 +28,13 @@ fn alerts(rules: &[(&str, &str)], file: &str, source: &str) -> Result<Vec<Alert>
         .collect::<Result<Vec<_>, _>>()?;
     let path = Path::new(file);
     let language = Language::from_path(path).ok_or("a file with an unknown extension")?;
-    let extension = path
-        .extension()
-        .and_then(|extension| extension.to_str())
-        .ok_or("a file with no extension")?;
-    Ok(lint(&rules, &parse(language, source)?, source, extension)?)
+    let own = langdex::by_path(file);
+    Ok(lint(
+        &rules,
+        &parse(language, source)?,
+        source,
+        own.as_slice(),
+    )?)
 }
 
 /// The alerts of one rule in a Markdown file.
@@ -893,7 +895,7 @@ fn eight_whole_file_metrics_over_sixty_thousand_lines() -> TestResult {
         let mut count = 0;
         for _ in 0..3 {
             let start = Instant::now();
-            count = lint(rules, &tree, &source, "md")?.len();
+            count = lint(rules, &tree, &source, tree.language.langdex().as_slice())?.len();
             best = best.min(start.elapsed());
         }
         Ok((count, best))
@@ -906,5 +908,80 @@ fn eight_whole_file_metrics_over_sixty_thousand_lines() -> TestResult {
         eight_time < one_time * 3,
         "eight rules took {eight_time:?}, one took {one_time:?}"
     );
+    Ok(())
+}
+
+/// A rule that flags `very`.
+const VERY: &str = "extends: existence\nmessage: \"Drop '%s'.\"\nlevel: error\ntokens: [very]\n";
+
+/// The line and first column of each alert of `VERY` in `source`, a file named
+/// `file`.
+fn very_in(file: &str, source: &str) -> Result<Vec<(usize, usize)>, Box<dyn Error>> {
+    let found = alerts(&[("Team.Very", VERY)], file, source)?;
+    Ok(found
+        .iter()
+        .map(|alert| (alert.line, alert.first_column))
+        .collect())
+}
+
+#[test]
+fn an_alias_of_the_language() -> TestResult {
+    let source = "```rs\n// A very good start.\n```\n\n```rust\n// A very good start.\n```\n";
+    assert_eq!(very_in("a.md", source)?, [(2, 6), (6, 6)]);
+    Ok(())
+}
+
+#[test]
+fn a_rust_fence() -> TestResult {
+    let source = "Intro.\n\n```rust\n// A very good start.\nlet x = 1;\n```\n";
+    assert_eq!(very_in("a.md", source)?, [(4, 6)]);
+    Ok(())
+}
+
+#[test]
+fn a_rust_fence_in_mdx() -> TestResult {
+    let source = "Intro.\n\n```rust\n// A very good start.\nlet x = 1;\n```\n";
+    assert_eq!(very_in("a.mdx", source)?, [(4, 6)]);
+    Ok(())
+}
+
+#[test]
+fn a_fence_in_a_list_item() -> TestResult {
+    let source = "- Item.\n\n   ```rust\n   // A very good start.\n   ```\n";
+    assert_eq!(very_in("a.md", source)?, [(4, 9)]);
+    Ok(())
+}
+
+#[test]
+fn a_scope_for_the_fences_language() -> TestResult {
+    let rule =
+        "extends: existence\nmessage: \"Found '%s'.\"\nscope: text.comment.rs\ntokens: [marker]\n";
+    let source = "```rust\n// A marker.\n```\n\n```js\n// A marker.\n```\n";
+    let found = alerts(&[("Team.Marker", rule)], "a.md", source)?;
+    let lines: Vec<usize> = found.iter().map(|alert| alert.line).collect();
+    assert_eq!(lines, [2], "one alert, in the Rust fence");
+    Ok(())
+}
+
+#[test]
+fn a_markdown_fence() -> TestResult {
+    for info in ["md", "markdown", "mdx", "text"] {
+        let source = format!("```{info}\nA very good start.\n```\n");
+        assert_eq!(very_in("a.md", &source)?, [], "{info}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_fence_of_a_language_with_no_comment_reader() -> TestResult {
+    let source = "```python\n# A very good start.\n```\n";
+    assert_eq!(very_in("a.md", source)?, []);
+    Ok(())
+}
+
+#[test]
+fn a_fence_with_no_info_string_or_an_indented_block() -> TestResult {
+    let source = "```\n// A very good start.\n```\n\n    // A very good start.\n";
+    assert_eq!(very_in("a.md", source)?, []);
     Ok(())
 }

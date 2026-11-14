@@ -959,3 +959,64 @@ fn a_node_records_whether_it_is_first_in_its_container() -> TestResult {
     }
     Ok(())
 }
+
+/// The names of the languages of the nodes of the fixture, in order, and
+/// `None` for a node with no language of its own.
+fn languages(node: &Node, found: &mut Vec<(Scope, Option<&'static str>)>) {
+    found.push((node.scope, node.language.map(|language| language.name)));
+    for child in &node.children {
+        languages(child, found);
+    }
+}
+
+#[test]
+fn a_rust_fence_gives_its_comment_nodes_their_language() -> TestResult {
+    let source = "Intro.\n\n```rust\n// A very good start.\nlet x = 1;\n```\n";
+    let fixture = Fixture {
+        source: source.to_owned(),
+        tree: parse(Language::Markdown, source)?,
+    };
+    let comments = fixture.nodes(Scope::CommentLine);
+    let [comment] = comments.as_slice() else {
+        return Err(format!("expected one comment node: {comments:?}").into());
+    };
+    assert_eq!(&source[comment.span.clone()], "// A very good start.");
+    assert_eq!(comment.language.map(|language| language.name), Some("Rust"));
+    let mut found = Vec::new();
+    for root in &fixture.tree.roots {
+        languages(root, &mut found);
+    }
+    assert_eq!(
+        found,
+        [
+            (Scope::Raw, None),
+            (Scope::Paragraph, None),
+            (Scope::CommentLine, Some("Rust")),
+            (Scope::Paragraph, Some("Rust")),
+        ]
+    );
+    assert_eq!(
+        fixture.texts(Scope::Paragraph),
+        ["Intro.", "A very good start."]
+    );
+    Ok(())
+}
+
+#[test]
+fn a_fence_in_a_list_item_has_the_bytes_of_the_file() -> TestResult {
+    let source = "- Item.\n\n   ```rust\n   /* A very\n      good start. */\n   ```\n";
+    let fixture = Fixture {
+        source: source.to_owned(),
+        tree: parse(Language::Markdown, source)?,
+    };
+    let comments = fixture.nodes(Scope::CommentBlock);
+    let [comment] = comments.as_slice() else {
+        return Err(format!("expected one comment node: {comments:?}").into());
+    };
+    assert_eq!(
+        &source[comment.span.clone()],
+        "/* A very\n      good start. */"
+    );
+    assert_eq!(fixture.texts(Scope::Paragraph).len(), 2);
+    Ok(())
+}

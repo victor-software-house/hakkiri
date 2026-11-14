@@ -772,7 +772,7 @@ level: warning
 tokens: [very]
 tests:
   - name: flags very in plain text
-    format: txt
+    format: cfg
     input: This is very good.
     want: \"1:9:Team.Filler:Remove 'very'.\"
 ";
@@ -784,11 +784,11 @@ fn a_case_in_a_format_no_extension_names_reads_as_plain_text() -> TestResult {
     root.file("styles/Team/Filler.yml", FILLER_TEXT);
     root.file(
         ".ctl/hakkiri.yaml",
-        "packages:\n  - path: styles\nfiles:\n  '*.txt': {styles: [Team]}\n",
+        "packages:\n  - path: styles\nfiles:\n  '*.cfg': {styles: [Team]}\n",
     );
     root.file(
         "through.test.yml",
-        "- name: through the config\n  format: txt\n  input: A very day.\n  want: \"1:3:Team.Filler:Remove 'very'.\"\n",
+        "- name: through the config\n  format: cfg\n  input: A very day.\n  want: \"1:3:Team.Filler:Remove 'very'.\"\n",
     );
     let result = run(root.path(), &["test"], &[])?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
@@ -837,19 +837,19 @@ fn a_case_has_the_extension_of_the_reader_a_formats_entry_picks() -> TestResult 
     Ok(())
 }
 
-/// A project that runs `Team` on `*.txt` and sets `on_unknown`.
+/// A project that runs `Team` on `*.cfg` and sets `on_unknown`.
 fn unknown_project<'a>(suite: &'a Suite, name: &str, word: &str) -> Root<'a> {
     let root = suite.scenario(name);
     root.file("styles/Team/Filler.yml", FILLER);
     root.file(
         ".ctl/hakkiri.yaml",
         format!(
-            "on_unknown: {word}\npackages:\n  - path: styles\nfiles:\n  '*.txt': {{styles: [Team]}}\n"
+            "on_unknown: {word}\npackages:\n  - path: styles\nfiles:\n  '*.cfg': {{styles: [Team]}}\n"
         ),
     );
     root.file(
         "through.test.yml",
-        "- name: a very day\n  format: txt\n  input: A very day.\n  want: ''\n",
+        "- name: a very day\n  format: cfg\n  input: A very day.\n  want: ''\n",
     );
     root
 }
@@ -861,7 +861,7 @@ fn on_unknown_error_stops_a_case_in_a_format_no_reader_reads() -> TestResult {
     let result = run(root.path(), &["test", "through.test.yml"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     assert!(
-        result.out.contains("no reader reads the format `txt`"),
+        result.out.contains("no reader reads the format `cfg`"),
         "{}",
         result.out
     );

@@ -15,6 +15,7 @@ pub mod dictionary;
 pub mod engine;
 mod entity;
 mod error;
+mod fence;
 pub mod formula;
 mod frontmatter;
 mod html;
@@ -43,7 +44,7 @@ mod tree;
 pub mod words;
 
 pub use error::Error;
-pub use language::{Language, READERS};
+pub use language::Language;
 use pattern::Pattern;
 pub use tree::{Comment, Join, Node, Reading, Scope, Tree};
 

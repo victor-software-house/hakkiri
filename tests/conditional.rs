@@ -35,7 +35,12 @@ fn acronyms(extra: &str) -> String {
 fn alerts(text: &str, source: &str) -> Result<Vec<Alert>, Box<dyn Error>> {
     let rule = Rule::from_text("Team.Defined", "Team/Defined.yml", text)?;
     let tree = parse(Language::Markdown, source)?;
-    Ok(lint(&[rule], &tree, source, "md")?)
+    Ok(lint(
+        &[rule],
+        &tree,
+        source,
+        tree.language.langdex().as_slice(),
+    )?)
 }
 
 /// The matched text of the alerts.

@@ -114,6 +114,9 @@ globset = { version = "0.4.21", default-features = false }
 # excludes ignore, as ripgrep does.
 ignore = "0.4.34"
 garde = { version = "0.23.0", default-features = false, features = ["derive"] }
+# The table of languages: names, aliases, extensions, file names and
+# interpreters, generated from GitHub Linguist.
+langdex = "0.0.1"
 markdown = "1.0.0"
 regex = "1.13.1"
 serde = { version = "1.0.229", features = ["derive"] }

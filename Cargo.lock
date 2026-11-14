@@ -510,6 +510,7 @@ dependencies = [
  "globset",
  "ignore",
  "insta",
+ "langdex",
  "markdown",
  "mimalloc",
  "regex",
@@ -623,6 +624,12 @@ dependencies = [
  "cfg-if",
  "wasm-bindgen",
 ]
+
+[[package]]
+name = "langdex"
+version = "0.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8550a64e5920a5522c6128574e00d1d81a34d34cf13bb6910f603078802c1255"
 
 [[package]]
 name = "libc"

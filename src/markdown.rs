@@ -16,7 +16,7 @@ use tree_sitter::{InputEdit, Node as SyntaxNode, Parser, Point, Tree};
 
 use crate::error::Error;
 use crate::tree::{Comment, Node, Scope};
-use crate::{frontmatter, html, html_text, math};
+use crate::{fence, frontmatter, html, html_text, math};
 
 /// Which constructs the parser reads.
 #[derive(Clone, Copy, Debug)]
@@ -231,6 +231,7 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     };
     let builder = Builder {
         source,
+        fences: !matches!(flavor, Flavor::Comment),
         code_blocks: Cell::new(0),
         addresses: addresses(&root),
         referenced: footnotes_referenced(&root),
@@ -379,6 +380,9 @@ impl Visited {
 
 struct Builder<'a> {
     source: &'a str,
+    /// Whether the comments of a fenced code block are read: in a Markdown or
+    /// MDX file, and not in the text of a comment.
+    fences: bool,
     /// The fenced and indented code blocks seen so far.
     code_blocks: Cell<usize>,
     /// The address each link definition gives its label.
@@ -864,9 +868,19 @@ impl Builder<'_> {
             Mdast::Image(_) | Mdast::ImageReference(_) => Step::Done(self.alt(node)),
             Mdast::MdxJsxFlowElement(_) | Mdast::MdxJsxTextElement(_) => Step::Open(Kind::Jsx),
             // Syntax that is not prose is a gap in the text around it.
-            Mdast::Code(_) => {
+            // The comments of a fence in a language hakkiri reads them in are
+            // nodes, and the fence stays a gap in the prose around it.
+            Mdast::Code(code) => {
                 self.code_blocks.set(self.code_blocks.get() + 1);
-                Step::Done(Visited::cut(span_of(node)))
+                let span = span_of(node);
+                let nodes = span
+                    .as_ref()
+                    .filter(|_| self.fences)
+                    .map_or_default(|span| fence::nodes(self.source, span, code));
+                Step::Done(Visited {
+                    nodes,
+                    ..Visited::cut(span)
+                })
             }
             Mdast::Html(html) => {
                 let span = span_of(node);

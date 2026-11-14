@@ -11,7 +11,7 @@ use hakkiri::{Language, engine, parse, parse_ignoring};
 
 use crate::cli::{OnUnknown, TestArgs};
 use crate::config::{self, DEFAULT, Project};
-use crate::files::is_skipped;
+use crate::files::{FIRST_LINE, file_language, is_skipped, languages_of};
 use crate::report::{CaseResult, Failure, Tests, Uncovered};
 use crate::run::lint_planned;
 
@@ -332,23 +332,32 @@ impl Runner {
     /// The alerts `case` gets under `setup`, or why it could not run.
     fn lint(&mut self, case: &TestCase, setup: Setup<'_>) -> Result<Vec<Alert>, String> {
         let name = format!("input.{}", case.format);
-        let known = Language::from_path(Path::new(&name));
-        // An isolated case reads a format that no extension names as plain
-        // text.
+        // The language of the input is the file's: its path, else the
+        // interpreter on its first line.
+        let own = file_language(&name, || {
+            case.input
+                .as_bytes()
+                .iter()
+                .take(FIRST_LINE)
+                .copied()
+                .collect()
+        });
+        let known = own.and_then(Language::of);
+        // An isolated case reads a format that no reader reads as plain text.
         let by_extension = known.unwrap_or(Language::Text);
         match setup {
             Setup::Rule(rule) => {
                 let tree = parse(by_extension, &case.input)
                     .map_err(|error| error.to_string())
                     .and_then(readable)?;
-                lint_alone(rule, &tree, case)
+                lint_alone(rule, &tree, case, own)
             }
             Setup::File(path) => {
                 let tree = parse(by_extension, &case.input)
                     .map_err(|error| error.to_string())
                     .and_then(readable)?;
                 let rule = self.rule_at(&path)?;
-                lint_alone(rule, &tree, case)
+                lint_alone(rule, &tree, case, own)
             }
             Setup::Project => {
                 let project = self.project()?;
@@ -356,8 +365,10 @@ impl Runner {
                     return Ok(Vec::new());
                 };
                 // A case reads as `check` reads a selected file: a `formats`
-                // entry, then the extension, then what `on_unknown` says.
-                let language = match project.mapped_language(&name).or(known) {
+                // entry, then the reader of its language, then what
+                // `on_unknown` says.
+                let mapped = project.mapped_language(&name);
+                let language = match mapped.or(known) {
                     Some(language) => language,
                     None => match project.on_unknown.unwrap_or_default() {
                         OnUnknown::Text => Language::Text,
@@ -386,9 +397,10 @@ impl Runner {
                         names.join(", ")
                     ));
                 }
-                // The extension is the file's own, as `check` gives it, and the
-                // tree records the reader.
-                let mut alerts = lint_planned(&plan, &tree, &case.input, &case.format)?;
+                // The languages are the file's own, and its reader's when
+                // `formats` chose the reader, as `check` gives them.
+                let languages = languages_of(own, mapped);
+                let mut alerts = lint_planned(&plan, &tree, &case.input, &languages)?;
                 alerts.retain(|alert| project.level.is_none_or(|lowest| alert.level >= lowest));
                 Ok(alerts)
             }
@@ -500,7 +512,13 @@ fn readable(tree: hakkiri::Tree) -> Result<hakkiri::Tree, String> {
     }
 }
 
-/// Lints the case's input with `rule` alone, at every level.
-fn lint_alone(rule: &Rule, tree: &hakkiri::Tree, case: &TestCase) -> Result<Vec<Alert>, String> {
-    engine::lint(&[rule], tree, &case.input, &case.format).map_err(|error| error.to_string())
+/// Lints the case's input, a file in the language `own`, with `rule` alone, at
+/// every level.
+fn lint_alone(
+    rule: &Rule,
+    tree: &hakkiri::Tree,
+    case: &TestCase,
+    own: Option<&'static langdex::Language>,
+) -> Result<Vec<Alert>, String> {
+    engine::lint(&[rule], tree, &case.input, own.as_slice()).map_err(|error| error.to_string())
 }

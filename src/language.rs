@@ -1,77 +1,104 @@
 //! The languages hakkiri reads.
+//!
+//! A reader is one of the seven parsers hakkiri has, and each reads one
+//! language of [langdex], the table of languages with their names, aliases,
+//! extensions, file names and interpreters.
 
-use std::ffi::OsStr;
 use std::path::Path;
 
 /// A language hakkiri builds a tree for.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Language {
-    /// Markdown with GFM and front matter, from `.md`.
+    /// Markdown with GFM and front matter.
     Markdown,
-    /// MDX, from `.mdx`.
+    /// MDX.
     Mdx,
-    /// Rust, from `.rs`.
+    /// Rust.
     Rust,
-    /// TypeScript, from `.ts`.
+    /// TypeScript.
     TypeScript,
-    /// TypeScript with JSX, from `.tsx`.
+    /// TypeScript with JSX.
     Tsx,
-    /// JavaScript with JSX, from `.js`, `.jsx`, `.mjs` and `.cjs`.
+    /// JavaScript with JSX.
     JavaScript,
     /// Plain text: the file is prose, read as written, in paragraphs set apart
-    /// by blank lines. No extension names it, so a file reads this way when
+    /// by blank lines. A file reads this way when its language is Text, when
     /// nothing else reads it, or when the config maps it here.
     Text,
 }
 
-/// The reader names a config's `formats` takes, with the language each gives.
-pub const READERS: [(&str, Language); 7] = [
-    ("md", Language::Markdown),
-    ("mdx", Language::Mdx),
-    ("rs", Language::Rust),
-    ("ts", Language::TypeScript),
-    ("tsx", Language::Tsx),
-    ("js", Language::JavaScript),
-    ("text", Language::Text),
-];
-
 impl Language {
-    /// The language of the file at `path`, chosen by its extension, or `None`
-    /// when no extension names one.
+    /// Every reader, in the order the `formats` error names them.
+    pub const ALL: [Self; 7] = [
+        Self::Markdown,
+        Self::Mdx,
+        Self::Rust,
+        Self::TypeScript,
+        Self::Tsx,
+        Self::JavaScript,
+        Self::Text,
+    ];
+
+    /// The name of the langdex language this reader reads.
     #[must_use]
-    pub fn from_path(path: &Path) -> Option<Self> {
-        match path.extension().and_then(OsStr::to_str)? {
-            "md" => Some(Self::Markdown),
-            "mdx" => Some(Self::Mdx),
-            "rs" => Some(Self::Rust),
-            "ts" => Some(Self::TypeScript),
-            "tsx" => Some(Self::Tsx),
-            "js" | "jsx" | "mjs" | "cjs" => Some(Self::JavaScript),
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Markdown => "Markdown",
+            Self::Mdx => "MDX",
+            Self::Rust => "Rust",
+            Self::TypeScript => "TypeScript",
+            Self::Tsx => "TSX",
+            Self::JavaScript => "JavaScript",
+            Self::Text => "Text",
+        }
+    }
+
+    /// The reader of `language`, or `None` when hakkiri has none for it.
+    #[must_use]
+    pub fn of(language: &langdex::Language) -> Option<Self> {
+        match language.name {
+            "Markdown" => Some(Self::Markdown),
+            "MDX" => Some(Self::Mdx),
+            "Rust" => Some(Self::Rust),
+            "TypeScript" => Some(Self::TypeScript),
+            "TSX" => Some(Self::Tsx),
+            "JavaScript" => Some(Self::JavaScript),
+            "Text" => Some(Self::Text),
             _ => None,
         }
     }
 
-    /// The language a reader name gives: `md`, `mdx`, `rs`, `ts`, `tsx`, `js`
-    /// or `text`.
+    /// The langdex language this reader reads.
     #[must_use]
-    pub fn from_reader(name: &str) -> Option<Self> {
-        READERS
+    pub fn langdex(self) -> Option<&'static langdex::Language> {
+        langdex::all()
             .iter()
-            .find_map(|(reader, language)| (*reader == name).then_some(*language))
+            .find(|language| language.name == self.name())
     }
 
-    /// The extension a file read as this language takes in the path a glob
-    /// matches: the name of its reader, and `txt` for plain text.
+    /// The reader of the file at `path`, chosen by its langdex language: its
+    /// file name, then its extension. `None` when no language has a reader.
     #[must_use]
-    pub const fn extension(self) -> &'static str {
-        match self {
-            Self::Markdown => "md",
-            Self::Mdx => "mdx",
-            Self::Rust => "rs",
-            Self::TypeScript => "ts",
-            Self::Tsx => "tsx",
-            Self::JavaScript => "js",
-            Self::Text => "txt",
-        }
+    pub fn from_path(path: &Path) -> Option<Self> {
+        langdex::by_path(path.to_str()?).and_then(Self::of)
+    }
+
+    /// The reader a `formats` name gives: any name, alias or extension of the
+    /// language it reads, such as `md`, `markdown` or `Markdown`.
+    #[must_use]
+    pub fn from_reader(name: &str) -> Option<Self> {
+        langdex::by_name(name).and_then(Self::of)
+    }
+
+    /// The extension of a file read as this language, without its dot: the
+    /// first extension of its langdex language.
+    #[must_use]
+    pub fn extension(self) -> &'static str {
+        self.langdex()
+            .and_then(|language| language.extensions.first())
+            .map_or("", |extension| extension.trim_start_matches('.'))
     }
 }
+
+#[cfg(test)]
+mod tests;

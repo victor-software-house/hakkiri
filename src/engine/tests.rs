@@ -33,7 +33,7 @@ fn rules_that_read_one_scope_select_it_once() -> Result<(), Box<dyn error::Error
         rule("four", "paragraph")?,
     ];
     let before = SELECTIONS.with(Cell::get);
-    lint(&rules, &tree, source, "md")?;
+    lint(&rules, &tree, source, tree.language.langdex().as_slice())?;
     let made = SELECTIONS.with(Cell::get) - before;
     assert_eq!(
         made, 2,

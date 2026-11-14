@@ -19,10 +19,12 @@ pub const DEFAULT_CODE_SPAN_SIZE: u8 = 1;
 ///
 /// `rules` is a slice of rules or of references to them, so a caller that picks
 /// a few of many rules for a file lends them without a copy.
-/// `tree` is the file's tree, `source` its text and `extension` its extension
-/// without the dot. Alerts at one place keep the order of their rules.
-/// A rule whose pattern gives up on a block reports one `error` alert at the
-/// block, and the other rules still run.
+/// `tree` is the file's tree, `source` its text and `languages` its languages:
+/// its own, and its reader's when a mapping chose the reader. A scope that
+/// names a language reads the nodes in it, and the nodes of a fenced code block
+/// are in the language of the fence. Alerts at one place keep the order of
+/// their rules. A rule whose pattern gives up on a block reports one `error`
+/// alert at the block, and the other rules still run.
 /// A comment of a Markdown file can turn rules off and on: see
 /// [`crate::control`]. A rule that a comment turned off for the element of a
 /// block reads no text in it, and an alert between the comment that turned its
@@ -44,9 +46,9 @@ pub fn lint<R: Borrow<Rule>>(
     rules: &[R],
     tree: &Tree,
     source: &str,
-    extension: &str,
+    languages: &[&'static langdex::Language],
 ) -> Result<Vec<Alert>, SelectError> {
-    lint_accepting(rules, tree, source, extension, &[], DEFAULT_CODE_SPAN_SIZE)
+    lint_accepting(rules, tree, source, languages, &[], DEFAULT_CODE_SPAN_SIZE)
 }
 
 /// The alerts of `rules` in one file, as [`lint`] gives them, with the
@@ -68,11 +70,12 @@ pub fn lint_accepting<R: Borrow<Rule>>(
     rules: &[R],
     tree: &Tree,
     source: &str,
-    extension: &str,
+    languages: &[&'static langdex::Language],
     accepted: &[&Exceptions],
     code_span_size: u8,
 ) -> Result<Vec<Alert>, SelectError> {
     let mut locator = Locator::new(source);
+    let extension = tree.language.extension();
     let controls = Controls::new(
         &tree.comments,
         source,
@@ -117,7 +120,7 @@ pub fn lint_accepting<R: Borrow<Rule>>(
         let at = if let Some(at) = selected.iter().position(|(scope, _)| *scope == &rule.scope) {
             at
         } else {
-            selected.push((&rule.scope, select(&rule.scope, tree, source, extension)?));
+            selected.push((&rule.scope, select(&rule.scope, tree, source, languages)?));
             selected.len() - 1
         };
         let blocks: &[Block] = selected.get(at).map_or(&[], |(_, blocks)| blocks);
@@ -140,7 +143,7 @@ pub fn lint_accepting<R: Borrow<Rule>>(
                 &rule.check,
                 &block.text,
                 &mut memory,
-                tree.language.extension(),
+                extension,
                 accepted,
                 code_span_size,
             ) {

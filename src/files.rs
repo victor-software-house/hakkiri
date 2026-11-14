@@ -30,10 +30,11 @@ pub(crate) struct Job<'a> {
     pub(crate) path: String,
     /// Where the file is.
     pub(crate) file: PathBuf,
-    /// The language its extension names.
+    /// The reader that reads it.
     pub(crate) language: Language,
-    /// Its extension, without the dot.
-    pub(crate) extension: String,
+    /// The languages a scope may name in the nodes outside its fenced code
+    /// blocks: its own, and its reader's when `formats` chose the reader.
+    pub(crate) languages: Vec<&'static langdex::Language>,
     /// The rules that run on it.
     pub(crate) plan: Plan<'a>,
 }
@@ -54,6 +55,47 @@ fn is_binary(path: &Path) -> bool {
     };
     let mut head = Vec::new();
     file.take(SNIFF).read_to_end(&mut head).is_ok() && head.contains(&0)
+}
+
+/// How many bytes at the start of a file may hold the line that names its
+/// interpreter.
+pub(crate) const FIRST_LINE: usize = 4096;
+
+/// The first 4096 bytes of the file at `path`, or none when it cannot be read:
+/// the run reports the failure when it reads the file.
+fn head(path: &Path) -> Vec<u8> {
+    let mut head = Vec::new();
+    if let Ok(file) = fs::File::open(path) {
+        // A read that fails midway leaves what it read.
+        let _ = file
+            .take(u64::try_from(FIRST_LINE).unwrap_or(u64::MAX))
+            .read_to_end(&mut head);
+    }
+    head
+}
+
+/// The langdex language of a file: the one its path `relative` to the project
+/// root gives, else the one the first line of `head` names as its interpreter.
+pub(crate) fn file_language(
+    relative: &str,
+    head: impl FnOnce() -> Vec<u8>,
+) -> Option<&'static langdex::Language> {
+    langdex::by_path(relative).or_else(|| langdex::by_first_line(&String::from_utf8_lossy(&head())))
+}
+
+/// The languages of a file for the scopes of its rules: its own, and its
+/// reader's when `mapped`, a `formats` entry, chose the reader.
+pub(crate) fn languages_of(
+    file: Option<&'static langdex::Language>,
+    mapped: Option<Language>,
+) -> Vec<&'static langdex::Language> {
+    let mut languages: Vec<_> = file.into_iter().collect();
+    if let Some(reader) = mapped.and_then(Language::langdex)
+        && !languages.contains(&reader)
+    {
+        languages.push(reader);
+    }
+    languages
 }
 
 /// How a run chooses its files, and the `code_span_size` that overrides every
@@ -106,14 +148,16 @@ fn display(path: &Path, current: Option<&Path>) -> String {
 impl Finder<'_> {
     /// Lints `file` when a glob selects it and a reader reads it.
     ///
-    /// The reader is the one a `formats` entry gives, else the one its
-    /// extension names. A selected file that no reader reads is plain text,
-    /// unless `on_unknown` says otherwise, and a plain-text file that holds a
-    /// NUL byte is binary and skipped, with no message.
+    /// The reader is the one a `formats` entry gives, else the one of the
+    /// file's language. The language is the one its path names, else the one of
+    /// the interpreter on its first line. A selected file that no reader reads
+    /// is plain text, unless `on_unknown` says otherwise, and a plain-text file
+    /// that holds a NUL byte is binary and skipped, with no message.
     ///
-    /// The job's extension is the file's own. The tree records the reader, and
-    /// a scope may name either extension, so `text.md` selects text in a `.txt`
-    /// file that `formats` maps to `md`, and `text.txt` still does.
+    /// The job's languages are the file's own, and its reader's when `formats`
+    /// chose the reader. The tree records the reader, and a scope may name
+    /// either language, so `text.md` selects text in a `.txt` file that
+    /// `formats` maps to `md`, and `text.txt` still does.
     fn file(&mut self, file: &Path, named: bool) {
         let path = display(file, self.current.as_deref());
         let Some(relative) = self.project.relative(file) else {
@@ -134,11 +178,9 @@ impl Finder<'_> {
         if let Some(words) = self.options.code_span_size {
             plan.code_span_size = words;
         }
-        let language = match self
-            .project
-            .mapped_language(&relative)
-            .or_else(|| Language::from_path(file))
-        {
+        let own = file_language(&relative, || head(file));
+        let mapped = self.project.mapped_language(&relative);
+        let language = match mapped.or_else(|| own.and_then(Language::of)) {
             Some(language) => language,
             None => match self.options.on_unknown {
                 OnUnknown::Text => Language::Text,
@@ -156,14 +198,11 @@ impl Finder<'_> {
         if language == Language::Text && is_binary(file) {
             return;
         }
-        let extension = file
-            .extension()
-            .map_or_default(|extension| extension.to_string_lossy().into_owned());
         self.jobs.push(Job {
             path,
             file: file.to_path_buf(),
             language,
-            extension,
+            languages: languages_of(own, mapped),
             plan,
         });
     }

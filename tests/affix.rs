@@ -28,7 +28,12 @@ fn package() -> PathBuf {
 fn alerts(text: &str, source: &str) -> Result<Vec<Alert>, Box<dyn Error>> {
     let rule = Rule::from_text_in("Team.Forms", "Team/Forms.yml", text, &package())?;
     let tree = parse(Language::Markdown, source)?;
-    Ok(lint(&[rule], &tree, source, "md")?)
+    Ok(lint(
+        &[rule],
+        &tree,
+        source,
+        tree.language.langdex().as_slice(),
+    )?)
 }
 
 /// The matched text of each alert.
