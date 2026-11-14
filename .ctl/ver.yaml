@@ -13,7 +13,7 @@ packages:
 
 # One key per host binary; the name is the job, the tarball, and the platform.
 # darwin-arm64 and linux-x64 are built-in records, so the runner labels (the
-# free macos-latest and ubuntu-latest), os, arch, and triple come from verctl.
+# free xcode-27 and ubuntu-26.04), os, arch, and triple come from verctl.
 # Each builds natively with the runner's own C compiler, which tree-sitter's
 # grammars need, so nothing is cross-compiled. linux-x64 overrides only the
 # triple: a static musl binary starts on a machine with no glibc loader, such
