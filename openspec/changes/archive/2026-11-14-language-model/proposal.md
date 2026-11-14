@@ -39,5 +39,5 @@ On 2026-11-14 the operator asked that each fenced block be parsed as its languag
 - Changed: `src/language.rs`, `src/scope.rs`, `src/select.rs`, `src/engine.rs`, `src/files.rs`, `src/formats.rs`, `src/suite.rs`, `src/markdown.rs`, `src/tree.rs`, their tests, `src/instructions.md`, the skill and `AGENTS.md`.
 - Public API: `READERS` is gone, `Language` gains the langdex mapping, and `Node` gains a `language`.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
 [langdex]: https://github.com/victor-software-house/langdex

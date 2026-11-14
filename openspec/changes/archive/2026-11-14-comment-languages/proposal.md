@@ -47,4 +47,4 @@ A probe of Vale at `66bbb85` against hakkiri, in a box, found each of these diff
 - A file that a glob selects and whose language is one of the five is read for its comments only, where it was read as plain text.
 - Changed: `src/comments.rs`, `src/jsdoc.rs`, `src/language.rs`, `src/lib.rs`, `src/tree.rs`, `src/engine.rs`, the operator instructions, the skill, the README and the tests.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml

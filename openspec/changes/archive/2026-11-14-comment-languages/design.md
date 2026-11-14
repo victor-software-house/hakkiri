@@ -149,7 +149,7 @@ Alternative: an extension table for the new readers.
 It lost because langdex already holds every name, extension, file name and interpreter, and a second table drifts from it.
 
 [comments]: https://github.com/victor-software-house/hakkiri/blob/962f38348478048ad7e3f5b0464a8bfb29224f44/src/comments.rs
-[code-span-size-6]: ../code-span-size/design.md#6-vale-drops-an-alert-that-has-the-place-of-another
+[code-span-size-6]: ../../code-span-size/design.md#6-vale-drops-an-alert-that-has-the-place-of-another
 [v-names]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/lang.go#L59
 [v-lang]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/code/lang.go#L122
 [v-formats]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/format.go#L157

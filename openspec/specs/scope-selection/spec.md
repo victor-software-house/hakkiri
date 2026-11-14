@@ -75,27 +75,6 @@ A sentence SHALL have the scope of the block it is in, so a part such as `list` 
 - **WHEN** a rule has `scope: sentence & list` and the input holds the paragraph `One two.` and the list item `- Three four.`
 - **THEN** hakkiri selects one sentence, `Three four.`
 
-### Requirement: A file extension narrows a scope
-
-A last scope part that names a file extension, such as `rs` in `raw.rs`, SHALL limit the scope to files with that extension.
-A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes only in files with that extension.  
-A scope item whose every part names another extension SHALL select nothing.
-
-#### Scenario: raw.rs in two files
-
-- **WHEN** a rule has `scope: raw.rs` and `tokens: [marker]`, and a Markdown file holds `A marker.` and a Rust file holds `// A marker.`
-- **THEN** hakkiri reports one alert, in the Rust file
-
-#### Scenario: A negated part for another language
-
-- **WHEN** a rule has `scope: text & ~heading.rs` and `tokens: [marker]`, and a Markdown file holds `# A marker`
-- **THEN** hakkiri reports one alert, on the heading
-
-#### Scenario: An item that names only another language
-
-- **WHEN** a rule has `scope: [~heading.rs]` and `tokens: [marker]`, and a Markdown file holds `# A marker` and `A marker.`
-- **THEN** hakkiri reports no alert
-
 ### Requirement: An inline exclusion blanks the element
 
 A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.
@@ -253,3 +232,49 @@ An alert on a character that a reference gave SHALL point at the first byte of t
 - **THEN** a rule with `scope: alt` reads the whitespace, as Vale does
 
 [rule-files]: ../rule-files/spec.md
+
+### Requirement: A language narrows a scope
+
+A last scope part piece that names a language by any of its langdex names, aliases or extensions, such as `rs` in `raw.rs` or `rust` in `raw.rust`, SHALL limit the scope to nodes in that language.  
+A negated part with a language, such as `~heading.rs`, SHALL leave out nodes only in that language.  
+A scope item whose every part names another language SHALL select nothing.
+
+#### Scenario: raw.rs in two files
+
+- **WHEN** a rule has `scope: raw.rs` and `tokens: [marker]`, and a Markdown file holds `A marker.` and a Rust file holds `// A marker.`
+- **THEN** hakkiri reports one alert, in the Rust file
+
+#### Scenario: One language, several extensions
+
+- **WHEN** a rule has `scope: text.comment.js` and `tokens: [marker]`, and the files `a.js`, `a.jsx`, `a.mjs` and `a.cjs` each hold `// A marker.`
+- **THEN** hakkiri reports one alert in each file
+
+#### Scenario: A name of the language
+
+- **WHEN** a rule has `scope: text.comment.rust` and `tokens: [marker]`, and a Rust file holds `// A marker.`
+- **THEN** hakkiri reports one alert
+
+#### Scenario: A negated part for another language
+
+- **WHEN** a rule has `scope: text & ~heading.rs` and `tokens: [marker]`, and a Markdown file holds `# A marker`
+- **THEN** hakkiri reports one alert, on the heading
+
+#### Scenario: An item that names only another language
+
+- **WHEN** a rule has `scope: [~heading.rs]` and `tokens: [marker]`, and a Markdown file holds `# A marker` and `A marker.`
+- **THEN** hakkiri reports no alert
+
+### Requirement: A piece names a language only after a scope
+
+A last piece SHALL name a language only when the whole part is not a scope hakkiri defines and the rest of it is one.  
+A piece that names no language SHALL be an error.
+
+#### Scenario: A scope name that ends like a language
+
+- **WHEN** a rule has `scope: text.comment.line`
+- **THEN** hakkiri reads it as the scope of line comments, in every language
+
+#### Scenario: A piece that names no language
+
+- **WHEN** a rule has `scope: text.nolang`
+- **THEN** hakkiri refuses the rule with `` `text.nolang` is not a scope hakkiri defines ``
