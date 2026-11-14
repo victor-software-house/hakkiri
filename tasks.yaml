@@ -221,6 +221,8 @@ queue:
     notes:
       - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: of 504 paired paragraphs Vale placed 500 on the last line, where vale-differences/spec.md and the rule-engine design say first. Vale matches tests/oracle/*/** for a file directly in tests/oracle, and hakkiri does not; whether hakkiri follows Vale is an open decision.'
       - '2026-11-14, the */** question moved to HKR-076: globs follow gitignore by operator decision.'
+      - '2026-11-14, a probe ran Vale 3.26.0 and Vale 66bbb85 with metric rules over paragraphs and list items: both place each alert at column 1 of the block last line and count a nested item as its own block. An occurrence alert is placed as hakkiri places it.'
+    plan: openspec/changes/block-alert-placement/proposal.md
 
   - id: HKR-075
     title: Read the alt text of an inline img tag as Vale does
