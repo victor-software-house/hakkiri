@@ -485,6 +485,17 @@ queue:
     notes:
       - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: of 504 paired paragraphs Vale placed 500 on the last line, where vale-differences/spec.md and the rule-engine design say first. Vale matches tests/oracle/*/** for a file directly in tests/oracle, and hakkiri does not; whether hakkiri follows Vale is an open decision.'
 
+  - id: HKR-075
+    title: Read the alt text of an inline img tag as Vale does
+    scope: tree
+    outcome: The alt text of an inline img tag in Markdown reads as Vale reads it.
+    blocked_by: []
+    acceptance:
+      - A Markdown paragraph with an inline img tag gives the alerts Vale 66bbb85 gives on its alt text.
+      - The vale-differences spec no longer lists the inline img text as a known gap.
+    notes:
+      - The Markdown probe of HKR-027 left this gap open, and vale-differences lists it.
+
 archive:
   - id: HKR-008
     title: Run ProseStyle on hakkiri

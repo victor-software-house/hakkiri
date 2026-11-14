@@ -19,11 +19,14 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 3. Alternatives (row `HKR-072`)
 
-- [ ] 3.1 Read a glob with `{…}` groups as its alternatives, rank each alternative at load, and give each glob, for one file, the rank of its most specific alternative that matches, as `design.md` sections 1 and 2 say.  
-  Verify unit tests of the expansion and its limit of 256, and a test for each new scenario of the `project-config` delta.
-- [ ] 3.2 Update `src/instructions.md`, `AGENTS.md` and the `settings-cascade` changeset, which is not released yet.  
-  Verify `operator_docs` passes.
+- [x] 3.1 Read a glob with `{…}` groups as its alternatives, rank each alternative at load, and give each glob, for one file, the rank of its most specific alternative that matches, as `design.md` sections 1 and 2 say.  
+  Verify unit tests of the expansion and its limit of 256, and a test for each new scenario of the `project-config` delta.  
+  Evidence, 2026-11-14 (UTC): [pull request 152](https://github.com/victor-software-house/hakkiri/pull/152) ranks each alternative of a `{…}` glob, with tests in `src/config/tests.rs`, `tests/rule_setting.rs` and `tests/package_settings.rs`.
+- [x] 3.2 Update `src/instructions.md`, `AGENTS.md` and the `settings-cascade` changeset, which is not released yet.  
+  Verify `operator_docs` passes.  
+  Evidence, 2026-11-14 (UTC): [pull request 152](https://github.com/victor-software-house/hakkiri/pull/152) updates `src/instructions.md`, `AGENTS.md` decision 5 and the changeset.
 
 ## 4. Integration
 
-- [ ] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
+- [x] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+  Evidence, 2026-11-14 (UTC): The CI of [pull request 151](https://github.com/victor-software-house/hakkiri/pull/151) and [pull request 152](https://github.com/victor-software-house/hakkiri/pull/152) passed, and both merged through the merge queue.

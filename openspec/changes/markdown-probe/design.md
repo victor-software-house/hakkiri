@@ -90,4 +90,4 @@ The `vale-differences` spec lists them, each with the input, so that none is rea
 Vale reads the alt text of an `img` tag in a line of text as prose, and not as part of a link around it.
 hakkiri cuts the tag whole.
 Reading it needs the alt text outside the `link` node and inside the paragraph, which the tag cuts do not give yet.
-The row stays open for it.
+Row `HKR-075` takes it.

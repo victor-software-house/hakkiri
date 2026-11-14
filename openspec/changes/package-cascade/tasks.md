@@ -18,4 +18,5 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 3. Integration
 
-- [ ] 3.1 Verify the pull request's CI passes, the same run as `settings-cascade`.
+- [x] 3.1 Verify the pull request's CI passes, the same run as `settings-cascade`.  
+  Evidence, 2026-11-14 (UTC): The CI of [pull request 151](https://github.com/victor-software-house/hakkiri/pull/151) passed, and it merged through the merge queue.

@@ -22,7 +22,7 @@ hakkiri before this change gave most of them, and each difference below came fro
   - A footnote reference is a gap, a definition no reference names is a gap, and a definition that one names is a `list` node.
 - hakkiri reads a backslash escape and a hard break written with a backslash without the backslash, where Vale gives no alert for a word that holds an escape.
 - The `vale-differences` spec drops the known gap of the Markdown parser and the scenario where inline HTML has no element scope, and lists the nine places where hakkiri differs on purpose.
-- The text of an inline `img` tag stays unread, which `vale-differences` lists as a known gap, and the row stays open for it.
+- The text of an inline `img` tag stays unread, which `vale-differences` lists as a known gap, and row `HKR-075` takes it.
 
 ## Capabilities
 
