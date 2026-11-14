@@ -195,18 +195,6 @@ queue:
       - '2026-11-13, operator decisions: front matter is document content, not CLI config; the crate is MIT OR Apache-2.0; JSON is read as JSON with struson, picked by a trial against JSONTestSuite; YAML may close with ....'
       - '2026-11-13, found by the Kody thread on PR 133: JSON front matter went through the YAML reader of ctl-core.'
 
-  - id: HKR-070
-    title: Keep ProseStyle.BareURL under the backtrack limit on long files
-    scope: engine
-    outcome: >-
-      ProseStyle.BareURL runs on long files without reaching the backtrack limit, so
-      no file fails at 1:1 for it.
-    blocked_by: []
-    acceptance:
-      - A long file that failed at 1:1 under hakkiri 0.0.6 lints with its BareURL alerts, with a test.
-    notes:
-      - '2026-11-13, found in the dotfiles skill lint with hakkiri 0.0.6 and ProseStyle v0.0.14: BareURL reaches the limit of 1,000,000 steps on long files, so the dotfiles turned the rule off.'
-
   - id: HKR-073
     title: Hold back a match only for the accepted term it is
     scope: engine
@@ -257,6 +245,19 @@ queue:
       - '2026-11-14, operator decision: globs follow the standard rules, whether Vale is looser or stricter.'
 
 archive:
+  - id: HKR-070
+    title: Keep ProseStyle.BareURL under the backtrack limit on long files
+    scope: engine
+    outcome: >-
+      ProseStyle.BareURL runs on long files without reaching the backtrack limit, so
+      no file fails at 1:1 for it.
+    notes:
+      - '2026-11-13, found in the dotfiles skill lint with hakkiri 0.0.6 and ProseStyle v0.0.14: BareURL reaches the limit of 1,000,000 steps on long files, so the dotfiles turned the rule off.'
+    completed: 2026-11-14T09:07:24
+    evidence:
+      - tests/long_inputs.rs a_long_file_with_bare_urls_lints_each_one lints 3,000 paragraphs with the BareURL rule of ProseStyle v0.0.16 and gets one alert for each bare URL and autolink, with no failure.
+    disposition: completed
+
   - id: HKR-072
     title: Rank a glob with alternatives as the alternative that matches
     scope: config
