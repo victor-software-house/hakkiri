@@ -306,6 +306,42 @@ fn a_config_with_no_vocab_loads_as_before() -> TestResult {
     Ok(())
 }
 
+/// A match that holds an accepted word as a whole word with its case is held
+/// back, wherever the word sits in it. Vale 3.26.0 gave the same three alerts
+/// with `ProseStyle.PrepositionChain` and `Vocab = ProseStyle`, on 2026-11-14.
+#[test]
+fn a_match_that_holds_an_accepted_word_is_held_back() -> TestResult {
+    let suite = Suite::new("vocabularies-inside");
+    let root = small(
+        &suite,
+        "inside",
+        "vocab: [Team]\n",
+        "Run it with the harness in a folder.\n\nRun it with the Harness in a folder.\n\n\
+         Run it with the harnessing in a folder.\n\nRun it with the parser in a folder.\n",
+    )?;
+    root.file(
+        "styles/Team/Chain.yml",
+        "extends: existence\nmessage: Chain\nlevel: warning\nignorecase: true\n\
+         raw:\n  - 'with the \\w+ in a folder'\n",
+    );
+    let result = run(root.path(), &["check", "text/a.md"], &[])?;
+    assert_eq!(result.code, 0, "{}{}", result.out, result.err);
+    let chains: Vec<&str> = result
+        .lines()
+        .into_iter()
+        .filter(|line| line.contains("Team.Chain"))
+        .collect();
+    assert_eq!(
+        chains,
+        [
+            "text/a.md:3:8: warning Team.Chain: Chain",
+            "text/a.md:5:8: warning Team.Chain: Chain",
+            "text/a.md:7:8: warning Team.Chain: Chain",
+        ]
+    );
+    Ok(())
+}
+
 #[test]
 fn a_bad_top_level_vocab_is_placed_on_its_own_line() -> TestResult {
     let suite = Suite::new("vocabularies-line");

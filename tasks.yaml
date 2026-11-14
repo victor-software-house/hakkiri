@@ -196,17 +196,18 @@ queue:
       - '2026-11-13, found by the Kody thread on PR 133: JSON front matter went through the YAML reader of ctl-core.'
 
   - id: HKR-073
-    title: Hold back a match only for the accepted term it is
-    scope: engine
+    title: State which matches an accepted word holds back
+    scope: docs
     outcome: >-
-      An existence match is held back only when it is an accepted term or lies inside
-      an accepted phrase, as the vocabularies spec says and Vale does.
+      The vocabularies spec states that a match holding an accepted word as a whole word with its case is held back, as Vale 3.26.0 and hakkiri both do, and a test pins it.
     blocked_by: []
     acceptance:
-      - A PrepositionChain match that holds the accepted word harness alerts, as Vale 3.26.0 alerts it, with a test.
-      - A match that is an accepted term, or lies inside an accepted phrase, is still held back, with a test.
+      - The vocabularies spec states the rule in its top-level and glob requirements, with a scenario.
+      - A test gives the alerts Vale 3.26.0 gives with ProseStyle.PrepositionChain and Vocab = ProseStyle on a chain holding harness, Harness, harnessing and no accepted word.
     notes:
       - '2026-11-13, found by the ProseStyle v0.0.16 alert diff: src/check.rs excepted holds back any existence match whose text holds an accepted word, which is wider than vocabularies/spec.md says. A sentence with the harness in a bench folder alerts in Vale and not in hakkiri.'
+      - 2026-11-14, a probe of Vale 3.26.0 found that it holds the harness chain back once Vocab = ProseStyle is set, at the top level or in a glob. The alert diff ran Vale with no vocabulary, because the ProseStyle package has no .vale.ini. hakkiri matches Vale; the spec was narrower than both.
+    plan: openspec/changes/vocab-hold-back/proposal.md
 
   - id: HKR-074
     title: Correct where Vale places a block alert
