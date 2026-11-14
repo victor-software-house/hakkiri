@@ -10,9 +10,9 @@
 //! One more test reads a single sentence of 50,000 characters with a
 //! `sequence` rule, where the walk starts once for each word the anchor
 //! accepts.
-//! The last lints a long file with the `BareURL` rule of ProseStyle v0.0.16,
+//! The last lints a long file with the `BareURL` rule of `ProseStyle` v0.0.16,
 //! which reached the backtrack limit at 1:1 under hakkiri 0.0.6 with the rule
-//! of ProseStyle v0.0.14 (row `HKR-070`).
+//! of `ProseStyle` v0.0.14 (row `HKR-070`).
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -20,6 +20,7 @@
 )]
 
 use std::error::Error;
+use std::fmt::Write as _;
 use std::slice;
 use std::time::{Duration, Instant};
 
@@ -194,7 +195,7 @@ fn spelling_and_affix_over_a_file_of_sixty_thousand_lines() -> TestResult {
     Ok(())
 }
 
-/// The `BareURL` rule of ProseStyle v0.0.16, which reads the address of each
+/// The `BareURL` rule of `ProseStyle` v0.0.16, which reads the address of each
 /// link and alt text.
 const BARE_URL: &str = "extends: existence\nmessage: \"Bare URL '%s'\"\nlevel: error\nscope:\n  - link\n  - alt\nnonword: true\nraw:\n  - 'https?://[^\\s<>]*[^\\s<>.,;:!?\"'']'\n";
 
@@ -202,13 +203,13 @@ const BARE_URL: &str = "extends: existence\nmessage: \"Bare URL '%s'\"\nlevel: e
 fn a_long_file_with_bare_urls_lints_each_one() -> TestResult {
     let rule = Rule::from_text("ProseStyle.BareURL", "ProseStyle/BareURL.yml", BARE_URL)?;
     let count = 3_000;
-    let source: String = (0..count)
-        .map(|at| {
-            format!(
-                "See https://bare.example/page/{at} and [the docs](https://ok.example/{at}), or <https://auto.example/{at}>.\n\n"
-            )
-        })
-        .collect();
+    let mut source = String::new();
+    for at in 0..count {
+        write!(
+            source,
+            "See https://bare.example/page/{at} and [the docs](https://ok.example/{at}), or <https://auto.example/{at}>.\n\n"
+        )?;
+    }
     let tree = parse(Language::Markdown, &source)?;
     let start = Instant::now();
     let alerts = lint(
