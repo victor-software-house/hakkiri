@@ -155,19 +155,29 @@ impl Selector {
                 let (negated, written) = written
                     .strip_prefix('~')
                     .map_or((false, written), |rest| (true, rest.trim()));
-                // The last piece is a language only when the whole part is no
-                // scope, and the rest of it is one.
-                let (named_parts, language) =
-                    if let Some(named_parts) = scope_names(written, negated) {
-                        (named_parts, None)
-                    } else if let Some((rest, piece)) = written.rsplit_once('.')
-                        && let Some(named_parts) = scope_names(rest, negated)
-                        && let Some(language) = langdex::by_name(piece)
-                    {
-                        (named_parts, Some(language))
-                    } else {
-                        return Err(refuse("is not a scope hakkiri defines"));
-                    };
+                // A key of the front matter may be any name, so a front matter
+                // part ends in a language when its last piece is the extension
+                // of one, as `frontmatter.title.md` does. Any other part ends
+                // in a language only when the whole part is no scope, and the
+                // rest of it is one.
+                let front =
+                    written.starts_with("frontmatter.") || written.starts_with("text.frontmatter.");
+                let (named_parts, language) = if front
+                    && let Some((rest, piece)) = written.rsplit_once('.')
+                    && let Some(named_parts) = scope_names(rest, negated)
+                    && let Some(language) = langdex::by_extension(piece)
+                {
+                    (named_parts, Some(language))
+                } else if let Some(named_parts) = scope_names(written, negated) {
+                    (named_parts, None)
+                } else if let Some((rest, piece)) = written.rsplit_once('.')
+                    && let Some(named_parts) = scope_names(rest, negated)
+                    && let Some(language) = langdex::by_name(piece)
+                {
+                    (named_parts, Some(language))
+                } else {
+                    return Err(refuse("is not a scope hakkiri defines"));
+                };
                 let last = named_parts.len();
                 for (index, name) in named_parts.into_iter().enumerate() {
                     parts.push(Part {
