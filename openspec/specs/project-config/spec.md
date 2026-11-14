@@ -84,7 +84,7 @@ hakkiri SHALL report only alerts at or above `level`, which is `suggestion`, `wa
 ### Requirement: files maps globs to settings
 
 hakkiri SHALL lint a file only when it matches a glob under `files`.  
-It SHALL apply the settings of every glob the file matches, in the order written, a later glob winning for the same key.
+It SHALL apply the settings of every glob the file matches in the rank of the settings cascade, a higher rank winning for the same key.
 
 #### Scenario: Two globs match one file
 
@@ -176,53 +176,6 @@ A rule name that gives a level SHALL run that rule on the matched files at that 
 
 - **WHEN** `files` holds `'*.md': {styles: [Other]}` and then `'a.md': {Team.Harsh: error}`
 - **THEN** `a.md` runs `Other` and `Team.Harsh`, and `b.md` runs `Other` alone
-
-### Requirement: Rule settings and style lists combine in the order written
-
-A later glob SHALL win for the same rule, whether it turns the rule on or off or sets its level.  
-A `styles` list SHALL replace the earlier list and keep the rule settings before it.  
-An empty `styles` list SHALL drop every rule setting before it, and the rule settings of its own glob SHALL apply after it.  
-The order of keys inside a glob SHALL NOT matter.
-
-#### Scenario: A rule turned on after it was turned off
-
-- **WHEN** `files` holds `'*.md': {styles: [Team], Team.Harsh: off}` and then `'a.md': {Team.Harsh: error}`
-- **THEN** `a.md` runs `Team.Harsh` as an error, and `b.md` runs the rest of `Team`
-
-#### Scenario: A rule turned off after it was enabled
-
-- **WHEN** `files` holds `'*.md': {Team.Filler: warning}` and then `'a.md': {Team.Filler: off}`
-- **THEN** `a.md` runs nothing, and `b.md` runs `Team.Filler` as a warning
-
-#### Scenario: A rule turned back on
-
-- **WHEN** `files` holds `'*.md': {styles: [Team], Team.Harsh: off}` and then `'a.md': {Team.Harsh: on}`
-- **THEN** `a.md` runs `Team.Harsh` as an error, the level of its rule file, and `b.md` runs the rest of `Team`
-
-#### Scenario: A level that stays
-
-- **WHEN** `files` holds `'*.md': {Team.Hint: error}`, then `'a.md': {Team.Hint: off}`, then `'a?md': {Team.Hint: on}`
-- **THEN** `a.md` and `b.md` report `Team.Hint` as an error
-
-#### Scenario: A level set again
-
-- **WHEN** `files` holds `'*.md': {Team.Filler: warning}` and then `'a.md': {Team.Filler: error}`
-- **THEN** `a.md` reports `Team.Filler` as an error, and `b.md` as a warning
-
-#### Scenario: A later list of styles
-
-- **WHEN** `files` holds `'*.md': {Team.Filler: warning}` and then `'a.md': {styles: [Other]}`
-- **THEN** `a.md` runs `Other` and `Team.Filler`
-
-#### Scenario: An empty list of styles
-
-- **WHEN** `files` holds `'*.md': {styles: [Other], Team.Filler: warning}`, then `'a.md': {styles: []}`, then `'b.md': {styles: []}` and `'b?md': {Team.Hint: warning}`
-- **THEN** `a.md` runs nothing, `b.md` runs `Team.Hint` alone, and `c.md` runs `Other` and `Team.Filler`
-
-#### Scenario: Keys in any order
-
-- **WHEN** a glob holds `Team.Harsh: off` before `styles: [Team]`
-- **THEN** the files it matches run `Team` without `Team.Harsh`
 
 ### Requirement: A rule setting does not make a clash an error
 
@@ -408,13 +361,13 @@ A package with no such file SHALL change nothing.
 
 ### Requirement: The project overrides a package
 
-A setting in the project's config SHALL win over the same setting in a package's file, and a later package SHALL win over an earlier one.  
-A rule that a package sets `off` SHALL stay off until a setting of the project or a later package turns it on.  
+At equal specificity a setting in the project's config SHALL win over the same setting in a package's file, and a later package SHALL win over an earlier one.  
+A rule that a package sets `off` SHALL stay off until a setting of a glob that ranks higher turns it on.  
 The project's `level` SHALL win, and a package's `level` SHALL apply only when the project sets none.
 
 #### Scenario: A project turns off a package rule
 
-- **WHEN** the package of the first scenario also sets `Team.Filler: warning`, and the project holds `files: {'a.md': {Team.Filler: off}}`
+- **WHEN** a package sets `'*.md': {styles: [Team], Team.Filler: warning}`, and the project holds `files: {'a.md': {Team.Filler: off}}`
 - **THEN** `a.md` draws no alert from `Team.Filler`, and `b.md` draws one
 
 #### Scenario: A package rule that ships off
@@ -434,13 +387,13 @@ The project's `level` SHALL win, and a package's `level` SHALL apply only when t
 
 #### Scenario: Two packages
 
-- **WHEN** the packages `a` and `b`, in that order, both set `Team.Filler` to a level
+- **WHEN** the packages `a` and `b`, in that order, both set `'*.md': {Team.Filler: ...}` to a level
 - **THEN** the level of `b` applies, and with the order reversed the level of `a` applies
 
 ### Requirement: A project's styles join those of a package under one glob
 
 A project's `styles` list under the same glob text as a package's SHALL add to the package's list.  
-A `styles` list under another glob SHALL replace the earlier list, as for any two globs of one config.
+A `styles` list under another glob SHALL compete in the settings cascade, the list of the higher rank replacing the other.
 
 #### Scenario: The same glob
 
@@ -449,8 +402,8 @@ A `styles` list under another glob SHALL replace the earlier list, as for any tw
 
 #### Scenario: Another glob
 
-- **WHEN** a package sets `'*.md': {styles: [Team]}` and the project sets `'*.{md,txt}': {styles: [Other]}`
-- **THEN** a Markdown file runs `Other`, and the rule settings of the package still apply
+- **WHEN** a package sets `'*.md': {styles: [Team]}` and the project sets `'docs/*.md': {styles: [Other]}`
+- **THEN** `docs/a.md` runs `Other`, the rule settings of the package still apply to it, and `a.md` runs `Team`
 
 #### Scenario: An empty list
 
@@ -475,17 +428,18 @@ A rule setting that names no loaded rule SHALL be an error, as in the project's 
 
 ### Requirement: The built-in style Vale holds the vocabulary rules
 
-hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Terms` and `Avoid`, when a named vocabulary holds a term, and SHALL refuse it as a style that no package holds when none does.
+hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Repetition` and `Spelling`, and `Terms` and `Avoid` when a named vocabulary at the top level holds a term.
+The style SHALL exist whatever the vocabularies hold.
 
 #### Scenario: A style named Vale
 
 - **WHEN** a glob lists `styles: [Vale]` and the config names a vocabulary with an accepted term
-- **THEN** the glob runs `Vale.Terms`
+- **THEN** the glob runs `Vale.Repetition`, `Vale.Spelling` and `Vale.Terms`
 
 #### Scenario: No vocabulary
 
 - **WHEN** a glob lists `styles: [Vale]` and no named vocabulary holds a term
-- **THEN** hakkiri reports that `Vale` is not a style in any package, and exits with a failure status
+- **THEN** the glob runs `Vale.Repetition` and `Vale.Spelling`
 
 ### Requirement: The run options are config keys
 
@@ -616,3 +570,178 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 
 - **WHEN** a package's settings file writes `fail_level:` or a package `path:` with its value on the next line
 - **THEN** hakkiri names the line of the key
+
+### Requirement: A package style named Vale is skipped with a warning
+
+hakkiri SHALL skip a package folder named for the built-in style `Vale`, as Vale does, and SHALL print one warning that names the folder and says the built-in style wins.  
+The other styles of the package SHALL load as before.
+
+#### Scenario: A package holds styles Acme and Vale
+
+- **WHEN** a package holds `styles/Acme` and `styles/Vale`, and a glob lists `styles: [Acme, Vale]`
+- **THEN** the rules of `Acme` run, no rule of the folder `Vale` runs, and `hakkiri check` prints one warning that `styles/Vale` is skipped because the built-in style `Vale` wins
+
+### Requirement: A glob's specificity is four counts over its parts
+
+A glob's specificity SHALL be four counts over the parts of its text between slashes, compared in order.  
+They SHALL be the parts of literal characters only, then the parts that hold a literal character and something else, then the parts that are `**`, then the literal characters of the whole glob.  
+More SHALL be more specific for each count but the third, where fewer SHALL be more specific.
+
+#### Scenario: A folder beats a file type
+
+- **WHEN** `files` holds `'docs/*': {Team.Filler: error}` and then `'*.mdx': {Team.Filler: warning}`
+- **THEN** `docs/a.mdx` reports `Team.Filler` as an error, and `a.mdx` as a warning
+
+#### Scenario: A deeper glob beats a shallower one written after it
+
+- **WHEN** `files` holds `'docs/**/*.md': {Team.Filler: error}` and then `'*.md': {Team.Filler: warning}`
+- **THEN** `docs/api/x.md` reports `Team.Filler` as an error, and `README.md` as a warning
+
+### Requirement: A literal character matches only itself
+
+A literal character SHALL be one outside a `[…]` class that is not `*` or `?`.  
+A backslash and the character after it SHALL count as one literal character.
+
+#### Scenario: More literal characters
+
+- **WHEN** `files` holds `'a*.md': {Team.Filler: error}` and then `'*.md': {Team.Filler: warning}`
+- **THEN** `a.md` reports `Team.Filler` as an error, and `b.md` as a warning
+
+### Requirement: A glob with alternatives ranks as the alternative that matches
+
+A glob with `{…}` groups SHALL be read as its alternatives, one for each choice in each group, each with its own specificity.  
+For one file, the glob SHALL rank as the most specific of its alternatives that match that file.  
+A glob with more than 256 alternatives SHALL be a fault that asks to split it into several globs.
+
+#### Scenario: The alternative that matches
+
+- **WHEN** `files` holds `'{*.md,docs/a.md}': {Team.Filler: error}` and then `'docs/*.md': {Team.Filler: warning}`
+- **THEN** `a.md` and `docs/a.md` report `Team.Filler` as an error, and `docs/b.md` as a warning
+
+#### Scenario: A skip list beats a package's file types
+
+- **WHEN** a package sets `'*.{md,mdx,rs}': {styles: [Team]}` and the project sets `'{CHANGELOG.md,notes/**}': {styles: []}`
+- **THEN** `a.md` runs `Team`, and `CHANGELOG.md` and `notes/b.md` run nothing
+
+### Requirement: The settings cascade applies the globs in rank order
+
+hakkiri SHALL rank every glob of the project and its packages once, by specificity, then by origin, then as written.  
+It SHALL apply the globs that match a file from the lowest rank to the highest, a higher rank winning for the same key.  
+A glob with alternatives SHALL take, for each file, the rank of its most specific alternative that matches that file.  
+Only settings of the same key SHALL compete: the settings of every matching glob merge.
+
+#### Scenario: Different keys merge
+
+- **WHEN** a package sets `'*.md': {Team.Filler: error}` and the project sets `'docs/*.md': {code_span_size: 0}`
+- **THEN** `docs/a.md` reports `Team.Filler` as an error and counts each code span as 0 words
+
+### Requirement: Rule settings combine in rank order
+
+A glob of higher rank SHALL win for the same rule, whether it turns the rule on or off or sets its level.  
+Turning a rule on or off and setting its level SHALL compete as two keys, so a level stays when a glob of higher rank turns the rule off or on.  
+The order of keys inside a glob SHALL NOT matter.
+
+#### Scenario: A rule turned on after it was turned off
+
+- **WHEN** `files` holds `'*.md': {styles: [Team], Team.Harsh: off}` and then `'a.md': {Team.Harsh: error}`
+- **THEN** `a.md` runs `Team.Harsh` as an error, and `b.md` runs the rest of `Team`
+
+#### Scenario: A more specific off written first
+
+- **WHEN** `files` holds `'a.md': {Team.Filler: off}` and then `'*.md': {Team.Filler: warning}`
+- **THEN** `a.md` runs nothing, and `b.md` runs `Team.Filler` as a warning
+
+#### Scenario: A rule turned back on
+
+- **WHEN** `files` holds `'*.md': {styles: [Team], Team.Harsh: off}` and then `'a.md': {Team.Harsh: on}`
+- **THEN** `a.md` runs `Team.Harsh` as an error, the level of its rule file, and `b.md` runs the rest of `Team`
+
+#### Scenario: A level that stays
+
+- **WHEN** `files` holds `'*.md': {Team.Hint: error}`, then `'a?md': {Team.Hint: off}`, then `'a.md': {Team.Hint: on}`
+- **THEN** `a.md` and `b.md` report `Team.Hint` as an error
+
+#### Scenario: A level set again
+
+- **WHEN** `files` holds `'*.md': {Team.Filler: warning}` and then `'a.md': {Team.Filler: error}`
+- **THEN** `a.md` reports `Team.Filler` as an error, and `b.md` as a warning
+
+#### Scenario: Keys in any order
+
+- **WHEN** a glob holds `Team.Harsh: off` before `styles: [Team]`
+- **THEN** the files it matches run `Team` without `Team.Harsh`
+
+### Requirement: Style lists combine in rank order
+
+A `styles` list SHALL replace the list of a lower rank and keep the rule settings of the lower ranks.  
+An empty `styles` list SHALL drop every rule setting of a lower rank, and the rule settings of its own glob SHALL apply after it.
+
+#### Scenario: A list of styles of a higher rank
+
+- **WHEN** `files` holds `'*.md': {Team.Filler: warning}` and then `'a.md': {styles: [Other]}`
+- **THEN** `a.md` runs `Other` and `Team.Filler`
+
+#### Scenario: An empty list of styles
+
+- **WHEN** `files` holds `'*.md': {styles: [Other], Team.Filler: warning}`, then `'a.md': {styles: []}`, then `'b.md': {styles: [], Team.Hint: warning}`
+- **THEN** `a.md` runs nothing, `b.md` runs `Team.Hint` alone, and `c.md` runs `Other` and `Team.Filler`
+
+### Requirement: Origin breaks a tie, and the top level ranks lowest
+
+At equal specificity the project SHALL rank above a package and a later package above an earlier one, and within one file a later glob SHALL rank above an earlier one.  
+The top level of each config file SHALL rank below every glob, in the same order of origin.
+
+#### Scenario: A tie between a package and the project
+
+- **WHEN** a package sets `'*.md': {Team.Filler: error}` and the project sets `'*.md': {Team.Filler: warning}`
+- **THEN** `a.md` reports `Team.Filler` as a warning
+
+#### Scenario: A package glob beats the project's top level
+
+- **WHEN** a package sets `'*.md': {code_span_size: 0}` and the project sets the top-level `code_span_size: 2`
+- **THEN** `README.md` counts each code span as 0 words
+
+### Requirement: The project forces a value with !override
+
+A value that the project's config tags `!override` SHALL apply after every value without the tag, whatever its rank, and the forced values SHALL apply among themselves in rank order.  
+The tag SHALL be read on the value of a key directly under a glob and on the top-level `code_span_size`; a forced `params` mapping SHALL force every parameter it holds.  
+A forced `styles` list SHALL be taken as written, and an empty forced list SHALL drop every rule setting without the tag.
+
+#### Scenario: A forced level beats a more specific off
+
+- **WHEN** a package sets `'docs/**/*.md': {Team.Filler: off}` and the project sets `'*.md': {Team.Filler: !override error}`
+- **THEN** `docs/a.md` reports `Team.Filler` as an error
+
+#### Scenario: A forced top-level value
+
+- **WHEN** a package sets `'*.md': {code_span_size: 0}` and the project sets the top-level `code_span_size: !override 2`
+- **THEN** `README.md` counts each code span as 2 words
+
+### Requirement: Only the project forces, and only with !override
+
+`!override` in a package's settings file, and any other tag on a value where hakkiri reads the tag, SHALL be an error that names the file and the line of its key.
+
+#### Scenario: A package that forces
+
+- **WHEN** a package's settings file holds `'*.md': {Team.Filler: !override off}` on line 4
+- **THEN** hakkiri reports an error naming the package's file, line 4 and `!override`, and exits 2
+
+#### Scenario: Another tag
+
+- **WHEN** the project holds `'*.md': {Team.Filler: !important off}` on line 6
+- **THEN** hakkiri reports an error naming line 6 and the tag `!important`, and exits 2
+
+### Requirement: Lists add up over every matching glob
+
+The lists of `vocab`, `block_ignores` and `token_ignores` SHALL add up over every glob that matches a file, in rank order.  
+The forced lists SHALL add up among themselves and replace what the lists without the tag gave.
+
+#### Scenario: Two ignore lists
+
+- **WHEN** a package sets `'*.md': {token_ignores: ['\{\{[^}]*\}\}']}` and the project sets `'docs/*.md': {token_ignores: ['%[^%]*%']}`
+- **THEN** `docs/a.md` hides both patterns from the prose rules, and `a.md` hides the first
+
+#### Scenario: A forced list
+
+- **WHEN** the same package glob holds, and the project sets `'docs/*.md': {token_ignores: !override ['%[^%]*%']}`
+- **THEN** `docs/a.md` hides only `%…%`

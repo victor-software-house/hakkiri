@@ -214,50 +214,6 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 - **WHEN** a dictionary declares a `SET` other than UTF-8 and ISO 8859-1
 - **THEN** hakkiri refuses it with an error that names the set, and Vale reads every set that `golang.org/x/text` knows ([case 6][case-6])
 
-### Requirement: Ported readers differ from Vale in detail
-
-hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, dictionaries and spelling.
-
-#### Scenario: A sentence is tagged whole
-
-- **WHEN** a text is cut differently by hakkiri's splitter and by prose's segmenter
-- **THEN** hakkiri tags its own sentence whole and Vale tags each part apart, so the tags can differ ([case 3][case-3])
-
-#### Scenario: A word's shape reads Rust's Unicode properties
-
-- **WHEN** a word holds a character such as `²`
-- **THEN** hakkiri reads its shape from Rust's Unicode properties and Vale from Go's categories, so the feature, and the tag, can differ ([case 5][case-5])
-
-#### Scenario: Compound directives are left out
-
-- **WHEN** a dictionary uses `COMPOUNDFLAG`, `COMPOUNDBEGIN`, `COMPOUNDMIDDLE` or `COMPOUNDEND`
-- **THEN** hakkiri loads it and accepts no compound made by flag, and Vale accepts a German or Dutch compound ([case 6][case-6])
-
-#### Scenario: A strip text that is not on the word makes no form
-
-- **WHEN** an affix rule strips `y` and adds `ies`, and the word is `cat`
-- **THEN** hakkiri makes no form, as Hunspell does, and Vale makes `caties` ([case 6][case-6])
-
-#### Scenario: A curly quote keeps its position
-
-- **WHEN** a misspelt word holds a curly quote or `&rsquo;`
-- **THEN** hakkiri reports it where it stands in the file, as written, and Vale gives it no position and reports the straight form ([spelling 1][spelling-1])
-
-#### Scenario: An email address is not read
-
-- **WHEN** a text holds an email address and `custom` turns the built-in filters off
-- **THEN** hakkiri reads no word in it, since it is a gap in the prose around it, and Vale reports it ([spelling 1][spelling-1])
-
-#### Scenario: Two swap keys expand to the same text
-
-- **WHEN** an `affix` rule's `swap` has two keys whose forms expand to the same text
-- **THEN** hakkiri keeps both in the order written, so the first gives the replacement, and Vale keeps the key its map visits last, which can change from run to run ([spelling 4][spelling-4])
-
-#### Scenario: A language other than English
-
-- **WHEN** a project checks text in a language other than English
-- **THEN** hakkiri does not support it, which the spelling change states as a non-goal, and Vale reads a dictionary for the language ([spelling goals][spelling-goals])
-
 ### Requirement: A run finishes where Vale panics, stalls or runs out of memory
 
 hakkiri SHALL finish a run on each input below in bounded time and memory, where Vale 3.26.0 panics, runs out of memory, or takes quadratic, cubic or exponential time.
@@ -357,46 +313,6 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 
 - **WHEN** `Terms.yml` and `Terms.custom.yml` both give `Team.Terms`, and `test --coverage` finds that no case flags it
 - **THEN** hakkiri lists it once with both files, and Vale lists `Team.Terms` twice and names no file ([rule-names 4][rule-names-4])
-
-### Requirement: HTML-block text differs from Vale in detail
-
-hakkiri SHALL read the text of an HTML block and the text around inline HTML as each scenario below says, where Vale 3.26.0 reads it otherwise.
-
-#### Scenario: A reference is unescaped once
-
-- **WHEN** a paragraph holds `&amp;lt;` or `&amp;#32;`, or a code span holds `&amp;`
-- **THEN** hakkiri reads `&lt;`, `&#32;` and `&amp;`, and Vale unescapes the text of each token twice, so it reads `<`, a space and `&` ([html 5][html-5])
-
-#### Scenario: Vale loses a match beside a reference
-
-- **WHEN** a text holds a reference that Vale cannot find in the file once it is unescaped, such as `&#109;arker` or a final `&nbsp;`, and a rule matches a word of it
-- **THEN** hakkiri reports the match through its byte table, and Vale finds the words of the text in the file, so it gives no alert for a word it cannot find ([html 5][html-5])
-- **AND** Vale places another alert on the wrong line or column
-
-#### Scenario: Vale loses the text around a blank alt
-
-- **WHEN** a paragraph holds `one marker <img src="x" alt=" "> end`
-- **THEN** hakkiri reads the paragraph as `one marker end`, and Vale gives no alert for that text, though it gives one when the alt text holds a word ([html 6][html-6])
-
-#### Scenario: A code element is a code span
-
-- **WHEN** an HTML block holds `a <code>x</code> b`
-- **THEN** hakkiri reads a code span of one word and reports no match over it, and Vale masks the text with asterisks and reports a match over them ([html 3][html-3])
-
-#### Scenario: Inline HTML in a paragraph has no element scope
-
-- **WHEN** a Markdown paragraph holds `a<b>marker</b>c`, `a <i>marker</i>` or an `a` element
-- **THEN** hakkiri joins and masks the text around the tags as Vale does, and gives no `strong`, `emphasis` or `link` node, where Vale gives each its scope (row [HKR-027][ledger], [html 4][html-4])
-
-#### Scenario: A block of masked text only
-
-- **WHEN** an HTML block holds `<p><kbd>x</kbd></p>`
-- **THEN** hakkiri reads `*`, and Vale reports nothing, since it cannot place text that is not in the file ([html 3][html-3])
-
-#### Scenario: A script that never ends
-
-- **WHEN** an HTML block holds `<script><!-- <script </script> marker`, and the next block holds `last marker`
-- **THEN** hakkiri reads the next block, since it tokenizes each HTML block alone, and Vale tokenizes the whole file as one stream, so the open script hides the rest of it ([html 1][html-1])
 
 ### Requirement: A rule setting is spelled as hakkiri's config spells it
 
@@ -533,88 +449,6 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 - **WHEN** a project's section under another glob replaces the styles a package turned on
 - **THEN** hakkiri prints nothing, and Vale warns once that the section replaces the styles of the package ([package settings 4][settings-4])
 
-### Requirement: Vocabulary rules differ from Vale's in these ways
-
-hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from the scenarios below.
-
-#### Scenario: An escape in a term
-
-- **WHEN** `data\Wset` is accepted and the text is `A data set, data-set, dataxset and DATA SET.`
-- **THEN** hakkiri flags `DATA SET`, since it lowercases the literal text of the term and keeps `\W`, and Vale flags `dataxset`, since it lowercases the escape to `\w` ([vocabulary-rules 1][vocabulary-rules-1])
-
-#### Scenario: The style Vale with no term
-
-- **WHEN** a glob lists `styles: [Vale]` and no named vocabulary holds a term
-- **THEN** hakkiri refuses the config, where Vale runs `Vale.Spelling` and `Vale.Repetition` from that style (rows [HKR-026][ledger] and [HKR-038][ledger], [vocabulary-rules 4][vocabulary-rules-4])
-
-[bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
-[bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
-[case-1]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
-[case-3]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
-[case-4]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#4-model-is-refused
-[case-5]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#5-tags-come-from-a-port-of-proses-tagger-and-model
-[case-6]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
-[case-8]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#8-a-style-other-than-ap-or-chicago-is-refused
-[case-9]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
-[check-1]: ../../changes/archive/2026-11-10-check-command/design.md#1-one-binary-on-ctl-cores-app
-[check-3]: ../../changes/archive/2026-11-10-check-command/design.md#3-globs-and-paths-are-relative-to-the-project-root
-[check-7]: ../../changes/archive/2026-11-10-check-command/design.md#7-output-is-a-line-per-alert-or-json
-[check-8]: ../../changes/archive/2026-11-10-check-command/design.md#8-exit-status-follows-vales-with-a-level-flag
-[engine-11]: ../../changes/archive/2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
-[engine-12]: ../../changes/archive/2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
-[engine-14]: ../../changes/archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
-[engine-16]: ../../changes/archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
-[engine-17]: ../../changes/archive/2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-the-scope-item
-[engine-18]: ../../changes/archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
-[engine-3]: ../../changes/archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
-[engine-7]: ../../changes/archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
-[engine-8]: ../../changes/archive/2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
-[format-4]: ../../changes/archive/2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
-[format-6]: ../../changes/archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
-[format-7]: ../../changes/archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[format-8]: ../../changes/archive/2026-11-10-rule-format/design.md#8-every-comment-reads-as-markdown
-[format-9]: ../../changes/archive/2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
-[html-1]: ../../changes/archive/2026-11-10-html-block-text/design.md#1-one-walk-follows-vales
-[html-3]: ../../changes/archive/2026-11-10-html-block-text/design.md#3-masked-text-reads-as-asterisks
-[html-4]: ../../changes/archive/2026-11-10-html-block-text/design.md#4-tags-join-the-text-around-them
-[html-5]: ../../changes/archive/2026-11-10-html-block-text/design.md#5-a-character-reference-reads-once
-[html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
-[ledger]: ../../../tasks.yaml
-[package-fetch-1]: ../../changes/archive/2026-11-11-package-fetch/design.md#1-vales-sync-is-the-reference-for-the-source
-[package-fetch-3]: ../../changes/archive/2026-11-11-package-fetch/design.md#3-the-checks-a-download-passes
-[pattern-1]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
-[pattern-2]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#2-consistency-matches-as-existence-does-one-pattern-per-pair
-[pattern-3]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#3-conditional-has-two-modes-chosen-by-the-second-pattern
-[pattern-6]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#6-an-unknown-or-empty-metrics-list-is-refused
-[pattern-7]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#7-ignorecase-on-a-conditional-applies-to-both-patterns
-[pattern-8]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#8-a-score-listed-twice-counts-once
-[pattern-9]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
-[rule-names-4]: ../../changes/archive/2026-11-10-rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
-[rule-setting-7]: ../../changes/archive/2026-11-11-rule-setting/design.md#7-what-stays-different
-[settings-2]: ../../changes/archive/2026-11-11-package-settings/design.md#2-the-files-name-and-place-in-the-package
-[settings-3]: ../../changes/archive/2026-11-11-package-settings/design.md#3-which-keys-a-package-may-set-and-nested-packages
-[settings-4]: ../../changes/archive/2026-11-11-package-settings/design.md#4-a-styles-list-under-a-glob-the-package-also-writes
-[settings-5]: ../../changes/archive/2026-11-11-package-settings/design.md#5-scalars-the-project-wins
-[settings-6]: ../../changes/archive/2026-11-11-package-settings/design.md#6-order-across-packages
-[settings-7]: ../../changes/archive/2026-11-11-package-settings/design.md#7-errors-name-the-package-file
-[spelling-1]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#1-spelling-reads-words-as-vales-tokenizer-cuts-them
-[spelling-2]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
-[spelling-3]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses
-[spelling-4]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
-[spelling-goals]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
-[splitter-5]: ../../changes/archive/2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-instead-of-vale
-[styles-1]: ../../changes/archive/2026-11-11-vale-styles/design.md#1-the-loader-resolves-inheritance
-[styles-4]: ../../changes/archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
-[test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
-[test-5]: ../../changes/archive/2026-11-10-test-command/design.md#5-finding-cases
-[test-7]: ../../changes/archive/2026-11-10-test-command/design.md#7-the-report-and-the-exit-status
-[tree-1]: ../../changes/archive/2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
-[vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
-[vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
-[vocabularies-8]: ../../changes/archive/2026-11-11-vocabularies/design.md#8-what-stays-different
-[vocabulary-rules-1]: ../../changes/archive/2026-11-11-vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
-[vocabulary-rules-4]: ../../changes/archive/2026-11-11-vocabulary-rules/design.md#4-the-style-vale-needs-a-vocabulary-term
-
 ### Requirement: Block and token ignores differ from Vale's in these ways
 
 hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart from the scenarios below.
@@ -702,33 +536,6 @@ A pull request that closes a gap SHALL record any difference the closing leaves 
 - **WHEN** a pull request closes the gap that a requirement below names
 - **THEN** the same pull request removes that requirement, and adds a scenario to the intended differences when hakkiri still differs
 
-### Requirement: The built-in spelling rule is a known gap
-
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
-
-#### Scenario: The built-in spelling rule
-
-- **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
-
-### Requirement: A YAML vocabulary is a known gap
-
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
-
-#### Scenario: A YAML vocabulary
-
-- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
-- **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
-
-### Requirement: The Markdown parser is a known gap
-
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
-
-#### Scenario: The Markdown parser
-
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
-- **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
-
 ### Requirement: A script rule is a known gap
 
 hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
@@ -746,15 +553,6 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 
 - **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
 - **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
-
-### Requirement: The built-in repetition rule is a known gap
-
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
-
-#### Scenario: The built-in repetition rule
-
-- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
-- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 ### Requirement: A doc selector or a View is a known gap
 
@@ -876,3 +674,548 @@ hakkiri SHALL join Rust doc line comments of the same type across blank lines, w
 - **THEN** hakkiri reads `curl it` as code, and Vale reads two comments, so a `text` rule sees `curl it` as prose ([doc-fence 1][doc-fence-1])
 
 [doc-fence-1]: ../../changes/archive/2026-11-12-doc-fence/design.md#1-doc-line-comments-join-across-blank-lines
+
+### Requirement: Tags come from the model and its corrections
+
+hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.
+Vale 3.26.0 tags with the model of prose v3.2.2, so the tags of the two tools differ.
+
+#### Scenario: Another model
+
+- **WHEN** both tools tag the 56,516 tokens of UD English GUM
+- **THEN** hakkiri's tags match the gold tags 92.53% of the time, and Vale's 90.26% ([tag-corrections 1][tag-corrections-1], [tag-corrections 2][tag-corrections-2])
+
+#### Scenario: A title is tagged by the model alone
+
+- **WHEN** the capitalization check tags a title
+- **THEN** hakkiri applies none of the corrections, as Vale applies none ([tag-corrections 4][tag-corrections-4])
+
+### Requirement: Corrections give the tags that documents need
+
+hakkiri SHALL apply to the tags of a sentence the corrections below, in this order, each reading the corrected tag before its word.
+
+#### Scenario: A modal in capitals
+
+- **WHEN** a sentence is `The loop SHALL keep its context.`
+- **THEN** `SHALL` reads `MD`, and Vale reads `NNP` ([tag-corrections 2][tag-corrections-2])
+
+#### Scenario: A name in capitals
+
+- **WHEN** a sentence is `The CSS file reads the SSH keys at UTC.`
+- **THEN** `CSS`, `SSH` and `UTC` read `NNP`
+- **AND** in `THE ANSWER AND THE QUESTION.`, a function word keeps the tag of the model, as does `MB` in `Read the first 10 MB of the file.` ([tag-corrections 5][tag-corrections-5])
+
+#### Scenario: A possessive
+
+- **WHEN** a sentence is `The checkpoint's pages per window show that cost.`
+- **THEN** `'s` reads `POS`, and the model alone reads `VBZ`, `NNS` or `NN` after a noun
+
+#### Scenario: A semicolon
+
+- **WHEN** a sentence is `The file holds rows; each row has a key.`
+- **THEN** `;` reads `:`, and the model alone reads `,`
+
+#### Scenario: A verb after a noun phrase
+
+- **WHEN** a sentence is `The freshness harness reads stdout.`
+- **THEN** `reads` reads `VBZ`, and the model alone reads `NNS`, which gives `NounStack` a false alert ([tag-corrections 6][tag-corrections-6])
+- **AND** in `The layout rules of the widgets.`, `rules` stays `NNS`
+
+[tag-corrections-1]: ../../changes/archive/2026-11-14-tag-corrections/design.md#1-keep-the-model-and-correct-the-tags-afterwards
+[tag-corrections-2]: ../../changes/archive/2026-11-14-tag-corrections/design.md#measures
+[tag-corrections-4]: ../../changes/archive/2026-11-14-tag-corrections/design.md#4-a-title-keeps-the-models-tags
+[tag-corrections-5]: ../../changes/archive/2026-11-14-tag-corrections/design.md#5-words-in-capitals-are-names-except-units-or-function-words
+[tag-corrections-6]: ../../changes/archive/2026-11-14-tag-corrections/design.md#6-a-plural-noun-is-a-verb-when-an-object-follows
+
+### Requirement: A code span is a noun of a sequence
+
+hakkiri SHALL read a code span as a noun in a `sequence` rule, and a pattern for a lowercase word SHALL refuse it.  
+Vale 3.26.0 reads the span as a run of `*`, and a rule with a tag and no pattern flags it.
+
+#### Scenario: A code name before a verb
+
+- **WHEN** a rule has `tokens: [{tag: 'NN|NNS'}, {pattern: says}]` and the input is ``The call fails as `flag` says.``
+- **THEN** hakkiri and Vale both give an alert, and Vale reports `**** says` ([code-span-tokens 1][code-span-tokens-1])
+
+### Requirement: The verbs of saying and asking keep their place
+
+hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is.
+It SHALL tag `asks` and `asked` in the noun phrase of a preposition as a noun and a participle, so a `sequence` rule with a verb tag flags the first and no other.  
+Vale tags the same words with the older model, and its rule has no verb tag.
+
+#### Scenario: A verb after a noun
+
+- **WHEN** the input is `The docs say so.`, `The CI builds agree with each other.` or `cargo asks again with a header.`
+- **THEN** `say` and `agree` read as verbs, `builds` reads `NNS`, and `cargo` reads `NN` ([code-span-tokens 6][code-span-tokens-6])
+
+#### Scenario: A noun and a participle
+
+- **WHEN** the input is `Answering the name asks that wait.` or `with the cache hook told of the new file`
+- **THEN** `asks` reads `NNS`, and `told` reads `VBN`, so a rule with the tag `^(?:VB|VBD|VBP|VBZ)$` on its verb flags neither ([code-span-tokens 6][code-span-tokens-6])
+
+[code-span-tokens-1]: ../../changes/archive/2026-11-14-code-span-tokens/design.md#1-the-model-reads-a-noun-in-place-of-a-code-span
+[code-span-tokens-6]: ../../changes/archive/2026-11-14-code-span-tokens/design.md#6-the-verb-token-of-thingsspeaknoun-carries-a-tag-and-the-tagger-corrections-make-the-tag-hold
+
+### Requirement: Front matter alerts lie at the text
+
+hakkiri SHALL read the front matter values as Vale does, and put each alert at the text of the value, apart from the scenarios below.
+
+#### Scenario: A folded scalar
+
+- **WHEN** a folded block scalar holds `Folded very` and `text here` and a rule flags `here`
+- **THEN** hakkiri puts the alert on the second line, and Vale puts it on the first ([front-matter-values 5][front-matter-values-5])
+
+#### Scenario: A TOML value
+
+- **WHEN** a TOML value reads `"A very toml title"` and a rule flags `title`
+- **THEN** hakkiri puts the alert in the value, and Vale puts it on the key, since it finds the value by searching the block ([front-matter-values 5][front-matter-values-5])
+
+#### Scenario: An explicit tag or an anchor
+
+- **WHEN** a YAML value reads `!!str tagged` or `&x anchored text` and a rule flags `tagged` or `anchored`
+- **THEN** hakkiri puts the alert at the word, and Vale puts it at the tag or the anchor ([front-matter-values 5][front-matter-values-5])
+
+#### Scenario: An alias
+
+- **WHEN** a YAML value is an alias such as `*name`
+- **THEN** hakkiri reads no text for it, and neither does Vale
+
+#### Scenario: Front matter that no parser reads
+
+- **WHEN** a block is no YAML, TOML or JSON that its parser reads, such as `other: [open`
+- **THEN** hakkiri reports the file as a failure with the line of the problem, and lints the rest of the file
+- **AND** Vale fails the file with its error on line 1 and lints none of it ([front-matter-values 6][front-matter-values-6])
+
+#### Scenario: A sequence as a key
+
+- **WHEN** a YAML block has a key that is a sequence, such as `? [a, b]`, and other entries
+- **THEN** hakkiri lints the values of the other entries
+- **AND** Vale fails the file with its error on line 1 and lints none of it ([front-matter-values 6][front-matter-values-6])
+
+[front-matter-values-5]: ../../changes/archive/2026-11-14-front-matter-values/design.md#5-where-vale-puts-an-alert
+[front-matter-values-6]: ../../changes/archive/2026-11-14-front-matter-values/design.md#6-a-block-no-parser-reads-is-a-fault-of-the-file
+
+### Requirement: A YAML vocabulary differs from Vale in six places
+
+hakkiri SHALL read a `vocab.yml` or `vocab.yaml` as each scenario below says, where Vale 3.26.0 does otherwise.
+
+#### Scenario: Several wrong entries
+
+- **WHEN** a file holds three wrong entries
+- **THEN** hakkiri reports all three with their lines, and Vale stops at the first ([yaml-vocabularies 2][yaml-vocabularies-2])
+
+#### Scenario: A key the file does not define
+
+- **WHEN** a file holds `accpt:` beside or instead of `accept:`
+- **THEN** hakkiri refuses the file on the line of the key, and Vale ignores the key and accepts nothing from it ([yaml-vocabularies 1][yaml-vocabularies-1])
+
+#### Scenario: The affix file
+
+- **WHEN** `affix: custom` names a file that only `$DICPATH` holds
+- **THEN** hakkiri reports that `custom.aff` is in no package, and Vale finds it there; hakkiri also looks in every other loaded package, which Vale does not ([yaml-vocabularies 6][yaml-vocabularies-6])
+
+#### Scenario: A name with a folder
+
+- **WHEN** `affix` is `../outside`
+- **THEN** hakkiri refuses the name, and Vale joins it to the folder ([yaml-vocabularies 6][yaml-vocabularies-6])
+
+#### Scenario: A syntax error of the file
+
+- **WHEN** the last list of the file is `[a` on line 3, with no closing bracket
+- **THEN** hakkiri names line 3, where the bracket opens, and Vale names line 2, which holds a complete entry and no fault ([yaml-vocabularies 2][yaml-vocabularies-2])
+
+#### Scenario: A period in a term with ignorecase
+
+- **WHEN** an entry is `Node.js` with `ignorecase: true`
+- **THEN** hakkiri accepts `Node.js` and `node.js`, and not `Nodexjs`, where Vale reads the period as any character and accepts it too ([yaml-vocabularies 3][yaml-vocabularies-3])
+
+[yaml-vocabularies-1]: ../../changes/archive/2026-11-14-yaml-vocabularies/design.md#1-the-file-parses-through-ctl-cores-input
+[yaml-vocabularies-2]: ../../changes/archive/2026-11-14-yaml-vocabularies/design.md#2-an-entry-is-checked-on-the-node-and-every-problem-is-reported
+[yaml-vocabularies-3]: ../../changes/archive/2026-11-14-yaml-vocabularies/design.md#3-a-plain-term-is-literal
+[yaml-vocabularies-6]: ../../changes/archive/2026-11-14-yaml-vocabularies/design.md#6-the-affix-file-comes-from-the-packages-never-from-dicpath
+
+### Requirement: Vocabulary rules differ from Vale's in this way
+
+hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from the scenario below.
+
+#### Scenario: An escape in a term
+
+- **WHEN** `data\Wset` is accepted and the text is `A data set, data-set, dataxset and DATA SET.`
+- **THEN** hakkiri flags `DATA SET`, since it lowercases the literal text of the term and keeps `\W`, and Vale flags `dataxset`, since it lowercases the escape to `\w` ([vocabulary-rules 1][vocabulary-rules-1])
+
+[vocabulary-rules-1]: ../../changes/archive/2026-11-11-vocabulary-rules/design.md#1-terms-and-avoid-are-rules-of-a-style-named-vale
+
+### Requirement: Rule parameters differ from Vale's in these ways
+
+hakkiri SHALL read a rule's parameters as Vale 3.26.0 does, apart from the scenarios below.
+
+#### Scenario: A parameter in one section
+
+- **WHEN** a section for `*.md` sets `Vale.Repetition[max] = 1` and a `.rs` file runs the rule
+- **THEN** hakkiri applies the parameter to the files of the glob that sets it, and Vale applies it to the `.rs` file too ([rule-parameters 2][rule-parameters-2])
+
+#### Scenario: A parameter in two sections
+
+- **WHEN** one section sets `max = 1` and another sets `max = 5` for the same rule
+- **THEN** hakkiri gives each glob its own value, and Vale gives `max = 5` to the files of both ([rule-parameters 2][rule-parameters-2])
+
+#### Scenario: An empty styles list
+
+- **WHEN** an empty list of styles follows a glob that set a parameter
+- **THEN** hakkiri drops the parameter, as it drops a level, and Vale keeps it for every file ([rule-parameters 3][rule-parameters-3])
+
+#### Scenario: A parameter Vale takes without a word
+
+- **WHEN** a parameter names a rule that does not exist, holds no value, sets a negative `max`, or sets a `scope` that is none
+- **THEN** hakkiri refuses it with the config file and the line, and Vale takes it with no error ([rule-parameters 4][rule-parameters-4])
+
+#### Scenario: A parameter Vale refuses without a place
+
+- **WHEN** a parameter has a value of the wrong kind, a name the check does not define, or a list
+- **THEN** hakkiri refuses it with the config file and the line, and Vale names `[internal]`, or its rule file at line 0 or 1, and for a wrong kind cuts the message off after `1 error(s) decoding:` ([rule-parameters 4][rule-parameters-4])
+
+#### Scenario: A flag and a name Vale accepts
+
+- **WHEN** a flag parameter is spelled `YES` or `1`, or a parameter name is written `IGNORECASE`
+- **THEN** hakkiri refuses it, since a YAML config writes `true` and `false` and names a field as the rule file does, and Vale reads the ini spelling and ignores the case of a name ([rule-parameters 4][rule-parameters-4])
+
+#### Scenario: A rule built from a vocabulary
+
+- **WHEN** a parameter names `Vale.Terms` or `Vale.Avoid`
+- **THEN** hakkiri refuses it, and Vale ignores it ([rule-parameters 5][rule-parameters-5])
+
+### Requirement: A consistency alert in a multi-line paragraph differs from Vale
+
+hakkiri SHALL place a `consistency` alert on the last match of a form, though an earlier line holds the same text.  
+
+#### Scenario: A form inside a longer word on a later line
+
+- **WHEN** a `consistency` rule with `nonword: true` pairs `advisor` with `adviser`, and a paragraph holds `The adviser spoke first.` and then `Two advisors met two advisers.`
+- **THEN** hakkiri puts the alert on line 2, column 22, the last match, and Vale searches the paragraph for the text `adviser` and puts it on line 1, column 5 ([pattern 2][pattern-2])
+
+[rule-parameters-2]: ../../changes/archive/2026-11-14-rule-parameters/design.md#2-parameters-apply-per-glob
+[rule-parameters-3]: ../../changes/archive/2026-11-14-rule-parameters/design.md#3-an-empty-styles-list-drops-the-parameters
+[rule-parameters-4]: ../../changes/archive/2026-11-14-rule-parameters/design.md#4-the-parameters-are-laid-over-the-rules-fields-and-the-rules-reader-refuses-them
+[rule-parameters-5]: ../../changes/archive/2026-11-14-rule-parameters/design.md#5-a-rule-built-from-a-vocabulary-takes-no-parameter
+[pattern-2]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#2-consistency-matches-as-existence-does-one-pattern-per-pair
+
+### Requirement: An existence match across a code span is a match
+
+hakkiri SHALL report an `existence` match that runs across a code span, as Vale does, and SHALL drop one that starts or ends on a span.
+Vale 3.26.0 masks the span as a run of `*` and reports a match that starts on it as well.
+The matched text differs: hakkiri prints `x` for the span, and Vale prints the mask.
+
+#### Scenario: A chain across a code span
+
+- **WHEN** the input is ``The loop reads `a`; the store keeps `b`, which is slow.`` under `ClauseChain`
+- **THEN** hakkiri and Vale both give an alert, and the two print the span differently in the matched text ([existence-span-mask 1][existence-span-mask-1])
+
+[existence-span-mask-1]: ../../changes/archive/2026-11-14-existence-span-mask/design.md#1-a-pattern-check-reads-a-code-span-as-one--and-drops-a-match-only-at-the-edges-of-the-match
+
+### Requirement: The nouns of technical prose read as nouns
+
+hakkiri SHALL tag `check`, `prompt`, `thinking` and `fade` as nouns after a determiner, where the model tags them as another part of speech.
+It SHALL tag `prompt`, `round` and `split` as nouns after a noun when the nouns after them run up to `pull request`.
+It SHALL tag `check` as a noun when a base form follows two singular nouns before a preposition or a stop.
+A rule of four lowercase nouns then counts them, and the verb `check` after a plural noun stays a verb.
+
+#### Scenario: A word of a pull request title
+
+- **WHEN** the input is `The queue load split pull request ended it.` or `It is merged (the prompt template pull request).`
+- **THEN** `split` and `prompt` read `NN`, and `final` in `the final mask round pull request` stays `JJ` ([technical-nouns 1][technical-nouns-1])
+
+#### Scenario: A verb of the same spelling
+
+- **WHEN** the input is `The tests check the cache against the spec.`
+- **THEN** `check` reads `VB`
+
+[technical-nouns-1]: ../../changes/archive/2026-11-14-technical-nouns/design.md#1-the-tagger-reads-the-nouns-that-technical-prose-uses-where-the-model-reads-another-part-of-speech
+
+### Requirement: A rule with forms is read by hakkiri alone
+
+hakkiri SHALL read a `sequence` rule that sets `forms`, which Vale 3.26.0 does not define.
+
+#### Scenario: A rule of forms with no tokens
+
+- **WHEN** a `sequence` rule sets `forms` and no `tokens`
+- **THEN** hakkiri reads it, and Vale stops with a panic at its type assertion on `tokens` ([sequence-forms 4][sequence-forms-4])
+
+[sequence-forms-4]: ../../changes/archive/2026-11-14-sequence-forms/design.md#4-a-rule-file-with-forms-is-read-by-hakkiri-alone
+
+### Requirement: The built-in spelling rule differs from Vale's in these ways
+
+hakkiri SHALL run `Vale.Spelling` as Vale does, apart from the scenarios below and the differences of a `spelling` rule that this spec already lists.
+
+#### Scenario: Several packages
+
+- **WHEN** a project loads two packages that each hold a `config/ignore` folder or a `config/dictionaries` folder
+- **THEN** hakkiri reads both, in order, and Vale reads one styles path ([vale-spelling 2][vale-spelling-2])
+
+#### Scenario: A code span in a code comment
+
+- **WHEN** a Rust comment holds `` `blorftCode` `` and `custom` turns the built-in filters off
+- **THEN** hakkiri reads no word in the code span, and Vale reports the span with its backticks as one word ([vale-spelling 5][vale-spelling-5])
+
+#### Scenario: The name after a param tag
+
+- **WHEN** a TypeScript comment holds `@param nme the nme of it`
+- **THEN** hakkiri reads no word for the name `nme`, and Vale reports it, and reports `@param` when `custom` turns the filters off ([vale-spelling 5][vale-spelling-5])
+
+### Requirement: Ported readers differ from Vale in these ways
+
+hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, dictionaries and spelling.
+
+#### Scenario: A sentence is tagged whole
+
+- **WHEN** a text is cut differently by hakkiri's splitter and by prose's segmenter
+- **THEN** hakkiri tags its own sentence whole and Vale tags each part apart, so the tags can differ ([case 3][case-3])
+
+#### Scenario: A word's shape reads Rust's Unicode properties
+
+- **WHEN** a word holds a character such as `²`
+- **THEN** hakkiri reads its shape from Rust's Unicode properties and Vale from Go's categories, so the feature, and the tag, can differ ([case 5][case-5])
+
+#### Scenario: Compound directives are left out
+
+- **WHEN** a dictionary uses `COMPOUNDFLAG`, `COMPOUNDBEGIN`, `COMPOUNDMIDDLE` or `COMPOUNDEND`
+- **THEN** hakkiri loads it and accepts no compound made by flag, and Vale accepts a German or Dutch compound ([case 6][case-6])
+
+#### Scenario: A strip text that is not on the word makes no form
+
+- **WHEN** an affix rule strips `y` and adds `ies`, and the word is `cat`
+- **THEN** hakkiri makes no form, as Hunspell does, and Vale makes `caties` ([case 6][case-6])
+
+#### Scenario: A curly quote keeps its position
+
+- **WHEN** a misspelt word holds a curly quote or `&rsquo;`
+- **THEN** hakkiri reports it where it stands in the file, as written, and Vale gives it no position and reports the straight form ([spelling 1][spelling-1])
+
+#### Scenario: Two swap keys expand to the same text
+
+- **WHEN** an `affix` rule's `swap` has two keys whose forms expand to the same text
+- **THEN** hakkiri keeps both in the order written, so the first gives the replacement, and Vale keeps the key its map visits last, which can change from run to run ([spelling 4][spelling-4])
+
+#### Scenario: A language other than English
+
+- **WHEN** a project checks text in a language other than English
+- **THEN** hakkiri does not support it, which the spelling change states as a non-goal, and Vale reads a dictionary for the language ([spelling goals][spelling-goals])
+
+[vale-spelling-2]: ../../changes/archive/2026-11-14-vale-spelling/design.md#2-the-built-in-rule-reads-the-settings-of-every-package
+[vale-spelling-5]: ../../changes/archive/2026-11-14-vale-spelling/design.md#5-what-the-probe-shows-and-hakkiri-differs-on
+[case-3]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor
+[case-5]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#5-tags-come-from-a-port-of-proses-tagger-and-model
+[case-6]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
+[spelling-1]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#1-spelling-reads-words-as-vales-tokenizer-cuts-them
+[spelling-4]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
+[spelling-goals]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
+
+### Requirement: A bare address ends where GFM ends it
+
+hakkiri SHALL end a bare web address at whitespace or `<`, as GFM and its Markdown parser do.  
+Vale ends one at the first byte that goldmark 1.8.6's linkify pattern leaves out, which holds no letter outside ASCII, and reads the rest as text.
+
+#### Scenario: A bare address with a letter outside ASCII
+
+- **WHEN** a Markdown file holds `Visit https://b.example/ä for special thanks.`
+- **THEN** hakkiri counts 8 words, the words of the whole address among them, and Vale 66bbb85 counts 5, since its link ends before `ä` ([link-address][link-address])
+
+[link-address]: ../../changes/archive/2026-11-14-link-address/proposal.md
+
+### Requirement: Settings resolve by specificity, where Vale applies its sections in order
+
+hakkiri SHALL resolve the settings of the globs that match a file by the settings cascade of `project-config`, where Vale 66bbb85 applies its sections in the order written, a later section winning for the file ([file.go][vale-file]).
+
+#### Scenario: A specific glob written first
+
+- **WHEN** the config holds `'docs/*.md': {Team.Filler: error}` and then `'*.md': {Team.Filler: warning}`
+- **THEN** hakkiri reports `Team.Filler` on `docs/a.md` as an error, and Vale, given the same two sections in that order, reports it as a warning
+
+[vale-file]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L185-L215
+
+### Requirement: A package glob can beat the project's top level, and the project can force a value
+
+hakkiri SHALL rank a package's glob above the project's top level, and SHALL apply a value the project tags `!override` after every other value.  
+Vale 66bbb85 applies the sections of a package before the project's in the order written, and has no way to force a value ([file.go][vale-file]).
+
+#### Scenario: A package glob and the project's top level
+
+- **WHEN** a package sets `'*.md': {code_span_size: 0}` and the project sets the top-level `code_span_size: 2`
+- **THEN** hakkiri counts a code span in `README.md` as 0 words; Vale has no such key
+
+#### Scenario: A forced value
+
+- **WHEN** the project tags a value `!override`
+- **THEN** hakkiri applies it after every value without the tag; Vale reads no YAML and forces nothing
+
+### Requirement: Sentences split where a reader splits them
+
+hakkiri SHALL split sentences by its own splitter where Vale 66bbb85's segmenter splits otherwise, in the places that `tests/sentence_differences.rs` pins.
+
+#### Scenario: A numbered heading or item
+
+- **WHEN** a Markdown file holds `## 1. Evaluation sets` or `- [x] 4. A patch changeset ships with the change.`
+- **THEN** hakkiri reads the heading or item as one sentence, and Vale reads the `1.` or `4.` as a sentence of its own
+
+#### Scenario: A version, a decimal or a task number before a capital
+
+- **WHEN** a file holds `The team pins ctl-core 0.5.2. ctl-core 0.6.3 ships the new look.`
+- **THEN** hakkiri gives two sentences, and Vale gives one, as it does after the decimal `4.75.` and the task number `1.3.`
+
+#### Scenario: vs. between two versions
+
+- **WHEN** a file holds `Rust 1.99 vs. Go 1.25 differ.`
+- **THEN** hakkiri gives one sentence, and Vale ends the first after `vs.`
+
+### Requirement: HTML-block text differs from Vale in these details
+
+hakkiri SHALL read the text of an HTML block and the text around inline HTML as each scenario below says, where Vale 3.26.0 reads it otherwise.
+
+#### Scenario: A reference is unescaped once
+
+- **WHEN** a paragraph holds `&amp;lt;` or `&amp;#32;`, or a code span holds `&amp;`
+- **THEN** hakkiri reads `&lt;`, `&#32;` and `&amp;`, and Vale unescapes the text of each token twice, so it reads `<`, a space and `&` ([html 5][html-5])
+
+#### Scenario: Vale loses a match beside a reference
+
+- **WHEN** a text holds a reference that Vale cannot find in the file once it is unescaped, such as `&#109;arker` or a final `&nbsp;`, and a rule matches a word of it
+- **THEN** hakkiri reports the match through its byte table, and Vale finds the words of the text in the file, so it gives no alert for a word it cannot find ([html 5][html-5])
+- **AND** Vale places another alert on the wrong line or column
+
+#### Scenario: Vale loses the text around a blank alt
+
+- **WHEN** a paragraph holds `one marker <img src="x" alt=" "> end`
+- **THEN** hakkiri reads the paragraph as `one marker end`, and Vale gives no alert for that text, though it gives one when the alt text holds a word ([html 6][html-6])
+
+#### Scenario: A code element is a code span
+
+- **WHEN** an HTML block holds `a <code>x</code> b`
+- **THEN** hakkiri reads a code span of one word and reports no match over it, and Vale masks the text with asterisks and reports a match over them ([html 3][html-3])
+
+#### Scenario: A block of masked text only
+
+- **WHEN** an HTML block holds `<p><kbd>x</kbd></p>`
+- **THEN** hakkiri reads `*`, and Vale reports nothing, since it cannot place text that is not in the file ([html 3][html-3])
+
+#### Scenario: A script that never ends
+
+- **WHEN** an HTML block holds `<script><!-- <script </script> marker`, and the next block holds `last marker`
+- **THEN** hakkiri reads the next block, since it tokenizes each HTML block alone, and Vale tokenizes the whole file as one stream, so the open script hides the rest of it ([html 1][html-1])
+
+### Requirement: Markdown reads differ from Vale's converter in these ways
+
+hakkiri SHALL read Markdown as each scenario below says, where Vale 3.26.0 reads it otherwise.
+
+#### Scenario: An inline tag between letters
+
+- **WHEN** a paragraph holds `one*two*three`, `one~~two~~three` or `one[two](u)three`
+- **THEN** hakkiri reads the word `onetwothree`, and Vale reads `one` and `twothree`, since its converter puts a space before the text of an opening tag and none after a closing tag ([markdown-probe 8][markdown-probe-8])
+
+#### Scenario: A word holds an escape
+
+- **WHEN** a paragraph holds `well\-known` or `snake\_case`
+- **THEN** hakkiri reads `well-known` and `snake_case` and alerts where they stand, and Vale cannot find the converted word in the file, so it gives no alert for it ([markdown-probe 4][markdown-probe-4])
+
+#### Scenario: A paragraph line starts with a number
+
+- **WHEN** a line that continues a paragraph starts with `1986.` and a space
+- **THEN** hakkiri reads `1986` as a word of the paragraph, and Vale masks every line start that holds digits and a dot, so it reads no such word ([markdown-probe 8][markdown-probe-8])
+
+#### Scenario: A reference that nothing defines
+
+- **WHEN** a paragraph holds `[a label][nope]` and no definition names `nope`
+- **THEN** hakkiri reads the text as written, so `nope` is a word, and Vale masks the second label as it does for a defined reference ([markdown-probe 8][markdown-probe-8])
+
+#### Scenario: A footnote reference
+
+- **WHEN** a paragraph holds `A word[^one] here.`
+- **THEN** hakkiri reads `A word here.`, and Vale reads the number `1` as a word of a link and places it at the first `1` of the line ([markdown-probe 6][markdown-probe-6])
+
+#### Scenario: The last word of a footnote definition
+
+- **WHEN** a definition ends with `the last.` and a rule matches each run of non-space characters
+- **THEN** hakkiri reports `last.`, and Vale gives no alert, since its text holds the back reference arrow after the full stop and the word with the arrow is not in the file ([markdown-probe 6][markdown-probe-6])
+
+#### Scenario: A tag that is never closed
+
+- **WHEN** a paragraph holds `Text <b>one open.` and the next holds `two </b>stray.`
+- **THEN** hakkiri scopes no text of the second paragraph as strong, and Vale scopes `two` as strong ([markdown-probe 8][markdown-probe-8])
+
+#### Scenario: An unclosed tag that swallows another
+
+- **WHEN** a paragraph holds `Text <unclosed one tag and <b>two bold.` and the next holds `three </b>stray.`
+- **THEN** hakkiri finishes the file, and Vale panics with a slice out of range ([markdown-probe 8][markdown-probe-8])
+
+#### Scenario: A link that is its own address
+
+- **WHEN** a paragraph holds `Read <https://b.example> first.`, `Read https://b.example first.` or `See [https://b.example](https://b.example) now.`
+- **THEN** hakkiri's `link` scope reads `https://b.example`, so ProseStyle's `BareURL` can flag it, and Vale's reads no word ([markdown-probe 2][markdown-probe-2])
+
+### Requirement: The alt text of an inline img is a known gap
+
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+
+#### Scenario: An img tag in a line of text
+
+- **WHEN** a paragraph holds `Build <a href="u"><img src="b.svg" alt="the badge"></a> now.`
+- **THEN** hakkiri reads no word of `the badge`, and Vale reads them as words of the paragraph and not of the link (row [HKR-027][ledger], [markdown-probe 9][markdown-probe-9])
+
+[html-1]: ../../changes/archive/2026-11-10-html-block-text/design.md#1-one-walk-follows-vales
+[html-3]: ../../changes/archive/2026-11-10-html-block-text/design.md#3-masked-text-reads-as-asterisks
+[html-5]: ../../changes/archive/2026-11-10-html-block-text/design.md#5-a-character-reference-reads-once
+[html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
+[ledger]: ../../../tasks.yaml
+[markdown-probe-2]: ../../changes/archive/2026-11-14-markdown-probe/design.md#2-a-link-keeps-the-address-for-the-link-scope
+[markdown-probe-4]: ../../changes/archive/2026-11-14-markdown-probe/design.md#4-a-backslash-escape-loses-the-backslash
+[markdown-probe-6]: ../../changes/archive/2026-11-14-markdown-probe/design.md#6-a-footnote-reads-as-in-vales-html
+[markdown-probe-8]: ../../changes/archive/2026-11-14-markdown-probe/design.md#8-what-hakkiri-keeps-from-the-earlier-reading
+[markdown-probe-9]: ../../changes/archive/2026-11-14-markdown-probe/design.md#9-known-gap-the-alt-text-of-an-inline-img
+[test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
+[bootstrap-1]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#1-own-format-built-from-the-best-prior-art
+[bootstrap-8]: ../../changes/archive/2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
+[case-1]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
+[case-4]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#4-model-is-refused
+[case-8]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#8-a-style-other-than-ap-or-chicago-is-refused
+[case-9]: ../../changes/archive/2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
+[check-1]: ../../changes/archive/2026-11-10-check-command/design.md#1-one-binary-on-ctl-cores-app
+[check-3]: ../../changes/archive/2026-11-10-check-command/design.md#3-globs-and-paths-are-relative-to-the-project-root
+[check-7]: ../../changes/archive/2026-11-10-check-command/design.md#7-output-is-a-line-per-alert-or-json
+[check-8]: ../../changes/archive/2026-11-10-check-command/design.md#8-exit-status-follows-vales-with-a-level-flag
+[engine-11]: ../../changes/archive/2026-11-10-rule-engine/design.md#11-metric-tokens-match-as-existence-tokens
+[engine-12]: ../../changes/archive/2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
+[engine-14]: ../../changes/archive/2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
+[engine-16]: ../../changes/archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
+[engine-17]: ../../changes/archive/2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-the-scope-item
+[engine-18]: ../../changes/archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
+[engine-3]: ../../changes/archive/2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
+[engine-7]: ../../changes/archive/2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
+[engine-8]: ../../changes/archive/2026-11-10-rule-engine/design.md#8-two-regex-engines-and-a-backtrack-limit
+[format-4]: ../../changes/archive/2026-11-10-rule-format/design.md#4-a-rate-is-a-metric-that-counts-tokens
+[format-6]: ../../changes/archive/2026-11-10-rule-format/design.md#6-the-project-config-uses-lowercase-keys
+[format-7]: ../../changes/archive/2026-11-10-rule-format/design.md#7-intended-differences-from-vale
+[format-8]: ../../changes/archive/2026-11-10-rule-format/design.md#8-every-comment-reads-as-markdown
+[format-9]: ../../changes/archive/2026-11-10-rule-format/design.md#9-a-table-row-is-a-scope
+[package-fetch-1]: ../../changes/archive/2026-11-11-package-fetch/design.md#1-vales-sync-is-the-reference-for-the-source
+[package-fetch-3]: ../../changes/archive/2026-11-11-package-fetch/design.md#3-the-checks-a-download-passes
+[pattern-1]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#1-per-file-state-belongs-to-one-rule
+[pattern-3]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#3-conditional-has-two-modes-chosen-by-the-second-pattern
+[pattern-6]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#6-an-unknown-or-empty-metrics-list-is-refused
+[pattern-7]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#7-ignorecase-on-a-conditional-applies-to-both-patterns
+[pattern-8]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#8-a-score-listed-twice-counts-once
+[pattern-9]: ../../changes/archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
+[rule-names-4]: ../../changes/archive/2026-11-10-rule-names/design.md#4-test-finds-the-style-folder-as-vale-does
+[rule-setting-7]: ../../changes/archive/2026-11-11-rule-setting/design.md#7-what-stays-different
+[settings-2]: ../../changes/archive/2026-11-11-package-settings/design.md#2-the-files-name-and-place-in-the-package
+[settings-3]: ../../changes/archive/2026-11-11-package-settings/design.md#3-which-keys-a-package-may-set-and-nested-packages
+[settings-4]: ../../changes/archive/2026-11-11-package-settings/design.md#4-a-styles-list-under-a-glob-the-package-also-writes
+[settings-5]: ../../changes/archive/2026-11-11-package-settings/design.md#5-scalars-the-project-wins
+[settings-6]: ../../changes/archive/2026-11-11-package-settings/design.md#6-order-across-packages
+[settings-7]: ../../changes/archive/2026-11-11-package-settings/design.md#7-errors-name-the-package-file
+[spelling-2]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#2-dictionaries-and-lists-stay-inside-the-package
+[spelling-3]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#3-fields-vale-reads-and-never-uses
+[splitter-5]: ../../changes/archive/2026-11-10-sentence-splitter/design.md#5-evaluation-against-gold-boundaries-instead-of-vale
+[styles-1]: ../../changes/archive/2026-11-11-vale-styles/design.md#1-the-loader-resolves-inheritance
+[styles-4]: ../../changes/archive/2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
+[test-5]: ../../changes/archive/2026-11-10-test-command/design.md#5-finding-cases
+[test-7]: ../../changes/archive/2026-11-10-test-command/design.md#7-the-report-and-the-exit-status
+[vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
+[vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
