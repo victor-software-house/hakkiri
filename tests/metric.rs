@@ -22,10 +22,12 @@ type TestResult = Result<(), Box<dyn Error>>;
 fn messages(rule: &str, source: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let rule = Rule::from_text("Team.Rule", "Team/Rule.yml", rule)?;
     let tree = parse(Language::Markdown, source)?;
-    Ok(lint(&[rule], &tree, source, "md")?
-        .into_iter()
-        .map(|alert| alert.message)
-        .collect())
+    Ok(
+        lint(&[rule], &tree, source, tree.language.langdex().as_slice())?
+            .into_iter()
+            .map(|alert| alert.message)
+            .collect(),
+    )
 }
 
 /// A rule that prints the formula's result and holds for any text.
@@ -61,10 +63,17 @@ fn a_code_span_counts_one_word_in_a_metric() -> TestResult {
 fn sized(rule: &str, source: &str, size: u8) -> Result<Vec<String>, Box<dyn Error>> {
     let rule = Rule::from_text("Team.Rule", "Team/Rule.yml", rule)?;
     let tree = parse(Language::Markdown, source)?;
-    Ok(lint_accepting(&[rule], &tree, source, "md", &[], size)?
-        .into_iter()
-        .map(|alert| alert.message)
-        .collect())
+    Ok(lint_accepting(
+        &[rule],
+        &tree,
+        source,
+        tree.language.langdex().as_slice(),
+        &[],
+        size,
+    )?
+    .into_iter()
+    .map(|alert| alert.message)
+    .collect())
 }
 
 #[test]
@@ -278,7 +287,7 @@ fn the_comments_of_a_code_file_are_measured() -> TestResult {
     )?;
     let source = "// One two three.\n// Four five.\nfn main() {}\n";
     let tree = parse(Language::Rust, source)?;
-    let found = lint(&[rule], &tree, source, "rs")?;
+    let found = lint(&[rule], &tree, source, tree.language.langdex().as_slice())?;
     assert_eq!(
         found
             .iter()

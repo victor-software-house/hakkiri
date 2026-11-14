@@ -20,7 +20,13 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    Each source language has a profile that maps its comments and doc comments into the tree.  
    Every comment reads as Markdown, plain `//` comments included; TSDoc and JSDoc keep their tags.  
    String literals are never prose.  
-   The first release ships Rust, TypeScript, JavaScript, Markdown and MDX.
+   The first release ships Rust, TypeScript, JavaScript, Markdown and MDX.  
+   A file, a fenced code block and a comment have a language from langdex, the table of languages, and a node has its own in `Node.language` when it has one.  
+   A reader is one of the seven parsers, and `Language` maps each to the langdex language it reads, by name.  
+   A fenced code block of Rust, TypeScript, TSX or JavaScript is parsed by that grammar, and `src/fence.rs` puts each comment in the tree at its place in the Markdown or MDX file, with the language of the fence.  
+   Each line of the fence's code must end the line of the file it came from, or the fence gives no nodes.  
+   A fence of Markdown, MDX or text, a fence with no info string, a fence of another language and an indented block stay gaps.  
+   The text of a comment in a source file reads its fences as gaps.
 4. **Matching.**
    The `regex` crate by default; `fancy-regex` with a backtrack limit only for a pattern that needs lookaround.  
    A limit reached is an error alert for that file, never a panic.
@@ -78,14 +84,19 @@ The operator contract is `hakkiri instructions` (`src/instructions.md`) and `ski
    `--fail-level` takes the place of Vale's `--no-exit`.  
    `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` are flags, variables and config keys, resolved in that order and then the default; only the project's config holds the keys, and a package's settings file that does is an error.  
    A walk is the `ignore` crate's, with git rules only: it skips what git ignores unless `gitignore` is false, and a named file is never filtered.  
+   A file has the langdex language of its path: its file name, then its extension.  
+   A path that names none leaves the interpreter on the first line, in at most the first 4096 bytes, and then the file has no language.  
+   A file is read by the reader its `formats` entry gives, then by the reader of its language, then as `on_unknown` says.  
+   A Text file reads as plain text whatever `on_unknown` says.  
    A selected file with no reader is plain text (`Language::Text`, one `raw` root of paragraphs), unless `on_unknown` changes that.  
    `code_span_size` is the words a code span counts as, 1 by default and 0 as Vale counts it.  
    It is a key of a package's file, the project and a glob, then `HAKKIRI_CODE_SPAN_SIZE`, then `--code-span-size`, each beating the one before.  
    `Plan` holds the value of each file, and `Text::code_sized` reads the text of a `metric` or `readability` rule with it.  
    A rule that reads a match never sees it.  
    `formats` looks a file up as Vale's `formatFor` does: the extension, then the name or a glob, in key order.  
-   A file it maps has two extensions for a scope such as `text.md`, its own and its reader's, where Vale keeps the file's own.  
-   The tree records the reader, and a scope may name either extension.  
+   It names a reader by any langdex name of the language it reads, so `md` and `markdown` are one.  
+   A node outside a fence is in the file's own language, and in its reader's when `formats` chose the reader, where Vale keeps the file's own extension.  
+   The tree records the reader, and a scope may name either language.  
    A plain-text file is binary, and skipped, when its first 8192 bytes hold a NUL byte.  
    A byte that is not UTF-8 reads as one `?`, so a Latin-1 file is linted at the byte offsets Vale gives.  
    The pretty output is a line per alert with no colour and no frame, because tools read it.

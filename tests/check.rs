@@ -190,6 +190,103 @@ fn plain_text_is_read_as_written() -> TestResult {
     Ok(())
 }
 
+/// A rule that finds `marker` in the nodes of `scope`, and reports `message`.
+fn marker_rule(root: &Root<'_>, name: &str, scope: &str, message: &str) {
+    root.file(
+        format!("styles/Team/{name}.yml"),
+        format!(
+            "extends: existence\nmessage: \"{message}\"\nlevel: warning\nscope: {scope}\ntokens: [marker]\n"
+        ),
+    );
+}
+
+#[test]
+fn a_file_name_an_extension_and_an_interpreter() -> TestResult {
+    let suite = Suite::new("check-file-language");
+    let root = project(&suite, "language", ALL);
+    marker_rule(&root, "Plain", "text.txt", "Text");
+    marker_rule(&root, "Toml", "text.toml", "TOML");
+    marker_rule(&root, "Shell", "text.shell", "Shell");
+    root.file("LICENSE", "A marker.\n");
+    root.file("notes.txt", "A marker.\n");
+    root.file("Cargo.toml", "# A marker.\n");
+    root.file("README", "A marker.\n");
+    root.file("bin/tool", "#!/usr/bin/env bash\n# A marker.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "Cargo.toml:1:5: warning Team.Toml: TOML",
+            "LICENSE:1:3: warning Team.Plain: Text",
+            "bin/tool:2:5: warning Team.Shell: Shell",
+            "notes.txt:1:3: warning Team.Plain: Text",
+            "4 alerts in 5 files",
+        ],
+        "LICENSE and notes.txt are Text, Cargo.toml is TOML, README has no language, and bin/tool is Shell"
+    );
+    Ok(())
+}
+
+#[test]
+fn a_file_read_as_plain_text_by_on_unknown() -> TestResult {
+    let suite = Suite::new("check-on-unknown-language");
+    let root = project(&suite, "language", ALL);
+    marker_rule(&root, "Plain", "text.txt", "Text");
+    root.file("notes.txt", "A marker.\n");
+    root.file("guide.rst", "A marker.\n");
+    root.file("README", "A marker.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "notes.txt:1:3: warning Team.Plain: Text",
+            "1 alert in 3 files",
+        ],
+        "text.txt reaches only the file whose language is Text"
+    );
+    Ok(())
+}
+
+#[test]
+fn more_extensions_of_a_language() -> TestResult {
+    let suite = Suite::new("check-more-extensions");
+    let root = project(&suite, "more", ALL);
+    root.file("a.mts", "// A very good start.\n");
+    root.file("a.markdown", "A very good start.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "a.markdown:1:3: warning Team.Filler: Remove 'very'.",
+            "a.mts:1:6: warning Team.Filler: Remove 'very'.",
+            "2 alerts in 2 files",
+        ],
+        "a.mts reads as TypeScript, and a.markdown as Markdown"
+    );
+    Ok(())
+}
+
+#[test]
+fn an_interpreter_picks_the_reader() -> TestResult {
+    let suite = Suite::new("check-interpreter-reader");
+    let root = project(&suite, "interpreter", ALL);
+    root.file("bin/tool", "#!/usr/bin/env node\n// A very good start.\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "bin/tool:2:6: warning Team.Filler: Remove 'very'.",
+            "1 alert in 1 file",
+        ],
+        "bin/tool reads as JavaScript, so its comment is prose and its first line is not"
+    );
+    Ok(())
+}
+
 /// A config that runs `Team` on every file, with `formats`.
 fn with_formats(formats: &str) -> String {
     format!("formats:\n{formats}{ALL}")
@@ -245,7 +342,7 @@ fn formats_map_a_file_name_and_a_glob() -> TestResult {
 }
 
 #[test]
-fn a_file_that_formats_maps_has_its_own_extension_and_its_readers() -> TestResult {
+fn a_mapped_file() -> TestResult {
     let suite = Suite::new("check-formats-scope-extension");
     let root = project(&suite, "scope-extension", &with_formats("  txt: md\n"));
     root.file(
@@ -299,9 +396,9 @@ fn an_unknown_reader_or_a_bad_glob_in_formats_is_refused() -> TestResult {
     let result = run(reader.path(), &["check"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     assert!(
-        result
-            .err
-            .contains("`loud` is not a reader: use md, mdx, rs, ts, tsx, js, text"),
+        result.err.contains(
+            "`loud` is not a language hakkiri reads: use Markdown, MDX, Rust, TypeScript, TSX, JavaScript or Text"
+        ),
         "{}",
         result.err
     );
@@ -309,6 +406,32 @@ fn an_unknown_reader_or_a_bad_glob_in_formats_is_refused() -> TestResult {
     let result = run(glob.path(), &["check"], &[])?;
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     assert!(result.err.contains("is not a glob"), "{}", result.err);
+    Ok(())
+}
+
+#[test]
+fn another_name_of_the_reader() -> TestResult {
+    let suite = Suite::new("check-formats-name");
+    let root = project(&suite, "name", &with_formats("  txt: markdown\n"));
+    root.file("a.txt", "```\nvery\n```\n");
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.lines(), ["0 alerts in 1 file"], "a.txt reads as md");
+    Ok(())
+}
+
+#[test]
+fn a_language_with_no_reader() -> TestResult {
+    let suite = Suite::new("check-formats-no-reader");
+    let root = project(&suite, "no-reader", &with_formats("  cfg: python\n"));
+    let result = run(root.path(), &["check"], &[])?;
+    assert_eq!(result.code, 2, "{}{}", result.out, result.err);
+    assert!(
+        result.err.contains(
+            "`python` is not a language hakkiri reads: use Markdown, MDX, Rust, TypeScript, TSX, JavaScript or Text"
+        ),
+        "{}",
+        result.err
+    );
     Ok(())
 }
 
@@ -330,6 +453,24 @@ fn on_unknown_warn_skips_the_file_with_a_warning() -> TestResult {
     let result = run(root.path(), &["check", "--on-unknown", "warn"], &[])?;
     assert_eq!(result.code, 0, "{}", result.err);
     assert_eq!(result.lines(), ["0 alerts in 1 file"]);
+    assert_eq!(result.err, UNKNOWN_WARNING);
+    Ok(())
+}
+
+#[test]
+fn a_text_file_under_on_unknown_warn() -> TestResult {
+    let suite = Suite::new("check-on-unknown-warn-text");
+    let root = unknown(&suite, "warn-text", ALL);
+    root.file("notes.txt", "This is very good.\n");
+    let result = run(root.path(), &["check", "--on-unknown", "warn"], &[])?;
+    assert_eq!(result.code, 0, "{}", result.err);
+    assert_eq!(
+        result.lines(),
+        [
+            "notes.txt:1:9: warning Team.Filler: Remove 'very'.",
+            "1 alert in 2 files",
+        ]
+    );
     assert_eq!(result.err, UNKNOWN_WARNING);
     Ok(())
 }

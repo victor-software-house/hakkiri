@@ -30,7 +30,8 @@ hakkiri check --format json
 - A walk skips `node_modules`, `.git` and each folder a `packages` entry names.
 - A walk also skips what `.gitignore`, `.git/info/exclude` and the global git excludes ignore, as ripgrep does, inside a git repository. `--no-gitignore`, `--gitignore=false` or `gitignore: false` in the config reads those files too. A file named on the command line is never skipped for being ignored.
 - A file named on the command line that no glob selects draws a warning on standard error and is not linted. `--on-unmatched` or `on_unmatched` takes `warn`, the default, `error`, which fails the run with exit 2, or `ignore`. A file that a glob selects but whose styles hold no rule draws nothing, and nor does a file a walk found.
-- Readers come from the extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` and `.js`, or from a `formats` entry. A file that a glob selects and that no reader reads is plain text: one block per run of lines between blank lines, read as written.
+- A file has the language of its path, by its file name and then its extension, else of the interpreter on its first line, and otherwise none. `LICENSE` and `notes.txt` are Text, `Cargo.toml` is TOML, `README` has none, and `bin/tool` that starts `#!/usr/bin/env bash` is Shell.
+- A file is read by the reader of its `formats` entry, then by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX, JavaScript or Text. So `.mts`, `.markdown` and a script that starts `#!/usr/bin/env node` have a reader. A file that a glob selects and that no reader reads is plain text, unless `on_unknown` says otherwise: one block per run of lines between blank lines, read as written. A Text file is plain text whatever `on_unknown` says.
 - `--on-unknown` or `on_unknown` takes `text`, the default, `warn`, which skips the file with a warning, `error`, which fails the run with exit 2, or `ignore`. A file that no glob selects draws no message.
 - `--code-span-size` or `code_span_size` sets how many words a code span counts as, in words. It reaches a word count and the metrics built on it: the `words`, `sentences` and `syllables` of a `metric` or `readability` rule, and the scores. It is 1 by default, and 0 counts as Vale does, 2 or more counts that many. `HAKKIRI_CODE_SPAN_SIZE` is its variable. A rule that reads a match, such as `existence` or `occurrence`, ignores it.
 - A plain-text file that holds a NUL byte in its first 8192 bytes is binary, and a run skips it with no message. A byte that is not valid UTF-8, in a Latin-1 file for example, reads as one `?`, so the file is linted and a column counts bytes, as in Vale.
@@ -48,7 +49,7 @@ hakkiri test --format json
 
 - A rule file holds cases under `tests`, and a `*.test.yml` file is a list of cases. `check` loads the cases and never runs them.
 - A case has `name` (required, unique in its file), `about`, `input`, `format` (an extension, `md` by default), `rule`, `want`, `contains` and `absent`.
-  A `format` that no reader reads is plain text, and a case that runs through the config reads `input.<format>` by the config's `formats` entry first.
+  A `format` that no reader reads is plain text, and a case that runs through the config reads `input.<format>` as a file, by the config's `formats` entry first.
   A case through the config follows `on_unknown` for such a format: `error` fails the case, and `warn` and `ignore` give it no alerts.
   A case needs one of `want`, `contains` and `absent`. `contains` and `absent` take a string or a list.
 - A case sees its alerts as lines, `line:column:Rule:message`. `want` equals them after both are trimmed, and an empty `want` means no alerts.
@@ -128,9 +129,9 @@ files:
 - `level` is the lowest level reported: `suggestion`, `warning` or `error`.
 - `fail_level`, `gitignore`, `on_unmatched` and `on_unknown` set the options of the same names for `check`. Only the project's config holds them, and a package's settings file that does is an error.
 - `code_span_size` is a key of the project config, of a package's settings file and of a glob under `files`, a whole number of words from 0 to 255. It resolves by the settings cascade, so the top level of a package's file ranks lowest, then the project's top level, then each matching glob by its rank, and the project may force it with `!override`. `HAKKIRI_CODE_SPAN_SIZE` and then `--code-span-size` beat them all. A value outside 0 to 255, or a word or a list under a glob, is an error with its line.
-- `formats` maps an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`. A key that holds `*`, `?`, `[`, `{` or `/` is a glob.
-  An entry named by the file's extension wins, then the first key in text order that is the file's name or a glob that matches its name or path. An entry beats the extension table, so `md: text` reads Markdown files as text.
-  A file that an entry maps has two extensions for a scope such as `text.md`: its own and its reader's. With `txt: md`, `text.txt` and `text.md` both select text in `a.txt`. Vale compares the scope with the file's own extension only, so `text.md` selects nothing there. A case that runs through the config has the same two extensions.
+- `formats` maps an extension, a file name or a glob to a reader, named by any name, alias or extension of the language it reads: Markdown, MDX, Rust, TypeScript, TSX, JavaScript or Text. So `md`, `markdown` and `Markdown` name one reader, and `text` names plain text. A key that holds `*`, `?`, `[`, `{` or `/` is a glob.
+  An entry named by the file's extension wins, then the first key in text order that is the file's name or a glob that matches its name or path. An entry beats the language of the file, so `md: text` reads Markdown files as text.
+  A file that an entry maps is in two languages for a scope such as `text.md`: its own and its reader's. With `txt: md`, `text.txt` and `text.md` both select text in `a.txt`. Vale compares the scope with the file's own extension only, so `text.md` selects nothing there. A case that runs through the config is in the same two languages.
 - `packages` lists folders of styles. Each `path` holds one folder per style, and each style folder holds one `.yml` file per rule, in the folder or under it. A folder that starts with `.` or `_` and a `*.test.yml` file are skipped, and so is a folder named `config`, where Vale keeps vocabularies and other settings. A folder named `Vale` is skipped too, with one warning, because the built-in style `Vale` wins, as in Vale.
   Two folders that hold one style name are refused. So are two files that give one rule name, and a name with a bracket, when a glob lists the style: a style no glob lists is not refused, as in Vale.
   A `url` entry holds the `url` of a zip, which starts with `https://` or `http://`, and its `sha256`, 64 lowercase hex digits. The first run downloads the zip, checks the hash, and unpacks it into the cache folder under that hash, and a later run reads it from there and asks for nothing.
@@ -222,6 +223,22 @@ The title of a tag in the text of a link is that tag's, so `title & link` leaves
 `link` and `image` alone never select a title, and no other scope reads one, as in Vale, where only `raw` does.
 `raw` still reads every title.
 
+The last piece of a part names a language, by any name, alias or extension of it in the GitHub Linguist table, when the whole part is no scope and the rest of it is one.
+`raw.rs` and `raw.rust` select the `raw` text of a Rust file, and `text.comment.js` selects the comments of `.js`, `.jsx`, `.mjs` and `.cjs` files.
+A negated part with a language, such as `~heading.rs`, leaves out nodes only in that language, and an item whose every part names another language selects nothing.
+A piece that names no language is an error, and `text.comment.line` stays the scope of line comments.
+A node is in the language of its file, and in that of its reader when `formats` chose the reader.
+So `text.txt` selects only a file whose language is Text, never a `.rst` file or a `README` that is read as plain text.
+
+## Fenced code blocks
+
+A fenced code block takes the language its info string names: `rs` and `rust` are one.
+When the language is Rust, TypeScript, TSX or JavaScript, hakkiri parses the code of the fence with that grammar, and each comment is read as Markdown at its place in the file, as in a source file.
+The nodes of that comment are in the language of the fence, so `text.comment.rs` selects the comments of Rust fences and no others.
+A fence of Markdown, MDX or plain text, a fence with no info string, a fence of another language and an indented block give no text, as in Vale.
+A fence whose code does not map line for line onto the file, such as one with a tab after a block quote marker, gives none either.
+A fence in a source file's comment is no code.
+
 ## Differences from Vale
 
 `hakkiri test` refuses a case that sets `view`, reads no `.yaml` file, and prints its report in its own layout.
@@ -234,6 +251,9 @@ hakkiri fetches a package pinned by `url` and `sha256` on the first run and keep
 It refuses a download that does not match its hash, and Vale installs any zip.
 
 hakkiri reads a plain-text file as paragraphs and skips a binary file, where Vale reads a file with no reader as lines of one block.
+hakkiri reads the comments of a fenced code block in Rust, TypeScript, TSX or JavaScript, where Vale reads no text inside a fence.
+A scope part names a language of the Linguist table, where Vale compares it with the extension after folding `.tsx`, `.mts` and `.cts` into `.ts`, so `text.comment.ts` does not reach a `.tsx` file.
+hakkiri reads a file with no extension by the interpreter on its first line, where Vale lints none of it.
 It takes a project's `formats` entry over a package's, where Vale keeps the first value.
 
 hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.

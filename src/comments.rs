@@ -11,6 +11,7 @@ use std::ops::Range;
 use tree_sitter::{Language as Grammar, Parser, Query, QueryCursor, StreamingIterator};
 
 use crate::error::Error;
+use crate::language::Language;
 use crate::markdown::{self, Flavor};
 use crate::pattern::Pattern;
 use crate::tree::{Node, Scope, remap_nodes};
@@ -26,6 +27,18 @@ pub(crate) enum Dialect {
 }
 
 impl Dialect {
+    /// The grammar that reads the comments of `language`, or `None` when
+    /// hakkiri reads the comments of no such language.
+    pub(crate) const fn of(language: Language) -> Option<Self> {
+        match language {
+            Language::Rust => Some(Self::Rust),
+            Language::TypeScript => Some(Self::TypeScript),
+            Language::Tsx => Some(Self::Tsx),
+            Language::JavaScript => Some(Self::JavaScript),
+            Language::Markdown | Language::Mdx | Language::Text => None,
+        }
+    }
+
     fn grammar(self) -> Grammar {
         match self {
             Self::Rust => tree_sitter_rust::LANGUAGE.into(),
@@ -252,6 +265,7 @@ fn root(
         closes: end,
         flushes: Vec::new(),
         label: None,
+        language: None,
     };
     Ok(Node {
         scope: Scope::Raw,
@@ -263,6 +277,7 @@ fn root(
         closes: end,
         flushes: Vec::new(),
         label: None,
+        language: None,
     })
 }
 

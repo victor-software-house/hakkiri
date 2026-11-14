@@ -27,11 +27,13 @@ fn blocks(scope: &[&str], file: &str, source: &str) -> Result<Vec<Block>, Box<dy
     let language = Language::from_path(path).ok_or("a file with an unknown extension")?;
     let tree = parse(language, source)?;
     let items: Vec<String> = scope.iter().map(|item| (*item).to_owned()).collect();
-    let extension = path
-        .extension()
-        .and_then(|extension| extension.to_str())
-        .ok_or("a file with no extension")?;
-    Ok(select(&Selector::parse(&items)?, &tree, source, extension)?)
+    let own = langdex::by_path(file);
+    Ok(select(
+        &Selector::parse(&items)?,
+        &tree,
+        source,
+        own.as_slice(),
+    )?)
 }
 
 /// The lines joined with a line feed after each.
@@ -458,11 +460,45 @@ fn a_heading_rule_reads_the_whole_heading() -> TestResult {
 }
 
 #[test]
-fn a_file_extension_narrows_a_scope() -> TestResult {
+fn raw_rs_in_two_files() -> TestResult {
     assert_eq!(blocks(&["raw.rs"], "a.md", "A marker.\n")?, Vec::new());
     let found = blocks(&["raw.rs"], "a.rs", "// A marker.\n")?;
     assert_eq!(found.len(), 1);
     Ok(())
+}
+
+#[test]
+fn one_language_several_extensions() -> TestResult {
+    for file in ["a.js", "a.jsx", "a.mjs", "a.cjs"] {
+        let found = blocks(&["text.comment.js"], file, "// A marker.\n")?;
+        assert_eq!(found.len(), 1, "{file}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_name_of_the_language() -> TestResult {
+    let found = blocks(&["text.comment.rust"], "a.rs", "// A marker.\n")?;
+    assert_eq!(found.len(), 1);
+    Ok(())
+}
+
+#[test]
+fn a_scope_name_that_ends_like_a_language() -> TestResult {
+    for file in ["a.rs", "a.js"] {
+        let found = blocks(&["text.comment.line"], file, "// A marker.\n")?;
+        assert_eq!(found.len(), 1, "{file}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_piece_that_names_no_language() {
+    let refused = Selector::parse(&["text.nolang".to_owned()]);
+    assert_eq!(
+        refused.map_err(|error| error.to_string()),
+        Err("`text.nolang` is not a scope hakkiri defines".to_owned())
+    );
 }
 
 #[test]
@@ -630,7 +666,7 @@ fn a_pipe_in_a_link_destination_outside_a_table_reads_as_nothing() -> TestResult
 }
 
 #[test]
-fn a_negated_part_with_another_extension_leaves_nothing_out() -> TestResult {
+fn a_negated_part_for_another_language() -> TestResult {
     let source = "# Head\n\nBody.\n";
     let found = blocks(&["text & ~heading.rs"], "a.md", source)?;
     assert_eq!(texts(&found), ["Head", "Body."]);
@@ -640,7 +676,7 @@ fn a_negated_part_with_another_extension_leaves_nothing_out() -> TestResult {
 }
 
 #[test]
-fn an_item_of_parts_for_another_language_selects_nothing() -> TestResult {
+fn an_item_that_names_only_another_language() -> TestResult {
     let source = "# Head\n\nBody.\n";
     let found = blocks(&["~heading.rs"], "a.md", source)?;
     assert_eq!(texts(&found), Vec::<&str>::new());
@@ -734,5 +770,35 @@ fn a_quote_in_a_list_item_gives_its_first_paragraph_to_the_item() -> TestResult 
     assert_eq!(texts(&found), ["Para two."]);
     let found = blocks(&["blockquote"], "a.md", source)?;
     assert_eq!(texts(&found), Vec::<&str>::new());
+    Ok(())
+}
+
+#[test]
+fn a_front_matter_part_ends_in_the_extension_of_a_language() -> TestResult {
+    let source = "---\ntitle: A very good start.\n---\n\nBody.\n";
+    let markdown = blocks(&["frontmatter.title.md"], "a.md", source)?;
+    let mdx = blocks(&["frontmatter.title.md"], "a.mdx", source)?;
+    let named = blocks(&["frontmatter.title.markdown"], "a.md", source)?;
+    assert_eq!(named.len(), 1, "a name of Markdown ends the part too");
+    assert_eq!(markdown.len(), 1, "the title of the Markdown file");
+    assert_eq!(mdx.len(), 0, "no block of an MDX file");
+    Ok(())
+}
+
+#[test]
+fn a_front_matter_part_that_names_markdown_limits_every_value() -> TestResult {
+    let source = "---\ntitle: A start.\nsummary: An end.\n---\n\nBody.\n";
+    let markdown = blocks(&["frontmatter.md"], "a.md", source)?;
+    let mdx = blocks(&["frontmatter.md"], "a.mdx", source)?;
+    assert_eq!(markdown.len(), 2, "every value of the Markdown file");
+    assert_eq!(mdx.len(), 0, "no value of an MDX file");
+    Ok(())
+}
+
+#[test]
+fn a_front_matter_key_that_is_an_extension_stays_a_key() -> TestResult {
+    let source = "---\ntoc: A very good start.\n---\n\nBody.\n";
+    let found = blocks(&["frontmatter.toc"], "a.md", source)?;
+    assert_eq!(found.len(), 1, "the value of the key toc");
     Ok(())
 }

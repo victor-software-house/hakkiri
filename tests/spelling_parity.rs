@@ -87,7 +87,12 @@ fn compare(style: &str, root: &str) -> TestResult {
             .ok_or("an input has no name")?
             .trim_end_matches(".fixture");
         for rule in &rules {
-            for alert in lint(slice::from_ref(rule), &tree, &source, "md")? {
+            for alert in lint(
+                slice::from_ref(rule),
+                &tree,
+                &source,
+                tree.language.langdex().as_slice(),
+            )? {
                 hakkiri.insert((
                     alert.rule,
                     file.to_owned(),

@@ -36,8 +36,12 @@ impl Formats {
     /// compile, and says the readers when `reader` names none.
     pub(crate) fn insert(&mut self, key: &str, reader: &str) -> Result<(), String> {
         let language = Language::from_reader(reader).ok_or_else(|| {
-            let names: Vec<&str> = hakkiri::READERS.iter().map(|(name, _)| *name).collect();
-            format!("`{reader}` is not a reader: use {}", names.join(", "))
+            let names = Language::ALL.map(Language::name);
+            let (last, first) = names.split_last().unwrap_or((&"", &[]));
+            format!(
+                "`{reader}` is not a language hakkiri reads: use {} or {last}",
+                first.join(", ")
+            )
         })?;
         let glob = if key.contains(GLOB_MARKS) || key.contains('/') {
             let compiled = GlobBuilder::new(key)

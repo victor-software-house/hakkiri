@@ -3,19 +3,16 @@
 //! A scope is a list of items, and a node is read when any item selects it.
 //! An item is parts joined by `&`, and every part must hold.
 //! A part is a dotted scope name, `~` before it to leave out an element, and a
-//! file extension as its last piece to limit it to files of that kind.
+//! language as its last piece, by any name, alias or extension langdex holds,
+//! to limit it to nodes in that language.
 
 use std::{error, fmt};
 
+use crate::language::Language as Reader;
 use crate::tree::Scope as NodeScope;
 
-/// The file extensions a scope part may end in. A rule for a language
-/// hakkiri does not read loads and selects nothing.
-const EXTENSIONS: [&str; 34] = [
-    "adoc", "c", "cc", "cjs", "cpp", "cs", "css", "go", "h", "hpp", "html", "java", "js", "jsx",
-    "kt", "lua", "md", "mdx", "mjs", "org", "php", "pl", "py", "r", "rb", "rs", "rst", "sass",
-    "scala", "scss", "swift", "ts", "tsx", "txt",
-];
+/// A language a scope part names.
+type Language = &'static langdex::Language;
 
 /// An inline element whose text a scope reads as spaces.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -68,19 +65,18 @@ impl error::Error for ScopeError {}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct Part {
-    /// The dotted scope name, without its extension.
+    /// The dotted scope name, without its language.
     name: String,
     negated: bool,
-    extension: Option<String>,
+    language: Option<Language>,
 }
 
 impl Part {
-    /// Whether the part holds in a file with `extensions`: it names no
-    /// extension, or one of the file's.
-    fn applies_to(&self, extensions: &[&str]) -> bool {
-        self.extension
-            .as_deref()
-            .is_none_or(|wanted| extensions.contains(&wanted))
+    /// Whether the part holds in a node with `languages`: it names no
+    /// language, or one of the node's.
+    fn applies_to(&self, languages: &[Language]) -> bool {
+        self.language
+            .is_none_or(|wanted| languages.contains(&wanted))
     }
 }
 
@@ -112,6 +108,32 @@ fn named(part: &str, name: &str) -> bool {
         .is_some_and(|rest| rest.is_empty() || rest.starts_with('.'))
 }
 
+/// The scope names a part of `written` holds, or `None` when it is no scope
+/// hakkiri defines.
+///
+/// Vale reads `sentence.list` as `sentence & list`.
+fn scope_names(written: &str, negated: bool) -> Option<Vec<&str>> {
+    let names = match written.strip_prefix("sentence.") {
+        Some(rest) if !negated => vec!["sentence", rest],
+        _ => vec![written],
+    };
+    names.iter().all(|name| is_scope(name)).then_some(names)
+}
+
+/// Whether `name` is a scope hakkiri defines.
+fn is_scope(name: &str) -> bool {
+    // A key of the front matter completes `frontmatter` and
+    // `text.frontmatter`, so any name below them is one.
+    let front = |prefix: &str| {
+        name.strip_prefix(prefix)
+            .is_some_and(|rest| rest.starts_with('.'))
+    };
+    matches!(name, "text" | "sentence" | "text.frontmatter")
+        || front("frontmatter")
+        || front("text.frontmatter")
+        || NodeScope::ALL.iter().any(|scope| named(name, scope.name()))
+}
+
 impl Selector {
     /// Parses the items of a rule's `scope`. No item reads as `text`.
     ///
@@ -134,39 +156,37 @@ impl Selector {
                 let (negated, written) = written
                     .strip_prefix('~')
                     .map_or((false, written), |rest| (true, rest.trim()));
-                let (name, extension) = match written.rsplit_once('.') {
-                    Some((name, extension))
-                        if EXTENSIONS.contains(&extension) && !name.is_empty() =>
-                    {
-                        (name, Some(extension.to_owned()))
-                    }
-                    _ => (written, None),
+                // A key of the front matter may be any name. So a front matter
+                // part ends in a language when its last piece names Markdown or
+                // MDX, the languages that hold front matter. Any other part
+                // ends in a language only when the whole part is no scope, and
+                // the rest of it is one.
+                let front =
+                    written.starts_with("frontmatter.") || written.starts_with("text.frontmatter.");
+                let (named_parts, language) = if front
+                    && let Some((rest, piece)) = written.rsplit_once('.')
+                    && let Some(named_parts) = scope_names(rest, negated)
+                    && let Some(language) =
+                        langdex::by_extension(piece).or_else(|| langdex::by_name(piece))
+                    && matches!(Reader::of(language), Some(Reader::Markdown | Reader::Mdx))
+                {
+                    (named_parts, Some(language))
+                } else if let Some(named_parts) = scope_names(written, negated) {
+                    (named_parts, None)
+                } else if let Some((rest, piece)) = written.rsplit_once('.')
+                    && let Some(named_parts) = scope_names(rest, negated)
+                    && let Some(language) = langdex::by_name(piece)
+                {
+                    (named_parts, Some(language))
+                } else {
+                    return Err(refuse("is not a scope hakkiri defines"));
                 };
-                // Vale reads `sentence.list` as `sentence & list`.
-                let named_parts: Vec<&str> = match name.strip_prefix("sentence.") {
-                    Some(rest) if !negated => vec!["sentence", rest],
-                    _ => vec![name],
-                };
-                for (index, name) in named_parts.iter().enumerate() {
-                    // A key of the front matter completes `frontmatter` and
-                    // `text.frontmatter`, so any name below them is one.
-                    let front = |prefix: &str| {
-                        name.strip_prefix(prefix)
-                            .is_some_and(|rest| rest.starts_with('.'))
-                    };
-                    let known = matches!(*name, "text" | "sentence" | "text.frontmatter")
-                        || front("frontmatter")
-                        || front("text.frontmatter")
-                        || NodeScope::ALL.iter().any(|scope| named(name, scope.name()));
-                    if !known {
-                        return Err(refuse("is not a scope hakkiri defines"));
-                    }
+                let last = named_parts.len();
+                for (index, name) in named_parts.into_iter().enumerate() {
                     parts.push(Part {
-                        name: (*name).to_owned(),
+                        name: name.to_owned(),
                         negated,
-                        extension: (index + 1 == named_parts.len())
-                            .then(|| extension.clone())
-                            .flatten(),
+                        language: language.filter(|_| index + 1 == last),
                     });
                 }
             }
@@ -190,7 +210,7 @@ impl Selector {
         match self.alternatives.as_slice() {
             [item] => matches!(
                 item.parts.as_slice(),
-                [part] if part.name == "text" && !part.negated && part.extension.is_none()
+                [part] if part.name == "text" && !part.negated && part.language.is_none()
             ),
             _ => false,
         }
@@ -203,8 +223,8 @@ impl Selector {
 
     /// What a block reads, or `None` when no item selects it.
     ///
-    /// `names` are the scope names the block holds, and `extensions` the
-    /// extensions the file has: its own and its reader's.
+    /// `names` are the scope names the block holds, and `languages` the
+    /// languages it is in.
     /// `around` are the names of the element around the block that a part may
     /// name beside the block's own, as `link` does in `title & link`: an item
     /// still needs a part that names the block itself.
@@ -215,15 +235,15 @@ impl Selector {
         &self,
         names: &[&str],
         around: &[&str],
-        extensions: &[&str],
+        languages: &[Language],
         sentence: bool,
     ) -> Option<Vec<Inline>> {
         let mut blank = Vec::new();
         let mut selected = false;
         for item in &self.alternatives {
-            if item.selects(names, around, extensions, sentence) {
+            if item.selects(names, around, languages, sentence) {
                 selected = true;
-                for inline in item.blank(extensions) {
+                for inline in item.blank(languages) {
                     if !blank.contains(&inline) {
                         blank.push(inline);
                     }
@@ -235,11 +255,11 @@ impl Selector {
 }
 
 impl Alternative {
-    /// The inline elements the item leaves out in a file with `extensions`.
-    fn blank(&self, extensions: &[&str]) -> impl Iterator<Item = Inline> {
+    /// The inline elements the item leaves out in a node with `languages`.
+    fn blank(&self, languages: &[Language]) -> impl Iterator<Item = Inline> {
         self.parts
             .iter()
-            .filter(move |part| part.negated && part.applies_to(extensions))
+            .filter(move |part| part.negated && part.applies_to(languages))
             .filter_map(|part| Inline::of(&part.name))
     }
 
@@ -253,7 +273,7 @@ impl Alternative {
         &self,
         names: &[&str],
         around: &[&str],
-        extensions: &[&str],
+        languages: &[Language],
         sentence: bool,
     ) -> bool {
         // A sentence is read for an item that names sentences, and only that
@@ -263,7 +283,7 @@ impl Alternative {
         }
         // An item whose every part names another language selects nothing,
         // whether its parts are negated or not.
-        if self.parts.iter().all(|part| !part.applies_to(extensions)) {
+        if self.parts.iter().all(|part| !part.applies_to(languages)) {
             return false;
         }
         let mut has_positive = false;
@@ -283,7 +303,7 @@ impl Alternative {
             } else if !around.iter().any(|name| named(&part.name, name)) {
                 return false;
             }
-            if !part.applies_to(extensions) {
+            if !part.applies_to(languages) {
                 return false;
             }
         }
@@ -299,7 +319,7 @@ impl Alternative {
         // holds them, and only the element around a block excludes it here.
         let excluded_by_around = self.parts.iter().any(|part| {
             part.negated
-                && part.applies_to(extensions)
+                && part.applies_to(languages)
                 && around.iter().any(|name| named(&part.name, name))
         });
         !excluded_by_around
@@ -307,7 +327,7 @@ impl Alternative {
                 .parts
                 .iter()
                 .filter(|part| {
-                    part.negated && Inline::of(&part.name).is_none() && part.applies_to(extensions)
+                    part.negated && Inline::of(&part.name).is_none() && part.applies_to(languages)
                 })
                 .all(|part| !names.iter().any(|name| named(&part.name, name)))
     }

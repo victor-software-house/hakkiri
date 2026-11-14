@@ -5,7 +5,7 @@ use std::borrow::Cow;
 use std::cell::Cell;
 use std::cmp::Reverse;
 use std::ops::Range;
-use std::{error, fmt};
+use std::{error, fmt, slice};
 
 use crate::scope::{Inline, Selector};
 use crate::splitter::{FormatError, Model};
@@ -403,6 +403,9 @@ struct Step<'t> {
     chain: Option<&'static str>,
     /// The scope of the node that holds this one.
     parent: Option<Scope>,
+    /// The language of the nearest node around this one that has one, such as
+    /// a fenced code block.
+    language: Option<&'static langdex::Language>,
 }
 
 /// The steps for the children of `node`, last first, so that a stack pops them
@@ -412,7 +415,11 @@ struct Step<'t> {
 /// In a list, a quote or a table row that is the child's `first` flag.
 /// An HTML block with an attribute but no text can sit before it as a child.
 /// Elsewhere it is the first child.
-fn children<'t>(node: &'t Node, chain: Option<&'static str>) -> impl Iterator<Item = Step<'t>> {
+fn children<'t>(
+    node: &'t Node,
+    chain: Option<&'static str>,
+    language: Option<&'static langdex::Language>,
+) -> impl Iterator<Item = Step<'t>> {
     let container = matches!(
         node.scope,
         Scope::List | Scope::Blockquote | Scope::TableRow
@@ -429,6 +436,7 @@ fn children<'t>(node: &'t Node, chain: Option<&'static str>) -> impl Iterator<It
                 None
             },
             parent: Some(node.scope),
+            language,
         })
 }
 
@@ -444,8 +452,13 @@ fn context(node: &Node, parent: Option<Scope>) -> Vec<&'static str> {
     }
 }
 
-/// The blocks of `tree`, a file of `source` with `extension`, that `selector`
+/// The blocks of `tree`, a file of `source` in `languages`, that `selector`
 /// reads, in file order: a node before the nodes inside it.
+///
+/// A node is in its own language when it has one, as the nodes of a fenced code
+/// block do, and the nodes inside it are in that language too.
+/// Any other node is in the `languages` of the file: its own language, and its
+/// reader's when a `formats` entry chose the reader.
 ///
 /// A block of text has the scope of one element, as in Vale, and not of every
 /// element around it.
@@ -466,14 +479,10 @@ pub fn select(
     selector: &Selector,
     tree: &Tree,
     source: &str,
-    extension: &str,
+    languages: &[&'static langdex::Language],
 ) -> Result<Vec<Block>, SelectError> {
     #[cfg(test)]
     SELECTIONS.with(|count| count.set(count.get() + 1));
-    // A scope may name the extension the file has or the one of its reader, so
-    // `text.md` reaches a `.txt` file that `formats` maps to `md`, and
-    // `text.txt` still reaches it as in Vale.
-    let extensions = [extension, tree.language.extension()];
     let model = if selector.wants_sentences() {
         Some(Model::english().map_err(SelectError::Model)?)
     } else {
@@ -488,24 +497,28 @@ pub fn select(
             node,
             chain: None,
             parent: None,
+            language: None,
         })
         .collect();
     while let Some(Step {
         node,
         chain,
         parent,
+        language,
     }) = steps.pop()
     {
+        let language = node.language.or(language);
         let chain = chain.or_else(|| named_scope(node.scope));
         let named = names(node, chain);
         let held: Vec<&str> = named.iter().map(AsRef::as_ref).collect();
         let around = context(node, parent);
-        let own = selector.reads(&held, &around, &extensions, false);
+        let node_languages = language.as_ref().map_or(languages, slice::from_ref);
+        let own = selector.reads(&held, &around, node_languages, false);
         let prose = is_prose(node.scope);
         let sentences = if prose && model.is_some() {
             let mut with_sentence = vec!["sentence"];
             with_sentence.extend(&held);
-            selector.reads(&with_sentence, &around, &extensions, true)
+            selector.reads(&with_sentence, &around, node_languages, true)
         } else {
             None
         };
@@ -564,7 +577,7 @@ pub fn select(
                 }
             }
         }
-        steps.extend(children(node, chain));
+        steps.extend(children(node, chain, language));
     }
     Ok(blocks)
 }

@@ -251,6 +251,10 @@ pub struct Node {
     ///
     /// A paragraph that holds a `<div>` has one.
     pub flushes: Vec<usize>,
+    /// The language of the node when it is not the file's: the comments of a
+    /// fenced code block, and every node inside them, have the language of the
+    /// fence. Every other node has none.
+    pub language: Option<&'static langdex::Language>,
 }
 
 impl Node {
@@ -266,6 +270,7 @@ impl Node {
             children,
             first: false,
             label: None,
+            language: None,
         }
     }
 
@@ -286,6 +291,7 @@ impl Node {
             children,
             first: false,
             label: None,
+            language: None,
         })
     }
 
@@ -476,8 +482,7 @@ pub(crate) fn remap_nodes(
 /// The tree of one file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Tree {
-    /// The language the file was read as, whose extension a scope such as
-    /// `text.md` may name beside the extension the file has.
+    /// The language the file was read as: its reader.
     pub language: Language,
     /// The `raw` roots: one for a Markdown or MDX file, one per comment group
     /// for a source file.

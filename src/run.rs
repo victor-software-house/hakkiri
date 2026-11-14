@@ -123,7 +123,7 @@ fn lint_file(job: &Job<'_>) -> Result<(Vec<Alert>, Option<String>), String> {
         &job.plan.token_ignores,
     )
     .map_err(|error| error.to_string())?;
-    let alerts = lint_planned(&job.plan, &tree, &source, &job.extension)?;
+    let alerts = lint_planned(&job.plan, &tree, &source, &job.languages)?;
     Ok((alerts, tree.front_matter_fault))
 }
 
@@ -132,13 +132,13 @@ pub(crate) fn lint_planned(
     plan: &Plan<'_>,
     tree: &Tree,
     source: &str,
-    extension: &str,
+    languages: &[&'static langdex::Language],
 ) -> Result<Vec<Alert>, String> {
     let mut alerts = lint_accepting(
         &plan.rules,
         tree,
         source,
-        extension,
+        languages,
         &plan.accepted,
         plan.code_span_size,
     )
