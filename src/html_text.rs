@@ -253,8 +253,8 @@ fn title_nodes(lines: &Lines, titles: &[(Range<usize>, Option<Scope>)]) -> Vec<N
 }
 
 /// The nodes for the `title` attributes of the tag text `tag`, which `span`
-/// covers in `source`: an inline HTML tag in a line of text, or the opening
-/// tag of a JSX element.
+/// covers in `source`: the opening tag of an inline HTML element, or of a JSX
+/// element.
 ///
 /// Vale reads such an attribute only through `raw`. The `title` scope reads it
 /// too, so a rule on `title` sees what a rule on `raw` sees in a title.
@@ -264,4 +264,28 @@ pub(crate) fn tag_titles(source: &str, span: &Range<usize>, tag: &str) -> Vec<No
         return Vec::new();
     }
     Lines::new(source, span, tag).map_or_else(Vec::new, |lines| title_nodes(&lines, &walk.titles))
+}
+
+/// The nodes for an inline HTML tag `tag` in a line of text, which `span`
+/// covers in `source`: its `title` attributes, as [`tag_titles`] gives them,
+/// and the alt text of an `img` tag.
+///
+/// The alt text is an `alt` node of its own, as Vale reads it, so the
+/// paragraph reads around it and a rule on `link` does not select it.
+pub(crate) fn inline_tag_nodes(source: &str, span: &Range<usize>, tag: &str) -> Vec<Node> {
+    let walk = html::walk(tag);
+    if walk.titles.is_empty() && walk.alts.is_empty() {
+        return Vec::new();
+    }
+    let Some(lines) = Lines::new(source, span, tag) else {
+        return Vec::new();
+    };
+    let mut nodes: Vec<Node> = walk
+        .alts
+        .iter()
+        .filter_map(|range| Node::from_segments(Scope::Alt, lines.map(range), Vec::new()))
+        .collect();
+    nodes.extend(title_nodes(&lines, &walk.titles));
+    nodes.sort_by_key(|node| node.span.start);
+    nodes
 }

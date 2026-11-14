@@ -894,7 +894,7 @@ impl Builder<'_> {
             Mdast::Html(html) => {
                 let span = span_of(node);
                 let nodes = span.as_ref().map_or_else(Vec::new, |span| {
-                    html_text::tag_titles(self.source, span, &html.value)
+                    html_text::inline_tag_nodes(self.source, span, &html.value)
                 });
                 Step::Done(Visited {
                     nodes,

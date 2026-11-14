@@ -802,3 +802,55 @@ fn a_front_matter_key_that_is_an_extension_stays_a_key() -> TestResult {
     assert_eq!(found.len(), 1, "the value of the key toc");
     Ok(())
 }
+
+/// The alt text of an inline `img` tag is an `alt` block of its own, as Vale
+/// 66bbb85 reads it.
+/// No `link` block and no sentence holds it, and the paragraph reads around it.
+#[test]
+fn the_alt_text_of_an_inline_img_is_an_alt_block() -> TestResult {
+    let source = concat_lines(&[
+        r#"Build <a href="u"><img src="b.svg" alt="the badge"></a> now."#,
+        "",
+        r#"See <img src="l.png" alt="our logo"> here."#,
+        "",
+        r#"[link <img src="x" alt="a badge"> here](u) end."#,
+    ]);
+    let alts = blocks(&["alt"], "a.md", &source)?;
+    assert_eq!(texts(&alts), ["the badge", "our logo", "a badge"]);
+    // Vale's columns for the last word of each, counted from 1.
+    for (block, word, line, column) in [
+        (&alts[0], "badge", 0, 45),
+        (&alts[1], "logo", 2, 31),
+        (&alts[2], "badge", 4, 27),
+    ] {
+        let at = block.text.as_str().find(word).ok_or("no word")?;
+        let range = block
+            .text
+            .file_range(at..at + word.len())
+            .ok_or("no range")?;
+        let line_start = source
+            .split_inclusive('\n')
+            .take(line)
+            .map(str::len)
+            .sum::<usize>();
+        assert_eq!(range.start - line_start + 1, column, "{word}");
+    }
+    let links = blocks(&["link"], "a.md", &source)?;
+    assert!(
+        links
+            .iter()
+            .all(|block| !block.text.as_str().contains("badge")),
+        "{:?}",
+        texts(&links)
+    );
+    let sentences = blocks(&["sentence"], "a.md", &source)?;
+    assert!(
+        sentences
+            .iter()
+            .all(|block| !block.text.as_str().contains("badge")
+                && !block.text.as_str().contains("logo")),
+        "{:?}",
+        texts(&sentences)
+    );
+    Ok(())
+}
