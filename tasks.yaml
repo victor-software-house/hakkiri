@@ -167,12 +167,14 @@ queue:
       language, not an extension.
     blocked_by: []
     acceptance:
-      - A scope part such as text.js reaches a .js, .jsx, .mjs or .cjs file, and text.txt reaches a file read as plain text, each with a test.
-      - A fenced code block reads its language from the first word of its info string, so md and markdown name the same language.
       - READERS, Language::from_path, Language::extension and the scope extension list read from langdex and no longer list extensions of their own.
+      - A fenced code block reads its language from its info string through langdex, so rs and rust name one language, and a fence of a language whose comments hakkiri reads gives those comments to the tree.
+      - A scope part such as text.comment.js reaches a .js, .jsx, .mjs or .cjs file, and text.txt reaches a Text file but no .rst or README file read as plain text, each with a test.
     notes:
       - '2026-11-13, operator decision: a language has a name, aliases and extensions, distinct from a file extension, as prettier and oxlint map them; langdex holds the table, generated from GitHub Linguist.'
       - '2026-11-13, found by the Kody thread on PR 131: a file with no reader also took the extension txt, so a rule scoped text.txt reached .rst and README files.'
+      - '2026-11-14, operator decision: a fenced block is parsed as its own language.'
+    plan: openspec/changes/language-model/proposal.md
 
   - id: HKR-068
     title: Read front matter with a parser per format
