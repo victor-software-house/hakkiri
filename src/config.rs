@@ -463,6 +463,18 @@ pub(crate) fn standard_glob(pattern: &str) -> Result<globset::Glob, globset::Err
     GlobBuilder::new(&text).literal_separator(true).build()
 }
 
+/// The glob `pattern` as one set of its [`alternatives`], each read by
+/// [`standard_glob`], or the message of the fault that refuses it.
+pub(crate) fn glob_set(pattern: &str) -> Result<GlobSet, String> {
+    let mut builder = GlobSetBuilder::new();
+    for (glob, _) in compile(pattern)? {
+        builder.add(glob);
+    }
+    builder
+        .build()
+        .map_err(|error| format!("is not a glob: {error}"))
+}
+
 /// The [`alternatives`] of the glob `pattern`, each compiled with its
 /// specificity, or the message of the fault that refuses `pattern`.
 fn compile(pattern: &str) -> Result<Vec<(globset::Glob, Specificity)>, String> {

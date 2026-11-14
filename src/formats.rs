@@ -4,10 +4,10 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use globset::GlobMatcher;
+use globset::GlobSet;
 use hakkiri::Language;
 
-use crate::config::standard_glob;
+use crate::config::glob_set;
 
 /// A key that holds one of these is a glob, as in Vale's `[formats]`.
 const GLOB_MARKS: [char; 4] = ['*', '?', '[', '{'];
@@ -17,7 +17,7 @@ const GLOB_MARKS: [char; 4] = ['*', '?', '[', '{'];
 #[derive(Debug)]
 struct Entry {
     language: Language,
-    glob: Option<GlobMatcher>,
+    glob: Option<GlobSet>,
 }
 
 /// The `formats` of a config, which map an extension, a file name or a glob to
@@ -46,8 +46,7 @@ impl Formats {
             )
         })?;
         let glob = if key.contains(GLOB_MARKS) || key.contains('/') {
-            let compiled = standard_glob(key).map_err(|error| format!("is not a glob: {error}"))?;
-            Some(compiled.compile_matcher())
+            Some(glob_set(key)?)
         } else {
             None
         };
