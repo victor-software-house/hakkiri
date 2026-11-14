@@ -1331,3 +1331,11 @@ hakkiri SHALL select as each scenario below says, where Vale 3.26.0 has no such 
 [test-7]: ../../changes/archive/2026-11-10-test-command/design.md#7-the-report-and-the-exit-status
 [vocabularies-3]: ../../changes/archive/2026-11-11-vocabularies/design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../changes/archive/2026-11-11-vocabularies/design.md#4-a-line-of-a-list-is-a-pattern
+[html-1]: ../../changes/archive/2026-11-10-html-block-text/design.md#1-one-walk-follows-vales
+[html-3]: ../../changes/archive/2026-11-10-html-block-text/design.md#3-masked-text-reads-as-asterisks
+[html-5]: ../../changes/archive/2026-11-10-html-block-text/design.md#5-a-character-reference-reads-once
+[html-6]: ../../changes/archive/2026-11-10-html-block-text/design.md#6-captions-data-and-descriptions-have-scopes
+[markdown-probe-2]: ../../changes/archive/2026-11-14-markdown-probe/design.md#2-a-link-keeps-the-address-for-the-link-scope
+[markdown-probe-4]: ../../changes/archive/2026-11-14-markdown-probe/design.md#4-a-backslash-escape-loses-the-backslash
+[markdown-probe-6]: ../../changes/archive/2026-11-14-markdown-probe/design.md#6-a-footnote-reads-as-in-vales-html
+[markdown-probe-8]: ../../changes/archive/2026-11-14-markdown-probe/design.md#8-what-hakkiri-keeps-from-the-earlier-reading
