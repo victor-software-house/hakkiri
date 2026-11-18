@@ -7,12 +7,14 @@ hakkiri SHALL run the pattern checks as each scenario below says, where Vale 3.2
 #### Scenario: State belongs to one rule
 
 - **WHEN** one `conditional` rule captures a term, and another rule of either kind reads the same file
-- **THEN** hakkiri keeps each rule's state apart, and Vale keeps one list per file, so a captured term can satisfy another `conditional` rule or count as a `consistency` form ([pattern 1][pattern-1])
+- **THEN** hakkiri keeps each rule's state apart, and Vale keeps one list per file.  
+  So a captured term can satisfy another `conditional` rule or count as a `consistency` form ([pattern 1][pattern-1])
 
 #### Scenario: A consistency alert sits at the last match
 
-- **WHEN** a `consistency` pair matches in a node whose earlier text holds the same words
-- **THEN** hakkiri puts the alert at the last match through its byte table, and Vale searches for the text, so the alert lands where it first appears ([pattern 2][pattern-2])
+- **WHEN** a `consistency` pair matches in a node whose earlier text has the same words
+- **THEN** hakkiri puts the alert at the last match through its byte table.  
+  Vale searches for the text, so the alert lands where it first appears ([pattern 2][pattern-2])
 
 #### Scenario: ignorecase applies to both conditional patterns
 
@@ -22,7 +24,8 @@ hakkiri SHALL run the pattern checks as each scenario below says, where Vale 3.2
 #### Scenario: Code is no match
 
 - **WHEN** two code spans sit side by side, or a form appears only in code
-- **THEN** hakkiri counts no repeat and no form seen, and Vale masks the code, so it can report a repeat the reader does not see ([pattern 9][pattern-9])
+- **THEN** hakkiri counts no repeat and no form seen.  
+  Vale masks the code, so it can report a repeat the reader does not see ([pattern 9][pattern-9])
 
 ### Requirement: Rules that Vale loads are refused
 
@@ -48,7 +51,7 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 - **WHEN** a `capitalization` rule has an empty `match`
 - **THEN** hakkiri refuses it, since every text would pass, and Vale loads it ([case 1][case-1])
 
-#### Scenario: A capitalization style that is not AP or Chicago
+#### Scenario: A capitalization style that is not `AP` or `Chicago`
 
 - **WHEN** a `capitalization` rule has `style: chicago` or any other value than `AP` or `Chicago`
 - **THEN** hakkiri refuses it with an error that names the value, and Vale reads every other value as `AP` ([case 8][case-8])
@@ -76,12 +79,14 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 #### Scenario: A dictionary outside the package
 
 - **WHEN** a rule names a dictionary, list or affix file by a path that leaves its package, or sets only one of `aff` and `dic`
-- **THEN** hakkiri refuses it, and Vale also searches an absolute path, the working directory and `DICPATH`, and answers one of `aff` and `dic` with the built-in dictionary ([spelling 2][spelling-2])
+- **THEN** hakkiri refuses it.  
+  Vale also searches an absolute path, the working directory and `DICPATH`.  
+  It answers one of `aff` and `dic` with the built-in dictionary ([spelling 2][spelling-2])
 
 #### Scenario: A dictionary in another character set
 
-- **WHEN** a dictionary declares a `SET` other than UTF-8 and ISO 8859-1
-- **THEN** hakkiri refuses it with an error that names the set, and Vale reads every set that `golang.org/x/text` knows ([case 6][case-6])
+- **WHEN** a dictionary declares a `SET` other than `UTF-8` and `ISO 8859-1`
+- **THEN** hakkiri refuses it with an error that names the set, and Vale reads every set that `golang.org/x/text` supports ([case 6][case-6])
 
 [case-1]: ../../../2026-11-10-case-and-sequence-checks/design.md#1-case-conversion-ports-proses-converters
 [case-3]: ../../../2026-11-10-case-and-sequence-checks/design.md#3-sequence-walks-tokens-around-an-anchor

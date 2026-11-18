@@ -1,3 +1,4 @@
 # bootstrap-hakkiri
 
-Bootstrap hakkiri: the research, the decisions and the release 1 contract behind replacing Vale
+Bootstrap hakkiri.  
+This folder has the research, the decisions and the release 1 contract for replacing Vale.

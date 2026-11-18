@@ -2,8 +2,8 @@
 
 ## Purpose
 
-A `spelling` rule checks each word of the selected text against a dictionary and reports the words it does not hold.  
-An `affix` field lets an `existence` token or a `substitution` key name a word with its affix flags.  
+A `spelling` rule checks each word of the selected text against a dictionary and reports the words it does not contain.  
+An `affix` field lets an `existence` token or a `substitution` key write a word with its affix flags.  
 Both keep the meaning Vale 3.26.0 gives them.
 
 ## ADDED Requirements
@@ -11,7 +11,7 @@ Both keep the meaning Vale 3.26.0 gives them.
 ### Requirement: spelling reports a word the dictionary lacks
 
 A `spelling` rule SHALL split the selected text into words.  
-It SHALL report each word that the rule's dictionaries do not hold, as one alert that spans the word.  
+It SHALL report each word that the rule's dictionaries do not contain, as one alert that spans the word.  
 A `%s` in its message SHALL read as the word.  
 When the rule loads no other dictionary, the dictionary SHALL be Vale's built-in `en_US-web`.
 
@@ -34,7 +34,7 @@ When the rule loads no other dictionary, the dictionary SHALL be Vale's built-in
 
 Unless the rule sets `custom: true`, three kinds of word SHALL be skipped.  
 These are a word that starts with a capital and has another capital after a lower-case letter, and a word that ends in capitals.  
-The third is a word that holds a character other than an ASCII letter, `_` or `'`.
+The third is a word that contains a character other than an ASCII letter, `_` or `'`.
 
 A word that matches one of the rule's `filters` SHALL also be skipped.
 
@@ -55,12 +55,12 @@ A word that matches one of the rule's `filters` SHALL also be skipped.
 
 ### Requirement: ignore adds word lists
 
-Each entry of `ignore` SHALL name a file of accepted words, one per line.  
-The file SHALL be found at that path in the package that holds the rule, or under the package's `config/ignore` folder.
+Each entry of `ignore` SHALL be the path of a file of accepted words, one per line.  
+The file SHALL be found at that path in the package that contains the rule, or under the package's `config/ignore` folder.
 
 #### Scenario: A project term
 
-- **WHEN** the rule has `ignore: [terms.txt]`, its package holds `config/ignore/terms.txt` with the line `hakkiri`, and the input is `Run hakkiri now.`
+- **WHEN** the rule has `ignore: [terms.txt]`, its package contains `config/ignore/terms.txt` with the line `hakkiri`, and the input is `Run hakkiri now.`
 - **THEN** hakkiri reports no alert
 
 ### Requirement: split checks the parts of an identifier
@@ -80,9 +80,11 @@ A misspelt part of three letters or more that is not in capitals SHALL be report
 
 ### Requirement: Vale's casing and code messages
 
-When the dictionary holds the word only with more capitals inside it, the message SHALL name the dictionary form.  
-It SHALL read `Use '<dictionary form>' instead of '<word>'.`  
-Otherwise, without `split`, a word shaped like an identifier in a Markdown or MDX file SHALL get the message `'<word>' looks like code; format it as code.`
+When the dictionary contains the word only with more capitals inside it, the message SHALL show the dictionary form.  
+It SHALL read `Use '<dictionary form>' instead of '<word>'.`
+
+Otherwise, without `split`, a word shaped like an identifier SHALL get the code message in a Markdown file or a Markdown with components (MDX) file.  
+That message SHALL read `'<word>' looks like code; format it as code.`
 
 #### Scenario: A casing mistake
 
@@ -96,18 +98,18 @@ Otherwise, without `split`, a word shaped like an identifier in a Markdown or MD
 
 ### Requirement: dictionaries come from the package
 
-`dictionaries` SHALL name dictionaries read as `<name>.aff` and `<name>.dic` from the `config/dictionaries` folder of the rule's package.  
+`dictionaries` SHALL list dictionaries read as `<name>.aff` and `<name>.dic` from the `config/dictionaries` folder of the rule's package.  
 When `dicpath` is set, they SHALL be read from that folder inside the package instead.  
 `append: true` SHALL add the built-in dictionary to the ones the rule loads.
 
 #### Scenario: A team dictionary
 
-- **WHEN** the rule has `dictionaries: [team]` and `append: true`, its package holds `config/dictionaries/team.aff` and a `team.dic` with the word `hakkiri`, and the input is `Run hakkiri on blorft.`
+- **WHEN** the rule has `dictionaries: [team]` and `append: true`, its package contains `config/dictionaries/team.aff` and a `team.dic` with the word `hakkiri`, and the input is `Run hakkiri on blorft.`
 - **THEN** hakkiri reports one alert, with the matched text `blorft`
 
 ### Requirement: aff and dic name one dictionary
 
-`aff` and `dic` SHALL name one dictionary's two files inside the package.  
+`aff` and `dic` SHALL give one dictionary's two files inside the package.  
 hakkiri SHALL refuse a rule that sets only one of them.
 
 #### Scenario: One dictionary by its two files
@@ -127,7 +129,7 @@ It SHALL refuse a rule whose path to a dictionary, a folder or a word list leave
 
 #### Scenario: A missing dictionary
 
-- **WHEN** rule `Team.Spelling` has `dictionaries: [absent]` and its package holds no `absent.dic`
+- **WHEN** rule `Team.Spelling` has `dictionaries: [absent]` and its package contains no `absent.dic`
 - **THEN** hakkiri reports an error naming `Team.Spelling` and `absent`, and exits with a failure status
 
 ### Requirement: A field with no effect is refused
@@ -141,8 +143,8 @@ hakkiri SHALL refuse a `spelling` rule that sets `exceptions`, or a `threshold` 
 
 ### Requirement: affix expands a word with flags
 
-When an `existence` or `substitution` rule sets `affix`, each token or key part written `word/FLAGS` SHALL match the word and each form the flags name in that affix file.  
-`affix: en_US-web` SHALL name the built-in affix file, and any other name SHALL be read from the package's `config/dictionaries`.
+When an `existence` or `substitution` rule sets `affix`, each token or key part written `word/FLAGS` SHALL match the word and each form the flags list in that affix file.  
+`affix: en_US-web` SHALL select the built-in affix file, and any other name SHALL be read from the package's `config/dictionaries`.
 
 #### Scenario: Every form of a verb
 

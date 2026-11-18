@@ -2,25 +2,26 @@
 
 ## Purpose
 
-A rule file holds one hakkiri rule: which text it reads, which check it runs, and the test cases that prove it.  
+A rule file contains one hakkiri rule.  
+It defines which text the rule reads, which check it runs, and which test cases prove it.  
 This spec fixes the file format, its fields, its scopes, how words are counted, and how its tests run.
 
 ## ADDED Requirements
 
-### Requirement: A rule file holds one rule
+### Requirement: A rule file has one rule
 
 hakkiri SHALL read each `.yml` file in a style folder as one rule, named by the folder, a dot, and the file name without its extension.
 
 #### Scenario: The file name is the rule name
 
-- **WHEN** a style folder `ProseStyle` holds the file `Filler.yml`
+- **WHEN** a style folder `ProseStyle` has the file `Filler.yml`
 - **THEN** hakkiri loads one rule named `ProseStyle.Filler`
 
 ### Requirement: Rule files are YAML 1.2
 
 hakkiri SHALL read a rule file as YAML 1.2, so an unquoted `yes`, `no`, `on` or `off` stays a string.
 
-#### Scenario: A token list holds no
+#### Scenario: A token list contains `no`
 
 - **WHEN** a rule has `extends: existence`, `message: "'%s'"`, `ignorecase: true` and `tokens: [no]`, and the input is `Say no to it.`
 - **THEN** hakkiri reports one alert with the message `'no'`
@@ -54,7 +55,7 @@ hakkiri SHALL refuse a rule whose `extends` is `script`, report an error that na
 
 #### Scenario: A style ships a script rule
 
-- **WHEN** a style folder `Team` holds `Grade.yml` with `extends: script`
+- **WHEN** a style folder `Team` has `Grade.yml` with `extends: script`
 - **THEN** hakkiri reports an error naming `Team/Grade.yml` and exits with a failure status
 
 ### Requirement: A scope names text with Vale's scope names
@@ -91,7 +92,7 @@ A rule SHALL read text that every part of a `&` scope matches, and text that any
 
 #### Scenario: A list of scopes
 
-- **WHEN** a rule has `scope: [heading, table.header]` and `tokens: [marker]`, and the input holds `# A marker heading`, a table whose header cell is `marker`, and a paragraph `A marker.`
+- **WHEN** a rule has `scope: [heading, table.header]` and `tokens: [marker]`, and the input has `# A marker heading`, a table whose header cell is `marker`, and a paragraph `A marker.`
 - **THEN** hakkiri reports two alerts, one in the heading and one in the table header
 
 ### Requirement: An exclusion reaches any depth
@@ -100,21 +101,23 @@ A scope part written `~` and a name SHALL leave out the text of that element and
 
 #### Scenario: A sentence in a list inside a quote
 
-- **WHEN** a rule has `scope: sentence & ~blockquote` and `tokens: [marker]`, and the input is `A marker here.` followed by a quote that holds `> - A marker in a list.`
+- **WHEN** a rule has `scope: sentence & ~blockquote` and `tokens: [marker]`, and the input is `A marker here.` followed by a quote that has `> - A marker in a list.`
 - **THEN** hakkiri reports one alert, on line 1, and none on the line of the list item
 
 ### Requirement: Code comments are scopes
 
-In Rust, TypeScript and JavaScript, hakkiri SHALL read `//` comments as `text.comment.line` and `/* */` comments as `text.comment.block`; Rust's `///` and `//!` as `text.comment.doc.line`; and `/** */`, and Rust's `/*! */`, as `text.comment.doc.block`.
+In Rust, TypeScript and JavaScript, hakkiri SHALL read `//` comments as `text.comment.line` and `/* */` comments as `text.comment.block`.  
+It SHALL read Rust's `///` and `//!` as `text.comment.doc.line`.  
+It SHALL read `/** */`, and Rust's `/*! */`, as `text.comment.doc.block`.
 
 #### Scenario: A Rust block comment is read
 
-- **WHEN** a rule has `scope: text.comment.block` and `tokens: [marker]`, and a Rust file holds `/* A marker here. */`
+- **WHEN** a rule has `scope: text.comment.block` and `tokens: [marker]`, and a Rust file has `/* A marker here. */`
 - **THEN** hakkiri reports one alert with the matched text `marker`
 
 #### Scenario: A plain comment is not a doc comment
 
-- **WHEN** a rule has `scope: text.comment.doc` and `tokens: [marker]`, and a Rust file holds `// A marker here.` and `/// A marker there.`
+- **WHEN** a rule has `scope: text.comment.doc` and `tokens: [marker]`, and a Rust file has `// A marker here.` and `/// A marker there.`
 - **THEN** hakkiri reports one alert, on the `///` line
 
 ### Requirement: Every comment reads as Markdown
@@ -124,7 +127,7 @@ A code span, a link and a bare URL in a comment SHALL read as they do in a Markd
 
 #### Scenario: A URL in a plain comment
 
-- **WHEN** a rule has `scope: link`, `nonword: true` and `tokens: ['^https?://\S+']`, and a Rust file holds two comment lines, `// Read https://bare.example first.` and ``// Run `https://span.example` too.``
+- **WHEN** a rule has `scope: link`, `nonword: true` and `tokens: ['^https?://\S+']`, and a Rust file has two comment lines, `// Read https://bare.example first.` and ``// Run `https://span.example` too.``
 - **THEN** hakkiri reports one alert, with the matched text `https://bare.example`
 
 ### Requirement: String literals are never prose
@@ -133,7 +136,7 @@ In a code file, every scope, `raw` included, SHALL hold comment text only, and n
 
 #### Scenario: A word in a string
 
-- **WHEN** a rule has `scope: raw` and `tokens: [basically]`, and a Rust file holds `let s = "basically fine";` and `// basically fine`
+- **WHEN** a rule has `scope: raw` and `tokens: [basically]`, and a Rust file has `let s = "basically fine";` and `// basically fine`
 - **THEN** hakkiri reports one alert, on the comment line
 
 ### Requirement: A code span reads as one word
@@ -158,7 +161,8 @@ Link text SHALL read as words, and a link target SHALL be left out.
 
 ### Requirement: A metric rule counts token matches
 
-A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`, the number of matches of those tokens in the text it measures.
+A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`.  
+The variable counts the matches of those tokens in the measured text.
 
 #### Scenario: A semicolon rate
 

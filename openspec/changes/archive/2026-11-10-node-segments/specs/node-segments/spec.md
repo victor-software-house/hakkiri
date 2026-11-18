@@ -7,14 +7,14 @@ A check reads the text, and an alert points at the span that covers it.
 
 ## ADDED Requirements
 
-### Requirement: Every node holds segments
+### Requirement: Every node has segments
 
 Each node SHALL hold its segments, the byte ranges of its text in the file, in order.  
 The span of the node SHALL run from the start of the first segment to the end of the last.
 
 #### Scenario: A heading
 
-- **WHEN** a Markdown file holds `# Title`
+- **WHEN** a Markdown file contains `# Title`
 - **THEN** the `heading.h1` node has one segment, the bytes of `Title`, and spans bytes 2 to 7
 
 ### Requirement: Segments join into the text of a node
@@ -26,7 +26,7 @@ Any other gap between segments SHALL read as nothing.
 
 #### Scenario: A table row
 
-- **WHEN** a Markdown file holds a table with the row `| a | b |`
+- **WHEN** a Markdown file contains a table with the row `| a | b |`
 - **THEN** the `table.row` node has the segments of its two cells, and its text is `a b`
 
 ### Requirement: A Markdown line is one segment
@@ -38,36 +38,36 @@ It also leaves out the indentation and the block quote markers in front of the l
 
 #### Scenario: A paragraph in a block quote
 
-- **WHEN** a Markdown file holds the lines `> First line` and `> second line.`
-- **THEN** the tree holds one `paragraph` node with two segments, the bytes of `First line` and of `second line.`, with no `>` marker in either
+- **WHEN** a Markdown file contains the lines `> First line` and `> second line.`
+- **THEN** the tree contains one `paragraph` node with two segments, the bytes of `First line` and of `second line.`, with no `>` marker in either
 - **AND** its text is those two lines joined by a line feed
 
 #### Scenario: A list item that continues on an indented line
 
-- **WHEN** a Markdown file holds the line `- Item first` and a line `item second` that is indented by two spaces
+- **WHEN** a Markdown file contains the line `- Item first` and a line `item second` that is indented by two spaces
 - **THEN** the `paragraph` node has two segments, the second without its two-space indent
 
 #### Scenario: A file with Windows line endings
 
-- **WHEN** a Markdown file holds `First line`, a carriage return and line feed, and `second line.`
-- **THEN** the `paragraph` node has two segments, and its text holds no carriage return
+- **WHEN** a Markdown file contains `First line`, a carriage return and line feed, and `second line.`
+- **THEN** the `paragraph` node has two segments, and its text contains no carriage return
 
 ### Requirement: Heading syntax is not text
 
-An ATX heading SHALL leave out its opening run of `#` with the space after it, and its closing run of `#`.  
+A hash-style (ATX) heading SHALL leave out its opening run of `#` with the space after it, and its closing run of `#`.  
 A setext heading SHALL leave out its underline.
 
 #### Scenario: A closed heading
 
-- **WHEN** a Markdown file holds `## Closed with more ###`
+- **WHEN** a Markdown file contains `## Closed with more ###`
 - **THEN** the `heading.h2` node has the text `Closed with more`
 
 #### Scenario: A setext heading
 
-- **WHEN** a Markdown file holds `Multi line`, `setext` and `======` on three lines
+- **WHEN** a Markdown file contains `Multi line`, `setext` and `======` on three lines
 - **THEN** the `heading.h1` node has two segments and the text `Multi line` and `setext` joined by a line feed
 
-### Requirement: Container text holds the content only
+### Requirement: Container text contains the content only
 
 A block quote, a list item and a table row SHALL have the segments of the nodes inside them, in order.  
 Their text SHALL hold no `>` marker, bullet, number or indentation.  
@@ -75,29 +75,30 @@ A block quote or list item with no prose inside it SHALL give no node.
 
 #### Scenario: A nested quote
 
-- **WHEN** a Markdown file holds `> First line` and, under it, `> > Nested one`
+- **WHEN** a Markdown file contains `> First line` and, under it, `> > Nested one`
 - **THEN** the outer `blockquote` node has the text `First line` and `Nested one` joined by a line feed
 
-#### Scenario: A quote that holds only a definition
+#### Scenario: A quote that contains only a definition
 
-- **WHEN** a Markdown file holds `> [a]: https://a.example`
-- **THEN** the tree holds no `blockquote` node
+- **WHEN** a Markdown file contains `> [a]: https://a.example`
+- **THEN** the tree contains no `blockquote` node
 
 ### Requirement: Syntax that is not prose is a gap
 
-Fenced code, raw HTML, link definitions, front matter and MDX expressions SHALL be gaps between the segments of the prose node around them.  
-The tags of a JSX element SHALL be gaps too, and its text SHALL be prose.  
-A paragraph that holds one of them SHALL stay one node.
+Fenced code, raw HTML, link definitions and front matter SHALL be gaps between the segments of the prose node around them.  
+Markdown with components (MDX) expressions SHALL be gaps too.  
+The tags of a JavaScript XML (JSX) element SHALL also be gaps, and its text SHALL be prose.  
+A paragraph that contains one of them SHALL stay one node.
 
 #### Scenario: HTML inside a paragraph
 
-- **WHEN** a Markdown file holds `Click <a href="https://h.example">here</a>.`
+- **WHEN** a Markdown file contains `Click <a href="https://h.example">here</a>.`
 - **THEN** the `paragraph` node has three segments, and its text is `Click here.`
 
 #### Scenario: An expression in a paragraph
 
-- **WHEN** an MDX file holds `Text with {expression} inside.`
-- **THEN** the tree holds one `paragraph` node whose text is `Text with  inside.`
+- **WHEN** an MDX file contains `Text with {expression} inside.`
+- **THEN** the tree contains one `paragraph` node whose text is `Text with  inside.`
 
 ### Requirement: Segments inside comments point into the file
 
@@ -106,6 +107,6 @@ A segment leaves out the comment marker and the indentation that hakkiri strips.
 
 #### Scenario: A paragraph over two line comments
 
-- **WHEN** a Rust file holds the lines `// Read the guide` and `// before you start.`
-- **THEN** the tree holds one `paragraph` node with two segments, the bytes of `Read the guide` and of `before you start.`, with no `//` marker in either
+- **WHEN** a Rust file contains the lines `// Read the guide` and `// before you start.`
+- **THEN** the tree contains one `paragraph` node with two segments, the bytes of `Read the guide` and of `before you start.`, with no `//` marker in either
 - **AND** its text is those two lines joined by a line feed

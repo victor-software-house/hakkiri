@@ -3,7 +3,8 @@
 ## Context
 
 The [`vale-differences` design][first-design] sets how the list is built: one scenario for each difference, with a link to its decision, and only what is true now.  
-This change adds the part that comes from the [case-and-sequence][case] and [spelling-and-affix][spelling] designs, and from the [rule-engine][engine] and [bootstrap][bootstrap] designs for the regex limit.
+This change adds the part that comes from the [case-and-sequence][case] and [spelling-and-affix][spelling] designs.  
+The regex limit comes from the [rule-engine][engine] and [bootstrap][bootstrap] designs.
 
 ## Goals / Non-Goals
 
@@ -22,17 +23,25 @@ This change adds the part that comes from the [case-and-sequence][case] and [spe
 
 ### 1. Resource use is listed
 
-Case-and-sequence decisions 3, 5 and 6 and the bootstrap design record cases where Vale runs out of memory, takes quadratic, cubic or exponential time, or panics, and hakkiri does not.  
-Output stays the same, but the behaviour differs, and a project that moves from Vale meets it.  
-The last requirement of the spec holds them.
+Decisions 3, 5 and 6 of the case-and-sequence design, and the bootstrap design, list cases where hakkiri finishes and Vale does not.  
+Vale runs out of memory, takes quadratic, cubic or exponential time, or panics.
 
-Alternative: list only differences in what a rule reports. Lost: a long line that makes Vale panic is a difference a reader looks for.
+Output stays the same, but the behaviour differs, and a project that moves from Vale meets it.  
+The last requirement of the spec contains them.
+
+Alternative: list only differences in what a rule reports.  
+Lost: a long line that makes Vale panic is a difference a reader looks for.
 
 ### 2. A number is quoted only as the design states the number
 
-A scenario gives a time or a size only where the design gives it: 31 ms for 16,667 words, 18 seconds for 8,000 words, and 13 seconds at a 6 GB limit.
+A scenario gives a time or a size only where the design gives it:
 
-Alternative: restate each case as a complexity class alone. Lost: the measured numbers are the evidence that the case matters.
+- 31 ms for 16,667 words.
+- 18 seconds for 8,000 words.
+- 13 seconds at a 6 GB limit.
+
+Alternative: restate each case as a complexity class alone.  
+Lost: the measured numbers are the evidence that the case matters.
 
 ### 3. Gaps are listed apart, with their rows
 
@@ -41,8 +50,10 @@ The spec lists `HKR-021`, `HKR-026`, `HKR-019` and `HKR-027` under Known gaps, s
 
 Alternatives:
 
-- Gaps among the differences. Lost: a reader would take a gap for a choice that stays.
-- Gaps in the queue only. Lost: the list a project reads would show no missing feature.
+- Gaps among the differences:  
+  Lost: a reader would take a gap for a choice that stays.
+- Gaps in the queue only:  
+  Lost: the list a project reads would show no missing feature.
 
 ## Risks / Trade-offs
 

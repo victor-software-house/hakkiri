@@ -5,7 +5,9 @@
 ### Requirement: sentence selects each sentence
 
 The scope `sentence` SHALL select each sentence of a paragraph, a heading or a table cell.  
-A sentence SHALL have the scope of the block it is in, so a part such as `list` selects the sentences of a list item, and an exclusion such as `~blockquote` leaves out the sentences of a quote.
+A sentence SHALL have the scope of the block it is in.  
+A part such as `list` selects the sentences of a list item.  
+An exclusion such as `~blockquote` leaves out the sentences of a quote.
 
 #### Scenario: Two sentences measured apart
 
@@ -14,16 +16,17 @@ A sentence SHALL have the scope of the block it is in, so a part such as `list` 
 
 #### Scenario: A sentence in a list item
 
-- **WHEN** a rule has `scope: sentence & list` and the input holds the paragraph `One two.` and the list item `- Three four.`
+- **WHEN** a rule has `scope: sentence & list` and the input has the paragraph `One two.` and the list item `- Three four.`
 - **THEN** hakkiri selects one sentence, `Three four.`
 
 ### Requirement: paragraph leaves out list items and quotes
 
-The scope `paragraph` SHALL select a paragraph that opens no list item or block quote, and every later paragraph of an item or a quote, as Vale 3.26.0 does.
+The scope `paragraph` SHALL select a paragraph that opens no list item or block quote.  
+It SHALL also select every later paragraph of an item or a quote, as Vale 3.26.0 does.
 
 #### Scenario: A paragraph and a list item
 
-- **WHEN** a rule has `scope: paragraph` and `tokens: [marker]`, and the input holds `- A marker item.` and a paragraph `A marker.`
+- **WHEN** a rule has `scope: paragraph` and `tokens: [marker]`, and the input has `- A marker item.` and a paragraph `A marker.`
 - **THEN** hakkiri reports one alert, in the paragraph
 
 #### Scenario: A later paragraph of a list item
@@ -36,7 +39,8 @@ The scope `paragraph` SHALL select a paragraph that opens no list item or block 
 ### Requirement: A block of text has the scope of one element
 
 A block of text SHALL have the scope of one element, as in Vale 3.26.0.  
-That element SHALL be the outermost list item, block quote, heading or table cell that the block is the first thing inside.  
+That element SHALL be the outermost list item, block quote, heading or table cell that the block is the first thing inside.
+
 A block that is the first thing inside none of them SHALL have its own scope: a paragraph, a heading or a table cell.  
 A list item and a block quote SHALL be read through the blocks inside them.
 
@@ -57,22 +61,22 @@ A list item and a block quote SHALL be read through the blocks inside them.
 
 #### Scenario: A paragraph after a fenced block in an item
 
-- **WHEN** a rule has `scope: paragraph`, and the input is a list item that starts with a fenced block and holds the paragraph `After the fence.`
+- **WHEN** a rule has `scope: paragraph`, and the input is a list item that starts with a fenced block and has the paragraph `After the fence.`
 - **THEN** hakkiri selects one block, `After the fence.`
 
 #### Scenario: A paragraph after a fenced block in a quote
 
-- **WHEN** a rule has `scope: paragraph`, and the input is a quote that starts with a fenced block and holds the paragraph `> After the fence.`
+- **WHEN** a rule has `scope: paragraph`, and the input is a quote that starts with a fenced block and has the paragraph `> After the fence.`
 - **THEN** hakkiri selects one block, `After the fence.`
 
 #### Scenario: A quote inside an item
 
-- **WHEN** a rule has `scope: paragraph`, and the input is a list item that holds a quote of the paragraphs `Para one.` and `Para two.`
+- **WHEN** a rule has `scope: paragraph`, and the input is a list item that contains a quote of the paragraphs `Para one.` and `Para two.`
 - **THEN** hakkiri selects one block, `Para two.`, and a rule with `scope: list` selects `Para one.`
 
 #### Scenario: A paragraph after a thematic break in a quote
 
-- **WHEN** a rule has `scope: blockquote`, and the input is a quote that holds a thematic break and then the paragraph `After the rule.`
+- **WHEN** a rule has `scope: blockquote`, and the input is a quote that contains a thematic break and then the paragraph `After the rule.`
 - **THEN** hakkiri selects one block, `After the rule.`
 
 ### Requirement: A dotted sentence is a sentence in a scope

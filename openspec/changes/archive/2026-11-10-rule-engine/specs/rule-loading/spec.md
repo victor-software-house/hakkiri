@@ -13,7 +13,7 @@ hakkiri SHALL load every `.yml` file directly inside a style folder as one rule,
 
 #### Scenario: A folder with a rule and a README
 
-- **WHEN** a style folder `Team` holds `Filler.yml` and `README.md`
+- **WHEN** a style folder `Team` has `Filler.yml` and `README.md`
 - **THEN** hakkiri loads one rule, `Team.Filler`
 
 ### Requirement: A rule needs extends and message
@@ -22,7 +22,7 @@ hakkiri SHALL refuse a rule file that has no `extends` or no `message`, and repo
 
 #### Scenario: A rule with no message
 
-- **WHEN** `Team/Short.yml` holds `extends: existence` and `tokens: [very]` only
+- **WHEN** `Team/Short.yml` has `extends: existence` and `tokens: [very]` only
 - **THEN** hakkiri reports an error naming `Team/Short.yml` and `message`, and exits with a failure status
 
 ### Requirement: An unknown extends is refused
@@ -31,32 +31,32 @@ hakkiri SHALL refuse a rule whose `extends` names no check type, and report an e
 
 #### Scenario: A check type Vale does not define
 
-- **WHEN** `Team/Grammar.yml` holds `extends: grammar`
+- **WHEN** `Team/Grammar.yml` has `extends: grammar`
 - **THEN** hakkiri reports an error naming `Team/Grammar.yml` and `grammar`, and exits with a failure status
 
 ### Requirement: An unknown field is refused
 
-hakkiri SHALL refuse a rule that holds a field its check type does not define.  
+hakkiri SHALL refuse a rule that has a field its check type does not define.  
 The error SHALL name the field and its line.
 
 #### Scenario: token in an existence rule
 
-- **WHEN** an `existence` rule holds `token: very` on line 3, where the type defines `tokens`
+- **WHEN** an `existence` rule has `token: very` on line 3, where the type defines `tokens`
 - **THEN** hakkiri reports an error naming `token` and line 3, and exits with a failure status
 
 ### Requirement: A field of the wrong type is refused
 
-hakkiri SHALL refuse a rule whose field holds a value of the wrong type, and report an error that names the field and its line.  
+hakkiri SHALL refuse a rule whose field contains a value of the wrong type, and report an error that names the field and its line.  
 A number written as a string, such as `max: '3'`, SHALL read as the number.
 
 #### Scenario: A count that is not a number
 
-- **WHEN** an `occurrence` rule holds `max: many` on line 4
+- **WHEN** an `occurrence` rule has `max: many` on line 4
 - **THEN** hakkiri reports an error naming `max` and line 4
 
 #### Scenario: A number in quotes
 
-- **WHEN** an `occurrence` rule holds `max: '3'`
+- **WHEN** an `occurrence` rule has `max: '3'`
 - **THEN** hakkiri loads the rule with a `max` of 3
 
 ### Requirement: level takes three values
@@ -71,7 +71,7 @@ hakkiri SHALL refuse any other value and name the file and the field.
 
 #### Scenario: A level Vale does not define
 
-- **WHEN** a rule holds `level: info`
+- **WHEN** a rule has `level: info`
 - **THEN** hakkiri reports an error naming the file and `level`, and exits with a failure status
 
 ### Requirement: A pattern that does not compile is refused
@@ -85,22 +85,24 @@ hakkiri SHALL refuse a rule with a pattern that neither regex engine compiles, a
 
 ### Requirement: A pattern with nothing to match is refused
 
-hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` hold nothing to match, and a `metric` rule that lists `tokens` or `raw` holding nothing, because such a pattern matches at every position.  
+hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` contain nothing to match.  
+It SHALL also refuse a `metric` rule that lists `tokens` or `raw` with nothing in them.  
+Such a pattern matches at every position.  
 The error SHALL name the file, the line, `tokens` and `raw`.
 
 #### Scenario: An existence rule with no tokens
 
-- **WHEN** `Team/Empty.yml` holds `extends: existence` and `message: m` only
+- **WHEN** `Team/Empty.yml` has `extends: existence` and `message: m` only
 - **THEN** hakkiri reports an error naming `Team/Empty.yml`, line 1, `tokens` and `raw`, and exits with a failure status
 
 #### Scenario: Tokens of blanks only
 
-- **WHEN** an `existence` rule holds `tokens: ['', '  ']` and no `raw`
+- **WHEN** an `existence` rule has `tokens: ['', '  ']` and no `raw`
 - **THEN** hakkiri reports the same error
 
 #### Scenario: A metric with an empty raw
 
-- **WHEN** a `metric` rule holds `raw: ['']` and no `tokens`
+- **WHEN** a `metric` rule has `raw: ['']` and no `tokens`
 - **THEN** hakkiri reports the same error
 
 ### Requirement: A YAML error names the line
@@ -109,7 +111,7 @@ hakkiri SHALL refuse a rule file that is not valid YAML, and report an error tha
 
 #### Scenario: A tab in the indentation
 
-- **WHEN** `Team/Tabs.yml` holds a tab character in the indentation of line 5
+- **WHEN** `Team/Tabs.yml` has a tab character in the indentation of line 5
 - **THEN** hakkiri reports an error naming `Team/Tabs.yml` and line 5
 
 ### Requirement: An action loads and is not applied

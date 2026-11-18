@@ -55,7 +55,8 @@ Alternatives:
 `first` and `second` compile as written, with no word template, as Vale compiles them ([conditional.go][v-cond-new]).  
 Group detection follows Vale's: a `(` that is not escaped, not inside a class and not `(?`, or a named group ([conditional.go][v-cond-group]).
 
-A `first` or `second` that is empty or matches the empty string is refused, which departs from Vale: it compiles both as written.  
+A `first` or `second` that is empty or matches the empty string is refused.  
+This departs from Vale, which compiles both as written.  
 An empty `first` would alert at every position, and an empty `second` would stop every alert.  
 A space is a pattern.  
 A zero-width match such as `\b` still gives an alert, as it does for `existence`.
@@ -76,7 +77,7 @@ The rule's `tokens` join into one pattern, with `(?i)` first when `ignorecase` i
 Within one selected node, each match is trimmed of spaces and compared with the one before.
 
 An equal pair raises the count, and a count over `max` gives an alert that spans both matches.  
-There is no alert when the span holds more than one sentence or matches an exception ([repetition.go][v-rep-run]).  
+There is no alert when the span contains more than one sentence or matches an exception ([repetition.go][v-rep-run]).  
 The count goes back to 0 only after an alert, as Vale counts it.
 
 Alternative: reset the count on every match that does not repeat.  
@@ -84,7 +85,7 @@ Lost: a rule with `max: 1` would then give fewer alerts than Vale on the same te
 
 ### 5. readability reads the metric scores
 
-`readability` computes each score its `metrics` list names, from the same counts a `metric` rule reads ([readability.go][v-read-run]).  
+`readability` computes each score listed in its `metrics`, from the same counts a `metric` rule reads ([readability.go][v-read-run]).  
 It averages them and reports when the average is greater than `grade`.  
 The comparison uses the unrounded average, and the message prints it with two decimals.
 
@@ -97,7 +98,7 @@ Lost: two copies of each formula could drift, and the Flesch-Kincaid parity test
 
 ### 6. An unknown or empty metrics list is refused
 
-The [readability spec][readability] rejects a `metrics` list that is empty or names a score outside the five.  
+The [readability spec][readability] rejects a `metrics` list that is empty or lists a score outside the five.  
 hakkiri gives a better result than Vale where Vale's is a defect (operator, 2026-11-10).
 
 Alternative: Vale's behaviour.  
@@ -109,28 +110,34 @@ Lost: a misspelt score name lowers the grade with no sign of why, measured on ot
 ### 7. ignorecase on a conditional applies to both patterns
 
 When `ignorecase` is `true`, a `conditional` rule matches `first` and `second` without regard to case, and compares a match of `first` with a captured term the same way.  
-Vale decodes the field and nothing reads it, so both patterns stay case-sensitive ([conditional.go][v-cond-fields]).  
+Vale decodes the field and nothing reads it, so both patterns stay case-sensitive ([conditional.go][v-cond-fields]).
+
 The [pattern-checks spec][pattern] states the behaviour, by the same rule as decision 6 (operator, 2026-11-10).
 
 Alternatives:
 
-- Load it with no effect, as Vale does. Lost: an author who sets the field gets no sign that it does nothing.
-- Refuse the field. Lost: a style written for Vale that sets it would stop loading.
+- Load it with no effect, as Vale does.  
+  Lost: an author who sets the field gets no sign that it does nothing.
+- Refuse the field.  
+  Lost: a style written for Vale that sets it would stop loading.
 
 ### 8. A score listed twice counts once
 
 Vale adds a listed score once however often it is listed, and divides by the length of the list ([readability.go][v-read-run]).  
-hakkiri averages the distinct scores, so a repeated name changes nothing: it gives a better result than Vale where Vale's is a defect, as in decision 6.
+hakkiri averages the distinct scores, so a repeated name changes nothing.  
+It gives a better result than Vale where Vale's is a defect, as in decision 6.
 
 Alternative: Vale's division.  
-Lost: `[SMOG, SMOG]` would report half of SMOG's grade.
+Lost: `[SMOG, SMOG]` would report half of the Simple Measure of Gobbledygook (SMOG) grade.
 
 ### 9. Code is no match in the pattern checks
 
-Vale masks code in the text a rule reads, so two adjacent code spans can read as one repeated word, and a form in code counts as seen.  
+Vale masks code in the text a rule reads.  
+So two adjacent code spans can read as one repeated word, and a form in code counts as seen.
+
 hakkiri treats a match that overlaps a code span as no match, as `existence` does.  
-For `repetition`, the match after it has none before it to repeat.  
-For `consistency`, it is not a form seen.  
+In `repetition`, the match after it has none before it to repeat.  
+`consistency` does not count it as a form seen.  
 For `conditional`, a match of `first` gives no alert and a match of `second` defines nothing.
 
 Alternative: Vale's masked text.  

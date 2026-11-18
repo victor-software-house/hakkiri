@@ -16,7 +16,8 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 
 - Loading: a style folder gives one rule per `.yml` file.  
   A rule with a missing, unknown or invalid field is refused with an error that names it.
-- Selection: scope names match nodes by their dotted prefix; `text`, `sentence` and file extensions get Vale's meaning; an inline exclusion blanks the text it names.
+- Selection: scope names match nodes by their dotted prefix; `text`, `sentence` and file extensions get Vale's meaning.  
+  An inline exclusion blanks the text it names.
 - Text: a check reads the text of a node with inline markup left out, and each code span as one word.  
   Sentences come from hakkiri's own splitter, and words from one word pattern.
 - Patterns: the `regex` crate, and `fancy-regex` with a backtrack limit for a pattern that needs lookaround; a limit reached is an error alert.
@@ -30,14 +31,14 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 
 - `rule-loading`: how style folders and rule files load, and which rules are refused.
 - `scope-selection`: which text a scope selects, and the text, sentences and words a check reads.
-- `alerts`: what an alert holds, where it points, how its message is filled, and how pattern failures report.
+- `alerts`: what an alert contains, where it points, how its message is filled, and how pattern failures report.
 - `match-checks`: the `existence`, `substitution` and `occurrence` checks.
 - `metric-check`: the `metric` check, its variables, its formula and its condition.
 
 ### Modified Capabilities
 
 - `node-segments`: inline markup becomes a gap, so a link reads as its text.
-- `document-tree`: a Markdown or MDX tree counts its code blocks, for the metric variable `pre`.
+- `document-tree`: a Markdown or Markdown with components (MDX) tree counts its code blocks, for the metric variable `pre`.
 - `rule-files`: the semicolon-rate scenario gains `nonword: true`, so its token matches as an `existence` token does.
 
 ## Impact

@@ -9,7 +9,7 @@ Its scores and counts are the ones the [metric check][metric] reads, so the two 
 
 ### Requirement: readability reports a grade over the limit
 
-A `readability` rule SHALL compute each score its `metrics` list names, average them, and report one alert for each measured text where the average is greater than `grade`.  
+A `readability` rule SHALL compute each score listed in its `metrics`, average them, and report one alert for each measured text where the average is greater than `grade`.  
 A `%s` in its message SHALL read as the average with two decimals.
 
 #### Scenario: One score
@@ -30,7 +30,7 @@ A `%s` in its message SHALL read as the average with two decimals.
 ### Requirement: readability has five scores
 
 The `metrics` list SHALL accept `Automated Readability`, `Coleman-Liau`, `Flesch-Kincaid`, `Gunning Fog` and `SMOG`, each computed as the metric variable of the same score.  
-hakkiri SHALL refuse a rule whose list is empty or names any other score, with an error that names the rule and the score.
+hakkiri SHALL refuse a rule whose list is empty or lists any other score, with an error that states the rule and the score.
 
 #### Scenario: A score hakkiri does not know
 
@@ -54,12 +54,12 @@ Text with no sentence SHALL give no alert.
 
 #### Scenario: Two paragraphs measured as one
 
-- **WHEN** a rule has `message: "Grade %s."`, `metrics: [Flesch-Kincaid]` and `grade: -5`, and the input holds the paragraphs `The cat sat.` and `The dog ran.`
+- **WHEN** a rule has `message: "Grade %s."`, `metrics: [Flesch-Kincaid]` and `grade: -5`, and the input contains the paragraphs `The cat sat.` and `The dog ran.`
 - **THEN** hakkiri reports one alert at line 1, column 1, with the message `Grade -2.62.`
 
 #### Scenario: Only a heading
 
-- **WHEN** the same rule reads a file that holds only `# One two three`
+- **WHEN** the same rule reads a file that contains only `# One two three`
 - **THEN** hakkiri reports no alert
 
 ### Requirement: readability with a scope measures each node

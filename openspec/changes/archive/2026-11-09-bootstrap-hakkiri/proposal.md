@@ -26,7 +26,8 @@ Version 0.0.7 still took 9.0 to 9.4 s after a rule redesign.
 
 ### New Capabilities
 
-None. This change adds the repository and the plan, not lint behaviour.  
+None.  
+This change adds the repository and the plan, not lint behaviour.  
 Each later slice adds the spec for the behaviour it builds.
 
 ### Modified Capabilities
@@ -36,7 +37,8 @@ None.
 ## Impact
 
 - A new repository in the ctl group of CLIs, built on ctl-core.
-- No change to any project yet. Projects keep Vale until the template switch in `HKR-009`.
+- No change to any project yet.  
+  Projects keep Vale until the template switch in `HKR-009`.
 
 [ProseStyle]: https://github.com/victor-software-house/prose-style
 [Vale]: https://vale.sh

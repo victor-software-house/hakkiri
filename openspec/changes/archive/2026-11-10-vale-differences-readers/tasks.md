@@ -5,18 +5,21 @@ This change adds to the spec that [`vale-differences`][first] creates.
 
 ## 1. The list
 
-- [x] 1.1 Add three requirements: the ported readers, the inputs on which a run finishes in hakkiri and fails or stalls in Vale, and the known gaps.  
+- [x] 1.1 Add three requirements.  
+  They cover the ported readers, the inputs on which a run finishes in hakkiri and fails or stalls in Vale, and the known gaps.  
   Each scenario links its decision or row.  
   Verify `openspec validate --all --strict` and the link check pass in CI, and that each scenario's link resolves to its decision.  
-  - 2026-11-10 (UTC), `openspec validate --all --strict` and the markdown link check pass in the [CI run on PR 48][pr48-ci], at head [9a09b1c][c-pr48].  
-    A dry-run archive of the four changes gave one spec of 12 requirements and 62 scenarios that validates strictly, and every link in it resolves to an archived design.
+  - 2026-11-10 (UTC), `openspec validate --all --strict` and the Markdown link check pass in the [CI run on PR 48][pr48-ci], at head [9a09b1c][c-pr48].  
+    A dry-run archive of the four changes gave one spec of 12 requirements and 62 scenarios that validates strictly.  
+    Every link in it resolves to an archived design.
 
 ## 2. Integration
 
 - [x] 2.1 Verify the pull request's CI passes: lint, prose lint, OpenSpec and the Template check.  
-  - 2026-11-10 (UTC), CI passes on [9a09b1c][c-pr48] of [PR 48][hakkiri#48]: Verify, Build and test, Static checks, CodeQL, both Analyze jobs, secrets and the Kody review.  
-    The Template check and Publish checks skip on this branch, and I did not run them.  
-    Kody left four threads on PR 48, all fixed in that PR before the merge.
+  - 2026-11-10 (UTC), CI passes on [9a09b1c][c-pr48] of [PR 48][hakkiri#48].  
+    - The jobs that pass are Verify, Build and test, Static checks, CodeQL, both Analyze jobs, secrets and the Kody review.
+    - The Template check and Publish checks skip on this branch, and I did not run them.
+    - Kody left four threads on PR 48, all fixed in that PR before the merge.
 
 ## Workflow follow-up
 

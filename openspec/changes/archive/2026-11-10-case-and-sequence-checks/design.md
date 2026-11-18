@@ -4,10 +4,11 @@
 
 The [`rule-engine` change][engine-design] selects sentences and nodes, builds check text and places alerts.  
 The [`pattern-and-readability-checks` change][pattern-design] adds four more check types on top of it.  
-`capitalization` and `sequence` need data that neither change holds, and so do `spelling` and `affix`, which the [`spelling-and-affix-checks` change][spelling-design] builds on the dictionary reader decided below:
+`capitalization` and `sequence` need data that neither change has.  
+So do `spelling` and `affix`, which the [`spelling-and-affix-checks` change][spelling-design] builds on the dictionary reader decided below:
 
 - `sequence` needs words and Penn Treebank tags for each sentence ([sequence.go][v-seq-run]).
-- `capitalization` needs title and sentence case converters, and AP title case reads one tag ([title.go][p-title]).
+- `capitalization` needs title and sentence case converters, and Associated Press (AP) title case reads one tag ([title.go][p-title]).
 - `spelling` and `affix` need a Hunspell dictionary and its affix rules ([spelling.go][v-spell-run], [affix.go][v-affix]).
 
 Vale gets the tagger and the converters from prose.  
@@ -39,24 +40,32 @@ In sentence case, a text fails when its first word fails.
 Otherwise it passes when enough words pass: equal to the converted form, in capitals, or matching an exception.  
 The share that agrees must be at least `threshold`.
 
-Vale hands the converters its own `exceptions` list after [`updateExceptions`][v-update-exceptions] has sorted it and rewritten each term in place, as `(?-i)` and the term with its periods escaped.  
+Vale hands the converters its own `exceptions` list after [`updateExceptions`][v-update-exceptions] has sorted it and rewritten each term in place, as `(?-i)` and the term with its periods escaped.
+
 The converters therefore match an exception as a case-sensitive pattern, and keep a word as written when one matches it.  
-They do not set a word to the case an exception was written in.  
+They do not set a word to the case an exception was written in.
+
 hakkiri hands its converters the same rewritten list.
 
 Three more points follow Vale or prose as they are:
 
-- A text with no word has a share of 0 over 0, which is not at least `threshold`, so it fails.
+- A text with no word has a share of 0 over 0.  
+  That is not at least `threshold`, so the text fails.
 - A pattern that gives up on a text finds nothing, as prose's wrapper reads it.
 - An empty `match` is refused, since every text would pass it, and a `style` other than `AP` or `Chicago` is refused where Vale reads any other value as `AP`.
 
 One point is a gap instead of a departure: `vocab` loads and has no effect.  
-In Vale, `vocab` defaults to true, and `true` adds the project's accepted Vocab terms to the rule's exceptions, both in the exceptions pattern and in the list the converters read ([capitalization.go][v-capitalization-vocab]).  
+In Vale, `vocab` defaults to true.  
+A `true` value adds the project's accepted Vocab terms to the rule's exceptions.  
+It adds them to the exceptions pattern and to the list the converters read ([capitalization.go][v-capitalization-vocab]).
+
 hakkiri has no project vocabulary yet, so a rule's exceptions are only its own.  
 When Vocab lands, `vocab` must add the accepted terms before `exceptions` is rewritten and sorted.
 
 The title converter's tagging and its checks of the text around a word use prose's byte offsets, as prose writes them.  
-Prose counts the width of each word in characters and adds it to a byte offset, and searches a copy of the title whose curly quotes and dashes are plain marks.  
+Prose counts the width of each word in characters and adds it to a byte offset.  
+It also searches a copy of the title whose curly quotes and dashes are plain marks.
+
 hakkiri keeps both, so a title with those marks gets the same words in lower case as in Vale.
 
 Alternative: `titlecase` 3.6.0, which applies John Gruber's rules.  
@@ -68,10 +77,12 @@ In AP style, `to` is lower case only when the tag after it starts with `NN` ([ti
 So `to` before an article starts with a capital.
 
 Vale reads that tag by the position of the word among the converter's words.  
-The tags come from prose's Treebank word tokenizer and the tagger, not from the tokenizer that `sequence` uses, and a contraction or hyphen before `to` shifts the two lists.  
+The tags come from prose's Treebank word tokenizer and the tagger, not from the tokenizer that `sequence` uses.  
+A contraction or hyphen before `to` shifts the two lists.
+
 hakkiri ports that tokenizer, and reads the tag the same way.  
 Go reads each map of its replacements in an order that changes between runs, and hakkiri reads them in the order the file lists them.  
-A test compares its words with prose's on over 600 texts.
+A test compares its words with prose's on more than 600 texts.
 
 Alternative: find the tag by the word's byte offset.  
 Lost: it gives a different answer from Vale in exactly the headings where the lists shift.
@@ -91,26 +102,39 @@ The alert spans the matched words, or the words from the first to the last `targ
 
 Vale's walk has two quirks that hakkiri keeps ([sequence.go][v-seq-run]):
 
-- It starts once for each place the anchor's pattern occurs, or each word for a tag anchor, and each start passes over the words earlier starts took. A sentence can give fewer alerts than the pattern has places.
+- It starts once for each place the anchor's pattern occurs, or each word for a tag anchor.  
+  Each start passes over the words earlier starts took.  
+  A sentence can give fewer alerts than the pattern has places.
 - A `target` on a token with `skip` narrows the alert only when every copy of the token read a word.
 
-Vale cuts each block again with prose's segmenter and tags each part apart ([prose.go][v-tag-text]), and skips the tagger when a literal that a token needs is missing.  
+Vale cuts each block again with prose's segmenter and tags each part apart ([prose.go][v-tag-text]).  
+It skips the tagger when a literal that a token needs is missing.  
 hakkiri tags its own sentence whole, so a text the two cut differently can get other tags.
 
 Two costs differ:
 
-- Vale makes one step for each copy of a `skip` and `min` ([sequence.go][v-seq-tokens]). With a 6 GB limit, `skip: 1000` with `min: 1000` ran out of memory in 13 seconds. hakkiri counts the steps and stores none.
-- Vale finds each start by scanning from the first word and through the earlier starts, so a sentence whose anchor matches most words costs the cube of its words. It took 18 seconds for 8,000 words and passed 100 for 16,667. hakkiri takes the next word the anchor accepts, and reads 16,667 words in 31 ms.
+- Vale makes one step for each copy of a `skip` and `min` ([sequence.go][v-seq-tokens]).  
+  With a 6 GB limit, `skip: 1000` with `min: 1000` ran out of memory in 13 seconds.  
+  hakkiri counts the steps and stores none.
+- Vale finds each start by scanning from the first word and through the earlier starts.  
+  A sentence whose anchor matches most words therefore costs the cube of its words.  
+  It took 18 seconds for 8,000 words and passed 100 for 16,667.  
+  hakkiri takes the next word the anchor accepts.  
+  It reads 16,667 words in 31 ms.
 
-hakkiri refuses what Vale loads and never matches: tokens with nothing to start from (a `pattern`, `tag` or `upos` without `negate`), a token field it does not define, and a `skip` or `min` below 0.  
-It refuses a `skip` and `min` whose steps overflow a count too.
+hakkiri refuses what Vale loads and never matches:
 
-Alternative: compile the tokens into one pattern over a string of `word/TAG` pairs.  
+- Tokens with nothing to start from (a `pattern`, `tag` or `upos` without `negate`).
+- A token field it does not define.
+- A `skip` or `min` below 0.
+- A `skip` and `min` whose steps overflow a count.
+
+Alternative: compile the tokens into one pattern that matches a string of `word/TAG` pairs.  
 Lost: `negate` at a sentence edge and `target` spans have no direct form there, and results would drift from Vale's walk.
 
 ### 4. model is refused
 
-`model` names another checker's tagger model in Vale's dictionary folder ([sequence.go][v-seq-new]).  
+`model` is the name of another checker's tagger model in Vale's dictionary folder ([sequence.go][v-seq-new]).  
 hakkiri refuses a rule that sets it.
 
 Alternative: read Vale's model format.  
@@ -120,26 +144,32 @@ Lost: it ties hakkiri to a Vale file format, for a field no known style uses.
 
 hakkiri ports prose's averaged perceptron and its English tokenizer, `tokenize.New()`, and embeds the English model (operator, 2026-11-10).  
 Vale tags each sentence with that tokenizer and the perceptron, so the port is those two and not prose's Treebank tokenizer ([tag step][v-tag-text]).  
-The model is trained on UD English EWT under CC BY-SA 4.0, and weighs 1.9 MB ([MODELS.md][p-models]).  
+
+The model is trained on Universal Dependencies (UD) English Web Treebank (EWT) under Creative Commons Attribution-ShareAlike 4.0 (`CC-BY-SA-4.0`).  
+It weighs 1.9 MB ([`MODELS.md`][p-models]).  
 It ships as its own data file with its notice.
 
 The port keeps prose's case and category tests where Go and Rust give the same result.  
-The shape of a word reads Rust's Unicode properties and not Go's categories, so a word of characters such as `²` can get another shape, and so another feature.  
+The shape of a word reads Rust's Unicode properties and not Go's categories.  
+So a word of characters such as `²` can get another shape, and so another feature.  
 A test compares tokens and tags with prose's on 188 sentences.
 
 The port splits a token's prefixes, suffixes and contractions in one pass, with the same tokens.  
-prose searches what is left of a token for a contraction ending again after each prefix or suffix it takes off, so a token of 20,000 marks takes quadratic time there.
+prose searches what is left of a token for a contraction ending again after each prefix or suffix it takes off.  
+So a token of 20,000 marks takes quadratic time there.
 
-Creative Commons lists GPLv3 as compatible with BY-SA 4.0 ([compatible licenses][cc-compat]).  
+Creative Commons lists GPLv3 as compatible with `CC-BY-SA-4.0` ([compatible licenses][cc-compat]).  
 Section 13 of hakkiri's AGPLv3 allows a combination with GPLv3 work.
 
 It is the only candidate whose tags equal Vale's, and every tag-based rule depends on them.
 
 Alternatives:
 
-- `english-pos-tagger`: a Brill tagger with Penn tags. Lost: its tags differ from Vale's.
+- `english-pos-tagger`: a Brill tagger with Penn tags.  
+  Lost: its tags differ from Vale's.
 - `nlprule`: its LanguageTool 5.2 data is LGPL-2.1 ([nlprule readme][nlprule-readme]).
-- No tagger, refusing `tag` and `upos` tokens. Lost: a style written for Vale stops loading.
+- No tagger, refusing `tag` and `upos` tokens.  
+  Lost: a style written for Vale stops loading.
 
 ### 6. Spelling ports Vale's Hunspell reader
 
@@ -150,18 +180,23 @@ The `affix` field reuses it.
 The port is smaller than Vale's package in three ways, none of which changes what an English dictionary accepts:
 
 - It makes every form of every entry when it loads, where Vale makes the forms of an entry when it looks a word up.
-- It leaves out the directives for compounds made by flag (`COMPOUNDFLAG`, `COMPOUNDBEGIN`, `COMPOUNDMIDDLE`, `COMPOUNDEND`), for suggestions, for Turkic casing and for `ß`. A dictionary that uses them loads, and a German or Dutch compound is not accepted.
-- It reads UTF-8 and ISO 8859-1 and refuses any other `SET` with an error that names it (operator, 2026-11-10). Vale reads every character set that `golang.org/x/text` knows, and reading them here would add `encoding_rs` as a dependency.
+- It leaves out the directives for compounds made by flag (`COMPOUNDFLAG`, `COMPOUNDBEGIN`, `COMPOUNDMIDDLE`, `COMPOUNDEND`), suggestions, Turkic casing and `ß`.  
+  A dictionary that uses them loads, and a German or Dutch compound is not accepted.
+- It reads UTF-8 and International Organization for Standardization (ISO) 8859-1.  
+  It refuses any other `SET` with an error that shows the name (operator, 2026-11-10).  
+  Vale reads every character set that `golang.org/x/text` supports, and reading them here would add `encoding_rs` as a dependency.
 
 It differs from Vale's package in two behaviours, where the port does what Hunspell does or what costs less:
 
-- A rule whose strip text is not on the word makes no form, as in Hunspell. Vale puts the affix on the whole word, so `cat` with a rule that strips `y` and adds `ies` gives `caties` there.
-- A word split at its breaks keeps the result of each part for each depth, so a token of many hyphenated parts takes polynomial time. Vale checks every part again at each split, and caches only the result for the whole word, so such a token takes exponential time there.
+- A rule whose strip text is not on the word makes no form, as in Hunspell.  
+  Vale puts the affix on the whole word, so `cat` with a rule that strips `y` and adds `ies` gives `caties` there.
+- A word split at its breaks keeps the result of each part for each depth, so a token of many hyphenated parts takes polynomial time.  
+  Vale checks every part again at each split, and caches only the result for the whole word, so such a token takes exponential time there.
 
 A flag is one byte in a file that declares `SET UTF-8` and no `FLAG`, and one character in any other file, as in Vale.  
 In a Latin-1 file, `é` and `è` are therefore two flags.
 
-A test compares the words accepted with Vale's on about 9,000 words, run in Go.
+A test run in Go checks about 9,000 words and compares the words accepted with Vale's.
 
 Alternatives:
 
@@ -172,44 +207,57 @@ Alternatives:
 
 ### 7. The built-in dictionary is Vale's
 
-hakkiri embeds `en_US-web.aff` and `en_US-web.dic`, 81,558 words built from SCOWL, now the English Speller Database (operator, 2026-11-10).  
+hakkiri embeds `en_US-web.aff` and `en_US-web.dic`, 81,558 words built from Spell Checker Oriented Word Lists (SCOWL), now the English Speller Database (operator, 2026-11-10).  
 Its [license][esdb-license] allows any use, if the copyright notice ships with every copy, so the notice ships beside the files.
 
-Alternative: no built-in dictionary, so a `spelling` rule must name one. Lost: a style written for Vale expects it.
+Alternative: no built-in dictionary, so a `spelling` rule must say which dictionary to use.  
+Lost: a style written for Vale expects it.
 
 ### 8. A style other than AP or Chicago is refused
 
 Vale reads any other value as AP ([capitalization.go][v-cap-new]).  
-hakkiri refuses the rule with an error that names the value (operator, 2026-11-10).  
+hakkiri refuses the rule with an error that shows the value (operator, 2026-11-10).  
 hakkiri does better than Vale where Vale's behaviour is a defect.
 
-Alternative: read it as AP. Lost: a misspelt `chicago` would apply AP with no sign.
+Alternative: read it as AP.  
+Lost: a misspelt `chicago` would apply AP with no sign.
 
 ### 9. A block of text has the scope of one element
 
 Vale gives a block of text one scope.  
 It is the outermost list item, quote, heading or table cell among the tags opened since the last element closed ([ast.go][v-tag-reset], [ast.go][v-tag-scope]).  
 A block with none is a paragraph.  
+
 So the first paragraph of an item is `list`, and the next is a `paragraph`.  
 A negated part reads the block's scope the same way ([scope.go][v-scope-match]), and `sentence.list` is `sentence & list`.
 
-hakkiri's tree gives a list item or a quote the text of everything inside it ([node-segments spec][node-segments]), and the metric summaries read that text.  
-Selection reads each paragraph, heading and cell under the scope Vale gives it, found from whether the node is the first child of its parent.  
-The tree records, for each node, whether it is the first child of its container, read from the parser's list of every child.  
+hakkiri's tree gives a list item or a quote the text of everything inside it ([node-segments spec][node-segments]).  
+The metric summaries read that text.
+
+Selection reads each paragraph, heading and cell under the scope Vale gives it.  
+It finds that scope from whether the node is the first child of its parent.  
+The tree records, for each node, whether it is the first child of its container, read from the parser's list of every child.
+
 So `~list` and `~blockquote` keep what Vale keeps, which replaces the any-depth exclusion of the [format design][format-7].  
 `table` selects cells, not rows, since Vale has no row scope.
 
 Two cases differ, where Vale's behaviour is a defect:
 
-- `sentence & paragraph` selects the sentences of paragraphs, and Vale selects none, since no sentence block has `paragraph` in its scope. Vale works around this for `sequence` ([sequence.go][v-seq-scope]).
-- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block holds `paragraph`. hakkiri gives 104 alerts fewer.
+- `sentence & paragraph` selects the sentences of paragraphs, and Vale selects none, since no sentence block has `paragraph` in its scope.  
+  Vale works around this for `sequence` ([sequence.go][v-seq-scope]).
+- `~paragraph` leaves out paragraphs, and Vale leaves out nothing, since only a wrapper block has `paragraph`.  
+  hakkiri gives 104 alerts fewer.
 
 A test runs 57 `existence` and `sequence` rules for 29 scopes over nine Markdown files that nest sentences in items, quotes, tables and headings.  
 It matches all of Vale's 4,513 alerts but those 104, and `departures.tsv` lists them and the 156 that only hakkiri gives.
 
 Three gaps are not departures, since Vale's behaviour is not a defect there ([HKR-021][hkr-021]):
 
-- Text that Vale lints after a closed raw-text tag on the same line, such as `<style></style > x` and `<style></style/> x`, and after `--!>` in a comment block, stays HTML in hakkiri, from the [CommonMark end condition][cm-html-blocks] of the block.
+- Text that Vale lints after some closing markers stays HTML in hakkiri.  
+  The [CommonMark end condition][cm-html-blocks] of the HTML block causes this.  
+  The markers are:
+  - A closed raw-text tag on the same line, such as `<style></style > x` and `<style></style/> x`.
+  - `--!>` in a comment block.
 - hakkiri reads no text inside an HTML block as prose, so Vale's alerts there are missing.
 - Three behaviours of Vale in that text are not probed: unescaping HTML entities, masking the text of `code`, `tt`, `kbd` and `samp`, and handling `pre`.
 

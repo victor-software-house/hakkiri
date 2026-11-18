@@ -6,12 +6,20 @@ It is the last of four changes that build the `vale-differences` spec, after [`v
 ## Motivation
 
 The first three changes list the differences that the designs record as differences.  
-The list holds any behaviour that differs from Vale, whether or not a design calls it a difference.  
-Checked against Vale 66bbb85, three decisions that the designs treat as choices of format differ in behaviour: comments read as Markdown, the `table.row` scope, and the rule fields, check types and configuration that hakkiri defines for itself.
+The list has any behaviour that differs from Vale, whether or not a design calls it a difference.
+
+Checked against Vale 66bbb85, three decisions that the designs treat as choices of format differ in behaviour:
+
+- Comments read as Markdown.
+- The `table.row` scope.
+- The rule fields, check types and configuration that hakkiri defines for itself.
 
 ## Changes
 
-- The `vale-differences` spec gains three requirements: comments read as Markdown, what a rule file accepts, refuses or selects where Vale does otherwise, and the configuration and packages.
+- The `vale-differences` spec gains three requirements:
+  - Comments read as Markdown.
+  - What a rule file accepts, refuses or selects where Vale does otherwise.
+  - The configuration and packages.
 - Each difference is a scenario with a link to the decision that records it.
 
 ## Capabilities

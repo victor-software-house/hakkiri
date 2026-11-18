@@ -1,8 +1,8 @@
 # ProseStyle in the format
 
-This file proves the format holds the package.  
+This file proves the format covers the package.  
 It covers the 25 rules in [ProseStyle][prose-style-rules] and the habit candidates in the [frequency research][habit-research].  
-No rule below uses a lookbehind to find code, a link, a fence or a comment; a scope holds that.  
+No rule below uses a lookbehind to find code, a link, a fence or a comment; a scope does that job.  
 A lookbehind that checks only the next character, such as the word before a dash, stays.
 
 ## 1. The 25 rules
@@ -46,9 +46,9 @@ Five rules found structure with `raw` and lookbehind; decisions 8 and 9 make the
 
 ```yaml
 # A bare URL shows the reader an address in place of a name.
-# GFM reads a bare URL or an autolink as a link whose text is the URL,
-# in files and in comments alike, so a link whose text starts with a URL
-# is bare. Link targets, code spans and fenced code are not link text.
+# GitHub Flavored Markdown (GFM) reads a bare URL or an autolink as a link.
+# The link's text is the URL, in files and comments alike, so a link whose text starts with a URL is bare.
+# Link targets, code spans and fenced code are not link text.
 extends: existence
 message: "Bare URL '%s': put the link on the words that name it."
 level: error
@@ -87,8 +87,8 @@ Vale's `BareWorkItem` reads fenced code in its `raw` scope, so it is off for thi
 
 ```yaml
 # A bare PR, MR, ticket or ledger code names nothing a reader knows.
-# Say what it is, and link it. Link text is left out, and a code span
-# reads as one word no token matches, so a code in either passes.
+# Say what it is, and link it.
+# Link text is left out, and a code span reads as one word no token matches, so a code in either passes.
 # Standard names such as SHA-256 and UTF-8 pass.
 extends: existence
 message: "'%s' is a bare code: say what it is, and link it."
@@ -256,8 +256,8 @@ tests:
 
 These are word lists, so they are `existence` rules like `Filler`.  
 `ThingsAct` lists owns, refuses, survives, carries, stays, waits, keeps, sits and lives after a noun for a thing, as `ThingsSpeak` does for speech.  
-`StockWords` lists durable, authoritative, deliberate, silently and verbatim.  
-`StockPhrases` gains "byte identical", "byte for byte", "source of truth" and "keeps its own".
+`StockWords` lists `durable`, `authoritative`, `deliberate`, `silently` and `verbatim`.  
+`StockPhrases` gains `byte identical`, `byte for byte`, `source of truth` and `keeps its own`.
 
 [prose-style-rules]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846/ProseStyle/styles/ProseStyle
 [habit-research]: https://github.com/victor-software-house/prose-style/blob/ee9f207279864e305d7372aef4a6c5dacc3eb846/openspec/changes/frequency-habit-rules/research.md

@@ -4,15 +4,16 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 1. Probe Vale
 
-- [x] 1.1 Build Vale `66bbb85` in a throwaway Linux box, and run `existence` rules and `dump` rules over 52 inputs that hold HTML blocks and inline HTML.  
-  Verify `tests/fixtures/html-block/vale.tsv` holds the alerts, and that the probe covers references, `code`, `tt`, `kbd`, `samp`, `pre`, joins, captions, descriptions, alt text, scripts and promoted blocks.
+- [x] 1.1 Build Vale `66bbb85` in a throwaway Linux box, and run `existence` rules and `dump` rules over 52 inputs that contain HTML blocks and inline HTML.  
+  Verify `tests/fixtures/html-block/vale.tsv` contains the alerts, and that the probe covers references, `code`, `tt`, `kbd`, `samp`, `pre`, joins, captions, descriptions, alt text, scripts and promoted blocks.
   - 2026-11-10 (UTC), Vale built from source in a throwaway Linux box gave 1,659 alert rows, kept in [8e901f2][c-feat].  
-    A `dump` rule matches the whole text of a block, so a row shows how Vale read it.  
-    The probe found that a `quote` rule makes Vale parse the HTML again, so no rule of the probe has that scope.
+    A `dump` rule matches the whole text of a block, so a row shows how Vale read it.
+  - 2026-11-10 (UTC), the probe found that a `quote` rule makes Vale parse the HTML again, so no rule of the probe has that scope.
 
 ## 2. Read the text
 
-- [x] 2.1 Port the tokenizer and Vale's walk to `src/html.rs`, with its promotion of block elements inside inline ones and its escaped states for `script`, and keep `resets_scope` as a question to that walk.  
+- [x] 2.1 Port the tokenizer and Vale's walk to `src/html.rs`, with its promotion of block elements inside inline ones and its escaped states for `script`.  
+  Keep `resets_scope` as a question to that walk.  
   Verify the scope parity test and the tree snapshots pass in CI as before.
   - 2026-11-10 (UTC), `mise run test` passes in a clean archive of [8e901f2][c-feat] in the same kind of box.  
     Three snapshots changed, since the text of a node now carries its joins and masks, and one of them reads `Cell **** text` for a `kbd`.
@@ -28,20 +29,22 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 2.5 Match Vale on the probe, and list each difference.  
   Verify the `html_parity` test passes in CI, with the rows of `departures.tsv` as its only differences.
   - 2026-11-10 (UTC), the test passes in the same box run.  
-    `departures.tsv` holds 52 rows, for six places.  
+    `departures.tsv` contains 52 rows, for six places.  
     They are a reference unescaped twice, a match Vale loses beside a reference, a `code` element, and inline HTML elements in a paragraph.  
     The others are a block of masked text only, and a script that never ends.
-- [x] 2.6 Read a heading of depth 0 or 7 to 9 under its own scope, and trim a reference that stands for a blank at an end of a text.  
+- [x] 2.6 Read a heading of depth 0 or 7 to 9 under its own scope.  
+  Trim the blank that a reference gives at either end of a text.  
   Verify the `heading-depths`, `raw-references`, `plaintext` and `reference-spaces` inputs match Vale, apart from the rows of `departures.tsv`.
   - 2026-11-10 (UTC), Vale gave 1,837 alert rows on the 49 inputs, and the `html_parity` test passes in [f35261b][c-heading].  
-    `departures.tsv` holds 52 rows, and none is about a heading or a raw text tag.
+    `departures.tsv` contains 52 rows, and none is about a heading or a raw text tag.
 - [x] 2.7 End a tag name and an attribute only at the whitespace of the tokenizer, and record that a one-digit numeric reference reads.  
   Verify the `vertical-tab` and `short-references` inputs match Vale, apart from the rows of `departures.tsv`.
   - 2026-11-11 (UTC), the `vertical-tab` input fails on the old whitespace set and passes on the new one, in [f9d09dd][c-vtab].  
     Vale gave 152 more alert rows on the two inputs, and `departures.tsv` gains one row, for a reference unescaped twice.
 - [x] 2.8 Read an `img` alt text that is only whitespace.  
   Verify the `blank-alt` input matches Vale, apart from the rows of `departures.tsv`.
-  - 2026-11-11 (UTC), the `blank-alt` input fails on the old check, with two alt rows only Vale gave, and passes on the new one, in [e40f778][c-blank].  
+  - 2026-11-11 (UTC), the `blank-alt` input fails on the old check, with two alt rows only Vale gave.  
+    It passes on the new one, in [e40f778][c-blank].  
     `departures.tsv` gains one row, for the text around a blank alt, which Vale does not report.
 
 ## 3. Record
@@ -53,7 +56,9 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 ## 4. Integration
 
 - [x] 4.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
-  - 2026-11-11 (UTC), CI passed on the head of [PR 55][pr55] in [run 42930851210][ci55], and on the head of [PR 58][pr58], its review fixes, in [run 42933135415][ci58]. The Template check passed in both.
+  - 2026-11-11 (UTC), CI passed on the head of [PR 55][pr55] ([run 42930851210][ci55]).  
+    It passed on the head of [PR 58][pr58], its review fixes ([run 42933135415][ci58]).  
+    The Template check passed in both.  
     Main CI passed after the merge, on [4979c2a][c-main], in [run 42948574268][ci-main].
 
 ## Workflow follow-up

@@ -5,15 +5,19 @@ Queue row: `HKR-014` in [tasks.yaml][ledger], a new row after `HKR-013`.
 ## Motivation
 
 The [`rule-engine` change][engine] and the [`pattern-and-readability-checks` change][pattern] run eight of Vale's eleven check types.  
-The Vale importer, `HKR-007`, also meets `capitalization` and `sequence` in the upstream styles it converts.  
-These two need data the engine does not hold: part-of-speech tags and title case word lists.  
+The Vale importer, `HKR-007`, also meets `capitalization` and `sequence` in the upstream styles it converts.
+
+These two need data the engine does not have: part-of-speech tags and word lists for title case.  
 The `spelling` and `affix` checks, which need a dictionary with its affix rules, are in the [`spelling-and-affix-checks` change][spelling].
 
 ProseStyle uses none of them, so no project that hakkiri lints today waits on this change.
 
 ## Changes
 
-- `capitalization`: `$title` in AP or Chicago style, `$sentence`, `$lower`, `$upper` or a pattern, with Vale's word share `threshold`.
+- `capitalization`:
+  - Title case with `$title`, in Associated Press (AP) or Chicago style.
+  - `$sentence`, `$lower`, `$upper` or a pattern.
+  - Vale's word share `threshold`.
 - `sequence`: tokens matched word by word in a sentence, by pattern, part-of-speech tag or universal tag, with `skip`, `negate`, `min` and `target`.
 
 ## Capabilities
