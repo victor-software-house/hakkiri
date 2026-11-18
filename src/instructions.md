@@ -74,8 +74,7 @@ hakkiri leaves out a comment addressed to a tool, and the `#!` line of a script.
 Such comments are `//go:`, `eslint-disable`, `@ts-ignore`, `swiftlint:`, `yaml-language-server:`, `#:schema`, `shellcheck` and the like.
 
 Some parts of a doc comment draw no alert, and the words around them keep their counts.  
-They are a link in brackets in a Go or Rust doc comment, the name a Go doc comment opens with, and a JSDoc `{@link}`.  
-
+They are a link in brackets in a Go or Rust doc comment, the name a Go doc comment opens with, and a JSDoc `{@link}`.
 
 A line comment of a Go, YAML, TOML or Shell file keeps its indentation after the first space.  
 So an indented example is code.
@@ -113,7 +112,7 @@ hakkiri test --format json
 
 ### Cases
 
-A rule file stores cases under `tests`, and a `*.test.yml` file is a list of cases.  
+In a rule file, cases go under `tests`, and a `*.test.yml` file is a list of cases.  
 `check` loads the cases and never runs them.
 
 A case has `name` (required, unique in its file), `about`, `input`, `format` (an extension, `md` by default), `rule`, `want`, `contains` and `absent`.  

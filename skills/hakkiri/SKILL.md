@@ -70,7 +70,7 @@ hakkiri test --coverage
 hakkiri test styles/Team/Filler.yml
 ```
 
-A rule file stores cases under `tests`, and a `*.test.yml` file is a list of cases.  
+In a rule file, cases go under `tests`, and a `*.test.yml` file is a list of cases.  
 Each case has a `name`, an `input`, and one of `want`, `contains` and `absent`.  
 A failed case prints as `failed <file>: <name>` with its reason and the alerts it got.  
 `--coverage` also fails for a rule that no case makes flag anything.
