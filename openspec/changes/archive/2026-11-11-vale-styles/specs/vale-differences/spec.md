@@ -29,7 +29,7 @@ hakkiri SHALL load or select as each scenario below shows, where Vale 3.26.0 doe
 - **WHEN** a rule has `scope: table.row` and a row contains the matched text
 - **THEN** hakkiri selects the text of the row, and Vale loads the rule and selects nothing, since no block has a `row` part ([format 9][format-9])
 
-#### Scenario: A scope no node contains
+#### Scenario: A scope no node has
 
 - **WHEN** a rule has `scope: nonsense`
 - **THEN** hakkiri rejects it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])

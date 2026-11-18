@@ -31,7 +31,7 @@ An entry SHALL beat the extension table.
 - **WHEN** `formats` contains `txt: text` and `'*': md`
 - **THEN** `a.txt` is read as plain text and `b.cfg` as Markdown
 
-### Requirement: formats refuses a bad entry
+### Requirement: formats rejects a bad entry
 
 A reader that is not one of the seven SHALL be an error that lists them.  
 A key that contains a glob mark and is not a glob SHALL be an error.

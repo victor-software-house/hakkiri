@@ -45,7 +45,7 @@ An entry SHALL beat the language of the file.
 - **WHEN** `formats` contains `mise-tasks/*: sh`
 - **THEN** a file `mise-tasks/lint` is read as Shell
 
-### Requirement: formats refuses a bad entry
+### Requirement: formats rejects a bad entry
 
 A reader value that matches no language hakkiri reads SHALL be an error that lists the twelve.  
 A key that contains a glob mark and is not a glob SHALL be an error.

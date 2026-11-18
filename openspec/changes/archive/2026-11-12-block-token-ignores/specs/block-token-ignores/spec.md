@@ -31,7 +31,7 @@ The run SHALL then exit 2.
 
 ### Requirement: A block pattern hides a match as a code block
 
-In a Markdown or MDX (Markdown with embedded components) file, each match of a block pattern SHALL be read as a fenced code block.  
+In a Markdown or Markdown with components (MDX) file, each match of a block pattern SHALL be read as a fenced code block.  
 The block SHALL contain the first group of the match, so no rule that reads prose reports text inside it.
 
 A match with no first group SHALL leave the text `$1` in place of the match.  
