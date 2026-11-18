@@ -650,7 +650,7 @@ fn a_rule_setting_in_a_package_file_that_names_no_rule_is_an_error() -> TestResu
     assert!(
         result
             .err
-            .contains("failed pkg/.ctl/hakkiri.yaml: line 4: Team.Nope: names no rule"),
+            .contains("failed pkg/.ctl/hakkiri.yaml: line 4: Team.Nope: is not a rule in any style the config loads"),
         "{}",
         result.err
     );

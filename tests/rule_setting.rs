@@ -572,7 +572,7 @@ fn a_fault_about_a_key_with_a_block_value_names_the_line_of_the_key() -> TestRes
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     for expected in [
         "line 4: [a: is not a glob",
-        "line 7: Nope.Rule: is not `styles`, and names no rule",
+        "line 7: Nope.Rule: is neither `styles` nor a rule in any style the config loads",
     ] {
         assert!(result.err.contains(expected), "{expected}: {}", result.err);
     }
