@@ -32,12 +32,12 @@ hakkiri does the same, so `off` is a stop and never an enable.
 
 ### 3. Globs combine in the order written, as sections do
 
-
 A later section won for the same rule: `NO` then `YES` ran it, `YES` then `NO` stopped it, and `warning` then `error` gave error on the file the later section matched.  
-Vale keeps a level in its own map: `NO` turns a rule off without dropping the level, so `YES` after `error` and `NO` ran the rule at error.
+The order of keys inside one section did not matter.
 
+Vale keeps a level in its own map: `NO` turns a rule off without dropping the level, so `YES` after `error` and `NO` ran the rule at error.  
+hakkiri keeps a switch and a level apart for the same reason.
 
-hakkiri keeps a switch and a level apart for the same reason.  
 A rule turned on in a section that lists `Extra` kept running when a later section listed `Extra` alone.  
 So a `styles` list replaces the list and leaves the rule settings.  
 hakkiri keeps its single map, applied in glob order, and `styles` keeps replacing the list.

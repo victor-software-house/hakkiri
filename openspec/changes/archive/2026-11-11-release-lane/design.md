@@ -27,10 +27,10 @@ Non-goals:
 
 ### 1. The release is verctl's reusable workflow
 
+`.github/workflows/release.yml` calls verctl's reusable workflow on every push to `main` and on dispatch.  
 It pins the workflow by commit, with the tag in a comment, and passes the App secrets by name in its `secrets:` map.  
 The workflow never uses `secrets: inherit`.
 
-It passes the App secrets by name in its `secrets:` map, and never `secrets: inherit`.  
 `.ctl/ver.yaml` declares one package, `hakkiri`, with `publisher: none`.  
 So a release is a tag, a GitHub Release and its assets.
 
