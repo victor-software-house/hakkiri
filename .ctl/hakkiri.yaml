@@ -3,7 +3,7 @@
 # first run and checks against the hash below. Every alert level is shown,
 # and an alert at fail_level or above fails the check.
 level: suggestion
-fail_level: error
+fail_level: suggestion
 # The pre-push hook passes every pushed file, and a file no glob selects is
 # not prose, so it draws no warning.
 on_unmatched: ignore
@@ -17,3 +17,7 @@ files:
   "target/**": {styles: []}
   # A tool writes CHANGELOG.md; nobody edits it by hand.
   "CHANGELOG.md": {styles: []}
+  # A tool writes data/splitter/SOURCES.md; nobody edits it by hand.
+  "data/splitter/SOURCES.md": {styles: []}
+  # Test inputs that rules must flag, and vendored Vale styles, keep their text.
+  'tests/fixtures/**': {styles: []}
