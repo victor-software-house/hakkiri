@@ -1,5 +1,9 @@
 # Changelog
 
+## hakkiri 0.1.2
+
+- A Swift `// MARK:` comment, which Xcode shows as a section, is a tool directive and draws no alert ([`e21b2cd`](https://github.com/victor-software-house/hakkiri/commit/e21b2cddfe2b3b6eee92d3736ef23096be58558c)).
+
 ## hakkiri 0.1.1
 
 - A mise task header in a Shell file, such as `#MISE description="..."` or `#USAGE arg`, is a tool directive and draws no alert ([`6f9e1b8`](https://github.com/victor-software-house/hakkiri/commit/6f9e1b8b5ddea7b4c6b824dfaa73e060cded14c1)).
