@@ -11,7 +11,8 @@ A render of the shared template has 47 such alerts.
 
 ## What Changes
 
-- A Shell comment that opens with `MISE` or `USAGE`, written `#MISE`, `# MISE`, `#[MISE]` or `# [MISE]`, is a tool directive.  
+- A Shell comment that opens with `#MISE`, `#USAGE`, `# [MISE]` or `# [USAGE]` is a tool directive.  
+  A bare keyword counts only right after `#`, so `# USAGE deploy.sh <env>` stays prose.  
   hakkiri leaves it out of the tree, as it does `# shellcheck disable=SC2086`.
 - The instructions list these headers beside the other directives.
 

@@ -48,5 +48,6 @@ A directive SHALL end a run of line comments, so the line after it starts a new 
 
 #### Scenario: A mise task header
 
-- **WHEN** a Shell file contains `#MISE description="kilo task"`, `# [MISE] alias="lima"` and `#USAGE arg "<mike>"`, and on the next line `# november after`
-- **THEN** the tree contains one comment node, for `november after`
+- **WHEN** a Shell file contains `#MISE description="kilo task"`, `# [MISE] alias="lima"` and `#USAGE arg "<mike>"`, then `# november after` and `# USAGE oscar`
+- **THEN** the tree contains one comment node, for `november after` and `USAGE oscar`
+- **AND** a bare `MISE` or `USAGE` is a header only right after `#`, and a bracketed one only with both brackets, as mise reads them

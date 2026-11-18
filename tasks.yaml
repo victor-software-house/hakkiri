@@ -167,8 +167,8 @@ queue:
     outcome: "hakkiri never lints a #MISE or # [MISE] header line, as it never lints //go: or shellcheck lines."
     blocked_by: []
     acceptance:
-      - 'A Shell, TOML or other comment line that starts with #MISE or # [MISE] draws no alert.'
       - hakkiri instructions lists the mise header among the comments addressed to a tool.
+      - 'A Shell comment line that starts with #MISE, #USAGE, # [MISE] or # [USAGE] draws no alert, and # USAGE with a space before a bare keyword stays prose.'
     notes:
       - '2026-11-18, the prose pass found UndefinedAcronym on the #MISE description line of each file task; mise reads only #MISE or # [MISE], so the line cannot change.'
     plan: openspec/changes/mise-task-headers/proposal.md
