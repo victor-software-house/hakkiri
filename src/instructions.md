@@ -71,7 +71,7 @@ A source, YAML, TOML or Shell file gives its comments only, read as Markdown.
 So a string, a key and a heredoc are never prose.
 
 hakkiri leaves out a comment addressed to a tool, and the `#!` line of a script.  
-Such comments are `//go:`, `eslint-disable`, `@ts-ignore`, `swiftlint:`, `yaml-language-server:`, `#:schema`, `shellcheck` and the like.
+Such comments are `//go:`, `eslint-disable`, `@ts-ignore`, `swiftlint:`, `yaml-language-server:`, `#:schema`, `shellcheck`, `#MISE`, `#USAGE` and the like.
 
 Some parts of a doc comment draw no alert, and the words around them keep their counts.  
 They are a link in brackets in a Go or Rust doc comment, the name a Go doc comment opens with, and a JSDoc `{@link}`.
