@@ -1,13 +1,13 @@
 # Proposal
 
-Queue row: `HKR-043` in [tasks.yaml][ledger].
+Queue row: `HKR-043` in [tasks.yaml][ledger].  
 It follows [vocabulary-rules][vocabulary-rules] in the stack and needs nothing from it.
 
 ## Motivation
 
-Vale's `BlockIgnores` and `TokenIgnores` hide text from the prose rules.
-OpenSpec 1.16 and 1.17 refuse a proposal without the headings `Why` and `What Changes`, and the ProseStyle rule `ChattyHeadings` flags both.
-Six repositories skip those two lines with `BlockIgnores` today, and one uses `TokenIgnores`.
+Vale's `BlockIgnores` and `TokenIgnores` hide text from the prose rules.  
+OpenSpec 1.16 and 1.17 refuse a proposal without the headings `Why` and `What Changes`, and the ProseStyle rule `ChattyHeadings` flags both.  
+Six repositories skip those two lines with `BlockIgnores` today, and one uses `TokenIgnores`.  
 A project that moves from Vale to hakkiri has no way to say the same, so it either lints text it hid before or edits its documents.
 
 ## Changes

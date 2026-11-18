@@ -2,8 +2,8 @@
 
 ### Requirement: A language is read by extension
 
-**Reason**: OpenSpec cannot drop a scenario of a modified requirement.
-Both scenarios of this one no longer hold: a file that no language reads was skipped in a walk and refused when named.
+**Reason**: OpenSpec cannot drop a scenario of a modified requirement.  
+Both scenarios of this one no longer hold: a file that no language reads was skipped in a walk and refused when named.  
 So the requirement is removed and added again below under a new name.
 
 **Migration**: Read the requirement named "A reader is chosen by formats, then by extension" under the ADDED section.
@@ -47,8 +47,8 @@ No marker, escape or entity SHALL change its text.
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text that holds a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.
-This SHALL hold whether a walk finds the file or the command line names it.
+A file read as plain text that holds a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.  
+This SHALL hold whether a walk finds the file or the command line names it.  
 A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
 
 #### Scenario: A picture
@@ -63,7 +63,7 @@ A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file
 
 ### Requirement: A file has its own extension and its reader's
 
-For the scopes of the rules that run on it, a file SHALL have its own extension and the extension of the reader that reads it.
+For the scopes of the rules that run on it, a file SHALL have its own extension and the extension of the reader that reads it.  
 A scope part that names an extension SHALL hold for either, and a negated part SHALL leave a block out for either.
 
 #### Scenario: A mapped file
@@ -73,8 +73,8 @@ A scope part that names an extension SHALL hold for either, and a negated part S
 
 ### Requirement: on_unknown sets what a selected file with no reader gets
 
-For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.
-`text`, the default, reads it as plain text, and `warn` skips it with a warning that names it.
+For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.  
+`text`, the default, reads it as plain text, and `warn` skips it with a warning that names it.  
 `error` fails the run with exit 2, and `ignore` skips it.  
 A file that no glob selects SHALL draw no message.
 

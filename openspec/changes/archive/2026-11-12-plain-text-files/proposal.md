@@ -1,13 +1,13 @@
 # Proposal
 
-Queue row: `HKR-030` in [tasks.yaml][ledger].
+Queue row: `HKR-030` in [tasks.yaml][ledger].  
 It follows [`gitignore-walk`][walk], which chose the files a run reads, and changes [check-command][check] and [project-config][config].
 
 ## Motivation
 
-hakkiri reads Markdown, MDX and the comments of three source languages, and skips every other file a glob selects.
-`hakkiri check notes.txt` is a failure, and a `*` glob lints less than it names.
-Vale reads such a file as plain text, and its `[formats]` section maps an extension to a reader.
+hakkiri reads Markdown, MDX and the comments of three source languages, and skips every other file a glob selects.  
+`hakkiri check notes.txt` is a failure, and a `*` glob lints less than it names.  
+Vale reads such a file as plain text, and its `[formats]` section maps an extension to a reader.  
 A project that checks `README`, `LICENSE`, `.txt` and `.toml` files with Vale cannot switch while hakkiri refuses them (operator, 2026-11-11).
 
 ## Changes

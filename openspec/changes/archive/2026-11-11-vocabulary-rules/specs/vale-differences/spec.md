@@ -56,7 +56,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A doc selector or a View
 
 - **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.  
   It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 #### Scenario: A Vale configuration file

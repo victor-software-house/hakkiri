@@ -1,13 +1,13 @@
 # Proposal
 
-Queue row: `HKR-050` in [tasks.yaml][ledger].
+Queue row: `HKR-050` in [tasks.yaml][ledger].  
 It follows [`plain-text-files`][plain], which made a file with no reader plain text for `hakkiri check`, and changes [test-command][test].
 
 ## Motivation
 
-A test case names its `format`, an extension, and hakkiri reads the input as a file of that extension.
-`hakkiri test` refused a format that no language reads, such as `txt`, though `hakkiri check` now reads such a file as plain text.
-The ProseStyle package could not test that a text file is not prose.
+A test case names its `format`, an extension, and hakkiri reads the input as a file of that extension.  
+`hakkiri test` refused a format that no language reads, such as `txt`, though `hakkiri check` now reads such a file as plain text.  
+The ProseStyle package could not test that a text file is not prose.  
 A `formats` entry that maps an extension to a reader changed nothing for a case.
 
 ## Changes

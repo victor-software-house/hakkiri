@@ -4,8 +4,8 @@ Queue row: `HKR-047` in [tasks.yaml][ledger].
 
 ## Motivation
 
-An alert for a match that wraps a line ended at the end of its first line, and no field named the line the match ends on.
-A tool that reads the JSON could not mark the match, and the end column of such an alert pointed at nothing in the match.
+An alert for a match that wraps a line ended at the end of its first line, and no field named the line the match ends on.  
+A tool that reads the JSON could not mark the match, and the end column of such an alert pointed at nothing in the match.  
 The operator ruled on 2026-11-11 that an alert names the true end of the match.
 
 ## Changes

@@ -18,7 +18,7 @@ A case whose format no reader reads SHALL read its input as plain text, except t
 
 ### Requirement: A case through the config has the extensions of its file
 
-A case that runs through the config SHALL have the extensions that `check` gives the file `input.<format>`.
+A case that runs through the config SHALL have the extensions that `check` gives the file `input.<format>`.  
 Those are `<format>` and the extension of the reader, which a `formats` entry may give.
 
 #### Scenario: A mapped case

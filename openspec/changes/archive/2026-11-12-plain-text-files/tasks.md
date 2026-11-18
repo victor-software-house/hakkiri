@@ -1,6 +1,6 @@
 # Tasks
 
-Every compile, lint and test step runs in the pull request's CI, or in a box for a pre-push run, and never on the authoring machine.
+Every compile, lint and test step runs in the pull request's CI, or in a box for a pre-push run, and never on the authoring machine.  
 This change follows [`gitignore-walk`][walk], which chose the files a run reads.
 
 ## 1. The readers

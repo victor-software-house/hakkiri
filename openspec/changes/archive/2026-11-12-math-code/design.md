@@ -2,8 +2,8 @@
 
 ## Context
 
-Vale parses math with two parsers of its own ([math.go][v-math]): `$…$` inline and `$$…$$` for a block.
-markdown-rs has math constructs that read a `$` pair whatever stands around it, so `$5 and $10` is math to it.
+Vale parses math with two parsers of its own ([math.go][v-math]): `$…$` inline and `$$…$$` for a block.  
+markdown-rs has math constructs that read a `$` pair whatever stands around it, so `$5 and $10` is math to it.  
 hakkiri parses without them.
 
 ## Goals / Non-Goals
@@ -21,14 +21,14 @@ Non-goals:
 
 ### 1. The file is parsed, masked and parsed again
 
-hakkiri finds the math in the text of each paragraph, heading and table cell of a first parse, and writes the file again with the same length.
-An inline span's `$` delimiters become backticks, and a backtick inside it becomes an apostrophe, so it parses as a code span.
-Each line of a display block becomes blank, so the paragraph ends before the block and starts again after it.
+hakkiri finds the math in the text of each paragraph, heading and table cell of a first parse, and writes the file again with the same length.  
+An inline span's `$` delimiters become backticks, and a backtick inside it becomes an apostrophe, so it parses as a code span.  
+Each line of a display block becomes blank, so the paragraph ends before the block and starts again after it.  
 The second parse gives the tree, and the code node of a span takes the `$` delimiters back into its segments, which Vale's code span holds.
 
-Alternative: enable the math of markdown-rs.
-It lost because its rules differ from Vale's on money, wrapped spans and block endings, and the probe shows each.
-Alternative: rewrite the text as the ignore patterns do.
+Alternative: enable the math of markdown-rs.  
+It lost because its rules differ from Vale's on money, wrapped spans and block endings, and the probe shows each.  
+Alternative: rewrite the text as the ignore patterns do.  
 It lost because the length changes, and a same-length mask needs no map of places.
 
 ### 2. The probe of Vale fixes the rules
@@ -46,7 +46,7 @@ The probe of Vale at `66bbb85` (2026-11-11), over three Markdown files, one MDX 
 
 ### 3. A container's markers stay
 
-A line after the first of a paragraph in a block quote or a list item holds the container's markers and indentation.
+A line after the first of a paragraph in a block quote or a list item holds the container's markers and indentation.  
 hakkiri skips them when it looks for `$$` at the start of a line, and a masked line keeps them, so a quote or an item goes on.
 
 [v-math]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/math.go

@@ -35,7 +35,7 @@ hakkiri SHALL read each line of a list as one term after trimming it, and SHALL 
 
 ### Requirement: A term is plain text or a pattern
 
-hakkiri SHALL read a term that holds no pattern operator other than a period as plain text, with each period literal, and any other term as a pattern.
+hakkiri SHALL read a term that holds no pattern operator other than a period as plain text, with each period literal, and any other term as a pattern.  
 A run of whitespace in a term SHALL match any run of whitespace.
 
 #### Scenario: A plain term with a period
@@ -60,8 +60,8 @@ A run of whitespace in a term SHALL match any run of whitespace.
 
 ### Requirement: Accepted terms hold back matches of the checks that read them
 
-hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule, before it rewrites and sorts them.
-It SHALL hold back a match that is an accepted term or lies inside an accepted phrase.
+hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule, before it rewrites and sorts them.  
+It SHALL hold back a match that is an accepted term or lies inside an accepted phrase.  
 A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonword` SHALL read none.
 
 #### Scenario: An existence rule
@@ -81,7 +81,7 @@ A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonwor
 
 ### Requirement: Spelling reads the accepted terms whole and without case
 
-hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule as a whole word matched without regard to case, with no `vocab` field to turn that off.
+hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule as a whole word matched without regard to case, with no `vocab` field to turn that off.  
 It SHALL mask an accepted phrase before it checks the words.
 
 #### Scenario: An accepted word and a near miss
@@ -96,9 +96,9 @@ It SHALL mask an accepted phrase before it checks the words.
 
 ### Requirement: A glob adds vocabularies for its files
 
-hakkiri SHALL hold back, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.
-The match SHALL be an accepted term of a vocabulary that a matching glob names, or lie inside an accepted phrase of one.
-It SHALL do so whatever the rule's `vocab` and `nonword` say, and a `capitalization` or `conditional` rule SHALL read none.
+hakkiri SHALL hold back, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.  
+The match SHALL be an accepted term of a vocabulary that a matching glob names, or lie inside an accepted phrase of one.  
+It SHALL do so whatever the rule's `vocab` and `nonword` say, and a `capitalization` or `conditional` rule SHALL read none.  
 A file SHALL take the vocabularies of every glob that matches it, besides the top-level ones.
 
 #### Scenario: A glob's vocabulary

@@ -4,10 +4,10 @@ Queue row: `HKR-033` in [tasks.yaml][ledger].
 
 ## Motivation
 
-A glob of `files` can set a rule by name, such as `Team.Terms: warning`.
-hakkiri applies the setting only to a rule of a style the glob lists, so a setting for a rule of an unlisted style changes nothing.
-Vale runs that rule instead: `Team.Terms = YES` or `Team.Terms = error` under a section that does not list `Team` turns the rule on, at the level it names ([Vale's section merge][v-merge]).
-A project that moved from Vale to hakkiri loses every rule it turned on that way.
+A glob of `files` can set a rule by name, such as `Team.Terms: warning`.  
+hakkiri applies the setting only to a rule of a style the glob lists, so a setting for a rule of an unlisted style changes nothing.  
+Vale runs that rule instead: `Team.Terms = YES` or `Team.Terms = error` under a section that does not list `Team` turns the rule on, at the level it names ([Vale's section merge][v-merge]).  
+A project that moved from Vale to hakkiri loses every rule it turned on that way.  
 The operator decided hakkiri does as Vale does unless Vale is wrong, and this is no defect of Vale (operator, 2026-11-10).
 
 ## Changes
@@ -20,8 +20,8 @@ The operator decided hakkiri does as Vale does unless Vale is wrong, and this is
 - An empty `styles` list drops every rule setting before it, as Vale's empty `BasedOnStyles` does, and the settings of the same glob apply after it.
 - A name clash or a bracket in the style of a rule that a setting enables is not refused, since no glob lists the style, as in Vale.
 - A style with two files of one name runs the later file's rule, as Vale registers it, where hakkiri ran the earlier one.
-- The `vale-differences` spec drops the gap and records what stays different.
-  hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.
+- The `vale-differences` spec drops the gap and records what stays different.  
+  hakkiri writes `on` and `off` where Vale writes `YES` and `NO`.  
   It refuses a key that names no rule, and a word that is none of those or a level.
 
 ## Capabilities
