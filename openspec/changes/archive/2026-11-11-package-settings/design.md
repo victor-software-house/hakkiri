@@ -15,9 +15,9 @@ Read at Vale commit `66bbb85`, and probed with a build of that commit (section "
 5. The sources merge key by key.  
    The first source contains the key and each later value is added to it as a shadow ([shadowMerge][v-shadow]).  
    How a key then resolves depends on the code that reads it:
-   - a rule's level reads the last value, so the project wins over a package ([lastValue][v-last]);
-   - `BasedOnStyles` and `Vocab` read all values and drop everything before a `NONE` ([valuesAfterNone][v-none]), so they add up;
-   - `MinAlertLevel` reads the last value ([line 413][v-min]);
+   - A rule's level reads the last value, so the project wins over a package ([lastValue][v-last]).
+   - `BasedOnStyles` and `Vocab` read all values and drop everything before a `NONE` ([valuesAfterNone][v-none]), so they add up.
+   - `MinAlertLevel` reads the last value ([line 413][v-min]).
    - `WordTemplate` and the `[formats]` entries read the first value, so a package beats the project ([line 434][v-wt], [line 672][v-formats]).
 6. A package's `StylesPath` is dropped on load ([expandPaths][v-expand], line 472).
 7. A key Vale does not know draws a warning and no error ([line 654][v-unknown]).

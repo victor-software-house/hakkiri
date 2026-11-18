@@ -92,7 +92,6 @@ The pretty form prints, for each failed case, its file, name and reason, and its
 It then prints the alerts the case got, with a diff against `want`.  
 A count line ends the report: `3 files, 41 passed, 1 failed`.
 
-
 `--format json` prints `passed`, `failed`, `results` and `uncovered`.  
 The exit status is:  
 
@@ -106,7 +105,7 @@ A case cannot run in four situations:
 - Its rule does not load.
 - Its file is not YAML.
 - Decision 2 refuses it.
-  
+
 Vale's statuses are the same ([report][v-report]).
 
 ### 8. A rule file may hold `tests`

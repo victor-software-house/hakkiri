@@ -142,7 +142,7 @@ Lost: it ties hakkiri to a Vale file format, for a field no known style uses.
 
 ### 5. Tags come from a port of prose's tagger and model
 
-hakkiri ports prose's averaged perceptron and its English tokenizer, `tokenize.New()`, and embeds the English model (operator, 2026-11-10).    
+hakkiri ports prose's averaged perceptron and its English tokenizer, `tokenize.New()`, and embeds the English model (operator, 2026-11-10).  
 Vale tags each sentence with that tokenizer and the perceptron, so the port is those two and not prose's Treebank tokenizer ([tag step][v-tag-text]).  
 
 The model is trained on Universal Dependencies (UD) English Web Treebank (EWT) under Creative Commons Attribution-ShareAlike 4.0 (`CC-BY-SA-4.0`).  
