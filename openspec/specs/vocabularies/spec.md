@@ -33,7 +33,8 @@ hakkiri SHALL read a named vocabulary from `config/vocabularies/<name>/` under a
 
 ### Requirement: A line of a list is a term
 
-hakkiri SHALL read each line of a list as one term after trimming it, and SHALL skip a blank line and a line that starts with a hash and a space.
+hakkiri SHALL read each line of a list as one term after trimming it.  
+It SHALL skip a blank line and a line that starts with a hash and a space.
 
 #### Scenario: A comment and a term that looks like one
 
@@ -47,7 +48,8 @@ hakkiri SHALL read each line of a list as one term after trimming it, and SHALL 
 
 ### Requirement: A term is plain text or a pattern
 
-hakkiri SHALL read a term that contains no pattern operator other than a period as plain text, with each period literal, and any other term as a pattern.  
+hakkiri SHALL read a term as plain text when it contains no pattern operator other than a period, and read each period literally.  
+It SHALL read any other term as a pattern.  
 A run of whitespace in a term SHALL match any run of whitespace.
 
 #### Scenario: A plain term with a period
@@ -68,12 +70,14 @@ A run of whitespace in a term SHALL match any run of whitespace.
 #### Scenario: A term that is not a pattern
 
 - **WHEN** a list contains `C(` on line 3
-- **THEN** hakkiri reports an error that names the file and line 3, and exits with a failure status, where Vale reports the pattern error with no line ([vocabularies 4][vocabularies-4])
+- **THEN** hakkiri reports an error that gives the file and line 3, and exits with a failure status
+- **AND** Vale reports the pattern error with no line ([vocabularies 4][vocabularies-4])
 
 ### Requirement: Accepted terms drop matches of the checks that read them
 
 hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule, before it rewrites and sorts them.  
-It SHALL drop a match that contains an accepted word as a whole word, with its case, anywhere in the matched text, as Vale does.  
+It SHALL drop a match that contains an accepted word as a whole word, with its case, anywhere in the matched text, as Vale does.
+
 It SHALL also drop a match that lies inside an accepted phrase.  
 A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonword` SHALL read none.
 
@@ -99,7 +103,8 @@ A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonwor
 
 ### Requirement: Spelling reads the accepted terms whole and without case
 
-hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule as a whole word matched without regard to case, with no `vocab` field to turn that off.  
+hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule, as a whole word matched in any case.  
+No `vocab` field SHALL turn that off.  
 It SHALL mask an accepted phrase before it checks the words.
 
 #### Scenario: An accepted word and a near miss
@@ -114,9 +119,11 @@ It SHALL mask an accepted phrase before it checks the words.
 
 ### Requirement: A glob adds vocabularies for its files
 
-hakkiri SHALL drop, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.  
-The match SHALL hold an accepted word of a vocabulary that a matching glob names, as a whole word with its case, or lie inside an accepted phrase of one.  
-It SHALL do so whatever the rule's `vocab` and `nonword` say, and a `capitalization` or `conditional` rule SHALL read none.  
+hakkiri SHALL drop, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule in two cases.  
+One is a match that contains, as a whole word with its case, an accepted word of a vocabulary that a matching glob lists.  
+The other is a match inside an accepted phrase of such a vocabulary.
+
+It SHALL do so whatever the values of the rule's `vocab` and `nonword`, and a `capitalization` or `conditional` rule SHALL read none.  
 A file SHALL take the vocabularies of every glob that matches it, besides the top-level ones.
 
 #### Scenario: A glob's vocabulary
@@ -131,7 +138,8 @@ A file SHALL take the vocabularies of every glob that matches it, besides the to
 
 #### Scenario: Two globs and the top level
 
-- **WHEN** the top level names `Docs`, which accepts `Zebra`, one glob names `Team`, which accepts `GitHub`, and the text is `We saw Zebra and GitHub here.`
+- **WHEN** the top level lists `Docs`, which accepts `Zebra`
+- **AND** one glob lists `Team`, which accepts `GitHub`, and the text is `We saw Zebra and GitHub here.`
 - **THEN** `Team.Filler` with the tokens `Zebra` and `GitHub` reports nothing, and a second glob that names `Docs` for another file does not reach this one
 
 #### Scenario: Spelling reads a glob's terms exactly
@@ -142,7 +150,8 @@ A file SHALL take the vocabularies of every glob that matches it, besides the to
 ### Requirement: A YAML entry is a term, or a term with options
 
 A `vocab.yml` or `vocab.yaml` file SHALL hold the keys `affix`, `accept` and `reject`.  
-An entry of `accept` or `reject` SHALL be a term, a term mapped to nothing, or a term mapped to the options `regex`, `ignorecase` and `flags`, and SHALL give the patterns that a line of a text list would.
+An entry of `accept` or `reject` SHALL be a term, a term mapped to nothing, or a term mapped to the options `regex`, `ignorecase` and `flags`.  
+It SHALL give the patterns that a line of a text list would.
 
 #### Scenario: A plain term
 
@@ -177,16 +186,17 @@ An entry of `accept` or `reject` SHALL be a term, a term mapped to nothing, or a
 ### Requirement: A wrong YAML entry is refused with its file and line
 
 hakkiri SHALL refuse a vocabulary file that has a wrong entry or a missing affix file.  
-Each problem SHALL name the file and the line Vale names, and one run SHALL report every one.
+Each problem SHALL give the file and the line that Vale gives, and one run SHALL report every one.
 
 #### Scenario: A wrong shape
 
-- **WHEN** an entry has more than one key, a key mapped to a string or a list, an unknown option, a `regex` or `ignorecase` that is no boolean, or an empty term
+- **WHEN** an entry has more than one key, a key mapped to a string or a list, or an unknown option
 - **THEN** hakkiri refuses the file
+- **AND** it refuses a `regex` or `ignorecase` that is no boolean, and an empty term
 
 #### Scenario: A wrong value
 
-- **WHEN** an entry has both `regex` and `flags`, a pattern that does not compile, flags that do not expand, or an `affix` that names a missing file
+- **WHEN** an entry has both `regex` and `flags`, a pattern that does not compile, flags that do not expand, or an `affix` that points to a missing file
 - **THEN** hakkiri refuses the file
 
 #### Scenario: Each fault
@@ -196,7 +206,8 @@ Each problem SHALL name the file and the line Vale names, and one run SHALL repo
 
 #### Scenario: Several faults in one file
 
-- **WHEN** a file contains an empty term on line 2, an unknown option on line 4 and a pattern that does not compile on line 5
+- **WHEN** a file contains an empty term on line 2 and an unknown option on line 4
+- **AND** it contains a pattern that does not compile on line 5
 - **THEN** hakkiri reports all three problems, each with its line, where Vale reports the first ([yaml-vocabularies 2][yaml-vocabularies-2])
 
 ### Requirement: The affix file comes from the packages
