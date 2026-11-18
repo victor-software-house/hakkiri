@@ -11,15 +11,20 @@ packages:
     path: Cargo.toml
     publisher: none
 
-# One key per host binary; the name is the job, the tarball, and the platform.
-# darwin-arm64 and linux-x64 are built-in records, so the runner labels (the
-# free xcode-27 and ubuntu-26.04), os, arch, and triple come from verctl.
-# Each builds natively with the runner's own C compiler, which tree-sitter's
-# grammars need, so nothing is cross-compiled. linux-x64 overrides only the
-# triple: a static musl binary starts on a machine with no glibc loader, such
-# as NixOS without nix-ld. The musl C compiler is the zig that mise installs,
-# which mise.toml hands to cc-rs. A declared prepare replaces verctl's
-# stock one, so the release:prepare task adds the Rust target.
+# One key per host binary. The key is the name of the job, the tarball and
+# the platform. darwin-arm64 and linux-x64 are built-in records in verctl.
+# verctl supplies their runner labels (the free xcode-27 and ubuntu-26.04),
+# os, arch and triple.
+#
+# Each binary builds natively with the runner's own C compiler, since the
+# tree-sitter grammars need one. Nothing is cross-compiled.
+#
+# linux-x64 overrides only the triple: a static musl binary starts on a
+# machine with no glibc loader, such as NixOS without nix-ld. The musl C
+# compiler is the zig that mise installs, and mise.toml passes it to cc-rs.
+#
+# A declared prepare replaces the one verctl ships, so the release:prepare
+# task adds the Rust target.
 assets:
   prepare: [mise, run, "release:prepare", "{triple}"]
   darwin-arm64: {}
