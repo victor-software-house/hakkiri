@@ -173,6 +173,19 @@ fn a_hash_comment_is_a_line_comment() -> TestResult {
 }
 
 #[test]
+fn an_oxlint_switch_is_not_prose() -> TestResult {
+    let words = "extends: existence\nmessage: \"found '%s'\"\nnonword: true\nscope: text\ntokens:\n  - '[A-Za-z]+'\n";
+    let found = alerts(
+        Language::TypeScript,
+        words,
+        "// oxlint-disable-next-line no-console -- kilo\nconsole.log(1);\n/* oxlint-disable eqeqeq */\n// oxlintrc files.\n// A note.\nexport const a = 1;\n",
+    )?;
+    let matched: Vec<&str> = found.iter().map(|(_, word)| word.as_str()).collect();
+    assert_eq!(matched, ["oxlintrc", "files", "A", "note"]);
+    Ok(())
+}
+
+#[test]
 fn a_go_link_with_a_target_is_prose() -> TestResult {
     let words = "extends: existence\nmessage: \"found '%s'\"\nnonword: true\nscope: text\ntokens:\n  - '[A-Za-z]+'\n";
     let found = alerts(

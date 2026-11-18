@@ -358,6 +358,12 @@ A directive SHALL end a run of line comments, so the line after it starts a new 
 - **WHEN** a Shell file contains `# shellcheck disable=SC2086`
 - **THEN** the tree contains no node for it
 
+#### Scenario: A mise task header
+
+- **WHEN** a Shell file contains `#MISE description="kilo task"`, `# [MISE] alias="lima"` and `#USAGE arg "<mike>"`, then `# november after` and `# USAGE oscar`
+- **THEN** the tree contains one comment node, for `november after` and `USAGE oscar`
+- **AND** a bare `MISE` or `USAGE` is a header only right after `#`, and a bracketed one only with both brackets, as mise reads them
+
 ### Requirement: A doc link and a doc name draw no alert
 
 hakkiri SHALL drop an alert whose match lies wholly in a doc name or a doc link.  

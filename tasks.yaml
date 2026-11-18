@@ -161,18 +161,6 @@ queue:
       - '2026-11-12, operator decision: a code span counts as one word by default, a setting sets it to zero, at the package, project and glob levels, with a flag and a variable. The key is code_span_size, and its unit is words.'
       - It applies only to word counts and to the metrics built on words. HKR-051 keeps the rule form of LongSentence; this row gives a project the way to count as Vale does.
 
-  - id: HKR-077
-    title: Skip mise task headers as tool directives
-    scope: comments
-    outcome: "hakkiri never lints a #MISE or # [MISE] header line, as it never lints //go: or shellcheck lines."
-    blocked_by: []
-    acceptance:
-      - hakkiri instructions lists the mise header among the comments addressed to a tool.
-      - 'A Shell comment line that starts with #MISE, #USAGE, # [MISE] or # [USAGE] draws no alert, and # USAGE with a space before a bare keyword stays prose.'
-    notes:
-      - '2026-11-18, the prose pass found UndefinedAcronym on the #MISE description line of each file task; mise reads only #MISE or # [MISE], so the line cannot change.'
-    plan: openspec/changes/mise-task-headers/proposal.md
-
   - id: HKR-078
     title: Print a whole metric value without decimals
     scope: metric rules, alert messages
@@ -184,7 +172,30 @@ queue:
     notes:
       - 2026-11-18, ProseStyle Paragraph, ListItem and LongSentence read Split this 62.00-word paragraph; a metric message takes only %s, and %d or %.0f print as written.
 
+  - id: HKR-079
+    title: Read an oxlint switch as a tool directive
+    scope: comments
+    outcome: hakkiri never lints an oxlint switch, as it never lints an eslint one.
+    blocked_by: []
+    acceptance:
+      - A TypeScript or JavaScript comment that opens with oxlint draws no alert.
+    plan: openspec/changes/oxlint-switches/proposal.md
+    notes:
+      - 2026-11-18, the templates prose pass found HyphenChain and Dashes on rendered // oxlint-disable-next-line rule -- reason lines, which oxlint needs as written.
+
 archive:
+  - id: HKR-077
+    title: Skip mise task headers as tool directives
+    scope: comments
+    outcome: "hakkiri never lints a #MISE or # [MISE] header line, as it never lints //go: or shellcheck lines."
+    notes:
+      - '2026-11-18, the prose pass found UndefinedAcronym on the #MISE description line of each file task; mise reads only #MISE or # [MISE], so the line cannot change.'
+    plan: openspec/changes/archive/2026-11-18-mise-task-headers/proposal.md
+    completed: 2026-11-18T18:53:19
+    evidence:
+      - openspec/changes/archive/2026-11-18-mise-task-headers/
+    disposition: completed
+
   - id: HKR-074
     title: Correct where Vale places a block alert
     scope: docs
