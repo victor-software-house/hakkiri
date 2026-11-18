@@ -38,7 +38,7 @@ When a YAML key is a list, a mapping or an alias, it SHALL give no value, and th
 - **THEN** the anchored value and the anchored key's value are read
 - **AND** the alias and the entry with the sequence key are not read, and the entries after them are
 
-#### Scenario: Keys that other parsers refuse
+#### Scenario: Keys that other parsers reject
 
 - **WHEN** a YAML block contains a key twice, a merge key `<<: *base`, and a key that is a number or a null
 - **AND** it contains the values `.inf`, `-.inf` and `.NaN`, each beside strings

@@ -47,7 +47,7 @@ It SHALL read any other `.yml` file only when it contains `extends` and `tests`,
 ### Requirement: A rule file may contain cases
 
 A rule file SHALL take `tests` as the cases of [design decision 2][test-2].  
-`hakkiri check` SHALL load them and run none, and SHALL refuse a malformed `tests` with its line.
+`hakkiri check` SHALL load them and run none, and SHALL reject a malformed `tests` with its line.
 
 #### Scenario: A rule with cases under check
 
@@ -57,12 +57,12 @@ A rule file SHALL take `tests` as the cases of [design decision 2][test-2].
 #### Scenario: A malformed case in a rule
 
 - **WHEN** a rule's `tests` contains a case with the field `inputs`
-- **THEN** hakkiri refuses the rule, reports the line of `inputs`, and exits 2
+- **THEN** hakkiri rejects the rule, reports the line of `inputs`, and exits 2
 
 ### Requirement: A case is checked before it runs
 
 A case SHALL have a `name` that is unique in its file, and at least one of `want`, `contains` and `absent`.  
-hakkiri SHALL refuse a field a case does not define, with its line.
+hakkiri SHALL reject a field a case does not define, with its line.
 
 #### Scenario: A case that asserts nothing
 

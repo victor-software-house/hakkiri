@@ -7,7 +7,7 @@ Rules select text from this tree, and alerts point back into the file through th
 
 ## Requirements
 
-### Requirement: Every node contains a scope and a span
+### Requirement: Every node has a scope and a span
 
 Each node in the tree SHALL contain its scope name, the byte span of its text in the file, and its child nodes.  
 The node-segments spec states which ranges make the text of a node and how the span covers them.
@@ -388,10 +388,14 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 - **THEN** no alert lies in `{@link Other|label}`
 - **AND** the tags `{@linkcode}`, `{@linkplain}` and `{@tutorial}` are links the same way
 
-#### Scenario: What a link points to
+#### Scenario: What a Go link points to
 
 - **WHEN** a Go link has a name with dots and an optional `*`, such as `[*pkg.Type]`
-- **AND** a Rust link has a path with `::` or a code span, such as ``[`Type`]``
+- **THEN** no alert lies in the brackets
+
+#### Scenario: What a Rust link points to
+
+- **WHEN** a Rust link has a path with `::` or a code span, such as ``[`Type`]``
 - **THEN** no alert lies in the brackets
 
 ### Requirement: More JSDoc tags name something

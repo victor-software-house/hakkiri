@@ -108,17 +108,17 @@ When `dicpath` is set, they SHALL be read from that folder inside the package in
 ### Requirement: aff and dic name one dictionary
 
 `aff` and `dic` SHALL point to one dictionary's two files inside the package.  
-hakkiri SHALL refuse a rule that sets only one of them.
+hakkiri SHALL reject a rule that sets only one of them.
 
 #### Scenario: One dictionary by its two files
 
 - **WHEN** the rule has `aff: team.aff` and `dic: team.dic`, found in `config/dictionaries`, and the input is `Run hakkiri on mail.`
 - **THEN** hakkiri reports three alerts, with the matched texts `Run`, `on` and `mail`
 
-### Requirement: A dictionary that cannot be read is refused
+### Requirement: A dictionary that cannot be read is rejected
 
-hakkiri SHALL refuse a rule whose dictionary is missing.  
-It SHALL refuse a rule whose path to a dictionary, a folder or a word list leaves its package.
+hakkiri SHALL reject a rule whose dictionary is missing.  
+It SHALL reject a rule whose path to a dictionary, a folder or a word list leaves its package.
 
 #### Scenario: A path that leaves the package
 
@@ -130,9 +130,9 @@ It SHALL refuse a rule whose path to a dictionary, a folder or a word list leave
 - **WHEN** rule `Team.Spelling` has `dictionaries: [absent]` and its package contains no `absent.dic`
 - **THEN** hakkiri reports an error that shows `Team.Spelling` and `absent`, and exits with a failure status
 
-### Requirement: A field with no effect is refused
+### Requirement: A field with no effect is rejected
 
-hakkiri SHALL refuse a `spelling` rule that sets `exceptions`, or a `threshold` other than 0, since neither changes what the rule reports.
+hakkiri SHALL reject a `spelling` rule that sets `exceptions`, or a `threshold` other than 0, since neither changes what the rule reports.
 
 #### Scenario: Exceptions in a spelling rule
 

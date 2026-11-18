@@ -85,7 +85,7 @@ When one or more tokens set `target: true`, the alert SHALL span only the words 
 ### Requirement: upos sets a universal tag
 
 A token's `upos` SHALL list one or more universal part-of-speech tags joined by `|`, matched through the Penn Treebank tags Vale maps them to.  
-hakkiri SHALL refuse a token that sets both `tag` and `upos`, or uses an unknown universal tag.
+hakkiri SHALL reject a token that sets both `tag` and `upos`, or uses an unknown universal tag.
 
 #### Scenario: A universal noun
 
@@ -106,9 +106,9 @@ A match that begins inside a match of one of the rule's `exceptions` patterns SH
 - **WHEN** the first rule above has `exceptions: ['"[^"]*"']`, and the input is `He wrote "your self" twice.`
 - **THEN** hakkiri reports no alert
 
-### Requirement: model is refused
+### Requirement: model is rejected
 
-hakkiri SHALL refuse a `sequence` rule that sets `model`, since it has no format for another tagger's model.  
+hakkiri SHALL reject a `sequence` rule that sets `model`, since it has no format for another tagger's model.  
 The error SHALL show the rule and the field.
 
 #### Scenario: A rule with a model
@@ -175,8 +175,8 @@ Matches of one form SHALL NOT drop each other.
 
 ### Requirement: A sequence rule has tokens or forms
 
-hakkiri SHALL refuse a `sequence` rule that sets both `tokens` and `forms`, or neither.  
-It SHALL refuse a form with no token that has a `pattern`, `tag` or `upos` without `negate`, and name the form's tokens in the error.
+hakkiri SHALL reject a `sequence` rule that sets both `tokens` and `forms`, or neither.  
+It SHALL reject a form with no token that has a `pattern`, `tag` or `upos` without `negate`, and name the form's tokens in the error.
 
 #### Scenario: Both keys
 

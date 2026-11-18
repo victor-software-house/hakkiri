@@ -16,9 +16,9 @@ hakkiri SHALL read its project config from `.ctl/hakkiri.yaml` in the current di
 - **WHEN** `HAKKIRI_CONFIG` is `docs/hakkiri.yaml` and no `--config` flag is given
 - **THEN** hakkiri reads `docs/hakkiri.yaml` and not `.ctl/hakkiri.yaml`
 
-### Requirement: An unknown key is refused
+### Requirement: An unknown key is rejected
 
-hakkiri SHALL refuse a project config that contains a key it does not define, and report an error that shows the key and its line.
+hakkiri SHALL reject a project config that contains a key it does not define, and report an error that shows the key and its line.
 
 #### Scenario: A key in Vale's spelling
 
@@ -31,7 +31,7 @@ Each entry in `packages` SHALL have a `path` to a folder of styles, or a `url` a
 A `url` SHALL start with `https://` or `http://`, and a `sha256` SHALL be 64 lowercase hex digits.
 
 hakkiri SHALL fetch and cache each `url` with no separate sync step, and lint with it only when its download matches the hash.  
-It SHALL refuse two entries that contain a style of one name, and the error SHALL give both.
+It SHALL reject two entries that contain a style of one name, and the error SHALL give both.
 
 #### Scenario: A local folder
 
@@ -113,7 +113,7 @@ An empty list SHALL turn off linting for those files.
 Under a glob, a key for a rule SHALL set that rule's level for the matched files.  
 The value SHALL be `suggestion`, `warning` or `error`, or `off` to turn the rule off.
 
-hakkiri SHALL refuse a key that is neither `styles` nor a rule in any style the config loads.  
+hakkiri SHALL reject a key that is neither `styles` nor a rule in any style the config loads.  
 Its error SHALL show the key and its line.  
 A rule name SHALL match case-sensitively.
 
@@ -186,7 +186,7 @@ A rule name that gives a level SHALL run that rule on the matched files at that 
 
 ### Requirement: A rule setting does not make a clash an error
 
-A rule setting SHALL NOT make hakkiri refuse a name clash or a bracket in the style of the rule it enables.  
+A rule setting SHALL NOT make hakkiri reject a name clash or a bracket in the style of the rule it enables.  
 Two files of a style that no glob lists may give one name, and a setting may enable that name.  
 hakkiri SHALL then run the later file in file name order.
 
@@ -542,7 +542,7 @@ A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.
 - **WHEN** `formats` contains `txt: text` and `'*': md`
 - **THEN** `a.txt` is read as plain text and `b.cfg` as Markdown
 
-### Requirement: formats refuses a bad entry
+### Requirement: formats rejects a bad entry
 
 A reader that gives no language hakkiri reads SHALL be an error that lists the twelve.  
 A key that contains a glob mark and is not a glob SHALL be an error.
@@ -606,13 +606,17 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 - **WHEN** a glob's `vocab` contains `Team` and then `Nope`, or `token_ignores` contains `(z)` and then `(`, one item to a line
 - **THEN** the fault shows the line of `Nope`, or of `(`
 
-#### Scenario: A glob or a setting with a block value
+#### Scenario: A glob with a block value
 
 - **WHEN** a glob that is no glob has a block mapping below it
 - **THEN** hakkiri gives the line of the key, and not the line below it
-- **AND** it does the same for a setting of an unknown rule that has a block list below it
 
-#### Scenario: A refused key of a package's settings file
+#### Scenario: A setting with a block value
+
+- **WHEN** a setting of an unknown rule has a block list below it
+- **THEN** hakkiri gives the line of the key, and not the line below it
+
+#### Scenario: A rejected key of a package's settings file
 
 - **WHEN** a package's settings file writes `fail_level:` or a package `path:` with its value on the next line
 - **THEN** hakkiri reports the line of the key

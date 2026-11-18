@@ -132,9 +132,9 @@ It SHALL be no form seen, give no alert, define nothing, and leave the next matc
 
 ### Requirement: the pattern checks need something to match
 
-hakkiri SHALL refuse a `consistency` rule whose `either` has no pair, or has a form with no text.  
-It SHALL refuse a `repetition` rule whose `tokens` have no text.  
-It SHALL also refuse a `conditional` rule whose `first` or `second` is empty or matches the empty string.  
+hakkiri SHALL reject a `consistency` rule whose `either` has no pair, or has a form with no text.  
+It SHALL reject a `repetition` rule whose `tokens` have no text.  
+It SHALL also reject a `conditional` rule whose `first` or `second` is empty or matches the empty string.  
 The error SHALL show the field.
 
 #### Scenario: No pair
@@ -147,9 +147,9 @@ The error SHALL show the field.
 - **WHEN** a rule has `extends: conditional` and `first: 'x*'`
 - **THEN** hakkiri reports an error that shows `first`, and exits with a failure status
 
-### Requirement: conditional refuses a View scope
+### Requirement: conditional rejects a View scope
 
-hakkiri has no Views, so it SHALL refuse a `conditional` rule that sets `in`, with an error that shows the rule and the field.
+hakkiri has no Views, so it SHALL reject a `conditional` rule that sets `in`, with an error that shows the rule and the field.
 
 #### Scenario: A rule that looks in a View
 

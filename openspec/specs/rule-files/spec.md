@@ -8,7 +8,7 @@ This spec fixes the file format, its fields, its scopes, how words are counted, 
 
 ## Requirements
 
-### Requirement: A rule file contains one rule
+### Requirement: A rule file has one rule
 
 hakkiri SHALL read each `.yml` file in a style folder as one rule.  
 The rule's name is the folder, a dot, and the file name without its extension.
@@ -22,7 +22,7 @@ The rule's name is the folder, a dot, and the file name without its extension.
 
 hakkiri SHALL read a rule file as YAML 1.2, so an unquoted `yes`, `no`, `on` or `off` stays a string.
 
-#### Scenario: A token list contains no
+#### Scenario: A token list contains `no`
 
 - **WHEN** a rule has `extends: existence`, `message: "'%s'"`, `ignorecase: true` and `tokens: [no]`, and the input is `Say no to it.`
 - **THEN** hakkiri reports one alert with the message `'no'`
@@ -69,9 +69,9 @@ The scope `table.row` SHALL contain the text of one table row, header row includ
 - **WHEN** a rule has `extends: metric`, `message: "This table row is over 250 characters."`, `scope: table.row`, `formula: characters` and `condition: '> 250'`, and a table has one row of 260 characters of cell text and one row of 10
 - **THEN** hakkiri reports one alert, on the line of the long row
 
-### Requirement: An unknown scope is refused
+### Requirement: An unknown scope is rejected
 
-hakkiri SHALL refuse a rule whose `scope` is no scope it defines, and report an error that shows the rule and the scope.
+hakkiri SHALL reject a rule whose `scope` is no scope it defines, and report an error that shows the rule and the scope.
 
 #### Scenario: A scope hakkiri does not define
 

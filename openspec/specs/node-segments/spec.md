@@ -7,7 +7,7 @@ A check reads the text, and an alert points at the span that covers it.
 
 ## Requirements
 
-### Requirement: Every node contains segments
+### Requirement: Every node has segments
 
 Each node SHALL contain its segments, the byte ranges of its text in the file, in order.  
 The span of the node SHALL run from the start of the first segment to the end of the last.
@@ -142,7 +142,7 @@ A link node SHALL have the segments of its text, a code node those of its conten
 The text of an autolink or a bare URL that is its own destination SHALL stay in its `link` node.  
 It SHALL be a gap in the nodes around it.
 
-The requirement "A link that names its address is a gap in the prose around it" covers a bracketed link whose text is its address.  
+The requirement "A link that shows its address is a gap in the prose around it" covers a bracketed link whose text is its address.  
 A link whose destination differs from its text, such as a bare email address or a `www.` address, SHALL stay in the nodes around it.
 
 #### Scenario: An autolink
@@ -163,7 +163,7 @@ A link whose destination differs from its text, such as a bare email address or 
 - **THEN** the `paragraph` node has the text `Mail me@b.example, me@b.example or www.b.example now.`
 - **AND** the `link` nodes have the texts `me@b.example`, `me@b.example` and `www.b.example`
 
-### Requirement: A link that names its address is a gap in the prose around it
+### Requirement: A link that shows its address is a gap in the prose around it
 
 The text of a Markdown link that is one run of text equal to the address of the link SHALL stay in its `link` node.  
 It SHALL be a gap in the nodes around that node.  

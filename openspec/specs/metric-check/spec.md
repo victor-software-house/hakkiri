@@ -94,9 +94,9 @@ A condition MAY read `result`, and the element counts as a formula does.
 - **WHEN** a rule has `message: "%s"`, `formula: paragraphs` and `condition: '>= heading.h2'`, and the input contains two `##` headings, each followed by a paragraph
 - **THEN** hakkiri reports one alert, with the message `2.00`
 
-### Requirement: A formula that cannot run is refused
+### Requirement: A formula that cannot run is rejected
 
-hakkiri SHALL refuse a `metric` rule whose `formula` or `condition` does not parse or uses an unknown variable.  
+hakkiri SHALL reject a `metric` rule whose `formula` or `condition` does not parse or uses an unknown variable.  
 The error SHALL show the rule and the field.
 
 #### Scenario: A formula cut short

@@ -229,7 +229,7 @@ An alert on a character that a reference gave SHALL point at the first byte of t
 - **WHEN** a paragraph contains `a &#38; b` and a rule matches `&`
 - **THEN** hakkiri reports the alert at the column of the `&` that starts `&#38;`
 
-#### Scenario: A text that starts or ends with a reference to a blank
+#### Scenario: A blank that a reference gives at either end of a text
 
 - **WHEN** an HTML block contains `<p>alpha&#32;</p>` and `<p>&#32;beta</p>`
 - **THEN** the paragraphs read `alpha` and `beta`, as Vale trims the blank that the reference gave
@@ -288,7 +288,7 @@ A piece that gives no language SHALL be an error.
 #### Scenario: A piece that gives no language
 
 - **WHEN** a rule has `scope: text.nolang`
-- **THEN** hakkiri refuses the rule with `` `text.nolang` is not a scope hakkiri defines ``
+- **THEN** hakkiri rejects the rule with `` `text.nolang` is not a scope hakkiri defines ``
 
 ### Requirement: title selects the title of a link, an image and a definition
 

@@ -32,7 +32,7 @@ An `existence` rule SHALL join its `raw` patterns and match them before its toke
 - **WHEN** a rule has `raw: ['\bvery\s+']` and `tokens: [good]`, and the input is `It is very good.`
 - **THEN** hakkiri reports one alert, with the matched text `very good`
 
-### Requirement: An exception drops a match
+### Requirement: An exception blocks a match
 
 A match that contains an entry of `exceptions` as a whole word SHALL give no alert.  
 A match inside a multi-word exception SHALL give no alert.

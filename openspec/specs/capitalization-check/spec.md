@@ -108,11 +108,11 @@ Any other `match` SHALL be a pattern that the text passes by matching.
 - **WHEN** the rule above has `match: '^[A-Z][a-z]+$'` instead, and reads the heading `# Changelog` on line 1 and `# ChangeLog` on line 3
 - **THEN** hakkiri reports one alert, on line 3
 
-### Requirement: An unknown style is refused
+### Requirement: An unknown style is rejected
 
-A `capitalization` rule whose `style` is neither `AP` nor `Chicago` SHALL be refused with an error that shows the rule and the value.
+A `capitalization` rule whose `style` is neither `AP` nor `Chicago` SHALL be rejected with an error that shows the rule and the value.
 
 #### Scenario: A misspelt style
 
 - **WHEN** rule `Team.Headings` has `extends: capitalization`, `match: $title` and `style: chicago`
-- **THEN** hakkiri refuses the rule with an error that shows `Team.Headings` and `chicago`
+- **THEN** hakkiri rejects the rule with an error that shows `Team.Headings` and `chicago`

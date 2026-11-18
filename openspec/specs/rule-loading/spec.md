@@ -3,7 +3,7 @@
 ## Purpose
 
 Loading turns the rule files of a style folder into rules the engine can run.  
-It refuses a rule it cannot run, with an error that shows the file, the field and the line.
+It rejects a rule it cannot run, with an error that shows the file, the field and the line.
 
 ## Requirements
 
@@ -25,25 +25,25 @@ A file called `*.test.yml` contains cases and is no rule.
 
 ### Requirement: A rule needs extends and message
 
-hakkiri SHALL refuse a rule file that has no `extends` or no `message`, and report an error that shows the file and the missing field.
+hakkiri SHALL reject a rule file that has no `extends` or no `message`, and report an error that shows the file and the missing field.
 
 #### Scenario: A rule with no message
 
 - **WHEN** `Team/Short.yml` contains `extends: existence` and `tokens: [very]` only
 - **THEN** hakkiri reports an error that shows `Team/Short.yml` and `message`, and exits with a failure status
 
-### Requirement: An unknown extends is refused
+### Requirement: An unknown extends is rejected
 
-hakkiri SHALL refuse a rule whose `extends` is neither a check type nor a rule, and report an error that shows the file and the value.
+hakkiri SHALL reject a rule whose `extends` is neither a check type nor a rule, and report an error that shows the file and the value.
 
 #### Scenario: A check type Vale does not define
 
 - **WHEN** `Team/Grammar.yml` contains `extends: grammar`
 - **THEN** hakkiri reports an error that shows `Team/Grammar.yml` and `grammar`, and exits with a failure status
 
-### Requirement: An unknown field is refused
+### Requirement: An unknown field is rejected
 
-hakkiri SHALL refuse a rule that contains a field its check type does not define.  
+hakkiri SHALL reject a rule that contains a field its check type does not define.  
 The error SHALL show the field and its line.
 
 #### Scenario: token in an existence rule
@@ -51,9 +51,9 @@ The error SHALL show the field and its line.
 - **WHEN** an `existence` rule contains `token: very` on line 3, where the type defines `tokens`
 - **THEN** hakkiri reports an error that shows `token` and line 3, and exits with a failure status
 
-### Requirement: A field of the wrong type is refused
+### Requirement: A field of the wrong type is rejected
 
-hakkiri SHALL refuse a rule whose field contains a value of the wrong type, and report an error that shows the field and its line.  
+hakkiri SHALL reject a rule whose field contains a value of the wrong type, and report an error that shows the field and its line.  
 A number written as a string, such as `max: '3'`, SHALL read as the number.
 
 #### Scenario: A count that is not a number
@@ -69,7 +69,7 @@ A number written as a string, such as `max: '3'`, SHALL read as the number.
 ### Requirement: level takes three values
 
 A rule's `level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `warning` when the rule sets none.  
-hakkiri SHALL refuse any other value and name the file and the field.
+hakkiri SHALL reject any other value and name the file and the field.
 
 #### Scenario: A rule with no level
 
@@ -81,19 +81,19 @@ hakkiri SHALL refuse any other value and name the file and the field.
 - **WHEN** a rule contains `level: info`
 - **THEN** hakkiri reports an error that shows the file and `level`, and exits with a failure status
 
-### Requirement: A pattern that does not compile is refused
+### Requirement: A pattern that does not compile is rejected
 
-hakkiri SHALL refuse a rule with a pattern that neither regex engine compiles, and report an error that shows the rule and the pattern.
+hakkiri SHALL reject a rule with a pattern that neither regex engine compiles, and report an error that shows the rule and the pattern.
 
 #### Scenario: An unclosed group
 
 - **WHEN** `Team.Broken` has `extends: existence` and `tokens: ['(unclosed']`
 - **THEN** hakkiri reports an error that shows `Team.Broken` and `(unclosed`, and exits with a failure status
 
-### Requirement: A pattern with nothing to match is refused
+### Requirement: A pattern with nothing to match is rejected
 
-hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` have nothing to match.  
-It SHALL refuse a `metric` rule that lists `tokens` or `raw` containing nothing, because such a pattern matches at every position.  
+hakkiri SHALL reject an `existence` rule whose `tokens` and `raw` have nothing to match.  
+It SHALL reject a `metric` rule that lists `tokens` or `raw` containing nothing, because such a pattern matches at every position.  
 The error SHALL show the file, the line, `tokens` and `raw`.
 
 #### Scenario: An existence rule with no tokens
@@ -113,7 +113,7 @@ The error SHALL show the file, the line, `tokens` and `raw`.
 
 ### Requirement: A YAML error shows the line
 
-hakkiri SHALL refuse a rule file that is not valid YAML, and report an error that shows the file and the line of the fault.
+hakkiri SHALL reject a rule file that is not valid YAML, and report an error that shows the file and the line of the fault.
 
 #### Scenario: A tab in the indentation
 
@@ -134,7 +134,7 @@ hakkiri SHALL load a rule's `action` field, carry it on the rule's alerts, and c
 hakkiri SHALL build a rule's name from the parts of its path, joined by dots, as Vale does.  
 The parts are its style folder, each folder between it and the file, and the file name up to its first dot.
 
-A name with `[` or `]` SHALL be refused when a glob lists the style.  
+A name with `[` or `]` SHALL be rejected when a glob lists the style.  
 `check`, `test` and `test --coverage` SHALL give a file one name.
 
 #### Scenario: A dotted file name
@@ -155,11 +155,11 @@ A name with `[` or `]` SHALL be refused when a glob lists the style.
 #### Scenario: A bracket in a name
 
 - **WHEN** the style folder `Team` contains `Weird[max].yml`, and a glob lists `Team`
-- **THEN** hakkiri refuses it with an error that shows the file and the rule name `Team.Weird[max]`
+- **THEN** hakkiri rejects it with an error that shows the file and the rule name `Team.Weird[max]`
 
-### Requirement: Two files with one name are refused
+### Requirement: Two files with one name are rejected
 
-hakkiri SHALL refuse a style folder in which two rule files give one rule name, when a glob lists the style.  
+hakkiri SHALL reject a style folder in which two rule files give one rule name, when a glob lists the style.  
 The error SHALL give the rule and both files.  
 A style no glob lists SHALL load with no error, as in Vale.
 
@@ -234,9 +234,9 @@ A bare key SHALL replace the parent's value.
 - **WHEN** a child of a rule with `swap: {swapme: swapped, delta: delta2}` contains `swap+: {alpha: omega}` and `swap-: [delta]`
 - **THEN** the child swaps `alpha` for `omega` and `swapme` for `swapped`, and not `delta`
 
-### Requirement: A chain Vale refuses is refused
+### Requirement: A chain Vale rejects is rejected
 
-hakkiri SHALL refuse a chain of rules that Vale 3.26.0 refuses, with an error that shows the rule file and the field.  
+hakkiri SHALL reject a chain of rules that Vale 3.26.0 rejects, with an error that shows the rule file and the field.  
 A rule read through a parent SHALL show no line.
 
 #### Scenario: A key written two ways

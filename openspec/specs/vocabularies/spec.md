@@ -183,21 +183,21 @@ It SHALL give the patterns that a line of a text list would.
 - **WHEN** a list contains `-` alone, and an entry sets `regex: yes`
 - **THEN** the empty entry adds nothing and `yes` turns the option on, as in Vale ([yaml-vocabularies 5][yaml-vocabularies-5])
 
-### Requirement: A wrong YAML entry is refused with its file and line
+### Requirement: A wrong YAML entry is rejected with its file and line
 
-hakkiri SHALL refuse a vocabulary file that has a wrong entry or a missing affix file.  
+hakkiri SHALL reject a vocabulary file that has a wrong entry or a missing affix file.  
 Each problem SHALL give the file and the line that Vale gives, and one run SHALL report every one.
 
 #### Scenario: A wrong shape
 
 - **WHEN** an entry has more than one key, a key mapped to a string or a list, or an unknown option
-- **THEN** hakkiri refuses the file
-- **AND** it refuses a `regex` or `ignorecase` that is no boolean, and an empty term
+- **THEN** hakkiri rejects the file
+- **AND** it rejects a `regex` or `ignorecase` that is no boolean, and an empty term
 
 #### Scenario: A wrong value
 
 - **WHEN** an entry has both `regex` and `flags`, a pattern that does not compile, flags that do not expand, or an `affix` that points to a missing file
-- **THEN** hakkiri refuses the file
+- **THEN** hakkiri rejects the file
 
 #### Scenario: Each fault
 
@@ -214,7 +214,7 @@ Each problem SHALL give the file and the line that Vale gives, and one run SHALL
 
 `affix` SHALL point to a file `<name>.aff` in the `config/dictionaries` folder of the package that contains the vocabulary, then of every other loaded package in order.  
 No name, and `en_US-web` with no such file, SHALL read the built-in dictionary.  
-A name that is not one file name SHALL be refused.
+A name that is not one file name SHALL be rejected.
 
 #### Scenario: The holder first
 

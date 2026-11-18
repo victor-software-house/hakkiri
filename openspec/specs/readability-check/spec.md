@@ -30,7 +30,7 @@ A `%s` in its message SHALL read as the average with two decimals.
 ### Requirement: readability has five scores
 
 The `metrics` list SHALL accept `Automated Readability`, `Coleman-Liau`, `Flesch-Kincaid`, `Gunning Fog` and `SMOG`, each computed as the metric variable of the same score.  
-hakkiri SHALL refuse a rule whose list is empty or lists any other score, with an error that shows the rule and the score.
+hakkiri SHALL reject a rule whose list is empty or lists any other score, with an error that shows the rule and the score.
 
 #### Scenario: A score hakkiri does not know
 

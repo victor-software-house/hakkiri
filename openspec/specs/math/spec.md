@@ -130,11 +130,15 @@ A tab runs to the next multiple of four.
 - **WHEN** the lines are indented four columns past the content of a list item, or past the `>` and its space in a block quote
 - **THEN** the text rule reports `w very` and `q very`, and does not for two columns
 
-#### Scenario: A lazy line and nested containers
+#### Scenario: A lazy line
 
 - **WHEN** a line of a quote or of its item has no `>` and is indented six spaces or three
-- **AND** other lines are indented past a quote in a list item, or past a list item in a quote
-- **THEN** six spaces keep the line as text and three open a block, and the nested lines follow the same four columns past both containers
+- **THEN** six spaces keep the line as text and three open a block
+
+#### Scenario: Nested containers
+
+- **WHEN** the lines are indented past a quote in a list item, or past a list item in a quote
+- **THEN** the nested lines follow the same four columns past both containers
 
 ### Requirement: A paragraph of unclosed delimiters costs its length
 
