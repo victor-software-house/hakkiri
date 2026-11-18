@@ -14,7 +14,7 @@
 - [x] 2.1 Write the `rule-files` and `project-config` specs, and verify `openspec validate rule-format --strict` passes.
   - 2026-11-10 (UTC), `openspec validate rule-format --strict` reported the change valid.
 - [x] 2.2 Write every ProseStyle rule and habit candidate in the format, and verify each sample parses with no lookbehind for structure.
-  - 2026-11-10 (UTC), [prose-style-rules.md][rules] holds all 25 rules and 8 habit rules; each of its 8 YAML samples parsed with `yq`.
+  - 2026-11-10 (UTC), [prose-style-rules.md][rules] has all 25 rules and 8 habit rules; each of its 8 YAML samples parsed with `yq`.
 
 ## 3. Integration
 
