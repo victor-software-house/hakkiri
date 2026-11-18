@@ -31,7 +31,7 @@ None.
 
 - `check-command`: the reader of a file, plain text, and binary files.
 - `project-config`: `formats` and `on_unknown` are keys.
-- `package-settings`: a package's file may hold `formats`, and may not hold `on_unknown`.
+- `package-settings`: a package's file may contain `formats`, and may not contain `on_unknown`.
 - `vale-differences`: the plain-text gap closes, and three differences stay.
 
 ## Impact

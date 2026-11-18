@@ -18,7 +18,7 @@ Both tools count a nested list item as its own block.
 
 - The `vale-differences` scenario for a `metric` alert states that Vale uses the block's last line, with the probe's input and alerts.
 - A new scenario covers a nested list item.
-- A test in `tests/metric.rs` pins hakkiri's alerts on the probe file and names Vale 66bbb85's lines.
+- A test in `tests/metric.rs` pins hakkiri's alerts on the probe file and records Vale 66bbb85's lines.
 - No code changes, and the difference itself stays.
 
 ## Capabilities

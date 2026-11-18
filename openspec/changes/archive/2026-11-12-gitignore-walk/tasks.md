@@ -23,7 +23,7 @@ None runs on the authoring machine.
 ## 2. The surfaces
 
 - [x] 2.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md`, `README.md` and `AGENTS.md`, list the difference in the `vale-differences` spec, and add the patch changeset.  
-  Verify `operator_docs` passes, and the changeset names `hakkiri: patch`.  
+  Verify `operator_docs` passes, and the changeset contains `hakkiri: patch`.  
   Evidence, 2026-11-11 (UTC): the full suite passed in a box with `operator_docs`, after clippy and rustfmt findings were fixed.
 
 ## 3. Integration

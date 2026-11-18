@@ -49,7 +49,7 @@ None.
 ### Modified Capabilities
 
 - `rule-loading`: inheritance, and a rule hakkiri cannot run.
-- `rule-files`: a script rule is reported, not refused.
+- `rule-files`: a script rule is reported, not rejected.
 - `project-config`: a rule hakkiri cannot run, and `off`.
 - `test-command`: the cases of such a rule.
 - `vale-differences`: the Known gaps and the departures.

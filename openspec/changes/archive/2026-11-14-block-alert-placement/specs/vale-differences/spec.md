@@ -2,7 +2,7 @@
 
 ### Requirement: Where an alert points and what it matches differs from Vale
 
-hakkiri SHALL place an alert, and match text for `existence`, `substitution` and `occurrence`, as each scenario below says, where Vale 3.26.0 does otherwise.
+hakkiri SHALL place an alert, and match text for `existence`, `substitution` and `occurrence`, as each scenario below shows, where Vale 3.26.0 does otherwise.
 
 #### Scenario: An alert is placed by offset
 
@@ -49,7 +49,7 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 - **WHEN** an `occurrence` match overlaps a code span
 - **THEN** hakkiri does not count it, and Vale counts every match, then points at the first one that is not code ([engine 16][engine-16])
 
-#### Scenario: Overlapping phrase exceptions both hold
+#### Scenario: Overlapping phrase exceptions both apply
 
 - **WHEN** the text is `a b c`, the exceptions are the phrases `a b` and `b c`, and a rule matches `c`
 - **THEN** hakkiri drops the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])

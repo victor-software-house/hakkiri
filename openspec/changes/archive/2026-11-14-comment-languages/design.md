@@ -76,7 +76,7 @@ A comment inside an interpolation is missed.
 hakkiri reads each as the Swift grammar does.
 
 Shell has no Vale reader.  
-Its table has no `.sh`, and the grammar `bash` is built and never named, so a shell file reads as plain text, or as Markdown with `sh = md` in `[formats]`.  
+Its table has no `.sh`, and the grammar `bash` is built and never used, so a shell file reads as plain text, or as Markdown with `sh = md` in `[formats]`.  
 hakkiri reads the `#` comments, and not the `#!` line, `$#`, `${#a}`, `${a#b}`, a `#` in a string, a heredoc or an escaped `\#`.
 
 Alternative for Swift: the C grammar, as Vale does.  

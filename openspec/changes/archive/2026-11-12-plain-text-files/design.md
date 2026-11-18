@@ -48,7 +48,7 @@ The value is one of the seven readers, and any other word is an error that lists
 Alternative: also accept Vale's extension aliases as values.  
 It lost because the readers are the languages hakkiri has, and `txt` or `markdown` as a value would point to Vale's table.
 
-### 3. A package may hold formats and the project wins
+### 3. A package may contain formats and the project wins
 
 A package's settings file contains `formats`, because a package of rules for `.toml` files needs the mapping to run.  
 The entries of every config add up, a later one replacing an earlier one with the same key, so the project overrides a package.

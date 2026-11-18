@@ -1,7 +1,7 @@
 # Tasks
 
 Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
-This change follows [`vocabularies`][vocabularies], which reads the lists and names the vocabularies in the config.
+This change follows [`vocabularies`][vocabularies], which reads the lists and adds the `vocab` key to the config.
 
 ## 1. The rules
 

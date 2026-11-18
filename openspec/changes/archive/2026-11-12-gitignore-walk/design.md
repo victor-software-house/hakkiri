@@ -11,7 +11,7 @@ Vale at [66bbb85][v-walk] does the same with its default ignored folders and rea
 Goals:
 
 - A walk skips the files git ignores, with git's own rules and precedence.
-- A named file always lints, and a warning marks it when no glob selects it.
+- A given file always lints, and a warning marks it when no glob selects it.
 - Each run option is set in the config, a flag or a variable, in ctl's order.
 
 Non-goals:
@@ -37,7 +37,7 @@ Alternative: read the `.gitignore` files with the crate's `gitignore` module and
 It lost because git defines the global excludes file, the parent folders and the precedence between the three.  
 The crate already contains that part.
 
-### 2. A named file is not filtered
+### 2. A given file is not filtered
 
 A file given on the command line is linted whether git ignores it or not, because the caller chose that file.  
 ripgrep does the same.  
@@ -47,7 +47,7 @@ The entries below it follow the same rules as any walk.
 Alternative: filter a given file too.  
 It lost because a caller who gives a file expects a result for it, and a skip with no message looks like a clean file.
 
-### 3. A named file that no glob selects draws a warning
+### 3. A given file that no glob selects draws a warning
 
 Today `plan` returns nothing for such a file and the run prints nothing.  
 A warning on standard error gives the file, and `on_unmatched` can make it an error with exit 2 or turn it off.
@@ -88,7 +88,7 @@ It lost because `level` hides alerts the package's own rules give, while these s
 
 ### 6. What stays different from Vale
 
-Vale walks files git ignores and lints a named file whether or not a section matches it, reporting nothing when no rule runs ([lintPrepared][v-runs-nothing]).  
+Vale walks files git ignores and lints a given file whether or not a section matches it, reporting nothing when no rule runs ([lintPrepared][v-runs-nothing]).  
 hakkiri skips the ignored files and warns about the named file, and both differences are scenarios of the `vale-differences` spec.
 
 [check]: ../../../specs/check-command/spec.md

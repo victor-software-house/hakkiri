@@ -59,4 +59,4 @@ It SHALL be resolved as the flag, then `HAKKIRI_ON_UNKNOWN`, then the config, th
 #### Scenario: An unknown word
 
 - **WHEN** the config contains `on_unknown: loud`
-- **THEN** hakkiri reports an error that names `loud` and exits 2
+- **THEN** hakkiri reports an error that gives `loud` and exits 2

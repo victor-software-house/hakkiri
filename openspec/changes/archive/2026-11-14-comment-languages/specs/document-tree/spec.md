@@ -106,7 +106,7 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 - **THEN** no alert lies in `{@link Other|label}`
 - **AND** the tags `{@linkcode}`, `{@linkplain}` and `{@tutorial}` are links the same way
 
-#### Scenario: What a link names
+#### Scenario: What a link points to
 
 - **WHEN** a Go link contains an identifier with dots and an optional `*`, such as `[*pkg.Type]`
 - **AND** a Rust link contains a path with `::` or a code span, such as ``[`Type`]``
@@ -115,7 +115,7 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 ### Requirement: More JSDoc tags name something
 
 In a `/** */` comment, the name after a tag SHALL carry no prose scope for `@see`, `@event`, `@member`, `@var`, `@name`, `@alias`, `@memberof`, `@augments`, `@extends`, `@mixes`, `@borrows`, `@function`, `@func`, `@method`, `@class`, `@constructor`, `@namespace` and `@module`, as it does after `@param`.  
-The same SHALL hold for `@enum`, `@external`, `@host`, `@kind`, `@listens`, `@fires`, `@emits`, `@this`, `@requires`, `@implements` and `@satisfies`.
+The same SHALL apply to `@enum`, `@external`, `@host`, `@kind`, `@listens`, `@fires`, `@emits`, `@this`, `@requires`, `@implements` and `@satisfies`.
 
 #### Scenario: A see tag
 

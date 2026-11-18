@@ -10,7 +10,7 @@ Vale prints the column where the match would end if it stayed on its first line,
 
 Goals:
 
-- An alert names the line and column of the last character of its match.
+- An alert gives the line and column of the last character of its match.
 - A tool that reads the JSON gets both without parsing the match.
 
 Non-goals:

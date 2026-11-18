@@ -10,7 +10,7 @@ Vale 3.26.0 does neither.
 - **WHEN** `.gitignore` contains `build/` and the folder contains a file a glob selects
 - **THEN** hakkiri skips it, and Vale lints it, because Vale skips only its default ignored folders and reads no git file ([gitignore 6][gitignore-6])
 
-#### Scenario: A named file with no glob
+#### Scenario: A given file with no glob
 
 - **WHEN** `hakkiri check README.md` runs and no glob matches it
 - **THEN** hakkiri warns that no glob selects it, and Vale lints it with no rule and reports nothing ([gitignore 6][gitignore-6])

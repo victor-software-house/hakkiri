@@ -3,7 +3,7 @@
 ### Requirement: A comment turns off the matches of a rule or limits the styles
 
 In a Markdown file, an HTML comment `vale Style.Rule["a","b"] = NO` or `YES` SHALL turn off and on the matches `a` and `b` of the rule.  
-A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style of the file except those it names.
+A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style of the file except those it lists.
 
 #### Scenario: One match
 
@@ -28,7 +28,7 @@ That level SHALL win over a level the config sets, until a later comment sets th
 A comment `hakkiri Style.Rule: on` SHALL return the level of the config.  
 A level for a style, and any other word, SHALL be no comment.
 
-#### Scenario: A level until the rule is named again
+#### Scenario: A level until a comment sets the rule again
 
 - **WHEN** a file contains `very` after no comment, after `error`, after `suggestion`, and after `on` for one rule
 - **THEN** the alerts are a warning, an error, a suggestion and a warning
@@ -40,11 +40,11 @@ A level for a style, and any other word, SHALL be no comment.
 
 ### Requirement: Source files hold no comment control
 
-A glob that matches a source file SHALL leave the text of its comments as it is, whatever HTML comment they hold.
+A glob that matches a source file SHALL leave the text of its comments as it is, whatever HTML comment they contain.
 
 #### Scenario: A Rust doc comment
 
-- **WHEN** a doc comment contains `<!-- hakkiri off -->` and the lines after it hold `very`
+- **WHEN** a doc comment contains `<!-- hakkiri off -->` and the lines after it contain `very`
 - **THEN** the alerts are those of the file with no comment
 
 ### Requirement: A level leaves a rule failure an error

@@ -16,13 +16,13 @@ ctl-core 0.7.1 places a path through the location index, with one step for each 
 - The `packages`, `formats`, glob, setting and `vocab` keys of a config take their line from `Input::place`.
 - A layer keeps its `Input`, so the check of its keys and the faults read one parsed document.
 - hakkiri takes ctl-core 0.7.1.
-- The `project-config` spec states that a fault names the line of the key it is about.
+- The `project-config` spec states that a fault gives the line of the key it is about.
 
 ## Capabilities
 
 ### Modified Capabilities
 
-- `project-config`: a fault names the line of its own key.
+- `project-config`: a fault gives the line of its own key.
 
 ## Impact
 

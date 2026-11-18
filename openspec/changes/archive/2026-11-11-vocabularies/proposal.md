@@ -15,12 +15,12 @@ The [vale-differences spec][differences] lists this as a known gap.
 
 ## Changes
 
-- The config names the vocabularies a project uses in a `vocab` list, at its top level and in a glob of `files` (operator, 2026-11-11).
+- The config lists the vocabularies a project uses in a `vocab` list, at its top level and in a glob of `files` (operator, 2026-11-11).
 - hakkiri reads each from `config/vocabularies/<name>/` in a loaded package: every `accept.txt` and `reject.txt` below it.
 - A glob's list adds its accepted terms to the files the glob matches, in the checks Vale reaches with a section's `Vocab`.
 - A line of a list is one term, which is a pattern, with Vale's rule for a plain term.
 - Accepted terms drop matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules, as in Vale, and `vocab: false` turns that off where Vale lets it.
-- An unknown vocabulary, two packages that hold one name and a term that is not a pattern are errors that name the file or line.
+- An unknown vocabulary, two packages that contain one name and a term that is not a pattern are errors that give the file or line.
 - The `vale-differences` spec records what still differs and lists the gaps with their rows.
 
 ## Capabilities
@@ -31,7 +31,7 @@ The [vale-differences spec][differences] lists this as a known gap.
 
 ### Modified Capabilities
 
-- `project-config`: the config names vocabularies in `vocab`, and a package may hold a vocabulary folder.
+- `project-config`: the config lists vocabularies in `vocab`, and a package may contain a vocabulary folder.
 - `vale-differences`: the vocabularies gap narrows, and its differences and gaps are listed.
 
 ## Impact

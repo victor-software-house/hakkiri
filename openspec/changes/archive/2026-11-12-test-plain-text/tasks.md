@@ -15,7 +15,7 @@ None runs on the authoring machine.
 ## 2. The surfaces
 
 - [x] 2.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md` and `AGENTS.md`, and add the patch changeset.  
-  Verify `operator_docs` passes, and the changeset names `hakkiri: patch`.  
+  Verify `operator_docs` passes, and the changeset contains `hakkiri: patch`.  
   Evidence, 2026-11-12 (UTC): PRs 109 and 112 updated `src/instructions.md` and added `.changeset/test-plain-text.md`, a patch, and `operator_docs` passes in the suite of main.
 
 ## 3. Integration

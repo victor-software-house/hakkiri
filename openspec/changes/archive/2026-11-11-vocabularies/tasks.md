@@ -62,7 +62,7 @@ It also follows [`package-fetch`][fetch], which keeps a package's `styles/config
 ## 3. The surfaces
 
 - [x] 3.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md`, `README.md` and `AGENTS.md`, narrow the vocabularies gap in the `vale-differences` spec, and add the patch changeset.  
-  Verify `operator_docs` passes, the instructions name the `vocab` key, and the changeset names `hakkiri: patch`.  
+  Verify `operator_docs` passes, the instructions describe the `vocab` key, and the changeset contains `hakkiri: patch`.  
   Evidence, 2026-11-11 (UTC): the full suite, 568 tests, passed in a box, and `operator_docs` with it.
 
 ## 4. Integration

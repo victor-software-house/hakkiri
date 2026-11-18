@@ -22,7 +22,7 @@ The requirement is removed and added again below with the new text.
 
 ### Requirement: Rule files differ from Vale in what they select
 
-hakkiri SHALL load or select as each scenario below says, where Vale 3.26.0 does otherwise.
+hakkiri SHALL load or select as each scenario below shows, where Vale 3.26.0 does otherwise.
 
 #### Scenario: A table row is a scope
 
@@ -32,12 +32,12 @@ hakkiri SHALL load or select as each scenario below says, where Vale 3.26.0 does
 #### Scenario: A scope no node contains
 
 - **WHEN** a rule has `scope: nonsense`
-- **THEN** hakkiri refuses it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
+- **THEN** hakkiri rejects it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
 
 #### Scenario: A metric counts tokens
 
 - **WHEN** a `metric` rule sets `tokens: [";"]` and the formula `occurrences / words * 1000`
-- **THEN** hakkiri measures the rate of the matches, and Vale refuses `tokens` as an invalid key and `occurrences` as an unresolved reference ([format 4][format-4], [engine 11][engine-11])
+- **THEN** hakkiri measures the rate of the matches, and Vale rejects `tokens` as an invalid key and `occurrences` as an unresolved reference ([format 4][format-4], [engine 11][engine-11])
 
 ### Requirement: Configuration is hakkiri's own, and Vale styles load as they are
 
@@ -74,7 +74,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: The built-in spelling rule
 
 - **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+- **THEN** hakkiri has no such rule, and a style sets its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
 
 #### Scenario: Vocabularies
 
@@ -90,7 +90,8 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A plain-text file
 
 - **WHEN** a glob matches a file that no language reads, such as `notes.txt`
-- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
+- **THEN** hakkiri skips it in a walk and rejects it when given by name
+- **AND** Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
 
 #### Scenario: Comments that turn rules off and on
 
@@ -112,7 +113,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: The built-in repetition rule
 
 - **WHEN** a glob lists the style `Vale`, which contains `Vale.Repetition`
-- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
+- **THEN** hakkiri has no such style and rejects the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 #### Scenario: A doc selector or a View
 

@@ -2,12 +2,12 @@
 
 ### Requirement: An unknown extends is refused
 
-hakkiri SHALL refuse a rule whose `extends` names neither a check type nor a rule, and report an error that names the file and the value.
+hakkiri SHALL reject a rule whose `extends` is neither a check type nor a rule, and report an error that gives the file and the value.
 
 #### Scenario: A check type Vale does not define
 
 - **WHEN** `Team/Grammar.yml` contains `extends: grammar`
-- **THEN** hakkiri reports an error naming `Team/Grammar.yml` and `grammar`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `Team/Grammar.yml` and `grammar`, and exits with a failure status
 
 ## ADDED Requirements
 
@@ -46,7 +46,7 @@ A parent's `tests` SHALL NOT carry over.
 
 #### Scenario: Cases of the child only
 
-- **WHEN** a parent and its child each hold one case
+- **WHEN** a parent and its child each contain one case
 - **THEN** `hakkiri test` runs one case for each rule, and the child does not run the case of its parent
 
 ### Requirement: A key with a plus or a minus edits a field of the parent
@@ -72,13 +72,13 @@ A bare key SHALL replace the parent's value.
 
 ### Requirement: A chain Vale refuses is refused
 
-hakkiri SHALL refuse a chain of rules that Vale 3.26.0 refuses, with an error that names the rule file and the field.  
+hakkiri SHALL reject a chain of rules that Vale 3.26.0 rejects, with an error that gives the rule file and the field.  
 A rule read through a parent SHALL name no line.
 
 #### Scenario: A key written two ways
 
 - **WHEN** a child contains `tokens` and `tokens+`
-- **THEN** hakkiri reports an error naming the file and `tokens+`: it both replaces `tokens` and edits it, so pick one, and exits 2
+- **THEN** hakkiri reports an error that shows the file and `tokens+`: it both replaces `tokens` and edits it, so pick one, and exits 2
 
 #### Scenario: An entry the parent lacks
 

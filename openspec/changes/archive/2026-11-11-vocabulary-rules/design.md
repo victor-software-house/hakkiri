@@ -91,7 +91,7 @@ It stays an error when no listed vocabulary contains a term.
 Alternative: a style `Vale` that is always present and contains no rule.  
 It lost because an empty style hides a wrong vocabulary name: the config would load and lint nothing.
 
-### 5. A package style named Vale is refused
+### 5. A package style called Vale is rejected
 
 Vale rejects a style called `Vale` beside its built-in one ([manager.go][v-load-rules]).  
 hakkiri rejects it too, with an error on the package's entry, but only when a vocabulary gives the built-in style a rule.  

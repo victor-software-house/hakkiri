@@ -53,8 +53,8 @@ It SHALL report an accepted term that is not written as the term is.
 
 #### Scenario: No accepted term
 
-- **WHEN** the named vocabularies hold no accepted term
-- **THEN** no rule `Vale.Terms` exists, and a config that sets its level is an error that names the rule
+- **WHEN** the listed vocabularies contain no accepted term
+- **THEN** no rule `Vale.Terms` exists, and a config that sets its level is an error that gives the rule
 
 ### Requirement: Avoid reports a rejected term
 
@@ -91,7 +91,7 @@ A level set by name SHALL be their level.
 - **WHEN** a glob lists `styles: [Team, Vale]` and the vocabulary accepts `GitHub`
 - **THEN** `github` in a matching file draws ``error Vale.Terms: Use 'GitHub' instead of 'github'.``
 
-#### Scenario: Only the vocabulary is named
+#### Scenario: Only the vocabulary is listed
 
 - **WHEN** a glob lists `styles: [Team]` and the vocabulary accepts `GitHub`
 - **THEN** `github` draws no alert, and the accepted terms still drop the `Team` rules' matches
@@ -111,17 +111,17 @@ A level set by name SHALL be their level.
 hakkiri SHALL build `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` from each vocabulary a glob of `files` lists, as it builds `Vale.Terms` and `Vale.Avoid`.  
 It SHALL run them on the files that glob matches with no style or setting.
 
-#### Scenario: A glob names Team
+#### Scenario: A glob lists Team
 
-- **WHEN** a glob names `Team`, which accepts `harness(?:es)?` and `kubectl`, and the text is `We harness it. HARNESS it. Run KUBECTL.`
+- **WHEN** a glob lists `Team`, which accepts `harness(?:es)?` and `kubectl`, and the text is `We harness it. HARNESS it. Run KUBECTL.`
 - **THEN** the alerts are ``error Vale.Team.Terms: Use 'harness' instead of 'HARNESS'.`` and ``error Vale.Team.Terms: Use 'kubectl' instead of 'KUBECTL'.``
 
 #### Scenario: A glob's own setting
 
-- **WHEN** a glob names `Team` and sets `Vale.Team.Terms: off`
+- **WHEN** a glob lists `Team` and sets `Vale.Team.Terms: off`
 - **THEN** `Vale.Team.Terms` still runs on its files, because the vocabulary turns it on after the glob's settings
 
-#### Scenario: A file no glob names
+#### Scenario: A file no glob lists
 
-- **WHEN** `Team` is named at the top level only, and the text is `Run KUBECTL.`
+- **WHEN** `Team` is listed at the top level only, and the text is `Run KUBECTL.`
 - **THEN** `Vale.Team.Terms` draws no alert, and `Vale.Terms` draws one only where the style `Vale` is listed

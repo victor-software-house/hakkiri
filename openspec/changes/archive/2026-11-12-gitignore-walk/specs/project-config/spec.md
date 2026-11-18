@@ -4,7 +4,7 @@
 
 `fail_level`, `gitignore` and `on_unmatched` SHALL be keys of the project's config, with the values of `--fail-level`, `--gitignore` and `--on-unmatched`.  
 Each SHALL be resolved as the flag, then its variable, then the config, then the default: `error`, `true` and `warn`.  
-An unknown value SHALL be an error that names the line.
+An unknown value SHALL be an error that gives the line.
 
 #### Scenario: The config sets the fail level
 
@@ -24,12 +24,12 @@ An unknown value SHALL be an error that names the line.
 #### Scenario: The same order for the other two
 
 - **WHEN** `on_unmatched: error` is set, then `HAKKIRI_ON_UNMATCHED=ignore`, then `--on-unmatched warn`
-- **THEN** a named file that no glob selects fails the run, then draws nothing, then draws a warning
+- **THEN** a given file that no glob selects fails the run, then draws nothing, then draws a warning
 
 #### Scenario: An unknown word
 
 - **WHEN** the config contains `on_unmatched: loud` or `fail_level: loud`
-- **THEN** hakkiri reports an error that names `loud`, and exits 2
+- **THEN** hakkiri reports an error that gives `loud`, and exits 2
 
 #### Scenario: Not a boolean
 

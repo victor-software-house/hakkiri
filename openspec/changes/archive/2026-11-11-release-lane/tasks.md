@@ -1,7 +1,7 @@
 # Tasks
 
 Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
-The release run and the install proof happen after the merge, and the notes under tasks 2.1 and 3.1 hold what they showed.  
+The release run and the install proof happen after the merge, and the notes under tasks 2.1 and 3.1 record what they showed.  
 This change follows [`check-command`][check] and [`test-command`][test], so the binary and the skill exist.
 
 ## 1. The lane

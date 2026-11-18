@@ -19,7 +19,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: The built-in spelling rule
 
 - **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+- **THEN** hakkiri has no such rule, and a style sets its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
 
 #### Scenario: A YAML vocabulary
 
@@ -34,7 +34,8 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A plain-text file
 
 - **WHEN** a glob matches a file that no language reads, such as `notes.txt`
-- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
+- **THEN** hakkiri skips it in a walk and rejects it when given by name
+- **AND** Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
 
 #### Scenario: Comments that turn rules off and on
 
@@ -56,13 +57,13 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: The built-in repetition rule
 
 - **WHEN** a glob lists the style `Vale`, which contains `Vale.Repetition`
-- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
+- **THEN** hakkiri has no such style and rejects the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 #### Scenario: A doc selector or a View
 
-- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
+- **WHEN** a rule has `scope: doc(h1)`, a section sets a View, or a case sets `view`
 - **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.  
-  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+  It rejects the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 #### Scenario: A Vale configuration file
 
@@ -86,8 +87,8 @@ hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from t
 
 #### Scenario: The style Vale with no term
 
-- **WHEN** a glob lists `styles: [Vale]` and no named vocabulary contains a term
-- **THEN** hakkiri refuses the config, where Vale runs `Vale.Spelling` and `Vale.Repetition` from that style (rows [HKR-026][ledger] and [HKR-038][ledger], [vocabulary-rules 4][vocabulary-rules-4])
+- **WHEN** a glob lists `styles: [Vale]` and no listed vocabulary contains a term
+- **THEN** hakkiri rejects the config, where Vale runs `Vale.Spelling` and `Vale.Repetition` from that style (rows [HKR-026][ledger] and [HKR-038][ledger], [vocabulary-rules 4][vocabulary-rules-4])
 
 [check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
 [engine-14]: ../../../2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser

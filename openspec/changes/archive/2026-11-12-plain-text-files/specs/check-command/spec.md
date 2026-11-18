@@ -3,10 +3,10 @@
 ### Requirement: A language is read by extension
 
 **Reason**: OpenSpec cannot drop a scenario of a modified requirement.  
-Both scenarios of this one no longer hold: a file that no language reads was skipped in a walk and refused when named.  
+Both scenarios of this one no longer apply: a file that no language reads was skipped in a walk and rejected when given by name.  
 So the requirement is removed and added again below under a new name.
 
-**Migration**: Read the requirement named "A reader is chosen by formats, then by extension" under the ADDED section.
+**Migration**: Read the requirement called "A reader is chosen by formats, then by extension" under the ADDED section.
 
 ## ADDED Requirements
 
@@ -21,7 +21,7 @@ A file that a glob selects and that no reader reads SHALL be read as plain text,
 - **WHEN** a walk finds `notes.txt`, `Cargo.toml` and `Makefile`, and the glob `*` selects them
 - **THEN** hakkiri lints each as plain text
 
-#### Scenario: A file no reader reads, named
+#### Scenario: A file no reader reads, given by name
 
 - **WHEN** `hakkiri check notes.txt` runs and a glob selects `notes.txt`
 - **THEN** hakkiri lints it as plain text
@@ -77,7 +77,7 @@ A scope part that gives an extension SHALL match either, and a negated part SHAL
 ### Requirement: on_unknown sets what a selected file with no reader gets
 
 For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.  
-`text`, the default, reads it as plain text, and `warn` skips it with a warning that names it.  
+`text`, the default, reads it as plain text, and `warn` skips it with a warning that gives its path.  
 `error` fails the run with exit 2, and `ignore` skips it.  
 A file that no glob selects SHALL draw no message.
 

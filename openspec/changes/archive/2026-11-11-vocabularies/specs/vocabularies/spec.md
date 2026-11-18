@@ -2,7 +2,7 @@
 
 ### Requirement: A vocabulary is a folder of word lists in a package
 
-hakkiri SHALL read a named vocabulary from `config/vocabularies/<name>/` under a loaded package folder, and SHALL read every `accept.txt` and `reject.txt` below that folder and no other file.
+hakkiri SHALL read a listed vocabulary from `config/vocabularies/<name>/` under a loaded package folder, and SHALL read every `accept.txt` and `reject.txt` below that folder and no other file.
 
 #### Scenario: A list in a subfolder
 
@@ -11,13 +11,13 @@ hakkiri SHALL read a named vocabulary from `config/vocabularies/<name>/` under a
 
 #### Scenario: A vocabulary that is not there
 
-- **WHEN** the config names `Nope` and no loaded package contains `config/vocabularies/Nope`
-- **THEN** hakkiri reports an error that names `Nope` and the line of the key, and exits with a failure status
+- **WHEN** the config lists `Nope` and no loaded package contains `config/vocabularies/Nope`
+- **THEN** hakkiri reports an error that gives `Nope` and the line of the key, and exits with a failure status
 
-#### Scenario: Two packages hold one name
+#### Scenario: Two packages contain one name
 
-- **WHEN** two packages each hold `config/vocabularies/Team`
-- **THEN** hakkiri reports an error that names both folders, and exits with a failure status
+- **WHEN** two packages each contain `config/vocabularies/Team`
+- **THEN** hakkiri reports an error that gives both folders, and exits with a failure status
 
 ### Requirement: A line of a list is a term
 
@@ -75,7 +75,7 @@ A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonwor
 #### Scenario: A capitalization rule
 
 - **WHEN** a `capitalization` rule with `match: $sentence` checks the heading `# Using Kubernetes with Terraform today`, and the vocabulary accepts `Kubernetes` and `Terraform`
-- **THEN** it reports nothing, and it reports `'Using Kubernetes with Terraform today' should be in sentence case` when the rule sets `vocab: false` or no vocabulary is named
+- **THEN** it reports nothing, and it reports `'Using Kubernetes with Terraform today' should be in sentence case` when the rule sets `vocab: false` or no vocabulary is listed
 
 #### Scenario: A heading with words nobody accepted
 
@@ -108,12 +108,12 @@ A file SHALL take the vocabularies of every glob that matches it, besides the to
 
 #### Scenario: A glob's vocabulary
 
-- **WHEN** a glob names `Team`, `Team.Filler0` is an `existence` rule with `vocab: false` and the token `GitHub`, and the text is `Use GitHub here.`
-- **THEN** it reports nothing, and with `Team` named at the top level it reports ``warning Team.Filler0: Remove 'GitHub'.``
+- **WHEN** a glob lists `Team`, `Team.Filler0` is an `existence` rule with `vocab: false` and the token `GitHub`, and the text is `Use GitHub here.`
+- **THEN** it reports nothing, and with `Team` listed at the top level it reports ``warning Team.Filler0: Remove 'GitHub'.``
 
 #### Scenario: Rules a glob does not reach
 
-- **WHEN** a glob names `Team` and accepts `API` and `Kubernetes`, a `conditional` rule reads `The SDK and the API are here.` and a `capitalization` rule with `match: $sentence` reads `# Using Kubernetes with Terraform today`
+- **WHEN** a glob lists `Team` and accepts `API` and `Kubernetes`, a `conditional` rule reads `The SDK and the API are here.` and a `capitalization` rule with `match: $sentence` reads `# Using Kubernetes with Terraform today`
 - **THEN** the `conditional` rule reports `SDK` and `API`, and the `capitalization` rule reports the heading, where the top level contains both back
 
 #### Scenario: Two globs and the top level

@@ -6,7 +6,7 @@ A case that runs through the config SHALL read its input by the reader a `format
 An isolated case SHALL read its input by the extension `<format>`.  
 A case whose format no reader reads SHALL read its input as plain text, except that a case through the config follows `on_unknown`.
 
-#### Scenario: A format no extension names
+#### Scenario: A format no extension matches
 
 - **WHEN** a case has `format: txt` and `input: This is very good.`, and a rule flags `very`
 - **THEN** the case lints the input as plain text and reports `1:9`, both in the rule's `tests` and in a test file
@@ -29,7 +29,7 @@ Those are `<format>` and the extension of the reader, which a `formats` entry ma
 ### Requirement: A case through the config follows on_unknown
 
 A case through the config whose format no reader reads, and whose file the config selects, SHALL follow `on_unknown` as `check` does.  
-`text` reads it as plain text, `warn` and `ignore` give it no alerts, and `error` makes the case fail to run with a message that names the format.
+`text` reads it as plain text, `warn` and `ignore` give it no alerts, and `error` makes the case fail to run with a message that gives the format.
 
 #### Scenario: An error
 

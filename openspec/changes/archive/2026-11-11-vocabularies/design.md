@@ -14,13 +14,13 @@ So a vocabulary is already on disk and nothing reads it.
 
 Goals:
 
-- A project names vocabularies at the top level and per glob, and hakkiri reads them from its packages.
+- A project lists vocabularies at the top level and per glob, and hakkiri reads them from its packages.
 - The accepted terms reach the checks that Vale reaches, and drop the matches Vale drops.
 
 Non-goals:
 
 - The YAML vocabulary format (design decision 8).
-- `Vale.Terms` and `Vale.Avoid`, and the rules named `Vale.<Name>.Terms` for a glob, which are `HKR-042`.
+- `Vale.Terms` and `Vale.Avoid`, and the rules called `Vale.<Name>.Terms` for a glob, which are `HKR-042`.
 - `Vale.Spelling` and `Vale.Repetition`, which are `HKR-026` and `HKR-038`.
 - Reading a package's `.vale.ini`, which is `HKR-035`.
 
@@ -34,7 +34,7 @@ The five configs ran over one package in `tests/fixtures/vocabularies`, and its 
 
 | Part | Where in Vale | What it does |
 |:--|:--|:--|
-| Top-level `Vocab` | [ini.go][v-top-vocab] | Reads each named vocabulary, and adds its terms to the project's accepted and rejected lists |
+| Top-level `Vocab` | [ini.go][v-top-vocab] | Reads each listed vocabulary, and adds its terms to the project's accepted and rejected lists |
 | A section's `Vocab` | [ini.go][v-section-vocab], [file.go][v-file-vocab], [definition.go][v-vocab-for] | Contains the terms per file, from each section that matches, and checks them as each rule runs |
 | Finding one | [ini.go][v-load-vocab], [config.go][v-search-paths] | Takes the first search path that contains `config/vocabularies/<Name>`, walks it, and reads each `accept.txt` and `reject.txt` |
 | A line | [ini.go][v-word-list] | Trims it, skips a blank line and one that starts with a hash and a space |
@@ -81,14 +81,14 @@ files:
 Alternative: the top level alone.  
 It lost because a package that ships two vocabularies could not use one for its docs only.  
 Alternative: a glob alone.  
-It lost because ProseStyle names one vocabulary for every file ([prose-style][prose-style-ini]), and a glob key would repeat it on each glob.  
+It lost because ProseStyle lists one vocabulary for every file ([prose-style][prose-style-ini]), and a glob key would repeat it on each glob.  
 The other name considered, `vocabularies`, lost to Vale's `vocab`.
 
 ### 3. A vocabulary is a folder in a loaded package
 
 A package folder is the `styles` folder of its zip, or the `path` folder, so a vocabulary is `<package folder>/config/vocabularies/<name>/`.  
 hakkiri walks it and reads every `accept.txt` and `reject.txt` below it, as Vale does, and no other file.  
-It reads the accepted terms in the order the files walk and the vocabularies are named.
+It reads the accepted terms in the order the files walk and the vocabularies are listed.
 
 An unknown name is an error on the key's line: `` `Nope` is not a vocabulary in any package ``.  
 A name of the top level is rejected by the config's own validation.  
@@ -138,7 +138,7 @@ The `case-and-sequence-checks` change records the order: the terms go in before 
 | `spelling` | always, as whole words matched without regard to case, with a phrase masked | [spelling.go][v-spelling], [spelling.go][v-spelling-run] |
 
 No other check reads them.  
-The `vocab` field loads today with no effect, and it now decides.  
+The `vocab` field loads today with no effect, and now it applies.  
 A match inside an accepted phrase is dropped, so `mea` in `mea culpa` is dropped and a lone `mea` is not.
 
 ### 6. A glob's lists are held per file
@@ -171,7 +171,7 @@ It lost because the exceptions are compiled patterns sorted and rewritten at bui
 - The rules named `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` for a glob's vocabularies: `HKR-042`, with the top-level pair.
 - The YAML vocabulary, `vocab.yml`, with `regex`, `ignorecase`, `flags` and an affix file ([vocab.go][v-yaml-vocab]): `HKR-041`.
 - `Vale.Terms` and `Vale.Avoid`, in the [vocabulary-rules change][rules].
-- A vocabulary named in a package's own `.vale.ini`: `HKR-035`.
+- A vocabulary listed in a package's own `.vale.ini`: `HKR-035`.
 - The accepted terms as spelling suggestions ([spelling.go][v-spelling-suggest]), which needs `Vale.Spelling` and an applied action.
 - The per-user styles folder, two packages with one vocabulary name and an invalid term: decisions 3 and 4.
 

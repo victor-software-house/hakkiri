@@ -19,7 +19,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: The built-in spelling rule
 
 - **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+- **THEN** hakkiri has no such rule, and a style sets its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
 
 #### Scenario: A YAML vocabulary
 
@@ -51,13 +51,13 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: The built-in repetition rule
 
 - **WHEN** a glob lists the style `Vale`, which contains `Vale.Repetition`
-- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
+- **THEN** hakkiri has no such style and rejects the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 #### Scenario: A doc selector or a View
 
-- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
+- **WHEN** a rule has `scope: doc(h1)`, a section sets a View, or a case sets `view`
 - **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.  
-  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+  It rejects the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 #### Scenario: A Vale configuration file
 

@@ -16,7 +16,7 @@ This change follows [`gitignore-walk`][walk], which chose the files a run reads.
 ## 2. The surfaces
 
 - [x] 2.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md`, `README.md` and `AGENTS.md`, close the plain-text gap in the `vale-differences` spec, and add the patch changeset.  
-  Verify `operator_docs` passes, and the changeset names `hakkiri: patch`.
+  Verify `operator_docs` passes, and the changeset contains `hakkiri: patch`.
 
 ## 3. Integration
 

@@ -9,7 +9,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: The built-in spelling rule
 
 - **WHEN** a project enables Vale's `Vale.Spelling`, which ships with a default ignore list
-- **THEN** hakkiri has no such rule, and a style names its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
+- **THEN** hakkiri has no such rule, and a style sets its own dictionary and lists (row [HKR-026][ledger], [spelling goals][spelling-goals])
 
 #### Scenario: Vocabularies
 
@@ -30,7 +30,8 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A plain-text file
 
 - **WHEN** a glob matches a file that no language reads, such as `notes.txt`
-- **THEN** hakkiri skips it in a walk and refuses it when named, and Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
+- **THEN** hakkiri skips it in a walk and rejects it when given by name
+- **AND** Vale lints it as plain text (row [HKR-030][ledger], [check 5][check-5])
 
 #### Scenario: Comments that turn rules off and on
 
@@ -52,13 +53,13 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: The built-in repetition rule
 
 - **WHEN** a glob lists the style `Vale`, which contains `Vale.Repetition`
-- **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
+- **THEN** hakkiri has no such style and rejects the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 #### Scenario: A doc selector or a View
 
-- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
+- **WHEN** a rule has `scope: doc(h1)`, a section sets a View, or a case sets `view`
 - **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.  
-  It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+  It rejects the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 #### Scenario: A Vale configuration file
 
@@ -79,17 +80,17 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 #### Scenario: A term that is not a pattern
 
 - **WHEN** a list contains a term such as `C(` that is not a valid pattern
-- **THEN** hakkiri reports an error that names the file and line, where Vale stops with a pattern error that has no line ([vocabularies 4][vocabularies-4])
+- **THEN** hakkiri reports an error that gives the file and line, where Vale stops with a pattern error that has no line ([vocabularies 4][vocabularies-4])
 
-#### Scenario: A term that Vale's engines refuse
+#### Scenario: A term that Vale's engines reject
 
 - **WHEN** a list contains `C++`
 - **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and drops `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
 
 #### Scenario: Two packages with one vocabulary
 
-- **WHEN** two packages each hold a vocabulary `Team`
-- **THEN** hakkiri refuses the config and names both, where Vale takes the first search path, or the last package after `vale sync` ([vocabularies 3][vocabularies-3])
+- **WHEN** two packages each contain a vocabulary `Team`
+- **THEN** hakkiri rejects the config and lists both, where Vale takes the first search path, or the last package after `vale sync` ([vocabularies 3][vocabularies-3])
 
 #### Scenario: The per-user styles folder
 
@@ -98,8 +99,8 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 
 #### Scenario: An unknown vocabulary
 
-- **WHEN** the config names a vocabulary that no package contains
-- **THEN** hakkiri names the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
+- **WHEN** the config lists a vocabulary that no package contains
+- **THEN** hakkiri gives the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
 
 [vocabularies-3]: ../../design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../design.md#4-a-line-of-a-list-is-a-pattern

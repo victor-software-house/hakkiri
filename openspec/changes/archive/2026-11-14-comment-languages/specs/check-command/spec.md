@@ -15,7 +15,7 @@ A file that a glob selects SHALL be read as plain text when no reader reads its 
 - **WHEN** a walk finds `notes.txt`, `Dockerfile` and `Makefile`, and the glob `*` selects them
 - **THEN** hakkiri lints each as plain text
 
-#### Scenario: A file no reader reads, named
+#### Scenario: A file no reader reads, given by name
 
 - **WHEN** `hakkiri check notes.txt` runs and a glob selects `notes.txt`
 - **THEN** hakkiri lints it as plain text

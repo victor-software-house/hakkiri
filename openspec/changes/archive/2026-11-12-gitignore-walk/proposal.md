@@ -17,8 +17,8 @@ Yet every option reads the flag, then the variable, then the config, then the de
 ## Changes
 
 - A walk skips what `.gitignore`, `.git/info/exclude` and the global git excludes ignore, in a git repository, unless `gitignore` is false (`--no-gitignore`, `--gitignore=false`, `HAKKIRI_GITIGNORE`).
-- A named file is never filtered by git.
-- A named file that no glob selects draws a warning, and `on_unmatched` (`--on-unmatched`, `HAKKIRI_ON_UNMATCHED`) takes `warn`, `error` or `ignore`.
+- A given file is never filtered by git.
+- A given file that no glob selects draws a warning, and `on_unmatched` (`--on-unmatched`, `HAKKIRI_ON_UNMATCHED`) takes `warn`, `error` or `ignore`.
 - `fail_level`, `gitignore` and `on_unmatched` are config keys, each resolved as flag, then variable, then config, then default.
 - A package's settings file that contains one of the three keys is an error.
 - The `vale-differences` spec lists the walk as an intended difference.
@@ -31,10 +31,10 @@ None.
 
 ### Modified Capabilities
 
-- `check-command`: the walk skips what git ignores, and a named file that no glob selects draws a warning.
+- `check-command`: the walk skips what git ignores, and a given file that no glob selects draws a warning.
 - `project-config`: three run options are keys.
 - `package-settings`: a package's file does not set the run options.
-- `vale-differences`: a walk and a named file differ from Vale's.
+- `vale-differences`: a walk and a given file differ from Vale's.
 
 ## Impact
 

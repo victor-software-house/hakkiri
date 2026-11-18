@@ -21,7 +21,7 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 - **WHEN** `docs/.gitignore` contains `skip.md`, and `docs/skip.md` and `skip.md` exist
 - **THEN** a walk skips `docs/skip.md` and lints `skip.md`
 
-#### Scenario: A named ignored file
+#### Scenario: A given ignored file
 
 - **WHEN** `hakkiri check draft.md build/b.md` runs and git ignores both
 - **THEN** hakkiri lints both

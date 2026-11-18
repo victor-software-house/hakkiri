@@ -76,10 +76,10 @@ A test pins it.
 ### 7. What stays different
 
 - Vale writes `YES` and `NO`, and hakkiri writes `on` and `off`.
-- Vale ignores a key that names no rule, such as `Team.Nope = YES` or a rule of a style no package holds.  
-  hakkiri refuses it with its line, which `project-config` already requires.
+- Vale ignores a key that matches no rule, such as `Team.Nope = YES` or a rule of a style no package contains.  
+  hakkiri rejects it with its line, which `project-config` already requires.
 - Vale reads a word that is none of its words, such as `yes`, with a warning and switches the rule off.  
-  hakkiri refuses a word that is neither a level, `on` nor `off`.
+  hakkiri rejects a word that is neither a level, `on` nor `off`.
 
 These differences go in `vale-differences`.
 
