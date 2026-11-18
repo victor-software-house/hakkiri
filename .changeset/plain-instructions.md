@@ -2,4 +2,4 @@
 "hakkiri": patch
 ---
 
-The instructions and README read in plain words.
+The instructions, the README, the `--help` text and the error messages use plain words.
