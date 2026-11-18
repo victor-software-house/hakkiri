@@ -148,7 +148,7 @@ static DIRECTIVES: LazyLock<Directives> = LazyLock::new(|| {
     Directives {
         go: compile(r"^//(?:go:|line |export |extern |nolint\b|lint:ignore|[a-z0-9]+:[a-z0-9])"),
         script: compile(
-            r"^//[ \t]*(?:eslint|oxlint|@ts-|prettier-ignore|biome-ignore|istanbul\b|c8\b|v8\b|@flow\b|@jsx|jshint|jslint)|^/\*[ \t]*(?:eslint|oxlint|globals?\b|jshint|jslint|istanbul\b|c8\b|@flow\b|@jsx|webpackChunkName|[@#]__PURE__)",
+            r"^//[ \t]*(?:eslint|oxlint(?:-|[ \t]|$)|@ts-|prettier-ignore|biome-ignore|istanbul\b|c8\b|v8\b|@flow\b|@jsx|jshint|jslint)|^/\*[ \t]*(?:eslint|oxlint(?:-|[ \t]|\*/)|globals?\b|jshint|jslint|istanbul\b|c8\b|@flow\b|@jsx|webpackChunkName|[@#]__PURE__)",
         ),
         swift: compile(r"^//[ \t]*(?:swiftlint:|swiftformat:|sourcery:)|^/\*[ \t]*swiftlint:"),
         yaml: compile(r"^#[ \t]*(?:yaml-language-server:|yamllint[ \t])"),

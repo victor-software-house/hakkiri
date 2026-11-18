@@ -178,10 +178,10 @@ fn an_oxlint_switch_is_not_prose() -> TestResult {
     let found = alerts(
         Language::TypeScript,
         words,
-        "// oxlint-disable-next-line no-console -- kilo\nconsole.log(1);\n/* oxlint-disable eqeqeq */\n// A note.\nexport const a = 1;\n",
+        "// oxlint-disable-next-line no-console -- kilo\nconsole.log(1);\n/* oxlint-disable eqeqeq */\n// oxlintrc files.\n// A note.\nexport const a = 1;\n",
     )?;
     let matched: Vec<&str> = found.iter().map(|(_, word)| word.as_str()).collect();
-    assert_eq!(matched, ["A", "note"]);
+    assert_eq!(matched, ["oxlintrc", "files", "A", "note"]);
     Ok(())
 }
 
