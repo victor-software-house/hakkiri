@@ -1,22 +1,25 @@
 # Proposal
 
-Queue row: `HKR-030` in [tasks.yaml][ledger].
+Queue row: `HKR-030` in [tasks.yaml][ledger].  
 It follows [`gitignore-walk`][walk], which chose the files a run reads, and changes [check-command][check] and [project-config][config].
 
 ## Motivation
 
-hakkiri reads Markdown, MDX and the comments of three source languages, and skips every other file a glob selects.
-`hakkiri check notes.txt` is a failure, and a `*` glob lints less than it names.
-Vale reads such a file as plain text, and its `[formats]` section maps an extension to a reader.
-A project that checks `README`, `LICENSE`, `.txt` and `.toml` files with Vale cannot switch while hakkiri refuses them (operator, 2026-11-11).
+hakkiri reads Markdown, MDX and the comments of three source languages, and skips every other file a glob selects.  
+`hakkiri check notes.txt` is a failure, and a `*` glob lints less than it matches.
+
+Vale reads such a file as plain text, and its `[formats]` section maps an extension to a reader.  
+A project that checks `README`, `LICENSE`, `.txt` and `.toml` files with Vale cannot switch while hakkiri rejects them (operator, 2026-11-11).
 
 ## Changes
 
-- A file that a glob selects and that no reader reads is plain text: one `raw` root over the file, with a paragraph for each run of lines between blank lines.
-- `formats` maps an extension, a file name or a glob to a reader (`md`, `mdx`, `rs`, `ts`, `tsx`, `js`, `text`), as Vale's `[formats]` does, and a package's settings file may hold it.
+- A file that a glob selects and that no reader reads is plain text.  
+  It has one `raw` root over the file, and each run of lines between blank lines is a paragraph.
+- `formats` maps an extension, a file name or a glob to a reader (`md`, `mdx`, `rs`, `ts`, `tsx`, `js`, `text`), as Vale's `[formats]` does.  
+  A package's settings file may contain it.
 - `on_unknown` (`--on-unknown`, `HAKKIRI_ON_UNKNOWN`) takes `text`, the default, `warn`, `error` or `ignore`, for a selected file that no reader reads.
 - A binary file is skipped with no message.
-- The refusal of a named file that no language reads goes, and so does the gap scenario for it in the `vale-differences` spec.
+- The refusal of a given file that no language reads goes, and so does the gap scenario for it in the `vale-differences` spec.
 
 ## Capabilities
 
@@ -28,7 +31,7 @@ None.
 
 - `check-command`: the reader of a file, plain text, and binary files.
 - `project-config`: `formats` and `on_unknown` are keys.
-- `package-settings`: a package's file may hold `formats`, and may not hold `on_unknown`.
+- `package-settings`: a package's file may contain `formats`, and may not contain `on_unknown`.
 - `vale-differences`: the plain-text gap closes, and three differences stay.
 
 ## Impact

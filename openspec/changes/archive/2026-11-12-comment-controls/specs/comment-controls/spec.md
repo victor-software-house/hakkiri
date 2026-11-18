@@ -2,12 +2,15 @@
 
 ### Requirement: A comment turns every rule off and on
 
-In a Markdown file, an HTML comment `hakkiri off` or `vale off` SHALL leave the text after it out of every block until a comment `hakkiri on` or `vale on`, or the end of the file.  
-The comment SHALL be read with the blanks at its ends and its line breaks trimmed, and in capitals, with another word in front, or in a code block, a code span or after a backslash it SHALL be text.
+In a Markdown file, an HTML comment `hakkiri off` or `vale off` SHALL leave the text after it out of every block.  
+This SHALL last until a comment `hakkiri on` or `vale on`, or the end of the file.
+
+The comment SHALL be read with the blanks at its ends and its line breaks trimmed.  
+In capitals, with another word in front, in a code block, in a code span or after a backslash, it SHALL be text.
 
 #### Scenario: Between two blocks
 
-- **WHEN** a paragraph holds `very really good.` between `<!-- hakkiri off -->` and `<!-- hakkiri on -->`, and so do the paragraphs before and after
+- **WHEN** a paragraph contains `very really good.` between `<!-- hakkiri off -->` and `<!-- hakkiri on -->`, and so do the paragraphs before and after
 - **THEN** only the paragraphs before and after draw alerts
 
 #### Scenario: Inside a paragraph
@@ -17,7 +20,7 @@ The comment SHALL be read with the blanks at its ends and its line breaks trimme
 
 #### Scenario: A comment that is text
 
-- **WHEN** `<!-- Vale Off -->`, `<!-- note: vale off -->`, `\<!-- vale off -->`, a code span and a fenced block hold the words
+- **WHEN** `<!-- Vale Off -->`, `<!-- note: vale off -->`, `\<!-- vale off -->`, a code span and a fenced block contain the words
 - **THEN** no text after them is left out
 
 #### Scenario: The blanks
@@ -27,7 +30,7 @@ The comment SHALL be read with the blanks at its ends and its line breaks trimme
 
 #### Scenario: A comment with no partner
 
-- **WHEN** a file holds `on` with no `off`, two `off` and one `on`, or an `off` that nothing closes
+- **WHEN** a file contains `on` with no `off`, two `off` and one `on`, or an `off` that nothing closes
 - **THEN** the first changes nothing, the second ends at the `on`, and the third runs to the end of the file, a `raw` rule included
 
 ### Requirement: A comment turns a rule or a style off and on
@@ -54,9 +57,13 @@ Vale's `off` and `on` SHALL stand for `NO` and `YES`, and a rule name that no ru
 ### Requirement: A rule is gated where its text is read
 
 A rule that a comment turned off before the text of a block is read SHALL read no text in that block.  
-The text is read when its element ends, or where a tag that opens a block inside the element flushes it.  
-An alert between the comment that turned a rule off and the one that turned it on SHALL be left out.  
-A paragraph in a tight list item SHALL be read before a nested list, quote, code block, table, heading or HTML block that opens a block tag, and at the end of the item otherwise.
+The text is read when its element ends, or where a tag that opens a block inside the element flushes it.
+
+An alert between the comment that turned a rule off and the one that turned it on SHALL be left out.
+
+A tight list item's paragraph SHALL be read before the first block inside the item.  
+Such a block is a nested list, quote, code block, table, heading, or an HTML block that opens a block tag.  
+Otherwise it SHALL be read at the end of the item.
 
 #### Scenario: A comment inside a paragraph
 
@@ -65,17 +72,19 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 #### Scenario: A pair inside a paragraph
 
-- **WHEN** a paragraph holds the comment that turns a rule off, then `very`, then the comment that turns it on, then `very`
+- **WHEN** a paragraph contains the comment that turns a rule off, then `very`, then the comment that turns it on, then `very`
 - **THEN** only the second `very` draws the alert
 
 #### Scenario: A tight list item
 
-- **WHEN** a comment that turns a rule off is indented under the text of a tight list item, and the one that turns it on is under the item after it
+- **WHEN** a comment that turns a rule off is indented under the text of a tight list item
+- **AND** the one that turns it on is under the next item
 - **THEN** the rule reports nothing in the first item, and nothing in the item between the comments
 
 #### Scenario: A block that opens inside a tight list item
 
-- **WHEN** a tight list item holds `A very`, and a nested list, a quote, a fenced block, a table or a heading under it holds a comment that turns the rule off
+- **WHEN** a tight list item contains `A very`
+- **AND** a nested list, a quote, a fenced block, a table or a heading under it contains a comment that turns the rule off
 - **THEN** `A very` draws its alert, and the text after the comment draws none
 
 #### Scenario: A comment before the block that opens
@@ -85,7 +94,7 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 #### Scenario: A comment inside a nested HTML element
 
-- **WHEN** a `div` holds `one very`, a comment that turns the rule off, and a closing `</div>`
+- **WHEN** a `div` contains `one very`, a comment that turns the rule off, and a closing `</div>`
 - **THEN** `one very` draws no alert, since the closing tag reads the text after the comment
 
 #### Scenario: A tag that opens a block inside a paragraph
@@ -101,7 +110,8 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 #### Scenario: A skipped element flushes at its end tag
 
 - **WHEN** a paragraph reads `one very <!-- hakkiri off --> <pre>two</pre> three very.`
-- **THEN** `one very` draws no alert, since the `pre` start tag flushes nothing and the `pre` end tag, after the comment, flushes `one very`
+- **THEN** `one very` draws no alert, since the start tag of `pre` flushes nothing
+- **AND** the end tag of `pre`, after the comment, flushes `one very`
 
 #### Scenario: Text left at the end of an HTML block
 
@@ -115,17 +125,17 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 #### Scenario: A heading
 
-- **WHEN** a heading holds the comment that turns a rule back on, and the rule was turned off before it
+- **WHEN** a heading contains the comment that turns a rule back on, and the rule was turned off before it
 - **THEN** the rule reports nothing in the heading
 
 #### Scenario: A table cell
 
-- **WHEN** a cell holds `very <!-- hakkiri off -->`
+- **WHEN** a cell contains `very <!-- hakkiri off -->`
 - **THEN** the cell draws no alert, and the cell of the next row after an `on` draws the alerts after the comment
 
 #### Scenario: HTML blocks
 
-- **WHEN** a `div`, a `p` or a `table` holds `very`, an `off` comment, `very`, an `on` comment and `very`
+- **WHEN** a `div`, a `p` or a `table` contains `very`, an `off` comment, `very`, an `on` comment and `very`
 - **THEN** the first and last `very` draw alerts, and so do the words before the comment
 
 #### Scenario: A raw rule
@@ -135,7 +145,10 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 ### Requirement: An MDX file's braces comments are comments
 
-In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}`, as a block of its own or inside a line of text, SHALL turn rules off and on as the HTML comment does, with every form of the HTML comment.  
+In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}` SHALL turn rules off and on as the HTML comment does.  
+This SHALL apply to a comment as a block of its own or inside a line of text.  
+It SHALL apply to every form of the HTML comment.
+
 The text SHALL be exactly `{/*` and `*/}` around the comment, so `{ /* vale off */ }` and `{/* Vale Off */}` are text.
 
 #### Scenario: A block of its own

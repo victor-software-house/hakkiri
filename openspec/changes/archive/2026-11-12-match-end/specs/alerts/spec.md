@@ -2,7 +2,8 @@
 
 ### Requirement: The last column is where the match ends in the file
 
-**Reason**: The end of a match that goes on to the next line was the end of its first line, which names no character of the match, and no field held the line the match ends on.
+**Reason**: The end of a match that goes on to the next line was the end of its first line.  
+That end points to no character of the match, and no field contained the line the match ends on.
 
 **Migration**: Read the requirement "A match ends at its last character" under the ADDED section.
 
@@ -10,7 +11,8 @@
 
 ### Requirement: A match ends at its last character
 
-An alert SHALL name the line and the column of the match's last character in the file, so markup inside a match counts toward it.  
+An alert SHALL give the line and the column of the match's last character in the file.  
+Markup inside a match SHALL count toward it.  
 A match on one line SHALL end on the line it starts on.  
 A match that goes on to the next lines SHALL end on the line of its last character.
 

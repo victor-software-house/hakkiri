@@ -1,11 +1,12 @@
 # Tasks
 
-Every compile, lint and test step runs in the pull request's CI, or in a box for a pre-push run, and never on the authoring machine.
+Every compile, lint and test step runs in the pull request's CI, or in a box for a pre-push run.  
+None runs on the authoring machine.  
 This change follows [`gitignore-walk`][walk], which chose the files a run reads.
 
 ## 1. The readers
 
-- [x] 1.1 Add the `Text` language and its tree: one `raw` root over the file, with a paragraph for each run of lines between blank lines.  
+- [x] 1.1 Add the `Text` language and its tree: one `raw` root over the file, and a paragraph for every run of lines that blank lines bound.  
   Verify the plain-text scenarios of `check-command` pass.
 - [x] 1.2 Read `formats` from the config and the packages' settings, and look a file up as Vale's `formatFor` does.  
   Verify the scenarios of `project-config` and `package-settings` for `formats` pass.
@@ -15,7 +16,7 @@ This change follows [`gitignore-walk`][walk], which chose the files a run reads.
 ## 2. The surfaces
 
 - [x] 2.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md`, `README.md` and `AGENTS.md`, close the plain-text gap in the `vale-differences` spec, and add the patch changeset.  
-  Verify `operator_docs` passes, and the changeset names `hakkiri: patch`.
+  Verify `operator_docs` passes, and the changeset contains `hakkiri: patch`.
 
 ## 3. Integration
 
