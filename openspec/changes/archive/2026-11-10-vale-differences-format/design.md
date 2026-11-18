@@ -2,7 +2,8 @@
 
 ## Context
 
-The [`vale-differences` design][first-design] sets how the list is built: one scenario for each difference, with a link to its decision, and only what is true now.  
+The [`vale-differences` design][first-design] sets how the list is built: one scenario for each difference, with a link to its decision, and only what is true now.
+
 Any behaviour that differs from Vale belongs in it, whether or not a design calls it a difference.  
 This change adds the decisions that the [rule-format][format], [rule-engine][engine] and [bootstrap][bootstrap] designs record as choices, and that differ from Vale when checked.
 
@@ -23,19 +24,34 @@ This change adds the decisions that the [rule-format][format], [rule-engine][eng
 
 A probe of Vale 66bbb85 built from source gave these results:
 
-- A plain `//` comment holding a code span: Vale reported both the word inside the backticks, at column 9, and the plain word, at column 27. This build could not fetch the Rust grammar, so Vale read comments by their delimiters. The tree-sitter path was read in its source instead: with no markup format named, `lintComment` lints plain lines, and the default Rust query names none ([code_ts.go][v-comment], [rs.go][v-rust]).
-- `scope: table.row` and `scope: nonsense`: Vale loaded both and reported nothing, where `table`, `table.cell` and `text` reported the word in a cell. Vale's block scopes have `table.header`, `table.cell` and `table.caption`, and no `row` ([ast.go][v-table]).
-- A `metric` rule with `tokens`: Vale refused it as an invalid key. A formula that reads `occurrences`: Vale refused it as an unresolved reference.
-- The formula `words > 1 ? 7.0 : 0.0`: Vale reported 7.00. Vale runs the formula as one Tengo expression ([metric.go][v-eval]).
-- An `extends: script` rule: Vale loaded it ([script.go][v-script]). The refusal in hakkiri is from its spec.
+- A plain `//` comment with a code span:
+  - Vale reported both the word inside the backticks, at column 9, and the plain word, at column 27.
+  - This build could not fetch the Rust grammar, so Vale read comments by their delimiters.
+  - The tree-sitter path was read in its source instead.
+  - With no markup format set, `lintComment` lints plain lines, and the default Rust query defines none ([code_ts.go][v-comment], [rs.go][v-rust]).
+- `scope: table.row` and `scope: nonsense`:
+  - Vale loaded both and reported nothing.
+  - `table`, `table.cell` and `text` reported the word in a cell.
+  - Vale's block scopes have `table.header`, `table.cell` and `table.caption`, and no `row` ([ast.go][v-table]).
+- A `metric` rule with `tokens`:
+  - Vale rejected it as an invalid key.
+  - A formula that reads `occurrences`: Vale rejected it as an unresolved reference.
+- The formula `words > 1 ? 7.0 : 0.0`:
+  - Vale reported 7.00.
+  - Vale runs the formula as one Tengo expression ([metric.go][v-eval]).
+- An `extends: script` rule:
+  - Vale loaded it ([script.go][v-script]).
+  - The refusal in hakkiri is from its spec.
 
-Alternative: list these from the designs alone. Lost: no design states that Vale differs, so each scenario would repeat a claim no one had checked.
+Alternative: list these from the designs alone.  
+Lost: no design states that Vale differs, so each scenario would repeat a claim no one had checked.
 
 ### 2. Configuration is listed with the behaviour
 
 A project that moves from Vale writes new settings, so the three differences in configuration and packages sit in the same spec.
 
-Alternative: leave configuration to the importer's documentation. Lost: the list holds any difference, and a project meets these at its first run.
+Alternative: leave configuration to the importer's documentation.  
+Lost: the list has any difference, and a project meets these at its first run.
 
 ## Risks / Trade-offs
 
