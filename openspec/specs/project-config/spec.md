@@ -500,7 +500,7 @@ An unknown value SHALL be an error that shows the line.
 
 `formats` SHALL map an extension, a file name or a glob to a reader.  
 The reader SHALL be given by any langdex name, alias or extension of the language it reads.  
-The languages are Markdown, Markdown with components (MDX), Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell and Text.
+The languages are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell and Text.
 
 So `md`, `markdown` and `Markdown` give one reader, `sh` and `bash` give the Shell reader, and `text` gives plain text.  
 An entry SHALL beat the language of the file.

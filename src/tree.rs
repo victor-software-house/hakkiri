@@ -224,7 +224,7 @@ pub struct Node {
     /// A gap between two segments is whatever is not part of the text.
     /// It is a comment marker, or the indentation that a comment strips.
     /// It can also be syntax that is not prose, such as a code block, an HTML
-    /// tag or an expression in Markdown with components (MDX).
+    /// tag or an expression in MDX.
     ///
     /// A line of a comment with no text gives an empty range.
     pub segments: Vec<Range<usize>>,

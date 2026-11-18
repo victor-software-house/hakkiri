@@ -2,7 +2,7 @@
 
 ### Requirement: A top-level string of front matter is text
 
-In a Markdown or MDX (Markdown with JavaScript XML) file, a rule scoped `text` SHALL read each top-level string value of front matter.  
+In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
 The front matter is YAML between `---` lines, TOML between `+++` lines, or JSON between `;;;` lines.
 
 A key, a list, a nested mapping and a value that is not a string SHALL not be read.  

@@ -9,7 +9,7 @@ So a rule that reads text reports nothing in it, and a rule that reads code read
 
 ### Requirement: An inline span of math reads as code
 
-In a Markdown or Markdown with components (MDX) file, text from a `$` to the next closing `$` SHALL read as a code span.  
+In a Markdown or MDX file, text from a `$` to the next closing `$` SHALL read as a code span.  
 The opening `$` SHALL be followed by a character that is not a space or a `$`.
 
 The closing `$` SHALL not be escaped, and SHALL follow a character that is not a space.  

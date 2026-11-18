@@ -18,7 +18,7 @@ Goals:
 
 Non-goals:
 
-- MDX (Markdown with JavaScript XML) and front matter, which other changes probed.
+- MDX and front matter, which other changes probed.
 - Reading `img` text in inline HTML, which a known gap lists.
 
 ## Decisions

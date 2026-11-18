@@ -123,7 +123,7 @@ Lost: it adds a second place that contains styles beside `packages`, and a proje
 
 ### 5. A language is read by extension
 
-`.md` and `.mdx`, `.rs`, `.ts`, `.tsx` and `.js` select Markdown, Markdown with components (MDX), Rust, TypeScript, TypeScript with JavaScript XML (TSX) and JavaScript.
+`.md` and `.mdx`, `.rs`, `.ts`, `.tsx` and `.js` select Markdown, MDX, Rust, TypeScript, TypeScript with JavaScript XML (TSX) and JavaScript.
 
 A directory walk skips any other file with no message, so a `'*'` glob does not fail on an image.  
 A file named as an argument that no language reads is an error that shows its name.

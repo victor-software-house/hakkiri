@@ -2,7 +2,7 @@
 
 ### Requirement: title selects the title of a link, an image and a definition
 
-In a Markdown or MDX (Markdown with JavaScript XML) file, the scope `title` SHALL select the text of a title.  
+In a Markdown or MDX file, the scope `title` SHALL select the text of a title.  
 This covers the title of an inline link, an inline image and a link reference definition.  
 The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.
 

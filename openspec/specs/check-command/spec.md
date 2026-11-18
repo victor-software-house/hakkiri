@@ -45,7 +45,7 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 
 hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL still lint every other file.
 
-#### Scenario: One broken Markdown with components (MDX) file
+#### Scenario: One broken MDX file
 
 - **WHEN** `bad.mdx` has a syntax error and `good.md` draws one warning
 - **THEN** hakkiri reports the warning and a failure that shows `bad.mdx`, and exits 2

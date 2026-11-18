@@ -51,7 +51,7 @@ The text inside an HTML block is prose, and the html-block-text spec states whic
 - **WHEN** a Markdown file contains an HTML block `<div class="note">Read this.</div>`
 - **THEN** the tree contains a `paragraph` node for `Read this.` and no prose node for `<div class="note">`
 
-### Requirement: Markdown with components (MDX) keeps prose and leaves code out
+### Requirement: MDX keeps prose and leaves code out
 
 In an MDX file, text inside a JSX (JavaScript XML) element SHALL be prose.  
 Imports, exports, expressions, and the tags and attributes of JSX elements SHALL carry no prose scope.

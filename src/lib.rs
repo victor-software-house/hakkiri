@@ -1,4 +1,4 @@
-//! hakkiri, a prose linter for Markdown, Markdown with components (MDX) and
+//! hakkiri, a prose linter for Markdown, MDX and
 //! source comments.
 //!
 //! [`parse`] turns one file into a [`Tree`].

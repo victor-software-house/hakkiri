@@ -2,7 +2,7 @@
 
 ## Purpose
 
-An Markdown with components (MDX) file's expressions read as code, as in Vale, and so do its JSX (JavaScript XML) elements with no children.  
+An MDX file's expressions read as code, as in Vale, and so do its JSX (JavaScript XML) elements with no children.  
 The tags of an element with children read as no node.
 
 ## Requirements

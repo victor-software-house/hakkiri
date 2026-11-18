@@ -60,7 +60,7 @@ A link back to a folder already read stops the walk at that folder.
 ### 5. What the probe shows and hakkiri differs on
 
 The probe of Vale at `66bbb85` gave 880 alerts over 11 configs.  
-It covered four files: Markdown, MDX (Markdown with JavaScript XML), Rust and TypeScript.  
+It covered four files: Markdown, MDX, Rust and TypeScript.  
 hakkiri gives the same, with these exceptions, which it keeps on purpose:
 
 - A word with a curly quote or `&rsquo;` is reported where it stands, where Vale gives it no position.  

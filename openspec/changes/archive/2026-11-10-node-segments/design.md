@@ -45,7 +45,7 @@ Lost: the markers sit inside it, so the text would contain them.
 
 ### 3. Syntax that is not prose is a gap
 
-Fenced code, raw HTML, link definitions, front matter, Markdown with components (MDX) expressions and the tags of JavaScript XML (JSX) elements are gaps.  
+Fenced code, raw HTML, link definitions, front matter, MDX expressions and the tags of JavaScript XML (JSX) elements are gaps.  
 Where one sits inside a prose node, it separates two of its segments, so one paragraph stays one node.
 
 Alternative: split the paragraph into one node per piece of text.  

@@ -15,7 +15,7 @@ They sit in a block quote, over two line comments, or around an HTML tag.
 - Every node has segments: the byte ranges of its text, in order, with the syntax between them left out.
 - The text of a node is its segments joined, so no marker, bullet, number, indentation, line ending, heading hash or table pipe is in it.
 - Code, HTML and link definitions are gaps between the segments of the node around them.
-- So are Markdown with components (MDX) expressions and the tags of JavaScript XML (JSX) elements.
+- So are MDX expressions and the tags of JavaScript XML (JSX) elements.
 - A block quote, a list item and a table row read as the content inside them.
 
 ## Capabilities

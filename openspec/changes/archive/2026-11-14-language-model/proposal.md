@@ -29,7 +29,7 @@ On 2026-11-14 the operator asked that each fenced block be parsed as its languag
 - A fenced code block takes the language of its info string.
   - hakkiri parses a fence with that language's grammar when it reads the comments of that language.  
     The comments enter the tree at their place in the file, and each node has that language.
-  - A fence of Markdown, MDX (Markdown with JavaScript XML) or plain text stays a gap, as in Vale, since its text is an example.
+  - A fence of Markdown, MDX or plain text stays a gap, as in Vale, since its text is an example.
 - `formats` takes any name of a language hakkiri reads, such as `markdown` beside `md`.
 - `READERS`, `Language::from_path`, `Language::extension` and the list of scope extensions read from langdex.  
   They list no extensions of their own.

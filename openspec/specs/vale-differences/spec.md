@@ -1386,7 +1386,7 @@ hakkiri SHALL select as each scenario below says, where Vale 3.26.0 has no such 
 
 #### Scenario: A title attribute of a JSX element
 
-- **WHEN** a rule has `scope: title`, and a Markdown with components (MDX) file contains a JSX (JavaScript XML) element with `title`
+- **WHEN** a rule has `scope: title`, and an MDX file contains a JSX (JavaScript XML) element with `title`
 - **THEN** hakkiri selects the title, and Vale reads the attribute only in a rule on `raw` ([link-title 6][link-title])
 
 #### Scenario: A title attribute of an a tag and an img tag

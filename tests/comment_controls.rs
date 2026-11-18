@@ -3,8 +3,8 @@
 //! `tests/fixtures/comment-controls` has these files:
 //!
 //! - one package of twelve rules (`styles`)
-//! - 23 Markdown files and one Markdown with components (MDX) file (`text`,
-//!   with `.fixture` after the extension)
+//! - 23 Markdown files and one MDX file (`text`, with `.fixture` after the
+//!   extension)
 //! - two Markdown files where Vale places a comment wrongly (`differences`)
 //! - one config for each tool: `vale/all.ini` and `.ctl/all.yaml`
 //!

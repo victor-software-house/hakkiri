@@ -5,7 +5,7 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 ## 1. The probe
 
 - [x] 1.1 Probe Vale at `66bbb85` for `Vale.Spelling` under 11 configs, and record its alerts in `tests/fixtures/vale-spelling`.  
-  The probe covers Markdown, MDX (Markdown with JavaScript XML), Rust and TypeScript files.  
+  The probe covers Markdown, MDX, Rust and TypeScript files.  
   Verify `vale.tsv` contains the alerts of every config that gives one.
   - 2026-11-12 (UTC): A Vale build of `66bbb85` ran in a cloud box and gave 880 alerts.  
     It showed that a dictionary in `config/dictionaries` adds to the built-in one, and that `dictionaries` replaces it.  

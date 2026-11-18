@@ -2,7 +2,7 @@
 
 ## Context
 
-hakkiri has seven readers: Markdown, MDX (Markdown with JavaScript XML), Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and plain text.  
+hakkiri has seven readers: Markdown, MDX, Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and plain text.  
 It used to keep its own tables for them:
 
 - `Language::from_path` chose a reader by matching the extension.

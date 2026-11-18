@@ -9,7 +9,7 @@ So prose rules read it as text.
 
 ### Requirement: A top-level string of front matter is text
 
-In a Markdown or Markdown with components (MDX) file, a rule scoped `text` SHALL read each top-level string value of front matter.  
+In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
 The front matter is the block at the top of the file, in a form of the next requirement.
 
 Keys, lists, nested mappings and values that are not strings SHALL not be read.  

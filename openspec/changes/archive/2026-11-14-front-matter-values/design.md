@@ -12,7 +12,7 @@ hakkiri's parser reads the block as one node with no prose, and the tree dropped
 Goals:
 
 - The alerts in front matter match those of Vale on the probe files.  
-  This covers YAML, TOML and JSON, in Markdown and in MDX (Markdown with JavaScript XML).
+  This covers YAML, TOML and JSON, in Markdown and in MDX.
 - A rule reaches a value by `text`, `frontmatter` and the key, as in Vale.
 
 Non-goals:

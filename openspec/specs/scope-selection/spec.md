@@ -293,7 +293,7 @@ A piece that gives no language SHALL be an error.
 ### Requirement: title selects the title of a link, an image and a definition
 
 The scope `title` SHALL select the title text of an inline link, an inline image and a link reference definition.  
-This SHALL apply in a Markdown or Markdown with components (MDX) file.  
+This SHALL apply in a Markdown or MDX file.  
 The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.
 
 The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.  

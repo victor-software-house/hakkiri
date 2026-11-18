@@ -34,7 +34,7 @@ A scope part for a language SHALL match either of them, and a negated part SHALL
 
 hakkiri SHALL read a file by the reader its `formats` entry gives it.  
 Otherwise it SHALL read the file by the reader of its language.  
-The readers are Markdown, MDX (Markdown with JavaScript XML), Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and Text.
+The readers are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and Text.
 
 Some files that a glob selects have a language that no reader reads, or have no language.  
 Such a file SHALL be read as plain text, unless `on_unknown` is set to something else.  

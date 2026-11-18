@@ -1,7 +1,7 @@
 ---
 name: hakkiri
 description: >-
-  Run the hakkiri prose linter on Markdown, Markdown with components (MDX)
+  Run the hakkiri prose linter on Markdown, MDX
   and source comments: hakkiri check, hakkiri test, the project config
   .ctl/hakkiri.yaml, rule packages, rule test cases, alert levels and exit
   codes; use it when a repository has .ctl/hakkiri.yaml, when a lint:prose

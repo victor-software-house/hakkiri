@@ -82,7 +82,7 @@ Code comments are `text.comment.line` and `text.comment.block`, with `doc` added
 scope: sentence & ~blockquote
 ```
 
-Vale has no scope names for front matter, link definitions, raw HTML or Markdown with components (MDX).  
+Vale has no scope names for front matter, link definitions, raw HTML or MDX.  
 No ProseStyle rule needs one, so the spec adds none until a rule does.  
 Vale's code applies an exclusion to the element and its direct parent only.  
 hakkiri applies it at any depth, as decision 7 lists.

@@ -21,7 +21,7 @@ The fence SHALL stay a gap in the prose around it.
 When hakkiri reads the comments of a fence's language, it SHALL parse the code of the fence with that language's grammar.  
 Each comment SHALL be a node inside the node that contains the fence, read as the comments of a source file are.
 
-Each span of those nodes SHALL be the bytes of the Markdown or MDX (Markdown with JavaScript XML) file.  
+Each span of those nodes SHALL be the bytes of the Markdown or MDX file.  
 Each such node, and every node inside it, SHALL have that language.  
 A fence whose code does not map line for line onto the file SHALL give no nodes.
 
@@ -45,7 +45,7 @@ A fence whose code does not map line for line onto the file SHALL give no nodes.
 
 These blocks SHALL give no nodes:
 
-- a fence of Markdown, MDX (Markdown with JavaScript XML) or Text;
+- a fence of Markdown, MDX or Text;
 - a fence with no info string;
 - a fence of a language whose comments hakkiri does not read;
 - an indented code block.

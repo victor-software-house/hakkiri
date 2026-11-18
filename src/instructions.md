@@ -1,6 +1,6 @@
 # hakkiri operator instructions
 
-`hakkiri check` lints Markdown, Markdown with components (MDX) and source comments.  
+`hakkiri check` lints Markdown, MDX and source comments.  
 It reads the comments of Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files.  
 The project config, `.ctl/hakkiri.yaml`, sets which rules run on which files, and `hakkiri test` runs the test cases of rule files.  
 `hakkiri instructions` and `--help` are the contract of the installed version.
@@ -436,7 +436,7 @@ Any fault in the file is an error that shows the package, the file and the line.
 ### `files`
 
 `files` maps globs to settings, and a file is linted only when a glob matches it.  
-`*` crosses `/`, and `**` and `{a,b}` work.  
+`*` stays inside one folder, `**` spans folders, and `{a,b}` works.  
 Every matching glob applies, and only settings of the same key compete.  
 These keys are a rule's switch and its level, `styles`, each parameter of a rule, and `code_span_size`.
 

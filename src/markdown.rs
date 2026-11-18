@@ -1,4 +1,4 @@
-//! Markdown and Markdown with components (MDX) text into nodes, through
+//! Markdown and MDX text into nodes, through
 //! markdown-rs.
 
 use std::cell::{Cell, RefCell};

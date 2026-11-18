@@ -2,7 +2,7 @@
 
 ### Requirement: A top-level string of front matter is text
 
-In a Markdown or MDX (Markdown with JavaScript XML) file, a rule scoped `text` SHALL read each top-level string value of front matter.  
+In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
 The front matter is the block at the top of the file.  
 The block SHALL be no part of the body: no rule reads its lines as a paragraph, a heading or a sentence.
 

@@ -2,7 +2,7 @@
 //!
 //! `tests/fixtures/front-matter` contains one package of nine rules
 //! (`styles`).
-//! It also has six Markdown files, one Markdown with JavaScript XML (MDX) file
+//! It also has six Markdown files, one MDX file
 //! and one probe of YAML scalars (`text`, with `.fixture` after the extension).
 //! There is one config for each tool: `vale/all.ini` and `.ctl/all.yaml`.
 //!

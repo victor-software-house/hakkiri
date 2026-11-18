@@ -2,7 +2,7 @@
 
 ## Context
 
-The files are Markdown and MDX (Markdown with JavaScript XML).  
+The files are Markdown and MDX.  
 hakkiri gives each top-level string in a file's front matter a node of the scope `frontmatter` ([front-matter-values]).  
 It finds the block itself for three fences, and reads it with ctl-core's `Input::top_level`.  
 markdown-rs cuts the `---` and `+++` blocks from the body.

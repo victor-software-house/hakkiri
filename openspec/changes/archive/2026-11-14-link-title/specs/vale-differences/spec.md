@@ -18,7 +18,7 @@ hakkiri SHALL select as each scenario below shows, where Vale 3.26.0 has no such
 
 - **WHEN** a rule has `scope: title`.  
   The input is a Markdown file that contains `<p title="a marker">Some text.</p>` or a line of text with an inline tag that has a title.  
-  Or it is an MDX (Markdown with JavaScript XML) file that contains a JavaScript XML (JSX) element with `title`
+  Or it is an MDX file that contains a JavaScript XML (JSX) element with `title`
 - **THEN** hakkiri selects each title, and Vale reads the attribute only in a rule on `raw` ([link-title 6][link-title])
 
 #### Scenario: A title attribute of an a tag and an img tag

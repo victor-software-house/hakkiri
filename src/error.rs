@@ -9,7 +9,7 @@ use crate::pattern::SearchError;
 /// Why a file gave no tree.
 #[derive(Debug)]
 pub enum Error {
-    /// The Markdown with JavaScript XML (MDX) parser rejected the file.
+    /// The MDX parser rejected the file.
     Mdx(Message),
     /// A tree-sitter grammar could not load.
     Grammar(tree_sitter::LanguageError),

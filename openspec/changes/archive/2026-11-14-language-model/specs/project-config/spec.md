@@ -5,7 +5,7 @@
 `formats` SHALL map an extension, a file name or a glob to a reader.  
 The entry SHALL give the reader by any langdex name, alias or extension of the language it reads.
 
-The readers are Markdown, MDX (Markdown with JavaScript XML), Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and Text.  
+The readers are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and Text.  
 So `md`, `markdown` and `Markdown` give one reader, and `text` gives plain text.
 
 An entry keyed by the file's extension SHALL come first.  
