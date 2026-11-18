@@ -10,7 +10,7 @@ The release workflow of verctl builds it, and mise installs it from a pinned ver
 ### Requirement: A release is a tag, a Release and two tarballs
 
 A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.  
-The `linux-x64` tarball SHALL hold a statically linked `x86_64-unknown-linux-musl` binary.  
+The `linux-x64` tarball SHALL contain a statically linked `x86_64-unknown-linux-musl` binary.  
 GitHub records each tarball's SHA-256 digest, which a lock reads.  
 It SHALL publish nothing to crates.io.
 

@@ -210,7 +210,7 @@ The parent's `tests` SHALL NOT carry over.
 
 #### Scenario: Cases of the child only
 
-- **WHEN** a parent and its child each hold one case
+- **WHEN** a parent and its child each have one case
 - **THEN** `hakkiri test` runs one case for each rule, and the child does not run the case of its parent
 
 ### Requirement: A key with a plus or a minus edits a field of the parent

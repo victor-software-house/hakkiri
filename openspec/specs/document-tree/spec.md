@@ -9,7 +9,7 @@ Rules select text from this tree, and alerts point back into the file through th
 
 ### Requirement: Every node contains a scope and a span
 
-Each node in the tree SHALL hold its scope name, the byte span of its text in the file, and its child nodes.  
+Each node in the tree SHALL contain its scope name, the byte span of its text in the file, and its child nodes.  
 The node-segments spec states which ranges make the text of a node and how the span covers them.
 
 #### Scenario: A paragraph in a Markdown file
@@ -135,7 +135,7 @@ A Swift block comment SHALL nest.
 
 ### Requirement: String literals never reach the tree
 
-No node in the tree of a source file SHALL hold text from a string literal, a raw string or a macro argument.
+No node in the tree of a source file SHALL contain text from a string literal, a raw string or a macro argument.
 
 #### Scenario: A string that contains a URL
 
@@ -201,8 +201,8 @@ The run of `/` or `*` that follows the opener of a plain comment SHALL be stripp
 
 ### Requirement: A Markdown tree counts code blocks
 
-The tree of a Markdown or MDX file SHALL hold the number of its fenced and indented code blocks.  
-The tree of a source file SHALL hold 0.
+The tree of a Markdown or MDX file SHALL store the number of its fenced and indented code blocks.  
+The tree of a source file SHALL store 0.
 
 #### Scenario: Two fences and an indented block
 
@@ -397,7 +397,7 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 ### Requirement: More JSDoc tags name something
 
 In a `/** */` comment, the name after a tag SHALL carry no prose scope for `@see`, `@event`, `@member`, `@var`, `@name`, `@alias`, `@memberof`, `@augments`, `@extends`, `@mixes`, `@borrows`, `@function`, `@func`, `@method`, `@class`, `@constructor`, `@namespace` and `@module`, as it does after `@param`.  
-The same SHALL hold for `@enum`, `@external`, `@host`, `@kind`, `@listens`, `@fires`, `@emits`, `@this`, `@requires`, `@implements` and `@satisfies`.
+The same SHALL apply to `@enum`, `@external`, `@host`, `@kind`, `@listens`, `@fires`, `@emits`, `@this`, `@requires`, `@implements` and `@satisfies`.
 
 #### Scenario: A see tag
 

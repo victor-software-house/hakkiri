@@ -95,7 +95,7 @@ The exclusion SHALL apply only to the blocks that its own scope item selects.
 
 ### Requirement: A check reads text without inline markup
 
-The text a check reads SHALL hold the text of strong, emphasis and link elements without their markers, and no link target.
+The text a check reads SHALL contain the text of strong, emphasis and link elements without their markers, and no link target.
 
 #### Scenario: A phrase across markup
 
@@ -257,7 +257,7 @@ A scope item in which every part has another language SHALL select nothing.
 
 #### Scenario: One language, several extensions
 
-- **WHEN** a rule has `scope: text.comment.js` and `tokens: [marker]`, and the files `a.js`, `a.jsx`, `a.mjs` and `a.cjs` each hold `// A marker.`
+- **WHEN** a rule has `scope: text.comment.js` and `tokens: [marker]`, and the files `a.js`, `a.jsx`, `a.mjs` and `a.cjs` each contain `// A marker.`
 - **THEN** hakkiri reports one alert in each file
 
 #### Scenario: A name of the language
@@ -325,19 +325,19 @@ A title in a heading or a table cell SHALL be a link title as any other.
 
 #### Scenario: Link, image and definition
 
-- **WHEN** a link, an image and a definition each hold a title with the token `marker`
+- **WHEN** a link, an image and a definition each contain a title with the token `marker`
 - **THEN** `title & link` reports the title of the link, `title & image` that of the image, `title` all three, and `link` and `image` none
 
 A negated part for the element, such as `title & ~link`, SHALL leave out the titles that element contains.
 
 #### Scenario: A negated element
 
-- **WHEN** a link, an image and a definition each hold a title with the token `marker`
+- **WHEN** a link, an image and a definition each contain a title with the token `marker`
 - **THEN** `title & ~link` selects the titles of the image and the definition, and `title & ~image` those of the link and the definition
 
 #### Scenario: A heading and a table cell
 
-- **WHEN** a heading and a table cell each hold a link with a title
+- **WHEN** a heading and a table cell each have a link with a title
 - **THEN** `title & link` selects both titles
 
 #### Scenario: An image with no alt text

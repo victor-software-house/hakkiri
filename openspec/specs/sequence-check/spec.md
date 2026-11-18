@@ -64,7 +64,7 @@ With `ignorecase: true`, patterns SHALL ignore case.
 ### Requirement: negate and target
 
 A token with `negate: true` SHALL match a word its pattern or tag does not match.  
-A negated token SHALL also hold at the start or end of the sentence.  
+A negated token SHALL also apply at the start or end of the sentence.  
 When one or more tokens set `target: true`, the alert SHALL span only the words from the first to the last of them.
 
 #### Scenario: Not followed by a noun
@@ -148,7 +148,7 @@ The square brackets of an intra-doc link around one code span SHALL belong to th
 
 ### Requirement: A sequence rule may list several forms
 
-A `sequence` rule SHALL take `forms`, a list of mappings that each hold `tokens`, in place of `tokens`.  
+A `sequence` rule SHALL take `forms`, a list of mappings that each contain `tokens`, in place of `tokens`.  
 It SHALL report each run of words that any form matches, with the rule's own name.  
 The rest of the rule SHALL apply to every form.
 

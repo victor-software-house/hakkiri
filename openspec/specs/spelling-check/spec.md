@@ -2,7 +2,7 @@
 
 ## Purpose
 
-A `spelling` rule checks each word of the selected text against a dictionary and reports the words it does not hold.  
+A `spelling` rule checks each word of the selected text against a dictionary and reports the words it does not contain.  
 An `affix` field lets an `existence` token or a `substitution` key name a word with its affix flags.  
 Both keep the meaning Vale 3.26.0 gives them.
 
@@ -11,7 +11,7 @@ Both keep the meaning Vale 3.26.0 gives them.
 ### Requirement: spelling reports a word the dictionary lacks
 
 A `spelling` rule SHALL split the selected text into words.  
-It SHALL report each word that the rule's dictionaries do not hold, as one alert that spans the word.  
+It SHALL report each word that the rule's dictionaries do not contain, as one alert that spans the word.  
 A `%s` in its message SHALL read as the word.  
 When the rule loads no other dictionary, the dictionary SHALL be Vale's built-in `en_US-web`.
 

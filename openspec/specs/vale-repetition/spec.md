@@ -59,7 +59,7 @@ It SHALL compare them as Go's `strings.EqualFold` does, and SHALL NOT fold the t
 
 ### Requirement: Accepted terms and the config set the rule
 
-An accepted term of a top-level vocabulary or of a glob's vocabulary SHALL hold a repeat back.  
+An accepted term of a top-level vocabulary or of a glob's vocabulary SHALL drop a repeat.  
 A level, `on` or `off` set by the name `Vale.Repetition` SHALL apply to it as to any rule.
 
 #### Scenario: A vocabulary

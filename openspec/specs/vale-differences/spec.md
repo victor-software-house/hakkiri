@@ -46,7 +46,7 @@ hakkiri SHALL read the text and the scopes of a document as each scenario below 
 #### Scenario: A scope part matches by dotted prefix
 
 - **WHEN** a rule has `scope: h1` or `scope: comment.text`
-- **THEN** hakkiri refuses the name as unknown, and Vale compares the set of dotted parts, so it selects the nodes that hold them ([engine 3][engine-3])
+- **THEN** hakkiri refuses the name as unknown, and Vale compares the set of dotted parts, so it selects the nodes that contain them ([engine 3][engine-3])
 
 #### Scenario: A sentence in a paragraph is selected
 
@@ -120,7 +120,7 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 - **WHEN** an `occurrence` match overlaps a code span
 - **THEN** hakkiri does not count it, and Vale counts every match, then points at the first one that is not code ([engine 16][engine-16])
 
-#### Scenario: Overlapping phrase exceptions both hold
+#### Scenario: Overlapping phrase exceptions both apply
 
 - **WHEN** the text is `a b c`, the exceptions are the phrases `a b` and `b c`, and a rule matches `c`
 - **THEN** hakkiri drops the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
@@ -431,7 +431,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 
 #### Scenario: Two packages with one vocabulary
 
-- **WHEN** two packages each hold a vocabulary `Team`
+- **WHEN** two packages each contain a vocabulary `Team`
 - **THEN** hakkiri refuses the config and reports both, where Vale takes the first search path, or the last package after `vale sync` ([vocabularies 3][vocabularies-3])
 
 #### Scenario: The per-user styles folder
@@ -1031,7 +1031,7 @@ hakkiri SHALL run `Vale.Spelling` as Vale does, apart from the scenarios below a
 
 #### Scenario: Several packages
 
-- **WHEN** a project loads two packages that each hold a `config/ignore` folder or a `config/dictionaries` folder
+- **WHEN** a project loads two packages that each contain a `config/ignore` folder or a `config/dictionaries` folder
 - **THEN** hakkiri reads both, in order, and Vale reads one styles path ([vale-spelling 2][vale-spelling-2])
 
 #### Scenario: A code span in a code comment

@@ -53,7 +53,7 @@ hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL stil
 ### Requirement: The pretty output is a line per alert
 
 hakkiri SHALL print each alert as `path:line:column: level Rule: message`, in order of path, then line, then column, then each failure as `failed path: message`, and then one count line.  
-The lines SHALL hold no colour and no frame, and two runs over the same files SHALL print the same text.
+The lines SHALL contain no colour and no frame, and two runs over the same files SHALL print the same text.
 
 #### Scenario: A warning
 
@@ -68,8 +68,8 @@ The lines SHALL hold no colour and no frame, and two runs over the same files SH
 ### Requirement: The JSON output is one object
 
 `--format json` SHALL print one object with `alerts`, `failures` and `files`.  
-Each alert SHALL hold `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
-The output SHALL hold no escape (ESC) byte, whatever the colour variables hold.
+Each alert SHALL contain `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
+The output SHALL contain no escape (ESC) byte, whatever the colour variables are set to.
 
 #### Scenario: JSON with colour forced
 

@@ -9,8 +9,8 @@ This spec fixes its fields, its position, its message, its order, and what a pat
 
 ### Requirement: An alert shows the rule, level, message, place and match
 
-Each alert SHALL hold the rule name, the level, the message, the line, the first and last column of the match, and the matched text.  
-It SHALL also hold the rule's `link` and `description` when the rule sets them.
+Each alert SHALL contain the rule name, the level, the message, the line, the first and last column of the match, and the matched text.  
+It SHALL also contain the rule's `link` and `description` when the rule sets them.
 
 #### Scenario: A word in a sentence
 
@@ -123,7 +123,7 @@ hakkiri SHALL lint a 50,000-character line and a 60,000-line file to the end, wi
 
 #### Scenario: Sixty thousand lines
 
-- **WHEN** the same rule reads a file of 60,000 lines that each hold `A marker.`
+- **WHEN** the same rule reads a file of 60,000 lines that each contain `A marker.`
 - **THEN** hakkiri reports 60,000 alerts, the last on line 60,000
 
 ### Requirement: A match ends at its last character

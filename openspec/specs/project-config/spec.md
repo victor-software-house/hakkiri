@@ -55,13 +55,13 @@ It SHALL refuse two entries that contain a style of one name, and the error SHAL
 
 #### Scenario: One style in two folders
 
-- **WHEN** `packages` contains `{path: a}` and `{path: b}` and both hold a folder `Team`
+- **WHEN** `packages` contains `{path: a}` and `{path: b}` and both contain a folder `Team`
 - **THEN** hakkiri reports an error that shows `a/Team` and `b/Team`, and exits with a failure status
 
 #### Scenario: A folder of settings
 
 - **WHEN** a package's `styles` folder contains `config/vocabularies/Team/accept.txt` beside the style `Team`
-- **THEN** `config` is no style, a glob that lists `config` is an error, and two packages that each hold a `config` folder load together
+- **THEN** `config` is no style, a glob that lists `config` is an error, and two packages that each contain a `config` folder load together
 
 #### Scenario: A hash of the wrong shape
 
@@ -439,7 +439,7 @@ Like in the project's config, a rule setting for no loaded rule SHALL be an erro
 - **WHEN** a package's `.ctl/hakkiri.yaml` contains `MinAlertLevel: warning` on line 3
 - **THEN** hakkiri reports an error that shows `MinAlertLevel`, line 3 and the package, and exits 2
 
-#### Scenario: A rule the package does not hold
+#### Scenario: A rule the package does not contain
 
 - **WHEN** a package's file sets `Team.Nope: warning` and no loaded style contains `Team.Nope`
 - **THEN** hakkiri reports an error that shows the key and the line
@@ -448,7 +448,7 @@ Like in the project's config, a rule setting for no loaded rule SHALL be an erro
 
 hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Repetition` and `Spelling`.  
 It SHALL also contain `Terms` and `Avoid` when a listed vocabulary at the top level contains a term.  
-The style SHALL exist whatever the vocabularies hold.
+The style SHALL exist whatever the vocabularies contain.
 
 #### Scenario: A style called Vale
 
@@ -586,7 +586,7 @@ Both SHALL apply whatever characters the key contains and however the config is 
 A fault about one item of a list SHALL give the line of that item.  
 A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{` split nothing.
 
-#### Scenario: Globs and settings that hold special characters
+#### Scenario: Globs and settings that contain special characters
 
 - **WHEN** `files` contains `'docs/**/*.md': {Team.Hint: yes}` on line 4, `'src/{a,b}/lib.rs'` on line 5 with `styles: [Other]` on line 6 and `Team.Hint: maybe` on line 7, and `'x[1].md': {styles: [Nope]}` on line 8
 - **THEN** hakkiri reports line 4 for the first fault, line 7 for the second and line 8 for the third
@@ -804,5 +804,5 @@ The forced lists SHALL add up among themselves and replace what the lists withou
 
 #### Scenario: A forced list
 
-- **WHEN** the same package glob holds, and the project sets `'docs/*.md': {token_ignores: !override ['%[^%]*%']}`
+- **WHEN** the same package glob applies, and the project sets `'docs/*.md': {token_ignores: !override ['%[^%]*%']}`
 - **THEN** `docs/a.md` hides only `%…%`

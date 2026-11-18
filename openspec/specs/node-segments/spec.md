@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Every node of the document tree reads its text from segments: byte ranges of the file that hold prose and no syntax.  
+Every node of the document tree reads its text from segments: byte ranges of the file that contain prose and no syntax.  
 A check reads the text, and an alert points at the span that covers it.
 
 ## Requirements
 
 ### Requirement: Every node contains segments
 
-Each node SHALL hold its segments, the byte ranges of its text in the file, in order.  
+Each node SHALL contain its segments, the byte ranges of its text in the file, in order.  
 The span of the node SHALL run from the start of the first segment to the end of the last.
 
 #### Scenario: A heading
@@ -40,7 +40,7 @@ The text of an HTML tag and the text around it SHALL read as the html-block-text
 
 ### Requirement: A Markdown line is one segment
 
-A Markdown paragraph, heading or inline node SHALL hold one segment for each line of its text.
+A Markdown paragraph, heading or inline node SHALL have one segment for each line of its text.
 
 A segment leaves out the line ending.  
 It also leaves out the indentation and the block quote markers in front of the line.
@@ -79,7 +79,7 @@ A setext heading SHALL leave out its underline.
 ### Requirement: Container text contains the content only
 
 A block quote, a list item and a table row SHALL have the segments of the nodes inside them, in order.  
-Their text SHALL hold no `>` marker, bullet, number or indentation.  
+Their text SHALL contain no `>` marker, bullet, number or indentation.  
 A block quote or list item with no prose inside it SHALL give no node.
 
 #### Scenario: A nested quote
@@ -110,7 +110,7 @@ A paragraph that contains one of them SHALL stay one node.
 
 ### Requirement: Segments inside comments point into the file
 
-A node inside a comment SHALL hold one segment for each line of its text.  
+A node inside a comment SHALL have one segment for each line of its text.  
 A segment leaves out the comment marker and the indentation that hakkiri strips.
 
 #### Scenario: A paragraph over two line comments
@@ -124,7 +124,7 @@ A segment leaves out the comment marker and the indentation that hakkiri strips.
 The markup of strong text, emphasis, links, autolinks, code spans and images SHALL be gaps between segments.  
 These gaps SHALL cover the markers, the brackets, a link's target and title, an autolink's angle brackets and the backticks.
 
-A link node SHALL hold the segments of its text, a code node those of its content, and an `alt` node those of its alt text.
+A link node SHALL have the segments of its text, a code node those of its content, and an `alt` node those of its alt text.
 
 #### Scenario: Strong text and a link
 

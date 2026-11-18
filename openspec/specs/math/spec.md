@@ -54,7 +54,7 @@ A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one S
 #### Scenario: A code span or a heading or a table cell
 
 - **WHEN** `` `$very$` `` is a code span, and `$very$` is in a heading and in a table cell
-- **THEN** the code span contains no math, and the heading and the cell each hold a span
+- **THEN** the code span contains no math, and the heading and the cell each contain a span
 
 #### Scenario: The delimiters
 

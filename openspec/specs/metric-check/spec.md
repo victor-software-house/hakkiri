@@ -2,14 +2,14 @@
 
 ## Purpose
 
-A `metric` rule computes a formula over counts of the text it measures, and reports when a condition on the result holds.  
+A `metric` rule computes a formula over counts of the text it measures, and reports when a condition on the result is true.  
 Its variables, formula and condition keep the meaning Vale 3.26.0 gives them, plus `occurrences`.
 
 ## Requirements
 
 ### Requirement: A metric reports when the condition is true
 
-A `metric` rule SHALL evaluate its `formula`, then its `condition` against the result, and report one alert for each measured text where the condition holds.  
+A `metric` rule SHALL evaluate its `formula`, then its `condition` against the result, and report one alert for each measured text where the condition is true.  
 A `%s` in its message SHALL read as the result with two decimals.
 
 #### Scenario: Words per sentence

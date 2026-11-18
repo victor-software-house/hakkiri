@@ -53,7 +53,7 @@ hakkiri SHALL run a rule whose `extends` is `existence`, `substitution`, `occurr
 ### Requirement: A scope selects text with Vale's scope names
 
 A rule's `scope` SHALL take Vale 3.26.0's lowercase dotted scope names, such as `sentence`, `paragraph`, `heading.h1`, `list`, `blockquote`, `table.header` and `raw`.  
-The rule SHALL read only the text those scopes hold.
+The rule SHALL read only the text those scopes contain.
 
 #### Scenario: A paragraph rule skips a heading
 
@@ -62,7 +62,7 @@ The rule SHALL read only the text those scopes hold.
 
 ### Requirement: A table row is a scope
 
-The scope `table.row` SHALL hold the text of one table row, header row included, without its pipes and padding.
+The scope `table.row` SHALL contain the text of one table row, header row included, without its pipes and padding.
 
 #### Scenario: A long table row
 
@@ -146,7 +146,7 @@ A code span, a link and a bare URL in a comment SHALL read as they do in a Markd
 
 ### Requirement: String literals are never prose
 
-In a code file, every scope, `raw` included, SHALL hold comment text only, and never the text of a string literal.
+In a code file, every scope, `raw` included, SHALL contain comment text only, and never the text of a string literal.
 
 #### Scenario: A word in a string
 

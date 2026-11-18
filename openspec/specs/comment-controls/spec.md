@@ -29,7 +29,7 @@ It SHALL also be text inside a code block or a code span, or after a backslash.
 
 #### Scenario: A comment that is text
 
-- **WHEN** `<!-- Vale Off -->`, `<!-- note: vale off -->`, `\<!-- vale off -->`, a code span and a fenced block hold the words
+- **WHEN** `<!-- Vale Off -->`, `<!-- note: vale off -->`, `\<!-- vale off -->`, a code span and a fenced block contain the words
 - **THEN** no text after them is left out
 
 #### Scenario: The blanks

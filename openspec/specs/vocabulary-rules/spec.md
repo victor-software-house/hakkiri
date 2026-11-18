@@ -66,7 +66,7 @@ It SHALL report an accepted term that is not written as the term is.
 
 #### Scenario: No accepted term
 
-- **WHEN** the listed vocabularies hold no accepted term
+- **WHEN** the listed vocabularies contain no accepted term
 - **THEN** no rule `Vale.Terms` exists, and a config that sets its level is an error that shows the rule
 
 ### Requirement: Avoid reports a rejected term

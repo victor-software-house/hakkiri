@@ -59,7 +59,7 @@ Like in the project's config, a rule setting for no loaded rule SHALL be an erro
 - **WHEN** a package's `.ctl/hakkiri.yaml` contains `MinAlertLevel: warning` on line 3
 - **THEN** hakkiri reports an error that shows `MinAlertLevel`, line 3 and the package, and exits 2
 
-#### Scenario: A rule the package does not hold
+#### Scenario: A rule the package does not contain
 
 - **WHEN** a package's file sets `Team.Nope: warning` and no loaded style contains `Team.Nope`
 - **THEN** hakkiri reports an error that shows the key and the line

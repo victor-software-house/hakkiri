@@ -21,9 +21,9 @@ hakkiri SHALL read a listed vocabulary from `config/vocabularies/<name>/` under 
 - **WHEN** the config lists `Nope` and no loaded package contains `config/vocabularies/Nope`
 - **THEN** hakkiri reports an error that shows `Nope` and the line of the key, and exits with a failure status
 
-#### Scenario: Two packages hold one name
+#### Scenario: Two packages contain one name
 
-- **WHEN** two packages each hold `config/vocabularies/Team`
+- **WHEN** two packages each contain `config/vocabularies/Team`
 - **THEN** hakkiri reports an error that shows both folders, and exits with a failure status
 
 #### Scenario: Text and YAML files together
@@ -149,7 +149,7 @@ A file SHALL take the vocabularies of each matching glob, besides the top-level 
 
 ### Requirement: A YAML entry is a term, or a term with options
 
-A `vocab.yml` or `vocab.yaml` file SHALL hold the keys `affix`, `accept` and `reject`.  
+A `vocab.yml` or `vocab.yaml` file SHALL contain the keys `affix`, `accept` and `reject`.  
 An entry of `accept` or `reject` SHALL be a term, a term mapped to nothing, or a term mapped to the options `regex`, `ignorecase` and `flags`.  
 It SHALL give the patterns that a line of a text list would.
 
@@ -218,7 +218,7 @@ A name that is not one file name SHALL be refused.
 
 #### Scenario: The holder first
 
-- **WHEN** two packages each hold `config/dictionaries/custom.aff`, with the suffixes `zz` and `qq`, and the package with `zz` contains the vocabulary that sets `custom`
+- **WHEN** two packages each contain `config/dictionaries/custom.aff`, with the suffixes `zz` and `qq`, and the package with `zz` contains the vocabulary that sets `custom`
 - **THEN** `foo` and `foozz` are accepted and `fooqq` is not, whatever the order of the packages
 
 #### Scenario: Another package

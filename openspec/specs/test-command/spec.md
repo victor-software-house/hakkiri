@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`hakkiri test` runs the cases that rule files and `*.test.yml` files hold, checks each against the alerts it gets, and reports the result and an exit status.
+`hakkiri test` runs the cases that rule files and `*.test.yml` files contain, checks each against the alerts it gets, and reports the result and an exit status.
 
 ## Requirements
 
@@ -41,10 +41,10 @@ It SHALL read any other `.yml` file only when it contains `extends` and `tests`,
 
 #### Scenario: No case
 
-- **WHEN** the paths hold no case
+- **WHEN** the paths contain no case
 - **THEN** hakkiri reports an error that no case was found, and exits 2
 
-### Requirement: A rule file may hold cases
+### Requirement: A rule file may contain cases
 
 A rule file SHALL take `tests` as the cases of [design decision 2][test-2].  
 `hakkiri check` SHALL load them and run none, and SHALL refuse a malformed `tests` with its line.
@@ -103,7 +103,7 @@ It SHALL skip dot and underscore folders when it lists the rules.
 
 #### Scenario: A rule no case fires
 
-- **WHEN** `Team.Filler` and `Team.Hedge` each hold a case and only `Team.Filler` flags anything
+- **WHEN** `Team.Filler` and `Team.Hedge` each have a case and only `Team.Filler` flags anything
 - **THEN** `hakkiri test --coverage` lists `Team.Hedge`, and exits 1
 
 #### Scenario: A rule file with a dotted name

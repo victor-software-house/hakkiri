@@ -8,7 +8,7 @@ The ProseStyle port found two statements about a code span that look opposed.
 The `vale-differences` spec states that a code span counts one word in hakkiri and none in Vale.
 
 ProseStyle `LongSentence` counts the words of a sentence with an `occurrence` rule, and under hakkiri it counts none for a code span.  
-A probe of both tools on one sentence shows both statements hold, for two different checks.
+A probe of both tools on one sentence shows both statements are true, for two different checks.
 
 A project that wants Vale's counts has no way to get them.  
 The operator decided on 2026-11-12 that a code span counts as one word by default.  

@@ -45,13 +45,13 @@ A level for a style, and any other word, SHALL be no comment.
 - **WHEN** the config sets the rule to `suggestion` and a comment before the text sets it to `error`
 - **THEN** the alert is an error
 
-### Requirement: Source files hold no comment control
+### Requirement: Source files have no comment control
 
-A glob that matches a source file SHALL leave the text of its comments as it is, whatever HTML comment they hold.
+A glob that matches a source file SHALL leave the text of its comments as it is, whatever HTML comment they contain.
 
 #### Scenario: A Rust doc comment
 
-- **WHEN** a doc comment contains `<!-- hakkiri off -->` and the lines after it hold `very`
+- **WHEN** a doc comment contains `<!-- hakkiri off -->` and the lines after it contain `very`
 - **THEN** the alerts are those of the file with no comment
 
 ### Requirement: A level leaves a rule failure an error

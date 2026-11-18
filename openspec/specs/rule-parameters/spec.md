@@ -100,7 +100,7 @@ It SHALL refuse a value of the wrong kind, a missing value, and a list or a mapp
 
 ### Requirement: A parameter needs a rule that takes one
 
-hakkiri SHALL refuse a parameter of a rule that no loaded style holds, and a parameter of a rule that a vocabulary builds.
+hakkiri SHALL refuse a parameter of a rule that no loaded style contains, and a parameter of a rule that a vocabulary builds.
 
 #### Scenario: A rule no style contains
 
