@@ -183,6 +183,17 @@ queue:
     notes:
       - 2026-11-18, the templates prose pass found HyphenChain and Dashes on rendered // oxlint-disable-next-line rule -- reason lines, which oxlint needs as written.
 
+  - id: HKR-080
+    title: Read a Swift MARK comment as a tool directive
+    scope: comments
+    outcome: hakkiri never lints an Xcode MARK comment as prose.
+    blocked_by: []
+    acceptance:
+      - 'A Swift comment that opens with MARK: draws no alert.'
+    plan: openspec/changes/swift-mark/proposal.md
+    notes:
+      - '2026-11-18, the signd prose pass found UndefinedAcronym on each // MARK: line, and the only way to pass was to drop the Xcode sections.'
+
 archive:
   - id: HKR-077
     title: Skip mise task headers as tool directives

@@ -173,6 +173,19 @@ fn a_hash_comment_is_a_line_comment() -> TestResult {
 }
 
 #[test]
+fn a_swift_mark_is_not_prose() -> TestResult {
+    let words = "extends: existence\nmessage: \"found '%s'\"\nnonword: true\nscope: text\ntokens:\n  - '[A-Za-z]+'\n";
+    let found = alerts(
+        Language::Swift,
+        words,
+        "// MARK: - Sync state\nlet a = 1\n// MARKER words.\nlet b = 2\n",
+    )?;
+    let matched: Vec<&str> = found.iter().map(|(_, word)| word.as_str()).collect();
+    assert_eq!(matched, ["MARKER", "words"]);
+    Ok(())
+}
+
+#[test]
 fn an_oxlint_switch_is_not_prose() -> TestResult {
     let words = "extends: existence\nmessage: \"found '%s'\"\nnonword: true\nscope: text\ntokens:\n  - '[A-Za-z]+'\n";
     let found = alerts(
