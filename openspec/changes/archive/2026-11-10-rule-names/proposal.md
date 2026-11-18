@@ -5,10 +5,17 @@ Queue row: `HKR-032` in [tasks.yaml][ledger].
 ## Motivation
 
 hakkiri names a rule file differently from Vale, and `check` and `test` can name one file differently.
-Vale cuts a file name at its first dot, so `Terms.custom.yml` in `Team` is `Team.Terms`, and hakkiri cuts at the last dot, so it is `Team.Terms.custom`.
-Vale loads the folders under a style and joins them into the name, so `Team/Sub/Bar.yml` is `Team.Sub.Bar`, and hakkiri reads only the files directly in the folder.
-`test` names a nested file by its own folder, `Sub.Bar`, where `check` would name it `Team.Sub.Bar` once nested folders load ([review thread][thread]).
-A style written for Vale gives other rule names in hakkiri, so a setting such as `Team.Terms = NO` misses its rule.
+
+Vale cuts a file name at its first dot, so `Terms.custom.yml` in `Team` is `Team.Terms`.  
+hakkiri cuts at the last dot, so the same file is `Team.Terms.custom`.
+
+Vale loads the folders under a style and joins them into the name, so `Team/Sub/Bar.yml` is `Team.Sub.Bar`.  
+hakkiri reads only the files directly in the folder.
+
+`test` names a nested file by its own folder, `Sub.Bar`.  
+`check` would name it `Team.Sub.Bar` once nested folders load ([review thread][thread]).
+
+A style written for Vale gives other rule names in hakkiri, so a setting such as `Team.Terms = NO` misses its rule.  
 The operator decided hakkiri names rules as Vale does (operator, 2026-11-10).
 
 ## Changes
@@ -32,7 +39,8 @@ None.
 
 ## Impact
 
-- `src/rule.rs` (`rule_name`, `load_style`) and `src/suite.rs` change. No new dependency.
+- `src/rule.rs` (`rule_name`, `load_style`) and `src/suite.rs` change.  
+  There is no new dependency.
 - The [`test-command`][test] change, now archived, names a rule as the loader does, so its design and spec change in this pull request, from `Team.Foo.v2` to `Team.Foo`.
 
 [ledger]: ../../../../tasks.yaml
