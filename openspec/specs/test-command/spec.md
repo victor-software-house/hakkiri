@@ -10,31 +10,31 @@
 
 `hakkiri test` SHALL run the `tests` of each rule file and each case of each `*.test.yml` file under the paths it is given, or under the current directory when it is given none.  
 A directory walk SHALL skip a dot directory other than the one named, and every folder the `check` walk skips by name.  
-It SHALL read any other `.yml` file only when it holds `extends` and `tests`, and SHALL fail when it finds no case.
+It SHALL read any other `.yml` file only when it contains `extends` and `tests`, and SHALL fail when it finds no case.
 
 #### Scenario: A rule with cases and a test file
 
-- **WHEN** `styles/Team/Filler.yml` holds two cases and `test/package.test.yml` holds three
+- **WHEN** `styles/Team/Filler.yml` contains two cases and `test/package.test.yml` contains three
 - **THEN** `hakkiri test` runs five cases
 
 #### Scenario: YAML that is not a rule
 
-- **WHEN** a directory holds `ci.yml`, a workflow with no `extends`
+- **WHEN** a directory contains `ci.yml`, a workflow with no `extends`
 - **THEN** hakkiri reads no case from it and reports nothing about it
 
 #### Scenario: A folder the walk skips
 
-- **WHEN** `node_modules/pkg/x.test.yml` holds a failing case and the rest of the project holds passing ones
+- **WHEN** `node_modules/pkg/x.test.yml` contains a failing case and the rest of the project contains passing ones
 - **THEN** `hakkiri test` runs no case from `node_modules` and exits 0
 
 #### Scenario: A folder named as an argument
 
-- **WHEN** `hakkiri test node_modules/pkg` runs and `pkg` holds a case, and `pkg/node_modules` holds a failing one
+- **WHEN** `hakkiri test node_modules/pkg` runs and `pkg` contains a case, and `pkg/node_modules` contains a failing one
 - **THEN** hakkiri runs the case in `pkg` and none from `pkg/node_modules`, as `check` does
 
 #### Scenario: A skipped name given as the folder
 
-- **WHEN** `hakkiri test node_modules` runs and `node_modules` holds a case
+- **WHEN** `hakkiri test node_modules` runs and `node_modules` contains a case
 - **THEN** hakkiri runs the case, because a folder named as an argument is walked whatever its name
 
 #### Scenario: No case
@@ -49,12 +49,12 @@ A rule file SHALL take `tests` as the cases of [design decision 2][test-2].
 
 #### Scenario: A rule with cases under check
 
-- **WHEN** `hakkiri check` runs over a style whose rule holds a case that would fail
+- **WHEN** `hakkiri check` runs over a style whose rule contains a case that would fail
 - **THEN** hakkiri reports no failure for the case, and exits by the alerts alone
 
 #### Scenario: A malformed case in a rule
 
-- **WHEN** a rule's `tests` holds a case with the field `inputs`
+- **WHEN** a rule's `tests` contains a case with the field `inputs`
 - **THEN** hakkiri refuses the rule, names the line of `inputs`, and exits 2
 
 ### Requirement: A case is checked before it runs
@@ -127,7 +127,7 @@ It SHALL exit 0 when every case passes and no rule is uncovered, 1 when a case f
 #### Scenario: JSON with colour forced
 
 - **WHEN** `hakkiri test --format json` runs with `CLICOLOR_FORCE=1`
-- **THEN** the output parses as JSON and holds no ESC byte
+- **THEN** the output parses as JSON and contains no ESC byte
 
 [test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
 
@@ -138,12 +138,12 @@ It SHALL report a case that runs through a config as not run when the config run
 
 #### Scenario: A script rule with a case
 
-- **WHEN** `Cannot.yml` holds `extends: script` and one case, and `Parent.yml` holds a case that passes
+- **WHEN** `Cannot.yml` contains `extends: script` and one case, and `Parent.yml` contains a case that passes
 - **THEN** hakkiri prints a failure that says its cases did not run, counts the passing case, and exits 2
 
 #### Scenario: A case through a config that runs a rule hakkiri cannot run
 
-- **WHEN** a test file holds a case that runs through a config whose listed style holds a script rule
+- **WHEN** a test file contains a case that runs through a config whose listed style contains a script rule
 - **THEN** hakkiri reports the case as not run, naming the rule, and exits 2
 
 ### Requirement: A case's format picks its reader
@@ -159,7 +159,7 @@ A case whose format no reader reads SHALL read its input as plain text, except t
 
 #### Scenario: A formats entry
 
-- **WHEN** the config maps `cfg: md`, a glob selects `*.cfg`, and a case has `format: cfg` and a fenced block that holds `very`
+- **WHEN** the config maps `cfg: md`, a glob selects `*.cfg`, and a case has `format: cfg` and a fenced block that contains `very`
 - **THEN** the case reads the input as Markdown and the rule reports nothing for the fence
 
 ### Requirement: A case through the config has the extensions of its file
@@ -179,10 +179,10 @@ A case through the config whose format no reader reads, and whose file the confi
 
 #### Scenario: An error
 
-- **WHEN** the config holds `on_unknown: error` and `'*.txt': {styles: [Team]}`, and a case has `format: txt`
+- **WHEN** the config contains `on_unknown: error` and `'*.txt': {styles: [Team]}`, and a case has `format: txt`
 - **THEN** the case fails to run with ``no reader reads the format `txt` ``, and the run exits 2
 
 #### Scenario: A warning or an ignore
 
-- **WHEN** the config holds `on_unknown: warn`, or `ignore`, and a case has `format: txt` with `want: ''` and an input that a rule flags in plain text
+- **WHEN** the config contains `on_unknown: warn`, or `ignore`, and a case has `format: txt` with `want: ''` and an input that a rule flags in plain text
 - **THEN** the case passes, because the config does not lint such a file

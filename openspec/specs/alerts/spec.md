@@ -32,7 +32,7 @@ The line and columns of a match inside a comment SHALL be those of its bytes in 
 
 #### Scenario: An indented doc comment
 
-- **WHEN** a rule has `scope: text.comment` and `tokens: [marker]`, and a Rust file holds a line of four spaces and `/// A marker.`
+- **WHEN** a rule has `scope: text.comment` and `tokens: [marker]`, and a Rust file contains a line of four spaces and `/// A marker.`
 - **THEN** the alert is on that line, columns 11 to 16
 
 ### Requirement: A message fills %s in order

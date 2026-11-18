@@ -8,7 +8,7 @@ A value that is no whole number from 0 to 255 SHALL be a usage error.
 
 #### Scenario: The variable beats the config
 
-- **WHEN** the config holds `code_span_size: 2` and `HAKKIRI_CODE_SPAN_SIZE=0` is set
+- **WHEN** the config contains `code_span_size: 2` and `HAKKIRI_CODE_SPAN_SIZE=0` is set
 - **THEN** a `words` metric over a sentence of four code spans and three words reads 3.00
 
 #### Scenario: The flag beats the variable

@@ -69,7 +69,7 @@ A parameter of a rule that no glob runs SHALL be refused in the same way.
 
 ### Requirement: A parameter a rule cannot take is refused
 
-hakkiri SHALL refuse a level, a field that holds a list, a mapping, the rule's identity or its prose, and a field the rule's check does not define.
+hakkiri SHALL refuse a level, a field that contains a list, a mapping, the rule's identity or its prose, and a field the rule's check does not define.
 It SHALL refuse a value of the wrong kind, a missing value, and a list or a mapping as a value.
 
 #### Scenario: A level
@@ -96,10 +96,10 @@ It SHALL refuse a value of the wrong kind, a missing value, and a list or a mapp
 
 hakkiri SHALL refuse a parameter of a rule that no loaded style holds, and a parameter of a rule that a vocabulary builds.
 
-#### Scenario: A rule no style holds
+#### Scenario: A rule no style contains
 
 - **WHEN** a glob sets `max: 1` for `Nope.Rule`
-- **THEN** hakkiri refuses it, as it refuses a level for a rule no style holds
+- **THEN** hakkiri refuses it, as it refuses a level for a rule no style contains
 
 #### Scenario: A rule built from a vocabulary
 

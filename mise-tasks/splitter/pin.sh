@@ -3,7 +3,7 @@
 # Lists the public repositories of the owner that are not forks, not archived
 # and at most 10 MB, and writes each one's name, default-branch commit and
 # license to data/splitter/repositories.tsv. The listing needs no credentials,
-# so it holds only what anyone can read.
+# so it contains only what anyone can read.
 set -euo pipefail
 export GIT_TERMINAL_PROMPT=0
 owner=victor-software-house

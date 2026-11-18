@@ -16,7 +16,7 @@ It SHALL publish nothing to crates.io.
 #### Scenario: The first release
 
 - **WHEN** the Version PR that moves `Cargo.toml` from `0.0.0` to `0.0.1` merges
-- **THEN** the repository has the tag `v0.0.1` and a Release that holds the two tarballs, and crates.io has no `hakkiri` crate
+- **THEN** the repository has the tag `v0.0.1` and a Release that contains the two tarballs, and crates.io has no `hakkiri` crate
 
 #### Scenario: A platform missing
 
@@ -45,7 +45,7 @@ A pattern that matches nowhere or more than once SHALL stop the release.
 #### Scenario: A version bump
 
 - **WHEN** the Version PR bumps the crate to `0.0.1`
-- **THEN** `skills/hakkiri/SKILL.md` holds `version: 0.0.1` and the README installs `hakkiri@0.0.1`
+- **THEN** `skills/hakkiri/SKILL.md` contains `version: 0.0.1` and the README installs `hakkiri@0.0.1`
 
 ### Requirement: The linux-x64 binary needs no loader
 
@@ -53,7 +53,7 @@ The `linux-x64` binary SHALL start on a Linux machine that has no glibc loader, 
 
 #### Scenario: A root with no files
 
-- **WHEN** the binary runs in a root folder that holds no file but the binary, with `check` on a Markdown file that has the word `very` and a rule that flags it
+- **WHEN** the binary runs in a root folder that contains no file but the binary, with `check` on a Markdown file that has the word `very` and a rule that flags it
 - **THEN** it prints `1 alert in 1 file` and exits 0, and `--version` prints the released version
 
 ### Requirement: The linux-x64 binary keeps its speed

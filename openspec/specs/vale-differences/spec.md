@@ -22,7 +22,7 @@ A pull request that adds, changes or removes a difference SHALL change this spec
 #### Scenario: A later decision removes a difference
 
 - **WHEN** a decision makes hakkiri match Vale where an earlier decision differed, as [case 9][case-9] did for the `~` before a scope that [format 7][format-7] listed
-- **THEN** the same pull request removes or rewrites the scenario, so the list holds only what is true now
+- **THEN** the same pull request removes or rewrites the scenario, so the list contains only what is true now
 
 ### Requirement: What a rule reads differs from Vale
 
@@ -35,12 +35,12 @@ hakkiri SHALL read the text and the scopes of a document as each scenario below 
 
 #### Scenario: Rust block comments are read
 
-- **WHEN** a Rust file holds a `/* */`, `/** */` or `/*! */` comment
+- **WHEN** a Rust file contains a `/* */`, `/** */` or `/*! */` comment
 - **THEN** hakkiri reads it as `text.comment.block` or `text.comment.doc.block`, and Vale reads line comments only ([format 7][format-7])
 
 #### Scenario: String literals are never prose
 
-- **WHEN** a code file holds a string literal
+- **WHEN** a code file contains a string literal
 - **THEN** hakkiri never reads it as prose, and Vale reads it with the `raw` scope ([format 7][format-7])
 
 #### Scenario: A scope part matches by dotted prefix
@@ -100,7 +100,7 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 
 #### Scenario: A swap key with a space reads a line wrap
 
-- **WHEN** a `substitution` key holds a space and `$1` in its value, and the matched text wraps a line
+- **WHEN** a `substitution` key contains a space and `$1` in its value, and the matched text wraps a line
 - **THEN** hakkiri expands `$1` from the key as matched, and Vale expands it from the key as written, so the alert is lost ([engine 16][engine-16])
 
 #### Scenario: An occurrence over blank text points at a word
@@ -116,7 +116,7 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 #### Scenario: Overlapping phrase exceptions both hold
 
 - **WHEN** the text is `a b c`, the exceptions are the phrases `a b` and `b c`, and a rule matches `c`
-- **THEN** hakkiri holds back the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
+- **THEN** hakkiri drops the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
 
 [engine-16]: ../../changes/archive/2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
 [engine-18]: ../../changes/archive/2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
@@ -152,7 +152,7 @@ hakkiri SHALL run the pattern checks as each scenario below says, where Vale 3.2
 
 #### Scenario: A consistency alert sits at the last match
 
-- **WHEN** a `consistency` pair matches in a node whose earlier text holds the same words
+- **WHEN** a `consistency` pair matches in a node whose earlier text contains the same words
 - **THEN** hakkiri puts the alert at the last match through its byte table, and Vale searches for the text, so the alert lands where it first appears ([pattern 2][pattern-2])
 
 #### Scenario: ignorecase applies to both conditional patterns
@@ -245,12 +245,12 @@ hakkiri SHALL finish a run on each input below in bounded time and memory, where
 
 #### Scenario: A token of many hyphenated parts
 
-- **WHEN** a `spelling` token holds many hyphenated parts
+- **WHEN** a `spelling` token contains many hyphenated parts
 - **THEN** hakkiri keeps the result of each part for each depth, so it takes polynomial time, and Vale checks every part again at each split, so it takes exponential time ([case 6][case-6])
 
 #### Scenario: A token of many marks
 
-- **WHEN** a text holds a token of 20,000 marks
+- **WHEN** a text contains a token of 20,000 marks
 - **THEN** hakkiri splits its prefixes, suffixes and contractions in one pass, and prose searches what is left again after each one it takes off, which takes quadratic time ([case 5][case-5])
 
 ### Requirement: A comment reads as Markdown
@@ -259,7 +259,7 @@ hakkiri SHALL read every comment of a code file as Markdown, where Vale 3.26.0 r
 
 #### Scenario: A code span in a plain comment
 
-- **WHEN** a Rust file holds ``// Use `utilize` here.`` and an `existence` rule matches `utilize`
+- **WHEN** a Rust file contains ``// Use `utilize` here.`` and an `existence` rule matches `utilize`
 - **THEN** hakkiri reads the span as code and reports nothing, and Vale reports `utilize` inside the backticks ([format 8][format-8])
 
 ### Requirement: The command line differs from Vale's
@@ -274,7 +274,7 @@ hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.2
 #### Scenario: The JSON is an object
 
 - **WHEN** `--format json` is given
-- **THEN** hakkiri prints one object holding `alerts`, `failures` and `files`, and Vale prints a map from each path to its alerts ([check 7][check-7])
+- **THEN** hakkiri prints one object containing `alerts`, `failures` and `files`, and Vale prints a map from each path to its alerts ([check 7][check-7])
 
 #### Scenario: A level flag in place of two
 
@@ -292,7 +292,7 @@ hakkiri SHALL match each `files` glob against the file's path relative to the pr
 
 #### Scenario: A file named by its absolute path
 
-- **WHEN** `files` holds `'docs/**'` and a caller names `docs/a.md` by its absolute path
+- **WHEN** `files` contains `'docs/**'` and a caller names `docs/a.md` by its absolute path
 - **THEN** hakkiri lints it with the styles of that glob, and Vale matches only a glob such as `**/docs/**` ([check 3][check-3])
 
 #### Scenario: A run from a subdirectory
@@ -311,7 +311,7 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 
 #### Scenario: A `.yaml` file
 
-- **WHEN** a directory holds `Rule.yaml` with `extends` and `tests`
+- **WHEN** a directory contains `Rule.yaml` with `extends` and `tests`
 - **THEN** hakkiri reads no case from it, and Vale reads its cases ([test 5][test-5])
 
 #### Scenario: The report
@@ -335,7 +335,7 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 
 #### Scenario: A key that names no rule
 
-- **WHEN** a glob holds `Team.Nope: warning` and no loaded style holds a rule `Team.Nope`
+- **WHEN** a glob contains `Team.Nope: warning` and no loaded style contains a rule `Team.Nope`
 - **THEN** hakkiri refuses it with the line of the key, and Vale ignores `Team.Nope = YES` ([rule-setting 7][rule-setting-7])
 
 #### Scenario: A word that is no level
@@ -349,10 +349,10 @@ hakkiri SHALL load or select as each scenario below says, where Vale 3.26.0 does
 
 #### Scenario: A table row is a scope
 
-- **WHEN** a rule has `scope: table.row` and a row holds the matched text
+- **WHEN** a rule has `scope: table.row` and a row contains the matched text
 - **THEN** hakkiri selects the text of the row, and Vale loads the rule and selects nothing, since no block has a `row` part ([format 9][format-9])
 
-#### Scenario: A scope no node holds
+#### Scenario: A scope no node contains
 
 - **WHEN** a rule has `scope: nonsense`
 - **THEN** hakkiri refuses it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
@@ -368,7 +368,7 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.val
 
 #### Scenario: A Vale configuration
 
-- **WHEN** a project holds a `.vale.ini` and no `.ctl/hakkiri.yaml`
+- **WHEN** a project contains a `.vale.ini` and no `.ctl/hakkiri.yaml`
 - **THEN** hakkiri reads no setting from it, and Vale reads it ([bootstrap 1][bootstrap-1], row [HKR-035][ledger])
 
 #### Scenario: A rule is turned off
@@ -388,7 +388,7 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.val
 
 #### Scenario: A Vale style folder
 
-- **WHEN** a package holds a Vale style folder, such as Voices, Std or Readability
+- **WHEN** a package contains a Vale style folder, such as Voices, Std or Readability
 - **THEN** hakkiri loads it with no conversion, as Vale does, apart from the rules the Known gaps list ([styles 1][styles-1])
 
 ### Requirement: Vocabularies differ from Vale's in these ways
@@ -397,13 +397,13 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 
 #### Scenario: A term that is not a pattern
 
-- **WHEN** a list holds a term such as `C(` that is not a valid pattern
+- **WHEN** a list contains a term such as `C(` that is not a valid pattern
 - **THEN** hakkiri reports an error that names the file and line, where Vale stops with a pattern error that has no line ([vocabularies 4][vocabularies-4])
 
 #### Scenario: A term that Vale's engines refuse
 
-- **WHEN** a list holds `C++`
-- **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and holds back `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
+- **WHEN** a list contains `C++`
+- **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and drops `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
 
 #### Scenario: Two packages with one vocabulary
 
@@ -417,7 +417,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 
 #### Scenario: An unknown vocabulary
 
-- **WHEN** the config names a vocabulary that no package holds
+- **WHEN** the config names a vocabulary that no package contains
 - **THEN** hakkiri names the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
 
 ### Requirement: Package settings differ from Vale's package configuration
@@ -426,7 +426,7 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 
 #### Scenario: The file and its place
 
-- **WHEN** a package holds `.ctl/hakkiri.yaml`
+- **WHEN** a package contains `.ctl/hakkiri.yaml`
 - **THEN** hakkiri reads it from the package's top folder, beside `styles`, and Vale copies the package's `.vale.ini` to `StylesPath/.vale-config/<index>-<Name>.ini` at `vale sync` ([package settings 2][settings-2])
 
 #### Scenario: A scalar in a package
@@ -436,7 +436,7 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 
 #### Scenario: An unknown key in a package
 
-- **WHEN** a package's settings file holds a key hakkiri does not define
+- **WHEN** a package's settings file contains a key hakkiri does not define
 - **THEN** hakkiri refuses it with the line and the package, and Vale warns that the key is not a core option and ignores it ([package settings 7][settings-7])
 
 #### Scenario: A deep chain of packages
@@ -446,7 +446,7 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 
 #### Scenario: A nested package pinned by path
 
-- **WHEN** a package's `packages` holds a `path` entry
+- **WHEN** a package's `packages` contains a `path` entry
 - **THEN** hakkiri refuses it, and Vale installs a local folder named there ([package settings 3][settings-3])
 
 #### Scenario: Ten or more packages
@@ -504,7 +504,7 @@ hakkiri SHALL list here the place where it reads a file otherwise than Vale at 6
 
 #### Scenario: A sentence rule in a comment
 
-- **WHEN** a doc comment of a source file holds one sentence and a rule has `scope: sentence`
+- **WHEN** a doc comment of a source file contains one sentence and a rule has `scope: sentence`
 - **THEN** hakkiri runs the rule on the sentence, and Vale runs it on none, since it reads the comment as plain lines ([block-token-ignores 5][block-token-ignores-5])
 
 [block-token-ignores-2]: ../../changes/archive/2026-11-12-block-token-ignores/design.md#2-what-a-match-turns-into-is-what-vale-gives
@@ -580,7 +580,7 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 
 #### Scenario: A Vale configuration file
 
-- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
+- **WHEN** a project contains a `.vale.ini` and runs `hakkiri import vale`
 - **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
 
 ### Requirement: An action is a known gap
@@ -589,7 +589,7 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 
 #### Scenario: An action
 
-- **WHEN** a rule holds an `action`
+- **WHEN** a rule contains an `action`
 - **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
 
 ### Requirement: Comment controls differ from Vale's in these ways
@@ -598,12 +598,12 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 
 #### Scenario: Forms hakkiri adds
 
-- **WHEN** a Markdown file holds `<!-- hakkiri Team.Words: warning -->` or `<!-- hakkiri Team.Words: off -->`
+- **WHEN** a Markdown file contains `<!-- hakkiri Team.Words: warning -->` or `<!-- hakkiri Team.Words: off -->`
 - **THEN** hakkiri sets the level of the rule from there on, or turns it off, and Vale reads neither form
 
 #### Scenario: A source file
 
-- **WHEN** a doc comment of a Rust, TypeScript or JavaScript file holds an HTML comment that turns rules off
+- **WHEN** a doc comment of a Rust, TypeScript or JavaScript file contains an HTML comment that turns rules off
 - **THEN** hakkiri turns nothing off, and Vale reads a comment as plain lines, so it turns nothing off either ([comment-controls 4][comment-controls-4])
 
 #### Scenario: A directive quoted across a line break
@@ -611,9 +611,9 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 - **WHEN** a code span reads `<!-- vale off` on one line and `-->` on the next, and a real `vale off` comment comes after it
 - **THEN** hakkiri hides the text after the real comment, and Vale also hides the text after the code span, since it takes the comment's place from the first `vale off` that its search finds ([comment-controls 8][comment-controls-8])
 
-#### Scenario: An alert in an element that holds a comment
+#### Scenario: An alert in an element that contains a comment
 
-- **WHEN** a `strong` element holds a comment, and its text holds a match
+- **WHEN** a `strong` element contains a comment, and its text contains a match
 - **THEN** hakkiri places the alert on the match, and Vale places it on the comment ([comment-controls 8][comment-controls-8])
 
 #### Scenario: The styles of a file
@@ -631,7 +631,7 @@ hakkiri SHALL skip the files git ignores in a walk and SHALL warn about a named 
 
 #### Scenario: An ignored build folder
 
-- **WHEN** `.gitignore` holds `build/` and the folder holds a file a glob selects
+- **WHEN** `.gitignore` contains `build/` and the folder contains a file a glob selects
 - **THEN** hakkiri skips it, and Vale lints it, because Vale skips only its default ignored folders and reads no git file ([gitignore 6][gitignore-6])
 
 #### Scenario: A named file with no glob
@@ -647,12 +647,12 @@ hakkiri SHALL read a selected file that no reader reads as plain text, skip a bi
 
 #### Scenario: A manuscript
 
-- **WHEN** a `.txt` file holds chapter lines
+- **WHEN** a `.txt` file contains chapter lines
 - **THEN** hakkiri reads paragraphs, and Vale reads a document whose chapter lines are headings ([plain-text 1][plain-text-1])
 
 #### Scenario: A binary file
 
-- **WHEN** a glob selects a file that holds a NUL byte
+- **WHEN** a glob selects a file that contains a NUL byte
 - **THEN** hakkiri skips it, and Vale has no such test and reads it as lines ([plain-text 5][plain-text-5])
 
 #### Scenario: The extension of a mapped file
@@ -662,7 +662,7 @@ hakkiri SHALL read a selected file that no reader reads as plain text, skip a bi
 
 #### Scenario: A plain-text file with markup
 
-- **WHEN** `notes.cfg` holds a fenced block, a glob selects it and no `formats` entry maps it
+- **WHEN** `notes.cfg` contains a fenced block, a glob selects it and no `formats` entry maps it
 - **THEN** hakkiri reads the fence as text, as Vale reads a file of lines ([plain-text 1][plain-text-1])
 
 #### Scenario: A format in a package and in the project
@@ -680,7 +680,7 @@ hakkiri SHALL join Rust doc line comments of the same type across blank lines, w
 
 #### Scenario: A fence across a blank line
 
-- **WHEN** a Rust file holds `/// ```sh`, an empty line, `/// curl it` and `/// ```` `
+- **WHEN** a Rust file contains `/// ```sh`, an empty line, `/// curl it` and `/// ```` `
 - **THEN** hakkiri reads `curl it` as code, and Vale reads two comments, so a `text` rule sees `curl it` as prose ([doc-fence 1][doc-fence-1])
 
 [doc-fence-1]: ../../changes/archive/2026-11-12-doc-fence/design.md#1-doc-line-comments-join-across-blank-lines
@@ -772,7 +772,7 @@ hakkiri SHALL read the front matter values as Vale does, and put each alert at t
 
 #### Scenario: A folded scalar
 
-- **WHEN** a folded block scalar holds `Folded very` and `text here` and a rule flags `here`
+- **WHEN** a folded block scalar contains `Folded very` and `text here` and a rule flags `here`
 - **THEN** hakkiri puts the alert on the second line, and Vale puts it on the first ([front-matter-values 5][front-matter-values-5])
 
 #### Scenario: A TOML value
@@ -825,17 +825,17 @@ hakkiri SHALL read a `vocab.yml` or `vocab.yaml` as each scenario below says, wh
 
 #### Scenario: Several wrong entries
 
-- **WHEN** a file holds three wrong entries
+- **WHEN** a file contains three wrong entries
 - **THEN** hakkiri reports all three with their lines, and Vale stops at the first ([yaml-vocabularies 2][yaml-vocabularies-2])
 
 #### Scenario: A key the file does not define
 
-- **WHEN** a file holds `accpt:` beside or instead of `accept:`
+- **WHEN** a file contains `accpt:` beside or instead of `accept:`
 - **THEN** hakkiri refuses the file on the line of the key, and Vale ignores the key and accepts nothing from it ([yaml-vocabularies 1][yaml-vocabularies-1])
 
 #### Scenario: The affix file
 
-- **WHEN** `affix: custom` names a file that only `$DICPATH` holds
+- **WHEN** `affix: custom` names a file that only `$DICPATH` contains
 - **THEN** hakkiri reports that `custom.aff` is in no package, and Vale finds it there; hakkiri also looks in every other loaded package, which Vale does not ([yaml-vocabularies 6][yaml-vocabularies-6])
 
 #### Scenario: A name with a folder
@@ -846,7 +846,7 @@ hakkiri SHALL read a `vocab.yml` or `vocab.yaml` as each scenario below says, wh
 #### Scenario: A syntax error of the file
 
 - **WHEN** the last list of the file is `[a` on line 3, with no closing bracket
-- **THEN** hakkiri names line 3, where the bracket opens, and Vale names line 2, which holds a complete entry and no fault ([yaml-vocabularies 2][yaml-vocabularies-2])
+- **THEN** hakkiri names line 3, where the bracket opens, and Vale names line 2, which contains a complete entry and no fault ([yaml-vocabularies 2][yaml-vocabularies-2])
 
 #### Scenario: A period in a term with ignorecase
 
@@ -890,7 +890,7 @@ hakkiri SHALL read a rule's parameters as Vale 3.26.0 does, apart from the scena
 
 #### Scenario: A parameter Vale takes without a word
 
-- **WHEN** a parameter names a rule that does not exist, holds no value, sets a negative `max`, or sets a `scope` that is none
+- **WHEN** a parameter names a rule that does not exist, contains no value, sets a negative `max`, or sets a `scope` that is none
 - **THEN** hakkiri refuses it with the config file and the line, and Vale takes it with no error ([rule-parameters 4][rule-parameters-4])
 
 #### Scenario: A parameter Vale refuses without a place
@@ -910,11 +910,11 @@ hakkiri SHALL read a rule's parameters as Vale 3.26.0 does, apart from the scena
 
 ### Requirement: A consistency alert in a multi-line paragraph differs from Vale
 
-hakkiri SHALL place a `consistency` alert on the last match of a form, though an earlier line holds the same text.  
+hakkiri SHALL place a `consistency` alert on the last match of a form, though an earlier line contains the same text.  
 
 #### Scenario: A form inside a longer word on a later line
 
-- **WHEN** a `consistency` rule with `nonword: true` pairs `advisor` with `adviser`, and a paragraph holds `The adviser spoke first.` and then `Two advisors met two advisers.`
+- **WHEN** a `consistency` rule with `nonword: true` pairs `advisor` with `adviser`, and a paragraph contains `The adviser spoke first.` and then `Two advisors met two advisers.`
 - **THEN** hakkiri puts the alert on line 2, column 22, the last match, and Vale searches the paragraph for the text `adviser` and puts it on line 1, column 5 ([pattern 2][pattern-2])
 
 [rule-parameters-2]: ../../changes/archive/2026-11-14-rule-parameters/design.md#2-parameters-apply-per-glob
@@ -977,12 +977,12 @@ hakkiri SHALL run `Vale.Spelling` as Vale does, apart from the scenarios below a
 
 #### Scenario: A code span in a code comment
 
-- **WHEN** a Rust comment holds `` `blorftCode` `` and `custom` turns the built-in filters off
+- **WHEN** a Rust comment contains `` `blorftCode` `` and `custom` turns the built-in filters off
 - **THEN** hakkiri reads no word in the code span, and Vale reports the span with its backticks as one word ([vale-spelling 5][vale-spelling-5])
 
 #### Scenario: The name after a param tag
 
-- **WHEN** a TypeScript comment holds `@param nme the nme of it`
+- **WHEN** a TypeScript comment contains `@param nme the nme of it`
 - **THEN** hakkiri reads no word for the name `nme`, and Vale reports it, and reports `@param` when `custom` turns the filters off ([vale-spelling 5][vale-spelling-5])
 
 ### Requirement: Ported readers differ from Vale in these ways
@@ -996,7 +996,7 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 
 #### Scenario: A word's shape reads Rust's Unicode properties
 
-- **WHEN** a word holds a character such as `²`
+- **WHEN** a word contains a character such as `²`
 - **THEN** hakkiri reads its shape from Rust's Unicode properties and Vale from Go's categories, so the feature, and the tag, can differ ([case 5][case-5])
 
 #### Scenario: Compound directives are left out
@@ -1011,7 +1011,7 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 
 #### Scenario: A curly quote keeps its position
 
-- **WHEN** a misspelt word holds a curly quote or `&rsquo;`
+- **WHEN** a misspelt word contains a curly quote or `&rsquo;`
 - **THEN** hakkiri reports it where it stands in the file, as written, and Vale gives it no position and reports the straight form ([spelling 1][spelling-1])
 
 #### Scenario: Two swap keys expand to the same text
@@ -1036,11 +1036,11 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 ### Requirement: A bare address ends where GFM ends it
 
 hakkiri SHALL end a bare web address at whitespace or `<`, as GFM and its Markdown parser do.  
-Vale ends one at the first byte that goldmark 1.8.6's linkify pattern leaves out, which holds no letter outside ASCII, and reads the rest as text.
+Vale ends one at the first byte that goldmark 1.8.6's linkify pattern leaves out, which contains no letter outside ASCII, and reads the rest as text.
 
 #### Scenario: A bare address with a letter outside ASCII
 
-- **WHEN** a Markdown file holds `Visit https://b.example/ä for special thanks.`
+- **WHEN** a Markdown file contains `Visit https://b.example/ä for special thanks.`
 - **THEN** hakkiri counts 8 words, the words of the whole address among them, and Vale 66bbb85 counts 5, since its link ends before `ä` ([link-address][link-address])
 
 [link-address]: ../../changes/archive/2026-11-14-link-address/proposal.md
@@ -1051,7 +1051,7 @@ hakkiri SHALL resolve the settings of the globs that match a file by the setting
 
 #### Scenario: A specific glob written first
 
-- **WHEN** the config holds `'docs/*.md': {Team.Filler: error}` and then `'*.md': {Team.Filler: warning}`
+- **WHEN** the config contains `'docs/*.md': {Team.Filler: error}` and then `'*.md': {Team.Filler: warning}`
 - **THEN** hakkiri reports `Team.Filler` on `docs/a.md` as an error, and Vale, given the same two sections in that order, reports it as a warning
 
 [vale-file]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/core/file.go#L185-L215
@@ -1077,17 +1077,17 @@ hakkiri SHALL split sentences by its own splitter where Vale 66bbb85's segmenter
 
 #### Scenario: A numbered heading or item
 
-- **WHEN** a Markdown file holds `## 1. Evaluation sets` or `- [x] 4. A patch changeset ships with the change.`
+- **WHEN** a Markdown file contains `## 1. Evaluation sets` or `- [x] 4. A patch changeset ships with the change.`
 - **THEN** hakkiri reads the heading or item as one sentence, and Vale reads the `1.` or `4.` as a sentence of its own
 
 #### Scenario: A version, a decimal or a task number before a capital
 
-- **WHEN** a file holds `The team pins ctl-core 0.5.2. ctl-core 0.6.3 ships the new look.`
+- **WHEN** a file contains `The team pins ctl-core 0.5.2. ctl-core 0.6.3 ships the new look.`
 - **THEN** hakkiri gives two sentences, and Vale gives one, as it does after the decimal `4.75.` and the task number `1.3.`
 
 #### Scenario: vs. between two versions
 
-- **WHEN** a file holds `Rust 1.99 vs. Go 1.25 differ.`
+- **WHEN** a file contains `Rust 1.99 vs. Go 1.25 differ.`
 - **THEN** hakkiri gives one sentence, and Vale ends the first after `vs.`
 
 ### Requirement: HTML-block text differs from Vale in these details
@@ -1096,33 +1096,33 @@ hakkiri SHALL read the text of an HTML block and the text around inline HTML as 
 
 #### Scenario: A reference is unescaped once
 
-- **WHEN** a paragraph holds `&amp;lt;` or `&amp;#32;`, or a code span holds `&amp;`
+- **WHEN** a paragraph contains `&amp;lt;` or `&amp;#32;`, or a code span contains `&amp;`
 - **THEN** hakkiri reads `&lt;`, `&#32;` and `&amp;`, and Vale unescapes the text of each token twice, so it reads `<`, a space and `&` ([html 5][html-5])
 
 #### Scenario: Vale loses a match beside a reference
 
-- **WHEN** a text holds a reference that Vale cannot find in the file once it is unescaped, such as `&#109;arker` or a final `&nbsp;`, and a rule matches a word of it
+- **WHEN** a text contains a reference that Vale cannot find in the file once it is unescaped, such as `&#109;arker` or a final `&nbsp;`, and a rule matches a word of it
 - **THEN** hakkiri reports the match through its byte table, and Vale finds the words of the text in the file, so it gives no alert for a word it cannot find ([html 5][html-5])
 - **AND** Vale places another alert on the wrong line or column
 
 #### Scenario: Vale loses the text around a blank alt
 
-- **WHEN** a paragraph holds `one marker <img src="x" alt=" "> end`
-- **THEN** hakkiri reads the paragraph as `one marker end`, and Vale gives no alert for that text, though it gives one when the alt text holds a word ([html 6][html-6])
+- **WHEN** a paragraph contains `one marker <img src="x" alt=" "> end`
+- **THEN** hakkiri reads the paragraph as `one marker end`, and Vale gives no alert for that text, though it gives one when the alt text contains a word ([html 6][html-6])
 
 #### Scenario: A code element is a code span
 
-- **WHEN** an HTML block holds `a <code>x</code> b`
+- **WHEN** an HTML block contains `a <code>x</code> b`
 - **THEN** hakkiri reads a code span of one word and reports no match over it, and Vale masks the text with asterisks and reports a match over them ([html 3][html-3])
 
 #### Scenario: A block of masked text only
 
-- **WHEN** an HTML block holds `<p><kbd>x</kbd></p>`
+- **WHEN** an HTML block contains `<p><kbd>x</kbd></p>`
 - **THEN** hakkiri reads `*`, and Vale reports nothing, since it cannot place text that is not in the file ([html 3][html-3])
 
 #### Scenario: A script that never ends
 
-- **WHEN** an HTML block holds `<script><!-- <script </script> marker`, and the next block holds `last marker`
+- **WHEN** an HTML block contains `<script><!-- <script </script> marker`, and the next block contains `last marker`
 - **THEN** hakkiri reads the next block, since it tokenizes each HTML block alone, and Vale tokenizes the whole file as one stream, so the open script hides the rest of it ([html 1][html-1])
 
 ### Requirement: Markdown reads differ from Vale's converter in these ways
@@ -1131,47 +1131,47 @@ hakkiri SHALL read Markdown as each scenario below says, where Vale 3.26.0 reads
 
 #### Scenario: An inline tag between letters
 
-- **WHEN** a paragraph holds `one*two*three`, `one~~two~~three` or `one[two](u)three`
+- **WHEN** a paragraph contains `one*two*three`, `one~~two~~three` or `one[two](u)three`
 - **THEN** hakkiri reads the word `onetwothree`, and Vale reads `one` and `twothree`, since its converter puts a space before the text of an opening tag and none after a closing tag ([markdown-probe 8][markdown-probe-8])
 
-#### Scenario: A word holds an escape
+#### Scenario: A word contains an escape
 
-- **WHEN** a paragraph holds `well\-known` or `snake\_case`
+- **WHEN** a paragraph contains `well\-known` or `snake\_case`
 - **THEN** hakkiri reads `well-known` and `snake_case` and alerts where they stand, and Vale cannot find the converted word in the file, so it gives no alert for it ([markdown-probe 4][markdown-probe-4])
 
 #### Scenario: A paragraph line starts with a number
 
 - **WHEN** a line that continues a paragraph starts with `1986.` and a space
-- **THEN** hakkiri reads `1986` as a word of the paragraph, and Vale masks every line start that holds digits and a dot, so it reads no such word ([markdown-probe 8][markdown-probe-8])
+- **THEN** hakkiri reads `1986` as a word of the paragraph, and Vale masks every line start that contains digits and a dot, so it reads no such word ([markdown-probe 8][markdown-probe-8])
 
 #### Scenario: A reference that nothing defines
 
-- **WHEN** a paragraph holds `[a label][nope]` and no definition names `nope`
+- **WHEN** a paragraph contains `[a label][nope]` and no definition names `nope`
 - **THEN** hakkiri reads the text as written, so `nope` is a word, and Vale masks the second label as it does for a defined reference ([markdown-probe 8][markdown-probe-8])
 
 #### Scenario: A footnote reference
 
-- **WHEN** a paragraph holds `A word[^one] here.`
+- **WHEN** a paragraph contains `A word[^one] here.`
 - **THEN** hakkiri reads `A word here.`, and Vale reads the number `1` as a word of a link and places it at the first `1` of the line ([markdown-probe 6][markdown-probe-6])
 
 #### Scenario: The last word of a footnote definition
 
 - **WHEN** a definition ends with `the last.` and a rule matches each run of non-space characters
-- **THEN** hakkiri reports `last.`, and Vale gives no alert, since its text holds the back reference arrow after the full stop and the word with the arrow is not in the file ([markdown-probe 6][markdown-probe-6])
+- **THEN** hakkiri reports `last.`, and Vale gives no alert, since its text contains the back reference arrow after the full stop and the word with the arrow is not in the file ([markdown-probe 6][markdown-probe-6])
 
 #### Scenario: A tag that is never closed
 
-- **WHEN** a paragraph holds `Text <b>one open.` and the next holds `two </b>stray.`
+- **WHEN** a paragraph contains `Text <b>one open.` and the next contains `two </b>stray.`
 - **THEN** hakkiri scopes no text of the second paragraph as strong, and Vale scopes `two` as strong ([markdown-probe 8][markdown-probe-8])
 
 #### Scenario: An unclosed tag that swallows another
 
-- **WHEN** a paragraph holds `Text <unclosed one tag and <b>two bold.` and the next holds `three </b>stray.`
+- **WHEN** a paragraph contains `Text <unclosed one tag and <b>two bold.` and the next contains `three </b>stray.`
 - **THEN** hakkiri finishes the file, and Vale panics with a slice out of range ([markdown-probe 8][markdown-probe-8])
 
 #### Scenario: A link that is its own address
 
-- **WHEN** a paragraph holds `Read <https://b.example> first.`, `Read https://b.example first.` or `See [https://b.example](https://b.example) now.`
+- **WHEN** a paragraph contains `Read <https://b.example> first.`, `Read https://b.example first.` or `See [https://b.example](https://b.example) now.`
 - **THEN** hakkiri's `link` scope reads `https://b.example`, so ProseStyle's `BareURL` can flag it, and Vale's reads no word ([markdown-probe 2][markdown-probe-2])
 
 ### Requirement: The comments of a fenced code block are read
@@ -1181,7 +1181,7 @@ Vale 66bbb85 reads no text inside a fence.
 
 #### Scenario: A Rust fence in Markdown
 
-- **WHEN** a Markdown file holds a fence opened with ```` ```rust ```` around `// A very good start.`, and a rule flags `very`
+- **WHEN** a Markdown file contains a fence opened with ```` ```rust ```` around `// A very good start.`, and a rule flags `very`
 - **THEN** hakkiri reports `very` in the comment, and Vale reports nothing ([decision 5][language-model-5])
 
 ### Requirement: A scope part names a Linguist language
@@ -1192,7 +1192,7 @@ Linguist keeps TSX apart from TypeScript, so a scope that names `ts` does not re
 
 #### Scenario: A TSX file
 
-- **WHEN** a rule has `scope: text.comment.ts` and `tokens: [marker]`, and `a.tsx` holds `// A marker.`
+- **WHEN** a rule has `scope: text.comment.ts` and `tokens: [marker]`, and `a.tsx` contains `// A marker.`
 - **THEN** Vale reports one alert, and hakkiri reports none ([decision 4][language-model-4])
 
 ### Requirement: A file with no extension is read by its interpreter
@@ -1202,7 +1202,7 @@ Vale 66bbb85 finds no format for such a file and lints nothing in it.
 
 #### Scenario: A script
 
-- **WHEN** `bin/tool` has no extension, starts with `#!/usr/bin/env node`, holds `// A very good start.`, and a rule flags `very`
+- **WHEN** `bin/tool` has no extension, starts with `#!/usr/bin/env node`, contains `// A very good start.`, and a rule flags `very`
 - **THEN** hakkiri reads it as JavaScript and reports `very`, and Vale reports nothing ([decision 2][language-model-2])
 
 [language-model-2]: ../../changes/archive/2026-11-14-language-model/design.md#2-the-language-of-a-file
@@ -1217,12 +1217,12 @@ It reads a glob with `**` through doublestar, whose trailing `/**` also matches 
 
 #### Scenario: A star across folders
 
-- **WHEN** a glob is `docs/*.md` and the project holds `docs/x/a.md`
+- **WHEN** a glob is `docs/*.md` and the project contains `docs/x/a.md`
 - **THEN** Vale lints the file, and hakkiri does not ([decision 1][standard-globs-1])
 
 #### Scenario: A trailing double star
 
-- **WHEN** a glob is `tests/oracle/*/**` and the project holds `tests/oracle/a.md`
+- **WHEN** a glob is `tests/oracle/*/**` and the project contains `tests/oracle/a.md`
 - **THEN** Vale lints the file, and hakkiri does not ([decision 1][standard-globs-1])
 
 [standard-globs-1]: ../../changes/archive/2026-11-14-standard-globs/design.md#1-globs-follow-gitignore
@@ -1233,13 +1233,13 @@ hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files, and th
 
 #### Scenario: Swift is read by its own grammar
 
-- **WHEN** a Swift file holds `/* outer /* inner */ still outer */`, a raw string `##"x "# // y"##`, a multi-line string whose line is `// z`, or `/* c */` inside a string interpolation
+- **WHEN** a Swift file contains `/* outer /* inner */ still outer */`, a raw string `##"x "# // y"##`, a multi-line string whose line is `// z`, or `/* c */` inside a string interpolation
 - **THEN** hakkiri reads `still outer` and `c` as comment text and reads nothing from the strings
 - **AND** Vale reads the file with its C grammar, so it stops the first comment at the first `*/`, reads `y"##` and `z` as comments, and reads no comment inside an interpolation ([comment-languages 3][comment-languages-3])
 
 #### Scenario: A comment that a tool reads
 
-- **WHEN** a Swift file holds `// swiftlint:disable all`, a YAML file holds `# yaml-language-server: $schema=./a.json` or `# yamllint disable`, or a TOML file holds `#:schema ./a.json`
+- **WHEN** a Swift file contains `// swiftlint:disable all`, a YAML file contains `# yaml-language-server: $schema=./a.json` or `# yamllint disable`, or a TOML file contains `#:schema ./a.json`
 - **THEN** hakkiri reads none of them as prose, and Vale reads each as a sentence ([comment-languages 5][comment-languages-5])
 
 #### Scenario: A shell file has comments
@@ -1254,17 +1254,17 @@ hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files, and th
 
 #### Scenario: An indented line of a comment
 
-- **WHEN** a run of line comments holds a prose line, an empty comment line, and a line indented four spaces more, such as `///     cargo run`
+- **WHEN** a run of line comments contains a prose line, an empty comment line, and a line indented four spaces more, such as `///     cargo run`
 - **THEN** hakkiri reads the indented line as code, and Vale takes the leading spaces off every line after the first, so it reads the line as prose ([comment-languages 7][comment-languages-7])
 
 #### Scenario: A see tag that opens with a link
 
-- **WHEN** a JavaScript file holds `@see {@link Other} for more.` in a doc comment
+- **WHEN** a JavaScript file contains `@see {@link Other} for more.` in a doc comment
 - **THEN** hakkiri reads `for` as prose, and Vale reads the link as a type and `for` as the name of the tag, so it drops `for` ([comment-languages 6][comment-languages-6])
 
 #### Scenario: A column after a character of many bytes
 
-- **WHEN** a Go file holds `var s = "’" // note`
+- **WHEN** a Go file contains `var s = "’" // note`
 - **THEN** hakkiri gives the columns of `note` in characters, and Vale adds the extra bytes of `’` to each column of a comment that trails code ([comment-languages 8][comment-languages-8])
 
 [comment-languages-3]: ../../changes/archive/2026-11-14-comment-languages/design.md#3-the-lexer-is-the-grammars-probed-against-vale
@@ -1280,22 +1280,22 @@ hakkiri SHALL select as each scenario below says, where Vale 3.26.0 has no such 
 
 #### Scenario: A link title
 
-- **WHEN** a rule has `scope: title` and a link holds the token in its title
+- **WHEN** a rule has `scope: title` and a link contains the token in its title
 - **THEN** hakkiri reports the alert, and Vale reports it only for a rule on `raw` ([link-title 1][link-title], row [HKR-054][ledger])
 
-#### Scenario: A title selected by the element that holds it
+#### Scenario: A title selected by the element that contains it
 
 - **WHEN** a rule has `scope: title & link` or `scope: title & image`
 - **THEN** hakkiri selects only the titles of links, or only those of images, and Vale has no scope that reads a title ([link-title 5][link-title])
 
 #### Scenario: An HTML title attribute
 
-- **WHEN** a Markdown file holds `<p title="a marker">Some text.</p>`, a line of text with an inline tag that has a title, or an MDX file holds a JSX element with `title`, and a rule has `scope: title`
+- **WHEN** a Markdown file contains `<p title="a marker">Some text.</p>`, a line of text with an inline tag that has a title, or an MDX file contains a JSX element with `title`, and a rule has `scope: title`
 - **THEN** hakkiri selects each title, and Vale reads the attribute only in a rule on `raw` ([link-title 6][link-title])
 
 #### Scenario: A title attribute of an a tag and an img tag
 
-- **WHEN** an HTML block holds `<a href="u" title="a marker">x</a>` and a rule has `scope: title & link`, or `<img src="i.png" title="a marker">` and `scope: title & image`
+- **WHEN** an HTML block contains `<a href="u" title="a marker">x</a>` and a rule has `scope: title & link`, or `<img src="i.png" title="a marker">` and `scope: title & image`
 - **THEN** hakkiri selects `a marker`, and Vale loads the rule and selects nothing, since only `raw` reads the attribute ([link-title 6][link-title])
 
 #### Scenario: The alt text of an image

@@ -4,7 +4,7 @@
 
 A code span reads as the one-letter word `x` in the text a rule reads ([rule-engine design][engine-text]).
 Vale masks it as a run of `*`.
-An `occurrence` rule counts no match that overlaps a code span, so the `x` is never counted, as the `match-checks` spec holds.
+An `occurrence` rule counts no match that overlaps a code span, so the `x` is never counted, as the `match-checks` spec states.
 
 ## Decisions
 
@@ -18,7 +18,7 @@ The probe of Vale at `66bbb85` and of hakkiri (2026-11-11) read `Run `a`, `b`, `
 
 The first number of each pair is for the first text, and the second for the second text.
 
-A `metric` rule counts each code span once in hakkiri and none in Vale, as the spec holds.
+A `metric` rule counts each code span once in hakkiri and none in Vale, as the spec states.
 An `occurrence` rule counts nothing for a code span in hakkiri, and counts the mask in Vale only when its token reads a `*` run.
 Alternative: count a match that overlaps a code span in an `occurrence` rule.
 It lost because the `match-checks` spec and its scenario `A match inside code` decide the opposite, and a token such as `x` would count every code span.
@@ -59,14 +59,14 @@ The metric counts `occurrences` of its `tokens` in the text as before.
 The last setting wins, in this order of rising weight: the package's settings file, the project config, each matching glob in the rank of the settings cascade (row `HKR-069`), `HAKKIRI_CODE_SPAN_SIZE`, then `--code-span-size`.
 A glob is the more specific of the two config levels, so it beats the project's top level.
 The variable and the flag beat every file, as for the other options of `check`.
-`code_span_size` is a reserved key under a glob, as `styles` and `vocab` are, and no rule name can equal it, since a rule name holds a dot.
+`code_span_size` is a reserved key under a glob, as `styles` and `vocab` are, and no rule name can equal it, since a rule name contains a dot.
 `hakkiri test` reads the project's key for a case that runs through the config, and runs a case of one rule file at 1.
 
 ### 6. Vale drops an alert that has the place of another
 
 Vale keeps each alert under the key of its line, its column and its rule, and drops a later alert with the same key ([history key][v-history]).
 A block that is not a sentence is reported at the first column of its line, so a table row of three cells gives one alert, the one of its first cell.
-A sentence that starts with a code span has no place in its block, so Vale reports it at the line the block was found on, and an earlier sentence often holds that place.
+A sentence that starts with a code span has no place in its block, so Vale reports it at the line the block was found on, and an earlier sentence often contains that place.
 Vale also finds the line of a block by searching the file for its text ([walker.advance][v-advance]), so a block whose text is not in the file as written can land on the line of another block.
 The later alert is dropped.
 A reference definition that repeats the text of a code span, and an entity such as `&amp;lt;` in a code span, are two ways to get there.

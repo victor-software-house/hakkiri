@@ -34,7 +34,7 @@ When the rule loads no other dictionary, the dictionary SHALL be Vale's built-in
 
 Unless the rule sets `custom: true`, three kinds of word SHALL be skipped.  
 These are a word that starts with a capital and has another capital after a lower-case letter, and a word that ends in capitals.  
-The third is a word that holds a character other than an ASCII letter, `_` or `'`.
+The third is a word that contains a character other than an ASCII letter, `_` or `'`.
 
 A word that matches one of the rule's `filters` SHALL also be skipped.
 
@@ -56,11 +56,11 @@ A word that matches one of the rule's `filters` SHALL also be skipped.
 ### Requirement: ignore adds word lists
 
 Each entry of `ignore` SHALL name a file of accepted words, one per line.  
-The file SHALL be found at that path in the package that holds the rule, or under the package's `config/ignore` folder.
+The file SHALL be found at that path in the package that contains the rule, or under the package's `config/ignore` folder.
 
 #### Scenario: A project term
 
-- **WHEN** the rule has `ignore: [terms.txt]`, its package holds `config/ignore/terms.txt` with the line `hakkiri`, and the input is `Run hakkiri now.`
+- **WHEN** the rule has `ignore: [terms.txt]`, its package contains `config/ignore/terms.txt` with the line `hakkiri`, and the input is `Run hakkiri now.`
 - **THEN** hakkiri reports no alert
 
 ### Requirement: split checks the parts of an identifier
@@ -80,7 +80,7 @@ A misspelt part of three letters or more that is not in capitals SHALL be report
 
 ### Requirement: Vale's casing and code messages
 
-When the dictionary holds the word only with more capitals inside it, the message SHALL name the dictionary form.  
+When the dictionary contains the word only with more capitals inside it, the message SHALL name the dictionary form.  
 It SHALL read `Use '<dictionary form>' instead of '<word>'.`  
 Otherwise, without `split`, a word shaped like an identifier in a Markdown or MDX file SHALL get the message `'<word>' looks like code; format it as code.`
 
@@ -102,7 +102,7 @@ When `dicpath` is set, they SHALL be read from that folder inside the package in
 
 #### Scenario: A team dictionary
 
-- **WHEN** the rule has `dictionaries: [team]` and `append: true`, its package holds `config/dictionaries/team.aff` and a `team.dic` with the word `hakkiri`, and the input is `Run hakkiri on blorft.`
+- **WHEN** the rule has `dictionaries: [team]` and `append: true`, its package contains `config/dictionaries/team.aff` and a `team.dic` with the word `hakkiri`, and the input is `Run hakkiri on blorft.`
 - **THEN** hakkiri reports one alert, with the matched text `blorft`
 
 ### Requirement: aff and dic name one dictionary
@@ -127,7 +127,7 @@ It SHALL refuse a rule whose path to a dictionary, a folder or a word list leave
 
 #### Scenario: A missing dictionary
 
-- **WHEN** rule `Team.Spelling` has `dictionaries: [absent]` and its package holds no `absent.dic`
+- **WHEN** rule `Team.Spelling` has `dictionaries: [absent]` and its package contains no `absent.dic`
 - **THEN** hakkiri reports an error naming `Team.Spelling` and `absent`, and exits with a failure status
 
 ### Requirement: A field with no effect is refused
@@ -154,7 +154,7 @@ When an `existence` or `substitution` rule sets `affix`, each token or key part 
 - **WHEN** rule `Team.Forms` has `extends: existence`, `affix: absent` and `tokens: [run/G]`
 - **THEN** hakkiri reports an error naming `Team.Forms` and `absent.aff`, and exits with a failure status
 
-### Requirement: The style Vale holds Vale.Spelling
+### Requirement: The style Vale contains Vale.Spelling
 
 hakkiri SHALL give the style `Vale` a rule `Vale.Spelling` that reports each word the built-in dictionary lacks, with the message `Did you really mean '%s'?`, the level `error` and the scope `text`.  
 A config SHALL set its level, turn it off, and set its parameters as it does any rule.
@@ -171,12 +171,12 @@ A config SHALL set its level, turn it off, and set its parameters as it does any
 
 ### Requirement: Vale.Spelling adds the dictionaries of each package
 
-`Vale.Spelling` SHALL read every dictionary in the `config/dictionaries` folder of each package of the project, in the order of the packages, and accept a word that one holds beside the built-in dictionary.  
+`Vale.Spelling` SHALL read every dictionary in the `config/dictionaries` folder of each package of the project, in the order of the packages, and accept a word that one contains beside the built-in dictionary.  
 A parameter `dictionaries`, `aff` or `dic` SHALL replace them, and `append` SHALL keep the built-in dictionary.
 
 #### Scenario: A dictionary in a package
 
-- **WHEN** `config/dictionaries/team.dic` holds `blorft`, and the input is `We blorft mail.`
+- **WHEN** `config/dictionaries/team.dic` contains `blorft`, and the input is `We blorft mail.`
 - **THEN** hakkiri reports no alert
 
 #### Scenario: A dictionary named by a parameter
@@ -191,10 +191,10 @@ A file with another extension SHALL be no list.
 
 #### Scenario: A list in a folder below
 
-- **WHEN** `config/ignore/sub/more.txt` holds `foxs` and the input is `The foxs ran.`
+- **WHEN** `config/ignore/sub/more.txt` contains `foxs` and the input is `The foxs ran.`
 - **THEN** hakkiri reports no alert
 
 #### Scenario: A file that is not a list
 
-- **WHEN** `config/ignore/notes.md` holds `xyz` and the input is `The xyz plan.`
+- **WHEN** `config/ignore/notes.md` contains `xyz` and the input is `The xyz plan.`
 - **THEN** hakkiri reports `xyz`

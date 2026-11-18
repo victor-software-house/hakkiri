@@ -59,7 +59,7 @@ hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the named v
 
 #### Scenario: A term padded with spaces
 
-- **WHEN** a list holds the term `padded` with spaces around it and the text is `This is padded and Padded.`
+- **WHEN** a list contains the term `padded` with spaces around it and the text is `This is padded and Padded.`
 - **THEN** the only alert is ``Use 'padded' instead of 'Padded'.``
 
 #### Scenario: No accepted term
@@ -103,7 +103,7 @@ hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file when a glob lists the 
 #### Scenario: Only the vocabulary is named
 
 - **WHEN** a glob lists `styles: [Team]` and the vocabulary accepts `GitHub`
-- **THEN** `github` draws no alert, and the accepted terms still hold back the `Team` rules' matches
+- **THEN** `github` draws no alert, and the accepted terms still drop the `Team` rules' matches
 
 #### Scenario: One rule turned off
 

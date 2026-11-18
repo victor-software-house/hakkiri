@@ -54,12 +54,12 @@ Text with no sentence SHALL give no alert.
 
 #### Scenario: Two paragraphs measured as one
 
-- **WHEN** a rule has `message: "Grade %s."`, `metrics: [Flesch-Kincaid]` and `grade: -5`, and the input holds the paragraphs `The cat sat.` and `The dog ran.`
+- **WHEN** a rule has `message: "Grade %s."`, `metrics: [Flesch-Kincaid]` and `grade: -5`, and the input contains the paragraphs `The cat sat.` and `The dog ran.`
 - **THEN** hakkiri reports one alert at line 1, column 1, with the message `Grade -2.62.`
 
 #### Scenario: Only a heading
 
-- **WHEN** the same rule reads a file that holds only `# One two three`
+- **WHEN** the same rule reads a file that contains only `# One two three`
 - **THEN** hakkiri reports no alert
 
 ### Requirement: readability with a scope measures each node

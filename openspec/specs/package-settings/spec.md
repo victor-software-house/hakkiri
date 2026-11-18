@@ -3,19 +3,19 @@
 ## Purpose
 
 A package ships a settings file in its top folder, in the format of the project config, and hakkiri applies it under the project's own.  
-The file holds the packages a package lists and the vocabularies it names.
+The file contains the packages a package lists and the vocabularies it names.
 
 ## Requirements
 
 ### Requirement: A package's settings file is in its top folder
 
-The top folder of a package SHALL be the folder that holds its `styles` folder, and a fetched zip's top folder SHALL be its one top folder.  
-The top folder of a `path` entry that names a folder called `styles` SHALL be that folder's parent, except when the parent is the project root or holds it.  
+The top folder of a package SHALL be the folder that contains its `styles` folder, and a fetched zip's top folder SHALL be its one top folder.  
+The top folder of a `path` entry that names a folder called `styles` SHALL be that folder's parent, except when the parent is the project root or contains it.  
 A package with no top folder, and the project's own config, SHALL be no package's settings.
 
 #### Scenario: A fetched package
 
-- **WHEN** a package pinned by `url` and `sha256` holds `Pkg/.ctl/hakkiri.yaml` beside `Pkg/styles`
+- **WHEN** a package pinned by `url` and `sha256` contains `Pkg/.ctl/hakkiri.yaml` beside `Pkg/styles`
 - **THEN** hakkiri reads it from the cache folder of the hash, with no further download
 
 #### Scenario: Styles in the project root
@@ -25,29 +25,29 @@ A package with no top folder, and the project's own config, SHALL be no package'
 
 #### Scenario: Another config in the root
 
-- **WHEN** `--config cfg.yaml` names a config in the project root that lists `path: styles`, and the root holds a `.ctl/hakkiri.yaml` with an unknown key
+- **WHEN** `--config cfg.yaml` names a config in the project root that lists `path: styles`, and the root contains a `.ctl/hakkiri.yaml` with an unknown key
 - **THEN** hakkiri reads that `.ctl/hakkiri.yaml` as nothing, and reports no error for it
 
 #### Scenario: A folder not called styles
 
-- **WHEN** a config lists `path: pkg/rules` and `pkg` holds a `.ctl/hakkiri.yaml`
+- **WHEN** a config lists `path: pkg/rules` and `pkg` contains a `.ctl/hakkiri.yaml`
 - **THEN** hakkiri reads no settings from it
 
 ### Requirement: A package may list packages
 
-A package's `packages` SHALL be fetched like the project's, each entry holding a `url` and a `sha256`.  
+A package's `packages` SHALL be fetched like the project's, each entry containing a `url` and a `sha256`.  
 A `path` entry in a package's file SHALL be an error.  
 A chain of packages more than 10 deep SHALL be an error.  
 A package named twice SHALL load once, by its `sha256` for a download and its folder for a `path`, and the packages a package lists SHALL come before it, in the order written.
 
 #### Scenario: A nested package
 
-- **WHEN** a package's `.ctl/hakkiri.yaml` holds `packages: [{url: https://x.example/base.zip, sha256: <hash>}]` and the zip holds `styles/Base/Filler.yml`
+- **WHEN** a package's `.ctl/hakkiri.yaml` contains `packages: [{url: https://x.example/base.zip, sha256: <hash>}]` and the zip contains `styles/Base/Filler.yml`
 - **THEN** hakkiri fetches and caches `base.zip` as for a project entry, and a glob that lists `Base` runs `Base.Filler`
 
 #### Scenario: A nested path
 
-- **WHEN** a package's file holds `packages: [{path: ../base}]` on line 2
+- **WHEN** a package's file contains `packages: [{path: ../base}]` on line 2
 - **THEN** hakkiri reports an error naming `path`, line 2 and the package, and exits 2
 
 #### Scenario: Too deep
@@ -102,9 +102,9 @@ A name that no package holds, or that two packages hold, SHALL be an error on it
 - **WHEN** a package sets `vocab: [Team]` and the project sets no `vocab`
 - **THEN** hakkiri reads the vocabulary `Team`
 
-#### Scenario: A name no package holds
+#### Scenario: A name no package contains
 
-- **WHEN** a package's `.ctl/hakkiri.yaml` holds `vocab: [Nope]` on line 1 and no loaded package holds `config/vocabularies/Nope`
+- **WHEN** a package's `.ctl/hakkiri.yaml` contains `vocab: [Nope]` on line 1 and no loaded package contains `config/vocabularies/Nope`
 - **THEN** hakkiri reports an error naming `Nope`, line 1 and the package, and exits 2
 
 ### Requirement: A package's settings do not set the run options
@@ -113,7 +113,7 @@ A package's settings file SHALL NOT hold `fail_level`, `gitignore` or `on_unmatc
 
 #### Scenario: A package sets all three
 
-- **WHEN** a package's `.ctl/hakkiri.yaml` holds `gitignore: false` on line 2, `fail_level: warning` on line 3 and `on_unmatched: error` on line 4
+- **WHEN** a package's `.ctl/hakkiri.yaml` contains `gitignore: false` on line 2, `fail_level: warning` on line 3 and `on_unmatched: error` on line 4
 - **THEN** hakkiri reports an error for each, such as `pkg/.ctl/hakkiri.yaml: line 2: gitignore: belongs to the project's config`, and exits 2
 
 ### Requirement: A package's settings hold formats and not on_unknown
@@ -128,5 +128,5 @@ It SHALL NOT hold `on_unknown`, and a file that does SHALL be an error that name
 
 #### Scenario: A package sets on_unknown
 
-- **WHEN** a package's file holds `on_unknown: warn` on line 5
+- **WHEN** a package's file contains `on_unknown: warn` on line 5
 - **THEN** hakkiri reports `pkg/.ctl/hakkiri.yaml: line 5: on_unknown: belongs to the project's config` and exits 2

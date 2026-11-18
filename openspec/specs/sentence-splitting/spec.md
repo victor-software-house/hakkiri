@@ -23,7 +23,7 @@ The splitter SHALL end a sentence after `.`, `?` or `!` when whitespace follows 
 
 ### Requirement: An abbreviation does not end a sentence
 
-The splitter SHALL NOT end a sentence after a word its model holds as an abbreviation, when the next word does not start a sentence.
+The splitter SHALL NOT end a sentence after a word its model contains as an abbreviation, when the next word does not start a sentence.
 
 #### Scenario: A title before a name
 
@@ -35,7 +35,7 @@ The splitter SHALL NOT end a sentence after a word its model holds as an abbrevi
 - **WHEN** the splitter reads `Use a list, e.g. a table of flags. Then stop.`
 - **THEN** it returns the sentences `Use a list, e.g. a table of flags.` and `Then stop.`
 
-### Requirement: A token with no space holds no boundary
+### Requirement: A token with no space contains no boundary
 
 The splitter SHALL NOT end a sentence inside a run of characters with no whitespace, such as a version, a file name or a decimal.
 

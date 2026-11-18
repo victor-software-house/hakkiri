@@ -32,9 +32,9 @@ An `existence` rule SHALL join its `raw` patterns and match them before its toke
 - **WHEN** a rule has `raw: ['\bvery\s+']` and `tokens: [good]`, and the input is `It is very good.`
 - **THEN** hakkiri reports one alert, with the matched text `very good`
 
-### Requirement: An exception holds back a match
+### Requirement: An exception drops a match
 
-A match that holds an entry of `exceptions` as a whole word SHALL give no alert.  
+A match that contains an entry of `exceptions` as a whole word SHALL give no alert.  
 A match inside a multi-word exception SHALL give no alert.
 
 #### Scenario: An adverb list with an exception
@@ -62,7 +62,7 @@ A match inside a multi-word exception SHALL give no alert.
 A `substitution` rule SHALL match its `swap` keys as `existence` matches tokens, trying longer keys first.  
 Its message SHALL take the swap value, then the matched text.
 
-#### Scenario: A phrase that holds a shorter key
+#### Scenario: A phrase that contains a shorter key
 
 - **WHEN** a rule has `message: "Use '%s' instead of '%s'."` and `swap: {in order to: to, order: sequence}`, and the input is `In order to win.` with `ignorecase: true`
 - **THEN** hakkiri reports one alert, with the message `Use 'to' instead of 'In order to'.`

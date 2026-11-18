@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The project root is the folder that holds the `.ctl` folder of the config.  
+The project root is the folder that contains the `.ctl` folder of the config.  
 Globs and package paths are read from it, so a file matches the same glob however it is named, and a path outside it draws a warning.
 
 ## Requirements
@@ -14,17 +14,17 @@ It SHALL resolve the root and the folders of the file through symlinks, and keep
 
 #### Scenario: A dot-slash argument
 
-- **WHEN** `files` holds `'docs/**'` and `hakkiri check ./docs` runs
+- **WHEN** `files` contains `'docs/**'` and `hakkiri check ./docs` runs
 - **THEN** hakkiri lints `docs/a.md` with the styles of that glob
 
 #### Scenario: An absolute argument
 
-- **WHEN** `files` holds `'docs/**'` and `hakkiri check` is given the absolute path of `docs/a.md`
+- **WHEN** `files` contains `'docs/**'` and `hakkiri check` is given the absolute path of `docs/a.md`
 - **THEN** hakkiri lints it with the styles of that glob
 
 #### Scenario: A parent argument
 
-- **WHEN** `files` holds `'docs/**'` and `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ../docs/a.md` runs in `other/`
+- **WHEN** `files` contains `'docs/**'` and `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ../docs/a.md` runs in `other/`
 - **THEN** hakkiri lints `docs/a.md` with the styles of that glob
 
 #### Scenario: A root reached through a symlink
@@ -34,18 +34,18 @@ It SHALL resolve the root and the folders of the file through symlinks, and keep
 
 #### Scenario: A symlink to a file
 
-- **WHEN** `files` holds `'docs/**'` and `docs/a.md` is a symlink to `shared/a.md`, or to a file outside the root
+- **WHEN** `files` contains `'docs/**'` and `docs/a.md` is a symlink to `shared/a.md`, or to a file outside the root
 - **THEN** hakkiri lints it as `docs/a.md`, with the styles of that glob
 
 ### Requirement: A path outside the project root is reported
 
 hakkiri SHALL print a warning on standard error for each path it is given that is outside the project root and does not hold it, and SHALL lint none of its files.  
 When it is given no path, the current directory is the path given.  
-When no path lies under the root or holds it, hakkiri SHALL report a failure that names the root and exit 2.  
+When no path lies under the root or contains it, hakkiri SHALL report a failure that names the root and exit 2.  
 
 #### Scenario: One file outside the root
 
-- **WHEN** `hakkiri check in.md ../outside.md` runs in `project/`, which holds the root, and `in.md` draws a warning
+- **WHEN** `hakkiri check in.md ../outside.md` runs in `project/`, which contains the root, and `in.md` draws a warning
 - **THEN** hakkiri prints a warning that names `../outside.md`, lints `in.md`, and exits 0
 
 #### Scenario: No file under the root
@@ -72,18 +72,18 @@ The failure that names the root SHALL be one of the `failures` of the JSON objec
 #### Scenario: JSON output
 
 - **WHEN** `hakkiri check --format json ../outside.md` runs in `project/`
-- **THEN** standard error holds the warning, standard output is one JSON object whose `failures` names the root, and hakkiri exits 2
+- **THEN** standard error contains the warning, standard output is one JSON object whose `failures` names the root, and hakkiri exits 2
 
 #### Scenario: Quiet output
 
 - **WHEN** `hakkiri check --quiet in.md ../outside.md` runs in `project/`
-- **THEN** standard output is empty, standard error holds the warning, and hakkiri exits 0
+- **THEN** standard output is empty, standard error contains the warning, and hakkiri exits 0
 
 ### Requirement: A walk enters only the way to the project root
 
-A walk of a directory that holds the root SHALL enter only the folders on the way to the root and the folders under it.
+A walk of a directory that contains the root SHALL enter only the folders on the way to the root and the folders under it.
 
-#### Scenario: A walk from a folder that holds the root
+#### Scenario: A walk from a folder that contains the root
 
 - **WHEN** `hakkiri check ..` runs in `project/` and a sibling folder `sibling/locked` cannot be read
 - **THEN** hakkiri does not enter `sibling`, lints the files under the root, and exits 0
@@ -122,20 +122,20 @@ A trailing `/**` SHALL match only the files below its folder.
 
 #### Scenario: A star inside one folder
 
-- **WHEN** `files` holds `'docs/*.md'`, and the project holds `docs/a.md` and `docs/x/a.md`
+- **WHEN** `files` contains `'docs/*.md'`, and the project contains `docs/a.md` and `docs/x/a.md`
 - **THEN** hakkiri lints `docs/a.md` and not `docs/x/a.md`
 
 #### Scenario: A glob with no slash
 
-- **WHEN** `files` holds `'*.md'`, and the project holds `a.md` and `docs/x/a.md`
+- **WHEN** `files` contains `'*.md'`, and the project contains `a.md` and `docs/x/a.md`
 - **THEN** hakkiri lints both
 
 #### Scenario: A trailing double star
 
-- **WHEN** `files` holds `'tests/oracle/*/**'`, and the project holds `tests/oracle/a.md` and `tests/oracle/x/a.md`
+- **WHEN** `files` contains `'tests/oracle/*/**'`, and the project contains `tests/oracle/a.md` and `tests/oracle/x/a.md`
 - **THEN** hakkiri lints `tests/oracle/x/a.md` and not `tests/oracle/a.md`
 
 #### Scenario: A leading slash
 
-- **WHEN** `files` holds `'/a.md'`, and the project holds `a.md` and `docs/a.md`
+- **WHEN** `files` contains `'/a.md'`, and the project contains `a.md` and `docs/a.md`
 - **THEN** hakkiri lints `a.md` and not `docs/a.md`

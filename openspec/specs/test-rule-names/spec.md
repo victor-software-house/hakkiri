@@ -20,22 +20,22 @@ A rule file named as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHA
 #### Scenario: Through a symlink and back out
 
 - **WHEN** a case has `rule: via/../Team/Foo.yml` and `via` is a symlink to a folder elsewhere
-- **THEN** hakkiri reads `Team/Foo.yml` beside the case file, as Vale does, and not the file the symlink's target holds
+- **THEN** hakkiri reads `Team/Foo.yml` beside the case file, as Vale does, and not the file the symlink's target contains
 
 #### Scenario: A symlinked style folder
 
-- **WHEN** `styles/Team` is a symlink to `shared/TeamStyle` that holds `Foo.yml`, and a case through the config flags `Team.Foo`
+- **WHEN** `styles/Team` is a symlink to `shared/TeamStyle` that contains `Foo.yml`, and a case through the config flags `Team.Foo`
 - **THEN** `hakkiri test --coverage styles/Team/Foo.yml` counts `Team.Foo` as covered
 
 #### Scenario: A `.yaml` rule file
 
-- **WHEN** `styles/Team/Other.yaml` holds `extends` and `tests`
+- **WHEN** `styles/Team/Other.yaml` contains `extends` and `tests`
 - **THEN** `hakkiri test --coverage` reads no case from it and names no rule for it
 
 #### Scenario: A nested rule
 
 - **WHEN** the config has the package `styles` and a case loads `styles/Team/Sub/Bar.yml`
-- **THEN** the rule is `Team.Sub.Bar`, and with no package that holds the file it is `Sub.Bar`, since the folder that holds the file is its style
+- **THEN** the rule is `Team.Sub.Bar`, and with no package that contains the file it is `Sub.Bar`, since the folder that contains the file is its style
 
 #### Scenario: A dotted file name
 
@@ -55,4 +55,4 @@ A rule file named as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHA
 #### Scenario: A shared name in JSON
 
 - **WHEN** `test --coverage --format json` finds that no case flags `Team.Terms`, which `Terms.yml` and `Terms.custom.yml` both give
-- **THEN** `uncovered` holds one object, `{"rule": "Team.Terms", "files": [...]}` with both files, and the object of a name one file gives holds `rule` alone
+- **THEN** `uncovered` contains one object, `{"rule": "Team.Terms", "files": [...]}` with both files, and the object of a name one file gives contains `rule` alone

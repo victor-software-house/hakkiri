@@ -15,7 +15,7 @@ That alert SHALL sit at the last match of the pair in the node.
 
 #### Scenario: Two spellings in two paragraphs
 
-- **WHEN** a rule has `extends: consistency`, `message: "Inconsistent: '%s'"` and `either: {advisor: adviser}`, and the input holds a paragraph `An advisor came.` and then `The adviser left.`
+- **WHEN** a rule has `extends: consistency`, `message: "Inconsistent: '%s'"` and `either: {advisor: adviser}`, and the input contains a paragraph `An advisor came.` and then `The adviser left.`
 - **THEN** hakkiri reports one alert, in the second paragraph, with the message `Inconsistent: 'adviser'`
 
 #### Scenario: One spelling throughout
@@ -48,7 +48,7 @@ A match of `first` that is not defined, and is not an `exceptions` entry, SHALL 
 
 #### Scenario: An acronym defined once
 
-- **WHEN** a rule has `first: '\b[A-Z]{3,5}\b'` and `second: '\(([A-Z]{3,5})\)'`, and the input holds `The World Health Organization (WHO) met. WHO agreed.` and then `The CDC said no.`
+- **WHEN** a rule has `first: '\b[A-Z]{3,5}\b'` and `second: '\(([A-Z]{3,5})\)'`, and the input contains `The World Health Organization (WHO) met. WHO agreed.` and then `The CDC said no.`
 - **THEN** hakkiri reports one alert, with the matched text `CDC`
 
 #### Scenario: A definition after the use
@@ -83,7 +83,7 @@ A match that does not repeat SHALL leave the count as it is.
 - **WHEN** the rule above has `max: 1` and reads `The the cat saw a a dog.`
 - **THEN** hakkiri reports one alert, with the matched text `a a`
 
-### Requirement: repetition holds back an exception
+### Requirement: repetition skips an exception
 
 A `repetition` rule SHALL NOT report a repeat when the text it spans matches an `exceptions` entry.
 
@@ -132,7 +132,7 @@ It SHALL be no form seen, give no alert, define nothing, and leave the next matc
 
 ### Requirement: the pattern checks need something to match
 
-hakkiri SHALL refuse a `consistency` rule whose `either` holds no pair or a form with no text, a `repetition` rule whose `tokens` hold no text, and a `conditional` rule whose `first` or `second` is empty or matches the empty string.  
+hakkiri SHALL refuse a `consistency` rule whose `either` contains no pair or a form with no text, a `repetition` rule whose `tokens` hold no text, and a `conditional` rule whose `first` or `second` is empty or matches the empty string.  
 The error SHALL name the field.
 
 #### Scenario: No pair

@@ -5,7 +5,7 @@ Queue rows: `HKR-051` and `HKR-063` in [tasks.yaml][ledger].
 ## Motivation
 
 The ProseStyle port found two statements about a code span that look opposed.
-The `vale-differences` spec holds that a code span counts one word in hakkiri and none in Vale.
+The `vale-differences` spec states that a code span counts one word in hakkiri and none in Vale.
 ProseStyle `LongSentence` counts the words of a sentence with an `occurrence` rule, and under hakkiri it counts none for a code span.
 A probe of both tools on one sentence shows both statements hold, for two different checks.
 

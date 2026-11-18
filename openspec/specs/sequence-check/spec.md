@@ -37,7 +37,7 @@ A match SHALL never cross a sentence end.
 
 #### Scenario: Sentences of list items
 
-- **WHEN** the first rule above has `scope: list`, and the input holds the paragraph `Do it your self.` on line 1 and the list item `- Do it your self.` on line 3
+- **WHEN** the first rule above has `scope: list`, and the input contains the paragraph `Do it your self.` on line 1 and the list item `- Do it your self.` on line 3
 - **THEN** hakkiri reports one alert, on line 3
 
 ### Requirement: skip and min widen a token
@@ -171,7 +171,7 @@ Matches of one form SHALL NOT drop each other.
 - **WHEN** a rule has the forms `[{pattern: red}, {pattern: green}]` and `[{pattern: green}, {pattern: blue}]`, and the input is `Paint red green blue.`
 - **THEN** hakkiri reports one alert, with the matched text `red green`
 
-### Requirement: A sequence rule holds tokens or forms
+### Requirement: A sequence rule contains tokens or forms
 
 hakkiri SHALL refuse a `sequence` rule that sets both `tokens` and `forms`, or neither.  
 It SHALL refuse a form with no token that has a `pattern`, `tag` or `upos` without `negate`, and name the form's tokens in the error.

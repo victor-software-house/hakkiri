@@ -21,7 +21,7 @@ A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one S
 #### Scenario: Money
 
 - **WHEN** a paragraph reads `Money $5 and $10 very today.`, `Glued US$5 and CA$10 very.` or `A lone $5 very here.`
-- **THEN** the text rule reports `very`, since none of the three holds math
+- **THEN** the text rule reports `very`, since none of the three contains math
 
 #### Scenario: Spaces and escapes
 
@@ -45,17 +45,17 @@ A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one S
 
 #### Scenario: Emphasis and a backtick inside
 
-- **WHEN** a paragraph holds `$a *very* b$` or `$a `b` very c$`
-- **THEN** the span holds them as written, and the code rule reports `very`
+- **WHEN** a paragraph contains `$a *very* b$` or `$a `b` very c$`
+- **THEN** the span contains them as written, and the code rule reports `very`
 
 #### Scenario: A code span or a heading or a table cell
 
 - **WHEN** `` `$very$` `` is a code span, and `$very$` is in a heading and in a table cell
-- **THEN** the code span holds no math, and the heading and the cell each hold a span
+- **THEN** the code span contains no math, and the heading and the cell each hold a span
 
 #### Scenario: The delimiters
 
-- **WHEN** a code rule matches `$` and a paragraph holds `$a$`
+- **WHEN** a code rule matches `$` and a paragraph contains `$a$`
 - **THEN** the rule reports both delimiters, as it does in Vale
 
 ### Requirement: A display block of math reads as code
@@ -91,8 +91,8 @@ The text before and after the block SHALL read as separate paragraphs.
 
 #### Scenario: In an MDX file
 
-- **WHEN** an MDX file holds an inline span, money, a block and `{1 + 1}` in one line with a span
-- **THEN** the alerts are those of a Markdown file, and the expression holds no math
+- **WHEN** an MDX file contains an inline span, money, a block and `{1 + 1}` in one line with a span
+- **THEN** the alerts are those of a Markdown file, and the expression contains no math
 
 ### Requirement: A backtick beside math changes nothing
 
@@ -115,7 +115,7 @@ A tab runs to the next multiple of four.
 
 #### Scenario: Under no container
 
-- **WHEN** a paragraph holds `$$`, `z very` and `$$` on lines indented four spaces or a tab, or three spaces
+- **WHEN** a paragraph contains `$$`, `z very` and `$$` on lines indented four spaces or a tab, or three spaces
 - **THEN** the text rule reports `z very` for four spaces and a tab, and does not for three
 
 #### Scenario: Under a list item and a quote
@@ -134,5 +134,5 @@ The search for the closing `$` of a span and for the end of an HTML tag SHALL ta
 
 #### Scenario: A hundred thousand unclosed openers
 
-- **WHEN** a paragraph holds `$a` and a space, or `<a`, a hundred thousand times with no closer
+- **WHEN** a paragraph contains `$a` and a space, or `<a`, a hundred thousand times with no closer
 - **THEN** the spans are found in seconds

@@ -15,7 +15,7 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 
 #### Scenario: A directory and a file
 
-- **WHEN** `hakkiri check docs README.md` runs and `docs` holds `a.md` and `sub/b.md`
+- **WHEN** `hakkiri check docs README.md` runs and `docs` contains `a.md` and `sub/b.md`
 - **THEN** hakkiri lints `docs/a.md`, `docs/sub/b.md` and `README.md`
 
 #### Scenario: A file named two ways
@@ -30,12 +30,12 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 
 #### Scenario: Folders a walk leaves alone
 
-- **WHEN** a walk meets `node_modules/x.md`, `.git/y.md` and a `packages` folder `styles/` holding `z.md`
+- **WHEN** a walk meets `node_modules/x.md`, `.git/y.md` and a `packages` folder `styles/` containing `z.md`
 - **THEN** hakkiri lints none of them, and lints a file of `.github/` that a glob matches
 
 #### Scenario: A walk from another folder
 
-- **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ..` runs in `other/` and the package folder `styles/` holds `Team/notes.md`
+- **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ..` runs in `other/` and the package folder `styles/` contains `Team/notes.md`
 - **THEN** hakkiri lints `docs/a.md` and not `styles/Team/notes.md`
 
 ### Requirement: A file that fails does not stop the run
@@ -71,12 +71,12 @@ The output SHALL hold no ESC byte, whatever the colour variables hold.
 #### Scenario: JSON with colour forced
 
 - **WHEN** `hakkiri check --format json` runs with `CLICOLOR_FORCE=1` and a file draws an alert
-- **THEN** the output parses as JSON with one alert, and holds no ESC byte
+- **THEN** the output parses as JSON with one alert, and contains no ESC byte
 
 #### Scenario: The end of a match
 
 - **WHEN** a file draws an alert for a match on line 1, columns 9 to 12
-- **THEN** the alert holds `line` 1, `column` 9, `end_line` 1 and `end_column` 12
+- **THEN** the alert contains `line` 1, `column` 9, `end_line` 1 and `end_column` 12
 
 ### Requirement: The exit status shows what happened
 
@@ -106,7 +106,7 @@ It SHALL see only the alerts that the config's `level` leaves in.
 
 #### Scenario: A broken config
 
-- **WHEN** `.ctl/hakkiri.yaml` holds an unknown key
+- **WHEN** `.ctl/hakkiri.yaml` contains an unknown key
 - **THEN** hakkiri lints no file, prints the error with its line to stderr, and exits 2
 
 ### Requirement: Every flag has a variable
@@ -131,7 +131,7 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: An ignored folder and file
 
-- **WHEN** `.gitignore` holds `build/` and `draft.md`, and `a.md`, `draft.md` and `build/b.md` each draw one warning
+- **WHEN** `.gitignore` contains `build/` and `draft.md`, and `a.md`, `draft.md` and `build/b.md` each draw one warning
 - **THEN** `hakkiri check` lints `a.md` alone, and prints `1 alert in 1 file`
 
 #### Scenario: The exclude file and the global excludes
@@ -141,7 +141,7 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: A nested gitignore
 
-- **WHEN** `docs/.gitignore` holds `skip.md`, and `docs/skip.md` and `skip.md` exist
+- **WHEN** `docs/.gitignore` contains `skip.md`, and `docs/skip.md` and `skip.md` exist
 - **THEN** a walk skips `docs/skip.md` and lints `skip.md`
 
 #### Scenario: A named ignored file
@@ -181,7 +181,7 @@ A file that a glob matches whose styles hold no rule, a file found by a walk, an
 
 #### Scenario: A walk finds an unselected file
 
-- **WHEN** `hakkiri check` walks a folder that holds `README.md`, which no glob selects
+- **WHEN** `hakkiri check` walks a folder that contains `README.md`, which no glob selects
 - **THEN** hakkiri prints no warning
 
 ### Requirement: A reader is chosen by formats, then by extension
@@ -191,12 +191,12 @@ A reader SHALL follow the langdex language of the file, so no table of extension
 
 #### Scenario: The reader of an extension
 
-- **WHEN** `formats` holds `txt: md` and `a.txt` holds a fenced block that holds `very`
+- **WHEN** `formats` contains `txt: md` and `a.txt` contains a fenced block that contains `very`
 - **THEN** hakkiri reads `a.txt` as Markdown and reports nothing for the fence
 
 #### Scenario: More extensions of a language
 
-- **WHEN** `a.mts` holds `// A very good start.`, `a.markdown` holds `A very good start.`, and a rule flags `very`
+- **WHEN** `a.mts` contains `// A very good start.`, `a.markdown` contains `A very good start.`, and a rule flags `very`
 - **THEN** hakkiri reads `a.mts` as TypeScript and `a.markdown` as Markdown, and reports `very` once in each
 
 #### Scenario: An interpreter picks the reader
@@ -206,12 +206,12 @@ A reader SHALL follow the langdex language of the file, so no table of extension
 
 #### Scenario: A TOML file
 
-- **WHEN** a glob selects `Cargo.toml`, which holds `name = "very" # very`
+- **WHEN** a glob selects `Cargo.toml`, which contains `name = "very" # very`
 - **THEN** hakkiri reports one alert, in the comment, and none for the string
 
 #### Scenario: Files of the data and shell languages
 
-- **WHEN** `a.yml` holds `# A very good start.`, `a.bash` holds `# A very good start.`, `bashrc` holds `# A very good start.`, `bin/tool` starts with `#!/bin/sh` and holds `# A very good start.`, and a rule flags `very`
+- **WHEN** `a.yml` contains `# A very good start.`, `a.bash` contains `# A very good start.`, `bashrc` contains `# A very good start.`, `bin/tool` starts with `#!/bin/sh` and contains `# A very good start.`, and a rule flags `very`
 - **THEN** hakkiri reads the first as YAML and the other three as Shell, and reports `very` once in each
 
 ### Requirement: A file no reader reads is plain text
@@ -241,28 +241,28 @@ No marker, escape or entity SHALL change its text.
 
 #### Scenario: Paragraphs
 
-- **WHEN** `notes.txt` holds `This is very good.`, a blank line and `A second very paragraph.` and a rule flags `very`
+- **WHEN** `notes.txt` contains `This is very good.`, a blank line and `A second very paragraph.` and a rule flags `very`
 - **THEN** hakkiri reports `notes.txt:1:9` and `notes.txt:3:10`
 
 #### Scenario: A fence is text
 
-- **WHEN** `a.txt` holds a fence around `very`
+- **WHEN** `a.txt` contains a fence around `very`
 - **THEN** hakkiri reports `very` on line 2, column 1
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text that holds a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.
+A file read as plain text that contains a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.
 This SHALL hold whether a walk finds the file or the command line names it.
 A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
 
 #### Scenario: A picture
 
-- **WHEN** `logo.png` holds a NUL byte and the glob `*` selects it
+- **WHEN** `logo.png` contains a NUL byte and the glob `*` selects it
 - **THEN** hakkiri skips it, counts no file for it, and exits 0
 
 #### Scenario: A Latin-1 file
 
-- **WHEN** `latin.txt` holds a word that has the byte `E9`, then a space and `very`, and no NUL byte, and a rule flags `very`
+- **WHEN** `latin.txt` contains a word that has the byte `E9`, then a space and `very`, and no NUL byte, and a rule flags `very`
 - **THEN** hakkiri reports `very` at the column that counts the bytes, and Vale gives the same column
 
 ### Requirement: on_unknown sets what a selected file with no reader gets
@@ -310,10 +310,10 @@ A scope part that names a language SHALL hold for either, and a negated part SHA
 
 #### Scenario: A mapped file
 
-- **WHEN** `formats` maps `txt: md`, `a.txt` holds `# beta`, a blank line and `beta alpha gamma.`, and three rules have `text.md` with `alpha`, `text & ~heading.md` with `beta`, and `text.txt` with `gamma`
+- **WHEN** `formats` maps `txt: md`, `a.txt` contains `# beta`, a blank line and `beta alpha gamma.`, and three rules have `text.md` with `alpha`, `text & ~heading.md` with `beta`, and `text.txt` with `gamma`
 - **THEN** hakkiri reports `beta`, `alpha` and `gamma` on line 3, and none in the heading
 
 #### Scenario: A file read as plain text by on_unknown
 
-- **WHEN** a rule has `scope: text.txt` and `tokens: [marker]`, the glob `*` selects `notes.txt`, `guide.rst` and `README`, and each holds `A marker.`
+- **WHEN** a rule has `scope: text.txt` and `tokens: [marker]`, the glob `*` selects `notes.txt`, `guide.rst` and `README`, and each contains `A marker.`
 - **THEN** hakkiri reports one alert, in `notes.txt`

@@ -7,7 +7,7 @@ Its variables, formula and condition keep the meaning Vale 3.26.0 gives them, pl
 
 ## Requirements
 
-### Requirement: A metric reports when the condition holds
+### Requirement: A metric reports when the condition is true
 
 A `metric` rule SHALL evaluate its `formula`, then its `condition` against the result, and report one alert for each measured text where the condition holds.  
 A `%s` in its message SHALL read as the result with two decimals.
@@ -48,7 +48,7 @@ In a metric with a scope, each element count SHALL be 0.
 
 #### Scenario: Second-level headings
 
-- **WHEN** a rule has `message: "%s"`, `formula: heading.h2` and `condition: '> 1'`, and the input holds three `##` headings, each followed by a paragraph
+- **WHEN** a rule has `message: "%s"`, `formula: heading.h2` and `condition: '> 1'`, and the input contains three `##` headings, each followed by a paragraph
 - **THEN** hakkiri reports one alert, with the message `3.00`
 
 ### Requirement: With no scope, a metric measures the prose of the file
@@ -65,7 +65,7 @@ A `metric` rule with another `scope` SHALL measure each block that scope selects
 
 #### Scenario: Only a heading
 
-- **WHEN** the same rule reads a file that holds only `# One two three`
+- **WHEN** the same rule reads a file that contains only `# One two three`
 - **THEN** hakkiri reports no alert
 
 #### Scenario: A scope measures each block
@@ -75,7 +75,7 @@ A `metric` rule with another `scope` SHALL measure each block that scope selects
 
 #### Scenario: A comment in a code file
 
-- **WHEN** the same rule reads a Rust file that holds `// One two three.` and `// Four five.` on two lines, above `fn main() {}`
+- **WHEN** the same rule reads a Rust file that contains `// One two three.` and `// Four five.` on two lines, above `fn main() {}`
 - **THEN** hakkiri reports one alert, with the message `5.00`
 
 ### Requirement: Formulas use Tengo's expression syntax
@@ -90,7 +90,7 @@ A condition MAY read `result`, and the element counts as a formula does.
 
 #### Scenario: A heading count in a condition
 
-- **WHEN** a rule has `message: "%s"`, `formula: paragraphs` and `condition: '>= heading.h2'`, and the input holds two `##` headings, each followed by a paragraph
+- **WHEN** a rule has `message: "%s"`, `formula: paragraphs` and `condition: '>= heading.h2'`, and the input contains two `##` headings, each followed by a paragraph
 - **THEN** hakkiri reports one alert, with the message `2.00`
 
 ### Requirement: A formula that cannot run is refused

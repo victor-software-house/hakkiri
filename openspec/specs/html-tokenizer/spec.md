@@ -13,10 +13,10 @@ The trimming of the text between tags SHALL trim a vertical tab too, as Vale doe
 
 #### Scenario: A vertical tab in a tag
 
-- **WHEN** an HTML block holds `<span`, a vertical tab and `class="code">marker</span>`
-- **THEN** the tag name holds the vertical tab and `class="code"`, so no attribute is read, and `marker` reads as text
+- **WHEN** an HTML block contains `<span`, a vertical tab and `class="code">marker</span>`
+- **THEN** the tag name contains the vertical tab and `class="code"`, so no attribute is read, and `marker` reads as text
 
 #### Scenario: A vertical tab around a text
 
-- **WHEN** an HTML block holds `<p>`, a vertical tab, `marker` and a vertical tab before `</p>`
+- **WHEN** an HTML block contains `<p>`, a vertical tab, `marker` and a vertical tab before `</p>`
 - **THEN** the paragraph reads `marker`

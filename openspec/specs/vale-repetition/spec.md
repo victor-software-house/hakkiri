@@ -2,11 +2,11 @@
 
 ## Purpose
 
-The built-in style `Vale` holds the rule `Vale.Repetition`, read from Vale's own definition, which flags a word written twice in a row.
+The built-in style `Vale` contains the rule `Vale.Repetition`, read from Vale's own definition, which flags a word written twice in a row.
 
 ## Requirements
 
-### Requirement: The style Vale holds the rule Vale.Repetition
+### Requirement: The style Vale contains the rule Vale.Repetition
 
 hakkiri SHALL build the rule `Vale.Repetition` into the style `Vale`, with Vale's defaults: `extends: repetition`, the level `error`, the message `'%s' is repeated!`, the scope `text`, `ignorecase`, `alpha`, a `max` of 0 and the tokens `[^\s.!?]+`.
 A glob that lists `Vale` SHALL run it, with no vocabulary named.
