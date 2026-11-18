@@ -22,7 +22,7 @@ A pull request that adds, changes or removes a difference SHALL change this spec
 #### Scenario: A later decision removes a difference
 
 - **WHEN** a decision makes hakkiri match Vale where an earlier decision differed, as [case 9][case-9] did for the `~` before a scope that [format 7][format-7] listed
-- **THEN** the same pull request removes or rewrites the scenario, so the list holds only what is true now
+- **THEN** the same pull request removes or rewrites the scenario, so the list contains only what is true now
 
 ### Requirement: What a rule reads differs from Vale
 
@@ -35,12 +35,12 @@ hakkiri SHALL read the text and the scopes of a document as each scenario below 
 
 #### Scenario: Rust block comments are read
 
-- **WHEN** a Rust file holds a `/* */`, `/** */` or `/*! */` comment
+- **WHEN** a Rust file has a `/* */`, `/** */` or `/*! */` comment
 - **THEN** hakkiri reads it as `text.comment.block` or `text.comment.doc.block`, and Vale reads line comments only ([format 7][format-7])
 
 #### Scenario: String literals are never prose
 
-- **WHEN** a code file holds a string literal
+- **WHEN** a code file has a string literal
 - **THEN** hakkiri never reads it as prose, and Vale reads it with the `raw` scope ([format 7][format-7])
 
 #### Scenario: A scope part matches by dotted prefix
@@ -56,17 +56,21 @@ hakkiri SHALL read the text and the scopes of a document as each scenario below 
 #### Scenario: A negated paragraph is left out
 
 - **WHEN** a rule has `scope: ~paragraph`
-- **THEN** hakkiri leaves paragraphs out, and Vale leaves out nothing, so hakkiri gives 104 alerts fewer on the nine files of the scope test ([case 9][case-9])
+- **THEN** hakkiri leaves paragraphs out, and Vale leaves out nothing.  
+  So hakkiri gives 104 alerts fewer on the nine files of the scope test ([case 9][case-9])
 
 #### Scenario: An inline exclusion belongs to its scope item
 
 - **WHEN** a rule has `scope: [heading, 'paragraph & ~link']`
-- **THEN** a link in a heading still reads as text in hakkiri, and Vale blanks it, since it gathers the exclusions of every item into one list ([engine 17][engine-17])
+- **THEN** a link in a heading still reads as text in hakkiri, and Vale blanks it.  
+  Vale gathers the exclusions of every item into one list ([engine 17][engine-17])
 
 #### Scenario: Sentences are cut by hakkiri's splitter
 
 - **WHEN** a text has a break that the two splitters cut differently
-- **THEN** hakkiri cuts it by its own splitter, which is held to split at least as well as Vale on every evaluation set, so a few inputs read apart from Vale ([splitter 5][splitter-5], [engine 12][engine-12])
+- **THEN** hakkiri cuts it by its own splitter.  
+  The splitter must split at least as well as Vale on every evaluation set.  
+  So a few inputs read apart from Vale ([splitter 5][splitter-5], [engine 12][engine-12])
 
 ### Requirement: Where an alert points and what it matches differs from Vale
 
@@ -75,17 +79,20 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 #### Scenario: An alert is placed by offset
 
 - **WHEN** a phrase appears twice in a block and the second copy matches
-- **THEN** hakkiri points at the second copy through its byte table, and Vale's default path searches for the matched text, so it can land on the first ([engine 7][engine-7])
+- **THEN** hakkiri points at the second copy through its byte table.  
+  Vale's default path searches for the matched text, so it can land on the first ([engine 7][engine-7])
 
 #### Scenario: A measurement alert points at its node
 
 - **WHEN** a measurement alert fires on a list item
-- **THEN** hakkiri points at the first byte of the measured node, past its bullet, and Vale points at column 1 of the block's first line ([engine 16][engine-16])
+- **THEN** hakkiri points at the first byte of the measured node, past its bullet.  
+  Vale points at column 1 of the block's first line ([engine 16][engine-16])
 
 #### Scenario: Word and space classes are Unicode
 
 - **WHEN** a pattern uses `\w`, `\d` or `\s` on `naïve`
-- **THEN** hakkiri reads one word, since these classes are Unicode as `\b` is, and Vale reads them as ASCII, so a word with an accent reads as two ([engine 16][engine-16])
+- **THEN** hakkiri reads one word, since these classes are Unicode as `\b` is.  
+  Vale reads them as ASCII, so a word with an accent reads as two ([engine 16][engine-16])
 
 #### Scenario: capitalize needs a capital to start
 
@@ -94,7 +101,7 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 
 #### Scenario: A swap key with a space reads a line wrap
 
-- **WHEN** a `substitution` key holds a space and `$1` in its value, and the matched text wraps a line
+- **WHEN** a `substitution` key has a space and `$1` in its value, and the matched text wraps a line
 - **THEN** hakkiri expands `$1` from the key as matched, and Vale expands it from the key as written, so the alert is lost ([engine 16][engine-16])
 
 #### Scenario: An occurrence over blank text points at a word
@@ -110,7 +117,8 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 #### Scenario: Overlapping phrase exceptions both hold
 
 - **WHEN** the text is `a b c`, the exceptions are the phrases `a b` and `b c`, and a rule matches `c`
-- **THEN** hakkiri holds back the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
+- **THEN** hakkiri skips the match, and Vale reports `c`.  
+  Its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
 
 ### Requirement: Measurements differ from Vale
 
@@ -124,18 +132,20 @@ hakkiri SHALL measure as each scenario below says, where Vale 3.26.0 measures ot
 #### Scenario: A whole-file metric reads code comments
 
 - **WHEN** a whole-file metric runs on a Rust file
-- **THEN** hakkiri measures the prose of the comments, and Vale prints no value, since its default Rust query gives no comment a markup format ([engine 16][engine-16])
+- **THEN** hakkiri measures the prose of the comments, and Vale prints no value.  
+  Its default Rust query gives no comment a markup format ([engine 16][engine-16])
 
 #### Scenario: A score listed twice counts once
 
 - **WHEN** a `readability` rule has `metrics: [SMOG, SMOG]`
-- **THEN** hakkiri averages the distinct scores and reports SMOG's grade, and Vale divides by the length of the list and reports half of it ([pattern 8][pattern-8])
+- **THEN** hakkiri averages the distinct scores and reports the Simple Measure of Gobbledygook (SMOG) grade.  
+  Vale divides by the length of the list and reports half of it ([pattern 8][pattern-8])
 
 [case-9]: ../../../2026-11-10-case-and-sequence-checks/design.md#9-a-block-of-text-has-the-scope-of-one-element
 [engine-12]: ../../../2026-11-10-rule-engine/design.md#12-flesch-kincaid-parity-has-two-tolerances
 [engine-16]: ../../../2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
 [engine-17]: ../../../2026-11-10-rule-engine/design.md#17-an-inline-exclusion-belongs-to-the-scope-item
-[engine-18]: ../../../2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested
+[engine-18]: ../../../2026-11-10-rule-engine/design.md#18-every-phrase-exception-applies-overlapping-or-nested
 [engine-3]: ../../../2026-11-10-rule-engine/design.md#3-a-scope-part-matches-by-dotted-prefix
 [engine-7]: ../../../2026-11-10-rule-engine/design.md#7-positions-from-one-line-table
 [format-7]: ../../../2026-11-10-rule-format/design.md#7-intended-differences-from-vale

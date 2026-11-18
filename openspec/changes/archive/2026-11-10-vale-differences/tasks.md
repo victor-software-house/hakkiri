@@ -9,19 +9,21 @@ This change reads the designs that [`spelling-and-affix-checks`][spelling] and t
   They state that every difference is listed, and give the differences in what a rule reads, where an alert points and how text is measured.  
   Each scenario links its decision.  
   Verify `openspec validate --all --strict` and the link check pass in CI, and that each scenario's link resolves to its decision.  
-  - 2026-11-10 (UTC), `openspec validate --all --strict` and the markdown link check pass in the [CI run on PR 48][pr48-ci], at head [9a09b1c][c-pr48].  
-    A dry-run archive of the four changes gave one spec of 12 requirements and 62 scenarios that validates strictly, and every link in it resolves to an archived design.
+  - 2026-11-10 (UTC), `openspec validate --all --strict` and the link check for Markdown pass in the [CI run on PR 48][pr48-ci], at head [9a09b1c][c-pr48].  
+    A dry-run archive of the four changes gave one spec of 12 requirements and 62 scenarios.  
+    The spec validates strictly, and every link in it resolves to an archived design.
 
 ## 2. The rule
 
 - [x] 2.1 Add the rule that a change adding, changing or removing a difference updates the spec in the same pull request, to `openspec/config.yaml` and `AGENTS.md`.  
-  Verify `openspec instructions specs --change vale-differences` prints the rule, and `AGENTS.md` holds it.  
-  - 2026-11-10 (UTC), on `main` after [PR 48][hakkiri#48] merged, `openspec instructions specs --change vale-differences` printed the rule, and `AGENTS.md` holds it under Rules.
+  Verify `openspec instructions specs --change vale-differences` prints the rule, and `AGENTS.md` contains it.  
+  - 2026-11-10 (UTC), on `main` after [PR 48][hakkiri#48] merged, `openspec instructions specs --change vale-differences` printed the rule, and `AGENTS.md` contains it under Rules.
 
 ## 3. Integration
 
 - [x] 3.1 Verify the pull request's CI passes: lint, prose lint, OpenSpec and the Template check.  
-  - 2026-11-10 (UTC), CI passes on [9a09b1c][c-pr48] of [PR 48][hakkiri#48]: Verify, Build and test, Static checks, CodeQL, both Analyze jobs, secrets and the Kody review.  
+  - 2026-11-10 (UTC), CI passes on [9a09b1c][c-pr48] of [PR 48][hakkiri#48].  
+    Verify, Build and test, Static checks, CodeQL, both Analyze jobs, secrets and the Kody review pass.  
     The Template check and Publish checks skip on this branch, and I did not run them.  
     Kody left four threads on PR 48, all fixed in that PR before the merge.
 
