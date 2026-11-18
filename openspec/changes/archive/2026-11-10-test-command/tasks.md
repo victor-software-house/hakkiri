@@ -8,7 +8,8 @@ This change adds to the binary that [`check-command`][check] creates.
 - [x] 1.1 Add `tests` to every check type of the rule schema, read as the cases of design decision 2.  
   Verify a rule with `tests` loads, `check` runs no case, and a malformed `tests` is refused with its line.  
   Evidence, 2026-11-11 (UTC): `a_malformed_case_in_a_rule_is_refused_at_load` and `check_loads_the_cases_and_runs_none` pass in [the main CI run][ci-main].
-- [x] 1.2 Read `*.test.yml` files and the `tests` of rule files into one list of cases, with the checks of decision 2.  
+- [x] 1.2 Read `*.test.yml` files and each rule file's `tests` into one list of cases.  
+  Apply the checks of decision 2.  
   Verify the scenarios for a case that asserts nothing, a duplicate name and an unknown field pass.  
   Evidence, 2026-11-11 (UTC): `a_case_that_asserts_nothing_does_not_run` and `a_duplicate_name_and_an_unknown_field_are_refused` pass in [the main CI run][ci-main].
 
@@ -26,24 +27,26 @@ This change adds to the binary that [`check-command`][check] creates.
 - [x] 3.1 Find cases as design decision 5 says, and add `hakkiri test` with `--coverage`.  
   Verify the scenarios for a rule and a test file, YAML that is not a rule, no case, and an uncovered rule pass.  
   Evidence, 2026-11-11 (UTC): `a_rule_and_a_test_file_run_five_cases`, `yaml_that_is_not_a_rule_is_not_read`, `no_case_is_an_error` and `coverage_names_a_rule_no_case_fires` pass in [the main CI run][ci-main].
-- [x] 3.2 Build the result that ctl-core renders as the report and as JSON, with exit codes 0, 1 and 2.  
-  Verify the scenarios for a failed case, a case that cannot run and JSON with colour forced pass, through the shared helper that clears the colour variables.  
-  Evidence, 2026-11-11 (UTC): `a_failed_case_prints_its_file_name_and_reason`, `a_case_that_cannot_run_is_reported_with_the_others` and `json_holds_no_escape_byte_under_forced_colour` pass in [the main CI run][ci-main].
-- [x] 3.3 Run `hakkiri test --coverage` over a fixture style folder of three rules that carry cases in the form ProseStyle uses, including `want: ''` and `format: rs`.  
-  Verify a test passes every case and names no rule, and ProseStyle's own cases are left to `HKR-008`.  
-  Evidence, 2026-11-11 (UTC): `a_style_folder_of_three_rules_covers_every_rule` passes in [the main CI run][ci-main].  
-  The fixture holds six cases, with `want: ''` and `format: rs`, and ProseStyle's own cases are left to `HKR-008`.
-- [x] 3.4 Name a rule from its absolute path with symlinks left alone, and read its text from that path.  
-  Verify the scenarios of `test-rule-names` pass.  
-  Evidence, 2026-11-11 (UTC): `a_rule_file_is_named_from_inside_its_style_folder`, `a_symlinked_style_folder_is_named_by_its_link`, `a_rule_path_through_a_symlink_and_back_out_is_read_from_the_folded_path` and `a_yaml_rule_file_is_neither_read_nor_covered` pass in [the main CI run][ci-main].  
-  [PR 60][pr60] later changed which name a dotted file name and a nested folder give, so the spec holds that rule in place of the one [PR 59][pr59] first wrote.
+- [x] 3.2 Build the result that ctl-core renders as the report and as JSON, with exit codes 0, 1 and 2.
+  - Verify the scenarios for a failed case, a case that cannot run and JSON with colour forced pass.  
+    They use the shared helper that clears the colour variables.
+  - Evidence, 2026-11-11 (UTC): `a_failed_case_prints_its_file_name_and_reason`, `a_case_that_cannot_run_is_reported_with_the_others` and `json_holds_no_escape_byte_under_forced_colour` pass in [the main CI run][ci-main].
+- [x] 3.3 Run `hakkiri test --coverage` over a fixture style folder of three rules that carry cases in the form ProseStyle uses, including `want: ''` and `format: rs`.
+  - Verify a test passes every case and lists no rule, and ProseStyle's own cases are left to `HKR-008`.
+  - Evidence, 2026-11-11 (UTC): `a_style_folder_of_three_rules_covers_every_rule` passes in [the main CI run][ci-main].
+  - The fixture has six cases, with `want: ''` and `format: rs`.
+- [x] 3.4 Derive a rule's name from its absolute path with symlinks left alone, and read its text from that path.
+  - Verify the scenarios of `test-rule-names` pass.
+  - Evidence, 2026-11-11 (UTC): `a_rule_file_is_named_from_inside_its_style_folder`, `a_symlinked_style_folder_is_named_by_its_link`, `a_rule_path_through_a_symlink_and_back_out_is_read_from_the_folded_path` and `a_yaml_rule_file_is_neither_read_nor_covered` pass in [the main CI run][ci-main].
+  - [PR 60][pr60] later changed which name a dotted file name and a nested folder give.  
+    So the spec states that rule in place of the one [PR 59][pr59] first wrote.
 
 ## 4. The bundle
 
-- [x] 4.1 Add `test` to `src/instructions.md` and `skills/hakkiri/SKILL.md`, and the three differences to the `vale-differences` spec.  
-  Verify the instructions test passes, and `openspec validate --all --strict` and `qctl check` pass.  
-  Evidence, 2026-11-11 (UTC): The 3 tests of `operator_docs` pass, and the `specs` task reports 22 of 22 specs, in [the main CI run][ci-main].  
-  `qctl check` ran in the local gate, not in the CI log.
+- [x] 4.1 Add `test` to `src/instructions.md` and `skills/hakkiri/SKILL.md`, and the three differences to the `vale-differences` spec.
+  - Verify the instructions test passes, and `openspec validate --all --strict` and `qctl check` pass.
+  - Evidence, 2026-11-11 (UTC): The 3 tests of `operator_docs` pass, and the `specs` task reports 22 of 22 specs, in [the main CI run][ci-main].
+  - `qctl check` ran in the local gate, not in the CI log.
 
 ## 5. Integration
 

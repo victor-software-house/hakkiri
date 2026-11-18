@@ -11,7 +11,7 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 
 #### Scenario: A `.yaml` file
 
-- **WHEN** a directory holds `Rule.yaml` with `extends` and `tests`
+- **WHEN** a directory has `Rule.yaml` with `extends` and `tests`
 - **THEN** hakkiri reads no case from it, and Vale reads its cases ([test 5][test-5])
 
 #### Scenario: The report
