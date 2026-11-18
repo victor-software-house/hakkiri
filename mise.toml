@@ -2,8 +2,8 @@
 min_version = "2026.11.6"
 
 [settings]
-# Every tool, whether a config file, a task or the command line asks for it,
-# comes from the locks; one with no entry fails instead of being looked up.
+# Every tool comes from the locks, whether a config file, a task or the command
+# line needs it. A tool with no entry fails instead of being looked up.
 locked = true
 # mise loads git:: task includes, and runs [deps] providers, only in
 # experimental mode.
@@ -46,7 +46,7 @@ RUST_NIGHTLY = "nightly-2026-11-01"
 # cc-rs compiles the C of the dependencies for the musl release target with
 # this wrapper around zig, and only for that target.
 CC_x86_64_unknown_linux_musl = "{{ config_root }}/tools/zig-cc-musl"
-# cargo skips a crates.io release younger than this, unless Cargo.lock holds it.
+# cargo skips a crates.io release younger than this, unless Cargo.lock contains it.
 CARGO_REGISTRY_GLOBAL_MIN_PUBLISH_AGE = "3 days"
 # The crates.io logins whose crates `mise run update:own` takes past the cooldown.
 CARGO_TRUSTED_OWNERS = "any-victor"
@@ -68,9 +68,9 @@ depends = [
   "check:repo",
 ]
 
-# mise-tasks/ holds this repository's task fragments and file tasks. An
-# includes list replaces the default task dirs, so mise-tasks comes first; add
-# pinned git:: catalogs after it.
+# mise-tasks/ contains this repository's task fragments and file tasks.
+# An includes list replaces the default task dirs, so mise-tasks comes first.
+# Add pinned git:: catalogs after it.
 [task_config]
 includes = [
   # Pinned git:: catalogs follow mise-tasks.
@@ -79,8 +79,8 @@ includes = [
   "git::https://github.com/victor-software-house/qctl.git//tasks/q?ref=v0.6.0",
   # The ver task the release workflow and check:versions run; it pins the verctl above.
   "git::https://github.com/victor-software-house/verctl.git//tasks/ver?ref=v0.8.6-rc.5",
-  # The shared Rust tasks, at actions main, 2026-11-14.
-  "git::https://github.com/victor-software-house/actions.git//tasks/rust.toml?ref=0c64886d642612fa5f1dcc6920fcb12c51c4b1eb",
-  # template:check, template:off, and template:on, at actions main, 2026-11-14.
-  "git::https://github.com/victor-software-house/actions.git//tasks/template.toml?ref=0c64886d642612fa5f1dcc6920fcb12c51c4b1eb",
+  # The shared Rust tasks, at actions main, 2026-11-18.
+  "git::https://github.com/victor-software-house/actions.git//tasks/rust.toml?ref=6243d0aec17b8d3eb664b6cf5162bfb5ef7990c3",
+  # template:check, template:off, and template:on, at actions main, 2026-11-18.
+  "git::https://github.com/victor-software-house/actions.git//tasks/template.toml?ref=6243d0aec17b8d3eb664b6cf5162bfb5ef7990c3",
 ]

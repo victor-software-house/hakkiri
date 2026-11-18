@@ -2,23 +2,6 @@
 
 lockfile_version = 4
 
-[[tools."aqua:vale-cli/vale"]]
-version = "3.26.0"
-backend = "aqua:vale-cli/vale"
-specifiers = ["3.26.0"]
-
-[tools."aqua:vale-cli/vale"."platforms.linux-x64"]
-checksum = "sha256:22aa69a556558e4a9dfc63c17030777383d8d3c48dcdfad655fa98e839d666ed"
-checksum_source = "mise-versions"
-url = "https://github.com/vale-cli/vale/releases/download/v3.26.0/vale_3.26.0_Linux_64-bit.tar.gz"
-url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/695681930"
-
-[tools."aqua:vale-cli/vale"."platforms.macos-arm64"]
-checksum = "sha256:a6c3370f53bad93086c6b85f3163676e44e08049d69743afdcc13f3aab5b7482"
-checksum_source = "mise-versions"
-url = "https://github.com/vale-cli/vale/releases/download/v3.26.0/vale_3.26.0_macOS_arm64.tar.gz"
-url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/695682018"
-
 [[tools.conftest]]
 version = "0.71.1"
 backend = "aqua:open-policy-agent/conftest"
@@ -51,6 +34,23 @@ provenance = "github-attestations"
 checksum = "sha256:51e9298489a86718e32433ddffbb6d4a29ee9da992bf3bcfaa29a664ec7b4cc2"
 url = "https://github.com/Fission-AI/OpenSpec/releases/download/v1.16.0/openspec-darwin-arm64.tar.gz"
 url_api = "https://api.github.com/repos/Fission-AI/OpenSpec/releases/assets/693785649"
+provenance = "github-attestations"
+
+[[tools."github:victor-software-house/hakkiri"]]
+version = "0.1.1"
+backend = "github:victor-software-house/hakkiri"
+specifiers = ["0.1.1"]
+
+[tools."github:victor-software-house/hakkiri"."platforms.linux-x64"]
+checksum = "sha256:b63dbd6dfc212b14d4915aef129fd4054258fd4f35b732202cc62d2b12805424"
+url = "https://github.com/victor-software-house/hakkiri/releases/download/v0.1.1/hakkiri_0.1.1_linux_x64.tar.gz"
+url_api = "https://api.github.com/repos/victor-software-house/hakkiri/releases/assets/764713424"
+provenance = "github-attestations"
+
+[tools."github:victor-software-house/hakkiri"."platforms.macos-arm64"]
+checksum = "sha256:d15040c2fb2bbefb9de9c59e630a741d2a2b5279118f3a4de980b086ec1edf31"
+url = "https://github.com/victor-software-house/hakkiri/releases/download/v0.1.1/hakkiri_0.1.1_macos_arm64.tar.gz"
+url_api = "https://api.github.com/repos/victor-software-house/hakkiri/releases/assets/764713388"
 provenance = "github-attestations"
 
 [[tools."github:victor-software-house/qctl"]]
