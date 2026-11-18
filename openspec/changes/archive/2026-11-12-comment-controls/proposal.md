@@ -6,7 +6,8 @@ It follows [block-token-ignores][block-token-ignores] in the stack, and uses not
 ## Motivation
 
 Vale reads HTML comments such as `<!-- vale Style.Rule = NO -->` and turns rules off for the text after them.  
-The consumers use the per-rule form: 58 tags in one private repository, 4 in nishiki, 2 in hakkiri and 2 in prose-style.  
+The consumers use the per-rule form: 58 tags in one private repository, 4 in nishiki, 2 in hakkiri and 2 in prose-style.
+
 hakkiri read no comment, so a project that moves from Vale lints text it had turned off.  
 The [vale-differences spec][differences] lists the missing controls as a known gap.
 

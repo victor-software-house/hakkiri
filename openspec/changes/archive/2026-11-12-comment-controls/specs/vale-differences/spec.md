@@ -2,15 +2,18 @@
 
 ### Requirement: Known gaps are listed apart from what differs by choice
 
-**Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for the comment controls closes, so the requirement is removed and added again below without that scenario.
+**Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for the comment controls closes.  
+So the requirement is removed and added again below without that scenario.
 
-**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from what differs on purpose". Its other scenarios are unchanged.
+**Migration**: Read the requirement of the same body under the ADDED section, called "Known gaps are listed apart from what differs on purpose".  
+Its other scenarios are unchanged.
 
 ## ADDED Requirements
 
 ### Requirement: Known gaps are listed apart from what differs on purpose
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
+The intended differences SHALL stay apart from this list.  
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: The built-in spelling rule
@@ -36,12 +39,14 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A script rule
 
 - **WHEN** a rule has `extends: script`
-- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
+- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`
+- **AND** Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
 
 #### Scenario: A formula outside the listed syntax
 
 - **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
-- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
+- **THEN** hakkiri rejects it, since it reads numbers, variables, operators, `math` functions and `round`
+- **AND** Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
 
 #### Scenario: The built-in repetition rule
 
@@ -66,12 +71,14 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 ### Requirement: Comment controls differ from Vale's in these ways
 
-hakkiri SHALL read the comments that turn rules off and on as Vale does in a Markdown file, apart from the scenarios below, and SHALL read the forms of its own as well.
+hakkiri SHALL read the comments that turn rules off and on as Vale does in a Markdown file, apart from the scenarios below.  
+hakkiri SHALL read the forms of its own as well.
 
 #### Scenario: Forms hakkiri adds
 
 - **WHEN** a Markdown file contains `<!-- hakkiri Team.Words: warning -->` or `<!-- hakkiri Team.Words: off -->`
-- **THEN** hakkiri sets the level of the rule from there on, or turns it off, and Vale reads neither form
+- **THEN** hakkiri sets the rule's level from there on, or turns it off
+- **AND** Vale reads neither form
 
 #### Scenario: A source file
 
@@ -81,7 +88,9 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 #### Scenario: A directive quoted across a line break
 
 - **WHEN** a code span reads `<!-- vale off` on one line and `-->` on the next, and a real `vale off` comment comes after it
-- **THEN** hakkiri hides the text after the real comment, and Vale also hides the text after the code span, since it takes the comment's place from the first `vale off` that its search finds ([comment-controls 8][comment-controls-8])
+- **THEN** hakkiri hides the text after the real comment
+- **AND** Vale also hides the text after the code span ([comment-controls 8][comment-controls-8])
+- **AND** Vale takes the comment's place from the first `vale off` that its search finds
 
 #### Scenario: An alert in an element that contains a comment
 
