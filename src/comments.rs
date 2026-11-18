@@ -127,8 +127,8 @@ impl Dialect {
 /// written, marker included.
 ///
 /// Vale drops the comments of Go, TypeScript and JavaScript that these two
-/// patterns match.
-/// The others name the tools of the languages hakkiri reads that Vale does
+/// patterns match, except an `oxlint` switch, which Vale reads as prose.
+/// The others list the tools of the languages hakkiri reads that Vale does
 /// not read.
 struct Directives {
     go: Regex,
@@ -148,7 +148,7 @@ static DIRECTIVES: LazyLock<Directives> = LazyLock::new(|| {
     Directives {
         go: compile(r"^//(?:go:|line |export |extern |nolint\b|lint:ignore|[a-z0-9]+:[a-z0-9])"),
         script: compile(
-            r"^//[ \t]*(?:eslint|@ts-|prettier-ignore|biome-ignore|istanbul\b|c8\b|v8\b|@flow\b|@jsx|jshint|jslint)|^/\*[ \t]*(?:eslint|globals?\b|jshint|jslint|istanbul\b|c8\b|@flow\b|@jsx|webpackChunkName|[@#]__PURE__)",
+            r"^//[ \t]*(?:eslint|oxlint|@ts-|prettier-ignore|biome-ignore|istanbul\b|c8\b|v8\b|@flow\b|@jsx|jshint|jslint)|^/\*[ \t]*(?:eslint|oxlint|globals?\b|jshint|jslint|istanbul\b|c8\b|@flow\b|@jsx|webpackChunkName|[@#]__PURE__)",
         ),
         swift: compile(r"^//[ \t]*(?:swiftlint:|swiftformat:|sourcery:)|^/\*[ \t]*swiftlint:"),
         yaml: compile(r"^#[ \t]*(?:yaml-language-server:|yamllint[ \t])"),
