@@ -7,22 +7,26 @@ hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart
 #### Scenario: Sections that match one file
 
 - **WHEN** two sections of a Vale config each list `TokenIgnores` and both match one file
-- **THEN** Vale applies them in the order of a Go map, which varies from run to run, and hakkiri applies the globs in the order written ([block-token-ignores 4][block-token-ignores-4])
+- **THEN** Vale applies them in the order of a Go map, which varies from run to run
+- **AND** hakkiri applies the globs in the order written ([block-token-ignores 4][block-token-ignores-4])
 
 #### Scenario: A pattern that does not compile
 
 - **WHEN** a glob lists a pattern that does not compile
-- **THEN** hakkiri refuses the config at load with the key and its line, and Vale reports error E201 when it lints a file the section matches ([block-token-ignores 4][block-token-ignores-4])
+- **THEN** hakkiri rejects the config at load with the key and its line
+- **AND** Vale reports error E201 when it lints a file the section matches ([block-token-ignores 4][block-token-ignores-4])
 
 #### Scenario: A pattern that matches no bytes
 
 - **WHEN** a pattern is `(z*)`
-- **THEN** hakkiri changes nothing, and Vale puts an empty pair of backticks at every place in the text ([block-token-ignores 2][block-token-ignores-2])
+- **THEN** hakkiri changes nothing
+- **AND** Vale puts an empty pair of backticks everywhere in the text ([block-token-ignores 2][block-token-ignores-2])
 
 #### Scenario: Front matter
 
 - **WHEN** a Markdown file starts with front matter and a pattern matches a `---` line
-- **THEN** hakkiri leaves the front matter to the parser and the pattern sees the line, and Vale has already rewritten the front matter into a fenced block ([block-token-ignores, not ported][block-token-ignores-not-ported])
+- **THEN** hakkiri leaves the front matter to the parser and the pattern sees the line
+- **AND** Vale has already rewritten the front matter into a fenced block ([block-token-ignores, not ported][block-token-ignores-not-ported])
 
 #### Scenario: A code alert after a block with no group
 
@@ -37,16 +41,19 @@ hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart
 #### Scenario: A source file
 
 - **WHEN** a glob that matches a Rust, TypeScript or JavaScript file lists a block or token pattern
-- **THEN** hakkiri applies it to the Markdown of each comment, and Vale applies none, since it reads a comment as plain lines ([block-token-ignores 3][block-token-ignores-3])
+- **THEN** hakkiri applies it to the Markdown of each comment
+- **AND** Vale applies none, since it reads a comment as plain lines ([block-token-ignores 3][block-token-ignores-3])
 
 ### Requirement: A sentence rule in a comment is read otherwise than Vale reads it
 
-hakkiri SHALL list here the place where it reads a file otherwise than Vale at 66bbb85 that the probe of the ignores and the comment controls left.
+hakkiri SHALL list here the place where it still reads a file otherwise than Vale at 66bbb85.  
+The probe of the ignores and the comment controls left this one place.
 
 #### Scenario: A sentence rule in a comment
 
 - **WHEN** a doc comment of a source file contains one sentence and a rule has `scope: sentence`
-- **THEN** hakkiri runs the rule on the sentence, and Vale runs it on none, since it reads the comment as plain lines ([block-token-ignores 5][block-token-ignores-5])
+- **THEN** hakkiri runs the rule on the sentence
+- **AND** Vale runs it on none, since it reads the comment as plain lines ([block-token-ignores 5][block-token-ignores-5])
 
 [block-token-ignores-2]: ../../design.md#2-what-a-match-turns-into-is-what-vale-gives
 [block-token-ignores-3]: ../../design.md#3-a-source-files-comments-take-the-patterns
