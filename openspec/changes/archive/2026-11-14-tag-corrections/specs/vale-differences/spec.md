@@ -2,12 +2,12 @@
 
 ### Requirement: Tags come from the model and its corrections
 
-hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.
+hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.  
 Vale 3.26.0 tags with the model of prose v3.2.2, so the tags of the two tools differ.
 
 #### Scenario: Another model
 
-- **WHEN** both tools tag the 56,516 tokens of UD English GUM
+- **WHEN** both tools tag the 56,516 tokens of the Georgetown University Multilayer (GUM) corpus of Universal Dependencies (UD) English
 - **THEN** hakkiri's tags match the gold tags 92.53% of the time, and Vale's 90.26% ([tag-corrections 1][tag-corrections-1], [tag-corrections 2][tag-corrections-2])
 
 #### Scenario: A title is tagged by the model alone

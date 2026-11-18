@@ -2,8 +2,9 @@
 
 ### Requirement: An existence match across a code span is a match
 
-hakkiri SHALL report an `existence` match that runs across a code span, as Vale does, and SHALL drop one that starts or ends on a span.
+hakkiri SHALL report an `existence` match that runs across a code span, as Vale does, and SHALL drop one that starts or ends on a span.  
 Vale 3.26.0 masks the span as a run of `*` and reports a match that starts on it as well.
+
 The matched text differs: hakkiri prints `x` for the span, and Vale prints the mask.
 
 #### Scenario: A chain across a code span
