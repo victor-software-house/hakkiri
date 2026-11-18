@@ -3,14 +3,16 @@
 ## Purpose
 
 The project root is the folder that contains the `.ctl` folder of the config.  
-Globs and package paths are read from it, so a file matches the same glob however it is named, and a path outside it draws a warning.
+Globs and package paths are read from it, so a file matches the same glob however it is reached.  
+A path outside it draws a warning.
 
 ## Requirements
 
 ### Requirement: A glob matches the path under the project root
 
 hakkiri SHALL match each `files` glob against the file's path relative to the project root, with `/` separators.  
-It SHALL resolve the root and the folders of the file through symlinks, and keep the file's own name, so a symlink to a file matches by the name it is reached by, as in Vale.
+It SHALL resolve the root and the folders of the file through symlinks, and keep the file's own name.  
+So a symlink to a file matches by the name it is reached by, as in Vale.
 
 #### Scenario: A dot-slash argument
 
@@ -39,9 +41,11 @@ It SHALL resolve the root and the folders of the file through symlinks, and keep
 
 ### Requirement: A path outside the project root is reported
 
-hakkiri SHALL print a warning on standard error for each path it is given that is outside the project root and does not hold it, and SHALL lint none of its files.  
-When it is given no path, the current directory is the path given.  
-When no path lies under the root or contains it, hakkiri SHALL report a failure that names the root and exit 2.  
+hakkiri SHALL print a warning on standard error for each path it is given that is outside the project root and does not contain it.  
+It SHALL lint none of the files of that path.  
+When it is given no path, the current directory is the path given.
+
+When no path lies under the root or contains it, hakkiri SHALL report a failure that gives the root and exit 2.  
 
 #### Scenario: One file outside the root
 
@@ -60,9 +64,12 @@ When no path lies under the root or contains it, hakkiri SHALL report a failure 
 
 ### Requirement: The warning is a diagnostic
 
-hakkiri SHALL write the warning to standard error in every output format, and `--quiet` SHALL not hide it, because `--quiet` hides only a successful result.  
-A run with some paths under the root and some outside SHALL lint those under it, warn for each one outside, and exit by the alert level.  
-The failure that names the root SHALL be one of the `failures` of the JSON object.
+hakkiri SHALL write the warning to standard error in every output format.  
+`--quiet` SHALL not hide it, because `--quiet` hides only a successful result.
+
+A run with some paths under the root and some outside SHALL lint those under it and warn for each one outside.  
+It SHALL exit by the alert level.  
+The failure that gives the root SHALL be one of the `failures` of the JSON object.
 
 #### Scenario: A mixed run
 
@@ -90,9 +97,11 @@ A walk of a directory that contains the root SHALL enter only the folders on the
 
 ### Requirement: A walk compares resolved paths
 
-When it skips package folders, a walk SHALL compare the resolved path of each folder with the resolved package paths, so a folder written in another case, or below a symlinked folder, is skipped alike.  
+When it skips package folders, a walk SHALL compare the resolved path of each folder with the resolved package paths.  
+So a folder written in another case, or below a symlinked folder, is skipped alike.
+
 A walk SHALL NOT enter a symlink to a folder.  
-A directory named as an argument SHALL be walked even when it is a package folder, as Vale lints its styles path only when named.
+A directory given as an argument SHALL be walked even when it is a package folder, as Vale lints its styles path only when given.
 
 #### Scenario: A symlink to a package folder
 
@@ -116,8 +125,10 @@ A path that does not exist SHALL be a failure of its own, with no failure about 
 ### Requirement: A glob follows the rules of gitignore
 
 A `files` or `formats` glob SHALL match as gitignore matches a pattern.  
-`*`, `?` and a class SHALL stay inside one folder, and `**` SHALL span folders.  
-A glob with no `/` SHALL match the file name in any folder, a leading `/` SHALL tie a glob to the project root, and a trailing `/` SHALL match every file the folder holds.  
+`*`, `?` and a class SHALL stay inside one folder, and `**` SHALL span folders.
+
+A glob with no `/` SHALL match the file name in any folder, and a leading `/` SHALL tie a glob to the project root.  
+With a trailing `/`, it SHALL match every file the folder contains.  
 A trailing `/**` SHALL match only the files below its folder.
 
 #### Scenario: A star inside one folder

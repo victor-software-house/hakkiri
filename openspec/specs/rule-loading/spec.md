@@ -9,7 +9,8 @@ It refuses a rule it cannot run, with an error that names the file, the field an
 
 ### Requirement: A style folder gives one rule per file
 
-hakkiri SHALL load every `.yml` file under a style folder as one rule, in a folder that does not start with `.` or `_`, and SHALL ignore every other file there.  
+hakkiri SHALL load every `.yml` file under a style folder as one rule, in a folder that does not start with `.` or `_`.  
+It SHALL ignore every other file there.  
 A file named `*.test.yml` contains cases and is no rule.
 
 #### Scenario: A folder with a rule and a README
@@ -91,7 +92,8 @@ hakkiri SHALL refuse a rule with a pattern that neither regex engine compiles, a
 
 ### Requirement: A pattern with nothing to match is refused
 
-hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` hold nothing to match, and a `metric` rule that lists `tokens` or `raw` containing nothing, because such a pattern matches at every position.  
+hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` contain nothing to match.  
+It SHALL refuse a `metric` rule that lists `tokens` or `raw` containing nothing, because such a pattern matches at every position.  
 The error SHALL name the file, the line, `tokens` and `raw`.
 
 #### Scenario: An existence rule with no tokens
@@ -129,7 +131,10 @@ hakkiri SHALL load a rule's `action` field, carry it on the rule's alerts, and c
 
 ### Requirement: A rule is named by its path
 
-hakkiri SHALL name a rule by its style folder, each folder between it and the file, and the file name up to its first dot, joined by dots, as Vale does.  
+hakkiri SHALL build a rule's name from the parts of its path, joined by dots, as Vale does.  
+The parts are its style folder, each folder between it and the file, and the file name up to its first dot.
+
+
 A name with `[` or `]` SHALL be refused when a glob lists the style.  
 `check`, `test` and `test --coverage` SHALL give a file one name.
 
@@ -155,7 +160,8 @@ A name with `[` or `]` SHALL be refused when a glob lists the style.
 
 ### Requirement: Two files with one name are refused
 
-hakkiri SHALL refuse a style folder in which two rule files give one rule name, when a glob lists the style, with an error that names the rule and both files.  
+hakkiri SHALL refuse a style folder in which two rule files give one rule name, when a glob lists the style.  
+The error SHALL give the rule and both files.  
 A style no glob lists SHALL load with no error, as in Vale.
 
 #### Scenario: Terms.yml and Terms.custom.yml
@@ -170,8 +176,11 @@ A style no glob lists SHALL load with no error, as in Vale.
 
 ### Requirement: A rule may extend another rule
 
-A rule whose `extends` contains a dot SHALL start from the rule that name gives and lay its own fields on top, as Vale 3.26.0 does.  
-The first segment of the name SHALL be a style folder of any loaded package, and the rest SHALL be folders and a file name, in a nested folder or a `_` folder too.  
+A rule whose `extends` contains a dot SHALL start from the rule that name gives, as Vale 3.26.0 does.  
+It SHALL then lay its own fields on top.
+
+The first segment of the name SHALL be a style folder of any loaded package.  
+Its other segments SHALL be folders and a file name, in a nested folder or a `_` folder too.  
 The parent's `tests` SHALL NOT carry over.
 
 #### Scenario: A child takes the fields of its parent
@@ -206,7 +215,8 @@ The parent's `tests` SHALL NOT carry over.
 
 ### Requirement: A key with a plus or a minus edits a field of the parent
 
-`key+` SHALL add its entries to a list of the parent, or merge them into a mapping of the parent with the child's entries winning.  
+`key+` SHALL add its entries to a list of the parent.  
+For a mapping of the parent, it SHALL merge them in, and the child's entries SHALL win.  
 `key-` SHALL remove entries from a list by their text, or keys from a mapping by name.  
 A bare key SHALL replace the parent's value.
 
@@ -263,7 +273,8 @@ A rule read through a parent SHALL name no line.
 #### Scenario: A parent name that is a path
 
 - **WHEN** a rule contains `extends: /etc/x.y` or `extends: Std..Rule`
-- **THEN** hakkiri reports that it is not a rule name, says a rule name is a style, a dot and a rule such as `Std.Rule`, reads no file for it, and exits 2
+- **THEN** hakkiri reports that it is not a rule name, reads no file for it, and exits 2
+- **AND** the error shows that a rule name is a style, a dot and a rule, such as `Std.Rule`
 
 ### Requirement: A rule hakkiri cannot run loads no rule
 
@@ -289,4 +300,5 @@ The loader SHALL keep its name and its file, so a config can turn it `off`.
 #### Scenario: Two files for one rule
 
 - **WHEN** two files of a style give one rule name, and the later file is a rule hakkiri cannot run or the earlier one is
-- **THEN** the later file replaces the earlier one: the rule runs only if the later file is runnable, and fails the run only if it is not
+- **THEN** the later file replaces the earlier one
+- **AND** the rule runs only if the later file is runnable, and fails the run only if it is not
