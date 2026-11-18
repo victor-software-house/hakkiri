@@ -3,9 +3,10 @@
 ### Requirement: A message fills %s in order
 
 Each `%s` in a message SHALL take the next value the check gives, and `%%` SHALL read as `%`.  
-A `%[n]s`, with `n` counting from 1, SHALL take the `n`th value, and a `%s` after it SHALL take the value that follows, as Go's `fmt` does.  
+A `%[n]s`, with `n` counting from 1, SHALL take the `n`th value, and a `%s` after it SHALL take the value that follows, as Go's `fmt` does.
+
 A `%s` or `%[n]s` with no value to take SHALL read as nothing.  
-A line break inside a value SHALL read as one space.
+Inside a value, a line break SHALL read as one space.
 
 #### Scenario: A percent sign
 

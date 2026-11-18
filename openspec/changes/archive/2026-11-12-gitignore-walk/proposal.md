@@ -6,9 +6,13 @@ It changes how [check-command][check] finds files, and adds three keys to [proje
 ## Motivation
 
 A walk reads every file under a folder that a glob selects, including a build folder that git ignores.  
-A prose lint task passes every tracked file to Vale, because Vale walks the folders a build writes, and with this change it can run a bare `hakkiri check`.  
-A file named on the command line that no glob selects is skipped with no message, so a typo in a path or a glob looks like a clean run.  
-`--fail-level` is a flag and a variable but no config key, though every option reads the flag, then the variable, then the config, then the default (operator, 2026-11-11).
+A prose lint task passes every tracked file to Vale, because Vale walks the folders a build writes.  
+With this change it can run a bare `hakkiri check`.
+
+hakkiri skips a file given on the command line that no glob selects, with no message.  
+So a typo in a path or a glob looks like a clean run.  
+`--fail-level` is a flag and a variable but no config key.  
+Yet every option reads the flag, then the variable, then the config, then the default (operator, 2026-11-11).
 
 ## Changes
 

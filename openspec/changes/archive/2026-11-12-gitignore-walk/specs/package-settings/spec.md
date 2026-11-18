@@ -2,7 +2,8 @@
 
 ### Requirement: A package's settings do not set the run options
 
-A package's settings file SHALL NOT hold `fail_level`, `gitignore` or `on_unmatched`, and a file that does SHALL be an error that names the key, its line and the package.
+A package's settings file SHALL NOT contain `fail_level`, `gitignore` or `on_unmatched`.  
+A file that does SHALL be an error that gives the key, its line and the package.
 
 #### Scenario: A package sets all three
 

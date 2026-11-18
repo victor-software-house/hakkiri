@@ -24,45 +24,67 @@ Non-goals:
 
 ### 1. The walk is the ignore crate's
 
-The `ignore` crate is ripgrep's walker, and it reads `.gitignore` in every folder and in each parent up to the repository root, `.git/info/exclude` and the global excludes file, with git's precedence and negation.  
-It applies them inside a git repository only, as ripgrep does: a `.gitignore` in a folder with no `.git` above it changes nothing.  
-hakkiri turns off its `.ignore` and hidden-file filters, keeps its own skips for `node_modules`, `.git`, the package folders and folders off the way to the project root, and sorts each folder by path as before.  
-The crate was authorized for the walk (operator, 2026-11-11), and its latest release is 0.4.34.  
+The `ignore` crate is ripgrep's walker.  
+It reads `.gitignore` in every folder and in each parent up to the repository root, with git's precedence and negation.  
+The crate also reads `.git/info/exclude` and the global excludes file.  
+It applies them inside a git repository only, as ripgrep does: a `.gitignore` in a folder with no `.git` above it changes nothing.
+
+hakkiri turns off its `.ignore` and hidden-file filters, and sorts each folder by path as before.  
+It keeps its own skips for `node_modules`, `.git`, the package folders and folders off the way to the project root.  
+The crate was authorized for the walk (operator, 2026-11-11), and its latest release is 0.4.34.
+
 Alternative: read the `.gitignore` files with the crate's `gitignore` module and keep `read_dir`.  
-It lost because the global excludes file, the parent folders and the precedence between the three are the part git defines and the crate already holds.
+It lost because git defines the global excludes file, the parent folders and the precedence between the three.  
+The crate already contains that part.
 
 ### 2. A named file is not filtered
 
-A file named on the command line is linted whether git ignores it or not, because naming it is the request, and ripgrep does the same.  
-The walk root is not tested either, so `hakkiri check build` lints inside an ignored folder, and the entries below it follow the same rules as any walk.  
-Alternative: filter a named file too.  
-It lost because a caller who names a file expects a result for it, and a silent skip looks like a clean file.
+A file given on the command line is linted whether git ignores it or not, because the caller chose that file.  
+ripgrep does the same.  
+The walk root is not tested either, so `hakkiri check build` lints inside an ignored folder.  
+The entries below it follow the same rules as any walk.
+
+Alternative: filter a given file too.  
+It lost because a caller who gives a file expects a result for it, and a skip with no message looks like a clean file.
 
 ### 3. A named file that no glob selects draws a warning
 
 Today `plan` returns nothing for such a file and the run prints nothing.  
-A warning on standard error names the file, and `on_unmatched` can make it an error with exit 2 or silence it.  
-A file that a glob selects but whose styles hold no rule draws nothing, because the config chose to run nothing there, as an empty `styles` list does for a changelog.  
-A file found by a walk draws nothing either: a walk reads what the globs select, so most files it meets are not selected.  
-A file named twice warns once.  
+A warning on standard error gives the file, and `on_unmatched` can make it an error with exit 2 or turn it off.
+
+No warning goes to a file that a glob selects but whose styles contain no rule.  
+The config chose to run nothing there, as an empty `styles` list does for a changelog.
+
+A file found by a walk draws nothing either.  
+Since a walk reads what the globs select, so most files it meets are not selected.  
+A file given twice warns once.
+
 Alternative: a failure by default.  
 It lost because a pre-commit hook passes every staged file, and most of them are not prose.
 
 ### 4. Each option reads flag, variable, config, default
 
-`--fail-level` and `--on-unmatched` take no default in the parser, so an absent flag and variable leave the config's value to apply, and the default applies last.  
-`--gitignore` takes an optional boolean with `--gitignore=false` and the variable `HAKKIRI_GITIGNORE=false`, and `--no-gitignore` is the same as `--gitignore=false`.  
-ctl-core leaves a `--no-*` flag with no variable and drops a variable that a `--x` or `--no-x` flag on the command line overrules, so `--no-gitignore` wins over `HAKKIRI_GITIGNORE=true`.  
-A boolean flag that sets true reads the variable `false` as no change, so `--gitignore` takes a value: with it `HAKKIRI_GITIGNORE=false` turns the walk filter off.  
+`--fail-level` and `--on-unmatched` take no default in the parser.  
+So an absent flag and variable leave the config's value to apply, and the default applies last.  
+`--gitignore` takes an optional boolean, as in `--gitignore=false` and the variable `HAKKIRI_GITIGNORE=false`.  
+`--no-gitignore` is the same as `--gitignore=false`.
+
+ctl-core leaves a `--no-*` flag with no variable.  
+It drops a variable that a `--x` or `--no-x` flag on the command line overrules, so `--no-gitignore` wins over `HAKKIRI_GITIGNORE=true`.  
+A boolean flag that sets true reads the variable `false` as no change.  
+So `--gitignore` takes a value, and with it `HAKKIRI_GITIGNORE=false` turns the walk filter off.
+
 Alternative: `--gitignore` and `--no-gitignore` as two plain flags.  
 It lost because the variable could then only turn the filter on, which is the default.
 
 ### 5. A package's file does not set them
 
 The options belong to the run, and a package that set `gitignore: false` would change what every project that pins it reads.  
-The three keys in a package's settings file are an error that names the key, the line and the package, as for any key a package may not set.  
+The three keys in a package's settings file are an error that gives the key, the line and the package.  
+This is as for any key a package may not set.
+
 Alternative: apply them like `level`, the last config winning.  
-It lost because `level` hides alerts the package's own rules give, while these decide which files the project reads.
+It lost because `level` hides alerts the package's own rules give, while these set which files the project reads.
 
 ### 6. What stays different from Vale
 
