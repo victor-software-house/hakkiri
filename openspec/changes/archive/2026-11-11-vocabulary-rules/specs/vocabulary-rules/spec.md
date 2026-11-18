@@ -90,7 +90,7 @@ hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file when a glob lists the 
 #### Scenario: Only the vocabulary is named
 
 - **WHEN** a glob lists `styles: [Team]` and the vocabulary accepts `GitHub`
-- **THEN** `github` draws no alert, and the accepted terms still hold back the `Team` rules' matches
+- **THEN** `github` draws no alert, and the accepted terms still drop the `Team` rules' matches
 
 #### Scenario: One rule turned off
 

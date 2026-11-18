@@ -4,7 +4,8 @@
 
 A Vale vocabulary is a folder `config/vocabularies/<Name>/` that contains `accept.txt` and `reject.txt`, one term per line.  
 Vale reads the accepted terms as exceptions in most checks, and builds `Vale.Terms` and `Vale.Avoid` from the lists.  
-The [vocabulary-rules change][rules] builds those two rules, so this change reads the lists and applies the exceptions.  
+The [vocabulary-rules change][rules] builds those two rules, so this change reads the lists and applies the exceptions.
+
 `HKR-006` fetches a package whole and keeps its `styles/config` folder, and the loader skips that folder as a style.  
 `HKR-007` loads Vale styles as they are.  
 So a vocabulary is already on disk and nothing reads it.
@@ -14,7 +15,7 @@ So a vocabulary is already on disk and nothing reads it.
 Goals:
 
 - A project names vocabularies at the top level and per glob, and hakkiri reads them from its packages.
-- The accepted terms reach the checks that Vale reaches, and hold back the matches Vale contains back.
+- The accepted terms reach the checks that Vale reaches, and drop the matches Vale drops.
 
 Non-goals:
 
@@ -28,7 +29,8 @@ Non-goals:
 ### 1. Vale's code and a probe are the reference
 
 Vale at `66bbb85` reads vocabularies in these places.  
-The probe ran a Vale build of that commit on 2026-11-11, in two rounds: nine small projects, then five configs over one package in `tests/fixtures/vocabularies`, whose `vale.tsv` contains every alert.
+The probe ran a Vale build of that commit on 2026-11-11, in two rounds: nine small projects, then five configs.  
+The five configs ran over one package in `tests/fixtures/vocabularies`, and its `vale.tsv` contains every alert.
 
 | Part | Where in Vale | What it does |
 |:--|:--|:--|
@@ -37,7 +39,7 @@ The probe ran a Vale build of that commit on 2026-11-11, in two rounds: nine sma
 | Finding one | [ini.go][v-load-vocab], [config.go][v-search-paths] | Takes the first search path that contains `config/vocabularies/<Name>`, walks it, and reads each `accept.txt` and `reject.txt` |
 | A line | [ini.go][v-word-list] | Trims it, skips a blank line and one that starts with a hash and a space |
 | A term as a pattern | [definition.go][v-term-pattern] | Escapes the periods of a plain term, and makes each run of whitespace match any run |
-| Exceptions | [definition.go][v-update-exceptions], [definition.go][v-phrase] | Sorts the terms longest first, gives each `(?-i)`, and contains back a match inside an accepted phrase |
+| Exceptions | [definition.go][v-update-exceptions], [definition.go][v-phrase] | Sorts the terms longest first, gives each `(?-i)`, and drops a match inside an accepted phrase |
 | The checks | [capitalization][v-capitalization], [conditional][v-conditional], [existence][v-existence], [repetition][v-repetition], [substitution][v-substitution], [spelling][v-spelling] | Each adds the accepted terms to its exceptions |
 
 The probe found these, which the spec states as scenarios:
@@ -45,14 +47,14 @@ The probe found these, which the spec states as scenarios:
 - A line that starts with `#` and no space is a term: `#nocomment` is accepted as the text `#nocomment`.
 - A term of `C++` stops the run: Vale reports `error parsing regexp: invalid nested repetition operator` with no file and no line.
 - A `words.txt` is ignored, and an `accept.txt` in a subfolder is read.
-- A plain term with a period contains back its own text only: `Node.js` leaves `Nodexjs` flagged.
-- A phrase that wraps across a line is held back whole, in `existence` and in `spelling`.
+- A plain term with a period drops its own text only: `Node.js` leaves `Nodexjs` flagged.
+- A phrase that wraps across a line is dropped whole, in `existence` and in `spelling`.
 - At the top level, `existence`, `repetition`, `substitution`, `conditional`, `capitalization` and `spelling` all take the accepted terms, and `vocab: false` turns it off in the first five and `nonword` in `existence`.
 - A `capitalization` rule keeps its own `exceptions` and the accepted terms together.
 - A section's list reaches `existence`, `repetition`, `substitution` and `spelling`, and not `capitalization` or `conditional`.
-- A section's list ignores `vocab: false` and `nonword`: `Filler0` and `Raw` hold back `GitHub` there and not at the top.
+- A section's list ignores `vocab: false` and `nonword`: `Filler0` and `Raw` drop `GitHub` there and not at the top.
 - A file takes the lists of every section that matches it, and the top-level lists besides.
-- A section's list is read case-sensitively in `spelling`: with `zorbl` accepted, the top level contains back `Zorbl` and a section does not.
+- A section's list is read case-sensitively in `spelling`: with `zorbl` accepted, the top level drops `Zorbl` and a section does not.
 - A section's `Vocab` also turns on `Vale.<Name>.Terms` for its files, which is `HKR-042`.
 
 ### 2. The key is `vocab`, at the top level and per glob
@@ -89,14 +91,17 @@ hakkiri walks it and reads every `accept.txt` and `reject.txt` below it, as Vale
 It reads the accepted terms in the order the files walk and the vocabularies are named.
 
 An unknown name is an error on the key's line: `` `Nope` is not a vocabulary in any package ``.  
-A name of the top level is refused by the config's own validation, so its line comes from the YAML location index and not from a search of the text.  
-Vale's message names the search paths and has no line ([ini.go][v-load-vocab]).
+A name of the top level is rejected by the config's own validation.  
+So its line comes from the YAML location index and not from a search of the text.  
+Vale's message lists the search paths and has no line ([ini.go][v-load-vocab]).
 
-Two packages that hold one vocabulary name are an error that names both, as for a style.  
+Two packages that contain one vocabulary name are an error that lists both, as for a style.
+
 Alternative: the first package wins, as Vale's search does.  
-It lost because a second package would then change nothing and say nothing.  
+It lost because a second package would then change nothing and show no error.
+
 Alternative: the last package wins, as `vale sync` does when it moves the folders into one `StylesPath`.  
-It lost for the same reason, and because it makes the order of `packages` decide silently.
+It lost for the same reason, and because the order of `packages` would then pick the winner with no message.
 
 Vale also looks in a per-user styles folder.  
 hakkiri has none, because a project's packages are all in its config (intended difference).
@@ -104,15 +109,21 @@ hakkiri has none, because a project's packages are all in its config (intended d
 ### 4. A line of a list is a pattern
 
 hakkiri trims a line, skips a blank one and one that starts with `# `, and reads the rest as one term.  
-A term with no pattern operator other than a period is plain: its periods are literal, so `Node.js` does not match `nodexjs`.  
+A term with no pattern operator other than a period is plain.  
+Its periods are literal, so `Node.js` does not match `nodexjs`.
+
 Any other term is a pattern in hakkiri's regex dialect, so `harness(?:es)?` matches two forms.  
 In both, a run of whitespace matches any run of whitespace, so a phrase that wraps still matches ([definition.go][v-term-pattern]).
 
-A term that is not a valid pattern is an error that names the vocabulary file and the line.  
-Vale reports the failure with no line of the vocabulary file, and `C++` stops every run (intended difference, so the error is one a person can find).  
-hakkiri's regex dialect reads `C++` as a pattern with a possessive plus, so it contains back `C` and `CC` and stops nothing; a term is written `C\+\+` to mean the text.  
+A term that is not a valid pattern is an error that gives the vocabulary file and the line.  
+Vale reports the failure with no line of the vocabulary file, and `C++` stops every run.  
+This is an intended difference, so the error is one a person can find.
+
+hakkiri's regex dialect reads `C++` as a pattern with a possessive plus.  
+So it drops `C` and `CC` and stops nothing, and a term that means the text is written `C\+\+`.
+
 Alternative: escape every term unless it is marked as a pattern.  
-It lost because Vale's vocabularies hold patterns that way (`harness(?:es)?` in ProseStyle), so an escaped term would stop matching.
+It lost because Vale's vocabularies contain patterns that way (`harness(?:es)?` in ProseStyle), so an escaped term would stop matching.
 
 ### 5. Accepted terms are exceptions
 
@@ -128,12 +139,14 @@ The `case-and-sequence-checks` change records the order: the terms go in before 
 
 No other check reads them.  
 The `vocab` field loads today with no effect, and it now decides.  
-A match inside an accepted phrase is held back, so `mea` in `mea culpa` is held back and a lone `mea` is not.
+A match inside an accepted phrase is dropped, so `mea` in `mea culpa` is dropped and a lone `mea` is not.
 
 ### 6. A glob's lists are held per file
 
 hakkiri collects a file's lists from every glob that matches it, in the order written.  
-It builds one set of exceptions from them with the builder that a rule's `exceptions` use, and asks it of each match of an `existence`, `repetition`, `spelling` and `substitution` rule, after the rule's own exceptions ([definition.go][v-vocab-for]).  
+It builds one set of exceptions from them, with the builder that a rule's `exceptions` use.  
+It checks each match of an `existence`, `repetition`, `spelling` and `substitution` rule against that set, after the rule's own exceptions ([definition.go][v-vocab-for]).
+
 A set is built once for each distinct list of vocabulary names.  
 The top-level terms stay in each rule's own exceptions.  
 So a file's glob lists add to the top-level ones, and they ignore `vocab: false` and `nonword`, as the probe shows.
@@ -148,7 +161,8 @@ It lost because it multiplies the compiled rules by the number of lists, and Val
 
 A rule builds its exceptions when it loads, so the terms must exist first.  
 The loader reads all package folders, then the vocabularies, then the styles with the accepted terms in hand.  
-Today it reads each package's styles as it visits the package.  
+Today it reads each package's styles as it visits the package.
+
 Alternative: patch each rule after it loads.  
 It lost because the exceptions are compiled patterns sorted and rewritten at build.
 

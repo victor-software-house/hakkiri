@@ -5,9 +5,12 @@ It adds the rows `HKR-041` and `HKR-042` for what it leaves out, and `HKR-042` h
 
 ## Motivation
 
-A Vale package ships a vocabulary: `ProseStyle` contains `styles/config/vocabularies/ProseStyle/accept.txt`, and its `.vale.ini` sets `Vocab = ProseStyle` ([prose-style][prose-style-ini]).  
-Vale reads the accepted words as exceptions in most checks.  
-hakkiri skips `config`, loads a rule's `vocab` field and does nothing with it, so a project that moves from Vale gets alerts on words its vocabulary accepts.  
+A Vale package ships a vocabulary: `ProseStyle` contains `styles/config/vocabularies/ProseStyle/accept.txt`.  
+Its `.vale.ini` sets `Vocab = ProseStyle` ([prose-style][prose-style-ini]).  
+Vale reads the accepted words as exceptions in most checks.
+
+hakkiri skips `config`, and loads a rule's `vocab` field but does nothing with it.  
+So a project that moves from Vale gets alerts on words its vocabulary accepts.  
 The [vale-differences spec][differences] lists this as a known gap.
 
 ## Changes
@@ -16,7 +19,7 @@ The [vale-differences spec][differences] lists this as a known gap.
 - hakkiri reads each from `config/vocabularies/<name>/` in a loaded package: every `accept.txt` and `reject.txt` below it.
 - A glob's list adds its accepted terms to the files the glob matches, in the checks Vale reaches with a section's `Vocab`.
 - A line of a list is one term, which is a pattern, with Vale's rule for a plain term.
-- Accepted terms hold back matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules, as in Vale, and `vocab: false` turns that off where Vale lets it.
+- Accepted terms drop matches in `capitalization`, `conditional`, `existence`, `repetition`, `substitution` and `spelling` rules, as in Vale, and `vocab: false` turns that off where Vale lets it.
 - An unknown vocabulary, two packages that hold one name and a term that is not a pattern are errors that name the file or line.
 - The `vale-differences` spec records what still differs and lists the gaps with their rows.
 
@@ -33,7 +36,7 @@ The [vale-differences spec][differences] lists this as a known gap.
 
 ## Impact
 
-- New: `src/vocabulary.rs`, `tests/vocabularies.rs` and its fixtures, with Vale's alerts for them recorded from Vale at `66bbb85`.
+- New: `src/vocabulary.rs`, `tests/vocabularies.rs` and its fixtures, with the alerts Vale `66bbb85` gave for them.
 - Changed: the rule builders in `src/rule/build.rs`, the checks and the engine, which take a file's own accepted terms, the config loader, `src/instructions.md`, the skill, `AGENTS.md` and `README.md`.
 - No new dependency.
 

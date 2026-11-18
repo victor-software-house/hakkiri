@@ -2,7 +2,8 @@
 
 ### Requirement: Known gaps are listed apart from the intended differences
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
+The intended differences SHALL stay apart from this list.  
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: The built-in spelling rule
@@ -12,8 +13,9 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: Vocabularies
 
-- **WHEN** a section of a Vale config sets `Vocab`, or the top level names a vocabulary
-- **THEN** hakkiri contains back the matches the accepted terms name, and builds no `Vale.Terms`, `Vale.Avoid`, `Vale.<Name>.Terms` or `Vale.<Name>.Avoid`, which Vale runs for the project or the section (row [HKR-042][ledger], [vocabulary-rules 1][vocabulary-rules-1])
+- **WHEN** a section of a Vale config sets `Vocab`, or the top level lists a vocabulary
+- **THEN** hakkiri drops the matches of the accepted terms
+- **AND** hakkiri builds no `Vale.Terms`, `Vale.Avoid`, `Vale.<Name>.Terms` or `Vale.<Name>.Avoid`, which Vale runs for the project or the section (row [HKR-042][ledger], [vocabulary-rules 1][vocabulary-rules-1])
 
 #### Scenario: A YAML vocabulary
 
@@ -38,12 +40,14 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A script rule
 
 - **WHEN** a rule has `extends: script`
-- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
+- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`
+- **AND** Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
 
 #### Scenario: A formula outside the listed syntax
 
 - **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
-- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
+- **THEN** hakkiri rejects it, since it reads numbers, variables, operators, `math` functions and `round`
+- **AND** Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
 
 #### Scenario: The built-in repetition rule
 
@@ -80,7 +84,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 #### Scenario: A term that Vale's engines refuse
 
 - **WHEN** a list contains `C++`
-- **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and contains back `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
+- **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and drops `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
 
 #### Scenario: Two packages with one vocabulary
 

@@ -2,7 +2,7 @@
 
 ## Context
 
-[`vocabularies`][vocabularies] reads `accept.txt` and `reject.txt` and contains back the matches the accepted terms name.  
+[`vocabularies`][vocabularies] reads `accept.txt` and `reject.txt` and drops the matches the accepted terms name.  
 Vale also builds two rules from the lists, in [`loadVocabRules`][v-load-rules], which runs when the style `Vale` is needed.  
 hakkiri has no style `Vale` yet, and `HKR-026` and `HKR-038` will add `Spelling` and `Repetition` to it.
 

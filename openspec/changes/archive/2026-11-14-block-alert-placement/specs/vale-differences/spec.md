@@ -48,7 +48,7 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 #### Scenario: Overlapping phrase exceptions both hold
 
 - **WHEN** the text is `a b c`, the exceptions are the phrases `a b` and `b c`, and a rule matches `c`
-- **THEN** hakkiri contains back the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
+- **THEN** hakkiri drops the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
 
 [engine-16]: ../../../2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
 [engine-18]: ../../../2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested

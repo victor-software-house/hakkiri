@@ -2,7 +2,8 @@
 
 ### Requirement: The config names the vocabularies a project uses
 
-The project config SHALL name vocabularies by the name of their folder in a `vocab` list, at its top level and in a glob of `files`, and hakkiri SHALL read each from a loaded package before it builds any rule.
+The project config SHALL list vocabularies by folder name in a `vocab` list, at its top level and in a glob of `files`.  
+hakkiri SHALL read each from a loaded package before it builds any rule.
 
 #### Scenario: A vocabulary of a package
 
@@ -17,7 +18,7 @@ The project config SHALL name vocabularies by the name of their folder in a `voc
 #### Scenario: No vocab key
 
 - **WHEN** the config contains no `vocab` key
-- **THEN** no accepted or rejected term exists, and every rule contains back what it held back before
+- **THEN** no accepted or rejected term exists, and every rule drops what it dropped before
 
 #### Scenario: A vocabulary of a fetched package
 
