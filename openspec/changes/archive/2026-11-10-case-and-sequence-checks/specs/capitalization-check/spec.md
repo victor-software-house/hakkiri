@@ -2,14 +2,15 @@
 
 ## Purpose
 
-A `capitalization` rule compares the case of each selected text with the case its `match` asks for, and reports text that falls short.  
-Its case styles, word share and exceptions keep the meaning Vale 3.26.0 gives them.
+A `capitalization` rule compares the case of each selected text with the case its `match` requires, and reports text that falls short.  
+Its case styles, word share and exceptions keep the meaning Vale 3.26.0 gives them.  
+Title case follows the Associated Press (AP) style or the Chicago style.
 
 ## ADDED Requirements
 
 ### Requirement: capitalization reports text in the wrong case
 
-A `capitalization` rule SHALL convert each selected text to the case its `match` names.  
+A `capitalization` rule SHALL convert each selected text to the case its `match` requires.  
 When the text is not in that case, it SHALL report one alert that spans the text.  
 In its message, the first `%s` SHALL read as the text and the second as the converted text.
 
