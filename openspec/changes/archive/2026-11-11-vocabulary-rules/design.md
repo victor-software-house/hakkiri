@@ -23,8 +23,12 @@ Non-goals:
 ### 1. Terms and Avoid are rules of a style named Vale
 
 hakkiri builds `Vale.Terms` when a vocabulary contains an accepted term, and `Vale.Avoid` when it contains a rejected one ([manager.go][v-load-rules]).  
-`Vale.Terms` is a `substitution` rule: each accepted term lowercased is a swap key with the term as its value, matched without regard to case, with the boundaries `(?<!\w)` and `(?!\w)` and not `\b`.  
-The message is `Use '%s' instead of '%s'.`, the level `error` and the scope `text`, and the value shown is the term in the case of the text it replaced ([substitution.go][v-recase]).  
+`Vale.Terms` is a `substitution` rule: each accepted term lowercased is a swap key with the term as its value.  
+It matches without regard to case, with the boundaries `(?<!\w)` and `(?!\w)` and not `\b`.
+
+The message is `Use '%s' instead of '%s'.`, the level `error` and the scope `text`.  
+The value shown is the term in the case of the text it replaced ([substitution.go][v-recase]).
+
 `Vale.Avoid` is an `existence` rule over the rejected terms, case-sensitive, between word boundaries, with the message `Avoid using '%s'.`, the level `error` and the scope `text`.  
 Accepted terms are exceptions of `Vale.Avoid`, not of `Vale.Terms` ([definition.go][v-default-rules]).
 
@@ -38,48 +42,63 @@ The probe of Vale at `66bbb85` (2026-11-11) found these:
 - `Bad Word` matches `Bad  Word` with two spaces, and not `bad word`.
 - `colou?r` draws `Use 'color' instead of 'COLOR'.` and `Use 'colour' instead of 'Colour'.`, and a term with a class, a wildcard or a repeat is shown as written.
 - Two terms with one lowercase form, `iOS` and `IOS`, give one swap key, and the later one is the value: `ios`, `Ios` and `iOS` each draw `Use 'IOS' instead of ...`.
-- Vale lowercases the whole pattern, escapes included, so `data\Wset` builds the key `data\wset`: it flags `dataxset`, draws `Use 'data\Wset' instead of 'dataxset'.`, and leaves `data set` alone.  
-  That changes what the pattern means, so hakkiri lowercases only the literal text of a term: `\W` stays a non-word character, `data\Wset` flags `DATA SET`, and `dataxset` draws nothing. The lead session decided this, as a note on `HKR-042` records.
+- Vale lowercases the whole pattern, escapes included, so `data\Wset` builds the key `data\wset`.  
+  That key flags `dataxset`, draws `Use 'data\Wset' instead of 'dataxset'.`, and leaves `data set` alone.
+
+  That changes what the pattern means, so hakkiri lowercases only the literal text of a term.  
+  `\W` stays a non-word character, `data\Wset` flags `DATA SET`, and `dataxset` draws nothing.  
+  The lead session decided this, as a note on `HKR-042` records.
 - A phrase that wraps matches across the line break: `mea\nCulpa` draws `Use 'mea culpa' instead of 'mea Culpa'.`, and `mea\nculpa` draws nothing.
 - Nothing runs from a vocabulary that a config lists without the style `Vale`, and `Vale.Terms: off` leaves `Vale.Avoid` on.
 - A glob's own rule turns on after the glob's settings, so `Vale.Team.Terms: off` beside `vocab: [Team]` in one glob leaves it on.
 
 Alternative: swap keys that keep the term's case and match with the `(?i)` flag.  
-It lost because Vale lowercases the key, so a term written in capitals and one written in lowercase give one key, and the later term wins.
+It lost because Vale lowercases the key.  
+So a term written in capitals and one written in lowercase give one key, and the later term wins.
 
 ### 2. The rules run where the style Vale or their name is listed
 
 A rule runs on a file when its style is listed for the file, or its name is set ([lint.go][v-should-run]).  
-So `styles: [Vale]` runs both rules, and `Vale.Terms: warning` runs `Terms` at that level, as `BasedOnStyles = Vale` and `Vale.Terms = warning` do.  
-hakkiri's rule settings already run a rule whichever style contains it.  
-With no accepted term there is no `Vale.Terms`, and a setting that names it is an error, as for any rule no loaded style holds.
+So `styles: [Vale]` runs both rules, and `Vale.Terms: warning` runs `Terms` at that level, as `BasedOnStyles = Vale` and `Vale.Terms = warning` do.
 
-The names are Vale's own, so a ProseStyle config reads the same in both tools.  
-Alternative: run both rules whenever a vocabulary is named.  
-It lost because the probe shows Vale keeps them off unless the style or the name is listed, and a project that lists only `Team` gets no `Terms` alerts.  
+hakkiri's rule settings already run a rule whichever style contains it.  
+With no accepted term there is no `Vale.Terms`, and a setting for it is an error, as for any rule no loaded style contains.
+
+The names are Vale's own, so a ProseStyle config reads the same in both tools.
+
+Alternative: run both rules whenever a vocabulary is listed.  
+It lost because the probe shows Vale keeps them off unless the style or the name is listed.  
+A project that lists only `Team` gets no `Terms` alerts.
+
 Alternative: own names such as `Vocab.Terms`.  
 It lost because a name the operator did not choose is a decision for the operator, and Vale's names need none.
 
 ### 3. A glob's vocabulary builds rules named after the vocabulary
 
-A glob that names `Team` builds `Vale.Team.Terms` and `Vale.Team.Avoid` from that vocabulary, as `Vale.Terms` and `Vale.Avoid` are built from the top level ([manager.go][v-load-rules]).  
-Vale turns them on for the files the glob matches, so no style or setting is needed, and the probe shows `Use 'harness' instead of 'HARNESS'.` from `Vale.Team.Terms` with only a `Vocab` in the section.  
+A glob that lists `Team` builds `Vale.Team.Terms` and `Vale.Team.Avoid` from that vocabulary, as `Vale.Terms` and `Vale.Avoid` are built from the top level ([manager.go][v-load-rules]).  
+Vale turns them on for the files the glob matches, so no style or setting is needed.  
+The probe shows `Use 'harness' instead of 'HARNESS'.` from `Vale.Team.Terms` with only a `Vocab` in the section.
+
 Alternative: build one `Vale.Terms` over the lists of the file.  
 It lost because Vale's names and its alerts carry the vocabulary, and a project sets a level for one vocabulary's rule.
 
 ### 4. The style Vale needs a vocabulary term
 
 `styles: [Vale]` is an error today, because no package contains a style `Vale`.  
-It stays an error when no named vocabulary contains a term, and `HKR-026` and `HKR-038` will give the style rules that need no vocabulary.  
+It stays an error when no listed vocabulary contains a term.  
+`HKR-026` and `HKR-038` will give the style rules that need no vocabulary.
+
 Alternative: a style `Vale` that is always present and contains no rule.  
 It lost because an empty style hides a wrong vocabulary name: the config would load and lint nothing.
 
 ### 5. A package style named Vale is refused
 
-Vale refuses a style named `Vale` beside its built-in one ([manager.go][v-load-rules]).  
-hakkiri refuses it too, with an error on the package's entry, but only when a vocabulary gives the built-in style a rule: a project with no vocabulary term keeps a package style named `Vale`.  
-Alternative: refuse it always.  
-It lost because it would break a config that has never named a vocabulary.
+Vale rejects a style called `Vale` beside its built-in one ([manager.go][v-load-rules]).  
+hakkiri rejects it too, with an error on the package's entry, but only when a vocabulary gives the built-in style a rule.  
+A project with no vocabulary term keeps a package style called `Vale`.
+
+Alternative: reject it always.  
+It lost because it would break a config that has never listed a vocabulary.
 
 [vocabularies]: ../2026-11-11-vocabularies/design.md
 [v-load-rules]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/manager.go#L559-L628

@@ -2,15 +2,18 @@
 
 ### Requirement: Known gaps are listed apart from the intended differences
 
-**Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for the vocabulary rules closes, so the requirement is removed and added again below without that scenario.
+**Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for the vocabulary rules closes.  
+So the requirement is removed and added again below without that scenario.
 
-**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from what differs by choice". Its other scenarios are unchanged.
+**Migration**: Read the requirement of the same body under the ADDED section, called "Known gaps are listed apart from what differs by choice".  
+Its other scenarios are unchanged.
 
 ## ADDED Requirements
 
 ### Requirement: Known gaps are listed apart from what differs by choice
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
+The intended differences SHALL stay apart from this list.  
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: The built-in spelling rule
@@ -41,12 +44,14 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A script rule
 
 - **WHEN** a rule has `extends: script`
-- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
+- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`
+- **AND** Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
 
 #### Scenario: A formula outside the listed syntax
 
 - **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
-- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
+- **THEN** hakkiri rejects it, since it reads numbers, variables, operators, `math` functions and `round`
+- **AND** Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
 
 #### Scenario: The built-in repetition rule
 
@@ -76,7 +81,8 @@ hakkiri SHALL build and run the rules of a vocabulary as Vale does, apart from t
 #### Scenario: An escape in a term
 
 - **WHEN** `data\Wset` is accepted and the text is `A data set, data-set, dataxset and DATA SET.`
-- **THEN** hakkiri flags `DATA SET`, since it lowercases the literal text of the term and keeps `\W`, and Vale flags `dataxset`, since it lowercases the escape to `\w` ([vocabulary-rules 1][vocabulary-rules-1])
+- **THEN** hakkiri flags `DATA SET`, since it lowercases the literal text of the term and keeps `\W`
+- **AND** Vale flags `dataxset`, since it lowercases the escape to `\w` ([vocabulary-rules 1][vocabulary-rules-1])
 
 #### Scenario: The style Vale with no term
 
