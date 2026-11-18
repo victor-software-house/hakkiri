@@ -21,10 +21,13 @@ Non-goals:
 
 ### 1. The file is parsed, masked and parsed again
 
-hakkiri finds the math in the text of each paragraph, heading and table cell of a first parse, and writes the file again with the same length.  
-An inline span's `$` delimiters become backticks, and a backtick inside it becomes an apostrophe, so it parses as a code span.  
+hakkiri finds the math in the text of each paragraph, heading and table cell of a first parse.  
+It then writes the file again with the same length.  
+An inline span's `$` delimiters become backticks, and a backtick inside it becomes an apostrophe, so it parses as a code span.
+
 Each line of a display block becomes blank, so the paragraph ends before the block and starts again after it.  
-The second parse gives the tree, and the code node of a span takes the `$` delimiters back into its segments, which Vale's code span holds.
+The second parse gives the tree.  
+The code node of a span takes the `$` delimiters back into its segments, as Vale's code span contains them.
 
 Alternative: enable the math of markdown-rs.  
 It lost because its rules differ from Vale's on money, wrapped spans and block endings, and the probe shows each.  
@@ -40,13 +43,15 @@ The probe of Vale at `66bbb85` (2026-11-11), over three Markdown files, one MDX 
 - `$a$5 very then $b$` is one span, since the first closing `$` is followed by a digit.
 - `$$x very$$` inside a line contains the span `$x very$`, because the first `$` cannot open and the second can.
 - A span contains `*very*` and a backtick as written, since the math parser reads before the emphasis and code parsers do.
-- A display block can end with `$$` after content, with `$$ {#eq-a}`, with a blank line, or with the paragraph, and it can start in the middle of a paragraph, in a list item and in a block quote.
+- A display block can end with `$$` after content, with `$$ {#eq-a}`, with a blank line, or with the paragraph.  
+  It can start in the middle of a paragraph, in a list item and in a block quote.
 - An MDX file reads the same rules, and skips a `{…}` expression first.
 - A `code` rule reads `$a$` with its delimiters, so a rule that matches `$` flags both.
 
 ### 3. A container's markers stay
 
-A line after the first of a paragraph in a block quote or a list item contains the container's markers and indentation.  
-hakkiri skips them when it looks for `$$` at the start of a line, and a masked line keeps them, so a quote or an item goes on.
+In a block quote or a list item, each line of a paragraph but the first contains the container's markers and indentation.  
+hakkiri skips them when it looks for `$$` at the start of a line.  
+A masked line keeps them, so a quote or an item goes on.
 
 [v-math]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/math.go

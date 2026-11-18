@@ -5,8 +5,11 @@ It follows [source-comment ignores][ignores] in the stack, and uses nothing from
 
 ## Motivation
 
-Vale reads `$…$` and `$$…$$` in a Markdown or MDX file as math, and no prose rule reads math: an inline span is a code span, and a display block is a code block.  
-markdown-rs reads a `$` pair as math by other rules, and hakkiri's parser enables none of its math, so a text rule flagged the words of an equation.  
+Vale reads `$…$` and `$$…$$` in a Markdown or MDX file as math, and no prose rule reads math.  
+An inline span is a code span, and a display block is a code block.
+
+markdown-rs reads a `$` pair as math by other rules, and hakkiri's parser enables none of its math.  
+So a text rule flagged the words of an equation.  
 The probe in `tests/fixtures/markup-differences` showed it, and the row `HKR-048` queued it.
 
 ## Changes
@@ -14,7 +17,8 @@ The probe in `tests/fixtures/markup-differences` showed it, and the row `HKR-048
 - An inline span follows Pandoc's delimiters, as Vale does.  
   The opening `$` is followed by a character that is not a space, and the closing `$` follows one and is not followed by a digit.  
   A span wraps over the lines of a paragraph.
-- A display block opens with a line that starts with `$$`, even in the middle of a paragraph, and closes with a line that ends with `$$`, a blank line or the end of the paragraph.
+- A display block opens with a line that starts with `$$`, even in the middle of a paragraph.  
+  It closes with a line that ends with `$$`, a blank line or the end of the paragraph.
 - Both read as code, so text and sentence rules skip them and a `code` rule reads an inline span with its `$` delimiters.
 - The difference is gone from the `block-token-ignores` change, which listed it.
 
