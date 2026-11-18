@@ -1,17 +1,20 @@
 # Proposal
 
-Queue row: `HKR-038` in [tasks.yaml][ledger].
+Queue row: `HKR-038` in [tasks.yaml][ledger].  
 It follows [HKR-042][vocabulary-rules], which built the style `Vale` with `Terms` and `Avoid`.
 
 ## Motivation
 
-Vale builds the rule `Vale.Repetition` into its style `Vale`, whenever a section lists that style ([definition.go][v-rules], [manager.go][v-manager]).
-It reports a word that repeats, such as `the the`, at the level `error`, and a Vale package with `BasedOnStyles = Vale` relies on it.
-hakkiri built the style `Vale` only while a top-level vocabulary held a term, and it held no repetition rule, so a project that moved from Vale lost the alerts, or had its config refused.
+Vale builds the rule `Vale.Repetition` into its style `Vale`, whenever a section lists that style ([definition.go][v-rules], [manager.go][v-manager]).  
+It reports a word that repeats, such as `the the`, at the level `error`.  
+A Vale package with `BasedOnStyles = Vale` relies on it.
+
+hakkiri built the style `Vale` only while a top-level vocabulary had a term, and the style had no repetition rule.  
+So a project that moved from Vale lost the alerts, or hakkiri rejected its config.
 
 ## Changes
 
-- The style `Vale` always exists and holds `Vale.Repetition`, besides `Vale.Terms` and `Vale.Avoid` when a vocabulary gives them.
+- The style `Vale` always exists and contains `Vale.Repetition`, besides `Vale.Terms` and `Vale.Avoid` when a vocabulary gives them.
 - `Vale.Repetition` has Vale's defaults: `extends: repetition`, level `error`, message `'%s' is repeated!`, scope `text`, `ignorecase`, `alpha`, `max` 0 and the tokens `[^\s.!?]+`.
 - Accepted terms hold a repeat back, at the top level and in a glob, as in Vale.
 - A level, `on` and `off` by name apply to it as to any rule.

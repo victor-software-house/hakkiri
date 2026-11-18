@@ -1,9 +1,10 @@
 ## MODIFIED Requirements
 
-### Requirement: The built-in style Vale holds the vocabulary rules
+### Requirement: The built-in style Vale contains the vocabulary rules
 
-hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Repetition` and `Spelling`, and `Terms` and `Avoid` when a named vocabulary at the top level holds a term.
-The style SHALL exist whatever the vocabularies hold.
+hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Repetition` and `Spelling`.  
+The style SHALL also have `Terms` and `Avoid` when a named vocabulary at the top level has a term.  
+The style SHALL exist whatever the vocabularies contain.
 
 #### Scenario: A style named Vale
 
@@ -12,5 +13,5 @@ The style SHALL exist whatever the vocabularies hold.
 
 #### Scenario: No vocabulary
 
-- **WHEN** a glob lists `styles: [Vale]` and no named vocabulary holds a term
+- **WHEN** a glob lists `styles: [Vale]` and no named vocabulary has a term
 - **THEN** the glob runs `Vale.Repetition` and `Vale.Spelling`

@@ -1,8 +1,8 @@
 ## ADDED Requirements
 
-### Requirement: The style Vale holds the rule Vale.Repetition
+### Requirement: The style Vale contains the rule Vale.Repetition
 
-hakkiri SHALL build the rule `Vale.Repetition` into the style `Vale`, with Vale's defaults: `extends: repetition`, the level `error`, the message `'%s' is repeated!`, the scope `text`, `ignorecase`, `alpha`, a `max` of 0 and the tokens `[^\s.!?]+`.
+hakkiri SHALL build the rule `Vale.Repetition` into the style `Vale`, with Vale's defaults: `extends: repetition`, the level `error`, the message `'%s' is repeated!`, the scope `text`, `ignorecase`, `alpha`, a `max` of 0 and the tokens `[^\s.!?]+`.  
 A glob that lists `Vale` SHALL run it, with no vocabulary named.
 
 #### Scenario: A repeated word
@@ -37,12 +37,15 @@ A glob that lists `Vale` SHALL run it, with no vocabulary named.
 
 ### Requirement: Words compare by simple case folding
 
-hakkiri SHALL read two words as the same when each character of one folds to the character of the other by simple case folding, as Go's `strings.EqualFold` reads them, and SHALL NOT fold the text as a whole.
+hakkiri SHALL read two words as the same when each character of one folds to the character of the other by simple case folding.  
+This is how Go's `strings.EqualFold` reads them.  
+hakkiri SHALL NOT fold the text as a whole.
 
 #### Scenario: A sigma
 
 - **WHEN** the text is `ΣΑΣ σασ and ΣΑΣ σας and όλος όλος.`
-- **THEN** each pair is a repeat, so `ΣΑΣ σασ` is reported, which lowercasing the whole word did not ([vale-repetition 4][vale-repetition-4])
+- **THEN** each pair is a repeat, so `ΣΑΣ σασ` is reported.  
+  Lowercasing the whole word did not report it ([vale-repetition 4][vale-repetition-4])
 
 #### Scenario: Other foldings
 
@@ -51,7 +54,7 @@ hakkiri SHALL read two words as the same when each character of one folds to the
 
 ### Requirement: Accepted terms and the config set the rule
 
-An accepted term of a top-level vocabulary or of a glob's vocabulary SHALL hold a repeat back.
+An accepted term of a top-level vocabulary or of a glob's vocabulary SHALL hold a repeat back.  
 A level, `on` or `off` set by the name `Vale.Repetition` SHALL apply to it as to any rule.
 
 #### Scenario: A vocabulary
