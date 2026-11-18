@@ -159,7 +159,7 @@ hakkiri SHALL read no text of an HTML block when a line of it does not end as th
 
 ### Requirement: The alt text of an inline img tag is an alt node
 
-hakkiri SHALL give the alt text of an `img` tag in a line of Markdown an `alt` node of its own, as it gives one to the alt text of a Markdown image.
+hakkiri SHALL give the alt text of an `img` tag in a line of Markdown an `alt` node of its own, as it gives one to the alt text of a Markdown image.  
 The paragraph SHALL read around the node, and a rule on `link` or on sentences SHALL not select it, as in Vale.
 
 #### Scenario: An img tag alone and inside links

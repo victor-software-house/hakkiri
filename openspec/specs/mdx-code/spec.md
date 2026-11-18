@@ -8,8 +8,8 @@ An MDX file's expressions and its JSX elements with no children read as code, as
 
 ### Requirement: An MDX expression and a childless JSX element read as code
 
-In an MDX file, an `{…}` expression, in a line of text, a heading, a table cell or a block of its own, SHALL read as a code node over the text as written.
-A JSX element with no children SHALL read the same way when it is a block, or when it is written `<Tag />` in a line of text.
+In an MDX file, an `{…}` expression, in a line of text, a heading, a table cell or a block of its own, SHALL read as a code node over the text as written.  
+A JSX element with no children SHALL read the same way when it is a block, or when it is written `<Tag />` in a line of text.  
 A `{/* … */}` comment SHALL read as no node, and the tags of an element with children SHALL read as no node.
 
 #### Scenario: A self-closing element in a line of text

@@ -428,7 +428,7 @@ A rule setting that names no loaded rule SHALL be an error, as in the project's 
 
 ### Requirement: The built-in style Vale contains the vocabulary rules
 
-hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Repetition` and `Spelling`, and `Terms` and `Avoid` when a named vocabulary at the top level contains a term.
+hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Repetition` and `Spelling`, and `Terms` and `Avoid` when a named vocabulary at the top level contains a term.  
 The style SHALL exist whatever the vocabularies hold.
 
 #### Scenario: A style named Vale

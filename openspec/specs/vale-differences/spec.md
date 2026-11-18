@@ -571,7 +571,7 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 #### Scenario: A doc selector or a View
 
 - **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.  
   It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 ### Requirement: A Vale configuration file is a known gap
@@ -687,7 +687,7 @@ hakkiri SHALL join Rust doc line comments of the same type across blank lines, w
 
 ### Requirement: Tags come from the model and its corrections
 
-hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.
+hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.  
 Vale 3.26.0 tags with the model of prose v3.2.2, so the tags of the two tools differ.
 
 #### Scenario: Another model
@@ -749,7 +749,7 @@ Vale 3.26.0 reads the span as a run of `*`, and a rule with a tag and no pattern
 
 ### Requirement: The verbs of saying and asking keep their place
 
-hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is.
+hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is.  
 It SHALL tag `asks` and `asked` in the noun phrase of a preposition as a noun and a participle, so a `sequence` rule with a verb tag flags the first and no other.  
 Vale tags the same words with the older model, and its rule has no verb tag.
 
@@ -925,8 +925,8 @@ hakkiri SHALL place a `consistency` alert on the last match of a form, though an
 
 ### Requirement: An existence match across a code span is a match
 
-hakkiri SHALL report an `existence` match that runs across a code span, as Vale does, and SHALL drop one that starts or ends on a span.
-Vale 3.26.0 masks the span as a run of `*` and reports a match that starts on it as well.
+hakkiri SHALL report an `existence` match that runs across a code span, as Vale does, and SHALL drop one that starts or ends on a span.  
+Vale 3.26.0 masks the span as a run of `*` and reports a match that starts on it as well.  
 The matched text differs: hakkiri prints `x` for the span, and Vale prints the mask.
 
 #### Scenario: A chain across a code span
@@ -938,9 +938,9 @@ The matched text differs: hakkiri prints `x` for the span, and Vale prints the m
 
 ### Requirement: The nouns of technical prose read as nouns
 
-hakkiri SHALL tag `check`, `prompt`, `thinking` and `fade` as nouns after a determiner, where the model tags them as another part of speech.
-It SHALL tag `prompt`, `round` and `split` as nouns after a noun when the nouns after them run up to `pull request`.
-It SHALL tag `check` as a noun when a base form follows two singular nouns before a preposition or a stop.
+hakkiri SHALL tag `check`, `prompt`, `thinking` and `fade` as nouns after a determiner, where the model tags them as another part of speech.  
+It SHALL tag `prompt`, `round` and `split` as nouns after a noun when the nouns after them run up to `pull request`.  
+It SHALL tag `check` as a noun when a base form follows two singular nouns before a preposition or a stop.  
 A rule of four lowercase nouns then counts them, and the verb `check` after a plural noun stays a verb.
 
 #### Scenario: A word of a pull request title

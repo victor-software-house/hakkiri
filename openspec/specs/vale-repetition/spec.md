@@ -8,7 +8,7 @@ The built-in style `Vale` contains the rule `Vale.Repetition`, read from Vale's 
 
 ### Requirement: The style Vale contains the rule Vale.Repetition
 
-hakkiri SHALL build the rule `Vale.Repetition` into the style `Vale`, with Vale's defaults: `extends: repetition`, the level `error`, the message `'%s' is repeated!`, the scope `text`, `ignorecase`, `alpha`, a `max` of 0 and the tokens `[^\s.!?]+`.
+hakkiri SHALL build the rule `Vale.Repetition` into the style `Vale`, with Vale's defaults: `extends: repetition`, the level `error`, the message `'%s' is repeated!`, the scope `text`, `ignorecase`, `alpha`, a `max` of 0 and the tokens `[^\s.!?]+`.  
 A glob that lists `Vale` SHALL run it, with no vocabulary named.
 
 #### Scenario: A repeated word
@@ -57,7 +57,7 @@ hakkiri SHALL read two words as the same when each character of one folds to the
 
 ### Requirement: Accepted terms and the config set the rule
 
-An accepted term of a top-level vocabulary or of a glob's vocabulary SHALL hold a repeat back.
+An accepted term of a top-level vocabulary or of a glob's vocabulary SHALL hold a repeat back.  
 A level, `on` or `off` set by the name `Vale.Repetition` SHALL apply to it as to any rule.
 
 #### Scenario: A vocabulary

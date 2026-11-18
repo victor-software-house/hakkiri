@@ -77,7 +77,7 @@ A sentence SHALL have the scope of the block it is in, so a part such as `list` 
 
 ### Requirement: An inline exclusion blanks the element
 
-A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.
+A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.  
 The exclusion SHALL apply only to the blocks that its own scope item selects.
 
 #### Scenario: A word outside and inside a link
@@ -101,8 +101,8 @@ The text a check reads SHALL hold the text of strong, emphasis and link elements
 
 ### Requirement: A match on a code span is not reported
 
-A match that overlaps a code span SHALL give no alert from `substitution`.
-An `existence` rule SHALL read each code span as one `*`, a byte that no word and no space matches, and SHALL give no alert for a match that starts or ends on a code span.
+A match that overlaps a code span SHALL give no alert from `substitution`.  
+An `existence` rule SHALL read each code span as one `*`, a byte that no word and no space matches, and SHALL give no alert for a match that starts or ends on a code span.  
 A match with text on both sides of a code span SHALL give an alert, and its matched text SHALL read the span as `x`.
 
 #### Scenario: A pattern that reaches into a code span
@@ -281,9 +281,9 @@ A piece that names no language SHALL be an error.
 
 ### Requirement: title selects the title of a link, an image and a definition
 
-In a Markdown or MDX file, the scope `title` SHALL select the text of the title of an inline link, an inline image and a link reference definition.
-The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.
-The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.
+In a Markdown or MDX file, the scope `title` SHALL select the text of the title of an inline link, an inline image and a link reference definition.  
+The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.  
+The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.  
 A link or image with no title, or an empty one, SHALL give no block.
 
 #### Scenario: Three kinds of title
@@ -303,8 +303,8 @@ A link or image with no title, or an empty one, SHALL give no block.
 
 ### Requirement: A title is selected by what contains it
 
-A scope item `title & link` SHALL select the title of an inline link, and `title & image` the title of an inline image.
-The scope `link` alone and the scope `image` alone SHALL select no title, and an item with no part that names the block itself SHALL select nothing in it.
+A scope item `title & link` SHALL select the title of an inline link, and `title & image` the title of an inline image.  
+The scope `link` alone and the scope `image` alone SHALL select no title, and an item with no part that names the block itself SHALL select nothing in it.  
 The scope `image` SHALL select the alt text of an image, and a title in a heading or a table cell SHALL be a link title as any other.
 
 #### Scenario: Link, image and definition
@@ -331,8 +331,8 @@ A negated part that names the element, such as `title & ~link`, SHALL leave out 
 
 ### Requirement: An HTML title attribute is a title
 
-The `title` attribute of an HTML tag SHALL be selected by `title`, and by no prose scope.
-That holds for a tag in an HTML block, a tag in a line of text, and the opening tag of a JSX element.
+The `title` attribute of an HTML tag SHALL be selected by `title`, and by no prose scope.  
+That holds for a tag in an HTML block, a tag in a line of text, and the opening tag of a JSX element.  
 The attribute of an `a` tag SHALL be a link title, and that of an `img` tag an image title.
 
 #### Scenario: An HTML block
