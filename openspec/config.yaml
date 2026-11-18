@@ -1,4 +1,4 @@
-# OpenSpec reads the project context and the per-artifact rules from here.
+# OpenSpec reads the context and the rules for each file from here.
 schema: spec-driven
 
 context: |
@@ -17,8 +17,8 @@ context: |
 
 rules:
   proposal:
-    # ProseStyle.ChattyHeadings rejects a question heading, and OpenSpec
-    # accepts any heading in a proposal.
+    # ProseStyle.ChattyHeadings flags a heading that asks a question.
+    # OpenSpec takes any heading in a proposal.
     - Use the headings `## Motivation` and `## Changes` in place of the template's `## Why` and `## What Changes`.
     - Name the HKR row the change belongs to.
   specs:

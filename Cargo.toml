@@ -132,17 +132,17 @@ tree-sitter-swift = "0.7.4"
 tree-sitter-toml-ng = "0.7.0"
 tree-sitter-typescript = "0.23.2"
 tree-sitter-yaml = "0.7.2"
-# A package pinned by url is downloaded with rustls and the bundled root
-# certificates, which a static musl binary needs, and read as a zip without the
-# compressors.
+# hakkiri downloads a package pinned by url with rustls and the bundled root
+# certificates, which a static musl binary needs. It reads the package as a
+# zip without the compressors.
 ureq = { version = "3.5.1", default-features = false, features = ["rustls"] }
 zip = { version = "9.5.1", default-features = false, features = [
   "deflate-flate2-zlib-rs",
 ] }
 
-# musl's allocator takes a lock that threads fight over, and a parallel `check`
-# runs about eight times slower with it, so the musl build links mimalloc.
-# No other build does.
+# musl's allocator takes a lock that threads fight over. With it, a parallel
+# `check` runs about eight times slower. So the musl build links to mimalloc,
+# and no other build does.
 [target.'cfg(target_env = "musl")'.dependencies]
 mimalloc = { version = "0.1.52", default-features = false }
 
