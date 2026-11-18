@@ -35,7 +35,7 @@ The splitter SHALL NOT end a sentence after a word its model contains as an abbr
 - **WHEN** the splitter reads `Use a list, e.g. a table of flags. Then stop.`
 - **THEN** it returns the sentences `Use a list, e.g. a table of flags.` and `Then stop.`
 
-### Requirement: A token with no space contains no boundary
+### Requirement: A token with no space has no boundary
 
 The splitter SHALL NOT end a sentence inside a run of characters with no whitespace, such as a version, a file name or a decimal.
 

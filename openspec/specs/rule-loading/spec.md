@@ -92,7 +92,7 @@ hakkiri SHALL refuse a rule with a pattern that neither regex engine compiles, a
 
 ### Requirement: A pattern with nothing to match is refused
 
-hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` contain nothing to match.  
+hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` have nothing to match.  
 It SHALL refuse a `metric` rule that lists `tokens` or `raw` containing nothing, because such a pattern matches at every position.  
 The error SHALL show the file, the line, `tokens` and `raw`.
 

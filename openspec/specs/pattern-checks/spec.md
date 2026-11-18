@@ -132,8 +132,8 @@ It SHALL be no form seen, give no alert, define nothing, and leave the next matc
 
 ### Requirement: the pattern checks need something to match
 
-hakkiri SHALL refuse a `consistency` rule whose `either` contains no pair or a form with no text.  
-It SHALL refuse a `repetition` rule whose `tokens` contain no text.  
+hakkiri SHALL refuse a `consistency` rule whose `either` has no pair, or has a form with no text.  
+It SHALL refuse a `repetition` rule whose `tokens` have no text.  
 It SHALL also refuse a `conditional` rule whose `first` or `second` is empty or matches the empty string.  
 The error SHALL show the field.
 

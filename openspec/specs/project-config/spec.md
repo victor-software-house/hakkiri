@@ -27,7 +27,7 @@ hakkiri SHALL refuse a project config that contains a key it does not define, an
 
 ### Requirement: A package is a folder or a download
 
-Each entry in `packages` SHALL contain a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
+Each entry in `packages` SHALL have a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
 A `url` SHALL start with `https://` or `http://`, and a `sha256` SHALL be 64 lowercase hex digits.
 
 hakkiri SHALL fetch and cache each `url` with no separate sync step, and lint with it only when its download matches the hash.  
@@ -50,7 +50,7 @@ It SHALL refuse two entries that contain a style of one name, and the error SHAL
 
 #### Scenario: An entry with both
 
-- **WHEN** an entry contains a `path` and a `url`
+- **WHEN** an entry has a `path` and a `url`
 - **THEN** hakkiri reports an error that shows the entry's line, and exits with a failure status
 
 #### Scenario: One style in two folders
@@ -113,7 +113,7 @@ An empty list SHALL turn off linting for those files.
 Under a glob, a key for a rule SHALL set that rule's level for the matched files.  
 The value SHALL be `suggestion`, `warning` or `error`, or `off` to turn the rule off.
 
-hakkiri SHALL refuse a key other than `styles` that matches no rule in any style the config loads.  
+hakkiri SHALL refuse a key that is neither `styles` nor a rule in any style the config loads.  
 Its error SHALL show the key and its line.  
 A rule name SHALL match case-sensitively.
 
@@ -500,7 +500,7 @@ An unknown value SHALL be an error that shows the line.
 
 `formats` SHALL map an extension, a file name or a glob to a reader.  
 The reader SHALL be given by any langdex name, alias or extension of the language it reads.  
-The languages are Markdown, MDX (Markdown with components), Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell and Text.
+The languages are Markdown, Markdown with components (MDX), Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell and Text.
 
 So `md`, `markdown` and `Markdown` give one reader, `sh` and `bash` give the Shell reader, and `text` gives plain text.  
 An entry SHALL beat the language of the file.

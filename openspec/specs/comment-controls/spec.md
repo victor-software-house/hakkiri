@@ -3,7 +3,7 @@
 ## Purpose
 
 In a Markdown file, an HTML comment turns rules off and on for the text that follows it.  
-So does a `{/* … */}` comment in an MDX (Markdown with components) file.  
+So does a `{/* … */}` comment in an Markdown with components (MDX) file.  
 Both reach as far as Vale's comments do.
 
 ## Requirements

@@ -57,7 +57,7 @@ An empty `styles` list SHALL drop the parameters of the globs that rank below it
 - **WHEN** a package's settings set `max: 2` for `*.md` and the project sets `max: 1` for `b.md`
 - **THEN** `b.md` runs with `max` 1 and `a.md` with `max` 2
 
-### Requirement: A refused parameter shows its config line
+### Requirement: A rejected parameter shows its config line
 
 hakkiri SHALL refuse a parameter with the config file and the line of the parameter, and SHALL report every refusal of a config at once.  
 A parameter of a rule that no glob runs SHALL be refused in the same way.
@@ -72,7 +72,7 @@ A parameter of a rule that no glob runs SHALL be refused in the same way.
 - **WHEN** a glob lists `styles: [Vale]` and sets `max: 1` for `Team.Exist`, an `existence` rule
 - **THEN** hakkiri refuses it with the line of `max`
 
-### Requirement: A parameter a rule cannot take is refused
+### Requirement: A parameter a rule cannot take is rejected
 
 hakkiri SHALL refuse a level, a field that contains a list, a mapping, and the rule's identity or its prose.  
 It SHALL also refuse a field that the rule's check does not define.  

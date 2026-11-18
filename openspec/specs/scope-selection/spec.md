@@ -278,14 +278,14 @@ A scope item in which every part has another language SHALL select nothing.
 ### Requirement: A piece is a language only after a scope
 
 A last piece SHALL be a language only when the whole part is not a scope hakkiri defines and the rest of it is one.  
-A piece that is no language SHALL be an error.
+A piece that gives no language SHALL be an error.
 
 #### Scenario: A scope name that ends like a language
 
 - **WHEN** a rule has `scope: text.comment.line`
 - **THEN** hakkiri reads it as the scope of line comments, in every language
 
-#### Scenario: A piece that is no language
+#### Scenario: A piece that gives no language
 
 - **WHEN** a rule has `scope: text.nolang`
 - **THEN** hakkiri refuses the rule with `` `text.nolang` is not a scope hakkiri defines ``
@@ -293,7 +293,7 @@ A piece that is no language SHALL be an error.
 ### Requirement: title selects the title of a link, an image and a definition
 
 The scope `title` SHALL select the title text of an inline link, an inline image and a link reference definition.  
-This SHALL apply in a Markdown or MDX (Markdown with components) file.  
+This SHALL apply in a Markdown or Markdown with components (MDX) file.  
 The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.
 
 The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.  

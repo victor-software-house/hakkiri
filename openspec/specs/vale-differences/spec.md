@@ -666,7 +666,7 @@ It SHALL also read the forms of its own.
 
 [comment-controls-8]: ../../changes/archive/2026-11-12-comment-controls/design.md#8-a-comment-that-vale-places-wrongly
 [comment-controls-3]: ../../changes/archive/2026-11-12-comment-controls/design.md#3-a-style-comment-reads-the-styles-of-the-rules
-[comment-controls-4]: ../../changes/archive/2026-11-12-comment-controls/design.md#4-a-source-file-holds-no-comment-control
+[comment-controls-4]: ../../changes/archive/2026-11-12-comment-controls/design.md#4-a-source-file-contains-no-comment-control
 
 ### Requirement: A walk and a given file differ from Vale's
 
@@ -947,7 +947,7 @@ hakkiri SHALL read a rule's parameters as Vale 3.26.0 does, apart from the scena
 - **WHEN** a parameter is for a rule that does not exist, contains no value, sets a negative `max`, or sets a `scope` that is none
 - **THEN** hakkiri refuses it with the config file and the line, and Vale takes it with no error ([rule-parameters 4][rule-parameters-4])
 
-#### Scenario: A parameter Vale refuses without a place
+#### Scenario: A parameter Vale rejects without a place
 
 - **WHEN** a parameter has a value of the wrong kind, a name the check does not define, or a list
 - **THEN** hakkiri refuses it with the config file and the line
@@ -1094,7 +1094,7 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 [spelling-4]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
 [spelling-goals]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
 
-### Requirement: A bare address ends where GFM (GitHub Flavored Markdown) ends it
+### Requirement: A bare address ends where GitHub Flavored Markdown (GFM) ends it
 
 hakkiri SHALL end a bare web address at whitespace or `<`, as GFM and its Markdown parser do.  
 Vale ends one at the first byte that the linkify pattern of goldmark 1.8.6 leaves out, and reads the rest as text.  
@@ -1378,7 +1378,7 @@ hakkiri SHALL select as each scenario below says, where Vale 3.26.0 has no such 
 
 - **WHEN** a rule has `scope: title`
 - **AND** a Markdown file contains `<p title="a marker">Some text.</p>` and a line of text with an inline tag that has a title
-- **AND** an MDX (Markdown with components) file contains a JSX (JavaScript XML) element with `title`
+- **AND** an Markdown with components (MDX) file contains a JSX (JavaScript XML) element with `title`
 - **THEN** hakkiri selects each title, and Vale reads the attribute only in a rule on `raw` ([link-title 6][link-title])
 
 #### Scenario: A title attribute of an a tag and an img tag
