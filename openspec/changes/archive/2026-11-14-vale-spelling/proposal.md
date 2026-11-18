@@ -1,25 +1,30 @@
 # Proposal
 
-Queue row: `HKR-026` in [tasks.yaml][ledger].
+Queue row: `HKR-026` in [tasks.yaml][ledger].  
 It follows [HKR-038][vale-repetition], which built `Vale.Repetition` and left `Vale.Spelling` for this row.
 
 ## Motivation
 
-Vale builds two rules into its style `Vale`: `Vale.Repetition` and `Vale.Spelling` ([manager.go][v-manager]).
-A project that lists `Vale` gets both, and turns the second off with `Vale.Spelling = NO`.
-hakkiri built only the first, so a project that moves from Vale loses its spelling alerts, and the same project turns spelling off in Vale only to see no change in hakkiri.
+Vale builds two rules into its style `Vale`: `Vale.Repetition` and `Vale.Spelling` ([manager.go][v-manager]).  
+A project that lists `Vale` gets both, and turns the second off with `Vale.Spelling = NO`.  
+hakkiri built only the first, so a project that moves from Vale loses its spelling alerts.  
+And when that project turns spelling off in Vale, hakkiri shows no change.
 
 ## Changes
 
-- The style `Vale` holds `Vale.Spelling`, a `spelling` rule with Vale's definition: the message `Did you really mean '%s'?`, the level `error` and the scope `text`.
-  It uses the built-in dictionary, and a config sets its level, turns it off, and sets its parameters as it does any rule.
-- It adds every dictionary in the `config/dictionaries` folder of each package, and accepts the words of each `.txt` file under the `config/ignore` folder of each package, as Vale reads them from its styles path ([spelling.go][v-spelling], [multi.go][v-multi], [config.go][v-config]).
-- The `vale-differences` spec drops the gap, and records three places where hakkiri differs.
-  It reads each package of the project where Vale has one styles path.
+- The style `Vale` contains `Vale.Spelling`, a `spelling` rule with Vale's definition.  
+  The definition has the message `Did you really mean '%s'?`, the level `error` and the scope `text`.  
+  The rule uses the built-in dictionary, and a config sets its level, turns it off, and sets its parameters as it does any rule.
+- It adds every dictionary in the `config/dictionaries` folder of each package.  
+  It accepts the words of each `.txt` file under the `config/ignore` folder of each package.  
+  Vale reads both from its styles path ([spelling.go][v-spelling], [multi.go][v-multi], [config.go][v-config]).
+- The `vale-differences` spec drops the gap, and records three places where hakkiri differs.  
+  It reads each package of the project where Vale has one styles path.  
   It reads no word in a code span of a code comment, and no name after `@param`.
 - The fixtures of the other `Vale` tests turn the rule off in the hakkiri configs, as their Vale configs already do.
-- A Markdown file keeps a bare email address, a `www.` address and an angle-bracket email address in its text.
-  Vale's converter keeps them there, since it writes a destination that differs from their text, and hakkiri dropped them as links, so the probe showed `custom` spelling a bare email address in Vale alone.
+- A Markdown file keeps a bare email address, a `www.` address and an angle-bracket email address in its text.  
+  Vale's converter keeps them there, since it writes a destination that differs from their text.
+- hakkiri dropped those addresses as links, so the probe showed `custom` spelling a bare email address in Vale alone.  
   The `vale-differences` spec drops the scenario that recorded it as a difference.
 
 ## Capabilities
