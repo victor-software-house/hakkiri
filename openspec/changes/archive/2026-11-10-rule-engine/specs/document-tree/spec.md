@@ -4,10 +4,10 @@
 
 ### Requirement: A Markdown tree counts code blocks
 
-The tree of a Markdown or MDX file SHALL hold the number of its fenced and indented code blocks.  
-The tree of a source file SHALL hold 0.
+The tree of a Markdown or MDX (Markdown with JSX) file SHALL have the number of its fenced and indented code blocks.  
+The tree of a source file SHALL have 0.
 
 #### Scenario: Two fences and an indented block
 
-- **WHEN** a Markdown file holds two fenced code blocks and one block indented by four spaces
-- **THEN** the tree holds a code block count of 3
+- **WHEN** a Markdown file has two fenced code blocks and one block indented by four spaces
+- **THEN** the tree has a code block count of 3
