@@ -9,7 +9,7 @@ Its scores and counts are the ones the [metric check][metric] reads, so the two 
 
 ### Requirement: readability reports a grade over the limit
 
-A `readability` rule SHALL compute each score its `metrics` list names, average them, and report one alert for each measured text where the average is greater than `grade`.  
+A `readability` rule SHALL compute each score its `metrics` list contains, average them, and report one alert for each measured text where the average is greater than `grade`.  
 A `%s` in its message SHALL read as the average with two decimals.
 
 #### Scenario: One score
@@ -30,12 +30,12 @@ A `%s` in its message SHALL read as the average with two decimals.
 ### Requirement: readability has five scores
 
 The `metrics` list SHALL accept `Automated Readability`, `Coleman-Liau`, `Flesch-Kincaid`, `Gunning Fog` and `SMOG`, each computed as the metric variable of the same score.  
-hakkiri SHALL refuse a rule whose list is empty or names any other score, with an error that names the rule and the score.
+hakkiri SHALL refuse a rule whose list is empty or lists any other score, with an error that shows the rule and the score.
 
 #### Scenario: A score hakkiri does not know
 
 - **WHEN** rule `Team.Grade` has `extends: readability` and `metrics: [Dale-Chall]`
-- **THEN** hakkiri reports an error naming `Team.Grade` and `Dale-Chall`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `Team.Grade` and `Dale-Chall`, and exits with a failure status
 
 ### Requirement: readability counts a repeated score once
 

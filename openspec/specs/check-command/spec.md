@@ -21,7 +21,7 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 - **WHEN** `hakkiri check docs README.md` runs and `docs` contains `a.md` and `sub/b.md`
 - **THEN** hakkiri lints `docs/a.md`, `docs/sub/b.md` and `README.md`
 
-#### Scenario: A file named two ways
+#### Scenario: A file given two ways
 
 - **WHEN** `hakkiri check ../a.md .. ../../docs/a.md` runs in `docs/sub/` and `docs/a.md` draws one warning
 - **THEN** hakkiri prints that warning once, and counts one file
@@ -48,7 +48,7 @@ hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL stil
 #### Scenario: One broken MDX (Markdown with components) file
 
 - **WHEN** `bad.mdx` has a syntax error and `good.md` draws one warning
-- **THEN** hakkiri reports the warning and a failure naming `bad.mdx`, and exits 2
+- **THEN** hakkiri reports the warning and a failure that shows `bad.mdx`, and exits 2
 
 ### Requirement: The pretty output is a line per alert
 
@@ -131,7 +131,7 @@ Each long flag of `check` SHALL read `HAKKIRI_<FLAG>` when it is not given, with
 
 Inside a git repository, a walk SHALL skip each file and folder that `.gitignore`, `.git/info/exclude` and the global git excludes ignore, unless `gitignore` is false.  
 It SHALL apply the `.gitignore` of each folder from the repository root down.  
-A file named on the command line SHALL be linted whether git ignores it or not.
+A file given on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: An ignored folder and file
 
@@ -148,7 +148,7 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 - **WHEN** `docs/.gitignore` contains `skip.md`, and `docs/skip.md` and `skip.md` exist
 - **THEN** a walk skips `docs/skip.md` and lints `skip.md`
 
-#### Scenario: A named ignored file
+#### Scenario: An ignored file given by path
 
 - **WHEN** `hakkiri check draft.md build/b.md` runs and git ignores both
 - **THEN** hakkiri lints both
@@ -158,7 +158,7 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 - **WHEN** `--no-gitignore`, `--gitignore=false`, `HAKKIRI_GITIGNORE=false` or `gitignore: false` is set
 - **THEN** a walk lints `a.md`, `build/b.md` and `draft.md`
 
-### Requirement: A named file that no glob selects draws a warning
+### Requirement: A file given by path that no glob selects draws a warning
 
 A file given on the command line that no glob of `files` matches SHALL draw a warning that gives its path.  
 When `on_unmatched` is `error`, it SHALL draw a failure with exit 2 instead, and when it is `ignore`, nothing.
@@ -234,7 +234,7 @@ A Text file SHALL be read as plain text whatever the value of `on_unknown`.
 - **WHEN** a walk finds `notes.txt`, `Dockerfile` and `Makefile`, and the glob `*` selects them
 - **THEN** hakkiri lints each as plain text
 
-#### Scenario: A file no reader reads, named
+#### Scenario: A file no reader reads, given by path
 
 - **WHEN** `hakkiri check notes.txt` runs and a glob selects `notes.txt`
 - **THEN** hakkiri lints it as plain text
@@ -280,7 +280,7 @@ A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file
 ### Requirement: on_unknown sets what a selected file with no reader gets
 
 For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.  
-`text`, the default, reads it as plain text, and `warn` skips it with a warning that names it.  
+`text`, the default, reads it as plain text, and `warn` skips it with a warning that shows it.  
 `error` fails the run with exit 2, and `ignore` skips it.  
 A file that no glob selects SHALL draw no message.
 
@@ -321,7 +321,7 @@ With no interpreter line, the file SHALL have no language.
 For the scopes of the rules that run on it, a node outside a fenced code block SHALL be in the file's own language.  
 It SHALL also be in the language of the file's reader when a `formats` entry chose that reader.
 
-A scope part that names a language SHALL match either, and a negated part SHALL leave a block out for either.
+A scope part with a language SHALL match either, and a negated part SHALL leave a block out for either.
 
 #### Scenario: A mapped file
 

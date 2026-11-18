@@ -29,7 +29,7 @@ A package with no top folder, and the project's own config, SHALL be no package'
 
 #### Scenario: Another config in the root
 
-- **WHEN** `--config cfg.yaml` names a config in the project root that lists `path: styles`, and the root contains a `.ctl/hakkiri.yaml` with an unknown key
+- **WHEN** `--config cfg.yaml` points to a config in the project root that lists `path: styles`, and the root contains a `.ctl/hakkiri.yaml` with an unknown key
 - **THEN** hakkiri reads that `.ctl/hakkiri.yaml` as nothing, and reports no error for it
 
 #### Scenario: A folder not called styles
@@ -54,14 +54,14 @@ The packages a package lists SHALL come before it, in the order written.
 #### Scenario: A nested path
 
 - **WHEN** a package's file contains `packages: [{path: ../base}]` on line 2
-- **THEN** hakkiri reports an error naming `path`, line 2 and the package, and exits 2
+- **THEN** hakkiri reports an error that shows `path`, line 2 and the package, and exits 2
 
 #### Scenario: Too deep
 
 - **WHEN** each of 11 packages lists the next, and the project lists the first
-- **THEN** hakkiri reports an error that names the limit of 10, and exits 2
+- **THEN** hakkiri reports an error that shows the limit of 10, and exits 2
 
-#### Scenario: One package named twice
+#### Scenario: One package listed twice
 
 - **WHEN** the project and a package both list the same `url` and `sha256`
 - **THEN** hakkiri loads it once, with no error for a duplicate style
@@ -73,12 +73,12 @@ The packages a package lists SHALL come before it, in the order written.
 
 ### Requirement: Package vocabularies and the project's add up
 
-The `vocab` names of the packages and the project SHALL add up, the packages' first.  
-A `vocab` written as an empty list SHALL drop the names before it, as Vale's `Vocab = NONE` does, and a missing key SHALL keep them.
+The `vocab` lists of the packages and the project SHALL add up, the packages' first.  
+An empty `vocab` list SHALL drop the names before it, as Vale's `Vocab = NONE` does, and a missing key SHALL keep them.
 
 The same SHALL hold between two packages, where the later one wins.  
-It SHALL also hold for the `vocab` of a glob, which drops only the lists of earlier configs for the same glob text.  
-A name that no package contains, or that two packages contain, SHALL be an error on its line in the file that lists it.
+So SHALL the `vocab` of a glob, which drops only the lists of earlier configs for the same glob text.  
+A name that no package or two packages contain SHALL be an error on its line in the file that lists it.
 
 #### Scenario: Two lists
 
@@ -88,12 +88,12 @@ A name that no package contains, or that two packages contain, SHALL be an error
 #### Scenario: An empty list
 
 - **WHEN** a package sets `vocab: [Team]` and the project sets `vocab: []`
-- **THEN** hakkiri reads no vocabulary named by a package
+- **THEN** hakkiri reads no vocabulary listed by a package
 
 #### Scenario: A later package
 
 - **WHEN** the package `a` sets `vocab: [Team]` and the later package `b` sets `vocab: []`
-- **THEN** hakkiri reads no vocabulary named by a package
+- **THEN** hakkiri reads no vocabulary listed by a package
 
 #### Scenario: A glob's empty list
 
@@ -113,7 +113,7 @@ A name that no package contains, or that two packages contain, SHALL be an error
 #### Scenario: A name no package contains
 
 - **WHEN** a package's `.ctl/hakkiri.yaml` contains `vocab: [Nope]` on line 1 and no loaded package contains `config/vocabularies/Nope`
-- **THEN** hakkiri reports an error naming `Nope`, line 1 and the package, and exits 2
+- **THEN** hakkiri reports an error that shows `Nope`, line 1 and the package, and exits 2
 
 ### Requirement: A package's settings do not set the run options
 
@@ -129,7 +129,7 @@ A file that does SHALL be an error that gives the key, its line and the package.
 
 A package's settings file MAY contain `formats`, and the entries of the packages and the project SHALL add up.  
 A later entry SHALL replace an earlier one with the same key.  
-It SHALL NOT hold `on_unknown`, and a file that does SHALL be an error that names the key, its line and the package.
+It SHALL NOT hold `on_unknown`, and a file that does SHALL be an error that shows the key, its line and the package.
 
 #### Scenario: The project overrides the package
 

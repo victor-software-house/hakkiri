@@ -78,13 +78,13 @@ Incomplete code SHALL read on past the blank line.
 
 ### Requirement: Invalid export code is an error
 
-A syntax error in an import or export block SHALL fail the file with an error that names its line.  
+A syntax error in an import or export block SHALL fail the file with an error that shows its line.  
 A block incomplete at the end of the file SHALL fail the file too.
 
 #### Scenario: A syntax error in an export
 
 - **WHEN** an MDX file contains `export const = 1` on line 3
-- **THEN** parsing fails and the error names line 3
+- **THEN** parsing fails and the error shows line 3
 
 #### Scenario: An unclosed export at the end of the file
 
@@ -388,7 +388,7 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 - **THEN** no alert lies in `{@link Other|label}`
 - **AND** the tags `{@linkcode}`, `{@linkplain}` and `{@tutorial}` are links the same way
 
-#### Scenario: What a link names
+#### Scenario: What a link points to
 
 - **WHEN** a Go link has a name with dots and an optional `*`, such as `[*pkg.Type]`
 - **AND** a Rust link has a path with `::` or a code span, such as ``[`Type`]``

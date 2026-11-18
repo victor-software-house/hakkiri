@@ -7,7 +7,7 @@ This spec fixes its fields, its position, its message, its order, and what a pat
 
 ## Requirements
 
-### Requirement: An alert names the rule, level, message, place and match
+### Requirement: An alert shows the rule, level, message, place and match
 
 Each alert SHALL hold the rule name, the level, the message, the line, the first and last column of the match, and the matched text.  
 It SHALL also hold the rule's `link` and `description` when the rule sets them.
@@ -110,7 +110,7 @@ It SHALL NOT panic.
 #### Scenario: Nested repeats with a lookahead
 
 - **WHEN** rule `Team.Slow` has `nonword: true` and `tokens: ['(a+)+(?=b)c']`, and the input is one line of 50,000 `a` characters
-- **THEN** hakkiri reports one `error` alert for `Team.Slow` that names the backtrack limit, and the other rules report as usual
+- **THEN** hakkiri reports one `error` alert for `Team.Slow` that shows the backtrack limit, and the other rules report as usual
 
 ### Requirement: Long input finishes
 

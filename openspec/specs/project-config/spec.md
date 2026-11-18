@@ -9,21 +9,21 @@ It contains the settings a `.vale.ini` contains, in lowercase keys.
 
 ### Requirement: hakkiri reads .ctl/hakkiri.yaml
 
-hakkiri SHALL read its project config from `.ctl/hakkiri.yaml` in the current directory, or from the file that `--config` or `HAKKIRI_CONFIG` names, the flag winning over the variable.
+hakkiri SHALL read its project config from `.ctl/hakkiri.yaml` in the current directory, or from the file that `--config` or `HAKKIRI_CONFIG` points to, the flag winning over the variable.
 
-#### Scenario: The variable names another file
+#### Scenario: The variable points to another file
 
 - **WHEN** `HAKKIRI_CONFIG` is `docs/hakkiri.yaml` and no `--config` flag is given
 - **THEN** hakkiri reads `docs/hakkiri.yaml` and not `.ctl/hakkiri.yaml`
 
 ### Requirement: An unknown key is refused
 
-hakkiri SHALL refuse a project config that contains a key it does not define, and report an error that names the key and its line.
+hakkiri SHALL refuse a project config that contains a key it does not define, and report an error that shows the key and its line.
 
 #### Scenario: A key in Vale's spelling
 
 - **WHEN** `.ctl/hakkiri.yaml` contains `MinAlertLevel: warning` on line 4
-- **THEN** hakkiri reports an error naming `MinAlertLevel` and line 4, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `MinAlertLevel` and line 4, and exits with a failure status
 
 ### Requirement: A package is a folder or a download
 
@@ -46,17 +46,17 @@ It SHALL refuse two entries that contain a style of one name, and the error SHAL
 #### Scenario: A package that does not match
 
 - **WHEN** a package's download does not match its `sha256`
-- **THEN** hakkiri reports an error naming the `url`, the expected hash and the actual hash, lints nothing, caches nothing, and exits with a failure status
+- **THEN** hakkiri reports an error that shows the `url`, the expected hash and the actual hash, lints nothing, caches nothing, and exits with a failure status
 
 #### Scenario: An entry with both
 
 - **WHEN** an entry contains a `path` and a `url`
-- **THEN** hakkiri reports an error naming the entry's line, and exits with a failure status
+- **THEN** hakkiri reports an error that shows the entry's line, and exits with a failure status
 
 #### Scenario: One style in two folders
 
 - **WHEN** `packages` contains `{path: a}` and `{path: b}` and both hold a folder `Team`
-- **THEN** hakkiri reports an error naming `a/Team` and `b/Team`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `a/Team` and `b/Team`, and exits with a failure status
 
 #### Scenario: A folder of settings
 
@@ -110,11 +110,11 @@ An empty list SHALL turn off linting for those files.
 
 ### Requirement: A rule name sets the rule's level
 
-Under a glob, a key that names a rule SHALL set that rule's level for the matched files.  
+Under a glob, a key for a rule SHALL set that rule's level for the matched files.  
 The value SHALL be `suggestion`, `warning` or `error`, or `off` to turn the rule off.
 
-hakkiri SHALL refuse a key other than `styles` that names no rule in any style the config loads.  
-Its error SHALL name the key and its line.  
+hakkiri SHALL refuse a key other than `styles` that matches no rule in any style the config loads.  
+Its error SHALL show the key and its line.  
 A rule name SHALL match case-sensitively.
 
 #### Scenario: A rule turned down
@@ -124,8 +124,8 @@ A rule name SHALL match case-sensitively.
 
 #### Scenario: A misspelled rule name
 
-- **WHEN** a glob contains `ProseStyle.BareUrl: off` on line 7, and the loaded ProseStyle has a rule `BareURL` and none named `BareUrl`
-- **THEN** hakkiri reports an error naming `ProseStyle.BareUrl` and line 7, and exits with a failure status
+- **WHEN** a glob contains `ProseStyle.BareUrl: off` on line 7, and the loaded ProseStyle has a rule `BareURL` and none called `BareUrl`
+- **THEN** hakkiri reports an error that shows `ProseStyle.BareUrl` and line 7, and exits with a failure status
 
 #### Scenario: A rule from a style another glob lists
 
@@ -135,20 +135,20 @@ A rule name SHALL match case-sensitively.
 ### Requirement: Paths in the config are relative to the project root
 
 The project root SHALL be the folder that contains the `.ctl` folder of the config file.  
-When the config file is not in a `.ctl` folder, the root SHALL be the folder of the config file.  
-In both cases, symlinks SHALL be resolved.
+Otherwise the root SHALL be the folder of the config file.  
+Symlinks SHALL be resolved in both.
 
 hakkiri SHALL read every `path` in the config relative to that root.  
 To skip package folders, a walk SHALL compare each folder's resolved path with those resolved package paths.
 
-A `packages` `path` that does not exist SHALL be an error that names its line, and hakkiri SHALL NOT fall back to a path as written.
+A missing `packages` `path` SHALL be an error that shows its line, and hakkiri SHALL NOT fall back to a path as written.
 
 #### Scenario: A package folder that is missing
 
 - **WHEN** `packages` contains `{path: styles}` and `styles/` does not exist
-- **THEN** hakkiri reports an error naming the line of that `path` and exits 2
+- **THEN** hakkiri reports an error that shows the line of that `path` and exits 2
 
-#### Scenario: A config named from another folder
+#### Scenario: A config given from another folder
 
 - **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml` is set in `other/` and `packages` contains `{path: styles}`
 - **THEN** hakkiri loads the styles from `styles/` beside `.ctl`, not from `other/styles`
@@ -208,7 +208,7 @@ A download that fails a check SHALL leave nothing in the cache.
 #### Scenario: A server answers 404
 
 - **WHEN** a `url` answers `404`
-- **THEN** hakkiri reports an error naming the `url` and `404`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows the `url` and `404`, and exits with a failure status
 
 #### Scenario: A redirect
 
@@ -218,17 +218,17 @@ A download that fails a check SHALL leave nothing in the cache.
 #### Scenario: A body that is not a zip
 
 - **WHEN** a body matches its hash and is not a zip
-- **THEN** hakkiri reports an error naming the `url` and saying it is not a zip
+- **THEN** hakkiri reports an error that shows the `url` and saying it is not a zip
 
 #### Scenario: A name that leaves the package
 
 - **WHEN** a zip contains the entry `../escape.txt`
-- **THEN** hakkiri reports an error naming the `url` and the entry, writes no file outside the cache folder of that package, and caches nothing
+- **THEN** hakkiri reports an error that shows the `url` and the entry, writes no file outside the cache folder of that package, and caches nothing
 
 #### Scenario: A zip with no top folder
 
 - **WHEN** a zip contains a file at its root and no folder
-- **THEN** hakkiri reports an error naming the `url` and saying a package contains one top folder, and caches nothing
+- **THEN** hakkiri reports an error that shows the `url` and saying a package contains one top folder, and caches nothing
 
 #### Scenario: A style-only package
 
@@ -243,7 +243,7 @@ A download that fails a check SHALL leave nothing in the cache.
 #### Scenario: A body over the limit
 
 - **WHEN** a body is over 32 MiB
-- **THEN** hakkiri reports an error naming the `url` and the limit, and caches nothing
+- **THEN** hakkiri reports an error that shows the `url` and the limit, and caches nothing
 
 ### Requirement: A fetched package is cached by its hash
 
@@ -267,7 +267,7 @@ hakkiri SHALL keep each fetched package in the folder `<cache>/<sha256>/`, and S
 #### Scenario: An empty cache with the server gone
 
 - **WHEN** the cache contains no folder for the hash and the server does not answer
-- **THEN** hakkiri reports an error naming the `url`, lints nothing, and exits with a failure status
+- **THEN** hakkiri reports an error that shows the `url`, lints nothing, and exits with a failure status
 
 #### Scenario: The test command
 
@@ -276,11 +276,11 @@ hakkiri SHALL keep each fetched package in the folder `<cache>/<sha256>/`, and S
 
 ### Requirement: The cache folder is an option
 
-`--cache-dir`, or the variable `HAKKIRI_CACHE_DIR`, SHALL name the cache folder, and its default SHALL be the per-user cache folder `hakkiri`.
+`--cache-dir`, or the variable `HAKKIRI_CACHE_DIR`, SHALL set the cache folder, and its default SHALL be the per-user cache folder `hakkiri`.
 
 #### Scenario: A cache folder from the variable
 
-- **WHEN** `HAKKIRI_CACHE_DIR` names a folder and a package is fetched
+- **WHEN** `HAKKIRI_CACHE_DIR` points to a folder and a package is fetched
 - **THEN** the package is in that folder under its hash
 
 #### Scenario: The default folder
@@ -327,7 +327,7 @@ A rule in a style no glob lists, and that no level or `on` sets, SHALL be ignore
 - **WHEN** a rule of a listed style extends a script rule
 - **THEN** hakkiri prints a `failed` line for it, as for the script rule
 
-### Requirement: The config names the vocabularies a project uses
+### Requirement: The config lists the vocabularies a project uses
 
 The project config SHALL list vocabularies by folder name in a `vocab` list, at its top level and in a glob of `files`.  
 hakkiri SHALL read each from a loaded package before it builds any rule.
@@ -349,7 +349,7 @@ hakkiri SHALL read each from a loaded package before it builds any rule.
 
 #### Scenario: A vocabulary of a fetched package
 
-- **WHEN** a package pinned by `url` and `sha256` contains `styles/config/vocabularies/Team/`, and `vocab` names `Team`
+- **WHEN** a package pinned by `url` and `sha256` contains `styles/config/vocabularies/Team/`, and `vocab` lists `Team`
 - **THEN** hakkiri reads the lists from the cache folder of that package, and a second run makes no request
 
 #### Scenario: A vocab list that is not a list
@@ -437,12 +437,12 @@ Like in the project's config, a rule setting for no loaded rule SHALL be an erro
 #### Scenario: A key in Vale's spelling
 
 - **WHEN** a package's `.ctl/hakkiri.yaml` contains `MinAlertLevel: warning` on line 3
-- **THEN** hakkiri reports an error naming `MinAlertLevel`, line 3 and the package, and exits 2
+- **THEN** hakkiri reports an error that shows `MinAlertLevel`, line 3 and the package, and exits 2
 
 #### Scenario: A rule the package does not hold
 
 - **WHEN** a package's file sets `Team.Nope: warning` and no loaded style contains `Team.Nope`
-- **THEN** hakkiri reports an error naming the key and the line
+- **THEN** hakkiri reports an error that shows the key and the line
 
 ### Requirement: The built-in style Vale contains the vocabulary rules
 
@@ -450,21 +450,21 @@ hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Rep
 It SHALL also contain `Terms` and `Avoid` when a listed vocabulary at the top level contains a term.  
 The style SHALL exist whatever the vocabularies hold.
 
-#### Scenario: A style named Vale
+#### Scenario: A style called Vale
 
-- **WHEN** a glob lists `styles: [Vale]` and the config names a vocabulary with an accepted term
+- **WHEN** a glob lists `styles: [Vale]` and the config lists a vocabulary with an accepted term
 - **THEN** the glob runs `Vale.Repetition`, `Vale.Spelling` and `Vale.Terms`
 
 #### Scenario: No vocabulary
 
-- **WHEN** a glob lists `styles: [Vale]` and no named vocabulary contains a term
+- **WHEN** a glob lists `styles: [Vale]` and no listed vocabulary contains a term
 - **THEN** the glob runs `Vale.Repetition` and `Vale.Spelling`
 
 ### Requirement: The run options are config keys
 
 `fail_level`, `gitignore` and `on_unmatched` SHALL be keys of the project's config, with the values of `--fail-level`, `--gitignore` and `--on-unmatched`.  
 Each SHALL be resolved as the flag, then its variable, then the config, then the default: `error`, `true` and `warn`.  
-An unknown value SHALL be an error that names the line.
+An unknown value SHALL be an error that shows the line.
 
 #### Scenario: The config sets the fail level
 
@@ -484,12 +484,12 @@ An unknown value SHALL be an error that names the line.
 #### Scenario: The same order for the other two
 
 - **WHEN** `on_unmatched: error` is set, then `HAKKIRI_ON_UNMATCHED=ignore`, then `--on-unmatched warn`
-- **THEN** a named file that no glob selects fails the run, then draws nothing, then draws a warning
+- **THEN** a file given by path that no glob selects fails the run, then draws nothing, then draws a warning
 
 #### Scenario: An unknown word
 
 - **WHEN** the config contains `on_unmatched: loud` or `fail_level: loud`
-- **THEN** hakkiri reports an error that names `loud`, and exits 2
+- **THEN** hakkiri reports an error that shows `loud`, and exits 2
 
 #### Scenario: Not a boolean
 
@@ -575,9 +575,9 @@ It SHALL be resolved as the flag, then `HAKKIRI_ON_UNKNOWN`, then the config, th
 #### Scenario: An unknown word
 
 - **WHEN** the config contains `on_unknown: loud`
-- **THEN** hakkiri reports an error that names `loud` and exits 2
+- **THEN** hakkiri reports an error that shows `loud` and exits 2
 
-### Requirement: A fault names the line of its own key
+### Requirement: A fault shows the line of its own key
 
 A fault about a key of the config SHALL give the line where the config writes that key.  
 A fault about its value SHALL give the line where the value starts.  
@@ -589,7 +589,7 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 #### Scenario: Globs and settings that hold special characters
 
 - **WHEN** `files` contains `'docs/**/*.md': {Team.Hint: yes}` on line 4, `'src/{a,b}/lib.rs'` on line 5 with `styles: [Other]` on line 6 and `Team.Hint: maybe` on line 7, and `'x[1].md': {styles: [Nope]}` on line 8
-- **THEN** hakkiri names line 4 for the first fault, line 7 for the second and line 8 for the third
+- **THEN** hakkiri reports line 4 for the first fault, line 7 for the second and line 8 for the third
 
 #### Scenario: A config written in flow style
 
@@ -599,12 +599,12 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 #### Scenario: A later item of a list
 
 - **WHEN** `styles` contains `Other` on line 6 and `Nope` on line 7, and `Nope` is no style
-- **THEN** hakkiri names line 7, the line of the item, and not line 6
+- **THEN** hakkiri reports line 7, the line of the item, and not line 6
 
 #### Scenario: An unknown vocabulary of a glob and a pattern that does not compile
 
 - **WHEN** a glob's `vocab` contains `Team` and then `Nope`, or `token_ignores` contains `(z)` and then `(`, one item to a line
-- **THEN** the fault names the line of `Nope`, or of `(`
+- **THEN** the fault shows the line of `Nope`, or of `(`
 
 #### Scenario: A glob or a setting with a block value
 
@@ -615,9 +615,9 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 #### Scenario: A refused key of a package's settings file
 
 - **WHEN** a package's settings file writes `fail_level:` or a package `path:` with its value on the next line
-- **THEN** hakkiri names the line of the key
+- **THEN** hakkiri reports the line of the key
 
-### Requirement: A package style named Vale is skipped with a warning
+### Requirement: A package style called Vale is skipped with a warning
 
 hakkiri SHALL skip a package folder called after the built-in style `Vale`, as Vale does.  
 It SHALL print one warning that gives the folder and shows that the built-in style wins.  
@@ -785,12 +785,12 @@ So SHALL any other tag on a value where hakkiri reads the tag.
 #### Scenario: A package that forces
 
 - **WHEN** a package's settings file contains `'*.md': {Team.Filler: !override off}` on line 4
-- **THEN** hakkiri reports an error naming the package's file, line 4 and `!override`, and exits 2
+- **THEN** hakkiri reports an error that shows the package's file, line 4 and `!override`, and exits 2
 
 #### Scenario: Another tag
 
 - **WHEN** the project contains `'*.md': {Team.Filler: !important off}` on line 6
-- **THEN** hakkiri reports an error naming line 6 and the tag `!important`, and exits 2
+- **THEN** hakkiri reports an error that shows line 6 and the tag `!important`, and exits 2
 
 ### Requirement: Lists add up over every matching glob
 

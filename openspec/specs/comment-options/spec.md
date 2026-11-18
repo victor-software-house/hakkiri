@@ -10,7 +10,7 @@ A source file reads none of these comments.
 ### Requirement: A comment turns off the matches of a rule or limits the styles
 
 In a Markdown file, an HTML comment `vale Style.Rule["a","b"] = NO` or `YES` SHALL turn off and on the matches `a` and `b` of the rule.  
-A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style of the file except those it names.
+A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style of the file except those it lists.
 
 #### Scenario: One match
 
@@ -35,7 +35,7 @@ That level SHALL win over a level the config sets, until a later comment for the
 A comment `hakkiri Style.Rule: on` SHALL return the level of the config.  
 A level for a style, and any other word, SHALL be no comment.
 
-#### Scenario: A level until the rule is named again
+#### Scenario: A level until the rule is set again
 
 - **WHEN** a file contains `very` after no comment, after `error`, after `suggestion`, and after `on` for one rule
 - **THEN** the alerts are a warning, an error, a suggestion and a warning

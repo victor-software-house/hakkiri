@@ -18,7 +18,7 @@ The run SHALL then exit 2.
 #### Scenario: A pattern that does not compile
 
 - **WHEN** a glob contains `token_ignores: ['(']`
-- **THEN** hakkiri reports an error naming `token_ignores` and the pattern, lints nothing, and exits 2
+- **THEN** hakkiri reports an error that shows `token_ignores` and the pattern, lints nothing, and exits 2
 
 #### Scenario: A word for a list
 

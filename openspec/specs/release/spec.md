@@ -40,7 +40,7 @@ It SHALL publish nothing to crates.io.
 
 ### Requirement: Two texts carry the version
 
-The skill's `version:` line and the README's install line SHALL name the released version, and the Version PR SHALL move both with the crate.  
+The skill's `version:` line and the README's install line SHALL show the released version, and the Version PR SHALL move both with the crate.  
 A pattern that matches nowhere or more than once SHALL stop the release.
 
 #### Scenario: A version bump

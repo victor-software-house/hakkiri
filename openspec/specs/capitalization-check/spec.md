@@ -9,7 +9,7 @@ Its case styles, word share and exceptions keep the meaning Vale 3.26.0 gives th
 
 ### Requirement: capitalization reports text in the wrong case
 
-A `capitalization` rule SHALL convert each selected text to the case its `match` names.  
+A `capitalization` rule SHALL convert each selected text to the case its `match` sets.  
 When the text is not in that case, it SHALL report one alert that spans the text.  
 In its message, the first `%s` SHALL read as the text and the second as the converted text.
 
@@ -110,9 +110,9 @@ Any other `match` SHALL be a pattern that the text passes by matching.
 
 ### Requirement: An unknown style is refused
 
-A `capitalization` rule whose `style` is neither `AP` nor `Chicago` SHALL be refused with an error that names the rule and the value.
+A `capitalization` rule whose `style` is neither `AP` nor `Chicago` SHALL be refused with an error that shows the rule and the value.
 
 #### Scenario: A misspelt style
 
 - **WHEN** rule `Team.Headings` has `extends: capitalization`, `match: $title` and `style: chicago`
-- **THEN** hakkiri refuses the rule with an error naming `Team.Headings` and `chicago`
+- **THEN** hakkiri refuses the rule with an error that shows `Team.Headings` and `chicago`

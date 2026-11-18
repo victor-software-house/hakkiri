@@ -2,14 +2,14 @@
 
 ## Purpose
 
-A vocabulary is a folder of word lists in a package, which a project names in `vocab` at its top level and in a glob.  
+A vocabulary is a folder of word lists in a package, which a project lists in `vocab` at its top level and in a glob.  
 It contains the terms a project accepts, and the checks drop the matches those terms name, as Vale's `Vocab` does.
 
 ## Requirements
 
 ### Requirement: A vocabulary is a folder of word lists in a package
 
-hakkiri SHALL read a named vocabulary from `config/vocabularies/<name>/` under a loaded package folder, and SHALL read every `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml` below that folder and no other file.
+hakkiri SHALL read a listed vocabulary from `config/vocabularies/<name>/` under a loaded package folder, and SHALL read every `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml` below that folder and no other file.
 
 #### Scenario: A list in a subfolder
 
@@ -18,13 +18,13 @@ hakkiri SHALL read a named vocabulary from `config/vocabularies/<name>/` under a
 
 #### Scenario: A vocabulary that is not there
 
-- **WHEN** the config names `Nope` and no loaded package contains `config/vocabularies/Nope`
-- **THEN** hakkiri reports an error that names `Nope` and the line of the key, and exits with a failure status
+- **WHEN** the config lists `Nope` and no loaded package contains `config/vocabularies/Nope`
+- **THEN** hakkiri reports an error that shows `Nope` and the line of the key, and exits with a failure status
 
 #### Scenario: Two packages hold one name
 
 - **WHEN** two packages each hold `config/vocabularies/Team`
-- **THEN** hakkiri reports an error that names both folders, and exits with a failure status
+- **THEN** hakkiri reports an error that shows both folders, and exits with a failure status
 
 #### Scenario: Text and YAML files together
 
@@ -94,7 +94,7 @@ A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonwor
 #### Scenario: A capitalization rule
 
 - **WHEN** a `capitalization` rule with `match: $sentence` checks the heading `# Using Kubernetes with Terraform today`, and the vocabulary accepts `Kubernetes` and `Terraform`
-- **THEN** it reports nothing, and it reports `'Using Kubernetes with Terraform today' should be in sentence case` when the rule sets `vocab: false` or no vocabulary is named
+- **THEN** it reports nothing, and it reports `'Using Kubernetes with Terraform today' should be in sentence case` when the rule sets `vocab: false` or no vocabulary is listed
 
 #### Scenario: A heading with words nobody accepted
 
@@ -119,28 +119,28 @@ It SHALL mask an accepted phrase before it checks the words.
 
 ### Requirement: A glob adds vocabularies for its files
 
-hakkiri SHALL drop, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule in two cases.  
-One is a match that contains, as a whole word with its case, an accepted word of a vocabulary that a matching glob lists.  
-The other is a match inside an accepted phrase of such a vocabulary.
+hakkiri SHALL drop a match of an `existence`, `repetition`, `spelling` or `substitution` rule in two cases.  
+One is a match that contains, as a whole word with its case, an accepted word of a vocabulary a matching glob lists.  
+The other is a match inside one of its accepted phrases.
 
-It SHALL do so whatever the values of the rule's `vocab` and `nonword`, and a `capitalization` or `conditional` rule SHALL read none.  
-A file SHALL take the vocabularies of every glob that matches it, besides the top-level ones.
+It SHALL do so whatever the rule's `vocab` and `nonword` are, and a `capitalization` or `conditional` rule SHALL read none.  
+A file SHALL take the vocabularies of each matching glob, besides the top-level ones.
 
 #### Scenario: A glob's vocabulary
 
-- **WHEN** a glob names `Team`, `Team.Filler0` is an `existence` rule with `vocab: false` and the token `GitHub`, and the text is `Use GitHub here.`
-- **THEN** it reports nothing, and with `Team` named at the top level it reports ``warning Team.Filler0: Remove 'GitHub'.``
+- **WHEN** a glob lists `Team`, `Team.Filler0` is an `existence` rule with `vocab: false` and the token `GitHub`, and the text is `Use GitHub here.`
+- **THEN** it reports nothing, and with `Team` listed at the top level it reports ``warning Team.Filler0: Remove 'GitHub'.``
 
 #### Scenario: Rules a glob does not reach
 
-- **WHEN** a glob names `Team` and accepts `API` and `Kubernetes`, a `conditional` rule reads `The SDK and the API are here.` and a `capitalization` rule with `match: $sentence` reads `# Using Kubernetes with Terraform today`
+- **WHEN** a glob lists `Team` and accepts `API` and `Kubernetes`, a `conditional` rule reads `The SDK and the API are here.` and a `capitalization` rule with `match: $sentence` reads `# Using Kubernetes with Terraform today`
 - **THEN** the `conditional` rule reports `SDK` and `API`, and the `capitalization` rule reports the heading, where the top level drops both
 
 #### Scenario: Two globs and the top level
 
 - **WHEN** the top level lists `Docs`, which accepts `Zebra`
 - **AND** one glob lists `Team`, which accepts `GitHub`, and the text is `We saw Zebra and GitHub here.`
-- **THEN** `Team.Filler` with the tokens `Zebra` and `GitHub` reports nothing, and a second glob that names `Docs` for another file does not reach this one
+- **THEN** `Team.Filler` with the tokens `Zebra` and `GitHub` reports nothing, and a second glob that lists `Docs` for another file does not reach this one
 
 #### Scenario: Spelling reads a glob's terms exactly
 
@@ -155,7 +155,7 @@ It SHALL give the patterns that a line of a text list would.
 
 #### Scenario: A plain term
 
-- **WHEN** `accept` contains `GitHub`, `Node.js` and `C++`, a rule flags `GitHub`, `Node.js`, `Nodexjs`, `C++` and `Cxx`, and the text names each
+- **WHEN** `accept` contains `GitHub`, `Node.js` and `C++`, a rule flags `GitHub`, `Node.js`, `Nodexjs`, `C++` and `Cxx`, and the text contains each
 - **THEN** only `Nodexjs` and `Cxx` draw an alert, since a period is literal and `C++` is quoted ([yaml-vocabularies 3][yaml-vocabularies-3])
 
 #### Scenario: A pattern, case and flags
@@ -212,13 +212,13 @@ Each problem SHALL give the file and the line that Vale gives, and one run SHALL
 
 ### Requirement: The affix file comes from the packages
 
-`affix` SHALL name a file `<name>.aff` in the `config/dictionaries` folder of the package that contains the vocabulary, then of every other loaded package in order.  
+`affix` SHALL point to a file `<name>.aff` in the `config/dictionaries` folder of the package that contains the vocabulary, then of every other loaded package in order.  
 No name, and `en_US-web` with no such file, SHALL read the built-in dictionary.  
 A name that is not one file name SHALL be refused.
 
 #### Scenario: The holder first
 
-- **WHEN** two packages each hold `config/dictionaries/custom.aff`, with the suffixes `zz` and `qq`, and the package with `zz` contains the vocabulary that names `custom`
+- **WHEN** two packages each hold `config/dictionaries/custom.aff`, with the suffixes `zz` and `qq`, and the package with `zz` contains the vocabulary that sets `custom`
 - **THEN** `foo` and `foozz` are accepted and `fooqq` is not, whatever the order of the packages
 
 #### Scenario: Another package

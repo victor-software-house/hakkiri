@@ -9,7 +9,7 @@ The built-in style `Vale` contains the rule `Vale.Repetition`, read from Vale's 
 ### Requirement: The style Vale contains the rule Vale.Repetition
 
 hakkiri SHALL build the rule `Vale.Repetition` into the style `Vale`, with Vale's defaults: `extends: repetition`, the level `error`, the message `'%s' is repeated!`, the scope `text`, `ignorecase`, `alpha`, a `max` of 0 and the tokens `[^\s.!?]+`.  
-A glob that lists `Vale` SHALL run it, with no vocabulary named.
+A glob that lists `Vale` SHALL run it, with no vocabulary listed.
 
 #### Scenario: A repeated word
 

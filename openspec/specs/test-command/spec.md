@@ -29,7 +29,7 @@ It SHALL read any other `.yml` file only when it contains `extends` and `tests`,
 - **WHEN** `node_modules/pkg/x.test.yml` contains a failing case and the rest of the project contains passing ones
 - **THEN** `hakkiri test` runs no case from `node_modules` and exits 0
 
-#### Scenario: A folder named as an argument
+#### Scenario: A folder given as an argument
 
 - **WHEN** `hakkiri test node_modules/pkg` runs and `pkg` contains a case, and `pkg/node_modules` contains a failing one
 - **THEN** hakkiri runs the case in `pkg` and none from `pkg/node_modules`, as `check` does
@@ -37,7 +37,7 @@ It SHALL read any other `.yml` file only when it contains `extends` and `tests`,
 #### Scenario: A skipped name given as the folder
 
 - **WHEN** `hakkiri test node_modules` runs and `node_modules` contains a case
-- **THEN** hakkiri runs the case, because a folder named as an argument is walked whatever its name
+- **THEN** hakkiri runs the case, because a folder given as an argument is walked whatever its name
 
 #### Scenario: No case
 
@@ -57,7 +57,7 @@ A rule file SHALL take `tests` as the cases of [design decision 2][test-2].
 #### Scenario: A malformed case in a rule
 
 - **WHEN** a rule's `tests` contains a case with the field `inputs`
-- **THEN** hakkiri refuses the rule, names the line of `inputs`, and exits 2
+- **THEN** hakkiri refuses the rule, reports the line of `inputs`, and exits 2
 
 ### Requirement: A case is checked before it runs
 
@@ -96,15 +96,15 @@ Any other case SHALL lint `input` as a file called `input.<format>` through the 
 - **WHEN** a case has no `rule` and `files` maps `*.md` to `styles: [Team]`
 - **THEN** the case lints its input with the rules of `Team`
 
-### Requirement: Coverage names rules no case fires
+### Requirement: Coverage lists rules no case fires
 
-With `--coverage`, hakkiri SHALL fail when a rule file under the paths produced no alert in any case, and SHALL name each such rule.  
+With `--coverage`, hakkiri SHALL fail when a rule file under the paths produced no alert in any case, and SHALL list each such rule.  
 It SHALL skip dot and underscore folders when it lists the rules.
 
 #### Scenario: A rule no case fires
 
 - **WHEN** `Team.Filler` and `Team.Hedge` each hold a case and only `Team.Filler` flags anything
-- **THEN** `hakkiri test --coverage` names `Team.Hedge`, and exits 1
+- **THEN** `hakkiri test --coverage` lists `Team.Hedge`, and exits 1
 
 #### Scenario: A rule file with a dotted name
 
@@ -121,12 +121,12 @@ It SHALL exit 2 when a case could not run, after every other case has reported.
 
 #### Scenario: A failed case
 
-- **WHEN** a case named `flags filler` has `contains: ProseStyle.Filler` and the rule reports nothing
+- **WHEN** a case called `flags filler` has `contains: ProseStyle.Filler` and the rule reports nothing
 - **THEN** hakkiri prints its file, `flags filler` and `output does not contain "ProseStyle.Filler"`, and exits 1
 
 #### Scenario: A case that cannot run
 
-- **WHEN** a case names `rule: Missing.yml` and another case fails
+- **WHEN** a case sets `rule: Missing.yml` and another case fails
 - **THEN** hakkiri reports both after running every case, and exits 2
 
 #### Scenario: JSON with colour forced
@@ -149,7 +149,7 @@ It SHALL report a case that runs through a config as not run when the config run
 #### Scenario: A case through a config that runs a rule hakkiri cannot run
 
 - **WHEN** a test file contains a case that runs through a config whose listed style contains a script rule
-- **THEN** hakkiri reports the case as not run, naming the rule, and exits 2
+- **THEN** hakkiri reports the case as not run, with the rule, and exits 2
 
 ### Requirement: A case's format picks its reader
 
@@ -157,7 +157,7 @@ A case that runs through the config SHALL read its input by the reader a `format
 An isolated case SHALL read its input by the extension `<format>`.  
 A case whose format no reader reads SHALL read its input as plain text, except that a case through the config follows `on_unknown`.
 
-#### Scenario: A format no extension names
+#### Scenario: A format no extension maps to
 
 - **WHEN** a case has `format: txt` and `input: This is very good.`, and a rule flags `very`
 - **THEN** the case lints the input as plain text and reports `1:9`, both in the rule's `tests` and in a test file
@@ -180,7 +180,7 @@ Those are `<format>` and the extension of the reader, which a `formats` entry ma
 ### Requirement: A case through the config follows on_unknown
 
 A case through the config whose format no reader reads, and whose file the config selects, SHALL follow `on_unknown` as `check` does.  
-`text` reads it as plain text, `warn` and `ignore` give it no alerts, and `error` makes the case fail to run with a message that names the format.
+`text` reads it as plain text, `warn` and `ignore` give it no alerts, and `error` makes the case fail to run with a message that shows the format.
 
 #### Scenario: An error
 

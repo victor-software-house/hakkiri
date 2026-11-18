@@ -3,7 +3,7 @@
 ## Purpose
 
 The match checks find patterns in the text a scope selects.  
-`existence` reports each match, `substitution` names the word to use instead, and `occurrence` counts matches against a limit.  
+`existence` reports each match, `substitution` suggests the word to use instead, and `occurrence` counts matches against a limit.  
 Each keeps the meaning Vale 3.26.0 gives it.
 
 ## Requirements

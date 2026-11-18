@@ -2,11 +2,12 @@
 
 ## Purpose
 
-How `hakkiri test` names a rule and reads its text from the path it was given, so a coverage report and an alert use the same name.
+How `hakkiri test` gives a rule its name and reads its text from the path it was given.  
+So a coverage report and an alert use the same name.
 
 ## Requirements
 
-### Requirement: A rule is named from the path it was found at
+### Requirement: A rule takes its name from the path it was found at
 
 hakkiri SHALL derive a rule's name from its absolute path, with `.` and `..` parts folded away and symlinks left alone.  
 The style loader derives the name the same way from the folder it was given.
@@ -18,7 +19,7 @@ A rule file given as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHA
 #### Scenario: Run from inside the style folder
 
 - **WHEN** `hakkiri test Foo.yml`, `hakkiri test ./Foo.yml` and `hakkiri test --coverage .` run in `styles/Team`
-- **THEN** each runs the cases of `Foo.yml` and names the rule `Team.Foo`
+- **THEN** each runs the cases of `Foo.yml` and calls the rule `Team.Foo`
 
 #### Scenario: Through a symlink and back out
 
@@ -33,7 +34,7 @@ A rule file given as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHA
 #### Scenario: A `.yaml` rule file
 
 - **WHEN** `styles/Team/Other.yaml` contains `extends` and `tests`
-- **THEN** `hakkiri test --coverage` reads no case from it and names no rule for it
+- **THEN** `hakkiri test --coverage` reads no case from it and reports no rule for it
 
 #### Scenario: A nested rule
 
@@ -48,7 +49,7 @@ A rule file given as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHA
 #### Scenario: A project reached through a link
 
 - **WHEN** the project root is reached through a symlink, a style folder is a symlink, and `test --coverage` runs on `link/styles/Team/Sub/Bar.yml`
-- **THEN** the rule is `Team.Sub.Bar`, as `check` names it, and not `Sub.Bar`
+- **THEN** the rule is `Team.Sub.Bar`, as `check` calls it, and not `Sub.Bar`
 
 #### Scenario: A name two rule files share
 

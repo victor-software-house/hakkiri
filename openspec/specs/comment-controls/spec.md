@@ -66,12 +66,12 @@ Vale's `off` and `on` SHALL stand for `NO` and `YES`, and a rule name that no ru
 ### Requirement: A rule is gated where its text is read
 
 A rule that a comment turned off before the text of a block is read SHALL read no text in that block.  
-The text is read when its element ends, or where a tag that opens a block inside the element flushes it.
+The text is read when its element ends, or when a block tag inside it flushes it.
 
-An alert between the comment that turned a rule off and the one that turned it on SHALL be left out.
+An alert between the comments that turned a rule off and on SHALL be left out.
 
 In a tight list item, a paragraph SHALL be read before a nested block that opens a block tag.  
-Such a block is a list, quote, code block, table, heading or HTML block.  
+It may be a list, quote, code block, table, heading or HTML block.  
 Otherwise it SHALL be read at the end of the item.
 
 #### Scenario: A comment inside a paragraph

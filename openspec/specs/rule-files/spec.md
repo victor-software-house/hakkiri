@@ -10,12 +10,13 @@ This spec fixes the file format, its fields, its scopes, how words are counted, 
 
 ### Requirement: A rule file contains one rule
 
-hakkiri SHALL read each `.yml` file in a style folder as one rule, named by the folder, a dot, and the file name without its extension.
+hakkiri SHALL read each `.yml` file in a style folder as one rule.  
+The rule's name is the folder, a dot, and the file name without its extension.
 
 #### Scenario: The file name is the rule name
 
 - **WHEN** a style folder `ProseStyle` contains the file `Filler.yml`
-- **THEN** hakkiri loads one rule named `ProseStyle.Filler`
+- **THEN** hakkiri loads one rule called `ProseStyle.Filler`
 
 ### Requirement: Rule files are YAML 1.2
 
@@ -35,7 +36,7 @@ Each field of a rule SHALL have the name and meaning Vale 3.26.0 gives it for th
 - **WHEN** a rule has `extends: existence`, `message: "Filler: '%s'"`, `level: warning`, `ignorecase: true` and `tokens: [basically]`, and the input is `Basically, it works.`
 - **THEN** hakkiri reports one warning with the message `Filler: 'Basically'`
 
-#### Scenario: A substitution rule names the swap
+#### Scenario: A substitution rule shows the swap
 
 - **WHEN** a rule has `extends: substitution`, `message: "Use '%s' instead of '%s'."` and `swap: {utilize: use}`, and the input is `We utilize it.`
 - **THEN** hakkiri reports one alert with the message `Use 'use' instead of 'utilize'.`
@@ -49,7 +50,7 @@ hakkiri SHALL run a rule whose `extends` is `existence`, `substitution`, `occurr
 - **WHEN** a rule has `extends: occurrence`, `message: "%d words"`, `scope: sentence`, `max: 3` and `token: \b(\w+)\b`, and the input is `One two three four five.`
 - **THEN** hakkiri reports one alert with the message `5 words`
 
-### Requirement: A scope names text with Vale's scope names
+### Requirement: A scope selects text with Vale's scope names
 
 A rule's `scope` SHALL take Vale 3.26.0's lowercase dotted scope names, such as `sentence`, `paragraph`, `heading.h1`, `list`, `blockquote`, `table.header` and `raw`.  
 The rule SHALL read only the text those scopes hold.
@@ -70,12 +71,12 @@ The scope `table.row` SHALL hold the text of one table row, header row included,
 
 ### Requirement: An unknown scope is refused
 
-hakkiri SHALL refuse a rule whose `scope` names no scope it defines, and report an error that names the rule and the scope.
+hakkiri SHALL refuse a rule whose `scope` is no scope it defines, and report an error that shows the rule and the scope.
 
 #### Scenario: A scope hakkiri does not define
 
 - **WHEN** a rule `Team.Short` has `scope: chapter`
-- **THEN** hakkiri reports an error naming `Team.Short` and `chapter`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `Team.Short` and `chapter`, and exits with a failure status
 
 ### Requirement: Scopes combine with Vale's operators
 
@@ -193,7 +194,7 @@ A `metric` rule with no `scope` SHALL measure the whole file once and report at 
 ### Requirement: A rule carries test cases
 
 hakkiri SHALL run each case in a rule's `tests` against that rule alone.  
-It SHALL read `input` as Markdown, or as the extension that `format` names, and never assert on `about`.
+It SHALL read `input` as Markdown, or as the extension that `format` gives, and never assert on `about`.
 
 #### Scenario: A case in Rust
 
@@ -207,7 +208,7 @@ A `want` of `''` SHALL mean no alerts.
 
 #### Scenario: A case that fails
 
-- **WHEN** a case named `flags filler` has `input: "It works."` and `contains: ProseStyle.Filler`
+- **WHEN** a case called `flags filler` has `input: "It works."` and `contains: ProseStyle.Filler`
 - **THEN** hakkiri reports the case `flags filler` as failed and exits with a failure status
 
 #### Scenario: A case that expects no alerts
@@ -227,9 +228,9 @@ The `tokens` of a `metric` rule SHALL match as the `tokens` of an `existence` ru
 ### Requirement: A script rule is reported, and the rest of its style runs
 
 hakkiri SHALL NOT run a rule whose `extends` is `script`.  
-It SHALL report it as a rule it cannot run, with an error that names the rule file, as the project-config spec fixes.
+It SHALL report it as a rule it cannot run, with an error that shows the rule file, as the project-config spec fixes.
 
 #### Scenario: A style ships a script rule
 
 - **WHEN** a style folder `Team` contains `Grade.yml` with `extends: script` and a glob lists `Team`
-- **THEN** hakkiri reports an error naming `Team/Grade.yml` and exits 2, and the other rules of `Team` run
+- **THEN** hakkiri reports an error that shows `Team/Grade.yml` and exits 2, and the other rules of `Team` run

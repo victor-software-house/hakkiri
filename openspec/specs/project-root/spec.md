@@ -50,17 +50,17 @@ When no path lies under the root or contains it, hakkiri SHALL report a failure 
 #### Scenario: One file outside the root
 
 - **WHEN** `hakkiri check in.md ../outside.md` runs in `project/`, which contains the root, and `in.md` draws a warning
-- **THEN** hakkiri prints a warning that names `../outside.md`, lints `in.md`, and exits 0
+- **THEN** hakkiri prints a warning that shows `../outside.md`, lints `in.md`, and exits 0
 
 #### Scenario: No file under the root
 
 - **WHEN** `hakkiri check ../outside.md` runs in `project/`
-- **THEN** hakkiri prints a warning that names `../outside.md`, reports a failure naming the root, and exits 2
+- **THEN** hakkiri prints a warning that shows `../outside.md`, reports a failure that shows the root, and exits 2
 
 #### Scenario: A config elsewhere
 
 - **WHEN** `HAKKIRI_CONFIG=../other/hakkiri.yaml hakkiri check` runs in `project/`, so the root is `other/`
-- **THEN** hakkiri prints a warning that names `.`, reports a failure naming the root, and exits 2
+- **THEN** hakkiri prints a warning that shows `.`, reports a failure that shows the root, and exits 2
 
 ### Requirement: The warning is a diagnostic
 
@@ -79,7 +79,7 @@ The failure that gives the root SHALL be one of the `failures` of the JSON objec
 #### Scenario: JSON output
 
 - **WHEN** `hakkiri check --format json ../outside.md` runs in `project/`
-- **THEN** standard error contains the warning, standard output is one JSON object whose `failures` names the root, and hakkiri exits 2
+- **THEN** standard error contains the warning, standard output is one JSON object whose `failures` shows the root, and hakkiri exits 2
 
 #### Scenario: Quiet output
 
@@ -108,7 +108,7 @@ A directory given as an argument SHALL be walked even when it is a package folde
 - **WHEN** `docs/styles` is a symlink to the package folder `styles/`, and `hakkiri check docs` runs
 - **THEN** hakkiri does not enter `docs/styles`
 
-#### Scenario: A package folder named as an argument
+#### Scenario: A package folder given as an argument
 
 - **WHEN** `hakkiri check styles` runs and `styles/Team/notes.md` is prose a glob matches
 - **THEN** hakkiri lints `notes.md`
@@ -120,7 +120,7 @@ A path that does not exist SHALL be a failure of its own, with no failure about 
 #### Scenario: A path that does not exist
 
 - **WHEN** `hakkiri check typo.md` runs and `typo.md` does not exist
-- **THEN** hakkiri reports a failure naming `typo.md` and no failure about the root, and exits 2
+- **THEN** hakkiri reports a failure that shows `typo.md` and no failure about the root, and exits 2
 
 ### Requirement: A glob follows the rules of gitignore
 

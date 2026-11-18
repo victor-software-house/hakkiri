@@ -42,7 +42,7 @@ A match SHALL never cross a sentence end.
 
 ### Requirement: skip and min widen a token
 
-A token with `skip: N` SHALL match up to N words of any kind before the word it names.  
+A token with `skip: N` SHALL match up to N words of any kind before the word it matches.  
 A token with `min: N` SHALL repeat N times, each with its own `skip`.  
 With `ignorecase: true`, patterns SHALL ignore case.
 
@@ -82,10 +82,10 @@ When one or more tokens set `target: true`, the alert SHALL span only the words 
 - **WHEN** a rule has `message: "Join it."` and `tokens: [{pattern: your}, {pattern: self, target: true}]`, and the input is `Do it your self.`
 - **THEN** hakkiri reports one alert, with the matched text `self`
 
-### Requirement: upos names a universal tag
+### Requirement: upos sets a universal tag
 
-A token's `upos` SHALL name one or more universal part-of-speech tags joined by `|`, matched through the Penn Treebank tags Vale maps them to.  
-hakkiri SHALL refuse a token that sets both `tag` and `upos`, or names an unknown universal tag.
+A token's `upos` SHALL list one or more universal part-of-speech tags joined by `|`, matched through the Penn Treebank tags Vale maps them to.  
+hakkiri SHALL refuse a token that sets both `tag` and `upos`, or uses an unknown universal tag.
 
 #### Scenario: A universal noun
 
@@ -95,7 +95,7 @@ hakkiri SHALL refuse a token that sets both `tag` and `upos`, or names an unknow
 #### Scenario: Both tag kinds
 
 - **WHEN** rule `Team.Noun` has a token `{tag: NN, upos: NOUN}`
-- **THEN** hakkiri reports an error naming `Team.Noun`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `Team.Noun`, and exits with a failure status
 
 ### Requirement: exceptions drop a match
 
@@ -109,12 +109,12 @@ A match that begins inside a match of one of the rule's `exceptions` patterns SH
 ### Requirement: model is refused
 
 hakkiri SHALL refuse a `sequence` rule that sets `model`, since it has no format for another tagger's model.  
-The error SHALL name the rule and the field.
+The error SHALL show the rule and the field.
 
 #### Scenario: A rule with a model
 
 - **WHEN** rule `Team.Tags` has `extends: sequence` and `model: other`
-- **THEN** hakkiri reports an error naming `Team.Tags` and `model`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `Team.Tags` and `model`, and exits with a failure status
 
 ### Requirement: A code span is a noun that reads as one capital letter
 
@@ -155,7 +155,7 @@ The rest of the rule SHALL apply to every form.
 #### Scenario: Either of two forms
 
 - **WHEN** a rule has `message: "'%s'."` and `forms: [{tokens: [{pattern: red}, {pattern: green}]}, {tokens: [{pattern: blue}, {pattern: yellow}]}]`, and the input is `Paint red green or blue yellow.`
-- **THEN** hakkiri reports two alerts, with the matched text `red green` and `blue yellow`, both named by the rule
+- **THEN** hakkiri reports two alerts, with the matched text `red green` and `blue yellow`, both with the name of the rule
 
 #### Scenario: One form is the same as tokens
 
@@ -186,7 +186,7 @@ It SHALL refuse a form with no token that has a `pattern`, `tag` or `upos` witho
 #### Scenario: A fault in the second form
 
 - **WHEN** the second of two forms has the tokens `[{pattern: green}, {pattern: '('}]`
-- **THEN** hakkiri reports an error naming `forms[1].tokens[1].pattern`
+- **THEN** hakkiri reports an error that shows `forms[1].tokens[1].pattern`
 
 #### Scenario: Forms set as a parameter
 

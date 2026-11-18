@@ -147,7 +147,7 @@ A `<!--` in a `script` SHALL hide its end tag until a `-->`, and a `<script` aft
 
 ### Requirement: A heading of any depth Vale reads is read
 
-hakkiri SHALL read the text of an `h0` to `h9` element under the scope `heading.h0` to `heading.h9`, as Vale reads any element named `h` and a digit.
+hakkiri SHALL read the text of an `h0` to `h9` element under the scope `heading.h0` to `heading.h9`, as Vale reads any element called `h` and a digit.
 
 #### Scenario: A heading of depth 7
 

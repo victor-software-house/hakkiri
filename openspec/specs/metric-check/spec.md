@@ -96,10 +96,10 @@ A condition MAY read `result`, and the element counts as a formula does.
 
 ### Requirement: A formula that cannot run is refused
 
-hakkiri SHALL refuse a `metric` rule whose `formula` or `condition` does not parse or names an unknown variable.  
-The error SHALL name the rule and the field.
+hakkiri SHALL refuse a `metric` rule whose `formula` or `condition` does not parse or uses an unknown variable.  
+The error SHALL show the rule and the field.
 
 #### Scenario: A formula cut short
 
 - **WHEN** rule `Team.Rate` has `extends: metric` and `formula: words /`
-- **THEN** hakkiri reports an error naming `Team.Rate` and `formula`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `Team.Rate` and `formula`, and exits with a failure status

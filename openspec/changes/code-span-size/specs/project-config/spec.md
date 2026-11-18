@@ -17,7 +17,7 @@ So SHALL a glob that gives the key a word or a list.
 #### Scenario: A value outside 0 to 255
 
 - **WHEN** the config contains `code_span_size: 300`, or a glob contains `code_span_size: 300` or `code_span_size: many`
-- **THEN** hakkiri names the file and the line of the key, and exits 2
+- **THEN** hakkiri reports the file and the line of the key, and exits 2
 
 ### Requirement: code_span_size resolves by the settings cascade
 
@@ -57,11 +57,11 @@ Like in the project's config, a rule setting for no loaded rule SHALL be an erro
 #### Scenario: A key in Vale's spelling
 
 - **WHEN** a package's `.ctl/hakkiri.yaml` contains `MinAlertLevel: warning` on line 3
-- **THEN** hakkiri reports an error naming `MinAlertLevel`, line 3 and the package, and exits 2
+- **THEN** hakkiri reports an error that shows `MinAlertLevel`, line 3 and the package, and exits 2
 
 #### Scenario: A rule the package does not hold
 
 - **WHEN** a package's file sets `Team.Nope: warning` and no loaded style contains `Team.Nope`
-- **THEN** hakkiri reports an error naming the key and the line
+- **THEN** hakkiri reports an error that shows the key and the line
 
 [code-span-size-3]: ../../design.md#3-the-key-is-code_span_size-a-number-of-words

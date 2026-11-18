@@ -3,7 +3,7 @@
 ## Purpose
 
 This spec lists every intended difference between hakkiri and Vale 3.26.0.  
-Each scenario names the case, what Vale does, what hakkiri does, and links the decision that records it.  
+Each scenario states the case, what Vale does, what hakkiri does, and links the decision that records it.  
 A known gap, where hakkiri lacks something Vale does and means to close it, is not a difference.  
 It is listed apart, with its queue row, under Known gaps.
 
@@ -204,7 +204,7 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 #### Scenario: A capitalization style that is not AP (Associated Press) or Chicago
 
 - **WHEN** a `capitalization` rule has `style: chicago` or any other value than `AP` or `Chicago`
-- **THEN** hakkiri refuses it with an error that names the value, and Vale reads every other value as `AP` ([case 8][case-8])
+- **THEN** hakkiri refuses it with an error that shows the value, and Vale reads every other value as `AP` ([case 8][case-8])
 
 #### Scenario: A sequence with nothing to start from
 
@@ -228,7 +228,7 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 
 #### Scenario: A dictionary outside the package
 
-- **WHEN** a rule names a dictionary, list or affix file by a path that leaves its package, or sets only one of `aff` and `dic`
+- **WHEN** a rule points to a dictionary, list or affix file by a path that leaves its package, or sets only one of `aff` and `dic`
 - **THEN** hakkiri refuses it
 - **AND** Vale also searches an absolute path, the working directory and `DICPATH`, and answers one of `aff` and `dic` with the built-in dictionary ([spelling 2][spelling-2])
 
@@ -276,7 +276,7 @@ Vale 3.26.0 panics, runs out of memory, or takes quadratic, cubic or exponential
 ### Requirement: A comment reads as Markdown
 
 hakkiri SHALL read every comment of a code file as Markdown.  
-Vale 3.26.0 reads it as plain lines unless a View names a markup format.
+Vale 3.26.0 reads it as plain lines unless a View sets a markup format.
 
 #### Scenario: A code span in a plain comment
 
@@ -312,14 +312,14 @@ hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.2
 hakkiri SHALL match each `files` glob against the file's path relative to the project root.  
 Vale 3.26.0 matches the path as given after cleaning it.
 
-#### Scenario: A file named by its absolute path
+#### Scenario: A file given by its absolute path
 
-- **WHEN** `files` contains `'docs/**'` and a caller names `docs/a.md` by its absolute path
+- **WHEN** `files` contains `'docs/**'` and a caller passes `docs/a.md` by its absolute path
 - **THEN** hakkiri lints it with the styles of that glob, and Vale matches only a glob such as `**/docs/**` ([check 3][check-3])
 
 #### Scenario: A run from a subdirectory
 
-- **WHEN** a caller runs from `docs/` with the config named by `HAKKIRI_CONFIG`, and checks `a.md`
+- **WHEN** a caller runs from `docs/` with the config set by `HAKKIRI_CONFIG`, and checks `a.md`
 - **THEN** hakkiri matches `docs/a.md`, and Vale matches `a.md`, so `[docs/**]` does not apply ([check 3][check-3])
 
 ### Requirement: The test command differs from Vale's
@@ -344,7 +344,7 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 #### Scenario: A name two rule files share that no case flags
 
 - **WHEN** `Terms.yml` and `Terms.custom.yml` both give `Team.Terms`, and `test --coverage` finds that no case flags it
-- **THEN** hakkiri lists it once with both files, and Vale lists `Team.Terms` twice and names no file ([rule-names 4][rule-names-4])
+- **THEN** hakkiri lists it once with both files, and Vale lists `Team.Terms` twice and reports no file ([rule-names 4][rule-names-4])
 
 ### Requirement: A rule setting is spelled as hakkiri's config spells it
 
@@ -353,10 +353,10 @@ It SHALL refuse a rule key for no known rule, and a value that is none of those 
 
 #### Scenario: A rule turned on at its own level
 
-- **WHEN** a glob turns a rule on without naming a level
+- **WHEN** a glob turns a rule on without setting a level
 - **THEN** it sets the rule to `on`, where Vale writes `YES` ([rule-setting 7][rule-setting-7])
 
-#### Scenario: A key that names no rule
+#### Scenario: A key that matches no rule
 
 - **WHEN** a glob contains `Team.Nope: warning` and no loaded style contains a rule `Team.Nope`
 - **THEN** hakkiri refuses it with the line of the key, and Vale ignores `Team.Nope = YES` ([rule-setting 7][rule-setting-7])
@@ -408,7 +408,7 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.val
 #### Scenario: A package that was changed
 
 - **WHEN** a pinned package's download does not match its `sha256`
-- **THEN** hakkiri refuses it and names the `url` and both hashes, where Vale installs a changed zip with no complaint ([package-fetch 3][package-fetch-3])
+- **THEN** hakkiri refuses it and reports the `url` and both hashes, where Vale installs a changed zip with no complaint ([package-fetch 3][package-fetch-3])
 
 #### Scenario: A Vale style folder
 
@@ -422,7 +422,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 #### Scenario: A term that is not a pattern
 
 - **WHEN** a list contains a term such as `C(` that is not a valid pattern
-- **THEN** hakkiri reports an error that names the file and line, where Vale stops with a pattern error that has no line ([vocabularies 4][vocabularies-4])
+- **THEN** hakkiri reports an error that shows the file and line, where Vale stops with a pattern error that has no line ([vocabularies 4][vocabularies-4])
 
 #### Scenario: A term that Vale's engines refuse
 
@@ -432,7 +432,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 #### Scenario: Two packages with one vocabulary
 
 - **WHEN** two packages each hold a vocabulary `Team`
-- **THEN** hakkiri refuses the config and names both, where Vale takes the first search path, or the last package after `vale sync` ([vocabularies 3][vocabularies-3])
+- **THEN** hakkiri refuses the config and reports both, where Vale takes the first search path, or the last package after `vale sync` ([vocabularies 3][vocabularies-3])
 
 #### Scenario: The per-user styles folder
 
@@ -441,8 +441,8 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 
 #### Scenario: An unknown vocabulary
 
-- **WHEN** the config names a vocabulary that no package contains
-- **THEN** hakkiri names the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
+- **WHEN** the config lists a vocabulary that no package contains
+- **THEN** hakkiri reports the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
 
 ### Requirement: Package settings differ from Vale's package configuration
 
@@ -473,7 +473,7 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 #### Scenario: A nested package pinned by path
 
 - **WHEN** a package's `packages` contains a `path` entry
-- **THEN** hakkiri refuses it, and Vale installs a local folder named there ([package settings 3][settings-3])
+- **THEN** hakkiri refuses it, and Vale installs a local folder listed there ([package settings 3][settings-3])
 
 #### Scenario: Ten or more packages
 
@@ -560,7 +560,7 @@ Vale 3.26.0 prints Go's error text for it.
 
 ### Requirement: The end of a match that wraps a line differs from Vale
 
-hakkiri SHALL name the line and column of a match's last character.  
+hakkiri SHALL give the line and column of a match's last character.  
 Vale 3.26.0 prints the first column plus the number of characters of the match, line breaks included.
 
 #### Scenario: A match across a line break
@@ -581,12 +581,12 @@ A pull request that closes a gap SHALL record any difference the closing leaves 
 
 #### Scenario: A pull request closes a gap
 
-- **WHEN** a pull request closes the gap that a requirement below names
+- **WHEN** a pull request closes the gap that a requirement below describes
 - **THEN** the same pull request removes that requirement, and adds a scenario to the intended differences when hakkiri still differs
 
 ### Requirement: A script rule is a known gap
 
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it cites closes.
 
 #### Scenario: A script rule
 
@@ -596,7 +596,7 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 
 ### Requirement: A formula outside the listed syntax is a known gap
 
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it cites closes.
 
 #### Scenario: A formula outside the listed syntax
 
@@ -606,17 +606,17 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 
 ### Requirement: A doc selector or a View is a known gap
 
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it cites closes.
 
 #### Scenario: A doc selector or a View
 
-- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
+- **WHEN** a rule has `scope: doc(h1)`, a section sets a View, or a case sets `view`
 - **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.  
   It refuses the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 ### Requirement: A Vale configuration file is a known gap
 
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it cites closes.
 
 #### Scenario: A Vale configuration file
 
@@ -625,7 +625,7 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 
 ### Requirement: An action is a known gap
 
-hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it names closes.
+hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queue row it cites closes.
 
 #### Scenario: An action
 
@@ -668,9 +668,9 @@ It SHALL also read the forms of its own.
 [comment-controls-3]: ../../changes/archive/2026-11-12-comment-controls/design.md#3-a-style-comment-reads-the-styles-of-the-rules
 [comment-controls-4]: ../../changes/archive/2026-11-12-comment-controls/design.md#4-a-source-file-holds-no-comment-control
 
-### Requirement: A walk and a named file differ from Vale's
+### Requirement: A walk and a given file differ from Vale's
 
-hakkiri SHALL skip the files git ignores in a walk and SHALL warn about a named file that no glob selects.  
+hakkiri SHALL skip the files git ignores in a walk and SHALL warn about a file given by path that no glob selects.  
 Vale 3.26.0 does neither.
 
 #### Scenario: An ignored build folder
@@ -678,7 +678,7 @@ Vale 3.26.0 does neither.
 - **WHEN** `.gitignore` contains `build/` and the folder contains a file a glob selects
 - **THEN** hakkiri skips it, and Vale lints it, because Vale skips only its default ignored folders and reads no git file ([gitignore 6][gitignore-6])
 
-#### Scenario: A named file with no glob
+#### Scenario: A given file with no glob
 
 - **WHEN** `hakkiri check README.md` runs and no glob matches it
 - **THEN** hakkiri warns that no glob selects it, and Vale lints it with no rule and reports nothing ([gitignore 6][gitignore-6])
@@ -859,7 +859,7 @@ hakkiri SHALL read the front matter values as Vale does, and put each alert at t
 - **THEN** hakkiri reports nothing, since the key is no value and the block is no body text
 - **AND** Vale 3.26.0 reports `Install` on line 2, since it lints the lines of the block as a paragraph too ([front-matter-crate 3][front-matter-crate-3])
 
-#### Scenario: A named YAML or JSON fence
+#### Scenario: A fence marked YAML or JSON
 
 - **WHEN** a Markdown file starts with `---yaml` or `---json`, a block that its parser reads, and `---`
 - **THEN** hakkiri reads the values of the block
@@ -886,7 +886,7 @@ hakkiri SHALL read a `vocab.yml` or `vocab.yaml` as each scenario below says, wh
 
 #### Scenario: The affix file
 
-- **WHEN** `affix: custom` names a file that only `$DICPATH` contains
+- **WHEN** `affix: custom` points to a file that only `$DICPATH` contains
 - **THEN** hakkiri reports that `custom.aff` is in no package
 - **AND** Vale finds it there
 - **AND** hakkiri also looks in every other loaded package, and Vale does not ([yaml-vocabularies 6][yaml-vocabularies-6])
@@ -899,7 +899,7 @@ hakkiri SHALL read a `vocab.yml` or `vocab.yaml` as each scenario below says, wh
 #### Scenario: A syntax error of the file
 
 - **WHEN** the last list of the file is `[a` on line 3, with no closing bracket
-- **THEN** hakkiri names line 3, where the bracket opens, and Vale names line 2, which contains a complete entry and no fault ([yaml-vocabularies 2][yaml-vocabularies-2])
+- **THEN** hakkiri reports line 3, where the bracket opens, and Vale reports line 2, which contains a complete entry and no fault ([yaml-vocabularies 2][yaml-vocabularies-2])
 
 #### Scenario: A period in a term with ignorecase
 
@@ -944,24 +944,24 @@ hakkiri SHALL read a rule's parameters as Vale 3.26.0 does, apart from the scena
 
 #### Scenario: A parameter Vale takes without a word
 
-- **WHEN** a parameter names a rule that does not exist, contains no value, sets a negative `max`, or sets a `scope` that is none
+- **WHEN** a parameter is for a rule that does not exist, contains no value, sets a negative `max`, or sets a `scope` that is none
 - **THEN** hakkiri refuses it with the config file and the line, and Vale takes it with no error ([rule-parameters 4][rule-parameters-4])
 
 #### Scenario: A parameter Vale refuses without a place
 
 - **WHEN** a parameter has a value of the wrong kind, a name the check does not define, or a list
 - **THEN** hakkiri refuses it with the config file and the line
-- **AND** Vale names `[internal]`, or its rule file at line 0 or 1, and for a wrong kind cuts the message off after `1 error(s) decoding:` ([rule-parameters 4][rule-parameters-4])
+- **AND** Vale reports `[internal]`, or its rule file at line 0 or 1, and for a wrong kind cuts the message off after `1 error(s) decoding:` ([rule-parameters 4][rule-parameters-4])
 
 #### Scenario: A flag and a name Vale accepts
 
 - **WHEN** a flag parameter is spelled `YES` or `1`, or a parameter name is written `IGNORECASE`
-- **THEN** hakkiri refuses it, since a YAML config writes `true` and `false` and names a field as the rule file does
+- **THEN** hakkiri refuses it, since a YAML config writes `true` and `false` and spells a field as the rule file does
 - **AND** Vale reads the ini spelling and ignores the case of a name ([rule-parameters 4][rule-parameters-4])
 
 #### Scenario: A rule built from a vocabulary
 
-- **WHEN** a parameter names `Vale.Terms` or `Vale.Avoid`
+- **WHEN** a parameter is for `Vale.Terms` or `Vale.Avoid`
 - **THEN** hakkiri refuses it, and Vale ignores it ([rule-parameters 5][rule-parameters-5])
 
 ### Requirement: A consistency alert in a multi-line paragraph differs from Vale
@@ -1219,7 +1219,7 @@ hakkiri SHALL read Markdown as each scenario below says, where Vale 3.26.0 reads
 
 #### Scenario: A reference that nothing defines
 
-- **WHEN** a paragraph contains `[a label][nope]` and no definition names `nope`
+- **WHEN** a paragraph contains `[a label][nope]` and no definition has the label `nope`
 - **THEN** hakkiri reads the text as written, so `nope` is a word
 - **AND** Vale masks the second label as it does for a defined reference ([markdown-probe 8][markdown-probe-8])
 
@@ -1261,12 +1261,12 @@ Vale 66bbb85 reads no text inside a fence.
 - **WHEN** a Markdown file contains a fence opened with ```` ```rust ```` around `// A very good start.`, and a rule flags `very`
 - **THEN** hakkiri reports `very` in the comment, and Vale reports nothing ([decision 5][language-model-5])
 
-### Requirement: A scope part names a Linguist language
+### Requirement: A scope part gives a Linguist language
 
 hakkiri SHALL read the last piece of a scope part as a language of the GitHub Linguist table that langdex contains.
 
 Vale 66bbb85 compares it with the file's extension after its own table folds some extensions together, such as `.tsx`, `.mts` and `.cts` into `.ts`.  
-Linguist keeps TSX (TypeScript with tags) apart from TypeScript, so a scope that names `ts` does not reach a `.tsx` file.
+Linguist keeps TSX (TypeScript with tags) apart from TypeScript, so a scope with `ts` does not reach a `.tsx` file.
 
 #### Scenario: A TSX file
 
@@ -1331,7 +1331,7 @@ Vale 3.26.0 reads them otherwise.
 
 #### Scenario: A YAML or TOML file needs no view
 
-- **WHEN** a glob selects a YAML or TOML file and no view names it
+- **WHEN** a glob selects a YAML or TOML file and no view lists it
 - **THEN** hakkiri reads its comments
 - **AND** Vale reads the whole file as plain lines, since it reads a data file's comments only through a view ([comment-languages 4][comment-languages-4])
 

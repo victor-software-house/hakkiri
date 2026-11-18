@@ -3,7 +3,7 @@
 ## Purpose
 
 Selection decides which nodes of the document tree a rule reads, and what text, sentences and words a check sees in each of them.  
-The [rule-files spec][rule-files] names the scopes; this spec fixes how they match.
+The [rule-files spec][rule-files] lists the scopes; this spec fixes how they match.
 
 ## Requirements
 
@@ -270,22 +270,22 @@ A scope item in which every part has another language SHALL select nothing.
 - **WHEN** a rule has `scope: text & ~heading.rs` and `tokens: [marker]`, and a Markdown file contains `# A marker`
 - **THEN** hakkiri reports one alert, on the heading
 
-#### Scenario: An item that names only another language
+#### Scenario: An item with only another language
 
 - **WHEN** a rule has `scope: [~heading.rs]` and `tokens: [marker]`, and a Markdown file contains `# A marker` and `A marker.`
 - **THEN** hakkiri reports no alert
 
-### Requirement: A piece names a language only after a scope
+### Requirement: A piece is a language only after a scope
 
-A last piece SHALL name a language only when the whole part is not a scope hakkiri defines and the rest of it is one.  
-A piece that names no language SHALL be an error.
+A last piece SHALL be a language only when the whole part is not a scope hakkiri defines and the rest of it is one.  
+A piece that is no language SHALL be an error.
 
 #### Scenario: A scope name that ends like a language
 
 - **WHEN** a rule has `scope: text.comment.line`
 - **THEN** hakkiri reads it as the scope of line comments, in every language
 
-#### Scenario: A piece that names no language
+#### Scenario: A piece that is no language
 
 - **WHEN** a rule has `scope: text.nolang`
 - **THEN** hakkiri refuses the rule with `` `text.nolang` is not a scope hakkiri defines ``
@@ -328,7 +328,7 @@ A title in a heading or a table cell SHALL be a link title as any other.
 - **WHEN** a link, an image and a definition each hold a title with the token `marker`
 - **THEN** `title & link` reports the title of the link, `title & image` that of the image, `title` all three, and `link` and `image` none
 
-A negated part that names the element, such as `title & ~link`, SHALL leave out the titles that element holds.
+A negated part for the element, such as `title & ~link`, SHALL leave out the titles that element contains.
 
 #### Scenario: A negated element
 

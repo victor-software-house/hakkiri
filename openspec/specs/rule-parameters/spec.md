@@ -57,7 +57,7 @@ An empty `styles` list SHALL drop the parameters of the globs that rank below it
 - **WHEN** a package's settings set `max: 2` for `*.md` and the project sets `max: 1` for `b.md`
 - **THEN** `b.md` runs with `max` 1 and `a.md` with `max` 2
 
-### Requirement: A refused parameter names its config line
+### Requirement: A refused parameter shows its config line
 
 hakkiri SHALL refuse a parameter with the config file and the line of the parameter, and SHALL report every refusal of a config at once.  
 A parameter of a rule that no glob runs SHALL be refused in the same way.

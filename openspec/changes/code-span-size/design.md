@@ -42,7 +42,7 @@ Prior art for the shape, read on 2026-11-12:
 
 - Vale lists `IgnoredScopes` (`code`, `tt`), which masks inline code.  
   So Vale counts no word in it.
-- markdownlint names what a rule includes with booleans such as `code_blocks`.
+- markdownlint sets what a rule includes with booleans such as `code_blocks`.
 - remark-retext marks `inlineCode` as a source node, so it is never a word.
 
 Alternative: a boolean such as `count_code_spans`.  
