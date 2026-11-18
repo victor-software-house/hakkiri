@@ -54,7 +54,8 @@ In a metric with a scope, each element count SHALL be 0.
 ### Requirement: With no scope, a metric measures the prose of the file
 
 A `metric` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.  
-It SHALL leave out headings and table cells, and in a code file it SHALL measure the paragraphs of the comments.  
+It SHALL leave out headings and table cells, and in a code file it SHALL measure the paragraphs of the comments.
+
 Text with no words SHALL give no alert.  
 A `metric` rule with another `scope` SHALL measure each block that scope selects, and report at the start of that block.
 

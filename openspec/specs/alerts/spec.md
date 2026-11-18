@@ -38,9 +38,10 @@ The line and columns of a match inside a comment SHALL be those of its bytes in 
 ### Requirement: A message fills %s in order
 
 Each `%s` in a message SHALL take the next value the check gives, and `%%` SHALL read as `%`.  
-A `%[n]s`, with `n` counting from 1, SHALL take the `n`th value, and a `%s` after it SHALL take the value that follows, as Go's `fmt` does.  
-A `%s` or `%[n]s` with no value to take SHALL read as nothing.  
-A line break inside a value SHALL read as one space.
+A `%[n]s`, with `n` counting from 1, SHALL take the `n`th value, and a `%s` after it SHALL take the value that follows, as Go's `fmt` does.
+
+With no value to take, a `%s` or `%[n]s` SHALL read as nothing.  
+Inside a value, a line break SHALL read as one space.
 
 #### Scenario: A percent sign
 
@@ -127,7 +128,8 @@ hakkiri SHALL lint a 50,000-character line and a 60,000-line file to the end, wi
 
 ### Requirement: A match ends at its last character
 
-An alert SHALL name the line and the column of the match's last character in the file, so markup inside a match counts toward it.  
+An alert SHALL give the line and column, in the file, of the last character of the match.  
+So markup inside the match counts toward that place.  
 A match on one line SHALL end on the line it starts on.  
 A match that goes on to the next lines SHALL end on the line of its last character.
 

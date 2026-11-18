@@ -2,7 +2,7 @@
 
 ## Purpose
 
-A `capitalization` rule compares the case of each selected text with the case its `match` asks for, and reports text that falls short.  
+A `capitalization` rule compares the case of each selected text with the case its `match` sets, and reports text that falls short.  
 Its case styles, word share and exceptions keep the meaning Vale 3.26.0 gives them.
 
 ## Requirements

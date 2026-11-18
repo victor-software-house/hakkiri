@@ -2,7 +2,8 @@
 
 ## Purpose
 
-A comment turns off the matches of a rule, limits the styles of a file or sets the level of a rule, and a source file reads none of them.
+A comment turns off the matches of a rule, limits the styles of a file or sets the level of a rule.  
+A source file reads none of these comments.
 
 ## Requirements
 
@@ -28,7 +29,9 @@ A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style 
 
 ### Requirement: A comment sets the level of a rule
 
-In a Markdown file, an HTML comment `hakkiri Style.Rule: suggestion`, `warning` or `error` SHALL give each alert of the rule after it that level, over a level the config sets, until a later comment names the rule.  
+In a Markdown file, an HTML comment `hakkiri Style.Rule: suggestion`, `warning` or `error` SHALL set that level on each later alert of the rule.  
+That level SHALL win over a level the config sets, until a later comment for the same rule.
+
 A comment `hakkiri Style.Rule: on` SHALL return the level of the config.  
 A level for a style, and any other word, SHALL be no comment.
 
@@ -53,7 +56,8 @@ A glob that matches a source file SHALL leave the text of its comments as it is,
 
 ### Requirement: A level leaves a rule failure an error
 
-A level from a comment or from the config SHALL NOT change an alert that reports a fault of the rule itself, such as a pattern that gave up on a text.
+A level from a comment or from the config SHALL NOT change an alert that reports a fault of the rule itself.  
+One such fault is a pattern that gave up on a text.
 
 #### Scenario: A pattern that gives up
 

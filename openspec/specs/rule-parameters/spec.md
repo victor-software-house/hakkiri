@@ -2,14 +2,18 @@
 
 ## Purpose
 
-A glob of the project config sets fields of rules by name, as Vale's `Style.Rule[param] = value` does, and each file runs the rule read with the parameters that apply to it.
+A glob of the project config sets fields of rules by name, as Vale's `Style.Rule[param] = value` does.  
+Each file runs the rule with the parameters that apply to it.
 
 ## Requirements
 
 ### Requirement: A glob sets the parameters of a rule
 
-hakkiri SHALL read `params` in a glob of `files` as a mapping from a rule name to a mapping from a parameter name to one value, a number, `true` or `false`, or text.  
-It SHALL read the rule again with each parameter replacing the field of that name, whether the rule comes from a rule file or is `Vale.Repetition`.
+hakkiri SHALL read `params` in a glob of `files` as a mapping from a rule name to a mapping of parameters.  
+Each parameter name SHALL map to one value: a number, `true` or `false`, or text.
+
+hakkiri SHALL read the rule again with each parameter replacing the field of that name.  
+This SHALL apply whether the rule comes from a rule file or is `Vale.Repetition`.
 
 #### Scenario: A parameter of the built-in rule
 
@@ -29,7 +33,8 @@ It SHALL read the rule again with each parameter replacing the field of that nam
 ### Requirement: A parameter reaches the files of its glob
 
 A parameter SHALL apply to the files that the glob setting it matches.  
-The globs that match a file SHALL apply in the order of the settings cascade of `project-config`, a more specific glob winning for the same parameter of the same rule.  
+The globs that match a file SHALL apply in the order of the settings cascade of `project-config`.  
+For the same parameter of the same rule, a more specific glob SHALL win.  
 An empty `styles` list SHALL drop the parameters of the globs that rank below it.
 
 #### Scenario: A file outside the glob
@@ -69,7 +74,8 @@ A parameter of a rule that no glob runs SHALL be refused in the same way.
 
 ### Requirement: A parameter a rule cannot take is refused
 
-hakkiri SHALL refuse a level, a field that contains a list, a mapping, the rule's identity or its prose, and a field the rule's check does not define.  
+hakkiri SHALL refuse a level, a field that contains a list, a mapping, and the rule's identity or its prose.  
+It SHALL also refuse a field that the rule's check does not define.  
 It SHALL refuse a value of the wrong kind, a missing value, and a list or a mapping as a value.
 
 #### Scenario: A level

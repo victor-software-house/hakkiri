@@ -171,7 +171,8 @@ A config SHALL set its level, turn it off, and set its parameters as it does any
 
 ### Requirement: Vale.Spelling adds the dictionaries of each package
 
-`Vale.Spelling` SHALL read every dictionary in the `config/dictionaries` folder of each package of the project, in the order of the packages, and accept a word that one contains beside the built-in dictionary.  
+`Vale.Spelling` SHALL read every dictionary in each package's `config/dictionaries` folder, in the order of the packages.  
+It SHALL accept a word that one of them contains, as well as the words of the built-in dictionary.  
 A parameter `dictionaries`, `aff` or `dic` SHALL replace them, and `append` SHALL keep the built-in dictionary.
 
 #### Scenario: A dictionary in a package

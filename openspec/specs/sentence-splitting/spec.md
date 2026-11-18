@@ -120,7 +120,7 @@ A word that is no unit after a number SHALL end nothing.
 - **WHEN** the text is `The test takes 92 ms. Tests cover a phrase.`
 - **THEN** the splitter gives two sentences, the first ending after `ms.`
 
-### Requirement: vs. and a date end nothing
+### Requirement: `vs.` and a date end nothing
 
 `vs.` SHALL end no sentence, before a capital word or a number.  
 A date before a full stop SHALL NOT be a list number.

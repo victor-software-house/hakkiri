@@ -412,9 +412,9 @@ A `styles` list under another glob SHALL compete in the settings cascade, the li
 
 ### Requirement: A package's settings file contains the keys of a project config
 
-A package's settings file SHALL hold `files`, `level`, `vocab` and `packages`.  
-A key it contains that the project config does not define SHALL be an error that names the key, its line and the package.  
-A rule setting that names no loaded rule SHALL be an error, as in the project's config.
+The settings file of a package SHALL contain `files`, `level`, `vocab` and `packages`.  
+A key in it that the project config does not define SHALL be an error that gives the key, its line and the package.  
+Like in the project's config, a rule setting for no loaded rule SHALL be an error.
 
 #### Scenario: A key in Vale's spelling
 

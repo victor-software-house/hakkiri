@@ -2,7 +2,8 @@
 
 ## Purpose
 
-A release of hakkiri is a tag, a GitHub Release and one tarball for each platform a consumer locks, built by verctl's release workflow, and mise installs it from a pinned version with the checksum its lock records.
+A release of hakkiri is a tag, a GitHub Release and one tarball for each platform a consumer locks.  
+The release workflow of verctl builds it, and mise installs it from a pinned version with the checksum its lock records.
 
 ## Requirements
 
@@ -53,7 +54,8 @@ The `linux-x64` binary SHALL start on a Linux machine that has no glibc loader, 
 
 #### Scenario: A root with no files
 
-- **WHEN** the binary runs in a root folder that contains no file but the binary, with `check` on a Markdown file that has the word `very` and a rule that flags it
+- **WHEN** the binary runs in a root folder that contains nothing but the binary
+- **AND** it runs `check` on a Markdown file that has the word `very`, with a rule that flags it
 - **THEN** it prints `1 alert in 1 file` and exits 0, and `--version` prints the released version
 
 ### Requirement: The linux-x64 binary keeps its speed
@@ -63,7 +65,8 @@ A `check` over many files on four CPUs SHALL take at most twice as long as the s
 
 #### Scenario: Many files
 
-- **WHEN** `check` lints 3000 Markdown files of 18 MB in total on four CPUs, with the musl build and the glibc build of one release
+- **WHEN** a machine with four CPUs runs `check` on 3000 Markdown files, 18 MB in total
+- **AND** it runs the musl build and then the glibc build of one release
 - **THEN** the musl build takes at most twice the time of the glibc build
 
 #### Scenario: Other builds

@@ -2,7 +2,8 @@
 
 ## Purpose
 
-A rule file contains one hakkiri rule: which text it reads, which check it runs, and the test cases that prove it.  
+A rule file contains one hakkiri rule.  
+It sets which text the rule reads and which check it runs, and it has the test cases that prove the rule.  
 This spec fixes the file format, its fields, its scopes, how words are counted, and how its tests run.
 
 ## Requirements
@@ -87,8 +88,10 @@ A rule SHALL read text that every part of a `&` scope matches, and text that any
 
 ### Requirement: An exclusion leaves out blocks of that scope
 
-A scope part written `~` and a name SHALL leave out each block of text that has that scope, and no other.  
-A block has the scope of one element, as the scope-selection spec fixes, so an element inside a quote keeps its own scope: a list item after text in a quote is not left out by `~blockquote`.
+A scope part written `~` and a name SHALL leave out each block of text that has that scope, and no other.
+
+A block has the scope of one element, as the scope-selection spec states.  
+So an element inside a quote keeps its own scope, and `~blockquote` does not leave out a list item that follows text in a quote.
 
 #### Scenario: A sentence in a list inside a quote
 
@@ -171,7 +174,7 @@ Link text SHALL read as words, and a link target SHALL be left out.
 
 ### Requirement: A metric rule counts token matches
 
-A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`, the number of matches of those tokens in the text it measures.
+A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`: how many times those tokens match the text it measures.
 
 #### Scenario: A semicolon rate
 

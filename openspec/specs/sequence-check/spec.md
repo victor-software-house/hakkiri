@@ -149,7 +149,8 @@ The square brackets of an intra-doc link around one code span SHALL belong to th
 ### Requirement: A sequence rule may list several forms
 
 A `sequence` rule SHALL take `forms`, a list of mappings that each hold `tokens`, in place of `tokens`.  
-It SHALL report each run of words that any form matches, with the rule's own name, and the rest of the rule SHALL apply to every form.
+It SHALL report each run of words that any form matches, with the rule's own name.  
+The rest of the rule SHALL apply to every form.
 
 #### Scenario: Either of two forms
 
@@ -163,7 +164,8 @@ It SHALL report each run of words that any form matches, with the rule's own nam
 
 ### Requirement: Overlapping forms give one alert
 
-A match of one form that overlaps a match of another form SHALL give no alert when the other match starts first, or starts at the same word in an earlier form.  
+A match of one form may overlap a match of another form.  
+It SHALL give no alert when the other match starts first, or starts at the same word in an earlier form.  
 Matches of one form SHALL NOT drop each other.
 
 #### Scenario: Two forms share a word
@@ -197,6 +199,7 @@ A form SHALL read the tokens a `tokens` list reads, so a negated token that foll
 
 #### Scenario: Three forms of one check
 
-- **WHEN** a rule has a form of a noun and a present verb, a form of a noun, a past verb and a negated `TO|RB|RBR|RBS` token, and a form of a pronoun and a verb
+- **WHEN** a rule has three forms, and the first is a noun and a present verb
+- **AND** the second is a noun, a past verb and a negated `TO|RB|RBR|RBS` token, and the third a pronoun and a verb
 - **AND** the input is `The doc says to run the tool.`, `The jobs asked to end early.` and `The state is open and it knows its names.`
 - **THEN** hakkiri reports `doc says` and `it knows`, and no alert for the second sentence

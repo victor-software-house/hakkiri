@@ -8,8 +8,10 @@
 
 ### Requirement: Cases come from rule files and test files
 
-`hakkiri test` SHALL run the `tests` of each rule file and each case of each `*.test.yml` file under the paths it is given, or under the current directory when it is given none.  
-A directory walk SHALL skip a dot directory other than the one named, and every folder the `check` walk skips by name.  
+`hakkiri test` SHALL run the `tests` of each rule file and each case of each `*.test.yml` file under the paths it is given.  
+With no path, it SHALL use the current directory.
+
+A directory walk SHALL skip a dot directory other than the one given, and every folder the `check` walk skips by name.  
 It SHALL read any other `.yml` file only when it contains `extends` and `tests`, and SHALL fail when it finds no case.
 
 #### Scenario: A rule with cases and a test file
@@ -79,9 +81,10 @@ A case's alerts SHALL be one line each, `line:column:Rule:message`, in order of 
 
 ### Requirement: An isolated case loads one rule
 
-A case in a rule's `tests`, and a case with `rule`, SHALL load that rule alone, from a path relative to its file.  
+A case in a rule's `tests`, and a case with `rule`, SHALL load that rule alone, from a path relative to its file.
+
 It SHALL read no config, report an alert of any level, and name the rule as the style loader does, so `Team/Foo.v2.yml` is `Team.Foo`.  
-Any other case SHALL lint `input` as a file named `input.<format>` through the project config.
+Any other case SHALL lint `input` as a file called `input.<format>` through the project config.
 
 #### Scenario: A rule turned off in the config
 
@@ -111,8 +114,10 @@ It SHALL skip dot and underscore folders when it lists the rules.
 ### Requirement: The report and exit status show what happened
 
 hakkiri SHALL print, for each failed case, its file, name and reason, and the alerts it got, and then a count line.  
-`--format json` SHALL print `passed`, `failed`, `files`, `results`, `uncovered` and `failures`.  
-It SHALL exit 0 when every case passes and no rule is uncovered, 1 when a case fails or a rule is uncovered, and 2 when a case could not run, after every other case has reported.
+`--format json` SHALL print `passed`, `failed`, `files`, `results`, `uncovered` and `failures`.
+
+It SHALL exit 0 when every case passes and no rule is uncovered, and 1 when a case fails or a rule is uncovered.  
+It SHALL exit 2 when a case could not run, after every other case has reported.
 
 #### Scenario: A failed case
 

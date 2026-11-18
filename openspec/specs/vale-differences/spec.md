@@ -1085,7 +1085,7 @@ hakkiri SHALL split sentences by its own splitter where Vale 66bbb85's segmenter
 - **WHEN** a file contains `The team pins ctl-core 0.5.2. ctl-core 0.6.3 ships the new look.`
 - **THEN** hakkiri gives two sentences, and Vale gives one, as it does after the decimal `4.75.` and the task number `1.3.`
 
-#### Scenario: vs. between two versions
+#### Scenario: `vs.` between two versions
 
 - **WHEN** a file contains `Rust 1.99 vs. Go 1.25 differ.`
 - **THEN** hakkiri gives one sentence, and Vale ends the first after `vs.`

@@ -43,12 +43,14 @@ A glob that lists `Vale` SHALL run it, with no vocabulary named.
 
 ### Requirement: Words compare by simple case folding
 
-hakkiri SHALL read two words as the same when each character of one folds to the character of the other by simple case folding, as Go's `strings.EqualFold` reads them, and SHALL NOT fold the text as a whole.
+hakkiri SHALL read two words as the same when each character of one folds to the character of the other by simple case folding.  
+It SHALL compare them as Go's `strings.EqualFold` does, and SHALL NOT fold the text as a whole.
 
 #### Scenario: A sigma
 
 - **WHEN** the text is `ΣΑΣ σασ and ΣΑΣ σας and όλος όλος.`
-- **THEN** each pair is a repeat, so `ΣΑΣ σασ` is reported, which lowercasing the whole word did not ([vale-repetition 4][vale-repetition-4])
+- **THEN** each pair is a repeat, and hakkiri reports `ΣΑΣ σασ`
+- **AND** lowercasing the whole word did not report it ([vale-repetition 4][vale-repetition-4])
 
 #### Scenario: Other foldings
 

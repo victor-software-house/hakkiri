@@ -2,15 +2,18 @@
 
 ## Purpose
 
-How `hakkiri test` names a rule and reads its text from the path it was given, so a coverage report and an alert agree on one name.
+How `hakkiri test` names a rule and reads its text from the path it was given, so a coverage report and an alert use the same name.
 
 ## Requirements
 
 ### Requirement: A rule is named from the path it was found at
 
-hakkiri SHALL name a rule from its path made absolute, with `.` and `..` parts folded away and symlinks left alone, as the style loader names it from the folder it was given.  
-It SHALL read the rule's text from that same path, so a path through a symlink and back out with `..` reads the file its folded form names.  
-A rule file named as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHALL get the name of that folder.
+hakkiri SHALL derive a rule's name from its absolute path, with `.` and `..` parts folded away and symlinks left alone.  
+The style loader derives the name the same way from the folder it was given.
+
+It SHALL read the rule's text from that same path.  
+So a path through a symlink and back out with `..` reads the file its folded form points to.  
+A rule file given as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHALL get the name of that folder.
 
 #### Scenario: Run from inside the style folder
 
