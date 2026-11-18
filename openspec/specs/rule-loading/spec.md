@@ -134,7 +134,6 @@ hakkiri SHALL load a rule's `action` field, carry it on the rule's alerts, and c
 hakkiri SHALL build a rule's name from the parts of its path, joined by dots, as Vale does.  
 The parts are its style folder, each folder between it and the file, and the file name up to its first dot.
 
-
 A name with `[` or `]` SHALL be refused when a glob lists the style.  
 `check`, `test` and `test --coverage` SHALL give a file one name.
 
