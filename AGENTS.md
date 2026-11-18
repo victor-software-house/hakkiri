@@ -1,6 +1,6 @@
 # hakkiri
 
-A prose linter for Markdown, MDX (Markdown with React components) and source comments, built on ctl-core.  
+A prose linter for Markdown, Markdown with components (MDX) and source comments, built on ctl-core.  
 This file is the development contract.  
 The operator contract is `hakkiri instructions` (`src/instructions.md`) and `skills/hakkiri/SKILL.md`.
 

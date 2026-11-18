@@ -1,6 +1,6 @@
 # hakkiri operator instructions
 
-`hakkiri check` lints Markdown, MDX (Markdown with React components) and source comments.  
+`hakkiri check` lints Markdown, Markdown with components (MDX) and source comments.  
 It reads the comments of Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files.  
 The project config, `.ctl/hakkiri.yaml`, sets which rules run on which files, and `hakkiri test` runs the test cases of rule files.  
 `hakkiri instructions` and `--help` are the contract of the installed version.
@@ -316,7 +316,7 @@ A download is an error that shows the `url`, and nothing is cached, in these cas
 
 - it is over 32 MiB, or does not match its hash;
 - it is not a zip;
-- it points to a file outside the package, or contains a link;
+- it has an entry outside the package, or contains a link;
 - it has no single top folder.
 
 The cache folder is `--cache-dir`, or `hakkiri` in the per-user cache folder.  

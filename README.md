@@ -3,7 +3,7 @@
 A prose linter for documentation and source comments, written in Rust.  
 Its name is the Japanese はっきり, "clearly, plainly".
 
-hakkiri checks Markdown, MDX (Markdown with React components), and source comments against rule packages, such as [ProseStyle].  
+hakkiri checks Markdown, Markdown with components (MDX), and source comments against rule packages, such as [ProseStyle].  
 It reads the comments of Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files.  
 It is built to replace [Vale] in projects that use ProseStyle.
 
