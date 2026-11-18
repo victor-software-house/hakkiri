@@ -19,9 +19,11 @@ The probe of Vale at `66bbb85` and of hakkiri (2026-11-11) read `Run `a`, `b`, `
 The first number of each pair is for the first text, and the second for the second text.
 
 A `metric` rule counts each code span once in hakkiri and none in Vale, as the spec states.  
-An `occurrence` rule counts nothing for a code span in hakkiri, and counts the mask in Vale only when its token reads a `*` run.  
+An `occurrence` rule counts nothing for a code span in hakkiri, and counts the mask in Vale only when its token reads a `*` run.
+
 Alternative: count a match that overlaps a code span in an `occurrence` rule.  
-It lost because the `match-checks` spec and its scenario `A match inside code` decide the opposite, and a token such as `x` would count every code span.  
+It lost because the `match-checks` spec and its scenario `A match inside code` decide the opposite, and a token such as `x` would count every code span.
+
 Alternative: read a code span as a run of `*` in every rule.  
 It lost because it brings back the repeats and forms seen in code that [pattern 9][pattern-9] removed.
 
@@ -34,10 +36,12 @@ Its message shows the count with two decimals, and its cases keep `counts each c
 
 The operator chose the name on 2026-11-12.  
 Its value is the number of words a code span counts as: 1 by default, and 0 to match Vale.  
-A whole number from 0 to 255 is valid, so a project that counts a span as two words can say so.  
+A whole number from 0 to 255 is valid, so a project that counts a span as two words can say so.
+
 Prior art for the shape, read on 2026-11-12:
 
-- Vale lists `IgnoredScopes` (`code`, `tt`), which masks inline code, so it counts no word.
+- Vale lists `IgnoredScopes` (`code`, `tt`), which masks inline code.  
+  So Vale counts no word in it.
 - markdownlint names what a rule includes with booleans such as `code_blocks`.
 - remark-retext marks `inlineCode` as a source node, so it is never a word.
 
@@ -48,32 +52,55 @@ It lost because it would reach every rule, where this setting reaches word count
 
 ### 4. Word counts only
 
-The setting changes the text that a `metric` or `readability` rule counts words in, and so every variable and score built on that text: `words`, `sentences`, `syllables`, `complex_words`, and the scores.  
-A rule that reads a match, an `existence` or an `occurrence` rule for one, still reads a code span as one `x`, and a match that overlaps it is still none.  
+The setting changes the text in which a `metric` or `readability` rule counts words.  
+So it changes every variable and score built on that text: `words`, `sentences`, `syllables`, `complex_words`, and the scores.
+
+A rule that reads a match, such as an `existence` or an `occurrence` rule, still reads a code span as one `x`.  
+A match that overlaps the span is still no match.
+
 At 0, each code span reads as one `*` in that text, which is no word, as Vale's mask of asterisks is none.  
 At 2 or more, it reads as that many `x` separated by spaces.  
 The metric counts `occurrences` of its `tokens` in the text as before.
 
 ### 5. Package, project, glob, variable, flag
 
-The last setting wins, in this order of rising weight: the package's settings file, the project config, each matching glob in the rank of the settings cascade (row `HKR-069`), `HAKKIRI_CODE_SPAN_SIZE`, then `--code-span-size`.  
+The last setting wins, in this order of rising weight:
+
+1. the package's settings file;
+2. the project config;
+3. each matching glob, in the rank of the settings cascade (row `HKR-069`);
+4. `HAKKIRI_CODE_SPAN_SIZE`;
+5. `--code-span-size`.
+
 A glob is the more specific of the two config levels, so it beats the project's top level.  
-The variable and the flag beat every file, as for the other options of `check`.  
-`code_span_size` is a reserved key under a glob, as `styles` and `vocab` are, and no rule name can equal it, since a rule name contains a dot.  
+The variable and the flag beat every file, as for the other options of `check`.
+
+`code_span_size` is a reserved key under a glob, as `styles` and `vocab` are.  
+No rule name can equal it, since a rule name contains a dot.  
 `hakkiri test` reads the project's key for a case that runs through the config, and runs a case of one rule file at 1.
 
 ### 6. Vale drops an alert that has the place of another
 
-Vale keeps each alert under the key of its line, its column and its rule, and drops a later alert with the same key ([history key][v-history]).  
-A block that is not a sentence is reported at the first column of its line, so a table row of three cells gives one alert, the one of its first cell.  
-A sentence that starts with a code span has no place in its block, so Vale reports it at the line the block was found on, and an earlier sentence often contains that place.  
-Vale also finds the line of a block by searching the file for its text ([walker.advance][v-advance]), so a block whose text is not in the file as written can land on the line of another block.  
-The later alert is dropped.  
-A reference definition that repeats the text of a code span, and an entity such as `&amp;lt;` in a code span, are two ways to get there.
+Vale keeps each alert under a key of its line, column and rule ([history key][v-history]).  
+It drops a later alert with the same key.  
+A block that is not a sentence is reported at the first column of its line.  
+So a table row of three cells gives one alert, the one of its first cell.
 
-The probe at 0 differed from Vale in 1,910 alerts.  
-A build of Vale with that check off, in a box, differs in 860, so the drop is the cause of the other 1,050 alerts.  
-Table cells fall from 584 to 0, headings from 19 to 0, and list items from 71 to 2.  
+A sentence that starts with a code span has no place in its block.  
+Vale then reports it at the line where it found the block, and an earlier sentence often has that place.
+
+Vale also finds the line of a block by searching the file for its text ([walker.advance][v-advance]).  
+So a block whose text is not in the file as written can land on the line of another block.
+
+The later alert is dropped.  
+One way is a reference definition that repeats the text of a code span.  
+Another is an entity such as `&amp;lt;` in a code span.
+
+With the setting at 0, the probe found 1,910 alerts that differ from Vale's.  
+A build of Vale with that check turned off, in a box, differs in 860.  
+So the drop causes the other 1,050 alerts.  
+Table cells fall from 584 to 0, headings from 19 to 0, and list items from 71 to 2.
+
 In hakkiri each alert stays at its own place, since each block was measured, and the alert is as true as the others.  
 Alternative: drop the alert the way Vale does.  
 It lost because it loses a measurement that exists, and it needs Vale's search to know which blocks collide.
@@ -88,9 +115,11 @@ Vale does the same for `<https://a.example>` but not for `<a@b.example>`, whose 
 
 Of the 860 differences left with Vale's check off, 70 are the text of a link that repeats its address, which [HKR-064][ledger] fixes.  
 The 790 that remain are in how sentences split.  
-They are the sentence alerts and the counts built on sentences: `sentences`, the scores and the paragraph metrics.  
+They are the sentence alerts and the counts built on sentences: `sentences`, the scores and the paragraph metrics.
+
 Two of them are the long words of `はっきり`, which `vale-differences` already records as a count of characters.  
-The other 788 belong to the sentence splitter, row [HKR-065][ledger]: 172 minimal inputs, each still different from Vale, fall into four groups by what ends or starts the sentence.
+The other 788 belong to the sentence splitter, row [HKR-065][ledger].  
+They come down to 172 minimal inputs, each still different from Vale, in four groups by what ends or starts the sentence.
 
 [engine-text]: ../archive/2026-11-10-rule-engine/design.md
 [pattern-9]: ../archive/2026-11-10-pattern-and-readability-checks/design.md#9-code-is-no-match-in-the-pattern-checks
