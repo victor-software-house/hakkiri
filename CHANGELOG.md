@@ -1,5 +1,11 @@
 # Changelog
 
+## hakkiri 0.1.1
+
+- A mise task header in a Shell file, such as `#MISE description="..."` or `#USAGE arg`, is a tool directive and draws no alert ([`6f9e1b8`](https://github.com/victor-software-house/hakkiri/commit/6f9e1b8b5ddea7b4c6b824dfaa73e060cded14c1)).
+- An `oxlint` switch in TypeScript or JavaScript, such as `// oxlint-disable-next-line no-console`, is a tool directive and draws no alert ([`5fa1c27`](https://github.com/victor-software-house/hakkiri/commit/5fa1c27fe5d29d2b1f099cdf454056c6e8a69b20)).
+- The instructions, the README, the `--help` text and the error messages use plain words ([`034449b`](https://github.com/victor-software-house/hakkiri/commit/034449b5e1c6f6dee260f6d531a595b4dfef22a1)).
+
 ## hakkiri 0.1.0
 
 ### Added
