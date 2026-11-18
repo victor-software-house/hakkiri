@@ -7,6 +7,7 @@ vale	Comments.Words	go-indent.go	5	15	18	code
 vale	Comments.Words	rust-indent.rs	3	9	13	cargo
 vale	Comments.Words	rust-indent.rs	3	15	17	run
 vale	Comments.Words	rust-indent.rs	3	21	27	release
+vale	Comments.Words	swift-comments.swift	8	4	7	MARK
 vale	Comments.Words	swift-directive.swift	1	4	12	swiftlint
 vale	Comments.Words	swift-directive.swift	1	14	20	disable
 vale	Comments.Words	swift-directive.swift	1	22	24	all
@@ -74,7 +75,6 @@ hakkiri	Comments.Words	sh.sh	29	9	13	after
 hakkiri	Comments.Words	sh.sh	29	15	19	brace
 hakkiri	Comments.Words	sh.sh	32	2	8	nospace
 hakkiri	Comments.Words	sh.sh	33	4	9	double
-hakkiri	Comments.Words	swift-comments.swift	8	12	18	Section
 hakkiri	Comments.Words	swift-interpolation.swift	1	23	28	inside
 hakkiri	Comments.Words	swift-interpolation.swift	1	30	35	interp
 hakkiri	Comments.Words	swift-nested.swift	1	23	27	still
