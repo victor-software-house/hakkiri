@@ -2,8 +2,9 @@
 
 ### Requirement: A sequence rule may list several forms
 
-A `sequence` rule SHALL take `forms`, a list of mappings that each hold `tokens`, in place of `tokens`.  
-It SHALL report each run of words that any form matches, with the rule's own name, and the rest of the rule SHALL apply to every form.
+A `sequence` rule SHALL take `forms`, a list of mappings that each contain `tokens`, in place of `tokens`.  
+It SHALL report each run of words that any form matches, with the rule's own name.  
+The rest of the rule SHALL apply to every form.
 
 #### Scenario: Either of two forms
 
@@ -17,7 +18,8 @@ It SHALL report each run of words that any form matches, with the rule's own nam
 
 ### Requirement: Overlapping forms give one alert
 
-A match of one form that overlaps a match of another form SHALL give no alert when the other match starts first, or starts at the same word in an earlier form.  
+A match of one form may overlap a match of another form.  
+It SHALL give no alert when the other match starts first, or starts at the same word in an earlier form.  
 Matches of one form SHALL NOT drop each other.
 
 #### Scenario: Two forms share a word
@@ -25,20 +27,21 @@ Matches of one form SHALL NOT drop each other.
 - **WHEN** a rule has the forms `[{pattern: red}, {pattern: green}]` and `[{pattern: green}, {pattern: blue}]`, and the input is `Paint red green blue.`
 - **THEN** hakkiri reports one alert, with the matched text `red green`
 
-### Requirement: A sequence rule holds tokens or forms
+### Requirement: A sequence rule has tokens or forms
 
-hakkiri SHALL refuse a `sequence` rule that sets both `tokens` and `forms`, or neither.  
-It SHALL refuse a form with no token that has a `pattern`, `tag` or `upos` without `negate`, and name the form's tokens in the error.
+hakkiri SHALL reject a `sequence` rule that sets both `tokens` and `forms`, or neither.  
+It SHALL reject a form with no token that has a `pattern`, `tag` or `upos` without `negate`.  
+The error SHALL show the path of the form's tokens.
 
 #### Scenario: Both keys
 
 - **WHEN** a rule has `tokens: [{pattern: red}]` and `forms: [{tokens: [{pattern: green}]}]`
-- **THEN** hakkiri reports an error that says `tokens` and `forms` are both set, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `tokens` and `forms` are both set, and exits with a failure status
 
 #### Scenario: A fault in the second form
 
 - **WHEN** the second of two forms has the tokens `[{pattern: green}, {pattern: '('}]`
-- **THEN** hakkiri reports an error naming `forms[1].tokens[1].pattern`
+- **THEN** hakkiri reports an error that shows `forms[1].tokens[1].pattern`
 
 #### Scenario: Forms set as a parameter
 
@@ -51,6 +54,8 @@ A form SHALL read the tokens a `tokens` list reads, so a negated token that foll
 
 #### Scenario: Three forms of one check
 
-- **WHEN** a rule has a form of a noun and a present verb, a form of a noun, a past verb and a negated `TO|RB|RBR|RBS` token, and a form of a pronoun and a verb
+- **WHEN** a rule has a form of a noun and a present verb
+- **AND** it has a form of a noun, a past verb and a negated `TO|RB|RBR|RBS` token
+- **AND** it has a form of a pronoun and a verb
 - **AND** the input is `The doc says to run the tool.`, `The jobs asked to end early.` and `The state is open and it knows its names.`
 - **THEN** hakkiri reports `doc says` and `it knows`, and no alert for the second sentence
