@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="kilo task"
+# [MISE] alias="lima"
+#USAGE arg "<mike>"
+# november after
+echo done

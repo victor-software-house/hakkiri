@@ -171,6 +171,7 @@ queue:
       - hakkiri instructions lists the mise header among the comments addressed to a tool.
     notes:
       - '2026-11-18, the prose pass found UndefinedAcronym on the #MISE description line of each file task; mise reads only #MISE or # [MISE], so the line cannot change.'
+    plan: openspec/changes/mise-task-headers/proposal.md
 
   - id: HKR-078
     title: Print a whole metric value without decimals

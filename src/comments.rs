@@ -153,7 +153,7 @@ static DIRECTIVES: LazyLock<Directives> = LazyLock::new(|| {
         swift: compile(r"^//[ \t]*(?:swiftlint:|swiftformat:|sourcery:)|^/\*[ \t]*swiftlint:"),
         yaml: compile(r"^#[ \t]*(?:yaml-language-server:|yamllint[ \t])"),
         toml: compile(r"^#:schema\b"),
-        shell: compile(r"^#[ \t]*shellcheck[ \t]"),
+        shell: compile(r"^#[ \t]*(?:shellcheck[ \t]|\[?(?:MISE|USAGE)\]?[ \t])"),
     }
 });
 
