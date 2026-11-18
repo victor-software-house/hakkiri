@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The splitter decides where a sentence ends in the check text of one paragraph, heading or table cell.  
+The splitter decides where a sentence ends in the check text of one paragraph, heading or table cell.
 The [scope-selection spec][scope] decides which nodes it reads.
 
 ## ADDED Requirements
@@ -46,7 +46,7 @@ The splitter SHALL NOT end a sentence inside a run of characters with no whitesp
 
 ### Requirement: Closing marks stay with their sentence
 
-A closing quote or bracket right after an end mark SHALL belong to the sentence the end mark ends.  
+A closing quote or bracket right after an end mark SHALL belong to the sentence the end mark ends.
 The splitter SHALL NOT end a sentence inside brackets that close later in the same text.
 
 #### Scenario: A quoted sentence
@@ -79,7 +79,7 @@ The splitter SHALL NOT end a sentence at `...` or `…` when the next word start
 
 ### Requirement: The splitter does at least as well as Vale
 
-On each committed evaluation set, the splitter's boundary F1 SHALL be at least the F1 that Vale 3.26.0 scores on it.  
+On each committed evaluation set, the splitter's boundary F1 SHALL be at least the F1 that Vale 3.26.0 scores on it.
 Vale's F1 for each set is committed beside the set.
 
 #### Scenario: The evaluation test
@@ -89,7 +89,7 @@ Vale's F1 for each set is committed beside the set.
 
 ### Requirement: Training rebuilds the model
 
-The embedded model SHALL be the output of the committed training task on the committed source list.  
+The embedded model SHALL be the output of the committed training task on the committed source list.
 The same sources SHALL give the same file.
 
 #### Scenario: A second training run

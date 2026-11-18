@@ -2,10 +2,10 @@
 
 ### Requirement: A path is a file or a directory
 
-`hakkiri check` SHALL lint each file it is given and each file under each directory it is given.  
+`hakkiri check` SHALL lint each file it is given and each file under each directory it is given.
 It SHALL lint the current directory when it is given none.
 
-A walk SHALL skip `node_modules`, `.git` and each folder a `packages` entry lists, comparing the resolved path of each folder with the resolved package paths.  
+A walk SHALL skip `node_modules`, `.git` and each folder a `packages` entry lists, comparing the resolved path of each folder with the resolved package paths.
 It SHALL lint a file once, however many of the paths it is given reach that file.
 
 #### Scenario: A directory and a file
@@ -35,7 +35,7 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 
 ### Requirement: A language is read by extension
 
-hakkiri SHALL read a `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` file as Markdown, MDX, Rust, TypeScript, TypeScript with JavaScript XML (TSX) or JavaScript.  
+hakkiri SHALL read a `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` file as Markdown, MDX, Rust, TypeScript, TypeScript with JavaScript XML (TSX) or JavaScript.
 It SHALL skip any other file a walk finds, and SHALL refuse one named as an argument, with an error that shows its name.
 
 #### Scenario: A file no language reads, found by a walk
@@ -59,7 +59,7 @@ hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL stil
 
 ### Requirement: The pretty output is a line per alert
 
-hakkiri SHALL print each alert as `path:line:column: level Rule: message`, in order of path, then line, then column, then each failure as `failed path: message`, and then one count line.  
+hakkiri SHALL print each alert as `path:line:column: level Rule: message`, in order of path, then line, then column, then each failure as `failed path: message`, and then one count line.
 The lines SHALL contain no colour and no frame, and two runs over the same files SHALL print the same text.
 
 #### Scenario: A warning
@@ -74,8 +74,8 @@ The lines SHALL contain no colour and no frame, and two runs over the same files
 
 ### Requirement: The JSON output is one object
 
-`--format json` SHALL print one object with `alerts`, `failures` and `files`.  
-Each alert SHALL contain `path`, `line`, `column`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
+`--format json` SHALL print one object with `alerts`, `failures` and `files`.
+Each alert SHALL contain `path`, `line`, `column`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.
 The output SHALL contain no escape (ESC) byte, whatever value the colour variables contain.
 
 #### Scenario: JSON with colour forced
@@ -85,9 +85,9 @@ The output SHALL contain no escape (ESC) byte, whatever value the colour variabl
 
 ### Requirement: The exit status reports what happened
 
-hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed.  
-Otherwise it SHALL exit 1 when a reported alert reaches `--fail-level`, and 0 when none does.  
-`--fail-level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `error` when unset.  
+hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed.
+Otherwise it SHALL exit 1 when a reported alert reaches `--fail-level`, and 0 when none does.
+`--fail-level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `error` when unset.
 It SHALL see only the alerts that the config's `level` leaves in.
 
 #### Scenario: A warning under the default

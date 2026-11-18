@@ -2,7 +2,7 @@
 
 ### Requirement: Markdown nodes carry Vale scope names
 
-hakkiri SHALL give each Markdown node the scope the design's table names.  
+hakkiri SHALL give each Markdown node the scope the design's table names.
 The table covers paragraphs, headings, block quotes, list items, table rows and cells, links, code spans, strong and emphasis text, and image alt text.
 
 The text of an HTML block adds table and figure captions, the content of a `data` element as `meta`, and the description of a page.
@@ -19,7 +19,7 @@ The text of an HTML block adds table and figure captions, the content of a `data
 
 ### Requirement: Code and markup are not prose
 
-Fenced code, the tags of raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.  
+Fenced code, the tags of raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.
 Inside a prose node, the node-segments spec makes such syntax a gap in the text.
 
 The text inside an HTML block is prose, and the html-block-text spec states which text and under which scope.

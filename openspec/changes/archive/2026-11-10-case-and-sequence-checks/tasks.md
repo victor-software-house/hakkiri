@@ -1,6 +1,6 @@
 # Tasks
 
-Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
+Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.
 This change starts after the [`pattern-and-readability-checks` change][pattern] merges.
 
 ## 1. Open decisions

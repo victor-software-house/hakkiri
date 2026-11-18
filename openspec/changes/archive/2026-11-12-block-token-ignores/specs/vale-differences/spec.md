@@ -46,7 +46,7 @@ hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart
 
 ### Requirement: A sentence rule in a comment is read otherwise than Vale reads it
 
-hakkiri SHALL list here the place where it still reads a file otherwise than Vale at 66bbb85.  
+hakkiri SHALL list here the place where it still reads a file otherwise than Vale at 66bbb85.
 The probe of the ignores and the comment controls left this one place.
 
 #### Scenario: A sentence rule in a comment

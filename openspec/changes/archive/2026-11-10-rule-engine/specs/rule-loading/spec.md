@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Loading turns the rule files of a style folder into rules the engine can run.  
+Loading turns the rule files of a style folder into rules the engine can run.
 It refuses a rule it cannot run, with an error that names the file, the field and the line.
 
 ## ADDED Requirements
@@ -36,7 +36,7 @@ hakkiri SHALL refuse a rule whose `extends` names no check type, and report an e
 
 ### Requirement: An unknown field is refused
 
-hakkiri SHALL refuse a rule that has a field its check type does not define.  
+hakkiri SHALL refuse a rule that has a field its check type does not define.
 The error SHALL name the field and its line.
 
 #### Scenario: token in an existence rule
@@ -46,7 +46,7 @@ The error SHALL name the field and its line.
 
 ### Requirement: A field of the wrong type is refused
 
-hakkiri SHALL refuse a rule whose field contains a value of the wrong type, and report an error that names the field and its line.  
+hakkiri SHALL refuse a rule whose field contains a value of the wrong type, and report an error that names the field and its line.
 A number written as a string, such as `max: '3'`, SHALL read as the number.
 
 #### Scenario: A count that is not a number
@@ -61,7 +61,7 @@ A number written as a string, such as `max: '3'`, SHALL read as the number.
 
 ### Requirement: level takes three values
 
-A rule's `level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `warning` when the rule sets none.  
+A rule's `level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `warning` when the rule sets none.
 hakkiri SHALL refuse any other value and name the file and the field.
 
 #### Scenario: A rule with no level
@@ -85,9 +85,9 @@ hakkiri SHALL refuse a rule with a pattern that neither regex engine compiles, a
 
 ### Requirement: A pattern with nothing to match is refused
 
-hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` contain nothing to match.  
-It SHALL also refuse a `metric` rule that lists `tokens` or `raw` with nothing in them.  
-Such a pattern matches at every position.  
+hakkiri SHALL refuse an `existence` rule whose `tokens` and `raw` contain nothing to match.
+It SHALL also refuse a `metric` rule that lists `tokens` or `raw` with nothing in them.
+Such a pattern matches at every position.
 The error SHALL name the file, the line, `tokens` and `raw`.
 
 #### Scenario: An existence rule with no tokens

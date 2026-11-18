@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Selection decides which nodes of the document tree a rule reads, and what text, sentences and words a check sees in each of them.  
+Selection decides which nodes of the document tree a rule reads, and what text, sentences and words a check sees in each of them.
 The [rule-files spec][rule-files] names the scopes; this spec fixes how they match.
 
 ## ADDED Requirements
@@ -23,7 +23,7 @@ A scope part SHALL select every node whose scope name equals it or starts with i
 
 ### Requirement: text selects the prose leaves
 
-The scope `text` SHALL select each paragraph, heading and table cell, in a Markdown file and inside a comment.  
+The scope `text` SHALL select each paragraph, heading and table cell, in a Markdown file and inside a comment.
 A list item or a block quote SHALL be read through the paragraphs inside it, so its text is read once.
 
 #### Scenario: One alert per place
@@ -51,7 +51,7 @@ The scope `paragraph` SHALL select a paragraph that has no list item or block qu
 
 ### Requirement: sentence selects each sentence
 
-The scope `sentence` SHALL select each sentence of a paragraph, a heading or a table cell.  
+The scope `sentence` SHALL select each sentence of a paragraph, a heading or a table cell.
 A sentence SHALL keep the nodes around its node, so an exclusion such as `~blockquote` applies to it.
 
 #### Scenario: Two sentences measured apart
@@ -61,8 +61,8 @@ A sentence SHALL keep the nodes around its node, so an exclusion such as `~block
 
 ### Requirement: A file extension narrows a scope
 
-When the last scope part names a file extension, such as `rs` in `raw.rs`, it SHALL limit the scope to files with that extension.  
-A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes only in files with that extension.  
+When the last scope part names a file extension, such as `rs` in `raw.rs`, it SHALL limit the scope to files with that extension.
+A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes only in files with that extension.
 A scope item whose every part names another extension SHALL select nothing.
 
 #### Scenario: raw.rs in two files
@@ -82,7 +82,7 @@ A scope item whose every part names another extension SHALL select nothing.
 
 ### Requirement: An inline exclusion blanks the element
 
-A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.  
+A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.
 The exclusion SHALL apply only to the blocks that its own scope item selects.
 
 #### Scenario: A word outside and inside a link

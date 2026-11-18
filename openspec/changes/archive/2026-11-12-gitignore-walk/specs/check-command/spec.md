@@ -2,8 +2,8 @@
 
 ### Requirement: A walk skips what git ignores
 
-Inside a git repository, a walk SHALL skip each file and folder that `.gitignore`, `.git/info/exclude` and the global git excludes ignore, unless `gitignore` is false.  
-It SHALL apply the `.gitignore` of each folder from the repository root down.  
+Inside a git repository, a walk SHALL skip each file and folder that `.gitignore`, `.git/info/exclude` and the global git excludes ignore, unless `gitignore` is false.
+It SHALL apply the `.gitignore` of each folder from the repository root down.
 A file named on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: An ignored folder and file
@@ -33,10 +33,10 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 ### Requirement: A named file that no glob selects draws a warning
 
-A file given on the command line that no glob of `files` matches SHALL draw a warning that gives its path.  
+A file given on the command line that no glob of `files` matches SHALL draw a warning that gives its path.
 It SHALL instead fail with exit 2 when `on_unmatched` is `error`, and draw nothing when it is `ignore`.
 
-Three kinds of file SHALL NOT draw more than the one warning.  
+Three kinds of file SHALL NOT draw more than the one warning.
 They are a file that a glob matches whose styles contain no rule, a file found by a walk, and a file given twice.
 
 #### Scenario: A warning

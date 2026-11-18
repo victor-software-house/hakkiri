@@ -2,18 +2,18 @@
 
 ### Requirement: Rule files differ from Vale in what they accept or select
 
-**Reason**: Two of its scenarios are things Vale runs and hakkiri does not: a formula outside the listed syntax and a script rule.  
-So they move to the Known gaps with a row each.  
-OpenSpec cannot drop a scenario of a modified requirement.  
+**Reason**: Two of its scenarios are things Vale runs and hakkiri does not: a formula outside the listed syntax and a script rule.
+So they move to the Known gaps with a row each.
+OpenSpec cannot drop a scenario of a modified requirement.
 So the requirement is removed and added again below with the three scenarios that remain.
 
-**Migration**: Read "Rule files differ from Vale in what they select".  
+**Migration**: Read "Rule files differ from Vale in what they select".
 The formula and the script scenarios are under the Known gaps.
 
 ### Requirement: Configuration and packages are hakkiri's own
 
-**Reason**: It states that Vale styles enter only through `hakkiri import vale`, which is no longer true.  
-hakkiri reads a Vale style folder as it is.  
+**Reason**: It states that Vale styles enter only through `hakkiri import vale`, which is no longer true.
+hakkiri reads a Vale style folder as it is.
 The requirement is removed and added again below with the new text.
 
 **Migration**: Read "Configuration is hakkiri's own, and Vale styles load as they are".
@@ -67,8 +67,8 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.val
 
 ### Requirement: Known gaps are listed apart from the intended differences
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
-The intended differences SHALL stay apart from this list.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.
+The intended differences SHALL stay apart from this list.
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: The built-in spelling rule

@@ -2,11 +2,11 @@
 
 ### Requirement: A fault names the line of its own key
 
-A fault about a key of the config SHALL give the line where the config writes that key.  
-A fault about the value of a key SHALL give the line where the value starts.  
+A fault about a key of the config SHALL give the line where the config writes that key.
+A fault about the value of a key SHALL give the line where the value starts.
 Both apply whatever characters the key contains and however the config is written.
 
-A fault about one item of a list SHALL give the line of that item.  
+A fault about one item of a list SHALL give the line of that item.
 A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{` split nothing.
 
 #### Scenario: Globs and settings that contain special characters

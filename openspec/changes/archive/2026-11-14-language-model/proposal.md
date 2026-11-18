@@ -4,34 +4,34 @@ Queue row: `HKR-066` in [tasks.yaml][ledger].
 
 ## Motivation
 
-hakkiri chose the reader of a file by its extension.  
-It kept its own tables for this in three places: the readers, the scope parser and the extension a reader gives.  
+hakkiri chose the reader of a file by its extension.
+It kept its own tables for this in three places: the readers, the scope parser and the extension a reader gives.
 A scope such as `text.js` compared strings, so it matched an extension and not a language.
 
-Files with no reader took the extension `txt`.  
-So a rule scoped `text.txt` reached `.rst` and `README` files (row [HKR-066][ledger], found by a review of pull request 131).  
-A fenced code block was a gap with no language.  
+Files with no reader took the extension `txt`.
+So a rule scoped `text.txt` reached `.rst` and `README` files (row [HKR-066][ledger], found by a review of pull request 131).
+A fenced code block was a gap with no language.
 So the comments of a ```` ```rust ```` example in a Markdown file were never read.
 
-The operator ruled on 2026-11-13 that a file or an embedded segment has one language, distinct from a file extension.  
-A language has a name, aliases and extensions.  
-[langdex][langdex] contains the table, generated from GitHub Linguist.  
+The operator ruled on 2026-11-13 that a file or an embedded segment has one language, distinct from a file extension.
+A language has a name, aliases and extensions.
+[langdex][langdex] contains the table, generated from GitHub Linguist.
 On 2026-11-14 the operator asked that each fenced block be parsed as its language.
 
 ## Changes
 
 - Each file has the langdex language of its path, its file name, or the interpreter of its first line.
-- A reader is chosen by `formats`, then by the language of the file, then by `on_unknown`.  
+- A reader is chosen by `formats`, then by the language of the file, then by `on_unknown`.
   So `.mts`, `.cts`, `.markdown` and a script that starts `#!/usr/bin/env node` get their reader.
-- The last piece of a scope part gives a language by any of its langdex names.  
-  `text.js` reaches `.js`, `.jsx`, `.mjs` and `.cjs` files.  
+- The last piece of a scope part gives a language by any of its langdex names.
+  `text.js` reaches `.js`, `.jsx`, `.mjs` and `.cjs` files.
   `text.txt` reaches only plain-text files, never a `.rst` file or a `README`.
 - A fenced code block takes the language of its info string.
-  - hakkiri parses a fence with that language's grammar when it reads the comments of that language.  
+  - hakkiri parses a fence with that language's grammar when it reads the comments of that language.
     The comments enter the tree at their place in the file, and each node has that language.
   - A fence of Markdown, MDX or plain text stays a gap, as in Vale, since its text is an example.
 - `formats` takes any name of a language hakkiri reads, such as `markdown` beside `md`.
-- `READERS`, `Language::from_path`, `Language::extension` and the list of scope extensions read from langdex.  
+- `READERS`, `Language::from_path`, `Language::extension` and the list of scope extensions read from langdex.
   They list no extensions of their own.
 
 ## Capabilities

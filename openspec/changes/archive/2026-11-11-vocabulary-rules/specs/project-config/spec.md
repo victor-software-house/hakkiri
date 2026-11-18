@@ -2,7 +2,7 @@
 
 ### Requirement: The built-in style Vale contains the vocabulary rules
 
-hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Terms` and `Avoid`, when a listed vocabulary contains a term.  
+hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Terms` and `Avoid`, when a listed vocabulary contains a term.
 When none does, hakkiri SHALL reject it as a style that no package contains.
 
 #### Scenario: A style called Vale

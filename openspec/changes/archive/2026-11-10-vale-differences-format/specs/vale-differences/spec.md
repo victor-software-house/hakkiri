@@ -2,7 +2,7 @@
 
 ### Requirement: A comment reads as Markdown
 
-hakkiri SHALL read every comment of a code file as Markdown.  
+hakkiri SHALL read every comment of a code file as Markdown.
 Vale 3.26.0 reads a comment as plain lines unless a View sets a markup format.
 
 #### Scenario: A code span in a plain comment

@@ -2,11 +2,11 @@
 
 ### Requirement: A top-level string of front matter is text
 
-In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
+In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.
 The front matter is YAML between `---` lines, TOML between `+++` lines, or JSON between `;;;` lines.
 
-A key, a list, a nested mapping and a value that is not a string SHALL not be read.  
-Nor SHALL a TOML string below a table, or a member of a nested JSON object.  
+A key, a list, a nested mapping and a value that is not a string SHALL not be read.
+Nor SHALL a TOML string below a table, or a member of a nested JSON object.
 An opening fence line MAY carry blanks after the dashes or pluses.
 
 #### Scenario: Values of several kinds
@@ -67,7 +67,7 @@ An opening fence line MAY carry blanks after the dashes or pluses.
 
 ### Requirement: A value has the scope of its key
 
-A front matter value SHALL be read by a rule scoped `frontmatter`, `text.frontmatter`, `frontmatter.<key>` or `text.frontmatter.<key>`, and by no rule scoped `paragraph` or `sentence`.  
+A front matter value SHALL be read by a rule scoped `frontmatter`, `text.frontmatter`, `frontmatter.<key>` or `text.frontmatter.<key>`, and by no rule scoped `paragraph` or `sentence`.
 A scope name that goes on after `frontmatter` or `text.frontmatter` SHALL be a scope hakkiri defines.
 
 #### Scenario: Scopes that read the title
@@ -82,7 +82,7 @@ A scope name that goes on after `frontmatter` or `text.frontmatter` SHALL be a s
 
 ### Requirement: Front matter is read as written
 
-A block or token pattern of a glob SHALL not change the front matter, and a comment control SHALL not turn its rules off.  
+A block or token pattern of a glob SHALL not change the front matter, and a comment control SHALL not turn its rules off.
 An alert in a value SHALL lie at the value's text in the file.
 
 #### Scenario: A pattern that matches in a value

@@ -4,14 +4,14 @@ Queue row: `HKR-045` in [tasks.yaml][ledger].
 
 ## Motivation
 
-A Vale rule message can name its values by number, such as `%[1]s` and `%[2]s`, because Vale gives the message to Go's `Sprintf` ([`CondSprintf`][v-format]).  
-ProseStyle `NounStack` and `ThingsSpeakNoun` write theirs that way.  
+A Vale rule message can name its values by number, such as `%[1]s` and `%[2]s`, because Vale gives the message to Go's `Sprintf` ([`CondSprintf`][v-format]).
+ProseStyle `NounStack` and `ThingsSpeakNoun` write theirs that way.
 hakkiri fills only plain `%s`, so it prints `%[1]s %[2]s` as written in those two messages.
 
 ## Changes
 
 - A message fills `%[n]s` with the `n`th value, counting from 1, and a `%s` after it takes the value that follows, as Go does.
-- A verb with no value to take is nothing, as a plain `%s` already was, where Vale prints Go's `%!s(MISSING)` or `%!s(BADINDEX)`.  
+- A verb with no value to take is nothing, as a plain `%s` already was, where Vale prints Go's `%!s(MISSING)` or `%!s(BADINDEX)`.
   The `vale-differences` spec records it.
 - A new fixture contains the two ProseStyle rules and three more, with the messages Vale prints for them.
 

@@ -2,16 +2,16 @@
 
 ## Purpose
 
-A `capitalization` rule compares the case of each selected text with the case its `match` requires, and reports text that falls short.  
-Its case styles, word share and exceptions keep the meaning Vale 3.26.0 gives them.  
+A `capitalization` rule compares the case of each selected text with the case its `match` requires, and reports text that falls short.
+Its case styles, word share and exceptions keep the meaning Vale 3.26.0 gives them.
 Title case follows the Associated Press (AP) style or the Chicago style.
 
 ## ADDED Requirements
 
 ### Requirement: capitalization reports text in the wrong case
 
-A `capitalization` rule SHALL convert each selected text to the case its `match` requires.  
-When the text is not in that case, it SHALL report one alert that spans the text.  
+A `capitalization` rule SHALL convert each selected text to the case its `match` requires.
+When the text is not in that case, it SHALL report one alert that spans the text.
 In its message, the first `%s` SHALL read as the text and the second as the converted text.
 
 #### Scenario: A heading in title case
@@ -21,10 +21,10 @@ In its message, the first `%s` SHALL read as the text and the second as the conv
 
 ### Requirement: sentence case counts the words that agree
 
-With `match: $sentence`, a word in capitals of two letters or more SHALL keep its case.  
+With `match: $sentence`, a word in capitals of two letters or more SHALL keep its case.
 Of the other words, the first SHALL start with a capital and the rest SHALL be in lower case.
 
-The text SHALL pass when its first word passes and enough words match the converted text.  
+The text SHALL pass when its first word passes and enough words match the converted text.
 The share that agrees SHALL be at least `threshold`, 0.8 by default.
 
 #### Scenario: An acronym
@@ -49,7 +49,7 @@ The share that agrees SHALL be at least `threshold`, 0.8 by default.
 
 ### Requirement: An indicator capitalizes the next word
 
-With `match: $sentence`, a word that ends with one of the rule's `indicators` SHALL make the next word start with a capital.  
+With `match: $sentence`, a word that ends with one of the rule's `indicators` SHALL make the next word start with a capital.
 So SHALL a first word that is a number followed by a period.
 
 #### Scenario: A colon as indicator
@@ -68,8 +68,8 @@ A word that matches one of the rule's `exceptions` SHALL keep the case the excep
 
 ### Requirement: title case follows AP or Chicago
 
-With `match: $title`, the first and last words SHALL start with a capital.  
-In `AP` style, the default, the articles, conjunctions and prepositions of Vale's short word list SHALL be in lower case.  
+With `match: $title`, the first and last words SHALL start with a capital.
+In `AP` style, the default, the articles, conjunctions and prepositions of Vale's short word list SHALL be in lower case.
 In `AP` style, `to` SHALL start with a capital unless the next word is tagged as a noun.
 
 In `Chicago` style, the short words and Vale's list of longer prepositions SHALL be in lower case.
@@ -96,7 +96,7 @@ In `Chicago` style, the short words and Vale's list of longer prepositions SHALL
 
 ### Requirement: lower, upper and a pattern
 
-With `match: $lower` or `match: $upper`, the text SHALL pass only when it equals its lower or upper case form, or matches an exception.  
+With `match: $lower` or `match: $upper`, the text SHALL pass only when it equals its lower or upper case form, or matches an exception.
 Any other `match` SHALL be a pattern that the text passes by matching.
 
 #### Scenario: A heading that is not lower case

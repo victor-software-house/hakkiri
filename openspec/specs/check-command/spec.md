@@ -2,18 +2,18 @@
 
 ## Purpose
 
-`hakkiri check` lints the files and directories it is given, or the current directory, and prints one line per alert or a JSON object.  
+`hakkiri check` lints the files and directories it is given, or the current directory, and prints one line per alert or a JSON object.
 It exits 0 for a clean run, 1 when an alert reaches `--fail-level`, and 2 when anything could not be run.
 
 ## Requirements
 
 ### Requirement: A path is a file or a directory
 
-`hakkiri check` SHALL lint each file it is given and each file under each directory it is given.  
+`hakkiri check` SHALL lint each file it is given and each file under each directory it is given.
 With no path, it SHALL lint the current directory.
 
-A walk SHALL skip `node_modules`, `.git` and each folder that a `packages` entry points to.  
-It SHALL compare the resolved path of each folder with the resolved package paths.  
+A walk SHALL skip `node_modules`, `.git` and each folder that a `packages` entry points to.
+It SHALL compare the resolved path of each folder with the resolved package paths.
 It SHALL lint a file once, however many of the paths it is given reach that file.
 
 #### Scenario: A directory and a file
@@ -52,7 +52,7 @@ hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL stil
 
 ### Requirement: The pretty output is a line per alert
 
-hakkiri SHALL print each alert as `path:line:column: level Rule: message`, in order of path, then line, then column, then each failure as `failed path: message`, and then one count line.  
+hakkiri SHALL print each alert as `path:line:column: level Rule: message`, in order of path, then line, then column, then each failure as `failed path: message`, and then one count line.
 The lines SHALL contain no colour and no frame, and two runs over the same files SHALL print the same text.
 
 #### Scenario: A warning
@@ -67,8 +67,8 @@ The lines SHALL contain no colour and no frame, and two runs over the same files
 
 ### Requirement: The JSON output is one object
 
-`--format json` SHALL print one object with `alerts`, `failures` and `files`.  
-Each alert SHALL contain `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
+`--format json` SHALL print one object with `alerts`, `failures` and `files`.
+Each alert SHALL contain `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.
 The output SHALL contain no escape (ESC) byte, whatever the colour variables are set to.
 
 #### Scenario: JSON with colour forced
@@ -83,9 +83,9 @@ The output SHALL contain no escape (ESC) byte, whatever the colour variables are
 
 ### Requirement: The exit status shows what happened
 
-hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed.  
-Otherwise it SHALL exit 1 when a reported alert reaches `--fail-level`, and 0 when none does.  
-`--fail-level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `error` when unset.  
+hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed.
+Otherwise it SHALL exit 1 when a reported alert reaches `--fail-level`, and 0 when none does.
+`--fail-level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `error` when unset.
 It SHALL see only the alerts that the config's `level` leaves in.
 
 #### Scenario: A warning under the default
@@ -129,8 +129,8 @@ Each long flag of `check` SHALL read `HAKKIRI_<FLAG>` when it is not given, with
 
 ### Requirement: A walk skips what git ignores
 
-Inside a git repository, a walk SHALL skip each file and folder that `.gitignore`, `.git/info/exclude` and the global git excludes ignore, unless `gitignore` is false.  
-It SHALL apply the `.gitignore` of each folder from the repository root down.  
+Inside a git repository, a walk SHALL skip each file and folder that `.gitignore`, `.git/info/exclude` and the global git excludes ignore, unless `gitignore` is false.
+It SHALL apply the `.gitignore` of each folder from the repository root down.
 A file given on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: An ignored folder and file
@@ -160,10 +160,10 @@ A file given on the command line SHALL be linted whether git ignores it or not.
 
 ### Requirement: A file given by path that no glob selects draws a warning
 
-A file given on the command line that no glob of `files` matches SHALL draw a warning that gives its path.  
+A file given on the command line that no glob of `files` matches SHALL draw a warning that gives its path.
 When `on_unmatched` is `error`, it SHALL draw a failure with exit 2 instead, and when it is `ignore`, nothing.
 
-A file that a glob matches but whose styles contain no rule SHALL NOT draw more than the one warning.  
+A file that a glob matches but whose styles contain no rule SHALL NOT draw more than the one warning.
 Nor SHALL a file found by a walk, or a file given twice.
 
 #### Scenario: A warning
@@ -193,7 +193,7 @@ Nor SHALL a file found by a walk, or a file given twice.
 
 ### Requirement: A reader is chosen by formats, then by extension
 
-hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by the reader of its language.  
+hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by the reader of its language.
 The languages are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell and Text.
 
 A reader SHALL follow the langdex language of the file, so no table of extensions lists the files a reader takes.
@@ -225,8 +225,8 @@ A reader SHALL follow the langdex language of the file, so no table of extension
 
 ### Requirement: A file no reader reads is plain text
 
-A file that a glob selects and that has no language, or whose language no reader reads, SHALL be read as plain text.  
-`on_unknown` can choose another action for it.  
+A file that a glob selects and that has no language, or whose language no reader reads, SHALL be read as plain text.
+`on_unknown` can choose another action for it.
 A Text file SHALL be read as plain text whatever the value of `on_unknown`.
 
 #### Scenario: A file no reader reads, found by a walk
@@ -246,8 +246,8 @@ A Text file SHALL be read as plain text whatever the value of `on_unknown`.
 
 ### Requirement: Plain text is read as written
 
-A plain-text file SHALL have one `raw` scope over the whole file.  
-Each run of lines between blank lines SHALL be one `paragraph`.  
+A plain-text file SHALL have one `raw` scope over the whole file.
+Each run of lines between blank lines SHALL be one `paragraph`.
 No marker, escape or entity SHALL change its text.
 
 #### Scenario: Paragraphs
@@ -262,7 +262,7 @@ No marker, escape or entity SHALL change its text.
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text SHALL be skipped, with no alert and no message, when its first 8192 bytes contain a null (NUL) byte.  
+A file read as plain text SHALL be skipped, with no alert and no message, when its first 8192 bytes contain a null (NUL) byte.
 This SHALL apply whether a walk finds the file or the command line gives it.
 
 A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
@@ -279,9 +279,9 @@ A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file
 
 ### Requirement: on_unknown sets what a selected file with no reader gets
 
-For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.  
-`text`, the default, reads it as plain text, and `warn` skips it with a warning that shows it.  
-`error` fails the run with exit 2, and `ignore` skips it.  
+For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.
+`text`, the default, reads it as plain text, and `warn` skips it with a warning that shows it.
+`error` fails the run with exit 2, and `ignore` skips it.
 A file that no glob selects SHALL draw no message.
 
 #### Scenario: Warn
@@ -306,9 +306,9 @@ A file that no glob selects SHALL draw no message.
 
 ### Requirement: A file has a language
 
-A file SHALL have the langdex language of its path, read by its file name and then its extension.  
-A file whose path gives no language SHALL take the language of the interpreter on its first line.  
-hakkiri SHALL read at most the first 4096 bytes to find that line.  
+A file SHALL have the langdex language of its path, read by its file name and then its extension.
+A file whose path gives no language SHALL take the language of the interpreter on its first line.
+hakkiri SHALL read at most the first 4096 bytes to find that line.
 With no interpreter line, the file SHALL have no language.
 
 #### Scenario: A file name, an extension and an interpreter
@@ -318,7 +318,7 @@ With no interpreter line, the file SHALL have no language.
 
 ### Requirement: A file has its own language, and its reader's when formats chose it
 
-For the scopes of the rules that run on it, a node outside a fenced code block SHALL be in the file's own language.  
+For the scopes of the rules that run on it, a node outside a fenced code block SHALL be in the file's own language.
 It SHALL also be in the language of the file's reader when a `formats` entry chose that reader.
 
 A scope part with a language SHALL match either, and a negated part SHALL leave a block out for either.

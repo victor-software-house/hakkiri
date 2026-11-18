@@ -2,8 +2,8 @@
 
 ### Requirement: A release is a tag, a Release and two tarballs
 
-A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.  
-GitHub records each tarball's SHA-256 digest, which a lock reads.  
+A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.
+GitHub records each tarball's SHA-256 digest, which a lock reads.
 It SHALL publish nothing to crates.io.
 
 #### Scenario: The first release
@@ -27,7 +27,7 @@ It SHALL publish nothing to crates.io.
 
 ### Requirement: Two texts carry the version
 
-The skill's `version:` line and the README's install line SHALL name the released version, and the Version PR SHALL move both with the crate.  
+The skill's `version:` line and the README's install line SHALL name the released version, and the Version PR SHALL move both with the crate.
 A pattern that matches nowhere or more than once SHALL stop the release.
 
 #### Scenario: A version bump

@@ -2,7 +2,7 @@
 
 ### Requirement: The text of an HTML block is prose
 
-hakkiri SHALL read the text inside an HTML block of a Markdown file as prose.  
+hakkiri SHALL read the text inside an HTML block of a Markdown file as prose.
 A block of text SHALL end at one of these places:
 
 - a start tag that is not inline or void
@@ -28,7 +28,7 @@ A block element that opens inside an inline element SHALL read as inline.
 
 ### Requirement: The scope is the outermost element
 
-hakkiri SHALL give a block of text the scope of the outermost `li`, `blockquote`, heading, `th`, `td`, `caption` or `figcaption` among the tags open around it.  
+hakkiri SHALL give a block of text the scope of the outermost `li`, `blockquote`, heading, `th`, `td`, `caption` or `figcaption` among the tags open around it.
 The scope SHALL be `meta` when a `data` element is open, and `paragraph` when none of those tags is open.
 
 #### Scenario: A list in HTML
@@ -58,7 +58,7 @@ The scope SHALL be `meta` when a `data` element is open, and `paragraph` when no
 
 ### Requirement: Some text is left out or masked
 
-hakkiri SHALL leave out the text of `script`, `style`, `noscript`, `iframe`, `pre`, and of an element whose class is `code`, `pre` or `problematic`.  
+hakkiri SHALL leave out the text of `script`, `style`, `noscript`, `iframe`, `pre`, and of an element whose class is `code`, `pre` or `problematic`.
 It SHALL read the first text after a `kbd` or `samp` start tag as one `*` for each character.
 
 #### Scenario: A pre block
@@ -84,7 +84,7 @@ hakkiri SHALL give a node of its own to each of these:
 - the `alt` of an `img`
 - the `content` of a `meta` element that describes the page
 
-The text of `code` and `tt` SHALL read as a code span in its block.  
+The text of `code` and `tt` SHALL read as a code span in its block.
 Alt text and a description SHALL be read as `text` too, and each as one block that no sentence splitter cuts.
 
 #### Scenario: A code element
@@ -114,7 +114,7 @@ hakkiri SHALL join the texts of a block in two ways:
 - with a space where an inline or void tag opens before the text
 - as the source has it where an inline tag or a comment closes before it
 
-A text SHALL lose the whitespace at its ends, and a space SHALL not follow an opening bracket or a dash.  
+A text SHALL lose the whitespace at its ends, and a space SHALL not follow an opening bracket or a dash.
 Inline HTML in a Markdown paragraph SHALL join its text the same way.
 
 #### Scenario: A tag between words
@@ -129,7 +129,7 @@ Inline HTML in a Markdown paragraph SHALL join its text the same way.
 
 ### Requirement: Raw text ends where the tokenizer ends it
 
-hakkiri SHALL read the text after the end tag of a raw-text element on the same line, and after `--!>` in a comment.  
+hakkiri SHALL read the text after the end tag of a raw-text element on the same line, and after `--!>` in a comment.
 A `<!--` in a `script` SHALL hide its end tag until a `-->`, and a `<script` after it until the end tag of that script.
 
 #### Scenario: Text after a style element

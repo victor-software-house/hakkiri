@@ -4,11 +4,11 @@
 
 `formats` SHALL map an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`.
 
-An entry for the file's extension SHALL come first.  
-Next SHALL come an entry whose key is the file's name, or a glob that matches its name or its path.  
+An entry for the file's extension SHALL come first.
+Next SHALL come an entry whose key is the file's name, or a glob that matches its name or its path.
 These SHALL come in the order of the keys as text.
 
-A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.  
+A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.
 An entry SHALL beat the extension table.
 
 #### Scenario: An extension
@@ -33,7 +33,7 @@ An entry SHALL beat the extension table.
 
 ### Requirement: formats rejects a bad entry
 
-A reader that is not one of the seven SHALL be an error that lists them.  
+A reader that is not one of the seven SHALL be an error that lists them.
 A key that contains a glob mark and is not a glob SHALL be an error.
 
 #### Scenario: An unknown reader
@@ -48,7 +48,7 @@ A key that contains a glob mark and is not a glob SHALL be an error.
 
 ### Requirement: on_unknown is a config key
 
-`on_unknown` SHALL be a key of the project's config with the values of `--on-unknown`.  
+`on_unknown` SHALL be a key of the project's config with the values of `--on-unknown`.
 It SHALL be resolved as the flag, then `HAKKIRI_ON_UNKNOWN`, then the config, then `text`, and an unknown word SHALL be an error.
 
 #### Scenario: The order

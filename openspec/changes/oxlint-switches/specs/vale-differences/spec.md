@@ -4,8 +4,8 @@
 
 ### Requirement: Comments of more languages differ from Vale in these ways
 
-hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files as each scenario below shows.  
-It SHALL read the directives and doc links of every source language the same way.  
+hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files as each scenario below shows.
+It SHALL read the directives and doc links of every source language the same way.
 Vale 3.26.0 reads them otherwise.
 
 #### Scenario: Swift is read by its own grammar

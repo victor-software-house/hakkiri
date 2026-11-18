@@ -2,8 +2,8 @@
 
 ### Requirement: A top-level string of front matter is text
 
-In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
-The front matter is the block at the top of the file.  
+In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.
+The front matter is the block at the top of the file.
 The block SHALL be no part of the body: no rule reads its lines as a paragraph, a heading or a sentence.
 
 The block has one of these forms:
@@ -14,14 +14,14 @@ The block has one of these forms:
 
 An opening fence line MAY carry blanks after the dashes or pluses.
 
-Keys, lists, nested mappings and values that are not strings SHALL not be read.  
+Keys, lists, nested mappings and values that are not strings SHALL not be read.
 A TOML string below a table and a member of a nested JSON object SHALL not be read either.
 
 A YAML key that is a list, a mapping or an alias SHALL give no value, and the entries after it SHALL be read.
 
 #### Scenario: Values of several kinds
 
-- **WHEN** YAML front matter contains a plain, a quoted, a folded and a literal string, and a number, a boolean, a date and a list.  
+- **WHEN** YAML front matter contains a plain, a quoted, a folded and a literal string, and a number, a boolean, a date and a list.
   It also contains a nested mapping and the key `very`
 - **THEN** a text rule that flags `very` reports the four strings, and no other
 
@@ -38,19 +38,19 @@ A YAML key that is a list, a mapping or an alias SHALL give no value, and the en
 #### Scenario: Anchors, aliases and complex keys
 
 - **WHEN** a value has an anchor, a key has an anchor, a value is an alias, and an entry has a sequence as its key
-- **THEN** the anchored value and the anchored key's value are read.  
+- **THEN** the anchored value and the anchored key's value are read.
   The alias and the entry with the sequence key are not read, and the entries after them are
 
 #### Scenario: Keys that other parsers reject
 
-- **WHEN** a YAML block has a key twice, a merge key `<<: *base`, and a key that is a number or a null.  
+- **WHEN** a YAML block has a key twice, a merge key `<<: *base`, and a key that is a number or a null.
   It also has the values `.inf`, `-.inf` and `.NaN`, each beside strings
 - **THEN** every string is read, a key written twice gives each of its values, and no value of the block is lost
 
 #### Scenario: Front matter that no parser reads
 
 - **WHEN** a YAML, TOML or JSON block is not valid, such as `other: [open`
-- **THEN** `hakkiri check` reports the file as a failure with the line of the problem, and exits 2.  
+- **THEN** `hakkiri check` reports the file as a failure with the line of the problem, and exits 2.
   It reads no value of the block, and lints the rest of the file
 
 #### Scenario: A fence with blanks
@@ -65,7 +65,7 @@ A YAML key that is a list, a mapping or an alias SHALL give no value, and the en
 
 #### Scenario: TOML and JSON
 
-- **WHEN** TOML front matter contains `title = "A very toml title"` and a table with a string.  
+- **WHEN** TOML front matter contains `title = "A very toml title"` and a table with a string.
   JSON front matter contains a string, a list and a nested object
 - **THEN** the title and the top-level JSON string are read, and the table, the list and the nested object are not
 
@@ -76,7 +76,7 @@ A YAML key that is a list, a mapping or an alias SHALL give no value, and the en
 
 #### Scenario: Every form of block
 
-- **WHEN** a Markdown file starts with `---yaml`, `---toml`, `---json`, a bare `{"title": "Install guide"}` line, or a YAML block closed by `...`.  
+- **WHEN** a Markdown file starts with `---yaml`, `---toml`, `---json`, a bare `{"title": "Install guide"}` line, or a YAML block closed by `...`.
   The title contains `Install`
 - **THEN** a text rule that flags `Install` reports it once, in the title
 

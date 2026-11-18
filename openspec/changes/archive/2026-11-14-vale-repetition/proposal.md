@@ -1,15 +1,15 @@
 # Proposal
 
-Queue row: `HKR-038` in [tasks.yaml][ledger].  
+Queue row: `HKR-038` in [tasks.yaml][ledger].
 It follows [HKR-042][vocabulary-rules], which built the style `Vale` with `Terms` and `Avoid`.
 
 ## Motivation
 
-Vale builds the rule `Vale.Repetition` into its style `Vale`, whenever a section lists that style ([definition.go][v-rules], [manager.go][v-manager]).  
-It reports a word that repeats, such as `the the`, at the level `error`.  
+Vale builds the rule `Vale.Repetition` into its style `Vale`, whenever a section lists that style ([definition.go][v-rules], [manager.go][v-manager]).
+It reports a word that repeats, such as `the the`, at the level `error`.
 A Vale package with `BasedOnStyles = Vale` relies on it.
 
-hakkiri built the style `Vale` only while a top-level vocabulary had a term, and the style had no repetition rule.  
+hakkiri built the style `Vale` only while a top-level vocabulary had a term, and the style had no repetition rule.
 So a project that moved from Vale lost the alerts, or hakkiri rejected its config.
 
 ## Changes

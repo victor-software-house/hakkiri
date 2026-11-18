@@ -4,19 +4,19 @@ Queue row: `HKR-075` in [tasks.yaml][ledger].
 
 ## Motivation
 
-hakkiri cut an inline `img` tag in a line of Markdown whole, so its alt text read as nothing.  
-Vale reads that alt text as an `alt` block of its own, as it reads the alt text of a Markdown image.  
+hakkiri cut an inline `img` tag in a line of Markdown whole, so its alt text read as nothing.
+Vale reads that alt text as an `alt` block of its own, as it reads the alt text of a Markdown image.
 The `vale-differences` spec lists this as a known gap ([markdown-probe 9][probe-9]).
 
-A probe on 2026-11-14 ran Vale 3.26.0 on three paragraphs, each with an inline `img`.  
+A probe on 2026-11-14 ran Vale 3.26.0 on three paragraphs, each with an inline `img`.
 The `img` stood alone, inside an `a` tag, and inside a Markdown link.
 
-Vale gave each alt text an `alt` alert and a `text` alert.  
+Vale gave each alt text an `alt` alert and a `text` alert.
 It gave no `link` alert and no `sentence` alert on it, and the paragraph's word count left it out.
 
 ## Changes
 
-- An inline HTML tag in a line of Markdown gives an `alt` node for the alt text of an `img`.  
+- An inline HTML tag in a line of Markdown gives an `alt` node for the alt text of an `img`.
   The same walk that gives its titles gives the node ([`html::walk`][walk]).
 - The paragraph reads around the node, and a rule on `link` or on sentences does not select it, as in Vale.
 - The opening tag of a paired inline element keeps its reading, and so does the opening tag of a JavaScript XML (JSX) element.

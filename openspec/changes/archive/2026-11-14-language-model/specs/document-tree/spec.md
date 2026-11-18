@@ -2,8 +2,8 @@
 
 ### Requirement: A fenced code block takes a language
 
-A fenced code block SHALL take the langdex language of the first word of its info string, up to a comma.  
-So `rs` and `rust`, or `md` and `markdown`, give one language, and `rust,no_run` gives Rust.  
+A fenced code block SHALL take the langdex language of the first word of its info string, up to a comma.
+So `rs` and `rust`, or `md` and `markdown`, give one language, and `rust,no_run` gives Rust.
 The fence SHALL stay a gap in the prose around it.
 
 #### Scenario: A rustdoc fence
@@ -18,11 +18,11 @@ The fence SHALL stay a gap in the prose around it.
 
 ### Requirement: A fence gives the comments of its language
 
-When hakkiri reads the comments of a fence's language, it SHALL parse the code of the fence with that language's grammar.  
+When hakkiri reads the comments of a fence's language, it SHALL parse the code of the fence with that language's grammar.
 Each comment SHALL be a node inside the node that contains the fence, read as the comments of a source file are.
 
-Each span of those nodes SHALL be the bytes of the Markdown or MDX file.  
-Each such node, and every node inside it, SHALL have that language.  
+Each span of those nodes SHALL be the bytes of the Markdown or MDX file.
+Each such node, and every node inside it, SHALL have that language.
 A fence whose code does not map line for line onto the file SHALL give no nodes.
 
 #### Scenario: A Rust fence

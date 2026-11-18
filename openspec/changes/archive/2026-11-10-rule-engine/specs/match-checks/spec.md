@@ -2,15 +2,15 @@
 
 ## Purpose
 
-The match checks find patterns in the text a scope selects.  
-`existence` reports each match, `substitution` names the word to use instead, and `occurrence` counts matches against a limit.  
+The match checks find patterns in the text a scope selects.
+`existence` reports each match, `substitution` names the word to use instead, and `occurrence` counts matches against a limit.
 Each keeps the meaning Vale 3.26.0 gives it.
 
 ## ADDED Requirements
 
 ### Requirement: existence tokens match whole words
 
-An `existence` rule SHALL report each match of any of its `tokens`, each bounded by word boundaries.  
+An `existence` rule SHALL report each match of any of its `tokens`, each bounded by word boundaries.
 With `nonword: true` it SHALL add no word boundaries.
 
 #### Scenario: A word and a longer word
@@ -34,7 +34,7 @@ An `existence` rule SHALL join its `raw` patterns and match them before its toke
 
 ### Requirement: An exception blocks a match
 
-A match that contains an entry of `exceptions` as a whole word SHALL give no alert.  
+A match that contains an entry of `exceptions` as a whole word SHALL give no alert.
 A match inside a multi-word exception SHALL give no alert.
 
 #### Scenario: An adverb list with an exception
@@ -59,7 +59,7 @@ A match inside a multi-word exception SHALL give no alert.
 
 ### Requirement: substitution tries longer keys first
 
-A `substitution` rule SHALL match its `swap` keys as `existence` matches tokens, trying longer keys first.  
+A `substitution` rule SHALL match its `swap` keys as `existence` matches tokens, trying longer keys first.
 Its message SHALL take the swap value, then the matched text.
 
 #### Scenario: A phrase that contains a shorter key
@@ -106,9 +106,9 @@ A `$1` in a swap value SHALL read as the text the first group of its key matched
 
 ### Requirement: occurrence counts the token as written
 
-An `occurrence` rule SHALL count the matches of its `token` in each selected node, with no word boundaries added.  
-It SHALL report when the count is over `max` or under `min`.  
-A match that overlaps a code span SHALL NOT count.  
+An `occurrence` rule SHALL count the matches of its `token` in each selected node, with no word boundaries added.
+It SHALL report when the count is over `max` or under `min`.
+A match that overlaps a code span SHALL NOT count.
 Its message and description SHALL read `%d` as `%s`, so the count fills either one.
 
 #### Scenario: Matches inside words
@@ -118,7 +118,7 @@ Its message and description SHALL read `%d` as `%s`, so the count fills either o
 
 ### Requirement: An occurrence alert points at a match
 
-An alert SHALL point at the first counted match that is not blank.  
+An alert SHALL point at the first counted match that is not blank.
 When there is none, it SHALL point at the first word of the node.
 
 #### Scenario: A match inside code

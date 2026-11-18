@@ -2,7 +2,7 @@
 
 ### Requirement: The cases of a rule hakkiri cannot run are not run
 
-`hakkiri test` SHALL report the cases of a rule hakkiri cannot run as not run, with a failure that states its cases did not run.  
+`hakkiri test` SHALL report the cases of a rule hakkiri cannot run as not run, with a failure that states its cases did not run.
 It SHALL report a case that runs through a config as not run when the config runs such a rule on the case's file.
 
 #### Scenario: A script rule with a case

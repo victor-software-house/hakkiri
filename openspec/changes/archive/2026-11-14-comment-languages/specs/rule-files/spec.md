@@ -2,7 +2,7 @@
 
 ### Requirement: Code comments are scopes
 
-In Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL read `//` and `#` comments as `text.comment.line` and `/* */` comments as `text.comment.block`.  
+In Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL read `//` and `#` comments as `text.comment.line` and `/* */` comments as `text.comment.block`.
 It SHALL read Rust's `///` and `//!`, and Swift's `///`, as `text.comment.doc.line`, and `/** */`, Rust's `/*! */` and Swift's `/** */`, as `text.comment.doc.block`.
 
 #### Scenario: A Rust block comment is read

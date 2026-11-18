@@ -4,8 +4,8 @@
 
 hakkiri SHALL read `.ctl/hakkiri.yaml` in the top folder of each loaded package, when it exists, in the format of the project config.
 
-It SHALL apply the settings of each package before the project's own, in the order of `packages`.  
-The result SHALL be as if they were written ahead of the project's `files` entries.  
+It SHALL apply the settings of each package before the project's own, in the order of `packages`.
+The result SHALL be as if they were written ahead of the project's `files` entries.
 A package with no such file SHALL change nothing.
 
 #### Scenario: A package turns a style on
@@ -20,10 +20,10 @@ A package with no such file SHALL change nothing.
 
 ### Requirement: The project overrides a package
 
-A setting in the project's config SHALL win over the same setting in a package's file.  
+A setting in the project's config SHALL win over the same setting in a package's file.
 A later package SHALL win over an earlier one.
 
-A rule that a package sets `off` SHALL stay off until a setting of the project or a later package turns it on.  
+A rule that a package sets `off` SHALL stay off until a setting of the project or a later package turns it on.
 The project's `level` SHALL win, and a package's `level` SHALL apply only when the project sets none.
 
 #### Scenario: A project turns off a package rule
@@ -53,7 +53,7 @@ The project's `level` SHALL win, and a package's `level` SHALL apply only when t
 
 ### Requirement: A project's styles join those of a package under one glob
 
-A project's `styles` list under the same glob text as a package's SHALL add to the package's list.  
+A project's `styles` list under the same glob text as a package's SHALL add to the package's list.
 A `styles` list under another glob SHALL replace the earlier list, as for any two globs of one config.
 
 #### Scenario: The same glob
@@ -73,8 +73,8 @@ A `styles` list under another glob SHALL replace the earlier list, as for any tw
 
 ### Requirement: A package's settings file contains the keys of a project config
 
-The settings file of a package SHALL accept the keys `files`, `level`, `vocab` and `packages`.  
-A key it contains that the project config does not define SHALL be an error that names the key, its line and the package.  
+The settings file of a package SHALL accept the keys `files`, `level`, `vocab` and `packages`.
+A key it contains that the project config does not define SHALL be an error that names the key, its line and the package.
 A rule setting that names no loaded rule SHALL be an error, as in the project's config.
 
 #### Scenario: A key in Vale's spelling

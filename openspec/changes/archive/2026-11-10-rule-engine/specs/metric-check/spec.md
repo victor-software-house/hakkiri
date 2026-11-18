@@ -2,14 +2,14 @@
 
 ## Purpose
 
-A `metric` rule computes a formula over counts of the text it measures, and reports when a condition on the result is true.  
+A `metric` rule computes a formula over counts of the text it measures, and reports when a condition on the result is true.
 Its variables, formula and condition keep the meaning Vale 3.26.0 gives them, plus `occurrences`.
 
 ## ADDED Requirements
 
 ### Requirement: A metric reports when the condition is true
 
-A `metric` rule SHALL evaluate its `formula`, then its `condition` against the result, and report one alert for each measured text where the condition is true.  
+A `metric` rule SHALL evaluate its `formula`, then its `condition` against the result, and report one alert for each measured text where the condition is true.
 A `%s` in its message SHALL read as the result with two decimals.
 
 #### Scenario: Words per sentence
@@ -19,7 +19,7 @@ A `%s` in its message SHALL read as the result with two decimals.
 
 ### Requirement: The formula reads Vale's text counts
 
-The formula SHALL read `words`, `sentences`, `characters`, `syllables`, `complex_words`, `long_words`, `polysyllabic_words`, `quote_words` and `sentence_length_sd`, counted as Vale 3.26.0 counts them.  
+The formula SHALL read `words`, `sentences`, `characters`, `syllables`, `complex_words`, `long_words`, `polysyllabic_words`, `quote_words` and `sentence_length_sd`, counted as Vale 3.26.0 counts them.
 A word SHALL be a run of letters, digits and apostrophes, or initials such as `U.S.`
 
 #### Scenario: A contraction and initials
@@ -43,7 +43,7 @@ The formula SHALL read `automated_readability`, `coleman_liau`, `dale_chall`, `f
 
 ### Requirement: The formula reads element counts
 
-The formula SHALL read `paragraphs`, `list`, `blockquote`, `pre` and `heading_h1` to `heading_h6` as the number of those elements in the file, and `heading.h1` SHALL read as `heading_h1`.  
+The formula SHALL read `paragraphs`, `list`, `blockquote`, `pre` and `heading_h1` to `heading_h6` as the number of those elements in the file, and `heading.h1` SHALL read as `heading_h1`.
 In a metric with a scope, each element count SHALL be 0.
 
 #### Scenario: Second-level headings
@@ -53,11 +53,11 @@ In a metric with a scope, each element count SHALL be 0.
 
 ### Requirement: With no scope, a metric measures the prose of the file
 
-A `metric` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.  
-It SHALL leave out headings and table cells.  
+A `metric` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.
+It SHALL leave out headings and table cells.
 In a code file it SHALL measure the paragraphs of the comments.
 
-Text with no words SHALL give no alert.  
+Text with no words SHALL give no alert.
 A `metric` rule with another `scope` SHALL measure each block that scope selects, and report at the start of that block.
 
 #### Scenario: A heading is not measured
@@ -82,7 +82,7 @@ A `metric` rule with another `scope` SHALL measure each block that scope selects
 
 ### Requirement: Formulas use Tengo's expression syntax
 
-A formula and a condition SHALL accept numbers, variables, parentheses, `+`, `-`, `*`, `/`, `%`, comparisons, `&&`, `||`, `!`, the functions of Tengo's `math` module written `math.sqrt(x)`, and `round(x)` or `round(x, places)`.  
+A formula and a condition SHALL accept numbers, variables, parentheses, `+`, `-`, `*`, `/`, `%`, comparisons, `&&`, `||`, `!`, the functions of Tengo's `math` module written `math.sqrt(x)`, and `round(x)` or `round(x, places)`.
 A condition MAY read `result`, and the element counts as a formula does.
 
 #### Scenario: A two-sided condition
@@ -97,7 +97,7 @@ A condition MAY read `result`, and the element counts as a formula does.
 
 ### Requirement: A formula that cannot run is refused
 
-hakkiri SHALL refuse a `metric` rule whose `formula` or `condition` does not parse or names an unknown variable.  
+hakkiri SHALL refuse a `metric` rule whose `formula` or `condition` does not parse or names an unknown variable.
 The error SHALL name the rule and the field.
 
 #### Scenario: A formula cut short

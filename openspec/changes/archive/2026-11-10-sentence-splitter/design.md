@@ -2,11 +2,11 @@
 
 ## Context
 
-The motivation is in [proposal.md][proposal].  
-Vale splits each paragraph, heading and table cell with prose's `segment` package ([segment.go][p-segment]).  
+The motivation is in [proposal.md][proposal].
+Vale splits each paragraph, heading and table cell with prose's `segment` package ([segment.go][p-segment]).
 That package runs neurosnap's Go port of Punkt ([sentences][neurosnap]) with the English model of the Natural Language Toolkit (NLTK), converted to JSON.
 
-The model has four tables.  
+The model has four tables.
 It learned them from about 469,000 tokens of 1980s Wall Street Journal text, with no labels:
 
 | Table | Entries | Example |
@@ -16,10 +16,10 @@ It learned them from about 469,000 tokens of 1980s Wall Street Journal text, wit
 | Words that start sentences | 39 | `but`, `yet` |
 | How a word was capitalized, at a sentence start and inside one | 20,366 | `crickets` |
 
-The last table is 95% of the 403 KB file.  
+The last table is 95% of the 403 KB file.
 No license covers the model ([nltk_data#188][nltk-188]).
 
-That model scores 90.8 F1 on Universal Dependencies (UD) English-EWT ([SaT paper][sat]).  
+That model scores 90.8 F1 on Universal Dependencies (UD) English-EWT ([SaT paper][sat]).
 On the Golden Rules, a list of hard cases, it scores 56% to 72% ([pySBD paper][pysbd]).
 
 ## Goals / Non-Goals
@@ -39,21 +39,21 @@ On the Golden Rules, a list of hard cases, it scores 56% to 72% ([pySBD paper][p
 
 ### 1. Own Punkt, from the paper
 
-hakkiri implements Punkt as [Kiss and Strunk][punkt] describe it.  
-NLTK's code is a reference ([punkt.py][nltk-punkt], Apache-2.0).  
+hakkiri implements Punkt as [Kiss and Strunk][punkt] describe it.
+NLTK's code is a reference ([punkt.py][nltk-punkt], Apache-2.0).
 The splitter marks each `.`, `?` and `!` that may end a sentence, then decides with the model's four tables (operator, 2026-11-10).
 
 Alternatives:
 
-- `sentencex`:  
-  34 crates enter the build, `clap` among them.  
-  Its splits matched Vale's on 91.3% of our measured cases.  
+- `sentencex`:
+  34 crates enter the build, `clap` among them.
+  Its splits matched Vale's on 91.3% of our measured cases.
   Lost: the weight, and rules we cannot train.
-- A port of Vale's Go code and model:  
+- A port of Vale's Go code and model:
   Lost: the model has no license.
-- `punkt` and `nupunkt-rs`:  
-  `punkt` is a Rust port with no release since 2019.  
-  `nupunkt-rs` has a model trained on legal text and UD treebanks.  
+- `punkt` and `nupunkt-rs`:
+  `punkt` is a Rust port with no release since 2019.
+  `nupunkt-rs` has a model trained on legal text and UD treebanks.
   Lost: an old base and a model we cannot ship.
 
 ### 2. Override rules after Punkt
@@ -73,7 +73,7 @@ Two more changes sit inside the Punkt step:
 - A run of initials, such as `J. R. R. Tolkien`, goes on.
 - A run of lone periods, such as `. . .`, reads as one ellipsis.
 
-Alternative: Punkt alone.  
+Alternative: Punkt alone.
 Lost: the Golden Rules score stays near Vale's.
 
 ### 3. Training text
@@ -81,44 +81,44 @@ Lost: the Golden Rules score stays near Vale's.
 The model is trained on four sources (operator, 2026-11-10):
 
 - The Markdown of the owner's public repositories: public, neither a fork nor archived, at most 10 MB, each pinned by commit.
-- The Markdown files of Common Pile's `stackv2`, kept where the record's `path` ends in `.md` or `.markdown`.  
-  Every license in its `metadata.license` is on the Blue Oak list ([dataset card][stackv2], [Common Pile][common-pile]).  
-  Markdown spreads over many of its 764 shards, mixed with code.  
+- The Markdown files of Common Pile's `stackv2`, kept where the record's `path` ends in `.md` or `.markdown`.
+  Every license in its `metadata.license` is on the Blue Oak list ([dataset card][stackv2], [Common Pile][common-pile]).
+  Markdown spreads over many of its 764 shards, mixed with code.
   The task reads a pinned prefix of one shard that is dense with Markdown.
 - The Python Enhancement Proposals of Common Pile's `python_enhancement_proposals`, in the public domain ([dataset card][peps]).
 - Public-domain books from Common Pile's `project_gutenberg`: a pinned prefix of one shard.
 
-From the documentation, the model learns terms such as `e.g.` and `etc.` as hakkiri's input uses them.  
-The books give volume.  
-A source list with each source's license is committed beside the model, in `data/splitter/SOURCES.md`.  
+From the documentation, the model learns terms such as `e.g.` and `etc.` as hakkiri's input uses them.
+The books give volume.
+A source list with each source's license is committed beside the model, in `data/splitter/SOURCES.md`.
 Every dataset is pinned by revision, so a rerun reads the same input.
 
 Alternatives:
 
-- Books only:  
+- Books only:
   Lost: abbreviations skew literary.
-- The owner's Markdown only:  
+- The owner's Markdown only:
   Lost: near the 100,000-word minimum that [nupunkt's guide][nupunkt-guide] gives, so rare abbreviations go unlearned.
-- Wikipedia or Stack Exchange:  
+- Wikipedia or Stack Exchange:
   Lost: their license is Creative Commons Attribution-ShareAlike (`CC BY-SA`).
 
 ### 4. Training runs in a build box, the model is a file
 
-The trainer is three CPU passes over the text, in the library module `splitter::train`.  
-It counts tokens, marks candidate sentence ends, and runs Punkt's likelihood tests.  
-The example `examples/train_splitter.rs` reads the corpus files.  
+The trainer is three CPU passes over the text, in the library module `splitter::train`.
+It counts tokens, marks candidate sentence ends, and runs Punkt's likelihood tests.
+The example `examples/train_splitter.rs` reads the corpus files.
 It writes the model and `data/splitter/SOURCES.md`.
 
-`mise run splitter:train` runs it after `mise run splitter:fetch`, which reads the pins in `data/splitter/` and writes the corpus to `target/splitter-corpus/`.  
-`mise run splitter:pin` refreshes the repository pins.  
+`mise run splitter:train` runs it after `mise run splitter:fetch`, which reads the pins in `data/splitter/` and writes the corpus to `target/splitter-corpus/`.
+`mise run splitter:pin` refreshes the repository pins.
 The tasks run in an ephemeral build box.
 
-The capitalization table keeps the 20,000 most frequent words.  
-A word outside it reads as unknown.  
-The model is a tab-separated text file, so a review reads its changes as lines.  
+The capitalization table keeps the 20,000 most frequent words.
+A word outside it reads as unknown.
+The model is a tab-separated text file, so a review reads its changes as lines.
 The binary embeds it with `include_str!` and parses it once per process.
 
-Alternative: generate Rust source with the tables.  
+Alternative: generate Rust source with the tables.
 Lost: a large generated file, slower to build.
 
 ### 5. Evaluation against gold boundaries instead of Vale
@@ -129,18 +129,18 @@ The committed evaluation set contains:
 - The Golden Rules list, under the MIT license of [pySBD][pysbd-repo].
 - A sample of the Manually Annotated Sub-Corpus ([MASC][masc]), which carries no license limits.
 
-Vale's F1 on each set is measured once and committed.  
+Vale's F1 on each set is measured once and committed.
 A test computes hakkiri's F1 and fails when it is lower on any set.
 
-UD English-EWT and the Georgetown University Multilayer corpus (GUM) are measured too, only in the design evidence.  
+UD English-EWT and the Georgetown University Multilayer corpus (GUM) are measured too, only in the design evidence.
 Their licenses are `CC BY-SA` and `CC BY-NC-SA`, so nothing from them is committed.
 
-Alternative: agreement with Vale as the score.  
+Alternative: agreement with Vale as the score.
 Lost: Vale's own mistakes would count as right.
 
 ## Risks / Trade-offs
 
-- [hakkiri splits some text apart from Vale] → `LongSentence` and Flesch-Kincaid move on those inputs.  
+- [hakkiri splits some text apart from Vale] → `LongSentence` and Flesch-Kincaid move on those inputs.
   The rule-engine change states its tolerance, and `HKR-008` reviews the alert diff.
 - [A file in `stackv2` carries a wrong license field] → the model stores counts, not text, and the source list describes the filter.
 - [Hand labels carry mistakes] → each label change is a reviewed diff, and the Golden Rules and MASC sets are labelled by others.

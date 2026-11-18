@@ -2,15 +2,15 @@
 
 ## Purpose
 
-Loading turns the rule files of a style folder into rules the engine can run.  
+Loading turns the rule files of a style folder into rules the engine can run.
 It rejects a rule it cannot run, with an error that shows the file, the field and the line.
 
 ## Requirements
 
 ### Requirement: A style folder gives one rule per file
 
-hakkiri SHALL load every `.yml` file under a style folder as one rule, in a folder that does not start with `.` or `_`.  
-It SHALL ignore every other file there.  
+hakkiri SHALL load every `.yml` file under a style folder as one rule, in a folder that does not start with `.` or `_`.
+It SHALL ignore every other file there.
 A file called `*.test.yml` contains cases and is no rule.
 
 #### Scenario: A folder with a rule and a README
@@ -43,7 +43,7 @@ hakkiri SHALL reject a rule whose `extends` is neither a check type nor a rule, 
 
 ### Requirement: An unknown field is rejected
 
-hakkiri SHALL reject a rule that contains a field its check type does not define.  
+hakkiri SHALL reject a rule that contains a field its check type does not define.
 The error SHALL show the field and its line.
 
 #### Scenario: token in an existence rule
@@ -53,7 +53,7 @@ The error SHALL show the field and its line.
 
 ### Requirement: A field of the wrong type is rejected
 
-hakkiri SHALL reject a rule whose field contains a value of the wrong type, and report an error that shows the field and its line.  
+hakkiri SHALL reject a rule whose field contains a value of the wrong type, and report an error that shows the field and its line.
 A number written as a string, such as `max: '3'`, SHALL read as the number.
 
 #### Scenario: A count that is not a number
@@ -68,7 +68,7 @@ A number written as a string, such as `max: '3'`, SHALL read as the number.
 
 ### Requirement: level takes three values
 
-A rule's `level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `warning` when the rule sets none.  
+A rule's `level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `warning` when the rule sets none.
 hakkiri SHALL reject any other value and name the file and the field.
 
 #### Scenario: A rule with no level
@@ -92,8 +92,8 @@ hakkiri SHALL reject a rule with a pattern that neither regex engine compiles, a
 
 ### Requirement: A pattern with nothing to match is rejected
 
-hakkiri SHALL reject an `existence` rule whose `tokens` and `raw` have nothing to match.  
-It SHALL reject a `metric` rule that lists `tokens` or `raw` containing nothing, because such a pattern matches at every position.  
+hakkiri SHALL reject an `existence` rule whose `tokens` and `raw` have nothing to match.
+It SHALL reject a `metric` rule that lists `tokens` or `raw` containing nothing, because such a pattern matches at every position.
 The error SHALL show the file, the line, `tokens` and `raw`.
 
 #### Scenario: An existence rule with no tokens
@@ -131,10 +131,10 @@ hakkiri SHALL load a rule's `action` field, carry it on the rule's alerts, and c
 
 ### Requirement: A rule takes its name from its path
 
-hakkiri SHALL build a rule's name from the parts of its path, joined by dots, as Vale does.  
+hakkiri SHALL build a rule's name from the parts of its path, joined by dots, as Vale does.
 The parts are its style folder, each folder between it and the file, and the file name up to its first dot.
 
-A name with `[` or `]` SHALL be rejected when a glob lists the style.  
+A name with `[` or `]` SHALL be rejected when a glob lists the style.
 `check`, `test` and `test --coverage` SHALL give a file one name.
 
 #### Scenario: A dotted file name
@@ -159,8 +159,8 @@ A name with `[` or `]` SHALL be rejected when a glob lists the style.
 
 ### Requirement: Two files with one name are rejected
 
-hakkiri SHALL reject a style folder in which two rule files give one rule name, when a glob lists the style.  
-The error SHALL give the rule and both files.  
+hakkiri SHALL reject a style folder in which two rule files give one rule name, when a glob lists the style.
+The error SHALL give the rule and both files.
 A style no glob lists SHALL load with no error, as in Vale.
 
 #### Scenario: Terms.yml and Terms.custom.yml
@@ -175,11 +175,11 @@ A style no glob lists SHALL load with no error, as in Vale.
 
 ### Requirement: A rule may extend another rule
 
-A rule whose `extends` contains a dot SHALL start from the rule that name gives, as Vale 3.26.0 does.  
+A rule whose `extends` contains a dot SHALL start from the rule that name gives, as Vale 3.26.0 does.
 It SHALL then lay its own fields on top.
 
-The first segment of the name SHALL be a style folder of any loaded package.  
-Its other segments SHALL be folders and a file name, in a nested folder or a `_` folder too.  
+The first segment of the name SHALL be a style folder of any loaded package.
+Its other segments SHALL be folders and a file name, in a nested folder or a `_` folder too.
 The parent's `tests` SHALL NOT carry over.
 
 #### Scenario: A child takes the fields of its parent
@@ -214,9 +214,9 @@ The parent's `tests` SHALL NOT carry over.
 
 ### Requirement: A key with a plus or a minus edits a field of the parent
 
-`key+` SHALL add its entries to a list of the parent.  
-For a mapping of the parent, it SHALL merge them in, and the child's entries SHALL win.  
-`key-` SHALL remove entries from a list by their text, or keys from a mapping by name.  
+`key+` SHALL add its entries to a list of the parent.
+For a mapping of the parent, it SHALL merge them in, and the child's entries SHALL win.
+`key-` SHALL remove entries from a list by their text, or keys from a mapping by name.
 A bare key SHALL replace the parent's value.
 
 #### Scenario: An entry added to a list
@@ -236,7 +236,7 @@ A bare key SHALL replace the parent's value.
 
 ### Requirement: A chain Vale rejects is rejected
 
-hakkiri SHALL reject a chain of rules that Vale 3.26.0 rejects, with an error that shows the rule file and the field.  
+hakkiri SHALL reject a chain of rules that Vale 3.26.0 rejects, with an error that shows the rule file and the field.
 A rule read through a parent SHALL show no line.
 
 #### Scenario: A key written two ways
@@ -277,8 +277,8 @@ A rule read through a parent SHALL show no line.
 
 ### Requirement: A rule hakkiri cannot run loads no rule
 
-A rule that is valid Vale and that hakkiri cannot run, a rule that extends `script` or whose `scope` is a `doc()` selector, SHALL give no rule.  
-It SHALL NOT stop the other rules of its style from loading.  
+A rule that is valid Vale and that hakkiri cannot run, a rule that extends `script` or whose `scope` is a `doc()` selector, SHALL give no rule.
+It SHALL NOT stop the other rules of its style from loading.
 The loader SHALL keep its name and its file, so a config can turn it `off`.
 
 #### Scenario: A script rule beside a rule that runs

@@ -5,8 +5,8 @@
 - [x] 1.1 Show the operator each format decision with every candidate side by side, and verify each answer is recorded in [design.md][design] with its alternatives.
   - 2026-11-10 (UTC), decisions 1 to 9 are recorded, each with its alternatives.
 - [x] 1.2 Measure each claimed Vale behaviour with Vale 3.26.0, or read it in Vale's source, and verify [design.md][design] names the measurement.
-  - 2026-11-10 (UTC), a word-count rule measured code spans, links, bare URLs and autolinks.  
-    A scope rule measured `~blockquote` on a list inside a quote.  
+  - 2026-11-10 (UTC), a word-count rule measured code spans, links, bare URLs and autolinks.
+    A scope rule measured `~blockquote` on a list inside a quote.
     The Rust comment query and the scope operators were read at Vale commit `66bbb85`.
 
 ## 2. Specs
@@ -19,11 +19,11 @@
 ## 3. Integration
 
 - [x] 3.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
-  - 2026-11-10 (UTC), [Verify][run-pr3] passed on [PR 3][pr3] at `e63c150`, and [Verify][run-pr4] passed on [PR 4][pr4] at `210b1f6`.  
+  - 2026-11-10 (UTC), [Verify][run-pr3] passed on [PR 3][pr3] at `e63c150`, and [Verify][run-pr4] passed on [PR 4][pr4] at `210b1f6`.
     The Template check skipped: neither pull request changed template files.
 - [x] 3.2 Verify the operator approved the format on the pull request.
-  - 2026-11-10 (UTC), the operator chose each format decision (operator, 2026-11-09 and 2026-11-10).  
-    The operator then directed the merge once every review thread was answered and resolved (operator, 2026-11-10).  
+  - 2026-11-10 (UTC), the operator chose each format decision (operator, 2026-11-09 and 2026-11-10).
+    The operator then directed the merge once every review thread was answered and resolved (operator, 2026-11-10).
     Kody's findings on [PR 3][pr3] and [PR 4][pr4] were fixed in [PR 4][pr4] and resolved, and the stack merged at `4646cb0`.
 
 ## Workflow follow-up

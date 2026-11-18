@@ -2,11 +2,11 @@
 
 ### Requirement: code_span_size sets how many words a code span counts as
 
-`code_span_size` SHALL be a key of the project's config, of a package's settings file, and of a glob under `files`.  
-Its value SHALL be the number of words a code span counts as in a word count.  
+`code_span_size` SHALL be a key of the project's config, of a package's settings file, and of a glob under `files`.
+Its value SHALL be the number of words a code span counts as in a word count.
 It SHALL be a whole number from 0 to 255, and 1 when nothing sets it.
 
-A value that is no whole number from 0 to 255 SHALL be an error that gives its line.  
+A value that is no whole number from 0 to 255 SHALL be an error that gives its line.
 So SHALL a glob that gives the key a word or a list.
 
 #### Scenario: The default
@@ -21,9 +21,9 @@ So SHALL a glob that gives the key a word or a list.
 
 ### Requirement: code_span_size resolves by the settings cascade
 
-`code_span_size` SHALL resolve by the settings cascade.  
-It starts with the top levels of a package's file and of the project, then each glob that matches the file, in rank order.  
-The last one SHALL win.  
+`code_span_size` SHALL resolve by the settings cascade.
+It starts with the top levels of a package's file and of the project, then each glob that matches the file, in rank order.
+The last one SHALL win.
 The flag and the variable of the `check` command SHALL win over all of them.
 
 #### Scenario: The project sets zero
@@ -50,8 +50,8 @@ The flag and the variable of the `check` command SHALL win over all of them.
 
 ### Requirement: A package's settings file contains the keys of a project config
 
-The settings file of a package SHALL contain `files`, `level`, `vocab`, `code_span_size` and `packages`.  
-A key in it that the project config does not define SHALL be an error that gives the key, its line and the package.  
+The settings file of a package SHALL contain `files`, `level`, `vocab`, `code_span_size` and `packages`.
+A key in it that the project config does not define SHALL be an error that gives the key, its line and the package.
 Like in the project's config, a rule setting for no loaded rule SHALL be an error.
 
 #### Scenario: A key in Vale's spelling

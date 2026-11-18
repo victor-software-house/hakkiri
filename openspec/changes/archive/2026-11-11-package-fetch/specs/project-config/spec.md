@@ -2,11 +2,11 @@
 
 ### Requirement: A package is a folder or a download
 
-Each entry in `packages` SHALL have a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
+Each entry in `packages` SHALL have a `path` to a folder of styles, or a `url` and a `sha256`, and never both.
 A `url` SHALL start with `https://` or `http://`, and a `sha256` SHALL be 64 lowercase hex digits.
 
-hakkiri SHALL fetch and cache each `url` with no separate sync step.  
-It SHALL lint with a download only when it matches the hash.  
+hakkiri SHALL fetch and cache each `url` with no separate sync step.
+It SHALL lint with a download only when it matches the hash.
 It SHALL refuse two entries that contain a style of one name, and the error SHALL show both.
 
 #### Scenario: A local folder
@@ -53,11 +53,11 @@ It SHALL refuse two entries that contain a style of one name, and the error SHAL
 
 ### Requirement: A download is checked before it is read
 
-A body SHALL be at most 32 MiB and SHALL match the `sha256`.  
+A body SHALL be at most 32 MiB and SHALL match the `sha256`.
 It SHALL be a zip with one top folder that names no file outside the package and unpacks to at most 128 MiB.
 
-The top folder SHALL be a style, or contain a `styles` folder of styles, as in a Vale package.  
-Each fault SHALL be an error that shows the `url`.  
+The top folder SHALL be a style, or contain a `styles` folder of styles, as in a Vale package.
+Each fault SHALL be an error that shows the `url`.
 A download that fails a check SHALL leave nothing in the cache.
 
 #### Scenario: A server answers 404

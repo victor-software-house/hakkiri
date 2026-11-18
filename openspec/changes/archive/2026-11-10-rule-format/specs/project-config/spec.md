@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`.ctl/hakkiri.yaml` contains the rule packages a project pins, the lowest level it reports, and the styles and rule levels for each set of files.  
+`.ctl/hakkiri.yaml` contains the rule packages a project pins, the lowest level it reports, and the styles and rule levels for each set of files.
 It has the settings a `.vale.ini` has, in lowercase keys.
 
 ## ADDED Requirements
@@ -27,7 +27,7 @@ hakkiri SHALL refuse a project config that has a key it does not define, and rep
 
 ### Requirement: A package is pinned by URL and hash
 
-Each entry in `packages` SHALL hold a `url` and a `sha256`.  
+Each entry in `packages` SHALL hold a `url` and a `sha256`.
 hakkiri SHALL fetch and cache each package with no separate sync step, and lint with it only when its download matches the hash.
 
 #### Scenario: A matching package
@@ -51,7 +51,7 @@ hakkiri SHALL report only alerts at or above `level`, which is `suggestion`, `wa
 
 ### Requirement: files maps globs to settings
 
-hakkiri SHALL lint a file only when it matches a glob under `files`.  
+hakkiri SHALL lint a file only when it matches a glob under `files`.
 It SHALL apply the settings of every glob the file matches, in the order written, a later glob winning for the same key.
 
 #### Scenario: Two globs match one file
@@ -66,7 +66,7 @@ It SHALL apply the settings of every glob the file matches, in the order written
 
 ### Requirement: styles lists the styles a glob runs
 
-`styles` SHALL list the style names whose rules run on the files a glob matches.  
+`styles` SHALL list the style names whose rules run on the files a glob matches.
 An empty list SHALL turn off linting for those files.
 
 #### Scenario: Generated files are skipped
@@ -76,11 +76,11 @@ An empty list SHALL turn off linting for those files.
 
 ### Requirement: A rule name sets the rule's level
 
-Under a glob, a key that names a rule SHALL set that rule's level for the matched files.  
+Under a glob, a key that names a rule SHALL set that rule's level for the matched files.
 The value SHALL be `suggestion`, `warning` or `error`, or `off` to turn the rule off.
 
-hakkiri SHALL refuse a key other than `styles` that names no rule in any style the config loads.  
-Its error SHALL name the key and its line.  
+hakkiri SHALL refuse a key other than `styles` that names no rule in any style the config loads.
+Its error SHALL name the key and its line.
 A rule name SHALL match case-sensitively.
 
 #### Scenario: A rule turned down

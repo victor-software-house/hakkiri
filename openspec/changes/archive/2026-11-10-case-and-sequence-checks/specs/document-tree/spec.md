@@ -4,8 +4,8 @@
 
 ### Requirement: A node records its first-child place
 
-In a Markdown or MDX tree, each node SHALL record whether it is the first child of its container.  
-The container is a list item, quote or table row.  
+In a Markdown or MDX tree, each node SHALL record whether it is the first child of its container.
+The container is a list item, quote or table row.
 The parser sets it from every child of that container.
 
 #### Scenario: A paragraph after a fenced block in an item
@@ -20,10 +20,10 @@ The parser sets it from every child of that container.
 
 ### Requirement: A block takes the first place as Vale reads it
 
-A fenced block, a table and an empty item SHALL take the first place.  
+A fenced block, a table and an empty item SHALL take the first place.
 An HTML block SHALL take it when the HTML has an end tag that is not inline, or text outside its tags and comments.
 
-A thematic break, a link definition and any other HTML block SHALL leave it free.  
+A thematic break, a link definition and any other HTML block SHALL leave it free.
 This follows Vale 66bbb85, which reads HTML with the tokenizer of golang.org/x/net/html.
 
 #### Scenario: A paragraph after a thematic break in a quote

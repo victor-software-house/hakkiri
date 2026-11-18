@@ -2,14 +2,14 @@
 
 ## Purpose
 
-A `readability` rule averages one or more grade-level scores of the text it measures, and reports when the average is over its `grade`.  
+A `readability` rule averages one or more grade-level scores of the text it measures, and reports when the average is over its `grade`.
 Its scores and counts are the ones the [metric check][metric] reads, so the two checks give the same result on the same text.
 
 ## Requirements
 
 ### Requirement: readability reports a grade over the limit
 
-A `readability` rule SHALL compute each score its `metrics` list contains, average them, and report one alert for each measured text where the average is greater than `grade`.  
+A `readability` rule SHALL compute each score its `metrics` list contains, average them, and report one alert for each measured text where the average is greater than `grade`.
 A `%s` in its message SHALL read as the average with two decimals.
 
 #### Scenario: One score
@@ -29,7 +29,7 @@ A `%s` in its message SHALL read as the average with two decimals.
 
 ### Requirement: readability has five scores
 
-The `metrics` list SHALL accept `Automated Readability`, `Coleman-Liau`, `Flesch-Kincaid`, `Gunning Fog` and `SMOG`, each computed as the metric variable of the same score.  
+The `metrics` list SHALL accept `Automated Readability`, `Coleman-Liau`, `Flesch-Kincaid`, `Gunning Fog` and `SMOG`, each computed as the metric variable of the same score.
 hakkiri SHALL reject a rule whose list is empty or lists any other score, with an error that shows the rule and the score.
 
 #### Scenario: A score hakkiri does not know
@@ -48,8 +48,8 @@ A score listed more than once in `metrics` SHALL count once in the average.
 
 ### Requirement: readability measures the whole file by default
 
-A `readability` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.  
-It SHALL measure them as a `metric` rule does, and report at line 1, column 1.  
+A `readability` rule with no `scope`, or with `scope: text`, SHALL measure the paragraphs, list items and block quotes of the file together.
+It SHALL measure them as a `metric` rule does, and report at line 1, column 1.
 Text with no sentence SHALL give no alert.
 
 #### Scenario: Two paragraphs measured as one

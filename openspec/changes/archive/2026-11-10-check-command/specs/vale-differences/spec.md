@@ -26,7 +26,7 @@ hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.2
 
 ### Requirement: Globs match from the project root
 
-hakkiri SHALL match each `files` glob against the file's path relative to the project root.  
+hakkiri SHALL match each `files` glob against the file's path relative to the project root.
 This differs from Vale 3.26.0, which matches the path as given after cleaning it.
 
 #### Scenario: A file named by its absolute path
@@ -43,8 +43,8 @@ This differs from Vale 3.26.0, which matches the path as given after cleaning it
 
 ### Requirement: Known gaps are listed apart
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
-It SHALL NOT list the intended differences.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.
+It SHALL NOT list the intended differences.
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: Text inside an HTML block
@@ -62,7 +62,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: Vocabularies
 
 - **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
-- **THEN** hakkiri loads the field and reads no vocabulary.  
+- **THEN** hakkiri loads the field and reads no vocabulary.
   Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
 
 #### Scenario: The Markdown parser

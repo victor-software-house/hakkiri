@@ -1,7 +1,7 @@
 # Tasks
 
-Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
-The code builds on `HKR-019`, because the settings include `vocab`.  
+Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.
+The code builds on `HKR-019`, because the settings include `vocab`.
 The operator ruled on the three decisions of the [proposal][proposal] on 2026-11-11.
 
 ## 1. Read the settings
@@ -12,10 +12,10 @@ The operator ruled on the three decisions of the [proposal][proposal] on 2026-11
     - "A package's settings file is in its top folder"
     - "A package's settings file contains the keys of a project config"
   - Each test fails on the code of main and passes with the change.
-  - 2026-11-11 (UTC), 19 of the 23 tests of `tests/package_settings.rs` failed on `src/` of [PR 83][c-base] in a throwaway Linux box.  
-    All 23 pass with the change.  
-    The other four pass either way.  
-    One covers a package with no settings file.  
+  - 2026-11-11 (UTC), 19 of the 23 tests of `tests/package_settings.rs` failed on `src/` of [PR 83][c-base] in a throwaway Linux box.
+    All 23 pass with the change.
+    The other four pass either way.
+    One covers a package with no settings file.
     Three guard what is no package top, each failing when its rule is removed.
 - [x] 1.2 Fetch the packages a package lists, with the depth limit, once per `sha256`, in `src/config.rs`.
   - Verify the scenarios of "A package may list packages" each fail before and pass after, the nested fetch served by the local test server of `tests/package_fetch.rs`.

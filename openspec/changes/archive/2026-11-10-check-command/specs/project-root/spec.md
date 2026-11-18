@@ -2,8 +2,8 @@
 
 ### Requirement: A glob matches the path under the project root
 
-hakkiri SHALL match each `files` glob against the file's path relative to the project root, with `/` separators.  
-It SHALL resolve the root and the folders of the file through symlinks, and keep the file's own name.  
+hakkiri SHALL match each `files` glob against the file's path relative to the project root, with `/` separators.
+It SHALL resolve the root and the folders of the file through symlinks, and keep the file's own name.
 So a symlink to a file matches by the name it is reached by, as in Vale.
 
 #### Scenario: A dot-slash argument
@@ -33,11 +33,11 @@ So a symlink to a file matches by the name it is reached by, as in Vale.
 
 ### Requirement: A path outside the project root is reported
 
-hakkiri SHALL print a warning on standard error for each path it is given that is outside the project root and does not contain it.  
+hakkiri SHALL print a warning on standard error for each path it is given that is outside the project root and does not contain it.
 hakkiri SHALL lint none of that path's files.
 
-When it is given no path, the current directory is the path given.  
-When no path lies under the root or contains it, hakkiri SHALL report a failure that shows the root and exit 2.  
+When it is given no path, the current directory is the path given.
+When no path lies under the root or contains it, hakkiri SHALL report a failure that shows the root and exit 2.
 
 #### Scenario: One file outside the root
 
@@ -56,11 +56,11 @@ When no path lies under the root or contains it, hakkiri SHALL report a failure 
 
 ### Requirement: The warning is a diagnostic
 
-hakkiri SHALL write the warning to standard error in every output format.  
+hakkiri SHALL write the warning to standard error in every output format.
 `--quiet` SHALL not hide it, because `--quiet` hides only a successful result.
 
-A run with some paths under the root and some outside SHALL lint those under it.  
-It SHALL warn for each path outside, and exit by the alert level.  
+A run with some paths under the root and some outside SHALL lint those under it.
+It SHALL warn for each path outside, and exit by the alert level.
 The failure that shows the root SHALL be one of the `failures` of the JSON object.
 
 #### Scenario: A mixed run
@@ -89,10 +89,10 @@ A walk of a directory that contains the root SHALL enter only the folders on the
 
 ### Requirement: A walk compares resolved paths
 
-When it skips package folders, a walk SHALL compare the resolved path of each folder with the resolved package paths.  
+When it skips package folders, a walk SHALL compare the resolved path of each folder with the resolved package paths.
 So a folder written in another case, or below a symlinked folder, is skipped alike.
 
-A walk SHALL NOT enter a symlink to a folder.  
+A walk SHALL NOT enter a symlink to a folder.
 A directory named as an argument SHALL be walked even when it is a package folder, as Vale lints its styles path only when named.
 
 #### Scenario: A symlink to a package folder

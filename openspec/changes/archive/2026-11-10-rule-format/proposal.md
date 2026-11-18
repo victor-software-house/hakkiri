@@ -4,14 +4,14 @@ Queue row: `HKR-002` in [tasks.yaml][ledger].
 
 ## Motivation
 
-The rule engine, the tree and the Vale importer all read the rule format.  
+The rule engine, the tree and the Vale importer all read the rule format.
 So it must be settled before any of them is built.
 
-The [bootstrap design][bootstrap] fixed the model: prose checks from Vale plus rates, and the project config in `.ctl/hakkiri.yaml`.  
-It took structure terms from ast-grep.  
+The [bootstrap design][bootstrap] fixed the model: prose checks from Vale plus rates, and the project config in `.ctl/hakkiri.yaml`.
+It took structure terms from ast-grep.
 This change replaces them with Vale's `scope`, which every ProseStyle rule already uses (operator, 2026-11-09).
 
-This change settles the file format, the field names, the scopes and the check types.  
+This change settles the file format, the field names, the scopes and the check types.
 Each is one decision, with every candidate shown side by side.
 
 ## Changes
@@ -34,7 +34,7 @@ None.
 
 ## Impact
 
-- No code yet.  
+- No code yet.
   The tree slice `HKR-003`, the engine slice `HKR-004` and the importer slice `HKR-007` build against these specs.
 
 [ledger]: ../../../../tasks.yaml

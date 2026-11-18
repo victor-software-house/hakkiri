@@ -4,12 +4,12 @@ Queue row: `HKR-076` in [tasks.yaml][ledger].
 
 ## Motivation
 
-hakkiri compiled each `files` and `formats` glob with the globset defaults, where `*` crosses `/`.  
-So `docs/*.md` matched `docs/x/a.md`, and `*.md` reached a nested file only because `*` crossed folders.  
+hakkiri compiled each `files` and `formats` glob with the globset defaults, where `*` crosses `/`.
+So `docs/*.md` matched `docs/x/a.md`, and `*.md` reached a nested file only because `*` crossed folders.
 The operator ruled on 2026-11-14 that a glob follows the standard rules, whether Vale is looser or stricter.
 
-Vale 66bbb85 reads a glob with `**` through doublestar.  
-It reads every other glob through gobwas with no separator, so its `*` crosses `/`.  
+Vale 66bbb85 reads a glob with `**` through doublestar.
+It reads every other glob through gobwas with no separator, so its `*` crosses `/`.
 Its trailing `/**` also matches the files in the folder itself.
 
 ## Changes

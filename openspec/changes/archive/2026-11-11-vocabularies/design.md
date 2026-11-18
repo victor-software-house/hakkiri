@@ -2,12 +2,12 @@
 
 ## Context
 
-A Vale vocabulary is a folder `config/vocabularies/<Name>/` that contains `accept.txt` and `reject.txt`, one term per line.  
-Vale reads the accepted terms as exceptions in most checks, and builds `Vale.Terms` and `Vale.Avoid` from the lists.  
+A Vale vocabulary is a folder `config/vocabularies/<Name>/` that contains `accept.txt` and `reject.txt`, one term per line.
+Vale reads the accepted terms as exceptions in most checks, and builds `Vale.Terms` and `Vale.Avoid` from the lists.
 The [vocabulary-rules change][rules] builds those two rules, so this change reads the lists and applies the exceptions.
 
-`HKR-006` fetches a package whole and keeps its `styles/config` folder, and the loader skips that folder as a style.  
-`HKR-007` loads Vale styles as they are.  
+`HKR-006` fetches a package whole and keeps its `styles/config` folder, and the loader skips that folder as a style.
+`HKR-007` loads Vale styles as they are.
 So a vocabulary is already on disk and nothing reads it.
 
 ## Goals / Non-Goals
@@ -28,8 +28,8 @@ Non-goals:
 
 ### 1. Vale's code and a probe are the reference
 
-Vale at `66bbb85` reads vocabularies in these places.  
-The probe ran a Vale build of that commit on 2026-11-11, in two rounds: nine small projects, then five configs.  
+Vale at `66bbb85` reads vocabularies in these places.
+The probe ran a Vale build of that commit on 2026-11-11, in two rounds: nine small projects, then five configs.
 The five configs ran over one package in `tests/fixtures/vocabularies`, and its `vale.tsv` contains every alert.
 
 | Part | Where in Vale | What it does |
@@ -59,8 +59,8 @@ The probe found these, which the spec states as scenarios:
 
 ### 2. The key is `vocab`, at the top level and per glob
 
-The key is `vocab`, a list of vocabulary names, and it sits at the top level and in a glob of `files` (operator, 2026-11-11).  
-The top level is Vale's `Vocab` before any section, and a glob's key is Vale's `Vocab` in a section.  
+The key is `vocab`, a list of vocabulary names, and it sits at the top level and in a glob of `files` (operator, 2026-11-11).
+The top level is Vale's `Vocab` before any section, and a glob's key is Vale's `Vocab` in a section.
 A glob's list adds its vocabularies to the files that glob matches.
 
 ```yaml
@@ -78,56 +78,56 @@ files:
 | Accepted terms reach | every check that reads them, in every file | `existence`, `repetition`, `spelling` and `substitution`, in the glob's files |
 | Held | once, when each rule builds | per file, from the globs that match it |
 
-Alternative: the top level alone.  
-It lost because a package that ships two vocabularies could not use one for its docs only.  
-Alternative: a glob alone.  
-It lost because ProseStyle lists one vocabulary for every file ([prose-style][prose-style-ini]), and a glob key would repeat it on each glob.  
+Alternative: the top level alone.
+It lost because a package that ships two vocabularies could not use one for its docs only.
+Alternative: a glob alone.
+It lost because ProseStyle lists one vocabulary for every file ([prose-style][prose-style-ini]), and a glob key would repeat it on each glob.
 The other name considered, `vocabularies`, lost to Vale's `vocab`.
 
 ### 3. A vocabulary is a folder in a loaded package
 
-A package folder is the `styles` folder of its zip, or the `path` folder, so a vocabulary is `<package folder>/config/vocabularies/<name>/`.  
-hakkiri walks it and reads every `accept.txt` and `reject.txt` below it, as Vale does, and no other file.  
+A package folder is the `styles` folder of its zip, or the `path` folder, so a vocabulary is `<package folder>/config/vocabularies/<name>/`.
+hakkiri walks it and reads every `accept.txt` and `reject.txt` below it, as Vale does, and no other file.
 It reads the accepted terms in the order the files walk and the vocabularies are listed.
 
-An unknown name is an error on the key's line: `` `Nope` is not a vocabulary in any package ``.  
-A name of the top level is rejected by the config's own validation.  
-So its line comes from the YAML location index and not from a search of the text.  
+An unknown name is an error on the key's line: `` `Nope` is not a vocabulary in any package ``.
+A name of the top level is rejected by the config's own validation.
+So its line comes from the YAML location index and not from a search of the text.
 Vale's message lists the search paths and has no line ([ini.go][v-load-vocab]).
 
 Two packages that contain one vocabulary name are an error that lists both, as for a style.
 
-Alternative: the first package wins, as Vale's search does.  
+Alternative: the first package wins, as Vale's search does.
 It lost because a second package would then change nothing and show no error.
 
-Alternative: the last package wins, as `vale sync` does when it moves the folders into one `StylesPath`.  
+Alternative: the last package wins, as `vale sync` does when it moves the folders into one `StylesPath`.
 It lost for the same reason, and because the order of `packages` would then pick the winner with no message.
 
-Vale also looks in a per-user styles folder.  
+Vale also looks in a per-user styles folder.
 hakkiri has none, because a project's packages are all in its config (intended difference).
 
 ### 4. A line of a list is a pattern
 
-hakkiri trims a line, skips a blank one and one that starts with `# `, and reads the rest as one term.  
-A term with no pattern operator other than a period is plain.  
+hakkiri trims a line, skips a blank one and one that starts with `# `, and reads the rest as one term.
+A term with no pattern operator other than a period is plain.
 Its periods are literal, so `Node.js` does not match `nodexjs`.
 
-Any other term is a pattern in hakkiri's regex dialect, so `harness(?:es)?` matches two forms.  
+Any other term is a pattern in hakkiri's regex dialect, so `harness(?:es)?` matches two forms.
 In both, a run of whitespace matches any run of whitespace, so a phrase that wraps still matches ([definition.go][v-term-pattern]).
 
-A term that is not a valid pattern is an error that gives the vocabulary file and the line.  
-Vale reports the failure with no line of the vocabulary file, and `C++` stops every run.  
+A term that is not a valid pattern is an error that gives the vocabulary file and the line.
+Vale reports the failure with no line of the vocabulary file, and `C++` stops every run.
 This is an intended difference, so the error is one a person can find.
 
-hakkiri's regex dialect reads `C++` as a pattern with a possessive plus.  
+hakkiri's regex dialect reads `C++` as a pattern with a possessive plus.
 So it drops `C` and `CC` and stops nothing, and a term that means the text is written `C\+\+`.
 
-Alternative: escape every term unless it is marked as a pattern.  
+Alternative: escape every term unless it is marked as a pattern.
 It lost because Vale's vocabularies contain patterns that way (`harness(?:es)?` in ProseStyle), so an escaped term would stop matching.
 
 ### 5. Accepted terms are exceptions
 
-When a rule builds, hakkiri adds the accepted terms to its exceptions before it rewrites and sorts them, as [updateExceptions][v-update-exceptions] does.  
+When a rule builds, hakkiri adds the accepted terms to its exceptions before it rewrites and sorts them, as [updateExceptions][v-update-exceptions] does.
 The `case-and-sequence-checks` change records the order: the terms go in before `exceptions` is rewritten.
 
 | Check | Accepted terms reach it | Vale |
@@ -137,33 +137,33 @@ The `case-and-sequence-checks` change records the order: the terms go in before 
 | `existence` | the same, and not when the rule is `nonword` | [existence.go][v-existence] |
 | `spelling` | always, as whole words matched without regard to case, with a phrase masked | [spelling.go][v-spelling], [spelling.go][v-spelling-run] |
 
-No other check reads them.  
-The `vocab` field loads today with no effect, and now it applies.  
+No other check reads them.
+The `vocab` field loads today with no effect, and now it applies.
 A match inside an accepted phrase is dropped, so `mea` in `mea culpa` is dropped and a lone `mea` is not.
 
 ### 6. A glob's lists are held per file
 
-hakkiri collects a file's lists from every glob that matches it, in the order written.  
-It builds one set of exceptions from them, with the builder that a rule's `exceptions` use.  
+hakkiri collects a file's lists from every glob that matches it, in the order written.
+It builds one set of exceptions from them, with the builder that a rule's `exceptions` use.
 It checks each match of an `existence`, `repetition`, `spelling` and `substitution` rule against that set, after the rule's own exceptions ([definition.go][v-vocab-for]).
 
-A set is built once for each distinct list of vocabulary names.  
-The top-level terms stay in each rule's own exceptions.  
+A set is built once for each distinct list of vocabulary names.
+The top-level terms stay in each rule's own exceptions.
 So a file's glob lists add to the top-level ones, and they ignore `vocab: false` and `nonword`, as the probe shows.
 
-The terms of a glob are read case-sensitively in `spelling`, where the top level reads them without regard to case ([spelling.go][v-spelling-run]).  
+The terms of a glob are read case-sensitively in `spelling`, where the top level reads them without regard to case ([spelling.go][v-spelling-run]).
 `capitalization` and `conditional` do not read them.
 
-Alternative: compile each rule again for each distinct list.  
+Alternative: compile each rule again for each distinct list.
 It lost because it multiplies the compiled rules by the number of lists, and Vale's own check is a second pass over the matches.
 
 ### 7. Vocabularies are read before rules build
 
-A rule builds its exceptions when it loads, so the terms must exist first.  
-The loader reads all package folders, then the vocabularies, then the styles with the accepted terms in hand.  
+A rule builds its exceptions when it loads, so the terms must exist first.
+The loader reads all package folders, then the vocabularies, then the styles with the accepted terms in hand.
 Today it reads each package's styles as it visits the package.
 
-Alternative: patch each rule after it loads.  
+Alternative: patch each rule after it loads.
 It lost because the exceptions are compiled patterns sorted and rewritten at build.
 
 ### 8. What stays different

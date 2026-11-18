@@ -1,11 +1,11 @@
 # Proposal
 
-Queue row: `HKR-025` in [tasks.yaml][ledger].  
+Queue row: `HKR-025` in [tasks.yaml][ledger].
 It is the last of four changes that build the `vale-differences` spec, after [`vale-differences`][first], [`vale-differences-checks`][checks] and [`vale-differences-readers`][readers].
 
 ## Motivation
 
-The first three changes list the differences that the designs record as differences.  
+The first three changes list the differences that the designs record as differences.
 The list has any behaviour that differs from Vale, whether or not a design calls it a difference.
 
 Checked against Vale 66bbb85, three decisions that the designs treat as choices of format differ in behaviour:

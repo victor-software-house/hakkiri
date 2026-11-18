@@ -1,12 +1,12 @@
 # Dictionary notice
 
-`en_US-web.aff` and `en_US-web.dic` are the built-in English dictionary of [Vale][vale-data], byte for byte, at commit `66bbb85`.  
-Their SHA-256 sums are `e3aa3f24f75ea49468f79f0aaf43e1095797f465d90ebd5a3e47690612e4b189` and `7e203a29114761b1c5d96d74d4c2011a9a202827cc64b1f1f0cee6a2fd377ba6`.  
+`en_US-web.aff` and `en_US-web.dic` are the built-in English dictionary of [Vale][vale-data], byte for byte, at commit `66bbb85`.
+Their SHA-256 sums are `e3aa3f24f75ea49468f79f0aaf43e1095797f465d90ebd5a3e47690612e4b189` and `7e203a29114761b1c5d96d74d4c2011a9a202827cc64b1f1f0cee6a2fd377ba6`.
 hakkiri made no change to them.
 
-The `.dic` file contains 81,558 words made from the English Speller Database (ESDB).  
-ESDB is the successor of Spell Checker Oriented Word Lists (SCOWL).  
-The [copyright notice of the database][esdb-license] allows any use, as long as the notice appears in every copy, so it follows here.  
+The `.dic` file contains 81,558 words made from the English Speller Database (ESDB).
+ESDB is the successor of Spell Checker Oriented Word Lists (SCOWL).
+The [copyright notice of the database][esdb-license] allows any use, as long as the notice appears in every copy, so it follows here.
 Official speller dictionaries need only the part before the `===` line.
 
 ```text
@@ -35,7 +35,7 @@ addition, he gave me an incredible amount of feedback and created a number of
 special lists in order to help improve the overall quality of ESDB.
 ```
 
-The code in `src/dictionary` is a port of the `spell` package of Vale, which is derived from gospell.  
+The code in `src/dictionary` is a port of the `spell` package of Vale, which is derived from gospell.
 It is under the MIT license in [`vale-spell.LICENSE`](vale-spell.LICENSE).
 
 [vale-data]: https://github.com/vale-cli/vale/tree/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell/data

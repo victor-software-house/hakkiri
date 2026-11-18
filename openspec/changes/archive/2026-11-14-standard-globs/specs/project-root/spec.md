@@ -2,11 +2,11 @@
 
 ### Requirement: A glob follows the rules of gitignore
 
-A `files` or `formats` glob SHALL match as gitignore matches a pattern.  
+A `files` or `formats` glob SHALL match as gitignore matches a pattern.
 `*`, `?` and a class SHALL stay inside one folder, and `**` SHALL span folders.
 
-A glob with no `/` SHALL match the file name in any folder.  
-Each glob that starts with `/` SHALL be tied to the project root.  
+A glob with no `/` SHALL match the file name in any folder.
+Each glob that starts with `/` SHALL be tied to the project root.
 A trailing `/` SHALL match every file in the folder, and a trailing `/**` SHALL match only the files below its folder.
 
 #### Scenario: A star inside one folder

@@ -1,27 +1,27 @@
 # Proposal
 
-Queue row: `HKR-041` in [tasks.yaml][ledger].  
+Queue row: `HKR-041` in [tasks.yaml][ledger].
 It follows [HKR-019][vocabularies] and [HKR-042][vocabulary-rules], which read `accept.txt` and `reject.txt` only.
 
 ## Motivation
 
-Vale reads a vocabulary from `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml` in its folder ([vocab.go][v-vocab], [loadVocabulary][v-load]).  
+Vale reads a vocabulary from `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml` in its folder ([vocab.go][v-vocab], [loadVocabulary][v-load]).
 A YAML entry is a term, a term mapped to nothing, or a term mapped to the options `regex`, `ignorecase` and `flags`.
 
-hakkiri skipped the YAML files, so a package that moves to them lost its accepted and rejected terms.  
+hakkiri skipped the YAML files, so a package that moves to them lost its accepted and rejected terms.
 The alerts those terms kept back came back.
 
 ## Changes
 
 - A vocabulary folder may contain `vocab.yml` and `vocab.yaml`, besides the text lists, and hakkiri reads them all.
-- The file has the keys `affix`, `accept` and `reject`.  
+- The file has the keys `affix`, `accept` and `reject`.
   An entry is a term, a term mapped to nothing, or a term mapped to `regex`, `ignorecase` and `flags`.
-- A plain term is literal.  
+- A plain term is literal.
   `regex: true` keeps a pattern, `flags` expands the term by the affix flags of a dictionary, and `ignorecase` puts `(?i)` before each pattern.
-- `affix` is the name of an affix file.  
-  hakkiri looks for it in the `config/dictionaries` folder of the package that contains the vocabulary.  
+- `affix` is the name of an affix file.
+  hakkiri looks for it in the `config/dictionaries` folder of the package that contains the vocabulary.
   Then it looks in every other loaded package in order, and never in `$DICPATH`.
-- The file parses through ctl-core's input, which rejects a key the file does not define.  
+- The file parses through ctl-core's input, which rejects a key the file does not define.
   Every wrong entry is reported with its file and line, where Vale stops at the first.
 - The `vale-differences` spec records the six places where hakkiri differs, and drops the gap for YAML vocabularies.
 

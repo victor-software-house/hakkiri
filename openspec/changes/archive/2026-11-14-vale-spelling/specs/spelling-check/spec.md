@@ -2,8 +2,8 @@
 
 ### Requirement: The style Vale contains Vale.Spelling
 
-hakkiri SHALL give the style `Vale` a rule `Vale.Spelling` that reports each word the built-in dictionary lacks.  
-The rule SHALL have the message `Did you really mean '%s'?`, the level `error` and the scope `text`.  
+hakkiri SHALL give the style `Vale` a rule `Vale.Spelling` that reports each word the built-in dictionary lacks.
+The rule SHALL have the message `Did you really mean '%s'?`, the level `error` and the scope `text`.
 A config SHALL set its level, turn it off, and set its parameters as it does any rule.
 
 #### Scenario: A project lists Vale
@@ -18,8 +18,8 @@ A config SHALL set its level, turn it off, and set its parameters as it does any
 
 ### Requirement: Vale.Spelling adds the dictionaries of each package
 
-`Vale.Spelling` SHALL read every dictionary in the `config/dictionaries` folder of each package, in the order of the packages.  
-It SHALL accept a word that one of them contains, beside the built-in dictionary.  
+`Vale.Spelling` SHALL read every dictionary in the `config/dictionaries` folder of each package, in the order of the packages.
+It SHALL accept a word that one of them contains, beside the built-in dictionary.
 A parameter `dictionaries`, `aff` or `dic` SHALL replace them, and `append` SHALL keep the built-in dictionary.
 
 #### Scenario: A dictionary in a package
@@ -34,7 +34,7 @@ A parameter `dictionaries`, `aff` or `dic` SHALL replace them, and `append` SHAL
 
 ### Requirement: Vale.Spelling accepts the words of the ignore folders
 
-`Vale.Spelling` SHALL accept each word of each `.txt` file under the `config/ignore` folder of each package, folders below it included.  
+`Vale.Spelling` SHALL accept each word of each `.txt` file under the `config/ignore` folder of each package, folders below it included.
 A file with another extension SHALL be no list.
 
 #### Scenario: A list in a folder below

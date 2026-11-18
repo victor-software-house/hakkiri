@@ -10,8 +10,8 @@ How hakkiri reads the text of an HTML block of a Markdown file, and which of it 
 
 hakkiri SHALL read the text inside an HTML block of a Markdown file as prose.
 
-A block of text SHALL end at three places.  
-They are a start tag that is not inline or void, an end tag that is not inline, and the end of the HTML block.  
+A block of text SHALL end at three places.
+They are a start tag that is not inline or void, an end tag that is not inline, and the end of the HTML block.
 A block element that opens inside an inline element SHALL read as inline.
 
 #### Scenario: Text in a div
@@ -31,7 +31,7 @@ A block element that opens inside an inline element SHALL read as inline.
 
 ### Requirement: The scope is the outermost element
 
-hakkiri SHALL give a block of text the scope of the outermost open `li`, `blockquote`, heading, `th`, `td`, `caption` or `figcaption` tag.  
+hakkiri SHALL give a block of text the scope of the outermost open `li`, `blockquote`, heading, `th`, `td`, `caption` or `figcaption` tag.
 It SHALL give `meta` when a `data` element is open, and `paragraph` when none of these is open.
 
 #### Scenario: A list in HTML
@@ -61,7 +61,7 @@ It SHALL give `meta` when a `data` element is open, and `paragraph` when none of
 
 ### Requirement: Some text is left out or masked
 
-hakkiri SHALL leave out the text of `script`, `style`, `noscript`, `iframe`, `pre`, and of an element whose class is `code`, `pre` or `problematic`.  
+hakkiri SHALL leave out the text of `script`, `style`, `noscript`, `iframe`, `pre`, and of an element whose class is `code`, `pre` or `problematic`.
 It SHALL read the first text after a `kbd` or `samp` start tag as one `*` for each character.
 
 #### Scenario: A pre block
@@ -81,10 +81,10 @@ It SHALL read the first text after a `kbd` or `samp` start tag as one `*` for ea
 
 ### Requirement: Inline elements have their scopes
 
-hakkiri SHALL give a node of its own to the text of `a`, `strong`, `b`, `em`, `i`, `code` and `tt`.  
+hakkiri SHALL give a node of its own to the text of `a`, `strong`, `b`, `em`, `i`, `code` and `tt`.
 It SHALL also give one to the `alt` of an `img`, and to the `content` of a `meta` element that describes the page.
 
-The text of `code` and `tt` SHALL read as a code span in its block.  
+The text of `code` and `tt` SHALL read as a code span in its block.
 Alt text and a description SHALL be read as `text` too, and each as one block that no sentence splitter cuts.
 
 #### Scenario: A code element
@@ -109,10 +109,10 @@ Alt text and a description SHALL be read as `text` too, and each as one block th
 
 ### Requirement: Tags join the text around them as Vale joins it
 
-hakkiri SHALL join the texts of a block with a space where an inline or void tag opens before the text.  
+hakkiri SHALL join the texts of a block with a space where an inline or void tag opens before the text.
 Where an inline tag or a comment closes before it, hakkiri SHALL join them as the source has it.
 
-A text SHALL lose the whitespace at its ends, and a space SHALL not follow an opening bracket or a dash.  
+A text SHALL lose the whitespace at its ends, and a space SHALL not follow an opening bracket or a dash.
 Inline HTML in a Markdown paragraph SHALL join its text the same way.
 
 #### Scenario: A tag between words
@@ -127,7 +127,7 @@ Inline HTML in a Markdown paragraph SHALL join its text the same way.
 
 ### Requirement: Raw text ends where the tokenizer ends it
 
-hakkiri SHALL read the text after the end tag of a raw-text element on the same line, and after `--!>` in a comment.  
+hakkiri SHALL read the text after the end tag of a raw-text element on the same line, and after `--!>` in a comment.
 A `<!--` in a `script` SHALL hide its end tag until a `-->`, and a `<script` after it until the end tag of that script.
 
 #### Scenario: Text after a style element
@@ -165,8 +165,8 @@ hakkiri SHALL read no text of an HTML block when a line of it does not end as th
 
 ### Requirement: The alt text of an inline img tag is an alt node
 
-hakkiri SHALL give the alt text of an `img` tag in a line of Markdown an `alt` node of its own.  
-It SHALL do so as it does for the alt text of a Markdown image.  
+hakkiri SHALL give the alt text of an `img` tag in a line of Markdown an `alt` node of its own.
+It SHALL do so as it does for the alt text of a Markdown image.
 The paragraph SHALL read around the node, and a rule on `link` or on sentences SHALL not select it, as in Vale.
 
 #### Scenario: An img tag alone and inside links

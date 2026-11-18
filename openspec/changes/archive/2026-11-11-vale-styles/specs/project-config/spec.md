@@ -2,11 +2,11 @@
 
 ### Requirement: A rule hakkiri cannot run fails the run until it is turned off
 
-Each rule hakkiri cannot run that the config runs on a linted file SHALL make the run exit 2.  
+Each rule hakkiri cannot run that the config runs on a linted file SHALL make the run exit 2.
 The run SHALL print a `failed` line with the rule, its file and the setting that leaves it out.
 
-A rule is run when its style is listed and no setting turns it `off`, or when a level or `on` turns it on.  
-A rule in a style no glob lists SHALL be ignored.  
+A rule is run when its style is listed and no setting turns it `off`, or when a level or `on` turns it on.
+A rule in a style no glob lists SHALL be ignored.
 `off` SHALL leave it out, and a level or `on` SHALL NOT make it run.
 
 #### Scenario: A script rule in a listed style

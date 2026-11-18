@@ -4,7 +4,7 @@
 
 ### Requirement: A metric rule counts token matches
 
-A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`.  
+A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`.
 The variable counts the matches of those tokens in the measured text.
 
 #### Scenario: A semicolon rate

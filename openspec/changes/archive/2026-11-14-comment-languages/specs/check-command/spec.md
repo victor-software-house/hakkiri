@@ -2,12 +2,12 @@
 
 ### Requirement: A reader is chosen by formats, then by extension
 
-hakkiri SHALL read a file by the reader its `formats` entry gives it.  
+hakkiri SHALL read a file by the reader its `formats` entry gives it.
 Otherwise it SHALL use the reader of the file's language: Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text.
 
 The reader SHALL follow the langdex language of the file, so no table of extensions lists the files a reader takes.
 
-A file that a glob selects SHALL be read as plain text when no reader reads its language, or it has no language.  
+A file that a glob selects SHALL be read as plain text when no reader reads its language, or it has no language.
 `on_unknown` can set this otherwise, but a Text file SHALL be read as plain text whatever `on_unknown` is set to.
 
 #### Scenario: A file no reader reads, found by a walk

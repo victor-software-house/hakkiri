@@ -2,7 +2,7 @@
 
 ### Requirement: Settings resolve by specificity, where Vale applies its sections in order
 
-hakkiri SHALL resolve the settings of the globs that match a file by the settings cascade of `project-config`.  
+hakkiri SHALL resolve the settings of the globs that match a file by the settings cascade of `project-config`.
 Vale 66bbb85 applies its sections in the order written, and a later section wins for the file ([file.go][vale-file]).
 
 #### Scenario: A specific glob written first

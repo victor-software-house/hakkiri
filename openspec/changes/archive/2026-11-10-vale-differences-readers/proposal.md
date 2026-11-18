@@ -1,6 +1,6 @@
 # Proposal
 
-Queue row: `HKR-024` in [tasks.yaml][ledger].  
+Queue row: `HKR-024` in [tasks.yaml][ledger].
 It is the third of four changes that build the `vale-differences` spec, after [`vale-differences`][first] and [`vale-differences-checks`][checks], and before [`vale-differences-format`][format].
 
 ## Motivation
@@ -12,7 +12,7 @@ The rest of the list covers two cases:
 - Where hakkiri's ports of Vale's tagger, dictionary reader and spelling check differ in detail.
 - Where a run that would fail or stall in Vale finishes.
 
-A gap is where hakkiri lacks something Vale does and means to close it.  
+A gap is where hakkiri lacks something Vale does and means to close it.
 A gap is not a difference, so the spec lists each apart, with its queue row.
 
 ## Changes

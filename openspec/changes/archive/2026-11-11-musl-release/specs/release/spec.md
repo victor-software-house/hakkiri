@@ -2,9 +2,9 @@
 
 ### Requirement: A release is a tag, a Release and two tarballs
 
-A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.  
-The `linux-x64` tarball SHALL contain a statically linked `x86_64-unknown-linux-musl` binary.  
-GitHub records each tarball's SHA-256 digest, which a lock reads.  
+A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.
+The `linux-x64` tarball SHALL contain a statically linked `x86_64-unknown-linux-musl` binary.
+GitHub records each tarball's SHA-256 digest, which a lock reads.
 It SHALL publish nothing to crates.io.
 
 #### Scenario: The first release
@@ -36,7 +36,7 @@ The `linux-x64` binary SHALL start on a Linux machine that has no glibc loader, 
 
 ### Requirement: The linux-x64 binary keeps its speed
 
-The `linux-x64` binary SHALL use mimalloc as its global allocator, and no other build SHALL link it.  
+The `linux-x64` binary SHALL use mimalloc as its global allocator, and no other build SHALL link it.
 A `check` over many files on four CPUs SHALL take at most twice as long as the same release built for glibc.
 
 #### Scenario: Many files

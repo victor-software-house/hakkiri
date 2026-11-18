@@ -4,10 +4,10 @@ Queue row: `HKR-012` in [tasks.yaml][ledger].
 
 ## Motivation
 
-An alert uses the span of a node to point into the file, and a check reads the text of that node.  
+An alert uses the span of a node to point into the file, and a check reads the text of that node.
 A span is one range, so it cannot leave out the markers in the middle of a node.
 
-Some paragraphs contain bytes that are syntax, not text.  
+Some paragraphs contain bytes that are syntax, not text.
 They sit in a block quote, over two line comments, or around an HTML tag.
 
 ## Changes
@@ -26,7 +26,7 @@ They sit in a block quote, over two line comments, or around an HTML tag.
 
 ### Modified Capabilities
 
-None.  
+None.
 The tree, its scopes and its spans stay in [document-tree][document-tree].
 
 ## Impact

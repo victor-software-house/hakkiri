@@ -1,16 +1,16 @@
 # Proposal
 
-Queue row: `HKR-019` in [tasks.yaml][ledger].  
+Queue row: `HKR-019` in [tasks.yaml][ledger].
 It adds the rows `HKR-041` and `HKR-042` for what it leaves out, and `HKR-042` has its own change, [vocabulary-rules][rules].
 
 ## Motivation
 
-A Vale package ships a vocabulary: `ProseStyle` contains `styles/config/vocabularies/ProseStyle/accept.txt`.  
-Its `.vale.ini` sets `Vocab = ProseStyle` ([prose-style][prose-style-ini]).  
+A Vale package ships a vocabulary: `ProseStyle` contains `styles/config/vocabularies/ProseStyle/accept.txt`.
+Its `.vale.ini` sets `Vocab = ProseStyle` ([prose-style][prose-style-ini]).
 Vale reads the accepted words as exceptions in most checks.
 
-hakkiri skips `config`, and loads a rule's `vocab` field but does nothing with it.  
-So a project that moves from Vale gets alerts on words its vocabulary accepts.  
+hakkiri skips `config`, and loads a rule's `vocab` field but does nothing with it.
+So a project that moves from Vale gets alerts on words its vocabulary accepts.
 The [vale-differences spec][differences] lists this as a known gap.
 
 ## Changes

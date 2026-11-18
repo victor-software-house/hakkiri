@@ -2,19 +2,19 @@
 
 ## Purpose
 
-In a Markdown file, an HTML comment turns rules off and on for the text that follows it.  
-So does a `{/* … */}` comment in an MDX file.  
+In a Markdown file, an HTML comment turns rules off and on for the text that follows it.
+So does a `{/* … */}` comment in an MDX file.
 Both reach as far as Vale's comments do.
 
 ## Requirements
 
 ### Requirement: A comment turns every rule off and on
 
-In a Markdown file, an HTML comment `hakkiri off` or `vale off` SHALL leave the text after it out of every block.  
+In a Markdown file, an HTML comment `hakkiri off` or `vale off` SHALL leave the text after it out of every block.
 This SHALL last until a comment `hakkiri on` or `vale on`, or the end of the file.
 
-hakkiri SHALL read the comment with the blanks at its ends and its line breaks trimmed.  
-The comment SHALL be text when it is in capitals or has another word in front.  
+hakkiri SHALL read the comment with the blanks at its ends and its line breaks trimmed.
+The comment SHALL be text when it is in capitals or has another word in front.
 It SHALL also be text inside a code block or a code span, or after a backslash.
 
 #### Scenario: Between two blocks
@@ -44,8 +44,8 @@ It SHALL also be text inside a code block or a code span, or after a backslash.
 
 ### Requirement: A comment turns a rule or a style off and on
 
-In a Markdown file, an HTML comment `hakkiri Style.Rule: off` or `on`, and `vale Style.Rule = NO` or `YES`, SHALL turn one rule off and on.  
-The same with a style name and no rule SHALL turn the style off and on.  
+In a Markdown file, an HTML comment `hakkiri Style.Rule: off` or `on`, and `vale Style.Rule = NO` or `YES`, SHALL turn one rule off and on.
+The same with a style name and no rule SHALL turn the style off and on.
 Vale's `off` and `on` SHALL stand for `NO` and `YES`, and a rule name that no rule has SHALL change nothing.
 
 #### Scenario: Between two blocks
@@ -65,13 +65,13 @@ Vale's `off` and `on` SHALL stand for `NO` and `YES`, and a rule name that no ru
 
 ### Requirement: A rule is gated where its text is read
 
-A rule that a comment turned off before the text of a block is read SHALL read no text in that block.  
+A rule that a comment turned off before the text of a block is read SHALL read no text in that block.
 The text is read when its element ends, or when a block tag inside it flushes it.
 
 An alert between the comments that turned a rule off and on SHALL be left out.
 
-In a tight list item, a paragraph SHALL be read before a nested block that opens a block tag.  
-It may be a list, quote, code block, table, heading or HTML block.  
+In a tight list item, a paragraph SHALL be read before a nested block that opens a block tag.
+It may be a list, quote, code block, table, heading or HTML block.
 Otherwise it SHALL be read at the end of the item.
 
 #### Scenario: A comment inside a paragraph
@@ -153,7 +153,7 @@ Otherwise it SHALL be read at the end of the item.
 
 ### Requirement: An MDX file's braces comments are comments
 
-In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}` SHALL turn rules off and on as the HTML comment does.  
+In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}` SHALL turn rules off and on as the HTML comment does.
 It SHALL do so as a block of its own or inside a line of text, and in every form the HTML comment takes.
 
 The text SHALL be exactly `{/*` and `*/}` around the comment, so `{ /* vale off */ }` and `{/* Vale Off */}` are text.

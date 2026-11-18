@@ -4,8 +4,8 @@ Queue row: `HKR-020` in [tasks.yaml][ledger], a new row after `HKR-014`.
 
 ## Motivation
 
-The [`case-and-sequence-checks` change][case] runs `capitalization` and `sequence`, and builds the dictionary reader and the built-in dictionary.  
-The Vale importer, `HKR-007`, also meets `spelling` in the upstream styles it converts, and Vale's `affix` field on `existence` and `substitution`.  
+The [`case-and-sequence-checks` change][case] runs `capitalization` and `sequence`, and builds the dictionary reader and the built-in dictionary.
+The Vale importer, `HKR-007`, also meets `spelling` in the upstream styles it converts, and Vale's `affix` field on `existence` and `substitution`.
 Both need that dictionary and its affix rules.
 
 ProseStyle uses neither, so no project that hakkiri lints today waits on this change.

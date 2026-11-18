@@ -2,19 +2,19 @@
 
 ### Requirement: Known gaps are listed apart from the differences
 
-**Reason**: OpenSpec cannot drop one scenario of a modified requirement.  
-The gap for a rule setting that enables one rule closes.  
+**Reason**: OpenSpec cannot drop one scenario of a modified requirement.
+The gap for a rule setting that enables one rule closes.
 So the requirement is removed and added again below without that scenario.
 
-**Migration**: Read the requirement of the same body under the ADDED section, called "Known gaps are listed apart from the intended differences".  
+**Migration**: Read the requirement of the same body under the ADDED section, called "Known gaps are listed apart from the intended differences".
 Its five remaining scenarios are unchanged.
 
 ## ADDED Requirements
 
 ### Requirement: Known gaps are listed apart from the intended differences
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
-The intended differences SHALL stay apart from this list.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.
+The intended differences SHALL stay apart from this list.
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: The built-in spelling rule
@@ -46,7 +46,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 ### Requirement: A rule setting is spelled as hakkiri's config spells it
 
-hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`.  
+hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`.
 hakkiri SHALL reject a rule key that matches no rule, and a value that is none of those words or a level.
 
 #### Scenario: A rule turned on at its own level

@@ -4,7 +4,7 @@
 
 ### Requirement: Inline markup is a gap
 
-The markup of strong text, emphasis, links, autolinks, code spans and images SHALL be gaps between segments.  
+The markup of strong text, emphasis, links, autolinks, code spans and images SHALL be gaps between segments.
 These gaps SHALL cover the markers, the brackets, a link's target and title, an autolink's angle brackets and the backticks.
 
 A link node SHALL have the segments of its text, a code node those of its content, and an `alt` node those of its alt text.
@@ -22,7 +22,7 @@ A link node SHALL have the segments of its text, a code node those of its conten
 
 ### Requirement: A URL is a gap in the prose around the link
 
-The text of an autolink or a bare URL SHALL stay in its `link` node.  
+The text of an autolink or a bare URL SHALL stay in its `link` node.
 It SHALL be a gap in the nodes around that node, since a URL counts no words in Vale.
 
 #### Scenario: An autolink

@@ -2,8 +2,8 @@
 
 ### Requirement: A package style named Vale is skipped with a warning
 
-hakkiri SHALL skip a package folder named for the built-in style `Vale`, as Vale does.  
-It SHALL print one warning that shows the folder and states that the built-in style wins.  
+hakkiri SHALL skip a package folder named for the built-in style `Vale`, as Vale does.
+It SHALL print one warning that shows the folder and states that the built-in style wins.
 The other styles of the package SHALL load as before.
 
 #### Scenario: A package contains styles Acme and Vale

@@ -2,7 +2,7 @@
 
 ### Requirement: A glob sets the parameters of a rule
 
-hakkiri SHALL read `params` in a glob of `files` as a mapping from a rule name to a mapping from a parameter name to one value.  
+hakkiri SHALL read `params` in a glob of `files` as a mapping from a rule name to a mapping from a parameter name to one value.
 The value SHALL be a number, `true` or `false`, or text.
 
 hakkiri SHALL read the rule again with each parameter replacing the field of that name, whether the rule comes from a rule file or is `Vale.Repetition`.
@@ -24,9 +24,9 @@ hakkiri SHALL read the rule again with each parameter replacing the field of tha
 
 ### Requirement: A parameter reaches the files of its glob
 
-A parameter SHALL apply to the files that the glob setting it matches.  
-The globs that match a file SHALL apply in the order of the settings cascade of `project-config`.  
-A more specific glob SHALL win for the same parameter of the same rule.  
+A parameter SHALL apply to the files that the glob setting it matches.
+The globs that match a file SHALL apply in the order of the settings cascade of `project-config`.
+A more specific glob SHALL win for the same parameter of the same rule.
 An empty `styles` list SHALL drop the parameters of the globs that rank below it.
 
 #### Scenario: A file outside the glob
@@ -51,7 +51,7 @@ An empty `styles` list SHALL drop the parameters of the globs that rank below it
 
 ### Requirement: A rejected parameter shows its config line
 
-hakkiri SHALL reject a parameter with the config file and the line of the parameter, and SHALL report every rejection of a config at once.  
+hakkiri SHALL reject a parameter with the config file and the line of the parameter, and SHALL report every rejection of a config at once.
 A parameter of a rule that no glob runs SHALL be rejected in the same way.
 
 #### Scenario: Several faults
@@ -66,8 +66,8 @@ A parameter of a rule that no glob runs SHALL be rejected in the same way.
 
 ### Requirement: A parameter a rule cannot take is rejected
 
-hakkiri SHALL reject a level, and a field that contains a list, a mapping, the rule's identity or its prose.  
-It SHALL also reject a field the rule's check does not define.  
+hakkiri SHALL reject a level, and a field that contains a list, a mapping, the rule's identity or its prose.
+It SHALL also reject a field the rule's check does not define.
 It SHALL reject a value of the wrong kind, a missing value, and a list or a mapping as a value.
 
 #### Scenario: A level

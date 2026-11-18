@@ -4,8 +4,8 @@ Queue row: `HKR-013` in [tasks.yaml][ledger], a new row after `HKR-004`.
 
 ## Motivation
 
-The [`rule-engine` change][engine] runs the four check types ProseStyle uses.  
-The Vale importer, `HKR-007`, converts every check type but `script`, and the upstream styles it converts use more of them.  
+The [`rule-engine` change][engine] runs the four check types ProseStyle uses.
+The Vale importer, `HKR-007`, converts every check type but `script`, and the upstream styles it converts use more of them.
 Four of the remaining types need no data beyond what the engine already has: `consistency`, `conditional`, `repetition` and `readability`.
 
 ## Changes

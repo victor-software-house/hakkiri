@@ -8,10 +8,10 @@
 
 ### Requirement: Cases come from rule files and test files
 
-`hakkiri test` SHALL run the `tests` of each rule file and each case of each `*.test.yml` file under the paths it is given.  
+`hakkiri test` SHALL run the `tests` of each rule file and each case of each `*.test.yml` file under the paths it is given.
 With no path, it SHALL use the current directory.
 
-A directory walk SHALL skip a dot directory other than the one given, and every folder the `check` walk skips by name.  
+A directory walk SHALL skip a dot directory other than the one given, and every folder the `check` walk skips by name.
 It SHALL read any other `.yml` file only when it contains `extends` and `tests`, and SHALL fail when it finds no case.
 
 #### Scenario: A rule with cases and a test file
@@ -46,7 +46,7 @@ It SHALL read any other `.yml` file only when it contains `extends` and `tests`,
 
 ### Requirement: A rule file may contain cases
 
-A rule file SHALL take `tests` as the cases of [design decision 2][test-2].  
+A rule file SHALL take `tests` as the cases of [design decision 2][test-2].
 `hakkiri check` SHALL load them and run none, and SHALL reject a malformed `tests` with its line.
 
 #### Scenario: A rule with cases under check
@@ -61,7 +61,7 @@ A rule file SHALL take `tests` as the cases of [design decision 2][test-2].
 
 ### Requirement: A case is checked before it runs
 
-A case SHALL have a `name` that is unique in its file, and at least one of `want`, `contains` and `absent`.  
+A case SHALL have a `name` that is unique in its file, and at least one of `want`, `contains` and `absent`.
 hakkiri SHALL reject a field a case does not define, with its line.
 
 #### Scenario: A case that asserts nothing
@@ -71,7 +71,7 @@ hakkiri SHALL reject a field a case does not define, with its line.
 
 ### Requirement: A case sees alerts as lines
 
-A case's alerts SHALL be one line each, `line:column:Rule:message`, in order of line and column.  
+A case's alerts SHALL be one line each, `line:column:Rule:message`, in order of line and column.
 `contains` and `absent` SHALL test the lines for a substring, and `want` SHALL equal them once both are trimmed.
 
 #### Scenario: Contains and want
@@ -83,7 +83,7 @@ A case's alerts SHALL be one line each, `line:column:Rule:message`, in order of 
 
 A case in a rule's `tests`, and a case with `rule`, SHALL load that rule alone, from a path relative to its file.
 
-It SHALL read no config, report an alert of any level, and name the rule as the style loader does, so `Team/Foo.v2.yml` is `Team.Foo`.  
+It SHALL read no config, report an alert of any level, and name the rule as the style loader does, so `Team/Foo.v2.yml` is `Team.Foo`.
 Any other case SHALL lint `input` as a file called `input.<format>` through the project config.
 
 #### Scenario: A rule turned off in the config
@@ -98,7 +98,7 @@ Any other case SHALL lint `input` as a file called `input.<format>` through the 
 
 ### Requirement: Coverage lists rules no case fires
 
-With `--coverage`, hakkiri SHALL fail when a rule file under the paths produced no alert in any case, and SHALL list each such rule.  
+With `--coverage`, hakkiri SHALL fail when a rule file under the paths produced no alert in any case, and SHALL list each such rule.
 It SHALL skip dot and underscore folders when it lists the rules.
 
 #### Scenario: A rule no case fires
@@ -113,10 +113,10 @@ It SHALL skip dot and underscore folders when it lists the rules.
 
 ### Requirement: The report and exit status show what happened
 
-hakkiri SHALL print, for each failed case, its file, name and reason, and the alerts it got, and then a count line.  
+hakkiri SHALL print, for each failed case, its file, name and reason, and the alerts it got, and then a count line.
 `--format json` SHALL print `passed`, `failed`, `files`, `results`, `uncovered` and `failures`.
 
-It SHALL exit 0 when every case passes and no rule is uncovered, and 1 when a case fails or a rule is uncovered.  
+It SHALL exit 0 when every case passes and no rule is uncovered, and 1 when a case fails or a rule is uncovered.
 It SHALL exit 2 when a case could not run, after every other case has reported.
 
 #### Scenario: A failed case
@@ -138,7 +138,7 @@ It SHALL exit 2 when a case could not run, after every other case has reported.
 
 ### Requirement: The cases of a rule hakkiri cannot run are not run
 
-`hakkiri test` SHALL report the cases of a rule hakkiri cannot run as not run, with a failure that says its cases did not run.  
+`hakkiri test` SHALL report the cases of a rule hakkiri cannot run as not run, with a failure that says its cases did not run.
 It SHALL report a case that runs through a config as not run when the config runs such a rule on the case's file.
 
 #### Scenario: A script rule with a case
@@ -153,8 +153,8 @@ It SHALL report a case that runs through a config as not run when the config run
 
 ### Requirement: A case's format picks its reader
 
-A case that runs through the config SHALL read its input by the reader a `formats` entry gives `input.<format>`, and otherwise by the extension `<format>`.  
-An isolated case SHALL read its input by the extension `<format>`.  
+A case that runs through the config SHALL read its input by the reader a `formats` entry gives `input.<format>`, and otherwise by the extension `<format>`.
+An isolated case SHALL read its input by the extension `<format>`.
 A case whose format no reader reads SHALL read its input as plain text, except that a case through the config follows `on_unknown`.
 
 #### Scenario: A format no extension maps to
@@ -169,7 +169,7 @@ A case whose format no reader reads SHALL read its input as plain text, except t
 
 ### Requirement: A case through the config has the extensions of its file
 
-A case that runs through the config SHALL have the extensions that `check` gives the file `input.<format>`.  
+A case that runs through the config SHALL have the extensions that `check` gives the file `input.<format>`.
 Those are `<format>` and the extension of the reader, which a `formats` entry may give.
 
 #### Scenario: A mapped case
@@ -179,7 +179,7 @@ Those are `<format>` and the extension of the reader, which a `formats` entry ma
 
 ### Requirement: A case through the config follows on_unknown
 
-A case through the config whose format no reader reads, and whose file the config selects, SHALL follow `on_unknown` as `check` does.  
+A case through the config whose format no reader reads, and whose file the config selects, SHALL follow `on_unknown` as `check` does.
 `text` reads it as plain text, `warn` and `ignore` give it no alerts, and `error` makes the case fail to run with a message that shows the format.
 
 #### Scenario: An error

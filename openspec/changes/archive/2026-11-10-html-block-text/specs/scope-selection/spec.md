@@ -2,7 +2,7 @@
 
 ### Requirement: text selects the prose leaves
 
-The scope `text` SHALL select each paragraph, heading, table cell and caption, in a Markdown file and inside a comment.  
+The scope `text` SHALL select each paragraph, heading, table cell and caption, in a Markdown file and inside a comment.
 It SHALL select the alt text of an image and the description of a page too, each as one block that no sentence splitter cuts.
 
 A list item or a block quote SHALL be read through the paragraphs inside it, so its text is read once.
@@ -27,7 +27,7 @@ The text of each of these SHALL read each HTML character reference as the charac
 - a link, strong text or emphasis
 - alt text
 
-This SHALL match `golang.org/x/net/html` at v0.62.0.  
+This SHALL match `golang.org/x/net/html` at v0.62.0.
 A code span, a comment and the `raw` text SHALL read as written.
 
 #### Scenario: A reference in a paragraph
@@ -52,7 +52,7 @@ A code span, a comment and the `raw` text SHALL read as written.
 
 ### Requirement: A reference reads once and keeps its place
 
-A reference SHALL read once, so `&amp;lt;` reads as `&lt;`.  
+A reference SHALL read once, so `&amp;lt;` reads as `&lt;`.
 An alert on a character that a reference gave SHALL point at the first byte of the reference.
 
 #### Scenario: A reference of a reference

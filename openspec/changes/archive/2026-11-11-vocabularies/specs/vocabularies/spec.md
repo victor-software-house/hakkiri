@@ -21,7 +21,7 @@ hakkiri SHALL read a listed vocabulary from `config/vocabularies/<name>/` under 
 
 ### Requirement: A line of a list is a term
 
-hakkiri SHALL trim each line of a list and read it as one term.  
+hakkiri SHALL trim each line of a list and read it as one term.
 It SHALL skip a blank line and a line that starts with a hash and a space.
 
 #### Scenario: A comment and a term that looks like one
@@ -36,8 +36,8 @@ It SHALL skip a blank line and a line that starts with a hash and a space.
 
 ### Requirement: A term is plain text or a pattern
 
-hakkiri SHALL read a term as plain text when it contains no pattern operator other than a period, with each period literal.  
-It SHALL read any other term as a pattern.  
+hakkiri SHALL read a term as plain text when it contains no pattern operator other than a period, with each period literal.
+It SHALL read any other term as a pattern.
 A run of whitespace in a term SHALL match any run of whitespace.
 
 #### Scenario: A plain term with a period
@@ -63,8 +63,8 @@ A run of whitespace in a term SHALL match any run of whitespace.
 
 ### Requirement: Accepted terms drop matches of the checks that read them
 
-hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule, before it rewrites and sorts them.  
-It SHALL drop a match that is an accepted term or lies inside an accepted phrase.  
+hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule, before it rewrites and sorts them.
+It SHALL drop a match that is an accepted term or lies inside an accepted phrase.
 A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonword` SHALL read none.
 
 #### Scenario: An existence rule
@@ -84,8 +84,8 @@ A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonwor
 
 ### Requirement: Spelling reads the accepted terms whole and without case
 
-hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule as a whole word, matched without regard to case.  
-A `vocab` field SHALL NOT turn that off.  
+hakkiri SHALL add each accepted term to the exceptions of a `spelling` rule as a whole word, matched without regard to case.
+A `vocab` field SHALL NOT turn that off.
 It SHALL mask an accepted phrase before it checks the words.
 
 #### Scenario: An accepted word and a near miss
@@ -100,10 +100,10 @@ It SHALL mask an accepted phrase before it checks the words.
 
 ### Requirement: A glob adds vocabularies for its files
 
-hakkiri SHALL drop, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.  
+hakkiri SHALL drop, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.
 The match SHALL be an accepted term of a vocabulary that a matching glob lists, or lie inside an accepted phrase of one.
 
-It SHALL do so whatever the rule's `vocab` and `nonword` are set to, and a `capitalization` or `conditional` rule SHALL read none.  
+It SHALL do so whatever the rule's `vocab` and `nonword` are set to, and a `capitalization` or `conditional` rule SHALL read none.
 A file SHALL take the vocabularies of every glob that matches it, besides the top-level ones.
 
 #### Scenario: A glob's vocabulary

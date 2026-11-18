@@ -2,16 +2,16 @@
 
 ## Purpose
 
-A release of hakkiri is a tag, a GitHub Release and one tarball for each platform a consumer locks.  
+A release of hakkiri is a tag, a GitHub Release and one tarball for each platform a consumer locks.
 The release workflow of verctl builds it, and mise installs it from a pinned version with the checksum its lock records.
 
 ## Requirements
 
 ### Requirement: A release is a tag, a Release and two tarballs
 
-A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.  
-The `linux-x64` tarball SHALL contain a statically linked `x86_64-unknown-linux-musl` binary.  
-GitHub records each tarball's SHA-256 digest, which a lock reads.  
+A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.
+The `linux-x64` tarball SHALL contain a statically linked `x86_64-unknown-linux-musl` binary.
+GitHub records each tarball's SHA-256 digest, which a lock reads.
 It SHALL publish nothing to crates.io.
 
 #### Scenario: The first release
@@ -40,7 +40,7 @@ It SHALL publish nothing to crates.io.
 
 ### Requirement: Two texts carry the version
 
-The skill's `version:` line and the README's install line SHALL show the released version, and the Version PR SHALL move both with the crate.  
+The skill's `version:` line and the README's install line SHALL show the released version, and the Version PR SHALL move both with the crate.
 A pattern that matches nowhere or more than once SHALL stop the release.
 
 #### Scenario: A version bump
@@ -60,7 +60,7 @@ The `linux-x64` binary SHALL start on a Linux machine that has no glibc loader, 
 
 ### Requirement: The linux-x64 binary keeps its speed
 
-The `linux-x64` binary SHALL use mimalloc as its global allocator, and no other build SHALL link it.  
+The `linux-x64` binary SHALL use mimalloc as its global allocator, and no other build SHALL link it.
 A `check` over many files on four CPUs SHALL take at most twice as long as the same release built for glibc.
 
 #### Scenario: Many files

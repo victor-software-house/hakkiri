@@ -2,18 +2,18 @@
 
 ### Requirement: Known gaps are listed apart
 
-**Reason**: OpenSpec cannot drop one scenario of a modified requirement.  
+**Reason**: OpenSpec cannot drop one scenario of a modified requirement.
 The gap for HTML-block text closes, so the requirement is removed and added again below without that scenario.
 
-**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from the differences".  
+**Migration**: Read the requirement of the same body under the ADDED section, named "Known gaps are listed apart from the differences".
 Its four remaining scenarios are unchanged, and it adds two.
 
 ## ADDED Requirements
 
 ### Requirement: Known gaps are listed apart from the differences
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
-The list SHALL stay apart from the intended differences.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.
+The list SHALL stay apart from the intended differences.
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: The built-in spelling rule
@@ -50,7 +50,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 ### Requirement: HTML-block text differs from Vale in detail
 
-hakkiri SHALL read the text of an HTML block and the text around inline HTML as each scenario below says.  
+hakkiri SHALL read the text of an HTML block and the text around inline HTML as each scenario below says.
 In each of these cases, Vale 3.26.0 reads it otherwise.
 
 #### Scenario: A reference is unescaped once

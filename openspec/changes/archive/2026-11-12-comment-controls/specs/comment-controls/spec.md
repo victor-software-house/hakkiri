@@ -2,10 +2,10 @@
 
 ### Requirement: A comment turns every rule off and on
 
-In a Markdown file, an HTML comment `hakkiri off` or `vale off` SHALL leave the text after it out of every block.  
+In a Markdown file, an HTML comment `hakkiri off` or `vale off` SHALL leave the text after it out of every block.
 This SHALL last until a comment `hakkiri on` or `vale on`, or the end of the file.
 
-The comment SHALL be read with the blanks at its ends and its line breaks trimmed.  
+The comment SHALL be read with the blanks at its ends and its line breaks trimmed.
 In capitals, with another word in front, in a code block, in a code span or after a backslash, it SHALL be text.
 
 #### Scenario: Between two blocks
@@ -35,8 +35,8 @@ In capitals, with another word in front, in a code block, in a code span or afte
 
 ### Requirement: A comment turns a rule or a style off and on
 
-In a Markdown file, an HTML comment `hakkiri Style.Rule: off` or `on`, and `vale Style.Rule = NO` or `YES`, SHALL turn one rule off and on.  
-The same with a style name and no rule SHALL turn the style off and on.  
+In a Markdown file, an HTML comment `hakkiri Style.Rule: off` or `on`, and `vale Style.Rule = NO` or `YES`, SHALL turn one rule off and on.
+The same with a style name and no rule SHALL turn the style off and on.
 Vale's `off` and `on` SHALL stand for `NO` and `YES`, and a rule name that no rule has SHALL change nothing.
 
 #### Scenario: Between two blocks
@@ -56,13 +56,13 @@ Vale's `off` and `on` SHALL stand for `NO` and `YES`, and a rule name that no ru
 
 ### Requirement: A rule is gated where its text is read
 
-A rule that a comment turned off before the text of a block is read SHALL read no text in that block.  
+A rule that a comment turned off before the text of a block is read SHALL read no text in that block.
 The text is read when its element ends, or where a tag that opens a block inside the element flushes it.
 
 An alert between the comment that turned a rule off and the one that turned it on SHALL be left out.
 
-A tight list item's paragraph SHALL be read before the first block inside the item.  
-Such a block is a nested list, quote, code block, table, heading, or an HTML block that opens a block tag.  
+A tight list item's paragraph SHALL be read before the first block inside the item.
+Such a block is a nested list, quote, code block, table, heading, or an HTML block that opens a block tag.
 Otherwise it SHALL be read at the end of the item.
 
 #### Scenario: A comment inside a paragraph
@@ -145,8 +145,8 @@ Otherwise it SHALL be read at the end of the item.
 
 ### Requirement: An MDX file's braces comments are comments
 
-In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}` SHALL turn rules off and on as the HTML comment does.  
-This SHALL apply to a comment as a block of its own or inside a line of text.  
+In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}` SHALL turn rules off and on as the HTML comment does.
+This SHALL apply to a comment as a block of its own or inside a line of text.
 It SHALL apply to every form of the HTML comment.
 
 The text SHALL be exactly `{/*` and `*/}` around the comment, so `{ /* vale off */ }` and `{/* Vale Off */}` are text.

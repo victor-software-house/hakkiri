@@ -2,16 +2,16 @@
 
 ## Purpose
 
-This spec lists every intended difference between hakkiri and Vale 3.26.0.  
-Each scenario states the case, what Vale does, what hakkiri does, and links the decision that records it.  
-A known gap, where hakkiri lacks something Vale does and means to close it, is not a difference.  
+This spec lists every intended difference between hakkiri and Vale 3.26.0.
+Each scenario states the case, what Vale does, what hakkiri does, and links the decision that records it.
+A known gap, where hakkiri lacks something Vale does and means to close it, is not a difference.
 It is listed apart, with its queue row, under Known gaps.
 
 ## Requirements
 
 ### Requirement: Every intended difference is listed here
 
-Every intended difference from Vale 3.26.0 SHALL be a scenario of this spec, with a link to the decision that records it.  
+Every intended difference from Vale 3.26.0 SHALL be a scenario of this spec, with a link to the decision that records it.
 A pull request that adds, changes or removes a difference SHALL change this spec in the same pull request.
 
 #### Scenario: A change adds a difference
@@ -240,7 +240,7 @@ hakkiri SHALL reject at load each rule below, which Vale 3.26.0 loads.
 
 ### Requirement: A run finishes where Vale panics, stalls or runs out of memory
 
-hakkiri SHALL finish a run on each input below in bounded time and memory.  
+hakkiri SHALL finish a run on each input below in bounded time and memory.
 Vale 3.26.0 panics, runs out of memory, or takes quadratic, cubic or exponential time.
 
 #### Scenario: A pattern reaches its limit
@@ -275,7 +275,7 @@ Vale 3.26.0 panics, runs out of memory, or takes quadratic, cubic or exponential
 
 ### Requirement: A comment reads as Markdown
 
-hakkiri SHALL read every comment of a code file as Markdown.  
+hakkiri SHALL read every comment of a code file as Markdown.
 Vale 3.26.0 reads it as plain lines unless a View sets a markup format.
 
 #### Scenario: A code span in a plain comment
@@ -309,7 +309,7 @@ hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.2
 
 ### Requirement: Globs match from the project root
 
-hakkiri SHALL match each `files` glob against the file's path relative to the project root.  
+hakkiri SHALL match each `files` glob against the file's path relative to the project root.
 Vale 3.26.0 matches the path as given after cleaning it.
 
 #### Scenario: A file given by its absolute path
@@ -348,7 +348,7 @@ hakkiri SHALL read cases and print their report as each scenario below says, whe
 
 ### Requirement: A rule setting is spelled as hakkiri's config spells it
 
-hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`.  
+hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`.
 It SHALL reject a rule key for no known rule, and a value that is none of those words or a level.
 
 #### Scenario: A rule turned on at its own level
@@ -531,7 +531,7 @@ hakkiri SHALL hide the text a block or token pattern matches as Vale does, apart
 
 ### Requirement: A sentence rule in a comment is read otherwise than Vale reads it
 
-hakkiri SHALL list here the place where it still reads a file otherwise than Vale at 66bbb85.  
+hakkiri SHALL list here the place where it still reads a file otherwise than Vale at 66bbb85.
 The probe of the ignores and the comment controls left this place.
 
 #### Scenario: A sentence rule in a comment
@@ -548,7 +548,7 @@ The probe of the ignores and the comment controls left this place.
 
 ### Requirement: A message verb with no value differs from Vale
 
-hakkiri SHALL read a `%s` or `%[n]s` of a message that has no value to take as nothing.  
+hakkiri SHALL read a `%s` or `%[n]s` of a message that has no value to take as nothing.
 Vale 3.26.0 prints Go's error text for it.
 
 #### Scenario: A verb past the values
@@ -560,7 +560,7 @@ Vale 3.26.0 prints Go's error text for it.
 
 ### Requirement: The end of a match that wraps a line differs from Vale
 
-hakkiri SHALL give the line and column of a match's last character.  
+hakkiri SHALL give the line and column of a match's last character.
 Vale 3.26.0 prints the first column plus the number of characters of the match, line breaks included.
 
 #### Scenario: A match across a line break
@@ -573,10 +573,10 @@ Vale 3.26.0 prints the first column plus the number of characters of the match, 
 
 ### Requirement: Known gaps are listed apart from what differs by choice
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.
 The intended differences are not part of this list.
 
-Each gap SHALL be a requirement of its own, called "<gap> is a known gap", so a pull request that closes one removes only that requirement.  
+Each gap SHALL be a requirement of its own, called "<gap> is a known gap", so a pull request that closes one removes only that requirement.
 A pull request that closes a gap SHALL record any difference the closing leaves as an intended difference.
 
 #### Scenario: A pull request closes a gap
@@ -611,7 +611,7 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 #### Scenario: A doc selector or a View
 
 - **WHEN** a rule has `scope: doc(h1)`, a section sets a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.  
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
   It rejects the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 ### Requirement: A Vale configuration file is a known gap
@@ -634,7 +634,7 @@ hakkiri SHALL differ from Vale 3.26.0 as the scenario below says, until the queu
 
 ### Requirement: Comment controls differ from Vale's in these ways
 
-hakkiri SHALL read the comments that turn rules off and on as Vale does in a Markdown file, apart from the scenarios below.  
+hakkiri SHALL read the comments that turn rules off and on as Vale does in a Markdown file, apart from the scenarios below.
 It SHALL also read the forms of its own.
 
 #### Scenario: Forms hakkiri adds
@@ -670,7 +670,7 @@ It SHALL also read the forms of its own.
 
 ### Requirement: A walk and a given file differ from Vale's
 
-hakkiri SHALL skip the files git ignores in a walk and SHALL warn about a file given by path that no glob selects.  
+hakkiri SHALL skip the files git ignores in a walk and SHALL warn about a file given by path that no glob selects.
 Vale 3.26.0 does neither.
 
 #### Scenario: An ignored build folder
@@ -687,8 +687,8 @@ Vale 3.26.0 does neither.
 
 ### Requirement: Readers differ from Vale in what a file with no reader gets
 
-hakkiri SHALL read a selected file that no reader reads as plain text, and skip a binary file.  
-It SHALL map a format as each scenario below shows.  
+hakkiri SHALL read a selected file that no reader reads as plain text, and skip a binary file.
+It SHALL map a format as each scenario below shows.
 Vale 3.26.0 does otherwise.
 
 #### Scenario: A manuscript
@@ -723,7 +723,7 @@ Vale 3.26.0 does otherwise.
 
 ### Requirement: Doc line comments join across blank lines
 
-hakkiri SHALL join Rust doc line comments of the same type across blank lines.  
+hakkiri SHALL join Rust doc line comments of the same type across blank lines.
 Vale 3.26.0 joins a line comment only when it follows the previous one directly.
 
 #### Scenario: A fence across a blank line
@@ -735,7 +735,7 @@ Vale 3.26.0 joins a line comment only when it follows the previous one directly.
 
 ### Requirement: Tags come from the model and its corrections
 
-hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.  
+hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.
 Vale 3.26.0 tags with the model of prose v3.2.2, so the tags of the two tools differ.
 
 #### Scenario: Another model
@@ -787,7 +787,7 @@ hakkiri SHALL apply to the tags of a sentence the corrections below, in this ord
 
 ### Requirement: A code span is a noun of a sequence
 
-hakkiri SHALL read a code span as a noun in a `sequence` rule, and a pattern for a lowercase word SHALL reject it.  
+hakkiri SHALL read a code span as a noun in a `sequence` rule, and a pattern for a lowercase word SHALL reject it.
 Vale 3.26.0 reads the span as a run of `*`, and a rule with a tag and no pattern flags it.
 
 #### Scenario: A code name before a verb
@@ -797,10 +797,10 @@ Vale 3.26.0 reads the span as a run of `*`, and a rule with a tag and no pattern
 
 ### Requirement: The verbs of saying and asking keep their place
 
-hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is.  
+hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is.
 It SHALL tag `asks` and `asked` in the noun phrase of a preposition as a noun and a participle.
 
-So a `sequence` rule with a verb tag flags the first and no other.  
+So a `sequence` rule with a verb tag flags the first and no other.
 Vale tags the same words with the older model, and its rule has no verb tag.
 
 #### Scenario: A verb after a noun
@@ -966,7 +966,7 @@ hakkiri SHALL read a rule's parameters as Vale 3.26.0 does, apart from the scena
 
 ### Requirement: A consistency alert in a multi-line paragraph differs from Vale
 
-hakkiri SHALL place a `consistency` alert on the last match of a form, though an earlier line contains the same text.  
+hakkiri SHALL place a `consistency` alert on the last match of a form, though an earlier line contains the same text.
 
 #### Scenario: A form inside a longer word on a later line
 
@@ -984,7 +984,7 @@ hakkiri SHALL place a `consistency` alert on the last match of a form, though an
 
 hakkiri SHALL report an `existence` match that runs across a code span, as Vale does, and SHALL drop one that starts or ends on a span.
 
-Vale 3.26.0 masks the span as a run of `*` and reports a match that starts on it as well.  
+Vale 3.26.0 masks the span as a run of `*` and reports a match that starts on it as well.
 The matched text differs: hakkiri prints `x` for the span, and Vale prints the mask.
 
 #### Scenario: A chain across a code span
@@ -996,10 +996,10 @@ The matched text differs: hakkiri prints `x` for the span, and Vale prints the m
 
 ### Requirement: The nouns of technical prose read as nouns
 
-hakkiri SHALL tag `check`, `prompt`, `thinking` and `fade` as nouns after a determiner, where the model tags them as another part of speech.  
+hakkiri SHALL tag `check`, `prompt`, `thinking` and `fade` as nouns after a determiner, where the model tags them as another part of speech.
 It SHALL tag `prompt`, `round` and `split` as nouns after a noun when the nouns after them run up to `pull request`.
 
-It SHALL tag `check` as a noun when a base form follows two singular nouns before a preposition or a stop.  
+It SHALL tag `check` as a noun when a base form follows two singular nouns before a preposition or a stop.
 A rule of four lowercase nouns then counts them, and the verb `check` after a plural noun stays a verb.
 
 #### Scenario: A word of a pull request title
@@ -1096,8 +1096,8 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 
 ### Requirement: A bare address ends where GitHub Flavored Markdown (GFM) ends it
 
-hakkiri SHALL end a bare web address at whitespace or `<`, as GFM and its Markdown parser do.  
-Vale ends one at the first byte that the linkify pattern of goldmark 1.8.6 leaves out, and reads the rest as text.  
+hakkiri SHALL end a bare web address at whitespace or `<`, as GFM and its Markdown parser do.
+Vale ends one at the first byte that the linkify pattern of goldmark 1.8.6 leaves out, and reads the rest as text.
 That pattern contains no letter outside ASCII.
 
 #### Scenario: A bare address with a letter outside ASCII
@@ -1109,7 +1109,7 @@ That pattern contains no letter outside ASCII.
 
 ### Requirement: Settings resolve by specificity, where Vale applies its sections in order
 
-hakkiri SHALL resolve the settings of the globs that match a file by the settings cascade of `project-config`.  
+hakkiri SHALL resolve the settings of the globs that match a file by the settings cascade of `project-config`.
 Vale 66bbb85 applies its sections in the order written, a later section winning for the file ([file.go][vale-file]).
 
 #### Scenario: A specific glob written first
@@ -1121,8 +1121,8 @@ Vale 66bbb85 applies its sections in the order written, a later section winning 
 
 ### Requirement: A package glob can beat the project's top level, and the project can force a value
 
-hakkiri SHALL rank a package's glob above the project's top level, and SHALL apply a value the project tags `!override` after every other value.  
-Vale 66bbb85 applies a package's sections before the project's, as written.  
+hakkiri SHALL rank a package's glob above the project's top level, and SHALL apply a value the project tags `!override` after every other value.
+Vale 66bbb85 applies a package's sections before the project's, as written.
 It has no way to force a value ([file.go][vale-file]).
 
 #### Scenario: A package glob and the project's top level
@@ -1156,7 +1156,7 @@ hakkiri SHALL split sentences by its own splitter where Vale 66bbb85's segmenter
 
 ### Requirement: HTML-block text differs from Vale in these details
 
-hakkiri SHALL read the text of an HTML block and the text around inline HTML as each scenario below says.  
+hakkiri SHALL read the text of an HTML block and the text around inline HTML as each scenario below says.
 Vale 3.26.0 reads it otherwise.
 
 #### Scenario: A reference is unescaped once
@@ -1253,7 +1253,7 @@ hakkiri SHALL read Markdown as each scenario below says, where Vale 3.26.0 reads
 
 ### Requirement: The comments of a fenced code block are read
 
-hakkiri SHALL read the comments of a fenced code block whose language it reads the comments of, as the `document-tree` spec sets.  
+hakkiri SHALL read the comments of a fenced code block whose language it reads the comments of, as the `document-tree` spec sets.
 Vale 66bbb85 reads no text inside a fence.
 
 #### Scenario: A Rust fence in Markdown
@@ -1265,7 +1265,7 @@ Vale 66bbb85 reads no text inside a fence.
 
 hakkiri SHALL read the last piece of a scope part as a language of the GitHub Linguist table that langdex contains.
 
-Vale 66bbb85 compares it with the file's extension after its own table folds some extensions together, such as `.tsx`, `.mts` and `.cts` into `.ts`.  
+Vale 66bbb85 compares it with the file's extension after its own table folds some extensions together, such as `.tsx`, `.mts` and `.cts` into `.ts`.
 Linguist keeps TSX (TypeScript with tags) apart from TypeScript, so a scope with `ts` does not reach a `.tsx` file.
 
 #### Scenario: A TSX file
@@ -1275,7 +1275,7 @@ Linguist keeps TSX (TypeScript with tags) apart from TypeScript, so a scope with
 
 ### Requirement: A file with no extension is read by its interpreter
 
-hakkiri SHALL read a file whose path gives no language by the interpreter on its first line.  
+hakkiri SHALL read a file whose path gives no language by the interpreter on its first line.
 Vale 66bbb85 finds no format for such a file and lints nothing in it.
 
 #### Scenario: A script
@@ -1289,8 +1289,8 @@ Vale 66bbb85 finds no format for such a file and lints nothing in it.
 
 ### Requirement: A glob follows gitignore, where Vale matches more
 
-hakkiri SHALL match a glob by the rules of gitignore, as the `project-root` spec sets.  
-Vale 66bbb85 reads a glob with no `**` through gobwas with no separator, so its `*` crosses `/`.  
+hakkiri SHALL match a glob by the rules of gitignore, as the `project-root` spec sets.
+Vale 66bbb85 reads a glob with no `**` through gobwas with no separator, so its `*` crosses `/`.
 It reads a glob with `**` through doublestar, whose trailing `/**` also matches zero folders.
 
 #### Scenario: A star across folders
@@ -1307,8 +1307,8 @@ It reads a glob with `**` through doublestar, whose trailing `/**` also matches 
 
 ### Requirement: Comments of more languages differ from Vale in these ways
 
-hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files as each scenario below shows.  
-It SHALL read the directives and doc links of every source language the same way.  
+hakkiri SHALL read the comments of Go, Swift, YAML, TOML and Shell files as each scenario below shows.
+It SHALL read the directives and doc links of every source language the same way.
 Vale 3.26.0 reads them otherwise.
 
 #### Scenario: Swift is read by its own grammar

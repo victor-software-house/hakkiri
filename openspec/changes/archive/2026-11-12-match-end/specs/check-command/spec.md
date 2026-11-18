@@ -2,8 +2,8 @@
 
 ### Requirement: The JSON output is one object
 
-`--format json` SHALL print one object with `alerts`, `failures` and `files`.  
-Each alert SHALL contain `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
+`--format json` SHALL print one object with `alerts`, `failures` and `files`.
+Each alert SHALL contain `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.
 The output SHALL contain no ESC (escape) byte, whatever the colour variables contain.
 
 #### Scenario: JSON with colour forced

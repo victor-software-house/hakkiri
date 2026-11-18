@@ -4,8 +4,8 @@
 
 ### Requirement: A comment addressed to a tool is not prose
 
-hakkiri SHALL leave out of the tree a comment that a tool reads and a person does not.  
-Each language has its own patterns for such comments, which the scenarios list.  
+hakkiri SHALL leave out of the tree a comment that a tool reads and a person does not.
+Each language has its own patterns for such comments, which the scenarios list.
 A directive SHALL end a run of line comments, so the line after it starts a new comment node.
 
 #### Scenario: A Go directive

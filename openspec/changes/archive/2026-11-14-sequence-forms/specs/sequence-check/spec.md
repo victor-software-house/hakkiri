@@ -2,8 +2,8 @@
 
 ### Requirement: A sequence rule may list several forms
 
-A `sequence` rule SHALL take `forms`, a list of mappings that each contain `tokens`, in place of `tokens`.  
-It SHALL report each run of words that any form matches, with the rule's own name.  
+A `sequence` rule SHALL take `forms`, a list of mappings that each contain `tokens`, in place of `tokens`.
+It SHALL report each run of words that any form matches, with the rule's own name.
 The rest of the rule SHALL apply to every form.
 
 #### Scenario: Either of two forms
@@ -18,8 +18,8 @@ The rest of the rule SHALL apply to every form.
 
 ### Requirement: Overlapping forms give one alert
 
-A match of one form may overlap a match of another form.  
-It SHALL give no alert when the other match starts first, or starts at the same word in an earlier form.  
+A match of one form may overlap a match of another form.
+It SHALL give no alert when the other match starts first, or starts at the same word in an earlier form.
 Matches of one form SHALL NOT drop each other.
 
 #### Scenario: Two forms share a word
@@ -29,8 +29,8 @@ Matches of one form SHALL NOT drop each other.
 
 ### Requirement: A sequence rule has tokens or forms
 
-hakkiri SHALL reject a `sequence` rule that sets both `tokens` and `forms`, or neither.  
-It SHALL reject a form with no token that has a `pattern`, `tag` or `upos` without `negate`.  
+hakkiri SHALL reject a `sequence` rule that sets both `tokens` and `forms`, or neither.
+It SHALL reject a form with no token that has a `pattern`, `tag` or `upos` without `negate`.
 The error SHALL show the path of the form's tokens.
 
 #### Scenario: Both keys

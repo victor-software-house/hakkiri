@@ -2,11 +2,11 @@
 
 ### Requirement: title selects the title of a link, an image and a definition
 
-In a Markdown or MDX file, the scope `title` SHALL select the text of a title.  
-This covers the title of an inline link, an inline image and a link reference definition.  
+In a Markdown or MDX file, the scope `title` SHALL select the text of a title.
+This covers the title of an inline link, an inline image and a link reference definition.
 The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.
 
-The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.  
+The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.
 A link or image with no title, or an empty one, SHALL give no block.
 
 #### Scenario: Three kinds of title
@@ -26,11 +26,11 @@ A link or image with no title, or an empty one, SHALL give no block.
 
 ### Requirement: A title is selected by what contains it
 
-A scope item `title & link` SHALL select the title of an inline link, and `title & image` the title of an inline image.  
-The scope `link` alone and the scope `image` alone SHALL select no title.  
+A scope item `title & link` SHALL select the title of an inline link, and `title & image` the title of an inline image.
+The scope `link` alone and the scope `image` alone SHALL select no title.
 An item with no part for the block itself SHALL select nothing in it.
 
-The scope `image` SHALL select the alt text of an image.  
+The scope `image` SHALL select the alt text of an image.
 A title in a heading or a table cell SHALL be a link title like any other.
 
 #### Scenario: Link, image and definition
@@ -57,8 +57,8 @@ A negated part for the element, such as `title & ~link`, SHALL leave out the tit
 
 ### Requirement: An HTML title attribute is a title
 
-The `title` attribute of an HTML tag SHALL be selected by `title`, and by no prose scope.  
-This applies to a tag in an HTML block and to a tag in a line of text.  
+The `title` attribute of an HTML tag SHALL be selected by `title`, and by no prose scope.
+This applies to a tag in an HTML block and to a tag in a line of text.
 It also applies to the opening tag of a JavaScript XML (JSX) element.
 
 The attribute of an `a` tag SHALL be a link title, and that of an `img` tag an image title.

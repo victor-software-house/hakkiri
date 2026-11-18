@@ -1,13 +1,13 @@
 # Entity table notice
 
-`html5.tsv` lists the named character references of HTML, in the form [golang.org/x/net/html][entity] reads them, at v0.62.0.  
-It contains the `entity` and `entity2` maps of `html/entity.go`, one reference for each line, sorted by name.  
+`html5.tsv` lists the named character references of HTML, in the form [golang.org/x/net/html][entity] reads them, at v0.62.0.
+It contains the `entity` and `entity2` maps of `html/entity.go`, one reference for each line, sorted by name.
 Each line has the name with its `;` when it has one, a tab, and the code points in hexadecimal.
 
-A name with no `;` is a legacy reference that HTML reads without one.  
+A name with no `;` is a legacy reference that HTML reads without one.
 Its SHA-256 is `dd052ec076d43ce16cd2195d13552ae196b2294cd9f0ead3a59b17d9833916f7`.
 
-Vale reads text through that package, so the table makes `src/entity.rs` read a reference as Vale does.  
+Vale reads text through that package, so the table makes `src/entity.rs` read a reference as Vale does.
 The package is under the Berkeley Software Distribution (BSD) 3-clause license, so its notice follows here.
 
 ```text

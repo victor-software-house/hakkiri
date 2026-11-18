@@ -1,56 +1,56 @@
 # Tasks
 
-Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
+Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.
 This change starts after the [rule-engine change][engine] merges.
 
 ## 1. Open decisions
 
-- [x] 1.1 Record the operator's answer to both open decisions in [design.md][design], moving each into Decisions with the candidates that lost.  
-  Change the [readability spec][readability] if the first answer differs from its recommendation.  
-  Verify the Open decisions section is empty and `mise run specs:budget` passes.  
+- [x] 1.1 Record the operator's answer to both open decisions in [design.md][design], moving each into Decisions with the candidates that lost.
+  Change the [readability spec][readability] if the first answer differs from its recommendation.
+  Verify the Open decisions section is empty and `mise run specs:budget` passes.
   2026-11-10, the operator's answers are recorded as decisions, and the Open decisions section is gone.
 
 ## 2. Pattern checks
 
-- [x] 2.1 Build `consistency`: one pattern per `either` pair in Vale's word template, and the forms seen per file in the rule.  
-  Give one alert per node, at the last match of the pair.  
+- [x] 2.1 Build `consistency`: one pattern per `either` pair in Vale's word template, and the forms seen per file in the rule.
+  Give one alert per node, at the last match of the pair.
   Verify every consistency scenario in the [pattern-checks spec][pattern] passes as a unit test in CI.
-  - 2026-11-10 (UTC), 13 tests in `tests/consistency.rs` cover every consistency scenario, in a Linux box run of [94c5649][c-consistency].  
+  - 2026-11-10 (UTC), 13 tests in `tests/consistency.rs` cover every consistency scenario, in a Linux box run of [94c5649][c-consistency].
     They add a mixed paragraph, the last match, the other form first, case, `nonword`, code, a fresh file, and two refusals.
-- [x] 2.2 Build `conditional`: group detection, the plain presence check, the terms captured per file in document order, `exceptions`, and the refusal of `in`.  
+- [x] 2.2 Build `conditional`: group detection, the plain presence check, the terms captured per file in document order, `exceptions`, and the refusal of `in`.
   Verify every conditional scenario passes as a unit test in CI.
-  - 2026-11-10 (UTC), 15 tests in `tests/conditional.rs` cover every conditional scenario, in a Linux box run of [b4ae3a2][c-conditional].  
+  - 2026-11-10 (UTC), 15 tests in `tests/conditional.rs` cover every conditional scenario, in a Linux box run of [b4ae3a2][c-conditional].
     They add a definition in the same block, case, an exception, code, groups that are not groups, and two refusals.
-  - 2026-11-10 (UTC), a `first` or `second` that is empty or matches the empty string is refused, and a single space loads.  
-    `tests/conditional.rs` has 17 tests in all.  
+  - 2026-11-10 (UTC), a `first` or `second` that is empty or matches the empty string is refused, and a single space loads.
+    `tests/conditional.rs` has 17 tests in all.
     fmt, clippy, the whole test suite and rustdoc pass in a Linux box run of the tree, and I did not run cargo deny.
-- [x] 2.3 Build `repetition`: the joined pattern, the trimmed comparison, `alpha`, `max` with Vale's count, the one-sentence check and `exceptions`.  
+- [x] 2.3 Build `repetition`: the joined pattern, the trimmed comparison, `alpha`, `max` with Vale's count, the one-sentence check and `exceptions`.
   Verify every repetition scenario passes as a unit test in CI.
-  - 2026-11-10 (UTC), 11 tests in `tests/repetition.rs` cover every repetition scenario, in a Linux box run of [ec04711][c-repetition].  
+  - 2026-11-10 (UTC), 11 tests in `tests/repetition.rs` cover every repetition scenario, in a Linux box run of [ec04711][c-repetition].
     They add the count's reset, a repeat over two sentences that still counts, case, `alpha`, a line wrap, and code.
 
 ## 3. Readability
 
-- [x] 3.1 Build `readability` on the engine's scores: the average, the strict comparison and the default scope at line 1.  
-  Add the per-node scope and the refusal the open decision chose.  
+- [x] 3.1 Build `readability` on the engine's scores: the average, the strict comparison and the default scope at line 1.
+  Add the per-node scope and the refusal the open decision chose.
   Verify every [readability scenario][readability] passes as a unit test in CI.
-  - 2026-11-10 (UTC), 14 tests in `tests/readability_check.rs` cover every readability scenario, in a Linux box run of [cfb9839][c-readability].  
+  - 2026-11-10 (UTC), 14 tests in `tests/readability_check.rs` cover every readability scenario, in a Linux box run of [cfb9839][c-readability].
     They add a repeated score, a missing list, a grade that is not a number, and a list item.
 
 ## 4. Long inputs
 
-- [x] 4.1 Run the four check types over the rule-engine change's 50,000-character line and 60,000-line file.  
+- [x] 4.1 Run the four check types over the rule-engine change's 50,000-character line and 60,000-line file.
   Verify both tests pass in CI with no panic, and record their run time in the evidence note.
-  - 2026-11-10 (UTC), both tests in `tests/long_inputs.rs` pass in a Linux box run of [9c98c9c][c-long], with the four rules together and every alert counted.  
-  - 2026-11-10 (UTC), in two debug runs the line of 50,000 characters gives 2,945 alerts in 76 to 126 ms.  
-    The file of 60,000 lines gives 90,002 alerts in 2.2 to 2.6 s.  
+  - 2026-11-10 (UTC), both tests in `tests/long_inputs.rs` pass in a Linux box run of [9c98c9c][c-long], with the four rules together and every alert counted.
+  - 2026-11-10 (UTC), in two debug runs the line of 50,000 characters gives 2,945 alerts in 76 to 126 ms.
+    The file of 60,000 lines gives 90,002 alerts in 2.2 to 2.6 s.
     Parsing it takes about 25 s more ([HKR-016][hkr-016]).
 
 ## 5. Integration
 
 - [x] 5.1 Verify the pull request's CI passes: build, lint, tests, docs, deny, prose lint, OpenSpec and the Template check.
-  - 2026-11-10 (UTC), CI passes on [95255ab][c-empty] of [PR 30][pr-30], the top of the stack.  
-    The passing jobs are Build and test, Static checks, Verify, CodeQL, both Analyze jobs, secrets and the Kody review.  
+  - 2026-11-10 (UTC), CI passes on [95255ab][c-empty] of [PR 30][pr-30], the top of the stack.
+    The passing jobs are Build and test, Static checks, Verify, CodeQL, both Analyze jobs, secrets and the Kody review.
     The Template check and Publish checks skip on this branch, and I did not run them.
 
 ## Workflow follow-up

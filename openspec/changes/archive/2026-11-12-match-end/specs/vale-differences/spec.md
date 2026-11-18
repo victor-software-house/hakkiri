@@ -2,7 +2,7 @@
 
 ### Requirement: The end of a match that wraps a line differs from Vale
 
-hakkiri SHALL give the line and column of a match's last character.  
+hakkiri SHALL give the line and column of a match's last character.
 Vale 3.26.0 prints the first column plus the number of characters of the match, line breaks included.
 
 #### Scenario: A match across a line break

@@ -2,14 +2,14 @@
 
 ## Purpose
 
-An alert is what a rule reports: which rule, at what level, with what message, and where in the file.  
+An alert is what a rule reports: which rule, at what level, with what message, and where in the file.
 This spec fixes its fields, its position, its message, its order, and what a pattern failure reports.
 
 ## Requirements
 
 ### Requirement: An alert shows the rule, level, message, place and match
 
-Each alert SHALL contain the rule name, the level, the message, the line, the first and last column of the match, and the matched text.  
+Each alert SHALL contain the rule name, the level, the message, the line, the first and last column of the match, and the matched text.
 It SHALL also contain the rule's `link` and `description` when the rule sets them.
 
 #### Scenario: A word in a sentence
@@ -37,10 +37,10 @@ The line and columns of a match inside a comment SHALL be those of its bytes in 
 
 ### Requirement: A message fills %s in order
 
-Each `%s` in a message SHALL take the next value the check gives, and `%%` SHALL read as `%`.  
+Each `%s` in a message SHALL take the next value the check gives, and `%%` SHALL read as `%`.
 A `%[n]s`, with `n` counting from 1, SHALL take the `n`th value, and a `%s` after it SHALL take the value that follows, as Go's `fmt` does.
 
-With no value to take, a `%s` or `%[n]s` SHALL read as nothing.  
+With no value to take, a `%s` or `%[n]s` SHALL read as nothing.
 Inside a value, a line break SHALL read as one space.
 
 #### Scenario: A percent sign
@@ -75,7 +75,7 @@ Inside a value, a line break SHALL read as one space.
 
 ### Requirement: Alerts come in file order
 
-hakkiri SHALL return the alerts of a file sorted by line, then by column.  
+hakkiri SHALL return the alerts of a file sorted by line, then by column.
 Alerts at the same place SHALL keep the order of their rules.
 
 #### Scenario: Two rules on one line
@@ -103,8 +103,8 @@ A rule with a `limit` above 0 SHALL report at most that many alerts in one file,
 
 ### Requirement: A pattern at the backtrack limit is an error alert
 
-When a pattern reaches the backtrack limit, hakkiri SHALL report one `error` alert for that rule and file, with the limit in its message.  
-hakkiri SHALL still run the other rules.  
+When a pattern reaches the backtrack limit, hakkiri SHALL report one `error` alert for that rule and file, with the limit in its message.
+hakkiri SHALL still run the other rules.
 It SHALL NOT panic.
 
 #### Scenario: Nested repeats with a lookahead
@@ -128,9 +128,9 @@ hakkiri SHALL lint a 50,000-character line and a 60,000-line file to the end, wi
 
 ### Requirement: A match ends at its last character
 
-An alert SHALL give the line and column, in the file, of the last character of the match.  
-So markup inside the match counts toward that place.  
-A match on one line SHALL end on the line it starts on.  
+An alert SHALL give the line and column, in the file, of the last character of the match.
+So markup inside the match counts toward that place.
+A match on one line SHALL end on the line it starts on.
 A match that goes on to the next lines SHALL end on the line of its last character.
 
 #### Scenario: A match across markup

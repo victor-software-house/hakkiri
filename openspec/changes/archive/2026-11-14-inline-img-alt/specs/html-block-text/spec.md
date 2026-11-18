@@ -2,8 +2,8 @@
 
 ### Requirement: The alt text of an inline img tag is an alt node
 
-hakkiri SHALL give the alt text of an `img` tag in a line of Markdown an `alt` node of its own.  
-This matches the `alt` node it gives the alt text of a Markdown image.  
+hakkiri SHALL give the alt text of an `img` tag in a line of Markdown an `alt` node of its own.
+This matches the `alt` node it gives the alt text of a Markdown image.
 The paragraph SHALL read around the node, and a rule on `link` or on sentences SHALL not select it, as in Vale.
 
 #### Scenario: An img tag alone and inside links

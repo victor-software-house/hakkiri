@@ -15,8 +15,8 @@ hakkiri SHALL reject a rule whose `extends` is neither a check type nor a rule, 
 
 A rule whose `extends` contains a dot SHALL start from that parent rule and add its own fields on top, as Vale 3.26.0 does.
 
-The first segment of the name SHALL be a style folder of any loaded package.  
-The rest SHALL be folders and a file name, and a nested folder or a `_` folder SHALL resolve too.  
+The first segment of the name SHALL be a style folder of any loaded package.
+The rest SHALL be folders and a file name, and a nested folder or a `_` folder SHALL resolve too.
 A parent's `tests` SHALL NOT carry over.
 
 #### Scenario: A child takes the fields of its parent
@@ -51,8 +51,8 @@ A parent's `tests` SHALL NOT carry over.
 
 ### Requirement: A key with a plus or a minus edits a field of the parent
 
-`key+` SHALL add its entries to the parent's list, or merge them into the parent's mapping with the child's entries winning.  
-`key-` SHALL remove entries from a list by their text, or keys from a mapping by name.  
+`key+` SHALL add its entries to the parent's list, or merge them into the parent's mapping with the child's entries winning.
+`key-` SHALL remove entries from a list by their text, or keys from a mapping by name.
 A bare key SHALL replace the parent's value.
 
 #### Scenario: An entry added to a list
@@ -72,7 +72,7 @@ A bare key SHALL replace the parent's value.
 
 ### Requirement: A chain Vale rejects is rejected
 
-hakkiri SHALL reject a chain of rules that Vale 3.26.0 rejects, with an error that gives the rule file and the field.  
+hakkiri SHALL reject a chain of rules that Vale 3.26.0 rejects, with an error that gives the rule file and the field.
 A rule read through a parent SHALL name no line.
 
 #### Scenario: A key written two ways
@@ -113,8 +113,8 @@ A rule read through a parent SHALL name no line.
 
 ### Requirement: A rule hakkiri cannot run loads no rule
 
-A rule that is valid Vale and that hakkiri cannot run, a rule that extends `script` or whose `scope` is a `doc()` selector, SHALL give no rule.  
-It SHALL NOT stop the other rules of its style from loading.  
+A rule that is valid Vale and that hakkiri cannot run, a rule that extends `script` or whose `scope` is a `doc()` selector, SHALL give no rule.
+It SHALL NOT stop the other rules of its style from loading.
 The loader SHALL keep its name and its file, so a config can turn it `off`.
 
 #### Scenario: A script rule beside a rule that runs

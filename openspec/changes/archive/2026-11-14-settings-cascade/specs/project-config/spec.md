@@ -2,7 +2,7 @@
 
 ### Requirement: A glob's specificity is four counts over its parts
 
-A glob's specificity SHALL be four counts, compared in order, over the parts of its text that slashes divide.  
+A glob's specificity SHALL be four counts, compared in order, over the parts of its text that slashes divide.
 The counts SHALL be, in order:
 
 1. the parts of literal characters only;
@@ -24,7 +24,7 @@ More SHALL be more specific for each count but the third, where fewer SHALL be m
 
 ### Requirement: A literal character matches only itself
 
-A literal character SHALL be one outside a `[…]` class that is not `*` or `?`.  
+A literal character SHALL be one outside a `[…]` class that is not `*` or `?`.
 A backslash and the character after it SHALL count as one literal character.
 
 #### Scenario: More literal characters
@@ -34,10 +34,10 @@ A backslash and the character after it SHALL count as one literal character.
 
 ### Requirement: A glob with alternatives ranks as the alternative that matches
 
-A glob with `{…}` groups SHALL be read as its alternatives, one for each choice in each group.  
+A glob with `{…}` groups SHALL be read as its alternatives, one for each choice in each group.
 Each alternative SHALL have its own specificity.
 
-For one file, the glob SHALL rank as the most specific of its alternatives that match that file.  
+For one file, the glob SHALL rank as the most specific of its alternatives that match that file.
 A glob with more than 256 alternatives SHALL be a fault, and its author SHALL split it into several globs.
 
 #### Scenario: The alternative that matches
@@ -52,10 +52,10 @@ A glob with more than 256 alternatives SHALL be a fault, and its author SHALL sp
 
 ### Requirement: The settings cascade applies the globs in rank order
 
-hakkiri SHALL rank every glob of the project and its packages once, by specificity, then by origin, then as written.  
+hakkiri SHALL rank every glob of the project and its packages once, by specificity, then by origin, then as written.
 It SHALL apply the globs that match a file from the lowest rank to the highest, a higher rank winning for the same key.
 
-A glob with alternatives SHALL take, for each file, the rank of its most specific alternative that matches that file.  
+A glob with alternatives SHALL take, for each file, the rank of its most specific alternative that matches that file.
 Only settings of the same key SHALL compete: the settings of every matching glob merge.
 
 #### Scenario: Different keys merge
@@ -65,8 +65,8 @@ Only settings of the same key SHALL compete: the settings of every matching glob
 
 ### Requirement: Rule settings combine in rank order
 
-A glob of higher rank SHALL win for the same rule, whether it turns the rule on or off or sets its level.  
-Turning a rule on or off and setting its level SHALL compete as two keys.  
+A glob of higher rank SHALL win for the same rule, whether it turns the rule on or off or sets its level.
+Turning a rule on or off and setting its level SHALL compete as two keys.
 So a level SHALL stay when a glob of higher rank turns the rule off or on.
 
 The order of keys inside a glob SHALL NOT matter.
@@ -103,7 +103,7 @@ The order of keys inside a glob SHALL NOT matter.
 
 ### Requirement: Style lists combine in rank order
 
-A `styles` list SHALL replace the list of a lower rank and keep the rule settings of the lower ranks.  
+A `styles` list SHALL replace the list of a lower rank and keep the rule settings of the lower ranks.
 An empty `styles` list SHALL drop every rule setting of a lower rank, and the rule settings of its own glob SHALL apply after it.
 
 #### Scenario: A list of styles of a higher rank
@@ -120,8 +120,8 @@ An empty `styles` list SHALL drop every rule setting of a lower rank, and the ru
 
 ### Requirement: files maps globs to settings
 
-hakkiri SHALL lint a file only when it matches a glob under `files`.  
-It SHALL apply the settings of every glob the file matches in the rank of the settings cascade.  
+hakkiri SHALL lint a file only when it matches a glob under `files`.
+It SHALL apply the settings of every glob the file matches in the rank of the settings cascade.
 A higher rank SHALL win for the same key.
 
 #### Scenario: Two globs match one file
@@ -138,5 +138,5 @@ A higher rank SHALL win for the same key.
 
 ### Requirement: Rule settings and style lists combine in the order written
 
-**Reason**: The globs that match a file now apply in the rank of the settings cascade, not in the order written.  
+**Reason**: The globs that match a file now apply in the rank of the settings cascade, not in the order written.
 **Migration**: The requirement "Rule settings and style lists combine in rank order" states the same rules over the rank.

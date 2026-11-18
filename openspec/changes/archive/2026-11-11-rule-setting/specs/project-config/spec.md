@@ -2,8 +2,8 @@
 
 ### Requirement: A level or `on` runs a rule whichever style contains it
 
-A rule name that gives a level SHALL run that rule on the matched files at that level, though no glob lists its style.  
-`on` SHALL run the rule at the level of its rule file.  
+A rule name that gives a level SHALL run that rule on the matched files at that level, though no glob lists its style.
+`on` SHALL run the rule at the level of its rule file.
 `off` SHALL stop a rule of a listed style, and SHALL change nothing for a rule of a style no glob lists.
 
 #### Scenario: A rule of a style no glob lists
@@ -33,10 +33,10 @@ A rule name that gives a level SHALL run that rule on the matched files at that 
 
 ### Requirement: Rule settings and style lists combine in the order written
 
-A later glob SHALL win for the same rule, whether it turns the rule on or off or sets its level.  
+A later glob SHALL win for the same rule, whether it turns the rule on or off or sets its level.
 A `styles` list SHALL replace the earlier list and keep the rule settings before it.
 
-An empty `styles` list SHALL drop every rule setting before it, and the rule settings of its own glob SHALL apply after it.  
+An empty `styles` list SHALL drop every rule setting before it, and the rule settings of its own glob SHALL apply after it.
 The order of keys inside a glob SHALL NOT matter.
 
 #### Scenario: A rule turned on after it was turned off
@@ -81,8 +81,8 @@ The order of keys inside a glob SHALL NOT matter.
 
 ### Requirement: A rule setting does not make a clash an error
 
-A rule setting SHALL NOT make hakkiri reject a name clash or a bracket in the style of the rule it enables.  
-Two files of a style that no glob lists may use one rule name, and a setting may enable that name.  
+A rule setting SHALL NOT make hakkiri reject a name clash or a bracket in the style of the rule it enables.
+Two files of a style that no glob lists may use one rule name, and a setting may enable that name.
 hakkiri SHALL then run the later file in file name order.
 
 #### Scenario: A clash in a style a setting enables

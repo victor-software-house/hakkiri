@@ -2,8 +2,8 @@
 
 ### Requirement: The run options are config keys
 
-`fail_level`, `gitignore` and `on_unmatched` SHALL be keys of the project's config, with the values of `--fail-level`, `--gitignore` and `--on-unmatched`.  
-Each SHALL be resolved as the flag, then its variable, then the config, then the default: `error`, `true` and `warn`.  
+`fail_level`, `gitignore` and `on_unmatched` SHALL be keys of the project's config, with the values of `--fail-level`, `--gitignore` and `--on-unmatched`.
+Each SHALL be resolved as the flag, then its variable, then the config, then the default: `error`, `true` and `warn`.
 An unknown value SHALL be an error that gives the line.
 
 #### Scenario: The config sets the fail level
