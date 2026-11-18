@@ -2,7 +2,9 @@
 
 ### Requirement: A script rule is refused
 
-**Reason**: A script rule no longer refuses its whole style. The loader reports it apart and the rest of the style runs, so the requirement is removed and added again below under a name that tells it.
+**Reason**: A script rule no longer makes its whole style fail.  
+The loader reports it apart and the rest of the style runs.  
+So the requirement is removed and added again below under a name that describes it.
 
 **Migration**: Read "A script rule is reported, and the rest of its style runs".
 

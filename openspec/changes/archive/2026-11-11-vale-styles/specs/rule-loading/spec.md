@@ -13,9 +13,11 @@ hakkiri SHALL refuse a rule whose `extends` names neither a check type nor a rul
 
 ### Requirement: A rule may extend another rule
 
-A rule whose `extends` contains a dot SHALL start from the rule that name gives and lay its own fields on top, as Vale 3.26.0 does.  
-The first segment of the name SHALL be a style folder of any loaded package, and the rest SHALL be folders and a file name, in a nested folder or a `_` folder too.  
-The parent's `tests` SHALL NOT carry over.
+A rule whose `extends` contains a dot SHALL start from that parent rule and add its own fields on top, as Vale 3.26.0 does.
+
+The first segment of the name SHALL be a style folder of any loaded package.  
+The rest SHALL be folders and a file name, and a nested folder or a `_` folder SHALL resolve too.  
+A parent's `tests` SHALL NOT carry over.
 
 #### Scenario: A child takes the fields of its parent
 
@@ -49,7 +51,7 @@ The parent's `tests` SHALL NOT carry over.
 
 ### Requirement: A key with a plus or a minus edits a field of the parent
 
-`key+` SHALL add its entries to a list of the parent, or merge them into a mapping of the parent with the child's entries winning.  
+`key+` SHALL add its entries to the parent's list, or merge them into the parent's mapping with the child's entries winning.  
 `key-` SHALL remove entries from a list by their text, or keys from a mapping by name.  
 A bare key SHALL replace the parent's value.
 
@@ -106,7 +108,8 @@ A rule read through a parent SHALL name no line.
 #### Scenario: A parent name that is a path
 
 - **WHEN** a rule contains `extends: /etc/x.y` or `extends: Std..Rule`
-- **THEN** hakkiri reports that it is not a rule name, says a rule name is a style, a dot and a rule such as `Std.Rule`, reads no file for it, and exits 2
+- **THEN** hakkiri reports that it is not a rule name, reads no file for it, and exits 2
+- **AND** the message shows that a rule name is a style, a dot and a rule, such as `Std.Rule`
 
 ### Requirement: A rule hakkiri cannot run loads no rule
 
@@ -131,5 +134,6 @@ The loader SHALL keep its name and its file, so a config can turn it `off`.
 
 #### Scenario: Two files for one rule
 
-- **WHEN** two files of a style give one rule name, and the later file is a rule hakkiri cannot run or the earlier one is
-- **THEN** the later file replaces the earlier one: the rule runs only if the later file is runnable, and fails the run only if it is not
+- **WHEN** two files of a style use one rule name, and the later file is a rule hakkiri cannot run or the earlier one is
+- **THEN** the later file replaces the earlier one
+- **AND** the rule runs only if the later file is runnable, and fails the run only if it is not

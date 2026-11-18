@@ -2,13 +2,19 @@
 
 ### Requirement: Rule files differ from Vale in what they accept or select
 
-**Reason**: Two of its scenarios, a formula outside the listed syntax and a script rule, are things Vale runs and hakkiri does not, so they move to the Known gaps with a row each. OpenSpec cannot drop a scenario of a modified requirement, so the requirement is removed and added again below with the three scenarios that remain.
+**Reason**: Two of its scenarios are things Vale runs and hakkiri does not: a formula outside the listed syntax and a script rule.  
+So they move to the Known gaps with a row each.  
+OpenSpec cannot drop a scenario of a modified requirement.  
+So the requirement is removed and added again below with the three scenarios that remain.
 
-**Migration**: Read "Rule files differ from Vale in what they select". The formula and the script scenarios are under the Known gaps.
+**Migration**: Read "Rule files differ from Vale in what they select".  
+The formula and the script scenarios are under the Known gaps.
 
 ### Requirement: Configuration and packages are hakkiri's own
 
-**Reason**: It states that Vale styles enter only through `hakkiri import vale`, which is no longer so: hakkiri reads a Vale style folder as it is. The requirement is removed and added again below with the new text.
+**Reason**: It states that Vale styles enter only through `hakkiri import vale`, which is no longer true.  
+hakkiri reads a Vale style folder as it is.  
+The requirement is removed and added again below with the new text.
 
 **Migration**: Read "Configuration is hakkiri's own, and Vale styles load as they are".
 
@@ -61,7 +67,8 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.val
 
 ### Requirement: Known gaps are listed apart from the intended differences
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
+The intended differences SHALL stay apart from this list.  
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: The built-in spelling rule
@@ -72,7 +79,8 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: Vocabularies
 
 - **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
-- **THEN** hakkiri loads the field and reads no vocabulary, and Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
+- **THEN** hakkiri loads the field and reads no vocabulary
+- **AND** Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
 
 #### Scenario: The Markdown parser
 
@@ -92,12 +100,14 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A script rule
 
 - **WHEN** a rule has `extends: script`
-- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`, and Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
+- **THEN** hakkiri runs the rest of its style and fails the run for the rule until the config sets it `off`
+- **AND** Vale runs its Tengo program (row [HKR-036][ledger], [styles 4][styles-4])
 
 #### Scenario: A formula outside the listed syntax
 
 - **WHEN** a `metric` rule has the formula `words > 1 ? 7.0 : 0.0`
-- **THEN** hakkiri refuses it, since it reads numbers, variables, operators, `math` functions and `round`, and Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
+- **THEN** hakkiri rejects it, since it reads numbers, variables, operators, `math` functions and `round`
+- **AND** Vale evaluates one Tengo expression and reports 7.00 (row [HKR-037][ledger], [engine 14][engine-14])
 
 #### Scenario: The built-in repetition rule
 
@@ -106,8 +116,9 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: A doc selector or a View
 
-- **WHEN** a rule has `scope: doc(h1)`, a section names a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`, refuses the case field, and Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
+- **WHEN** a rule has `scope: doc(h1)`, a section sets a View, or a case sets `view`
+- **THEN** hakkiri runs the rest of the style, fails the run for the rule until the config sets it `off`, and rejects the case field
+- **AND** Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 #### Scenario: A Vale configuration file
 
