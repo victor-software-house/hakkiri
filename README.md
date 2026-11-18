@@ -56,7 +56,7 @@ The `linux-x64` binary is static, so it needs no system loader, NixOS included.
 mise installs it with the `github:` backend, pinned to the version:
 
 ```sh
-mise use github:victor-software-house/hakkiri@0.1.1
+mise use github:victor-software-house/hakkiri@0.1.2
 ```
 
 ## Use
