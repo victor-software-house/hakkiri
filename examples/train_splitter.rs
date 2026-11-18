@@ -9,9 +9,9 @@
 //!     --model data/splitter/en.tsv --report data/splitter/SOURCES.md
 //! ```
 //!
-//! Each corpus file holds documents separated by a form feed (U+000C).
-//! A `--markdown` file holds Markdown, and the trainer reads the text of its
-//! paragraphs. A `--text` file holds plain text.
+//! Each corpus file contains documents separated by a form feed (U+000C).
+//! A `--markdown` file contains Markdown, and the trainer reads the text of its
+//! paragraphs. A `--text` file contains plain text.
 //! `mise run splitter:train` runs this after `mise run splitter:fetch`.
 
 use std::error::Error;
@@ -95,7 +95,7 @@ fn paragraphs(source: &str, tree: &Tree) -> String {
 
 /// Reads the documents of one corpus file.
 ///
-/// Bytes that are not UTF-8 read as U+FFFD.
+/// Bytes that are not UTF-8 read as U+FFFD (the replacement character).
 fn read(corpus: &Corpus) -> Outcome<(Vec<String>, Counts)> {
     let bytes = fs::read(&corpus.path)?;
     let text = String::from_utf8_lossy(&bytes);
@@ -158,9 +158,9 @@ fn report(sources: &Path, counts: &[Counts], summary: &Summary) -> Outcome<Strin
     text.push_str(
         "\n## Repositories\n\n\
          `repositories.tsv` lists the Markdown sources: public repositories of the owner, each at the commit below.  \n\
-         A repository is listed when it is public, is not a fork, is not archived, and is at most 10 MB.  \n\
-         A license of `none` means the repository declares no license.  \n\
-         The corpus holds every tracked `.md` file except `CHANGELOG.md`, and the trainer reads the text of its paragraphs.\n\n\
+         A repository is listed when it is public, is not a fork, is not archived, and is at most 10 MB.\n\n\
+         The corpus contains every tracked `.md` file except `CHANGELOG.md`, and the trainer reads the text of its paragraphs.  \n\
+         A license of `none` means the repository declares no license.\n\n\
          | Repository | Commit | License |\n|:--|:--|:--|\n",
     );
     for row in &repositories {
@@ -185,12 +185,13 @@ fn report(sources: &Path, counts: &[Counts], summary: &Summary) -> Outcome<Strin
     write!(
         text,
         "\n### Filters\n\n\
-         - `common-pile/stackv2` ([dataset card](https://huggingface.co/datasets/common-pile/stackv2)) holds code files from GitHub repositories whose detected licenses are all on the Blue Oak list.  \n  \
-         A record is kept when its `metadata.path` ends in `.md` or `.markdown`, in any case, and every license in its `metadata.license`, a comma-separated list, is one of the {licenses} ids in `licenses.txt`.  \n  \
+         - `common-pile/stackv2` ([dataset card](https://huggingface.co/datasets/common-pile/stackv2)) contains code files from GitHub repositories whose detected licenses are all on the Blue Oak list.  \n  \
+         A record is kept when its `metadata.path` ends in `.md` or `.markdown`, in any case.  \n  \
+         Each license in its comma-separated `metadata.license` must be one of the {licenses} ids in `licenses.txt`.  \n  \
          That file is the [Blue Oak Council list](https://blueoakcouncil.org/list), version 16.\n\
-         - `common-pile/python_enhancement_proposals` ([dataset card](https://huggingface.co/datasets/common-pile/python_enhancement_proposals)) holds the Python Enhancement Proposals in the public domain, as plain text.  \n  \
+         - `common-pile/python_enhancement_proposals` ([dataset card](https://huggingface.co/datasets/common-pile/python_enhancement_proposals)) contains the Python Enhancement Proposals in the public domain, as plain text.  \n  \
          A record is kept when `metadata.license` is `Public Domain`.\n\
-         - `common-pile/project_gutenberg` ([dataset card](https://huggingface.co/datasets/common-pile/project_gutenberg)) holds books.  \n  \
+         - `common-pile/project_gutenberg` ([dataset card](https://huggingface.co/datasets/common-pile/project_gutenberg)) contains books.  \n  \
          A record is kept when `metadata.license` is `Public Domain` and `metadata.language` is `en`.\n\n\
          ## Result\n\n\
          | Count | Value |\n|:--|--:|\n\
