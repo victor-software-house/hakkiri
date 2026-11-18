@@ -84,7 +84,7 @@ Vale's F1 for each set is committed beside the set.
 
 #### Scenario: The evaluation test
 
-- **WHEN** the test splits every paragraph of the owner's labelled documentation set, the Golden Rules set and the MASC sample
+- **WHEN** the test splits every paragraph of the owner's labelled documentation set, the Golden Rules set and the Manually Annotated Sub-Corpus (MASC) sample
 - **THEN** hakkiri's F1 on each set is at least Vale's committed F1 for that set
 
 ### Requirement: Training rebuilds the model

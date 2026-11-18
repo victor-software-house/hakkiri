@@ -8,7 +8,7 @@ A dollar-delimited span or a `$$` block of math in a Markdown file reads as code
 
 ### Requirement: An inline span of math reads as code
 
-In a Markdown or MDX file, text from a `$` to the next closing `$` SHALL read as a code span.  
+In a Markdown or MDX (Markdown with components) file, text from a `$` to the next closing `$` SHALL read as a code span.  
 The opening `$` SHALL be followed by a character that is not a space or a `$`.  
 The closing `$` SHALL not be escaped, SHALL follow a character that is not a space, SHALL not be followed by a digit, and SHALL not start a line.  
 A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one SHALL be text.

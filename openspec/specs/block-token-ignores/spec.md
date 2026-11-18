@@ -34,7 +34,7 @@ A pattern that does not compile, or a value that is not a list, SHALL be an erro
 
 ### Requirement: A block pattern hides a match as a code block
 
-In a Markdown or MDX file, each match of a block pattern SHALL be read as a fenced code block that contains the first group of the match, so no rule that reads prose reports text inside it.  
+In a Markdown or MDX (Markdown with components) file, each match of a block pattern SHALL be read as a fenced code block that contains the first group of the match, so no rule that reads prose reports text inside it.  
 A match with no first group SHALL hold the text `$1` in place of the match.  
 The text before and after a block in the middle of a paragraph SHALL read as two paragraphs.
 

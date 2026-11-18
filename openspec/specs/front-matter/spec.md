@@ -8,7 +8,7 @@ Each top-level string of a file's YAML, TOML or JSON front matter is a node of t
 
 ### Requirement: A top-level string of front matter is text
 
-In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
+In a Markdown or MDX (Markdown with components) file, a rule scoped `text` SHALL read each top-level string value of front matter.  
 The front matter is the block at the top of the file, in a form of the next requirement.  
 A key, a list, a nested mapping and a value that is not a string SHALL not be read.  
 A TOML string below a table and a member of a nested JSON object SHALL not be read.  

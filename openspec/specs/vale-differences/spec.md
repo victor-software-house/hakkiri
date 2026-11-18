@@ -139,7 +139,7 @@ hakkiri SHALL measure as each scenario below says, where Vale 3.26.0 measures ot
 #### Scenario: A score listed twice counts once
 
 - **WHEN** a `readability` rule has `metrics: [SMOG, SMOG]`
-- **THEN** hakkiri averages the distinct scores and reports SMOG's grade, and Vale divides by the length of the list and reports half of it ([pattern 8][pattern-8])
+- **THEN** hakkiri averages the distinct scores and reports the grade of SMOG (Simple Measure of Gobbledygook), and Vale divides by the length of the list and reports half of it ([pattern 8][pattern-8])
 
 ### Requirement: Pattern checks differ from Vale
 
@@ -189,7 +189,7 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 - **WHEN** a `capitalization` rule has an empty `match`
 - **THEN** hakkiri refuses it, since every text would pass, and Vale loads it ([case 1][case-1])
 
-#### Scenario: A capitalization style that is not AP or Chicago
+#### Scenario: A capitalization style that is not AP (Associated Press) or Chicago
 
 - **WHEN** a `capitalization` rule has `style: chicago` or any other value than `AP` or `Chicago`
 - **THEN** hakkiri refuses it with an error that names the value, and Vale reads every other value as `AP` ([case 8][case-8])
@@ -221,7 +221,7 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 
 #### Scenario: A dictionary in another character set
 
-- **WHEN** a dictionary declares a `SET` other than UTF-8 and ISO 8859-1
+- **WHEN** a dictionary declares a `SET` other than UTF-8 and ISO (International Organization for Standardization) 8859-1
 - **THEN** hakkiri refuses it with an error that names the set, and Vale reads every set that `golang.org/x/text` knows ([case 6][case-6])
 
 ### Requirement: A run finishes where Vale panics, stalls or runs out of memory
@@ -652,7 +652,7 @@ hakkiri SHALL read a selected file that no reader reads as plain text, skip a bi
 
 #### Scenario: A binary file
 
-- **WHEN** a glob selects a file that contains a NUL byte
+- **WHEN** a glob selects a file that contains a null (NUL) byte
 - **THEN** hakkiri skips it, and Vale has no such test and reads it as lines ([plain-text 5][plain-text-5])
 
 #### Scenario: The extension of a mapped file
@@ -692,7 +692,7 @@ Vale 3.26.0 tags with the model of prose v3.2.2, so the tags of the two tools di
 
 #### Scenario: Another model
 
-- **WHEN** both tools tag the 56,516 tokens of UD English GUM
+- **WHEN** both tools tag the 56,516 tokens of the English GUM (Georgetown University Multilayer) corpus of UD (Universal Dependencies)
 - **THEN** hakkiri's tags match the gold tags 92.53% of the time, and Vale's 90.26% ([tag-corrections 1][tag-corrections-1], [tag-corrections 2][tag-corrections-2])
 
 #### Scenario: A title is tagged by the model alone
@@ -1033,7 +1033,7 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 [spelling-4]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#4-affix-expands-before-compiling
 [spelling-goals]: ../../changes/archive/2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals
 
-### Requirement: A bare address ends where GFM ends it
+### Requirement: A bare address ends where GFM (GitHub Flavored Markdown) ends it
 
 hakkiri SHALL end a bare web address at whitespace or `<`, as GFM and its Markdown parser do.  
 Vale ends one at the first byte that goldmark 1.8.6's linkify pattern leaves out, which contains no letter outside ASCII, and reads the rest as text.
@@ -1188,7 +1188,7 @@ Vale 66bbb85 reads no text inside a fence.
 
 hakkiri SHALL read the last piece of a scope part as a language of the GitHub Linguist table that langdex holds.  
 Vale 66bbb85 compares it with the file's extension after its own table folds some extensions together, such as `.tsx`, `.mts` and `.cts` into `.ts`.  
-Linguist keeps TSX apart from TypeScript, so a scope that names `ts` does not reach a `.tsx` file.
+Linguist keeps TSX (TypeScript with tags) apart from TypeScript, so a scope that names `ts` does not reach a `.tsx` file.
 
 #### Scenario: A TSX file
 
@@ -1290,7 +1290,7 @@ hakkiri SHALL select as each scenario below says, where Vale 3.26.0 has no such 
 
 #### Scenario: An HTML title attribute
 
-- **WHEN** a Markdown file contains `<p title="a marker">Some text.</p>`, a line of text with an inline tag that has a title, or an MDX file contains a JSX element with `title`, and a rule has `scope: title`
+- **WHEN** a Markdown file contains `<p title="a marker">Some text.</p>`, a line of text with an inline tag that has a title, or an MDX (Markdown with components) file contains a JSX (JavaScript XML) element with `title`, and a rule has `scope: title`
 - **THEN** hakkiri selects each title, and Vale reads the attribute only in a rule on `raw` ([link-title 6][link-title])
 
 #### Scenario: A title attribute of an a tag and an img tag

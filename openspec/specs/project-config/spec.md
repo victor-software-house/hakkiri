@@ -479,7 +479,7 @@ An unknown value SHALL be an error that names the line.
 
 ### Requirement: formats maps a file to a reader
 
-`formats` SHALL map an extension, a file name or a glob to a reader, named by any langdex name, alias or extension of the language it reads: Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text.  
+`formats` SHALL map an extension, a file name or a glob to a reader, named by any langdex name, alias or extension of the language it reads: Markdown, MDX (Markdown with components), Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell or Text.  
 So `md`, `markdown` and `Markdown` name one reader, `sh` and `bash` name the Shell reader, and `text` names plain text.  
 An entry SHALL beat the language of the file.
 

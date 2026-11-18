@@ -42,7 +42,7 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 
 hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL still lint every other file.
 
-#### Scenario: One broken MDX file
+#### Scenario: One broken MDX (Markdown with components) file
 
 - **WHEN** `bad.mdx` has a syntax error and `good.md` draws one warning
 - **THEN** hakkiri reports the warning and a failure naming `bad.mdx`, and exits 2
@@ -66,7 +66,7 @@ The lines SHALL hold no colour and no frame, and two runs over the same files SH
 
 `--format json` SHALL print one object with `alerts`, `failures` and `files`.  
 Each alert SHALL hold `path`, `line`, `column`, `end_line`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
-The output SHALL hold no ESC byte, whatever the colour variables hold.
+The output SHALL hold no escape (ESC) byte, whatever the colour variables hold.
 
 #### Scenario: JSON with colour forced
 
@@ -186,7 +186,7 @@ A file that a glob matches whose styles hold no rule, a file found by a walk, an
 
 ### Requirement: A reader is chosen by formats, then by extension
 
-hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text.  
+hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell or Text.  
 A reader SHALL follow the langdex language of the file, so no table of extensions lists the files a reader takes.
 
 #### Scenario: The reader of an extension
@@ -251,7 +251,7 @@ No marker, escape or entity SHALL change its text.
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text that contains a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.  
+A file read as plain text that contains a null (NUL) byte in its first 8192 bytes SHALL be skipped with no alert and no message.  
 This SHALL hold whether a walk finds the file or the command line names it.  
 A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
 

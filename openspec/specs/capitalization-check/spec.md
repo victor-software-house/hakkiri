@@ -65,7 +65,7 @@ A word that matches one of the rule's `exceptions` SHALL keep the case the excep
 - **WHEN** the rule above has `exceptions: [Hakkiri]` and reads `# Getting started with Hakkiri`
 - **THEN** hakkiri reports no alert
 
-### Requirement: title case follows AP or Chicago
+### Requirement: title case follows AP (Associated Press) or Chicago
 
 With `match: $title`, the first and last words SHALL start with a capital.  
 In `AP` style, the default, the articles, conjunctions and prepositions of Vale's short word list SHALL be in lower case.  

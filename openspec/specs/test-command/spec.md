@@ -127,7 +127,7 @@ It SHALL exit 0 when every case passes and no rule is uncovered, 1 when a case f
 #### Scenario: JSON with colour forced
 
 - **WHEN** `hakkiri test --format json` runs with `CLICOLOR_FORCE=1`
-- **THEN** the output parses as JSON and contains no ESC byte
+- **THEN** the output parses as JSON and contains no escape (ESC) byte
 
 [test-2]: ../../changes/archive/2026-11-10-test-command/design.md#2-a-case-is-a-small-record
 

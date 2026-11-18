@@ -61,7 +61,7 @@ It also leaves out the indentation and the block quote markers in front of the l
 
 ### Requirement: Heading syntax is not text
 
-An ATX heading SHALL leave out its opening run of `#` with the space after it, and its closing run of `#`.  
+An ATX (hash-prefixed) heading SHALL leave out its opening run of `#` with the space after it, and its closing run of `#`.  
 A setext heading SHALL leave out its underline.
 
 #### Scenario: A closed heading
@@ -92,8 +92,8 @@ A block quote or list item with no prose inside it SHALL give no node.
 
 ### Requirement: Syntax that is not prose is a gap
 
-Fenced code, raw HTML, link definitions, front matter and MDX expressions SHALL be gaps between the segments of the prose node around them.  
-The tags of a JSX element SHALL be gaps too, and its text SHALL be prose.  
+Fenced code, raw HTML, link definitions, front matter and MDX (Markdown with components) expressions SHALL be gaps between the segments of the prose node around them.  
+The tags of a JSX (JavaScript XML) element SHALL be gaps too, and its text SHALL be prose.  
 A paragraph that contains one of them SHALL stay one node.
 
 #### Scenario: HTML inside a paragraph

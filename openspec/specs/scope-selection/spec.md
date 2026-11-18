@@ -281,7 +281,7 @@ A piece that names no language SHALL be an error.
 
 ### Requirement: title selects the title of a link, an image and a definition
 
-In a Markdown or MDX file, the scope `title` SHALL select the text of the title of an inline link, an inline image and a link reference definition.  
+In a Markdown or MDX (Markdown with components) file, the scope `title` SHALL select the text of the title of an inline link, an inline image and a link reference definition.  
 The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.  
 The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.  
 A link or image with no title, or an empty one, SHALL give no block.
@@ -332,7 +332,7 @@ A negated part that names the element, such as `title & ~link`, SHALL leave out 
 ### Requirement: An HTML title attribute is a title
 
 The `title` attribute of an HTML tag SHALL be selected by `title`, and by no prose scope.  
-That holds for a tag in an HTML block, a tag in a line of text, and the opening tag of a JSX element.  
+That holds for a tag in an HTML block, a tag in a line of text, and the opening tag of a JSX (JavaScript XML) element.  
 The attribute of an `a` tag SHALL be a link title, and that of an `img` tag an image title.
 
 #### Scenario: An HTML block
