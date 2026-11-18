@@ -50,9 +50,9 @@ Vale 3.26.0 reads them otherwise.
 - **THEN** hakkiri gives the columns of `note` in characters
 - **AND** Vale adds the extra bytes of `’` to each column of a comment that trails code ([comment-languages 8][comment-languages-8])
 
-[comment-languages-3]: ../../changes/archive/2026-11-14-comment-languages/design.md#3-the-lexer-is-the-grammars-probed-against-vale
-[comment-languages-4]: ../../changes/archive/2026-11-14-comment-languages/design.md#4-yaml-and-toml-comments-need-no-view
-[comment-languages-5]: ../../changes/archive/2026-11-14-comment-languages/design.md#5-a-comment-for-a-tool-is-not-prose
-[comment-languages-6]: ../../changes/archive/2026-11-14-comment-languages/design.md#6-a-doc-link-and-a-doc-name-are-masked-at-the-alert
-[comment-languages-7]: ../../changes/archive/2026-11-14-comment-languages/design.md#7-a-line-comment-keeps-the-indentation-of-the-text
-[comment-languages-8]: ../../changes/archive/2026-11-14-comment-languages/design.md#8-a-column-counts-characters
+[comment-languages-3]: ../../../archive/2026-11-14-comment-languages/design.md#3-the-lexer-is-the-grammars-probed-against-vale
+[comment-languages-4]: ../../../archive/2026-11-14-comment-languages/design.md#4-yaml-and-toml-comments-need-no-view
+[comment-languages-5]: ../../../archive/2026-11-14-comment-languages/design.md#5-a-comment-for-a-tool-is-not-prose
+[comment-languages-6]: ../../../archive/2026-11-14-comment-languages/design.md#6-a-doc-link-and-a-doc-name-are-masked-at-the-alert
+[comment-languages-7]: ../../../archive/2026-11-14-comment-languages/design.md#7-a-line-comment-keeps-the-indentation-of-the-text
+[comment-languages-8]: ../../../archive/2026-11-14-comment-languages/design.md#8-a-column-counts-characters
