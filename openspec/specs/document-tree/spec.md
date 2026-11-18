@@ -19,8 +19,9 @@ The node-segments spec states which ranges make the text of a node and how the s
 
 ### Requirement: Markdown nodes carry Vale scope names
 
-hakkiri SHALL give each Markdown node the scope the [design's table][tree-4] names.  
-The table covers paragraphs, headings, block quotes, list items, table rows and cells, links, code spans, strong and emphasis text, and image alt text.  
+hakkiri SHALL give each Markdown node the scope that the [design's table][tree-4] lists.  
+The table covers paragraphs, headings, block quotes, list items, table rows and cells, links, code spans, strong and emphasis text, and image alt text.
+
 The text of an HTML block adds table and figure captions, the content of a `data` element as `meta`, and the description of a page.
 
 #### Scenario: A nested list
@@ -35,7 +36,8 @@ The text of an HTML block adds table and figure captions, the content of a `data
 
 ### Requirement: Code and markup are not prose
 
-Fenced code, the tags of raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.  
+Fenced code, the tags of raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.
+
 Inside a prose node, the node-segments spec makes such syntax a gap in the text.  
 The text inside an HTML block is prose, and the html-block-text spec states which text and under which scope.
 
@@ -101,7 +103,8 @@ It SHALL do the same for 1,000 levels of lists.
 
 ### Requirement: Source files give the tree their comments only
 
-For Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL put only comment text in the tree, scoped `text.comment.line`, `text.comment.block`, `text.comment.doc.line` or `text.comment.doc.block` as the rule-files spec states.  
+For Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL put only comment text in the tree.  
+Its scope SHALL be `text.comment.line`, `text.comment.block`, `text.comment.doc.line` or `text.comment.doc.block`, as the rule-files spec states.  
 The `#!` line that opens a script SHALL be no comment.
 
 #### Scenario: A Rust block comment
@@ -111,7 +114,8 @@ The `#!` line that opens a script SHALL be no comment.
 
 ### Requirement: A grammar finds the comments of a source file
 
-Each language SHALL find its comments with its tree-sitter grammar, so a comment marker inside a string, a raw string, a multi-line string, a heredoc or a block scalar opens no comment.  
+Each language SHALL find its comments with its tree-sitter grammar.  
+So a comment marker inside a string, a raw string, a multi-line string, a heredoc or a block scalar opens no comment.  
 A Swift block comment SHALL nest.
 
 #### Scenario: A YAML comment beside strings
@@ -141,7 +145,8 @@ No node in the tree of a source file SHALL hold text from a string literal, a ra
 ### Requirement: Adjacent line comments join
 
 Adjacent line comments of the same type SHALL join into one comment node, read as one Markdown text.  
-Doc line comments of the same type SHALL join across blank lines, as rustdoc reads them, and a line of code or a comment of another type SHALL end the run.
+Doc line comments of the same type SHALL join across blank lines, as rustdoc reads them.  
+A line of code or a comment of another type SHALL end the run.
 
 #### Scenario: A doc comment over three lines
 
@@ -175,7 +180,8 @@ A node inside a comment SHALL span the bytes of its text in the file, not in the
 ### Requirement: JSDoc tags are not prose
 
 In a `/** */` comment of a TypeScript or JavaScript file, a tag name SHALL carry no prose scope.  
-A type in braces after a tag SHALL carry none either, and neither SHALL the name after `@param`, `@typedef`, `@property`, `@prop`, `@arg`, `@argument`, `@template` or `@callback`.  
+A type in braces after a tag SHALL carry none either, and neither SHALL the name after `@param`, `@typedef`, `@property`, `@prop`, `@arg`, `@argument`, `@template` or `@callback`.
+
 The description after them SHALL be prose, and the body of `@example` SHALL be code.  
 A line inside a fenced block SHALL begin no tag.
 
@@ -205,7 +211,7 @@ The tree of a source file SHALL hold 0.
 
 ### Requirement: A node records its first-child place
 
-The tree of a Markdown or MDX file SHALL record on each node whether it is the first child of the list item, quote or table row that contains it.  
+Each node of a Markdown or MDX file SHALL record whether it is the first child of its list item, quote or table row.  
 The parser decides, from every child of that container.
 
 #### Scenario: A paragraph after a fenced block in an item
@@ -220,8 +226,11 @@ The parser decides, from every child of that container.
 
 ### Requirement: A block takes the first place as Vale reads it
 
-A fenced block, a table, an empty item and an HTML block SHALL take the first place when the HTML has an end tag that is not inline, or text outside its tags and comments.  
-A thematic break, a link definition and any other HTML block SHALL leave it free, as in Vale 66bbb85, which reads HTML with the tokenizer of golang.org/x/net/html.
+A fenced block, a table and an empty item SHALL take the first place.  
+An HTML block SHALL take it when its HTML has an end tag that is not inline, or text outside its tags and comments.
+
+A thematic break, a link definition and any other HTML block SHALL leave it free, as in Vale 66bbb85.  
+Vale reads HTML with the tokenizer of golang.org/x/net/html.
 
 #### Scenario: A paragraph after a thematic break in a quote
 
@@ -247,7 +256,8 @@ A thematic break, a link definition and any other HTML block SHALL leave it free
 
 ### Requirement: A fenced code block takes a language
 
-A fenced code block SHALL take the langdex language that the first word of its info string names, up to a comma, so `rs` and `rust`, or `md` and `markdown`, name one language, and `rust,no_run` names Rust.  
+A fenced code block SHALL take the langdex language that the first word of its info string gives, up to a comma.  
+So `rs` and `rust`, or `md` and `markdown`, give one language, and `rust,no_run` gives Rust.  
 The fence SHALL stay a gap in the prose around it.
 
 #### Scenario: A rustdoc fence
@@ -263,8 +273,10 @@ The fence SHALL stay a gap in the prose around it.
 ### Requirement: A fence gives the comments of its language
 
 When hakkiri reads the comments of a fence's language, it SHALL parse the code of the fence with that language's grammar.  
-Each comment SHALL be a node inside the node that contains the fence, read as the comments of a source file are.  
-Each span of those nodes SHALL be the bytes of the Markdown or MDX file, and each such node, and every node inside it, SHALL have that language.  
+Each comment SHALL be a node inside the node that contains the fence, read as the comments of a source file are.
+
+Each span of those nodes SHALL be the bytes of the Markdown or MDX file.  
+Each such node, and every node inside it, SHALL have that language.  
 A fence whose code does not map line for line onto the file SHALL give no nodes.
 
 #### Scenario: A Rust fence
@@ -285,7 +297,12 @@ A fence whose code does not map line for line onto the file SHALL give no nodes.
 
 ### Requirement: Other fences give no nodes
 
-A fence of Markdown, MDX or Text, a fence with no info string, a fence of a language whose comments hakkiri does not read, and an indented code block SHALL give no nodes.
+The following SHALL give no nodes:
+
+- a fence of Markdown, MDX or Text;
+- a fence with no info string;
+- a fence of a language whose comments hakkiri does not read;
+- an indented code block.
 
 #### Scenario: A Markdown fence
 
@@ -299,7 +316,8 @@ A fence of Markdown, MDX or Text, a fence with no info string, a fence of a lang
 
 ### Requirement: A comment addressed to a tool is not prose
 
-hakkiri SHALL leave out of the tree a comment that a tool reads and a person does not, by the patterns of its language, which the scenarios list.  
+hakkiri SHALL leave out of the tree a comment that a tool reads and a person does not.  
+Each language has its own patterns for such comments, which the scenarios list.  
 A directive SHALL end a run of line comments, so the line after it starts a new comment node.
 
 #### Scenario: A Go directive
@@ -344,8 +362,9 @@ A directive SHALL end a run of line comments, so the line after it starts a new 
 
 hakkiri SHALL drop an alert whose match lies wholly in a doc name or a doc link.  
 A doc name is the name of the declaration that a Go doc comment opens with.  
-A doc link is a link in brackets of a Go or Rust comment, or an inline link tag of a TypeScript or JavaScript comment.  
-It SHALL leave the text of the node as written, so counts and sentences do not change.  
+A doc link is a link in brackets of a Go or Rust comment, or an inline link tag of a TypeScript or JavaScript comment.
+
+hakkiri SHALL leave the text of the node as written, so counts and sentences do not change.  
 A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 
 #### Scenario: A Go link and name
@@ -371,7 +390,8 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 
 #### Scenario: What a link names
 
-- **WHEN** a Go link contains an identifier with dots and an optional `*`, such as `[*pkg.Type]`, or a Rust link contains a path with `::` or a code span, such as ``[`Type`]``
+- **WHEN** a Go link has a name with dots and an optional `*`, such as `[*pkg.Type]`
+- **AND** a Rust link has a path with `::` or a code span, such as ``[`Type`]``
 - **THEN** no alert lies in the brackets
 
 ### Requirement: More JSDoc tags name something
