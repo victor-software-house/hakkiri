@@ -1,21 +1,23 @@
-//! The `spelling` check and the `affix` field against Vale: the alerts of one
-//! style of rules over Markdown inputs.
+//! The `spelling` check and the `affix` field against Vale.
+//! The test compares the alerts of one style on Markdown inputs.
 //!
-//! `tests/fixtures/spelling/Parity` holds the `spelling` rules and
-//! `tests/fixtures/spelling/Affix` the `existence` and `substitution` rules
-//! with `affix`, in the package under `tests/fixtures/spelling`.
-//! `tests/fixtures/spelling-parity/inputs` and `affix-parity/inputs` hold the
+//! The package under `tests/fixtures/spelling` has two styles.
+//! `Parity` has the `spelling` rules.
+//! `Affix` has the `existence` and `substitution` rules with `affix`.
+//!
+//! `tests/fixtures/spelling-parity/inputs` and `affix-parity/inputs` have the
 //! Markdown files of each, with `.fixture` after `.md`.
-//! `vale.tsv` beside each holds one row for each alert Vale gave: the rule, the
-//! file, the line, the first and last column, the matched text and the
-//! message.
-//! The rows come from Vale at `66bbb85` run on the inputs with the package as
+//!
+//! Next to each, `vale.tsv` has one row for each alert Vale gave.
+//! A row lists the rule, the file, the line, the first and last column, the
+//! matched text and the message.
+//! The rows come from Vale at `66bbb85`, run on the inputs with the package as
 //! its styles path.
 //!
-//! `departures.tsv` holds one row for each alert that only one side gave,
-//! led by `vale` or `hakkiri`.
-//! The test fails on any difference that file does not list, and on any row
-//! of it that no longer differs.
+//! `departures.tsv` has one row for each alert that only one side gave, led by
+//! `vale` or `hakkiri`.
+//! The test fails on any difference that file does not list.
+//! It also fails on a row that lists a difference that has gone.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -68,7 +70,8 @@ fn files_in(dir: &Path) -> Result<Vec<PathBuf>, Box<dyn Error>> {
     Ok(files)
 }
 
-/// Holds the alerts of the style `style` over the inputs of `root` to Vale's.
+/// Compares the alerts of the style `style` on the inputs of `root` with
+/// Vale's.
 fn compare(style: &str, root: &str) -> TestResult {
     let fixtures = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
     let root = fixtures.join(root);

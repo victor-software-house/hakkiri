@@ -1,20 +1,29 @@
 //! Rule parameters: the scenarios of the rule-parameters change.
 //!
-//! `tests/fixtures/rule-parameters` holds one package (`styles`, with the
-//! style `Team`: one rule of each check type that has parameters), two
-//! Markdown files (`text`, with `.fixture` after the extension), and one config
-//! for each tool and scenario: `vale/<name>.ini` and `.ctl/<name>.yaml`.
-//! `vale.tsv` holds one row for each alert Vale gave on the files under each
-//! config. A row has the config, the file, the line, the first and last column,
-//! the level, the rule, the message and the matched text, with a line feed
-//! written `\n` and a tab `\t`. The rows come from Vale at `66bbb85` run from
-//! the fixture folder as `vale --config=vale/<name>.ini --output=JSON text`,
-//! with `Vale.Spelling` turned off, as each hakkiri config turns it off.
+//! `tests/fixtures/rule-parameters` contains:
 //!
-//! Vale applies a parameter to every file, whichever section sets it, and
-//! hakkiri applies it to the files of the glob that sets it. Each config of the
-//! fixture has one glob that holds every file, where the two agree. The other
-//! tests hold what hakkiri does where they differ.
+//! - one package, `styles`, with the style `Team`: one rule of each check type
+//!   that has parameters;
+//! - two Markdown files (`text`, with `.fixture` after the extension);
+//! - one config for each tool and scenario: `vale/<name>.ini` and
+//!   `.ctl/<name>.yaml`.
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files under each
+//! config.
+//! A row has the config, the file, the line, the first and last column, the
+//! level, the rule, the message and the matched text.
+//! A line feed is written `\n` and a tab `\t`.
+//!
+//! The rows come from Vale at `66bbb85` run from the fixture folder as
+//! `vale --config=vale/<name>.ini --output=JSON text`.
+//! Vale ran with `Vale.Spelling` turned off, as each hakkiri config turns it
+//! off.
+//!
+//! Vale applies a parameter to every file, whichever section sets it.
+//! hakkiri applies it to the files of the glob that sets it.
+//! Each config of the fixture has one glob that matches every file, where the
+//! two agree.
+//! The other tests cover what hakkiri does where they differ.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -139,7 +148,7 @@ fn rows_of(out: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
     Ok(rows)
 }
 
-/// A scenario folder that holds the fixture's styles, text and configs.
+/// A scenario folder that has the fixture's styles, text and configs.
 fn project<'a>(suite: &'a Suite, name: &str) -> Result<Root<'a>, Box<dyn Error>> {
     let root = suite.scenario(name);
     copy_into(&root, &fixture().join("styles"), Path::new("styles"))?;

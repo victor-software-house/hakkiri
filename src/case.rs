@@ -1,8 +1,10 @@
 //! Case conversion one character to one, as Go's `unicode` package does it.
 //!
 //! Rust's own conversions can give several characters for one, such as `SS`
-//! for `ß`, and can read the neighbours of a character, as the final form of
-//! `Σ`. Go does neither, and the ported readers match what Go gives.
+//! for `ß`.
+//! They can also read the neighbours of a character, as the final form of
+//! `Σ` does.
+//! Go does neither, and the ported readers match what Go gives.
 
 /// The lower case of `c`, as one character.
 ///
@@ -32,7 +34,8 @@ pub(crate) fn title(c: char) -> char {
     }
 }
 
-/// The only character of `mapped`, or `fallback` when it holds more or none.
+/// The only character of `mapped`, or `fallback` when it has more than one or
+/// none.
 fn single(mut mapped: impl Iterator<Item = char>, fallback: char) -> char {
     match (mapped.next(), mapped.next()) {
         (Some(only), None) => only,

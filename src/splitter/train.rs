@@ -1,18 +1,19 @@
 //! The trainer: reads text with no labels and learns the model's four tables.
 //!
-//! It follows Kiss and Strunk (2006) with NLTK's thresholds, over three passes
-//! on the text:
+//! It follows Kiss and Strunk (2006) with the thresholds of the Natural
+//! Language Toolkit (NLTK), over three passes on the text:
 //!
-//! 1. Count every word type, and find the abbreviations: a word type whose
-//!    period sticks to it more often than chance, scaled by how short it is and
-//!    how many inner periods it has.
-//! 2. Mark each token that may end a sentence, and note how each word was
-//!    capitalized after a break, inside a sentence and where either could hold.
+//! 1. Count every word type, and find the abbreviations. A word type is one
+//!    when its period sticks to it more often than chance. The score is scaled
+//!    by how short it is and how many inner periods it has.
+//! 2. Mark each token that may end a sentence. Note how each word was
+//!    capitalized after a break, inside a sentence and where either fits.
 //! 3. Look at each token that ends in a period and the word after it, to find
 //!    rare abbreviations, words that start sentences, and collocations.
 //!
-//! The result does not depend on the order of the documents inside a pass, only
-//! on their content, and the same documents give the same model.
+//! The result depends only on the content of the documents, not on their order
+//! inside a pass.
+//! The same documents give the same model.
 
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
@@ -28,18 +29,21 @@ const COLLOCATION: f64 = 7.88;
 const SENTENCE_STARTER: f64 = 30.0;
 /// The size of text that the penalty for a word with no period counts in.
 ///
-/// Kiss and Strunk's penalty counts the occurrences with no period in a text of
-/// about 469,000 tokens. On a longer text the count is scaled down to this
-/// size. The value comes from scoring the model on the evaluation sets with
-/// sizes from 50,000 to 10,000,000; the larger ones drop `Mr`, `St` and `Feb`
-/// as abbreviations.
+/// Kiss and Strunk's penalty counts the words that occur without a period.
+/// It counts them over about 469,000 tokens of text.
+/// On a longer text the count is scaled down to this size.
+///
+/// The value comes from scoring the model on the evaluation sets, with sizes
+/// from 50,000 to 10,000,000.
+/// The larger ones drop `Mr`, `St` and `Feb` as abbreviations.
 const PENALTY_TEXT_TOKENS: u64 = 300_000;
 /// A word type seen fewer times than this, with or without a period, is rare.
 const RARE: u32 = 5;
 /// The words whose capitalization the model keeps, the most frequent first.
 ///
-/// A word that is not in the table reads as unknown, so the table can stay
-/// small: it only holds the words seen often enough to say something.
+/// A word that is not in the table reads as unknown.
+/// So the table can stay small: it only stores the words seen often enough to
+/// show a pattern.
 const ORTHOGRAPHY_ENTRIES: usize = 20_000;
 
 /// A count for each word type.
@@ -102,8 +106,9 @@ struct Pairs {
 
 /// Trains a model on `documents`, each the text of one document or paragraph.
 ///
-/// A blank line inside a document marks a paragraph, and a line break marks a
-/// line, which the trainer reads as weak evidence of a sentence break.
+/// A blank line inside a document marks a paragraph.
+/// A line break marks a line, which the trainer reads as weak evidence of a
+/// sentence break.
 /// The counts saturate at 2^32 - 1; a text that large is out of scope.
 #[must_use]
 pub fn train(documents: &[&str]) -> Trained {
@@ -143,7 +148,7 @@ fn bump(counts: &mut Counts, key: &str) {
     }
 }
 
-/// How often `kind` occurs, with and without a period after it.
+/// How often `kind` occurs, counting the forms with a period and without one.
 fn total(types: &Counts, kind: &str) -> u32 {
     let without = types.get(kind).copied().unwrap_or(0);
     let with = types.get(&format!("{kind}.")).copied().unwrap_or(0);
@@ -211,8 +216,9 @@ fn count_types(documents: &[&str]) -> Counted {
 /// periods, such as `mr` or `e.g`, that start and end with a letter.
 ///
 /// A version, a file extension, a path or a code fragment is not an
-/// abbreviation, and neither is a single letter: an initial has its own
-/// rules, and a letter in the table would hide them.
+/// abbreviation.
+/// Neither is a single letter.
+/// An initial has its own rules, and a letter in the table would hide them.
 fn is_abbreviation_shaped(stem: &str) -> bool {
     stem.chars().filter(|c| c.is_alphabetic()).count() >= 2
         && stem.chars().next().is_some_and(char::is_alphabetic)
@@ -239,12 +245,14 @@ fn find_abbreviations(counted: &Counted) -> HashSet<String> {
                 counted.tokens,
             );
             // Short words and words with inner periods, such as `e.g`, are
-            // likelier abbreviations. A word that also occurs with no period is
-            // less likely one: Kiss and Strunk divide by the number of letters
-            // to the power of that count. On a text of many millions, the same
-            // power drives `Mr` or `etc` to zero, because each is spelled both
-            // ways a few hundred times. The count is scaled to the text the
-            // penalty was set on.
+            // likelier abbreviations.
+            // A word that also occurs with no period is less likely to be one.
+            // Kiss and Strunk divide by the number of letters to the power of
+            // that count.
+            //
+            // On a text of many millions, the same power drives `Mr` or `etc`
+            // to zero, because each is spelled both ways a few hundred times.
+            // The count is scaled to the text the penalty was set on.
             let periods = real_len(stem.matches('.').count().saturating_add(1));
             let letters = real_len(stem.chars().filter(|&c| c != '.').count());
             let scale = (real(PENALTY_TEXT_TOKENS) / real(counted.tokens)).min(1.0);
@@ -323,8 +331,9 @@ impl Evidence<'_> {
     /// Whether `current`, which ends a sentence in the first look, is a rare
     /// word that the word after it shows to be an abbreviation.
     ///
-    /// It is, when a comma, semicolon or colon follows it, or when a word in
-    /// lower case follows it that is only ever capitalized after a break.
+    /// It is when a comma, semicolon or colon follows it.
+    /// It is also when a word in lower case follows it that is only ever
+    /// capitalized after a break.
     fn is_rare_abbreviation(
         &self,
         current: &Token<'_>,

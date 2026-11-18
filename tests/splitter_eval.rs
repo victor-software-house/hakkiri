@@ -1,13 +1,18 @@
 //! Evaluation of the sentence splitter on the committed sets.
 //!
-//! Each set in `tests/fixtures/splitter/` is a list of records, and a record
-//! is its sentences joined by one space. The gold boundaries are the end of
-//! every sentence but the last. The splitter's boundary F1 on a set must be at
-//! least the F1 that `vale-f1.tsv` holds for Vale 3.26.0. The F1 is summed over
-//! the whole set and compared in ten-thousandths, the precision of the file.
+//! Each set in `tests/fixtures/splitter/` is a list of records.
+//! A record is its sentences joined by one space.
+//! The gold boundaries are the end of every sentence but the last.
 //!
-//! Two checks guard the sets: no record holds two identical consecutive
-//! sentences, and every MASC record holds exactly four sentences.
+//! The splitter's boundary F1 on a set must be at least the F1 that
+//! `vale-f1.tsv` stores for Vale 3.26.0.
+//! The F1 is summed over the whole set and compared in ten-thousandths, the
+//! precision of the file.
+//!
+//! Two checks guard the sets.
+//! No record has two identical consecutive sentences.
+//! Every record from the Manually Annotated Sub-Corpus (MASC) has exactly
+//! four sentences.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -84,7 +89,7 @@ fn fixture_path(name: &str) -> PathBuf {
 
 /// Reads `tests/fixtures/splitter/<set>.fixture`.
 ///
-/// A record starts with a `# <source>` line, holds one sentence per line, and
+/// A record starts with a `# <source>` line, has one sentence per line, and
 /// ends at a blank line.
 fn records(set: &str) -> Result<Vec<Record>, Box<dyn Error>> {
     let text = fs::read_to_string(fixture_path(&format!("{set}.fixture")))?;

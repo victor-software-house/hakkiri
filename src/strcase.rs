@@ -61,8 +61,9 @@ const PREPOSITIONS: &[&str] = &[
 /// to a space, a hyphen or a slash.
 const TITLE_WORD: &str = r"[\p{N}\p{L}]+[^\t\n\f\r \-/]*";
 
-/// The words of a sentence, and of the texts a `capitalization` rule counts:
-/// a run of letters, digits and asterisks, and what follows it up to a space.
+/// The words of a sentence, and of the texts a `capitalization` rule counts.
+/// A word is a run of letters, digits and asterisks, and what follows it up to
+/// a space.
 pub const WORD: &str = r"[\p{N}\p{L}*]+[^\t\n\f\r ]*";
 
 /// How a title is cased.
@@ -165,9 +166,10 @@ pub struct Sentence {
 }
 
 impl Sentence {
-    /// A converter that keeps the words of `vocab` as written, leaves a
-    /// `prefix` alone, and starts the word after one that ends with an
-    /// `indicators` entry with a capital.
+    /// A converter that keeps the words of `vocab` as written and leaves a
+    /// `prefix` alone.
+    /// It starts the word after one that ends with an `indicators` entry with a
+    /// capital.
     ///
     /// # Errors
     ///
@@ -202,7 +204,8 @@ impl Sentence {
     }
 
     /// Whether the word after `word`, at `index` in the text, starts with a
-    /// capital: `word` ends with an indicator, or is the first and holds a
+    /// capital.
+    /// It does when `word` ends with an indicator, or is the first and has a
     /// number and a period.
     fn indicates(&self, word: &str, index: usize) -> bool {
         self.indicators
@@ -242,7 +245,7 @@ impl Sentence {
     }
 }
 
-/// Whether `word` holds a run of digits and then a period.
+/// Whether `word` has a run of digits and then a period.
 fn has_number_list(word: &str) -> bool {
     let bytes = word.as_bytes();
     bytes.iter().enumerate().any(|(at, byte)| {
@@ -305,7 +308,8 @@ impl Title {
     }
 
     /// Whether the word `lower`, number `index` of the title and tagged with
-    /// `tags`, stays in lower case when `bounding` says it is first or last.
+    /// `tags`, stays in lower case.
+    /// `bounding` is whether it is first or last.
     fn lowers(&self, lower: &str, tags: &[String], index: usize, bounding: bool) -> bool {
         match self.style {
             Style::Ap => {
@@ -325,11 +329,13 @@ impl Title {
     /// `text` in title case.
     ///
     /// Each word is read where prose reads it.
-    /// Its place is searched for in a copy of the text whose curly quotes,
-    /// dashes and ellipses are plain marks, from where the last word ended,
-    /// counted in characters.
+    /// Its place is found in a copy of the text whose curly quotes, dashes and
+    /// ellipses are plain marks.
+    /// The search starts where the last word ended, counted in characters.
+    ///
     /// The tag after `to` is the one of the word that follows it in the
-    /// Treebank tokenizer's words, which are not always the words of the title.
+    /// Treebank tokenizer's words.
+    /// These are not always the words of the title.
     #[must_use]
     pub fn convert(&self, text: &str) -> String {
         let (prefix, rest) = split_prefix(self.prefix.as_ref(), text);

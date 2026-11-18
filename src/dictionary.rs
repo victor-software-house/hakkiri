@@ -5,12 +5,15 @@
 //! gospell under the MIT license (`data/dictionary/vale-spell.LICENSE`).
 //! [`Dictionary::english()`] is Vale's built-in `en_US-web`.
 //!
-//! The port reads a dictionary eagerly: it makes every form of every entry
-//! when it loads, where Vale makes the forms of an entry when it looks a word
-//! up. The words accepted are the same. A dictionary that makes compounds by
-//! flag (`COMPOUNDFLAG`, `COMPOUNDBEGIN`, `COMPOUNDMIDDLE`, `COMPOUNDEND`),
-//! and every directive about suggestions, Turkic casing and `ß`, loads with
-//! those directives left out.
+//! The port reads a dictionary eagerly.
+//! It makes every form of every entry when it loads.
+//! Vale makes the forms of an entry when it looks a word up.
+//! The words accepted are the same.
+//!
+//! A dictionary can make compounds by flag (`COMPOUNDFLAG`, `COMPOUNDBEGIN`,
+//! `COMPOUNDMIDDLE`, `COMPOUNDEND`).
+//! It loads with those directives left out.
+//! Every directive about suggestions, Turkic casing and `ß` is left out too.
 //!
 //! [Vale]: https://github.com/vale-cli/vale/tree/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell
 
@@ -123,7 +126,7 @@ impl fmt::Display for DictionaryError {
 
 impl error::Error for DictionaryError {}
 
-/// How a word is read when it holds capitals, as Hunspell reads it.
+/// How a word is read when it has capitals, as Hunspell reads it.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Capitals {
     /// `hello`
@@ -253,7 +256,8 @@ fn find_from(word: &str, pattern: &str, from: usize) -> Option<usize> {
 /// # Errors
 ///
 /// Returns a [`DictionaryError`] when the file is in a character set this
-/// reader does not read, a directive lacks its argument, or a condition does
+/// reader does not read.
+/// It also returns one when a directive lacks its argument or a condition does
 /// not read.
 pub(crate) fn read_affixes(aff: &[u8]) -> Result<AffixFile, DictionaryError> {
     let (text, _) = charset::decode(aff, b"")?;
@@ -278,7 +282,8 @@ impl Dictionary {
     /// # Errors
     ///
     /// Returns a [`DictionaryError`] when a file is in a character set this
-    /// reader does not read, a directive lacks its argument, or a condition
+    /// reader does not read.
+    /// It also returns one when a directive lacks its argument or a condition
     /// does not read.
     pub fn parse(aff: &[u8], dic: &[u8]) -> Result<Self, DictionaryError> {
         let (aff_text, dic_text) = charset::decode(aff, dic)?;
@@ -447,7 +452,7 @@ impl Dictionary {
         self.affixes.convert(text)
     }
 
-    /// Whether the dictionary accepts `word`, or `listed` holds it.
+    /// Whether the dictionary accepts `word`, or `listed` contains it.
     ///
     /// The word is read as the dictionary reads its own: through `ICONV`, and
     /// without the `IGNORE` characters.
@@ -552,9 +557,11 @@ impl Dictionary {
         {
             return true;
         }
-        // A compound rule reads the word as written or, for a capitalized or
-        // all-caps word, in lower case, so an ordinal in capitals reads as one
-        // in lower case. An entry on its own is not a compound.
+        // A compound rule reads the word as written.
+        // For a capitalized or all-caps word, it also reads the word in lower
+        // case.
+        // So an ordinal in capitals reads as one in lower case.
+        // An entry on its own is not a compound.
         for pattern in &self.compounds {
             if !self.roots.contains(word) && pattern.is_match(word) {
                 return true;
@@ -590,8 +597,8 @@ impl Dictionary {
 
     /// Whether `word` is valid once split at the breaks of the dictionary.
     ///
-    /// A break written at the start or end is taken off that end of the word,
-    /// and any other splits the word at each place it occurs. The parts are
+    /// A break written at the start or end is taken off that end of the word.
+    /// Any other break splits the word at each place it occurs. The parts are
     /// then checked on their own, and split again as needed.
     ///
     /// The same part comes up again from other splits, so each part is

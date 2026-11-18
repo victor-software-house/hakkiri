@@ -1,6 +1,7 @@
-//! Tests for the sentence splitter: one per scenario of the
-//! sentence-splitting spec, run on the embedded English model, and tests of the
-//! trainer and the model file on small inputs.
+//! Tests for the sentence splitter.
+//! One test per scenario of the sentence-splitting spec runs on the embedded
+//! English model.
+//! Other tests cover the trainer and the model file on small inputs.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -25,7 +26,7 @@ fn sentences(text: &str) -> Result<Vec<&str>, Box<dyn Error>> {
         .collect())
 }
 
-/// The sentences of `text`, where each pair of backticks holds a code span
+/// The sentences of `text`, where each pair of backticks encloses a code span
 /// that reads as one `x`.
 fn code_sentences(text: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let model = Model::english().map_err(ToString::to_string)?;

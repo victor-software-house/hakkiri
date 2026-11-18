@@ -1,9 +1,9 @@
 //! Part-of-speech tags for the words of one sentence.
 //!
-//! The tagger is an averaged perceptron over the Penn Treebank tags, a port of
-//! the `tag` and `tokenize` packages of [prose] at `b33e60d`, with the English
-//! model it ships.
-//! [`Tagger::english()`] reads the model once per process, and
+//! The tagger is an averaged perceptron over the Penn Treebank tags.
+//! It is a port of the `tag` and `tokenize` packages of [prose] at `b33e60d`,
+//! with the English model it ships.
+//! [`Tagger::english()`] reads the model once per process.
 //! [`Tagger::tag()`] tokenizes one sentence and tags each token.
 //!
 //! A few rules then correct the model's tags where it is wrong on the prose of
@@ -12,11 +12,13 @@
 //! a semicolon.
 //! They also cover a verb after a noun phrase, the verbs of saying and asking
 //! after a noun, and the nouns of technical prose.
+//!
 //! [`Tagger::tag()`] and [`Tagger::tag_words()`] apply them.
 //! [`Tagger::tag_code()`] reads a noun in place of each code span first.
 //! [`Tagger::tag_treebank()`] does not, so a title is read as prose reads it.
 //!
-//! The model is trained on UD English EWT and is under CC BY-SA 4.0.
+//! The model is trained on the Universal Dependencies English Web Treebank.
+//! It is under the Creative Commons Attribution-ShareAlike 4.0 license.
 //! Its notice is in `data/tagger/NOTICE.md`.
 //!
 //! [prose]: https://github.com/jdkato/prose/tree/b33e60dbff0492289b227f3681120ac057d8131b
@@ -126,9 +128,9 @@ impl Tagger {
     /// The tokens of `sentence`, each with its tag, where `is_code` marks the
     /// tokens that read a code span.
     ///
-    /// A code span names a thing, so the model reads the noun `name` in
-    /// its place, with the words around it in context, and the tag of the span
-    /// is `NN`, which the corrections read as well.
+    /// A code span stands for a thing, so the model reads the noun `name` in
+    /// its place, with the words around it in context.
+    /// The tag of the span is `NN`, which the corrections read as well.
     /// The square brackets of an intra-doc link, as in ``[`Name`]``, belong
     /// to the span.
     #[must_use]

@@ -1,18 +1,25 @@
 //! Long inputs: the four check types of the `pattern-and-readability-checks`
-//! change, `capitalization` and `sequence`, and `spelling` with `affix`, over
-//! a line of 50,000 characters and a file of 60,000 lines.
+//! change.
+//! It also covers `capitalization`, `sequence`, and `spelling` with `affix`.
+//! The inputs are a line of 50,000 characters and a file of 60,000 lines.
 //!
-//! Each test lints one input with one set of rules:
-//! `consistency`, `conditional`, `repetition` and `readability`; or
-//! `capitalization` and `sequence`; or `spelling`, and an `existence` and a
-//! `substitution` rule that read `affix`.
-//! It checks the alerts each rule gives, and prints the time of the run.
+//! Each test lints one input with one set of rules.
+//! The sets are:
+//!
+//! - `consistency`, `conditional`, `repetition` and `readability`
+//! - `capitalization` and `sequence`
+//! - `spelling`, and an `existence` and a `substitution` rule that read `affix`
+//!
+//! Each test checks the alerts each rule gives, and prints the time of the run.
+//!
 //! One more test reads a single sentence of 50,000 characters with a
-//! `sequence` rule, where the walk starts once for each word the anchor
-//! accepts.
-//! The last lints a long file with the `BareURL` rule of `ProseStyle` v0.0.16,
-//! which reached the backtrack limit at 1:1 under hakkiri 0.0.6 with the rule
-//! of `ProseStyle` v0.0.14 (row `HKR-070`).
+//! `sequence` rule.
+//! There the walk starts once for each word the anchor accepts.
+//!
+//! The last test lints a long file with the `BareURL` rule of `ProseStyle`
+//! v0.0.16.
+//! That rule reached the backtrack limit at 1:1 under hakkiri 0.0.6 with the
+//! rule of `ProseStyle` v0.0.14 (row `HKR-070`).
 
 #![expect(
     clippy::panic_in_result_fn,

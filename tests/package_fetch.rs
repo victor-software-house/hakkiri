@@ -1,9 +1,9 @@
 //! A package pinned by `url` and `sha256`: the scenarios of the package-fetch
 //! change.
 //!
-//! Each test starts a small HTTP server on a local port, writes a project in a
-//! temporary directory, and runs the binary there with its cache in another
-//! temporary folder.
+//! Each test starts a small HTTP server on a local port.
+//! It writes a project in a temporary directory.
+//! It runs the binary there, with its cache in another temporary folder.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -44,9 +44,9 @@ const ALPHA_SHA256: &str = "c46cffdaaab0d6eb0d5adbf8cb2a6dc2315662540a84aa083c0a
 const BETA: &[u8] = include_bytes!("fixtures/packages/Beta.zip");
 const BETA_SHA256: &str = "760e55c4f7412703ffedd42fec9108ce1327fa8a2bcec167381188f7d36f9a11";
 
-/// `ProseStyle` v0.0.14, as its release holds it: the Voices, Direct, Std and
-/// Readability styles beside its own, with six script rules and the rules
-/// that inherit.
+/// `ProseStyle` v0.0.14, as its release ships it.
+/// It has the Voices, Direct, Std and Readability styles beside its own.
+/// It also has six script rules and the rules that inherit.
 const PROSE_STYLE: &[u8] = include_bytes!("fixtures/packages/ProseStyle.zip");
 const PROSE_STYLE_SHA256: &str = "8eeeb7192f24ceb3150292956df89869f6239c8632e6742d0401163c08e337da";
 
@@ -168,7 +168,7 @@ fn answer(
     stream.flush()
 }
 
-/// A project that holds `a.md`, the config with `packages`, and a cache folder.
+/// A project that has `a.md`, the config with `packages`, and a cache folder.
 fn project<'a>(suite: &'a Suite, name: &str, packages: &str) -> Root<'a> {
     let root = suite.scenario(name);
     root.file(

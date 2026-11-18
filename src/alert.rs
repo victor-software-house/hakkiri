@@ -42,11 +42,15 @@ pub struct Alert {
 /// Fills the `%s` and the indexed `%[n]s` of `template` with `values`, in
 /// order.
 ///
-/// `%[n]s` takes the `n`th value, counting from 1, and a `%s` after it takes
-/// the value that follows, as Go's `fmt` does and as Vale's messages rely on.
-/// `%%` is `%`. A `%s` or `%[n]s` with no value to take is nothing, and a value
-/// left over is dropped. A `%` before any other character stays as written. A
-/// line break in a value is one space.
+/// `%[n]s` takes the `n`th value, counting from 1.
+/// A `%s` after it takes the value that follows, as Go's `fmt` does and as
+/// Vale's messages rely on.
+///
+/// `%%` is `%`.
+/// With no value to take, a `%s` or `%[n]s` is nothing, and any value left
+/// over is dropped.
+/// Before any other character, a `%` stays as written.
+/// In a value, a line break is one space.
 #[must_use]
 pub fn fill(template: &str, values: &[&str]) -> String {
     let mut out = String::with_capacity(template.len());
@@ -94,9 +98,9 @@ fn verb(text: &str) -> Option<(Option<usize>, &str)> {
 
 /// Where the bytes of one file lie as lines and columns.
 ///
-/// It keeps the byte each line starts at, and counts the characters of a line
-/// from where the last count stopped, so the alerts of a long line cost the
-/// length of the line once.
+/// It keeps the byte each line starts at.
+/// It counts the characters of a line from where the last count stopped.
+/// So the alerts of a long line cost the length of the line once.
 #[derive(Debug)]
 pub struct Locator<'a> {
     source: &'a str,
@@ -259,9 +263,9 @@ impl<'a> Locator<'a> {
     }
 }
 
-/// The alerts of one rule in one file, in file order, without a second alert
-/// at one line and column, and at most `limit` of them when `limit` is above
-/// 0.
+/// The alerts of one rule in one file, in file order.
+/// There is no second alert at one line and column.
+/// There are at most `limit` of them when `limit` is above 0.
 #[must_use]
 pub fn settle(mut alerts: Vec<Alert>, limit: usize) -> Vec<Alert> {
     alerts.sort_by_key(|alert| (alert.line, alert.first_column));

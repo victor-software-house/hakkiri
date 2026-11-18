@@ -102,13 +102,13 @@ impl Dialect {
         matches!(self, Self::Rust | Self::Swift)
     }
 
-    /// Whether the text of a `/** */` comment holds `JSDoc` tags.
+    /// Whether the text of a `/** */` comment has `JSDoc` tags.
     const fn has_jsdoc(self) -> bool {
         matches!(self, Self::TypeScript | Self::Tsx | Self::JavaScript)
     }
 
     /// The pattern of a comment addressed to a tool, such as a linter switch
-    /// or a build constraint, which holds no prose.
+    /// or a build constraint, which has no prose.
     fn directive(self) -> Option<&'static Regex> {
         let patterns = &*DIRECTIVES;
         match self {
@@ -355,9 +355,10 @@ fn is_directive(dialect: Dialect, text: &str, offset: usize) -> bool {
 }
 
 /// Joins each run of adjacent line comments that share a marker, as rustdoc
-/// does. Doc line comments join across blank lines too, since rustdoc reads
-/// the lines of one item's doc comments as one text, so a fence opened before
-/// a blank line stays open after it.
+/// does.
+/// Doc line comments join across blank lines too.
+/// Rustdoc reads the lines of one item's doc comments as one text, so a fence
+/// opened before a blank line stays open after it.
 fn groups(source: &str, comments: &[Found]) -> Vec<Group> {
     let mut groups: Vec<Group> = Vec::new();
     for Found {
@@ -402,7 +403,7 @@ fn starts_line(source: &str, offset: usize) -> bool {
 }
 
 /// The `raw` root of one group, the comment node over the Markdown of its text,
-/// and the file ranges of the text that it marks as no prose.
+/// and the file ranges it marks as not prose.
 fn root(
     dialect: Dialect,
     source: &str,
@@ -496,8 +497,8 @@ fn root(
 /// `[crate::Name]` and ``[`Name`]``.
 /// `JSDoc` links in an inline tag, such as `{@link Name}`.
 ///
-/// A bracket is a link unless a `(`, a `[` or a `:` follows it, which make it
-/// a link with a target of its own, or a link definition.
+/// A bracket is a link unless a `(`, a `[` or a `:` follows it.
+/// Those make it a link with a target of its own, or a link definition.
 fn masks(dialect: Dialect, text: &str, name: Option<&str>) -> Vec<Range<usize>> {
     let link = match dialect {
         Dialect::Go => &GO_LINK,

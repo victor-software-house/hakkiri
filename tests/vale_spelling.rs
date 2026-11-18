@@ -1,26 +1,32 @@
 //! The built-in rule `Vale.Spelling`: the scenarios of the vale-spelling
 //! change.
 //!
-//! `tests/fixtures/vale-spelling` holds three packages, three Markdown files,
+//! `tests/fixtures/vale-spelling` has three packages, three Markdown files,
 //! one Rust file and one config for each tool and scenario.
-//! The packages are `plain`, with a vocabulary `Team`; `lists`, with word lists
-//! under `config/ignore`; and `dicts`, with a dictionary under
-//! `config/dictionaries`.
+//! The packages are:
+//!
+//! - `plain`, with a vocabulary `Team`
+//! - `lists`, with word lists under `config/ignore`
+//! - `dicts`, with a dictionary under `config/dictionaries`
+//!
 //! The files are in `text`, with `.fixture` after the extension.
 //! The configs are `vale/<name>.ini` and `.ctl/<name>.yaml`.
-//! `vale.tsv` holds one row for each alert Vale gave on the files under each
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files under each
 //! config.
-//! A row holds the config, the file, the line, the first and last column, the
+//! A row has the config, the file, the line, the first and last column, the
 //! level, the rule, the message and the matched text.
 //! A line feed is written `\n` and a tab `\t`.
-//! The rows come from Vale at `66bbb85` run from the fixture folder as `vale
-//! --config=vale/<name>.ini --output=JSON text`, with `Vale.Repetition`
-//! turned off, which `tests/builtin_repetition.rs` compares.
 //!
-//! `departures.tsv` holds one row for each alert that only one side gave,
-//! led by the config and `vale` or `hakkiri`.
-//! The test fails on any difference that file does not list, and on any row
-//! of it that no longer differs.
+//! The rows come from Vale at `66bbb85`, run from the fixture folder as `vale
+//! --config=vale/<name>.ini --output=JSON text`.
+//! `Vale.Repetition` is turned off in those runs.
+//! `tests/builtin_repetition.rs` compares it.
+//!
+//! `departures.tsv` has one row for each alert that only one side gave, led by
+//! the config and `vale` or `hakkiri`.
+//! The test fails on any difference that file does not list.
+//! It also fails on a row that lists a difference that has gone.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -41,7 +47,7 @@ use serde_json::Value;
 
 type TestResult = Result<(), Box<dyn Error>>;
 
-/// The rows of one table, each led by its first cell and holding the rest.
+/// The rows of one table, each led by its first cell, with the rest after it.
 type Table = Vec<(String, Vec<String>)>;
 
 /// A file, a line, the first and last column, the level, the rule, the
@@ -67,7 +73,7 @@ fn copy_into(root: &Root<'_>, from: &Path, to: &Path) -> TestResult {
     Ok(())
 }
 
-/// A scenario folder that holds the fixture's packages, text and configs.
+/// A scenario folder that has the fixture's packages, text and configs.
 fn project<'a>(suite: &'a Suite, name: &str) -> Result<Root<'a>, Box<dyn Error>> {
     let root = suite.scenario(name);
     for folder in ["plain", "lists", "dicts", "text", ".ctl"] {
@@ -303,7 +309,7 @@ fn a_dictionary_no_package_holds_is_an_error_on_the_line_of_the_parameter() -> T
     Ok(())
 }
 
-/// A project whose package `pack` holds the style `Team` and a dictionary with
+/// A project whose package `pack` has the style `Team` and a dictionary with
 /// no affix file, and whose config lists `styles` for the Markdown files.
 fn stray_dictionary<'a>(suite: &'a Suite, name: &str, styles: &str) -> Root<'a> {
     let root = suite.scenario(name);

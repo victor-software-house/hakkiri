@@ -113,9 +113,9 @@ fn numeric(text: &[u8]) -> Option<Reference> {
 
 /// The reference at the start of `text`, which starts with `&`.
 ///
-/// `attribute` is true for the value of an attribute, where a name with no
-/// `;` that `=` follows is not a reference, and a legacy name is read only
-/// whole.
+/// `attribute` is true for the value of an attribute.
+/// There, a name with no `;` that `=` follows is not a reference.
+/// A legacy name is read only whole.
 fn reference(text: &str, attribute: bool) -> Option<Reference> {
     let bytes = text.as_bytes();
     if bytes.get(1) == Some(&b'#') {

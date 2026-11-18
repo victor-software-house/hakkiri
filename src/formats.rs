@@ -9,7 +9,7 @@ use hakkiri::Language;
 
 use crate::config::glob_set;
 
-/// A key that holds one of these is a glob, as in Vale's `[formats]`.
+/// A key that contains one of these is a glob, as in Vale's `[formats]`.
 const GLOB_MARKS: [char; 4] = ['*', '?', '[', '{'];
 
 /// One `formats` entry: the language it gives, and its matcher when the key is
@@ -34,8 +34,9 @@ impl Formats {
     ///
     /// # Errors
     ///
-    /// Returns why `key` is not a glob when it holds a mark of one and does not
-    /// compile, and says the readers when `reader` names none.
+    /// Returns why `key` is not a glob when it has a glob mark and does not
+    /// compile.
+    /// It also lists the readers when `reader` is not one of them.
     pub(crate) fn insert(&mut self, key: &str, reader: &str) -> Result<(), String> {
         let language = Language::from_reader(reader).ok_or_else(|| {
             let names = Language::ALL.map(Language::name);
@@ -58,9 +59,10 @@ impl Formats {
     /// The reader the entries give the file at `path`, written relative to the
     /// project root with `/` separators, as Vale's `[formats]` does.
     ///
-    /// An entry named by the file's extension comes first. Then, in the order
-    /// of the keys as text, an entry whose key is the file's name, or a glob
-    /// that matches its path by the rules of gitignore.
+    /// An entry for the file's extension comes first.
+    /// Then come the other entries in the order of their keys as text.
+    /// Each is an entry whose key is the file's name, or a glob that matches
+    /// its path by the rules of gitignore.
     pub(crate) fn language_of(&self, path: &str) -> Option<Language> {
         let extension = Path::new(path)
             .extension()

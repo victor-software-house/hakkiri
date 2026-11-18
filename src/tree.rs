@@ -184,8 +184,8 @@ impl fmt::Display for Scope {
 /// What reads between a segment and the one before it.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum Join {
-    /// What the gap in the file holds: a line feed for a line break, a space
-    /// for a table pipe, and nothing for any other gap.
+    /// What the gap reads as: a line feed for a line break, a space for a
+    /// table pipe, and nothing for any other gap.
     #[default]
     Gap,
     /// Nothing, whatever the gap holds.
@@ -221,10 +221,11 @@ pub struct Node {
     pub span: Range<usize>,
     /// The byte ranges of the node's text in the original file, in file order.
     ///
-    /// A gap between two segments holds what is not part of the text.
+    /// A gap between two segments is whatever is not part of the text.
     /// It is a comment marker, or the indentation that a comment strips.
     /// It can also be syntax that is not prose, such as a code block, an HTML
-    /// tag or an MDX expression.
+    /// tag or an expression in Markdown with components (MDX).
+    ///
     /// A line of a comment with no text gives an empty range.
     pub segments: Vec<Range<usize>>,
     /// How each segment reads, in the order of `segments`.
@@ -233,27 +234,30 @@ pub struct Node {
     /// The nodes inside this one, in file order.
     pub children: Vec<Node>,
     /// Whether the node is the first thing inside the list item, quote or
-    /// table row around it, ahead of any fenced block, thematic break or other
-    /// element that holds no prose.
+    /// table row around it.
+    /// Fenced blocks, thematic breaks and other elements with no prose do not
+    /// count.
     pub first: bool,
     /// What follows the scope name in the node's scope: the key of a front
     /// matter value. Every other node has none.
     pub label: Option<String>,
-    /// The byte where the element that holds the node's text ends.
+    /// The byte where the element that contains the node's text ends.
     ///
     /// A comment inside the element, after the text, is before this byte.
-    /// It is the end of the node's span unless the element goes on, as a
-    /// paragraph in a tight list item does with the item.
+    /// It is the end of the node's span unless the element goes on.
+    /// A paragraph in a tight list item does so with the item.
     pub closes: usize,
     /// The bytes, in order, where a tag of the element that is not inline
-    /// flushes the text before it, so that text is read at that byte and the
-    /// text after the last one at [`closes`](Self::closes).
+    /// flushes the text before it.
+    /// That text is read at that byte, and the text after the last one at
+    /// [`closes`](Self::closes).
     ///
-    /// A paragraph that holds a `<div>` has one.
+    /// A paragraph that contains a `<div>` has one.
     pub flushes: Vec<usize>,
-    /// The language of the node when it is not the file's: the comments of a
-    /// fenced code block, and every node inside them, have the language of the
-    /// fence. Every other node has none.
+    /// The language of the node when it is not the file's.
+    /// The comments of a fenced code block, and every node inside them, have
+    /// the language of the fence.
+    /// Every other node has none.
     pub language: Option<&'static langdex::Language>,
 }
 
@@ -311,9 +315,9 @@ impl Node {
     /// What reads between two segments: the byte `end` of `source`, where one
     /// segment ends, and `next`, where the next one starts.
     ///
-    /// A line feed reads where the gap holds a line break, and one space where
-    /// the gap lies inside one of the table `rows` and holds a pipe that no
-    /// backslash escapes.
+    /// A line feed reads where the gap has a line break.
+    /// One space reads where the gap lies inside one of the table `rows` and
+    /// has a pipe that no backslash escapes.
     /// Any other gap, such as a link's destination, and a gap that is not a
     /// slice of `source`, reads as nothing.
     pub(crate) fn separator(
@@ -342,7 +346,7 @@ impl Node {
     }
 
     /// The spans of the table rows in this node and below it, in document
-    /// order. A row's cells are not read: a row holds no other row.
+    /// order. A row's cells are not read: a row contains no other row.
     pub(crate) fn rows(&self) -> Vec<Range<usize>> {
         let mut rows = Vec::new();
         let mut pending = vec![self];
@@ -365,10 +369,11 @@ impl Node {
 
     /// The text of this node in `source`: its segments in order.
     ///
-    /// A line feed separates two segments with a line break between them,
-    /// and one space separates two cells of a table row, at a pipe in a gap
-    /// inside the row. Any other gap, such as a link's destination, reads as
-    /// nothing.
+    /// A line feed separates two segments with a line break between them.
+    /// One space separates two cells of a table row, at a pipe in a gap inside
+    /// the row.
+    /// Any other gap, such as a link's destination, reads as nothing.
+    ///
     /// A segment's [`Reading`] gives the separator and the masking instead of
     /// the gap.
     /// A character reference is not read.
@@ -499,9 +504,10 @@ pub struct Tree {
     /// A Markdown or MDX file gives those of the comments in its fences.
     pub masks: Vec<Range<usize>>,
     /// Why the front matter of a Markdown or MDX file is no YAML, TOML or JSON
-    /// that its parser reads, as the line of the file and the parser's words.
-    /// The tree holds no value of such a block, and the rest of the file is
-    /// read as written.
+    /// that its parser reads.
+    /// The reason is the line of the file and the parser's words.
+    /// The tree has no value of such a block, and the rest of the file is read
+    /// as written.
     pub front_matter_fault: Option<String>,
 }
 

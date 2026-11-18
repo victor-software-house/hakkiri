@@ -1,7 +1,8 @@
-//! hakkiri, a prose linter for Markdown, MDX and source comments.
+//! hakkiri, a prose linter for Markdown, Markdown with components (MDX) and
+//! source comments.
 //!
 //! [`parse`] turns one file into a [`Tree`].
-//! Each [`Node`] holds a [`Scope`], the byte span of its text in the file, and
+//! Each [`Node`] has a [`Scope`], the byte span of its text in the file, and
 //! its children. Rules select text by scope, and alerts point back into the
 //! file through the spans.
 
@@ -54,10 +55,11 @@ pub use tree::{Comment, Join, Node, Reading, Scope, Tree};
 ///
 /// A Markdown or MDX file gives one `raw` root that spans the whole file, and
 /// the tree counts its code blocks.
-/// A source file gives one `raw` root per comment group, so no string literal
-/// reaches the tree.
+/// Each comment group of a source file gives one `raw` root, so no string
+/// literal reaches the tree.
+///
 /// A group is one comment, or adjacent line comments that share a marker.
-/// A plain-text file gives one `raw` root whose children are its paragraphs,
+/// In a plain-text file, one `raw` root has the paragraphs as its children,
 /// read as written.
 ///
 /// # Errors
@@ -73,9 +75,10 @@ pub fn parse(language: Language, source: &str) -> Result<Tree, Error> {
 ///
 /// A Markdown or MDX file is read as Vale reads it under `BlockIgnores` and
 /// `TokenIgnores`.
-/// Each match of a `blocks` pattern becomes a fenced code block that holds its
-/// first group, and each match of a `tokens` pattern becomes a code span that
-/// holds it.
+/// Each match of a `blocks` pattern becomes a fenced code block with its first
+/// group.
+/// Each match of a `tokens` pattern becomes a code span with that text.
+///
 /// The patterns run in order, block patterns first, each over the text the one
 /// before it left.
 /// Every span of the tree is in `source`.
@@ -83,9 +86,10 @@ pub fn parse(language: Language, source: &str) -> Result<Tree, Error> {
 ///
 /// # Errors
 ///
-/// Returns an [`Error`] when an MDX file has a syntax error, when the grammar
-/// of a source language cannot load or cannot parse the file, or when a
-/// pattern that backtracks gives up on the file.
+/// Returns an [`Error`] when an MDX file has a syntax error, or when a pattern
+/// that backtracks gives up on the file.
+/// It also returns one when the grammar of a source language cannot load or
+/// cannot parse the file.
 pub fn parse_ignoring(
     language: Language,
     source: &str,

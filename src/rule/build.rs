@@ -32,7 +32,7 @@ pub(super) struct Source<'a> {
     pub(super) name: &'a str,
     /// The rule's file.
     pub(super) file: &'a str,
-    /// The package that holds the rule, when it was read in one.
+    /// The package that contains the rule, when it was read in one.
     pub(super) package: Option<&'a Path>,
     /// The package folders of the project, which the built-in rule
     /// `Vale.Spelling` reads its dictionaries and word lists from.
@@ -71,8 +71,8 @@ impl Source<'_> {
     /// Compiles `pattern`, assembled from the `parts` of `field`.
     ///
     /// When it does not compile, the first part that does not compile alone
-    /// is the one the error names. When every part does, the fault is in how
-    /// they combine, and the error names the whole pattern.
+    /// is the one the error reports. When every part does, the fault is in how
+    /// they combine, and the error reports the whole pattern.
     fn compile(&self, field: &str, pattern: &str, parts: &[&str]) -> Result<Pattern, LoadError> {
         Pattern::new(pattern).map_err(|combined| {
             let blamed = parts
@@ -99,11 +99,11 @@ fn template(word: bool, ignorecase: bool, body: &str) -> String {
     }
 }
 
-/// `pattern` with each run of spaces between words matching a line wrap too.
+/// `pattern`, where each run of spaces between words also matches a line wrap.
 ///
-/// A space inside a character class, after a backslash or before a
-/// quantifier keeps its meaning, as does every space in a free-spacing
-/// pattern.
+/// A space keeps its meaning inside a character class, after a backslash or
+/// before a quantifier.
+/// So does every space in a free-spacing pattern.
 fn wrap_spaces(pattern: &str) -> String {
     if !pattern.contains([' ', '\t']) || pattern.contains("(?x") {
         return pattern.to_owned();
@@ -145,7 +145,7 @@ fn wrap_spaces(pattern: &str) -> String {
     out
 }
 
-/// Whether `term` holds no regular expression syntax, a period apart.
+/// Whether `term` has no regular expression syntax, a period apart.
 fn literal_term(term: &str) -> bool {
     !term.chars().any(|c| {
         matches!(
@@ -187,7 +187,7 @@ fn wrap_runs(text: &str) -> String {
 /// The patterns of a rule's `exceptions`.
 ///
 /// The words come longest first, so an alternation prefers the longer term,
-/// and each holds its own case.
+/// and each keeps its own case.
 /// The phrases are the terms of more than one word, matched without regard to
 /// case, so a match inside one is held back too.
 fn exceptions(source: &Source<'_>, terms: &[String]) -> Result<Exceptions, LoadError> {
@@ -301,7 +301,7 @@ fn existence(source: &Source<'_>, fields: &ExistenceFields) -> Result<Existence,
     })
 }
 
-/// Whether `value` holds a `$` and a digit, a reference to a group of the key.
+/// Whether `value` has a `$` and a digit, a reference to a group of the key.
 fn has_group_reference(value: &str) -> bool {
     value.match_indices('$').any(|(index, _)| {
         value
@@ -444,9 +444,9 @@ fn metric(source: &Source<'_>, fields: &MetricFields) -> Result<Metric, LoadErro
     })
 }
 
-/// Whether `pattern` holds a capture group: a `(` that is not escaped, not in
-/// a character class and not the start of an extension such as `(?:`, or a
-/// named group.
+/// Whether `pattern` has a capture group.
+/// That is a `(` that is not escaped, not in a character class and not the
+/// start of an extension such as `(?:`, or a named group.
 fn has_capture_group(pattern: &str) -> bool {
     let bytes = pattern.as_bytes();
     let mut in_class = false;
@@ -489,7 +489,7 @@ fn conditional(source: &Source<'_>, fields: &ConditionalFields) -> Result<Condit
             return Err(source.problem(
                 field,
                 format!(
-                    "rule `{}`: `{field}` holds nothing to match, so the pattern would match at \
+                    "rule `{}`: `{field}` has nothing to match, so the pattern would match at \
                      every position",
                     source.name
                 ),
@@ -841,8 +841,9 @@ pub(super) fn capitalization_rule(
     ))
 }
 
-/// One token of a `sequence` rule with its patterns compiled, and whether it
-/// names a word, a tag or a universal tag, which makes a step that must match.
+/// One token of a `sequence` rule with its patterns compiled.
+/// It also records whether the token matches a word, a tag or a universal
+/// tag, which makes a step that must match.
 fn sequence_token(
     source: &Source<'_>,
     place: &str,
@@ -1093,9 +1094,9 @@ fn spelling(source: &Source<'_>, fields: &SpellingFields) -> Result<Spelling, Lo
     })
 }
 
-/// The accepted terms as a `spelling` rule reads them, whatever the rule sets:
-/// whole words matched without regard to case, and the multi-word terms as
-/// phrases to mask before the words are read.
+/// The accepted terms as a `spelling` rule reads them, whatever the rule sets.
+/// Single words are matched whole and without regard to case.
+/// Multi-word terms are phrases to mask before the words are read.
 fn accepted_words(source: &Source<'_>) -> Result<(Option<Pattern>, Option<Pattern>), LoadError> {
     if source.accepted.is_empty() {
         return Ok((None, None));

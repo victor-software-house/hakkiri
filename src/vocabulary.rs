@@ -1,11 +1,13 @@
 //! A vocabulary: the terms a project accepts and rejects, kept in the folder
 //! `config/vocabularies/<name>/` of a package.
 //!
-//! A vocabulary holds every `accept.txt`, `reject.txt`, `vocab.yml` and
-//! `vocab.yaml` below its folder and no other file. A line of a text list is
-//! one term, after trimming; a blank line and a line that starts with a hash
-//! and a space are skipped. A term is a plain text or a pattern, as a rule's
-//! `exceptions` read it. The YAML files are read by [`yaml`].
+//! A vocabulary contains every `accept.txt`, `reject.txt`, `vocab.yml` and
+//! `vocab.yaml` below its folder and no other file.
+//! In a text list, each line is one term, after trimming.
+//! Blank lines and lines that start with a hash and a space are skipped.
+//!
+//! A term is a plain text or a pattern, as a rule's `exceptions` read it.
+//! The YAML files are read by [`yaml`].
 
 mod yaml;
 
@@ -15,14 +17,14 @@ use std::{fs, io};
 
 use hakkiri::rule::{Exceptions, LoadProblem};
 
-/// The folder of a package that holds its dictionaries, where a YAML
+/// The folder of a package that contains its dictionaries, where a YAML
 /// vocabulary looks for the affix file it names.
 pub(crate) const DICTIONARIES: &str = "config/dictionaries";
 
-/// The folder of a package that holds its vocabularies, under `config`.
+/// The folder of a package that contains its vocabularies, under `config`.
 const FOLDER: &str = "vocabularies";
 
-/// The folder of a package's styles that holds the settings of Vale, such as
+/// The folder of a package's styles that contains the settings of Vale, such as
 /// its vocabularies.
 pub(crate) const SETTINGS_FOLDER: &str = "config";
 
@@ -33,12 +35,12 @@ pub(crate) struct Vocabulary {
     pub(crate) accepted: Vec<String>,
     /// The rejected terms, in the same order.
     pub(crate) rejected: Vec<String>,
-    /// What holds back a match of an accepted term.
+    /// What blocks a match of an accepted term.
     pub(crate) exceptions: Exceptions,
 }
 
 /// Where the vocabulary `name` is in the package folder `package`, when that
-/// folder holds one.
+/// folder has one.
 pub(crate) fn find(package: &Path, name: &str) -> Option<PathBuf> {
     let mut parts = Path::new(name).components();
     let is_name = matches!((parts.next(), parts.next()), (Some(Normal(_)), None));
@@ -54,14 +56,16 @@ enum Kind {
     Yaml,
 }
 
-/// Reads the vocabulary in `folder`, whose files `shown` names in the errors.
-/// `dictionaries` are the folders that may hold the affix file a YAML file
-/// names, in the order they are searched.
+/// Reads the vocabulary in `folder`, whose files appear under `shown` in the
+/// errors.
+/// `dictionaries` are the folders that may contain the affix file a YAML file
+/// refers to, in the order they are searched.
 ///
 /// # Errors
 ///
 /// Returns a problem for each list that cannot be read, each term that is not
-/// a pattern and each YAML entry that is wrong, with the file and the line.
+/// a pattern and each wrong YAML entry.
+/// Each problem has the file and the line.
 pub(crate) fn read(
     folder: &Path,
     shown: &Path,

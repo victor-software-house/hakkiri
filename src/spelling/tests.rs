@@ -1,7 +1,8 @@
 //! Tests for the character categories of the `spelling` check.
 //!
-//! `is` tests an ASCII character by its byte and any other through a regex
-//! class, so one test holds the byte tests to the classes for every character.
+//! `is` tests an ASCII character by its byte.
+//! It tests any other character through a regex class.
+//! So one test checks the byte tests against the classes for every character.
 
 use super::{Category, LETTER, LOWER, UPPER, is};
 

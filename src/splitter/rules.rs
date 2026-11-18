@@ -1,10 +1,12 @@
 //! Override rules that run after Punkt.
 //!
-//! They cover the failures the pySBD paper reports for Punkt. The rule that a
-//! token with no space inside holds no boundary needs no code: a boundary falls
-//! only at the end of a token, and a token ends at whitespace. The rule that a
-//! closing quote or bracket stays with its sentence is applied where the
-//! sentences are cut, in [`super::Model::split`].
+//! They cover the failures the pySBD paper reports for Punkt.
+//!
+//! The rule that a token with no space inside has no boundary needs no code.
+//! A boundary falls only at the end of a token, and a token ends at whitespace.
+//!
+//! The rule that a closing quote or bracket stays with its sentence is applied
+//! where the sentences are cut, in [`super::Model::split`].
 
 use super::token::{Mark, Token};
 

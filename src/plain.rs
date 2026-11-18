@@ -2,8 +2,8 @@
 
 use crate::tree::{Node, Scope};
 
-/// The roots of a plain-text file: one `raw` root over the whole file, whose
-/// children are its paragraphs, the runs of lines that hold something between
+/// The roots of a plain-text file: one `raw` root over the whole file.
+/// Its children are its paragraphs, the runs of lines that have text between
 /// blank lines.
 ///
 /// A paragraph spans from its first character to its last, with no final line

@@ -1,11 +1,12 @@
 //! Tests for the dictionary reader: the scenarios of the spelling spec that
 //! need no rule, and a comparison with Vale.
 //!
-//! `tests/fixtures/dictionary/vale.tsv` holds a word and `1` or `0` a line:
+//! `tests/fixtures/dictionary/vale.tsv` stores a word and `1` or `0` a line:
 //! whether Vale's `en_US-web` accepts it, from Vale at `66bbb85` run in Go.
-//! The words are every 50th entry of the dictionary and variants of it, in
-//! other cases, with an ending, with a period, hyphenated, and misspelt, and
-//! hand-written numbers, units and ordinals.
+//! The words are every 50th entry of the dictionary and variants of it.
+//! Variants come in other cases, with an ending, with a period, hyphenated, and
+//! misspelt.
+//! Hand-written numbers, units and ordinals are included too.
 
 #![expect(
     clippy::panic_in_result_fn,

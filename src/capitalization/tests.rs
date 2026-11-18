@@ -1,13 +1,17 @@
 //! Tests for the case check: a comparison with Vale.
 //!
-//! `tests/fixtures/capitalization/vale.tsv` holds a configuration name, a text,
-//! the text as the rule's converter writes it, and `1` when Vale passes the
-//! text or `0` when not. The rows come from Vale at `66bbb85` run in Go: its
-//! `title` and `sentence` functions, with the converters of prose `b33e60d`
-//! and the exceptions as Vale's `updateExceptions` leaves them. The texts are
-//! hand-written headings and every 40th short sentence of "The Adventures of
-//! Sherlock Holmes", a public domain text, as it is, with each word
-//! capitalized, and in lower case.
+//! `tests/fixtures/capitalization/vale.tsv` has one row for each text.
+//! A row has a configuration name, the text, and the text as the rule's
+//! converter writes it.
+//! It ends with `1` when Vale passes the text, or `0` when not.
+//!
+//! The rows come from Vale at `66bbb85` run in Go.
+//! They use its `title` and `sentence` functions, with the converters of prose
+//! `b33e60d` and the exceptions as Vale's `updateExceptions` leaves them.
+//!
+//! The texts are hand-written headings and every 40th short sentence of "The
+//! Adventures of Sherlock Holmes", a public domain text.
+//! Each text is used as it is, with each word capitalized, and in lower case.
 
 #![expect(
     clippy::panic_in_result_fn,

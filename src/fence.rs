@@ -1,16 +1,17 @@
-//! The comments of a fenced code block, as nodes of the Markdown or MDX file
-//! that holds it.
+//! The comments of a fenced code block, as nodes of the Markdown or Markdown
+//! with components (MDX) file that contains it.
 //!
-//! The info string of a fence names a language through langdex. A fence of a
-//! language whose comments hakkiri reads is parsed with that language's
-//! grammar, as a source file is, and each comment becomes a node at its place
-//! in the file.
+//! The info string of a fence gives a language, which langdex resolves.
+//! A fence of a language whose comments hakkiri reads is parsed with that
+//! language's grammar, as a source file is.
+//! Each comment becomes a node at its place in the file.
 //!
 //! The Markdown parser gives the code of a fence without the indentation and
-//! the container markers that sit before each line in the file. Each line of
-//! that code must end the line of the file it came from, so a byte of the code
-//! has a place in the file. A fence with a line that does not map gives no
-//! nodes.
+//! the container markers that sit before each line in the file.
+//!
+//! Each line of that code must end the line of the file it came from.
+//! That way a byte of the code has a place in the file.
+//! A fence with a line that does not map gives no nodes.
 
 use std::iter;
 use std::ops::Range;
@@ -26,9 +27,9 @@ use crate::tree::Node;
 struct Line {
     /// The byte of the code where the line starts.
     code: usize,
-    /// How many bytes of the code the line holds, without its line feed.
+    /// How many bytes of the code the line has, without its line feed.
     len: usize,
-    /// How many of those bytes the file holds: a carriage return that the
+    /// How many of those bytes the file has: a carriage return that the
     /// parser keeps in the code is no byte of the text.
     kept: usize,
     /// The byte of the file where the line starts.
@@ -43,7 +44,8 @@ struct Placement {
 
 impl Placement {
     /// The lines of `code`, the code of the fence that spans `span` of
-    /// `source`, or `None` when a line of it does not end the line of the fence
+    /// `source`.
+    /// It is `None` when a line of the code does not end the line of the fence
     /// it should.
     ///
     /// The first line of the code is the line after the opening fence.
@@ -88,8 +90,9 @@ impl Placement {
             })
     }
 
-    /// The ranges of the file for the range of the code `range`, one for each
-    /// line it holds. An empty range gives the empty range at its place.
+    /// The ranges of the file that match `range` of the code, one for each
+    /// line it contains.
+    /// An empty range gives the empty range at its place.
     fn ranges(&self, range: Range<usize>) -> Vec<Range<usize>> {
         if range.is_empty() {
             let at = self.place(range.start);
@@ -115,11 +118,15 @@ fn language_word(lang: &str) -> &str {
 }
 
 /// The nodes of the comments in the fenced code block `code`, which spans
-/// `span` of `source`, and the file bytes of the doc links and names in them
-/// that no prose reads, as a source file gives its masks.
+/// `span` of `source`.
+/// It also gives the file bytes that no prose reads, such as doc links and
+/// names, as a source file gives its masks.
 ///
-/// There are none when hakkiri reads no comments of its language, when the
-/// block has none, and when its code does not map line for line onto `source`.
+/// There are none in three cases:
+///
+/// - hakkiri reads no comments of its language
+/// - the block has none
+/// - its code does not map line for line onto `source`
 ///
 /// Each comment node, and every node inside it, has the language of the fence.
 pub(crate) fn nodes(
@@ -153,8 +160,9 @@ pub(crate) fn nodes(
         comment.map_segments(&|range| placement.ranges(range));
         comment.closes = closes;
         comment.language = Some(language);
-        // The nodes inside a comment hold the offsets of the comment's text,
-        // which the file does not have: each closes where it ends.
+        // The nodes inside a comment have offsets in the comment's text, which
+        // the file does not have.
+        // Each closes where it ends.
         let mut pending: Vec<&mut Node> = comment.children.iter_mut().collect();
         while let Some(node) = pending.pop() {
             node.language = Some(language);

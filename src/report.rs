@@ -143,7 +143,7 @@ impl Failure {
             .collect()
     }
 
-    /// A rule hakkiri cannot run that the config lists: it holds no rule to run
+    /// A rule hakkiri cannot run that the config lists: it has no rule to run
     /// and fails the run until the config turns it `off`.
     pub(crate) fn unrunnable(rule: &Unrunnable) -> Self {
         Self {
@@ -231,8 +231,9 @@ impl Check {
 }
 
 impl Present for Check {
-    /// A line per alert, then a line per failure, then the count: plain text,
-    /// because tools read these lines and a frame or a colour would break them.
+    /// A line per alert, then a line per failure, then the count.
+    /// The output is plain text, because tools read these lines and a frame or
+    /// a colour would break them.
     fn present(&self) -> Document {
         let mut lines: Vec<String> = self
             .alerts

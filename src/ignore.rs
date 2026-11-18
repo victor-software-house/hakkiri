@@ -2,15 +2,19 @@
 //! reads prose.
 //!
 //! A port of `applyBlockPatterns` and `applyInlinePatterns` in `html.go` of
-//! [Vale] at `66bbb85`, for Markdown and MDX.
-//! Vale rewrites the file before it parses it. Each match of a block pattern
-//! becomes a fenced code block that holds the first group of the match, and
-//! each match of a token pattern becomes a code span that holds it.
+//! [Vale] at `66bbb85`, for Markdown and Markdown with JavaScript (MDX).
+//! Vale rewrites the file before it parses it.
+//!
+//! Each match of a block pattern becomes a fenced code block that contains the
+//! first group of the match.
+//! Each match of a token pattern becomes a code span that contains it.
 //! The patterns run one after the other, each over the text the one before it
 //! left, block patterns first.
-//! hakkiri parses the rewritten text, and then gives every node of the tree
-//! the bytes of the file the text came from, so an alert is still placed in the
-//! file as written.
+//!
+//! hakkiri parses the rewritten text.
+//! It then gives every node of the tree the bytes of the file the text came
+//! from.
+//! So an alert is still placed in the file as written.
 //!
 //! [Vale]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/html.go
 
@@ -35,21 +39,21 @@ const TOKEN: (&str, &str) = ("`", "`");
 /// the replacement `$1` to an engine that leaves it as written.
 const NO_GROUP: &str = "$1";
 
-/// A stretch of the rewritten text that holds bytes of the file.
+/// A stretch of the rewritten text that contains bytes of the file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct Run {
     /// Where the stretch starts in the rewritten text.
     new: usize,
     /// Where it starts in the file.
     old: usize,
-    /// How many bytes it holds.
+    /// How many bytes it contains.
     len: usize,
 }
 
 /// The text of a file after the patterns ran, and where each part of it came
 /// from.
 ///
-/// A byte that no run holds is one the rewrite added.
+/// A byte that no run contains is one the rewrite added.
 #[derive(Debug)]
 pub(crate) struct Changed {
     text: String,
@@ -72,8 +76,8 @@ impl Changed {
         &self.text
     }
 
-    /// This text with each match of each pattern of `patterns` turned into its
-    /// first group between `around`, a pattern after the one before it.
+    /// This text with each match turned into its first group between `around`.
+    /// It applies each pattern of `patterns` after the one before it.
     ///
     /// A match of no bytes changes nothing.
     fn apply(self, patterns: &[&Pattern], around: (&str, &str)) -> Result<Self, SearchError> {
@@ -112,7 +116,7 @@ impl Changed {
     }
 
     /// Appends the bytes `range` of this text to `text`, and the runs they
-    /// hold to `runs`.
+    /// contain to `runs`.
     fn copy(&self, range: Range<usize>, text: &mut String, runs: &mut Vec<Run>) {
         let start = text.len();
         text.push_str(self.text.get(range.clone()).unwrap_or_default());
@@ -204,13 +208,15 @@ pub(crate) fn restore(nodes: &mut Vec<Node>, changed: &Changed) {
     });
 }
 
-/// The tree of a whole Markdown or MDX file that the patterns rewrote: one
-/// `raw` root over the prose nodes, the number of its code blocks, its HTML
-/// comments, and the masks of the doc links in its fences.
+/// The tree of a whole Markdown or MDX file that the patterns rewrote.
+/// It returns one `raw` root over the prose nodes, and the number of its code
+/// blocks.
+/// It also returns its HTML comments, and the masks of the doc links in its
+/// fences.
 ///
 /// # Errors
 ///
-/// Returns an [`Error`] when a pattern gives up, or the MDX parser refuses the
+/// Returns an [`Error`] when a pattern gives up, or the MDX parser rejects the
 /// rewritten text.
 pub(crate) fn document(
     source: &str,

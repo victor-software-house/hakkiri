@@ -1,6 +1,7 @@
-//! A package pinned by `url` and `sha256`: downloaded once, checked, unpacked
-//! into the folder of the cache that its hash names, and read from there on
-//! every later run.
+//! A package pinned by `url` and `sha256`.
+//! It is downloaded once, checked, and unpacked into the cache folder for its
+//! hash.
+//! Every later run reads it from there.
 //!
 //! The cache keeps the package as its zip laid it out, so a Vale package keeps
 //! its `.vale.ini`, its `meta.json` and its vocabularies where Vale puts them.
@@ -17,10 +18,10 @@ use std::{env, process};
 use sha2::{Digest, Sha256};
 use zip::ZipArchive;
 
-/// The most a download may hold, 32 MiB.
+/// The largest download allowed, 32 MiB.
 const MAX_DOWNLOAD: u64 = 32 * 1024 * 1024;
 
-/// The most a package may hold once unpacked, 128 MiB.
+/// The largest package allowed once unpacked, 128 MiB.
 const MAX_UNPACKED: u64 = 128 * 1024 * 1024;
 
 /// How long each phase before the body may take: the name lookup, the
@@ -28,8 +29,8 @@ const MAX_UNPACKED: u64 = 128 * 1024 * 1024;
 /// them again.
 const BEFORE_BODY_TIMEOUT: Duration = Duration::from_secs(30);
 
-/// How long reading the body may take once the headers are in: 300 seconds,
-/// which lets a 32 MiB package finish at about 110 KB/s.
+/// How long reading the body may take once the headers are in: 300 seconds.
+/// That lets a 32 MiB package finish at about 110 KB/s.
 const BODY_TIMEOUT: Duration = Duration::from_secs(300);
 
 /// A zip that has passed the checks that need no file written.
@@ -44,11 +45,16 @@ type Archive = ZipArchive<Cursor<Vec<u8>>>;
 ///
 /// # Errors
 ///
-/// Returns a fault that names the `url`, or the option when no cache folder is
-/// known. A fault is a failed request, or a download over 32 MiB or with
-/// another hash than `sha256`. A fault is also a body that is not a zip, a file
-/// outside the package, a link, no single top folder, or an unpacked size over
-/// 128 MiB.
+/// Returns a fault that includes the `url`, or the option when no cache folder
+/// is known.
+/// A fault is:
+///
+/// - a failed request;
+/// - a download over 32 MiB or with another hash than `sha256`;
+/// - a body that is not a zip;
+/// - a file outside the package, or a link;
+/// - no single top folder;
+/// - an unpacked size over 128 MiB.
 pub(crate) fn fetch(cache_dir: Option<&Path>, url: &str, sha256: &str) -> Result<PathBuf, String> {
     let cache = cache_folder(cache_dir)?;
     let folder = cache.join(sha256);
@@ -91,7 +97,7 @@ fn absolute_variable(name: &str) -> Option<PathBuf> {
 }
 
 /// Downloads `url`, which fails when it answers an error status, outlasts
-/// [`BEFORE_BODY_TIMEOUT`] or [`BODY_TIMEOUT`], or holds over
+/// [`BEFORE_BODY_TIMEOUT`] or [`BODY_TIMEOUT`], or exceeds
 /// [`MAX_DOWNLOAD`] bytes.
 fn download(url: &str) -> Result<Vec<u8>, String> {
     let config = ureq::Agent::config_builder()
@@ -167,10 +173,12 @@ fn install(cache: &Path, folder: &Path, url: &str, body: Vec<u8>) -> Result<(), 
     }
 }
 
-/// Creates an empty folder in `cache` under a name that no other run holds: the
-/// process id and a random number, so two runs with one process id, such as
-/// containers that share a cache, still differ. `create_dir` fails when the
-/// name exists, so a folder another run made is never reused.
+/// Creates an empty folder in `cache` under a name that no other run uses.
+/// The name has the process id and a random number.
+/// So two runs with one process id, such as containers that share a cache,
+/// still differ.
+/// `create_dir` fails when the name exists, so a folder another run made is
+/// never reused.
 fn staging_folder(cache: &Path) -> Result<PathBuf, String> {
     loop {
         let random = RandomState::new().build_hasher().finish();
@@ -188,7 +196,7 @@ fn staging_folder(cache: &Path) -> Result<PathBuf, String> {
     }
 }
 
-/// Refuses a zip with a name outside the package, a link, a file at its root,
+/// Rejects a zip with a name outside the package, a link, a file at its root,
 /// or other than one top folder.
 fn check_names(archive: &mut Archive, url: &str) -> Result<(), String> {
     let mut tops = BTreeSet::new();
@@ -199,17 +207,17 @@ fn check_names(archive: &mut Archive, url: &str) -> Result<(), String> {
         let name = String::from_utf8_lossy(entry.name_raw()).into_owned();
         let Some(path) = entry.enclosed_name() else {
             return Err(format!(
-                "`{url}` names a file outside the package: `{name}`"
+                "`{url}` has an entry outside the package: `{name}`"
             ));
         };
         if entry.is_symlink() {
-            return Err(format!("`{url}` holds a link: `{name}`"));
+            return Err(format!("`{url}` contains a link: `{name}`"));
         }
         let mut parts = path.components();
         let top = parts.next().map(|part| part.as_os_str().to_owned());
         if parts.next().is_none() && !entry.is_dir() {
             return Err(format!(
-                "`{url}` holds a file at its root, `{name}`: a package holds one top folder"
+                "`{url}` contains a file at its root, `{name}`: a package has one top folder"
             ));
         }
         tops.extend(top);
@@ -217,12 +225,12 @@ fn check_names(archive: &mut Archive, url: &str) -> Result<(), String> {
     match tops.len() {
         1 => Ok(()),
         count => Err(format!(
-            "`{url}` holds {count} top folders: a package holds one top folder"
+            "`{url}` contains {count} top folders: a package has one top folder"
         )),
     }
 }
 
-/// Writes the files of `archive` under `staging`, and refuses a zip that
+/// Writes the files of `archive` under `staging`, and rejects a zip that
 /// unpacks to over [`MAX_UNPACKED`] bytes.
 fn unpack(archive: &mut Archive, staging: &Path, url: &str) -> Result<(), String> {
     let mut total = 0_u64;
@@ -254,14 +262,14 @@ fn unpack(archive: &mut Archive, staging: &Path, url: &str) -> Result<(), String
     Ok(())
 }
 
-/// The folder of `folder` that holds the styles: the `styles` folder of its one
-/// top folder, or `folder` itself when that top folder is a style.
+/// The folder of `folder` that contains the styles: the `styles` folder of its
+/// one top folder, or `folder` itself when that top folder is a style.
 fn package_folder(folder: &Path) -> io::Result<PathBuf> {
     let top = fs::read_dir(folder)?
         .filter_map(Result::ok)
         .map(|entry| entry.path())
         .find(|path| path.is_dir())
-        .ok_or_else(|| io::Error::other("the package holds no folder"))?;
+        .ok_or_else(|| io::Error::other("the package contains no folder"))?;
     let styles = top.join("styles");
     Ok(if styles.is_dir() {
         styles

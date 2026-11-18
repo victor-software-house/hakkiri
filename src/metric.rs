@@ -52,8 +52,9 @@ const ELEMENTS: [&str; 10] = [
     "heading_h6",
 ];
 
-/// Whether `name` is a variable of a formula. `counted` says the rule has
-/// `tokens` or `raw`, which give `occurrences`.
+/// Whether `name` is a variable of a formula.
+/// `counted` is true when the rule has `tokens` or `raw`, which give
+/// `occurrences`.
 pub(crate) fn is_variable(name: &str, counted: bool) -> bool {
     COUNTS.contains(&name)
         || SCORES.contains(&name)
@@ -101,11 +102,12 @@ pub(crate) fn variables(
     Some(found)
 }
 
-/// The result of the formula over a text with the variables `base`, when the
+/// The result of the formula for the text whose variables are `base`, when the
 /// condition holds for it.
 ///
-/// A text with no words, a formula that gives no number, and a condition that
-/// does not give a truth value hold nothing.
+/// A text with no words gives nothing.
+/// So does a formula that gives no number, or a condition that gives no truth
+/// value.
 pub(crate) fn measure(
     metric: &Metric,
     base: &Variables,
@@ -136,8 +138,8 @@ pub(crate) fn measure(
 /// The average of the scores of `readability` over a text with the variables
 /// `base`, when it is over the rule's grade.
 ///
-/// A text with no words or no sentence holds nothing: each score divides by
-/// one of those counts.
+/// A text with no words or no sentence gives nothing, because each score
+/// divides by one of those counts.
 pub(crate) fn graded(readability: &Readability, base: &Variables) -> Option<f64> {
     let has = |name: &str| base.get(name).is_some_and(|count| *count > 0.0);
     if !has("words") || !has("sentences") {

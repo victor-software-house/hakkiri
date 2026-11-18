@@ -46,8 +46,8 @@ pub(crate) enum Command {
 /// Arguments of `hakkiri test`.
 #[derive(Args, Debug)]
 pub(crate) struct TestArgs {
-    /// Rule files, test files and directories that hold them. Defaults to the
-    /// current directory.
+    /// Rule files, test files and directories that contain them.
+    /// Defaults to the current directory.
     #[arg(value_hint = clap::ValueHint::AnyPath)]
     pub(crate) paths: Vec<PathBuf>,
 
@@ -104,13 +104,13 @@ pub(crate) struct CheckArgs {
     #[arg(long)]
     pub(crate) no_gitignore: bool,
 
-    /// What to do with a file named on the command line that no glob selects.
+    /// What to do with a file given on the command line that no glob selects.
     /// Defaults to the config's `on_unmatched`, then to `warn`.
     #[arg(long, value_enum)]
     pub(crate) on_unmatched: Option<OnUnmatched>,
 
     /// What to do with a selected file that no reader reads: read it as plain
-    /// text, or warn, fail or say nothing. Defaults to the config's
+    /// text, or warn, fail or print nothing. Defaults to the config's
     /// `on_unknown`, then to `text`.
     #[arg(long, value_enum)]
     pub(crate) on_unknown: Option<OnUnknown>,
@@ -146,11 +146,11 @@ pub(crate) enum OnUnknown {
     Warn,
     /// Fail the run: exit 2.
     Error,
-    /// Skip it and say nothing.
+    /// Skip it and print nothing.
     Ignore,
 }
 
-/// What a run does with a file named on the command line that no glob selects.
+/// What a run does with a file given on the command line that no glob selects.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, ValueEnum)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum OnUnmatched {
@@ -159,7 +159,7 @@ pub(crate) enum OnUnmatched {
     Warn,
     /// Fail the run: exit 2.
     Error,
-    /// Say nothing.
+    /// Print nothing.
     Ignore,
 }
 

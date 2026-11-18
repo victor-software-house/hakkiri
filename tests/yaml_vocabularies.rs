@@ -1,19 +1,23 @@
 //! YAML vocabularies: the scenarios of the yaml-vocabularies change.
 //!
-//! `tests/fixtures/yaml-vocabularies` holds one package of rules and
+//! `tests/fixtures/yaml-vocabularies` contains one package of rules and
 //! vocabularies (`styles`), two Markdown files (`text`, with `.fixture` after
 //! `.md`), and a config for each tool: `vale/<name>.ini` and
 //! `.ctl/<name>.yaml`.
 //!
-//! `vale.tsv` holds one row for each alert Vale gave on the files under each
-//! of the first four configs: the config, the file, the line, the first and
-//! last column, the level, the rule, the message and the matched text.
-//! `errors.tsv` holds one row for each of the other configs, whose vocabulary
-//! has one fault: the config, and the error line Vale gave. The rows come from
-//! Vale at `66bbb85` run from the fixture folder as `vale
-//! --config=vale/<name>.ini --output=JSON text` and `--output=line text`, with
-//! `Vale.Spelling` and `Vale.Repetition` turned off in the first four, as the
-//! hakkiri configs turn them off.
+//! `vale.tsv` has one row for each alert Vale gave on the files.
+//! The first four configs give these rows.
+//! Each row has the config, the file, the line, the first and last column,
+//! the level, the rule, the message and the matched text.
+//!
+//! `errors.tsv` has one row for each of the other configs.
+//! The vocabulary of each has one fault.
+//! A row has the config and the error line Vale gave.
+//!
+//! The rows come from Vale at `66bbb85` run from the fixture folder as `vale
+//! --config=vale/<name>.ini --output=JSON text` and `--output=line text`.
+//! The first four configs turn off `Vale.Spelling` and `Vale.Repetition`, as
+//! the hakkiri configs turn them off.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -59,7 +63,7 @@ fn copy_into(root: &Root<'_>, from: &Path, to: &Path) -> TestResult {
     Ok(())
 }
 
-/// A scenario folder that holds the fixture's styles, text and configs.
+/// A scenario folder that contains the fixture's styles, text and configs.
 fn project<'a>(suite: &'a Suite, name: &str) -> Result<Root<'a>, Box<dyn Error>> {
     let root = suite.scenario(name);
     copy_into(&root, &fixture().join("styles"), Path::new("styles"))?;
@@ -187,8 +191,9 @@ fn every_fault_is_refused_on_the_file_and_line_vale_names() -> TestResult {
         let config = format!(".ctl/{case}.yaml");
         let result = run(root.path(), &["check", "--config", &config, "text"], &[])?;
         assert_eq!(result.code, 2, "{case}: {}{}", result.out, result.err);
-        // The unfinished list opens on line 3. Vale names line 2, which holds
-        // a complete entry, so hakkiri names the line of the bracket instead.
+        // The unfinished list opens on line 3.
+        // Vale reports line 2, which has a complete entry.
+        // hakkiri reports the line of the bracket instead.
         let line = if case == "yaml-syntax" { 3 } else { line };
         let wanted = format!("failed {file}: line {line}: ");
         assert!(result.err.contains(&wanted), "{case}: {}", result.err);
@@ -275,8 +280,8 @@ fn the_affix_file_is_looked_up_in_the_holder_first_then_the_other_packages() -> 
         "packages:\n  - path: other\n  - path: styles\nvocab: [Team]\nfiles:\n  'a.md': {styles: [Team]}\n",
     );
     root.file("other/config/dictionaries/custom.aff", aff("qq"));
-    // The package that holds the vocabulary comes first, whatever the order of
-    // the packages.
+    // The package that contains the vocabulary comes first, whatever the order
+    // of the packages.
     root.file("styles/config/dictionaries/custom.aff", aff("zz"));
     let result = run(root.path(), &["check", "--format", "json"], &[])?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);

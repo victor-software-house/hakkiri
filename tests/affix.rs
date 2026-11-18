@@ -44,7 +44,7 @@ fn matched(text: &str, source: &str) -> Result<Vec<String>, Box<dyn Error>> {
         .collect())
 }
 
-/// What the error that refuses the rule file `text` says.
+/// The message of the error that rejects the rule file `text`.
 fn refusal(text: &str) -> Result<String, Box<dyn Error>> {
     let refused = Rule::from_text_in("Team.Forms", "Team/Forms.yml", text, &package())
         .err()

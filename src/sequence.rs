@@ -1,12 +1,14 @@
 //! The `sequence` check: runs of words that a rule's tokens match in order.
 //!
 //! The walk is Vale's ([sequence.go]).
-//! It tags one sentence, picks the anchor step of the rule, and from each word
-//! the anchor matches it walks left and right over the other steps.
+//! It tags one sentence and picks the anchor step of the rule.
+//! From each word the anchor matches, it walks left and right over the other
+//! steps.
 //! A step of `skip` is optional: a word that does not match it is passed over.
-//! A rule that lists several forms walks each one the same way and keeps the
-//! matches together, an earlier match winning over a later one that it
-//! overlaps.
+//!
+//! A rule that lists several forms walks each one the same way.
+//! It keeps the matches together.
+//! An earlier match wins over a later one that it overlaps.
 //!
 //! [sequence.go]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L343-L497
 
@@ -50,10 +52,10 @@ struct Found {
 
 /// The text a pattern or a word list reads in place of a code span.
 ///
-/// A code span names a thing, so a token reads it as a noun by its tag.
-/// By its text it reads one capital letter: a pattern for any letter or word
-/// takes it, as `ThingsSpeakNoun` does, and a pattern for a lowercase word
-/// refuses it, as `NounStack` does.
+/// A code span stands for a thing, so a token reads it as a noun by its tag.
+/// By its text it reads one capital letter.
+/// A pattern for any letter or word takes it, as `ThingsSpeakNoun` does.
+/// A pattern for a lowercase word rejects it, as `NounStack` does.
 const CODE_TEXT: &str = "X";
 
 /// Whether `word` is one that `token` accepts.
@@ -82,8 +84,9 @@ fn accepts(token: &Token, word: &Word<'_>) -> Result<bool, SearchError> {
     Ok(!refused)
 }
 
-/// Whether every one of `steps` is negated. A negated step holds where there
-/// is no word at all, so it holds at the edge of the sentence.
+/// Whether every one of `steps` is negated.
+/// A negated step matches where there is no word at all, so it matches at the
+/// edge of the sentence.
 fn negated(form: &Form, steps: Range<usize>) -> bool {
     if steps.is_empty() {
         return true;
@@ -99,10 +102,10 @@ fn walk(form: &Form, words: &[Word<'_>], at: usize) -> Result<Option<Found>, Sea
     let mut first: Option<usize> = None;
     let mut last: Option<usize> = None;
     let mut read = HashMap::new();
-    // The steps before the anchor, read from the anchor leftwards. A step of
-    // `skip` is written for a walk to the right, so the left walk turns it
-    // around: the required step becomes optional, and the first optional one
-    // required.
+    // The steps before the anchor, read from the anchor leftwards.
+    // A step of `skip` is written for a walk to the right.
+    // So the left walk turns it around: the required step becomes optional,
+    // and the first optional one becomes required.
     let (mut step, mut word) = (anchor, at);
     while step > 0 {
         let Some(before) = word.checked_sub(1) else {
@@ -174,9 +177,11 @@ fn walk(form: &Form, words: &[Word<'_>], at: usize) -> Result<Option<Found>, Sea
 /// walk started from.
 ///
 /// Walks start from the words the anchor accepts in order, so the words before
-/// `cursor` are the ones already taken or refused. Vale looks each start up
-/// from the first word and in the list of earlier starts, which takes time
-/// that grows with the cube of the words when the anchor matches most of them.
+/// `cursor` are the ones already taken or refused.
+/// Vale looks each start up from the first word and in the list of earlier
+/// starts.
+/// That takes time that grows with the cube of the words when the anchor
+/// matches most of them.
 fn next_start(
     form: &Form,
     words: &[Word<'_>],
@@ -223,11 +228,13 @@ fn targeted(form: &Form, found: &Found) -> Option<(usize, usize)> {
 /// The scope items a `sequence` rule reads, narrowed to the sentences within
 /// what it declared.
 ///
-/// The rule reads tags a sentence at a time, so it always reads sentences, and
-/// its `scope` says which. No scope means every sentence, and `list` means the
-/// sentences of list items. An item that already names sentences stays as it
-/// is. One that only leaves something out, such as `~list`, is joined to
-/// `sentence`, and `paragraph` is `sentence`, since a sentence is always in a
+/// The rule reads tags a sentence at a time, so it always reads sentences.
+/// Its `scope` selects which.
+/// No scope means every sentence, and `list` means the sentences of list items.
+///
+/// An item that already selects sentences stays as it is.
+/// One that only leaves something out, such as `~list`, is joined to
+/// `sentence`. `paragraph` becomes `sentence`, since a sentence is always in a
 /// paragraph ([`sentenceScope`][v-scope] in Vale).
 ///
 /// [v-scope]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/sequence.go#L593-L641
@@ -283,7 +290,7 @@ pub(crate) fn find(sequence: &Sequence, text: &Text) -> Result<Vec<Matched>, Sea
 /// The runs of words in `sentence` that `sequence` matches, given the tokens of
 /// the sentence and their tags.
 ///
-/// `is_code` tells whether the bytes of a token read a code span.
+/// `is_code` returns whether the bytes of a token read a code span.
 ///
 /// A rule with several forms matches where any form does. When two forms
 /// match overlapping words, the match that starts first stays and the other
@@ -320,8 +327,9 @@ fn find_tagged(
 }
 
 /// The runs of `words` that one form matches, with the exceptions of the rule
-/// taken out. `excluded` holds the spans of the exceptions, found when a match
-/// first needs them, and is shared by the forms of the rule.
+/// taken out.
+/// `excluded` has the spans of the exceptions, found when a match first needs
+/// them, and is shared by the forms of the rule.
 fn find_form(
     sequence: &Sequence,
     form: &Form,
@@ -366,10 +374,11 @@ fn find_form(
     Ok(matches)
 }
 
-/// The matches of every form as one list. One form's matches stay as they
-/// were found. Several forms' matches go in order of where they start, the
-/// earlier form first at the same place, and a match that overlaps one kept
-/// from another form is dropped.
+/// The matches of every form as one list.
+/// One form's matches stay as they were found.
+/// Several forms' matches go in order of where they start, the earlier form
+/// first at the same place.
+/// A match that overlaps one kept from another form is dropped.
 fn merged(mut found: Vec<(usize, Matched)>, forms: usize) -> Vec<Matched> {
     if forms < 2 {
         return found.into_iter().map(|(_, matched)| matched).collect();

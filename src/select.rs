@@ -28,14 +28,14 @@ pub struct Block {
     pub sentence: bool,
     /// The text, and where each byte of it lies in the file.
     pub text: Text,
-    /// The byte where the element that holds the text ends.
+    /// The byte where the element that contains the text ends.
     pub closes: usize,
     /// The bytes where a tag inside the element flushes the text before it.
     pub flushes: Vec<usize>,
 }
 
 impl Block {
-    /// The byte where the text that holds the byte `at` is read: the first
+    /// The byte where the text that contains the byte `at` is read: the first
     /// tag after it that flushes it, or the end of the element.
     pub(crate) fn closes_for(&self, at: usize) -> usize {
         self.flushes
@@ -70,7 +70,8 @@ impl fmt::Display for SelectError {
 impl error::Error for SelectError {}
 
 /// The scope a node has when it is the one element a block of text is read
-/// under: a list item, a quote, a heading or a table cell.
+/// under.
+/// That element is a list item, a quote, a heading or a table cell.
 const fn named_scope(scope: Scope) -> Option<&'static str> {
     match scope {
         Scope::List
@@ -111,8 +112,9 @@ const fn named_scope(scope: Scope) -> Option<&'static str> {
 
 /// Whether `child` is the first thing inside `parent`.
 ///
-/// The tree keeps only the prose of a document, so a fenced block, a thematic
-/// break or another element with none can sit before the first child.
+/// The tree keeps only the prose of a document.
+/// So a fenced block, a thematic break or another element with none can sit
+/// before the first child.
 /// The parser reports each node's place, and the tree records it in `first`.
 fn opens(parent: &Node, child: &Node) -> bool {
     match parent.scope {
@@ -150,8 +152,9 @@ fn opens(parent: &Node, child: &Node) -> bool {
     }
 }
 
-/// Whether a node is prose, which the sentence splitter cuts: Vale reads the
-/// alt text of an image and the description of a page as one block.
+/// Whether a node is prose, which the sentence splitter cuts.
+/// Vale reads the alt text of an image and the description of a page as one
+/// block.
 const fn is_prose(scope: Scope) -> bool {
     match scope {
         Scope::Paragraph
@@ -231,10 +234,12 @@ const fn decodes(scope: Scope) -> Decode {
     }
 }
 
-/// The scope names a node holds.
+/// The scope names a node has.
 ///
-/// `text` marks the prose leaves, which a list item or a block quote is read
-/// through: the two hold no scope of their own.
+/// `text` marks the prose leaves.
+/// A list item or a block quote is read through them, and neither has a scope
+/// of its own.
+///
 /// The alt text of an image and the description of a page are text too, and
 /// `meta` is not.
 /// A block of text has one scope, as in Vale ([`select`] explains which).
@@ -401,7 +406,7 @@ pub(crate) fn replacements(node: &Node, blank: &[Inline]) -> Vec<(Range<usize>, 
 struct Step<'t> {
     node: &'t Node,
     chain: Option<&'static str>,
-    /// The scope of the node that holds this one.
+    /// The scope of the node that contains this one.
     parent: Option<Scope>,
     /// The language of the nearest node around this one that has one, such as
     /// a fenced code block.
@@ -440,8 +445,9 @@ fn children<'t>(
         })
 }
 
-/// The scope names of the element around a node that a part may name next to
-/// the node's own: the link or the image that holds a title.
+/// The scope names of the element around a node, which a part may use next to
+/// the node's own.
+/// That element is the link or the image that has a title.
 ///
 /// `title & link` selects the title of a link, and `link` alone selects none,
 /// because the context is not the node's own scope.
@@ -456,17 +462,19 @@ fn context(node: &Node, parent: Option<Scope>) -> Vec<&'static str> {
 /// reads, in file order: a node before the nodes inside it.
 ///
 /// A node is in its own language when it has one, as the nodes of a fenced code
-/// block do, and the nodes inside it are in that language too.
+/// block do.
+/// The nodes inside it are in that language too.
 /// Any other node is in the `languages` of the file: its own language, and its
 /// reader's when a `formats` entry chose the reader.
 ///
 /// A block of text has the scope of one element, as in Vale, and not of every
 /// element around it.
-/// Vale reads that element off the tags opened since the last element closed,
-/// and takes the outermost of a list item, a quote, a heading and a table
-/// cell.
-/// So a node that is the first child of an element gets that element's scope
-/// when the element had one, and a later child gets its own.
+/// Vale reads that element off the tags opened since the last element closed.
+/// It takes the outermost of a list item, a quote, a heading and a table cell.
+///
+/// A node that is the first child of an element gets that element's scope
+/// when the element had one.
+/// A later child gets its own.
 /// The first paragraph of an item is `list` and the second is a `paragraph`.
 /// A heading in the middle of a quote is a `heading`.
 /// A quote that opens an item is `list`.

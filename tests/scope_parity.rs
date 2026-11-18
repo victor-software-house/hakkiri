@@ -1,18 +1,21 @@
 //! Scope selection against Vale: the alerts of an `existence` and a
-//! `sequence` rule for each scope, over Markdown that nests sentences in list
-//! items, quotes, tables and headings.
+//! `sequence` rule for each scope.
+//! The inputs are Markdown that nests sentences in list items, quotes, tables
+//! and headings.
 //!
-//! `tests/fixtures/scope/rules` holds the rules, `inputs` the Markdown files
-//! with `.fixture` after `.md`, and `vale.tsv` one row for each alert Vale
-//! gave: the rule, the file, the line, the first and last column, and the
-//! matched text. The rows come from Vale at `66bbb85` run on the inputs with
-//! the rules as one style.
+//! `tests/fixtures/scope/rules` contains the rules.
+//! `inputs` contains the Markdown files, with `.fixture` after `.md`.
+//! `vale.tsv` has one row for each alert Vale gave: the rule, the file, the
+//! line, the first and last column, and the matched text.
+//! The rows come from Vale at `66bbb85` run on the inputs with the rules as
+//! one style.
 //!
 //! hakkiri gives Vale's alerts except in the two cases of design decision 9 of
-//! the `case-and-sequence-checks` change. `departures.tsv` holds one row for
-//! each alert that only one side gave, led by `vale` or `hakkiri`. The test
-//! fails on any difference that file does not list, and on any row of it that
-//! no longer differs.
+//! the `case-and-sequence-checks` change.
+//! `departures.tsv` has one row for each alert that only one side gave, led by
+//! `vale` or `hakkiri`.
+//! The test fails on any difference that file does not list.
+//! It also fails on any row of that file where the two sides now agree.
 
 #![expect(
     clippy::panic_in_result_fn,

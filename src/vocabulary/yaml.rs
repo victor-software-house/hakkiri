@@ -1,14 +1,14 @@
 //! A YAML vocabulary, `vocab.yml` or `vocab.yaml`, as Vale reads it.
 //!
-//! The file holds `affix`, `accept` and `reject`. An entry of a list is a term,
-//! a term mapped to nothing, or a term mapped to the options `regex`,
-//! `ignorecase` and `flags`. Each entry gives the patterns that a line of a
-//! text list would.
+//! The file contains `affix`, `accept` and `reject`.
+//! An entry of a list is a term, a term mapped to nothing, or a term mapped to
+//! the options `regex`, `ignorecase` and `flags`.
+//! Each entry gives the patterns that a line of a text list would.
 //!
-//! The file parses through ctl-core's input, which refuses a key it does not
-//! define and gives each fault its line. The shape of an entry is checked here
-//! on the document's nodes, so one run reports every faulty entry, where Vale
-//! stops at the first.
+//! The file parses through ctl-core's input, which rejects a key it does not
+//! define and gives each fault its line.
+//! The shape of an entry is checked here on the document's nodes.
+//! So one run reports every faulty entry, where Vale stops at the first.
 
 use std::path::{Component, Path, PathBuf};
 use std::{fmt, fs};
@@ -50,7 +50,7 @@ enum Node {
     Null,
     Text(String),
     Bool(bool),
-    /// A number. The text of the file holds how it was written.
+    /// A number. The text of the file stores how it was written.
     Number,
     List,
     Map(Vec<(String, Node)>),
@@ -192,8 +192,8 @@ impl Reading<'_> {
         });
     }
 
-    /// A problem on the key at the end of `at`, which is where a fault in the
-    /// key belongs.
+    /// A problem on the key that ends at `at`, where a fault in the key
+    /// belongs.
     fn key_problem(&mut self, at: &FieldPath, message: String) {
         let place = self.input.place_key(at);
         self.problems.push(LoadProblem {
@@ -206,9 +206,9 @@ impl Reading<'_> {
         });
     }
 
-    /// The text of the scalar written at `at`, as the file spells it: a number
-    /// or a word such as `null` reaches here as a value, and its spelling is
-    /// the term.
+    /// The text of the scalar written at `at`, as the file spells it.
+    /// A number or a word such as `null` reaches here as a value, and its
+    /// spelling is the term.
     fn written(&self, at: &FieldPath) -> String {
         let Some(place) = self.input.place(at) else {
             return String::new();
@@ -423,9 +423,10 @@ impl Expander {
     }
 }
 
-/// The truth a node gives an option such as `regex`: `true` or `false`, the
-/// words YAML 1.1 reads as booleans, which Vale's YAML reader takes for a
-/// boolean option, and nothing, which leaves the option off.
+/// The truth a node gives an option such as `regex`.
+/// It is `true` or `false`, or one of the words YAML 1.1 reads as booleans.
+/// Vale's YAML reader takes those words for a boolean option.
+/// Anything else gives nothing, which leaves the option off.
 fn truth(node: &Node) -> Option<bool> {
     match node {
         Node::Null => Some(false),
@@ -448,11 +449,12 @@ fn is_file_name(name: &str) -> bool {
     )
 }
 
-/// The pattern that matches `term` as written. A term whose only special
-/// character is a period stays as it is, which a text list reads as plain
-/// text with a literal period, as Vale does. With `ignorecase` the pattern
-/// starts with `(?i)`, which makes a text list read it as a regular
-/// expression, so the period is quoted as well.
+/// The pattern that matches `term` as written.
+/// A term whose only special character is a period stays as it is.
+/// A text list reads it as plain text with a literal period, as Vale does.
+/// With `ignorecase` the pattern starts with `(?i)`.
+/// That makes a text list read it as a regular expression, so the period is
+/// quoted as well.
 fn literal(term: &str, ignorecase: bool) -> String {
     const SPECIAL: &str = "\\.+*?()|[]{}^$";
     let bare = term.replace('.', "");

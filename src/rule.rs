@@ -1,13 +1,19 @@
 //! Rules: loading a style folder into the rules the engine runs.
 //!
-//! A style folder holds one `.yml` file per rule.
+//! A style folder contains one `.yml` file per rule.
 //! [`load_style`] reads them all, and [`Rule::from_text`] reads one.
-//! Loading refuses a rule it cannot run: a field its check does not define, a
-//! value of the wrong kind, or a pattern that does not compile.
-//! A rule that is valid Vale and that hakkiri does not run, a `script` rule or
-//! a `doc()` scope, is not a fault of the file: [`read_style`] reports it
-//! apart. A rule may extend another rule, as in Vale.
-//! Every error names the file, and the field and line when it has them.
+//!
+//! Loading rejects a rule it cannot run.
+//! The faults are a field its check does not define, a value of the wrong
+//! kind, and a pattern that does not compile.
+//!
+//! A rule that is valid Vale and that hakkiri does not run is not a fault of
+//! the file.
+//! A `script` rule and a `doc()` scope are such rules.
+//! [`read_style`] reports them apart.
+//!
+//! A rule may extend another rule, as in Vale.
+//! Every error shows the file, and the field and line when it has them.
 
 mod affix;
 mod build;
@@ -126,8 +132,8 @@ const NOT_PARAMETERS: [&str; 15] = [
 /// What a rule was read from, so it can be read again with parameters.
 #[derive(Debug)]
 enum Recipe {
-    /// A rule file: its name in errors, its text, and the package that holds
-    /// it.
+    /// A rule file: its name in errors, its text, and the package that
+    /// contains it.
     File {
         file: String,
         text: String,
@@ -195,11 +201,11 @@ pub enum Check {
 /// The patterns that hold a match back.
 #[derive(Debug, Default)]
 pub struct Exceptions {
-    /// The `exceptions` words: a match that holds one as a whole word is held
-    /// back.
+    /// The `exceptions` words: a match that contains one as a whole word is
+    /// suppressed.
     pub words: Option<Pattern>,
     /// The `exceptions` of more than one word, each as a pattern of its own: a
-    /// match inside a match of one is held back.
+    /// match inside a match of one is suppressed.
     pub phrases: Vec<Pattern>,
 }
 
@@ -220,7 +226,7 @@ impl Exceptions {
 pub struct Existence {
     /// The `raw` patterns and the `tokens`, joined.
     pub pattern: Pattern,
-    /// What holds a match back.
+    /// What suppresses a match.
     pub exceptions: Exceptions,
 }
 
@@ -234,7 +240,7 @@ pub struct Swap {
 }
 
 impl Swap {
-    /// The name of the group that holds swap number `n` in the rule's
+    /// The name of the group that contains swap number `n` in the rule's
     /// pattern is this, then the number.
     pub const GROUP: &'static str = "swap_";
 }
@@ -247,20 +253,20 @@ pub struct Substitution {
     /// The swaps, longest key first: swap number `n` is the group
     /// [`Swap::GROUP`] and `n`.
     pub swaps: Vec<Swap>,
-    /// For each swap, in the same order, its key as a pattern of its own when
-    /// the value holds `$1` or another group reference, to read the groups
-    /// from the matched text.
+    /// For each swap, in the same order, its key as a pattern of its own.
+    /// A swap has one when the value contains `$1` or another group
+    /// reference, to read the groups from the matched text.
     pub expanders: Vec<Option<Pattern>>,
-    /// What holds a match back.
+    /// What suppresses a match.
     pub exceptions: Exceptions,
     /// Whether the value takes a capital when the match does.
     pub capitalize: bool,
     /// Whether the keys match without regard to case.
     pub ignorecase: bool,
-    /// Whether the rule is built from the accepted terms of a vocabulary: each
-    /// value is a term, which may be a pattern. A match is in form when the
-    /// term as a pattern matches it whole, and the term is shown in the case of
-    /// the text it replaced.
+    /// Whether the rule is built from the accepted terms of a vocabulary.
+    /// Each value is a term, which may be a pattern.
+    /// A match is in form when the term as a pattern matches it whole.
+    /// The term is shown in the case of the text it replaced.
     pub terms: bool,
 }
 
@@ -297,7 +303,7 @@ pub struct Consistency {
 }
 
 impl Consistency {
-    /// The name of the group that holds a pair's form number `n` is this,
+    /// The name of the group that contains a pair's form number `n` is this,
     /// then the number.
     pub const FORM: &'static str = "form_";
 }
@@ -309,13 +315,13 @@ pub struct Conditional {
     pub first: Pattern,
     /// The `second` pattern, as written.
     pub second: Pattern,
-    /// Whether `second` has a capture group, which makes the texts it captures
-    /// the terms `first` may use; without one, `second` must match in the same
-    /// block.
+    /// Whether `second` has a capture group.
+    /// With one, the texts it captures are the terms `first` may use.
+    /// Without one, `second` must match in the same block.
     pub defines: bool,
     /// Whether both patterns, and a term, match without regard to case.
     pub ignorecase: bool,
-    /// What holds a match of `first` back.
+    /// What suppresses a match of `first`.
     pub exceptions: Exceptions,
 }
 
@@ -330,7 +336,7 @@ pub struct Repetition {
     pub ignorecase: bool,
     /// With `alpha`, the pattern a match must satisfy whole: letters only.
     pub letters: Option<Pattern>,
-    /// What holds a repeat back.
+    /// What suppresses a repeat.
     pub exceptions: Exceptions,
 }
 
@@ -377,7 +383,7 @@ impl Score {
         Self::ALL.into_iter().find(|score| score.name() == name)
     }
 
-    /// The metric variable that holds the score.
+    /// The metric variable that contains the score.
     pub(crate) const fn variable(self) -> &'static str {
         match self {
             Self::AutomatedReadability => "automated_readability",
@@ -659,22 +665,24 @@ impl Rule {
     ///
     /// `name` is the rule's name, such as `Team.Filler`, and `file` names the
     /// file in the errors.
-    /// A rule read this way holds no package, so a `spelling` rule that names
-    /// a dictionary or a word list is refused.
+    /// A rule read this way has no package, so a `spelling` rule that lists
+    /// a dictionary or a word list is rejected.
     ///
     /// # Errors
     ///
-    /// Returns a [`LoadError`] when the text is not YAML or names no check
-    /// type. The same holds for a field its check does not define, a value of
-    /// the wrong kind, and a feature hakkiri does not run. A pattern that does
-    /// not compile is refused, and so is a pattern with nothing to match.
+    /// Returns a [`LoadError`] when the text is not YAML or lists no check
+    /// type.
+    /// It also returns one for a field its check does not define, a value of
+    /// the wrong kind, and a feature hakkiri does not run.
+    /// A pattern that does not compile is rejected, and so is a pattern with
+    /// nothing to match.
     pub fn from_text(name: &str, file: &str, text: &str) -> Result<Self, LoadError> {
         Self::read(name, file, text, None, &[], &[], &[])
     }
 
     /// Reads one rule from the text of its file, in the package `package`.
     ///
-    /// The package is the folder that holds the rule's style folder.
+    /// The package is the folder that contains the rule's style folder.
     /// A `spelling` rule reads its dictionaries and word lists from it, and
     /// from no other place.
     ///
@@ -704,22 +712,27 @@ impl Rule {
     /// with a parent named by `extends` looked up in the package folders
     /// `search`.
     ///
-    /// A rule whose `extends` holds a dot starts from the rule it names and
-    /// lays its own fields on top, as Vale does: a bare key replaces, `key+`
-    /// adds to a list or a mapping, and `key-` removes from one.
+    /// A rule whose `extends` contains a dot starts from the rule it lists.
+    /// It lays its own fields on top, as Vale does.
+    /// A bare key replaces, `key+` adds to a list or a mapping, and `key-`
+    /// removes from one.
     /// The parent's `tests` do not carry over.
     ///
     /// # Errors
     ///
-    /// Returns a [`LoadError`] for each fault [`Rule::from_text_in`] refuses.
-    /// It also returns each fault Vale refuses in a chain of rules.
-    /// They are a parent that is missing, a cycle, and a key written both bare
-    /// and with `+` or `-`.
-    /// They are also an edit of a field the parent lacks, and a `Vale.` parent.
-    /// A rule read through a parent names no line, since the merged text has
+    /// Returns a [`LoadError`] for each fault [`Rule::from_text_in`] rejects.
+    /// It also returns each fault Vale rejects in a chain of rules.
+    ///
+    /// - a parent that is missing
+    /// - a cycle
+    /// - a key written both bare and with `+` or `-`
+    /// - an edit of a field the parent lacks
+    /// - a `Vale.` parent
+    ///
+    /// A rule read through a parent has no line, since the merged text has
     /// none.
-    /// `accepted` holds the accepted terms of the project's vocabularies, which
-    /// the checks that read them take as exceptions.
+    /// `accepted` contains the accepted terms of the project's vocabularies,
+    /// which the checks that read them take as exceptions.
     pub fn from_text_searching(
         name: &str,
         file: &str,
@@ -739,15 +752,18 @@ impl Rule {
     /// # Errors
     ///
     /// Returns a [`LoadError`] with a problem for each parameter that is a
-    /// level, which the rule's own setting carries, and for each that is not
-    /// adjustable.
+    /// level, which the rule's own setting carries.
+    /// It also returns one for each parameter that is not adjustable.
+    ///
     /// The parameters that are not adjustable are `extends`, `name`, `path`,
     /// `tests`, `message`, `description`, `link`, `tokens`, `forms`, `swap`,
     /// `exceptions`, `filters`, `ignore`, `raw` and `either`.
-    /// A parameter the rule's check does not define, or whose value is of the
-    /// wrong kind, is refused as the same field of a rule file is, naming the
-    /// field and no line.
-    /// A rule built from a vocabulary has no field to set, and refuses every
+    ///
+    /// The rule rejects a parameter that its check does not define.
+    /// It rejects a parameter whose value is of the wrong kind, as it rejects
+    /// the same field of a rule file.
+    /// The problem shows the field and no line.
+    /// A rule built from a vocabulary has no field to set, and rejects every
     /// parameter.
     pub fn with_params(
         &self,
@@ -972,9 +988,9 @@ fn at_tab(mut error: InputError, text: &str) -> LoadError {
     LoadError::from(error)
 }
 
-/// The name the rule in `file` has in the style folder `style`: the folder's
-/// name, then each folder between it and the file, then the file name up to
-/// its first dot, all joined by dots.
+/// The name the rule in `file` has in the style folder `style`.
+/// It is the folder's name, then each folder between it and the file.
+/// Then comes the file name up to its first dot, all joined by dots.
 /// So `Team/Foo.yml` is `Team.Foo`, `Team/Terms.custom.yml` is `Team.Terms`,
 /// and `Team/Sub/Bar.yml` is `Team.Sub.Bar`, as Vale names them.
 ///
@@ -983,9 +999,10 @@ fn at_tab(mut error: InputError, text: &str) -> LoadError {
 ///
 /// # Errors
 ///
-/// Returns why `file` has no name: it is not in `style`, a name is not
-/// UTF-8, or the name holds a bracket, which Vale keeps for the settings of a
-/// rule.
+/// Returns why `file` has no name.
+/// Either it is not in `style`, a name is not UTF-8, or the name contains a
+/// bracket.
+/// Vale keeps brackets for the settings of a rule.
 pub fn rule_name(style: &Path, file: &Path) -> Result<String, String> {
     let folder = style
         .file_name()
@@ -1004,7 +1021,7 @@ pub fn rule_name(style: &Path, file: &Path) -> Result<String, String> {
     let name = format!("{folder}.{}", parts.join("."));
     if name.contains(['[', ']']) {
         return Err(format!(
-            "`{name}` has a bracket, which a rule name cannot hold"
+            "`{name}` has a bracket, which a rule name cannot contain"
         ));
     }
     Ok(name)
@@ -1021,10 +1038,10 @@ fn is_rule_file(path: &Path) -> bool {
     path.extension().is_some_and(|extension| extension == "yml") && !is_test && path.is_file()
 }
 
-/// The rule files under `folder`, in the order Vale walks them: each folder's
-/// entries by name, a subfolder where it sits, and no folder whose name starts
-/// with `.` or `_`.
-/// A `*.test.yml` file holds cases and is no rule.
+/// The rule files under `folder`, in the order Vale walks them.
+/// That is each folder's entries by name, a subfolder where it sits, and no
+/// folder whose name starts with `.` or `_`.
+/// A `*.test.yml` file contains cases and is no rule.
 fn rule_files(folder: &Path, files: &mut Vec<PathBuf>) -> Result<(), (PathBuf, io::Error)> {
     let fail = |error| (folder.to_path_buf(), error);
     let mut entries = fs::read_dir(folder)
@@ -1051,9 +1068,10 @@ fn rule_files(folder: &Path, files: &mut Vec<PathBuf>) -> Result<(), (PathBuf, i
 pub struct Style {
     /// The rules, in the order of the walk.
     pub rules: Vec<Rule>,
-    /// A file whose rule name holds a bracket, which gives no rule, or that
-    /// gives the name of an earlier file, whose rule it replaces as Vale does.
-    /// Vale refuses these only for a style a glob enables, so a caller decides
+    /// A file whose rule name contains a bracket, which gives no rule.
+    /// It may instead give the name of an earlier file, whose rule it replaces
+    /// as Vale does.
+    /// Vale rejects these only for a style a glob enables, so a caller decides
     /// whether they are errors.
     pub names: Vec<LoadProblem>,
     /// The rules that are valid Vale and that hakkiri cannot run, such as a
@@ -1088,23 +1106,26 @@ fn problem(file: &str, message: String) -> LoadProblem {
 
 /// Reads every rule file under the style folder `folder`.
 ///
-/// A rule is named as [`rule_name`] names it, so a file in a subfolder joins
+/// A rule gets the name [`rule_name`] gives it, so a file in a subfolder joins
 /// the folders to its name.
 /// A folder that starts with `.` or `_`, a `*.test.yml` file and every other
 /// file are ignored.
+///
 /// The folder's parent is the rule's package.
-/// A rule whose `extends` names another rule looks it up in the package
+/// A rule whose `extends` lists another rule looks it up in the package
 /// folders `search`.
 /// The rules come in the order of the walk.
-/// `accepted` holds the accepted terms of the project's vocabularies, which the
-/// checks that read them take as exceptions.
+///
+/// `accepted` contains the accepted terms of the project's vocabularies, which
+/// the checks that read them take as exceptions.
 ///
 /// # Errors
 ///
 /// Returns a [`LoadError`] with the problems of every rule file, or with the
 /// failure to read a folder.
-/// A fault in a name is not one: [`Style::names`] holds it, and a rule that
-/// hakkiri cannot run is not one: [`Style::unrunnable`] holds it.
+/// A fault in a name is not one: [`Style::names`] contains it.
+/// A rule that hakkiri cannot run is not one: [`Style::unrunnable`] contains
+/// it.
 pub fn read_style(
     folder: &Path,
     search: &[PathBuf],
@@ -1140,7 +1161,7 @@ pub fn read_style(
             names.push(problem(
                 &file,
                 format!(
-                    "the rule `{name}` is also the name of `{}`: a rule name ends at the first dot of its file name, so rename one file",
+                    "the rule `{name}` is also the name of `{}`: a rule name ends at the first dot of the file name, so rename one file",
                     first.display()
                 ),
             ));
@@ -1229,10 +1250,10 @@ alpha: true
 tokens: ['[^\s.!?]+']
 "#;
 
-/// The rule `Vale.Repetition`, which Vale builds into its style `Vale`: it
-/// reports a word that repeats, such as `the the`, at the level `error`.
-/// `project_accepted` holds the accepted terms of the project, which hold a
-/// repeat back.
+/// The rule `Vale.Repetition`, which Vale builds into its style `Vale`.
+/// It reports a word that repeats, such as `the the`, at the level `error`.
+/// `project_accepted` contains the accepted terms of the project, which
+/// suppress a repeat.
 ///
 /// # Errors
 ///
@@ -1259,16 +1280,17 @@ level: error
 scope: text
 "#;
 
-/// The rule `Vale.Spelling`, which Vale builds into its style `Vale`: it
-/// reports a word the built-in dictionary does not hold, at the level
+/// The rule `Vale.Spelling`, which Vale builds into its style `Vale`.
+/// It reports a word the built-in dictionary does not contain, at the level
 /// `error`.
 ///
 /// Vale adds to the built-in dictionary every dictionary in the
-/// `config/dictionaries` folder of its styles path, and accepts every word of
-/// the `.txt` files under its `config/ignore` folder. The rule does the same
-/// for each folder of `folders`, the package folders of the project, in order.
-/// `project_accepted` holds the accepted terms of the project, which hold a
-/// word back.
+/// `config/dictionaries` folder of its styles path.
+/// It accepts every word of the `.txt` files under its `config/ignore` folder.
+/// The rule does the same for each folder of `folders`, the package folders of
+/// the project, in order.
+/// `project_accepted` contains the accepted terms of the project, which
+/// suppress a word.
 ///
 /// # Errors
 ///
@@ -1292,12 +1314,16 @@ pub(crate) const VALE_SPELLING_NAME: &str = "Vale.Spelling";
 /// The rules a vocabulary builds, named `{prefix}.Terms` and `{prefix}.Avoid`,
 /// as Vale builds them.
 ///
-/// `Terms` reports an accepted term written in another case, and is there only
-/// when `accepted` holds a term. `Avoid` reports a rejected term, and is there
-/// only when `rejected` holds one. Both have the level `error` and the scope
-/// `text`, and a rule that is there runs on no file until a config lists it.
-/// `project_accepted` holds the accepted terms of the project, which hold a
-/// match of `Avoid` back.
+/// `Terms` reports an accepted term written in another case.
+/// It is there only when `accepted` has a term.
+///
+/// `Avoid` reports a rejected term.
+/// It is there only when `rejected` has one.
+///
+/// Both have the level `error` and the scope `text`.
+/// A rule that is there runs on no file until a config lists it.
+/// `project_accepted` contains the accepted terms of the project, which
+/// suppress a match of `Avoid`.
 ///
 /// # Errors
 ///

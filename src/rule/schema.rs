@@ -1,8 +1,8 @@
-//! What a rule file may hold, one type per check.
+//! What a rule file may contain, one type per check.
 //!
-//! Each type rejects a field its check does not define, and validation then
-//! refuses a field of the wrong kind, a `level` Vale does not define, and the
-//! Vale features hakkiri does not run.
+//! Each type rejects a field its check does not define.
+//! Validation then rejects a field of the wrong kind, a `level` Vale does not
+//! define, and the Vale features hakkiri does not run.
 
 use garde::Validate;
 use serde::Deserialize;
@@ -82,14 +82,14 @@ fn level_ok(value: &Text, ctx: &()) -> garde::Result {
     }
 }
 
-/// Whether `tokens` and `raw` hold a pattern to match: a pattern of nothing
+/// Whether `tokens` and `raw` contain a pattern to match: a pattern of nothing
 /// matches at every position.
 fn has_pattern(tokens: &Texts, raw: &Texts) -> bool {
     raw.values().iter().any(|part| !part.is_empty())
         || tokens.values().iter().any(|token| !token.trim().is_empty())
 }
 
-const NO_PATTERN: &str = "`tokens` and `raw` hold nothing to match, so the pattern would \
+const NO_PATTERN: &str = "`tokens` and `raw` have nothing to match, so the pattern would \
      match at every position: list a token or a raw pattern";
 
 #[expect(
@@ -105,7 +105,7 @@ fn existence_ok(fields: &ExistenceFields, _: &()) -> garde::Result {
 }
 
 /// A metric that lists neither `tokens` nor `raw` counts words only. One
-/// that lists either of them, holding nothing, counts nothing, which is a
+/// that lists either of them, with no entries, counts nothing, which is a
 /// mistake.
 #[expect(
     clippy::trivially_copy_pass_by_ref,
@@ -128,7 +128,7 @@ fn consistency_ok(fields: &ConsistencyFields, _: &()) -> garde::Result {
     let entries = fields.either.entries();
     if entries.is_empty() {
         return Err(garde::Error::new(
-            "`either` holds no pair: list at least one `form: other form`",
+            "`either` has no pair: list at least one `form: other form`",
         ));
     }
     if entries
@@ -142,7 +142,7 @@ fn consistency_ok(fields: &ConsistencyFields, _: &()) -> garde::Result {
     Ok(())
 }
 
-/// Whether `tokens` holds a pattern to match.
+/// Whether `tokens` contains a pattern to match.
 fn has_tokens(tokens: &Texts) -> bool {
     tokens.values().iter().any(|token| !token.trim().is_empty())
 }
@@ -156,7 +156,7 @@ fn repetition_ok(fields: &RepetitionFields, _: &()) -> garde::Result {
         Ok(())
     } else {
         Err(garde::Error::new(
-            "`tokens` holds nothing to match, so the pattern would match at every position: \
+            "`tokens` has nothing to match, so the pattern would match at every position: \
              list a token",
         ))
     }

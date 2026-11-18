@@ -1,12 +1,16 @@
-//! Tests for the tagger: the scenarios of the sequence and capitalization
-//! specs that read a tag, the corrections made after the model, and a
-//! comparison of the model with prose.
+//! Tests for the tagger.
+//! They cover:
 //!
-//! `tests/fixtures/tagger/prose.tsv` holds one sentence a line, then the tokens
-//! and tags that prose `b33e60d` gives it, as `start:end:tag` in bytes.
-//! The sentences are the hand-written cases of its tokenizer and tagger tests,
-//! and every 20th sentence of "The Adventures of Sherlock Holmes", a public
-//! domain text.
+//! - the scenarios of the sequence and capitalization specs that read a tag;
+//! - the corrections made after the model;
+//! - a comparison of the model with prose.
+//!
+//! `tests/fixtures/tagger/prose.tsv` contains one sentence a line, then the
+//! tokens and tags that prose `b33e60d` gives it, as `start:end:tag` in bytes.
+//! The sentences are the hand-written cases of its tokenizer and tagger tests.
+//! They also include every 20th sentence of "The Adventures of Sherlock
+//! Holmes", a public domain text.
+//!
 //! The tags come from `tag.New()` and `tokenize.New()` of that commit, run in
 //! Go.
 
@@ -558,9 +562,9 @@ fn a_long_run_of_apostrophes_tags_in_linear_time() -> TestResult {
 
 #[test]
 fn many_contractions_in_one_token_tag_in_linear_time() -> TestResult {
-    // Each ending splits off, and then the other one does: after a split the
-    // ending it made is the first one at `from`, so the same ending cannot
-    // split twice in a row.
+    // Each ending splits off, and then the other one does.
+    // After a split, the ending it made is the first one at `from`.
+    // So the same ending cannot split twice in a row.
     assert_linear("contractions", |n| format!("a{}", "'s'm".repeat(n / 4)))
 }
 
@@ -658,9 +662,9 @@ fn the_contractions_found_once_equal_a_search_of_each_window() {
 
 #[test]
 fn the_treebank_words_equal_prose() -> TestResult {
-    // `tests/fixtures/tagger/treebank.tsv` holds a text and its words, joined
-    // by spaces, from `NewTreebankWordTokenizer` of prose `b33e60d` run in Go.
-    // A line break in a text is written `\n` or `\r`.
+    // `tests/fixtures/tagger/treebank.tsv` contains a text and its words,
+    // joined by spaces, from `NewTreebankWordTokenizer` of prose `b33e60d` run
+    // in Go. A line break in a text is written `\n` or `\r`.
     let fixture = include_str!("../../tests/fixtures/tagger/treebank.tsv");
     let mut wrong = Vec::new();
     let mut checked = 0;

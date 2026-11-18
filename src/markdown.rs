@@ -1,4 +1,5 @@
-//! Markdown and MDX text into nodes, through markdown-rs.
+//! Markdown and Markdown with components (MDX) text into nodes, through
+//! markdown-rs.
 
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
@@ -21,8 +22,8 @@ use crate::{Parsed, fence, frontmatter, html, html_text, math};
 /// Which constructs the parser reads.
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum Flavor {
-    /// A `.md` file: GFM. hakkiri cuts the front matter before parsing, and
-    /// markdown-rs reads none.
+    /// A `.md` file: GitHub Flavored Markdown (GFM). hakkiri cuts the front
+    /// matter before parsing, and markdown-rs reads none.
     Markdown,
     /// An `.mdx` file: MDX and GFM. hakkiri cuts the front matter before
     /// parsing, and markdown-rs reads none.
@@ -56,8 +57,8 @@ impl Flavor {
 ///
 /// markdown-rs reads such a block only when it has a parser for it.
 /// It ends the block at the first blank line the parser accepts.
-/// The TSX grammar of tree-sitter parses the block, as acorn does in the MDX
-/// compiler.
+/// The TypeScript XML (TSX) grammar of tree-sitter parses the block, as acorn
+/// does in the MDX compiler.
 ///
 /// - No syntax error: the block ends here.
 /// - The first error reaches the end of the block, such as a missing bracket.
@@ -185,9 +186,9 @@ pub(crate) struct Built {
     pub(crate) masks: Vec<Range<usize>>,
 }
 
-/// The tree of a whole Markdown or MDX file: one `raw` root over the prose
-/// nodes, the number of its fenced and indented code blocks, and its HTML
-/// comments.
+/// The tree of a whole Markdown or MDX file.
+/// It has one `raw` root over the prose nodes, the number of its fenced and
+/// indented code blocks, and its HTML comments.
 /// It also gives the doc links and names in the comments of its fences that no
 /// prose reads.
 pub(crate) fn document(source: &str, flavor: Flavor) -> Result<Parsed, Error> {
@@ -209,7 +210,8 @@ pub(crate) fn blocks(source: &str, flavor: Flavor) -> Result<Vec<Node>, Error> {
 /// comments of a Markdown file.
 pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     // The front matter is metadata, whatever its form, so it is blanked out of
-    // the text that markdown-rs parses, and its values come from the file.
+    // the text that markdown-rs parses.
+    // Its values come from the file.
     let file = source;
     let blanked;
     let source = match frontmatter::span(file) {
@@ -220,8 +222,8 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
         _ => file,
     };
     let mut root = markdown::to_mdast(source, &flavor.options()).map_err(Error::Mdx)?;
-    // Vale reads math as code, which markdown-rs reads by other rules, so the
-    // text is parsed again with each math span marked as code.
+    // Vale reads math as code, but markdown-rs reads it by other rules.
+    // So the text is parsed again with each math span marked as code.
     let masked;
     let mut spans = Vec::new();
     let source = if matches!(flavor, Flavor::Comment) {
@@ -266,10 +268,11 @@ pub(crate) fn build(source: &str, flavor: Flavor) -> Result<Built, Error> {
     })
 }
 
-/// The comments below `root`, in file order: the HTML comments of an HTML
-/// block and of inline HTML, and the `{/* … */}` comments of an MDX file, as a
-/// flow expression or in a line of text. A code block and a code span hold
-/// none.
+/// The comments below `root`, in file order.
+/// They are the HTML comments of an HTML block and of inline HTML.
+/// They are also the `{/* … */}` comments of an MDX file, as a flow
+/// expression or in a line of text.
+/// A code block and a code span have none.
 fn comments_of(root: &Mdast, source: &str) -> Vec<Comment> {
     let mut found = Vec::new();
     let mut pending = vec![root];
@@ -356,8 +359,8 @@ fn leaves_first_place(node: &Mdast) -> bool {
 struct Visited {
     /// The prose nodes, in file order.
     nodes: Vec<Node>,
-    /// MDX syntax inside the node that is not prose: JSX tags, expressions and
-    /// ESM.
+    /// MDX syntax inside the node that is not prose: JavaScript XML (JSX) tags,
+    /// expressions and ECMAScript modules (ESM).
     cuts: Vec<Range<usize>>,
     /// The inline HTML inside the node, each tag or comment one span. They are
     /// cuts too: the text around them is read as Vale reads it.
@@ -405,7 +408,7 @@ struct Builder<'a> {
 }
 
 /// The address of each link definition below `root`, by label.
-/// The first definition of a label holds, as in `CommonMark`.
+/// The first definition of a label is the one used, as in `CommonMark`.
 fn addresses(root: &Mdast) -> HashMap<String, String> {
     let mut found = HashMap::new();
     let mut pending = vec![root];
@@ -428,9 +431,9 @@ const HREF_SAFE: &[u8] =
     b"!#$&'()*+,-./0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~";
 
 /// The `href` that goldmark writes for the link destination `destination`,
-/// as its `util.URLEscape` does: a byte outside `HREF_SAFE` becomes `%` and
-/// two upper-case hex digits, a space becomes `%20`, and a `%` before two hex
-/// digits stays.
+/// as its `util.URLEscape` does.
+/// A byte outside `HREF_SAFE` becomes `%` and two upper-case hex digits.
+/// A space becomes `%20`, and a `%` before two hex digits stays.
 fn goldmark_href(destination: &str) -> String {
     let bytes = destination.as_bytes();
     let mut href = String::with_capacity(destination.len());
@@ -468,8 +471,9 @@ enum Kind {
     /// A JSX element: its tags are gaps in the text around it.
     Jsx,
     /// An inline HTML element, from its opening tag to its closing tag, of the
-    /// scope Vale gives its tag. Its tags are gaps in its text, and the
-    /// `title` nodes of its opening tag sit beside it, as they do beside a
+    /// scope Vale gives its tag.
+    /// Its tags are gaps in its text.
+    /// The `title` nodes of its opening tag sit beside it, as they do beside a
     /// tag that opens no element.
     Raw {
         scope: Scope,
@@ -481,7 +485,7 @@ enum Kind {
     Transparent,
 }
 
-/// The syntax an inline node holds that is not its text.
+/// The syntax an inline node has that is not its text.
 struct Markup {
     /// The span of the node's own text, markers aside.
     span: Range<usize>,
@@ -509,8 +513,8 @@ struct Frame<'n> {
     index: usize,
     inner: Visited,
     /// Whether the node is the first thing inside the node that gives it a
-    /// place in the tree, and each node between the two is first in its own
-    /// parent.
+    /// place in the tree.
+    /// Each node between the two must also be first in its own parent.
     first: bool,
     /// Whether a child that takes the first place has been visited.
     taken: bool,
@@ -520,8 +524,8 @@ struct Frame<'n> {
     /// visits: not the first for an inline HTML element.
     base: usize,
     /// For each child of `node`, the index of the closing tag that ends the
-    /// inline HTML element it opens, found on the first look; an inline HTML
-    /// element shares the list of its parent.
+    /// inline HTML element it opens, found on the first look.
+    /// An inline HTML element shares the list of its parent.
     pairs: Option<Rc<[Option<usize>]>>,
 }
 
@@ -561,13 +565,15 @@ impl<'n> Frame<'n> {
     }
 
     /// The next child, the scope of a table cell below it, and whether it is
-    /// the first thing inside the node that holds it in the tree.
+    /// first inside the node that contains it in the tree.
     ///
-    /// The parser lists every child, a fenced block, a table, an empty list
-    /// item and an HTML block included, and each takes the first place.
+    /// The parser lists every child, including a fenced block, a table, an
+    /// empty list item and an HTML block.
+    /// Each takes the first place.
+    ///
     /// A thematic break, a link definition, and an HTML block that ends no
-    /// run of tags leave the place free: Vale takes a block's scope from the
-    /// tags opened since the last reset.
+    /// run of tags leave the place free.
+    /// Vale takes a block's scope from the tags opened since the last reset.
     /// A node with no place of its own passes the place of its first child up.
     fn next_child(&mut self) -> Option<(&'n Mdast, Scope, bool)> {
         let child = self.children.next()?;
@@ -679,8 +685,10 @@ impl Builder<'_> {
     /// `block`, a child of a container, or `None` when it flushes nothing.
     ///
     /// A block that opens an element that is not inline or void flushes the
-    /// text before it: a paragraph, a list, a quote, a code block, a table, a
+    /// text before it.
+    /// Such blocks are a paragraph, a list, a quote, a code block, a table, a
     /// heading, and an HTML block that starts such a tag.
+    ///
     /// A thematic break renders a void tag, and a definition renders nothing.
     /// The MDX blocks and display math are not probed, and flush nothing.
     fn flush_at(&self, block: &Mdast) -> Option<usize> {
@@ -723,9 +731,10 @@ impl Builder<'_> {
         }
     }
 
-    /// The byte where the first flush comes among the children of `parent`
-    /// from the index `after` on: the start of the next block that flushes,
-    /// or the end of the parent, whose end tag flushes.
+    /// The byte where the first flush comes among the children of `parent`,
+    /// from the index `after` on.
+    /// It is the start of the next block that flushes, or the end of the
+    /// parent, whose end tag flushes.
     fn flush_after(&self, parent: &Mdast, after: usize) -> usize {
         parent
             .children()
@@ -764,8 +773,9 @@ impl Builder<'_> {
     }
 
     /// The element of the inline HTML tag at `at` among the children of
-    /// `parent`, which the tag at `close` ends: the scope Vale gives its tag,
-    /// and the spans of the two tags.
+    /// `parent`.
+    /// The tag at `close` ends it.
+    /// It has the scope Vale gives its tag, and the spans of the two tags.
     ///
     /// Vale scopes `b` and `strong` as strong text, `i` and `em` as emphasis,
     /// `code` and `tt` as code, and `a` as a link, as it does the elements
@@ -788,11 +798,11 @@ impl Builder<'_> {
         ))
     }
 
-    /// A node that holds the span of an inline HTML element.
+    /// A node that covers the span of an inline HTML element.
     ///
     /// Its first and last children are empty text at the end of its opening
-    /// tag and at the start of its closing tag, so that the tags are its
-    /// markers.
+    /// tag and at the start of its closing tag.
+    /// So the tags are its markers.
     fn carrier(span: Range<usize>, inner_start: usize, inner_end: usize) -> Mdast {
         let position = |from: usize, to: usize| Position::new(1, 1, from, 1, 1, to);
         let marker = |offset: usize| {
@@ -932,8 +942,8 @@ impl Builder<'_> {
         match frame.kind {
             Kind::Scoped(scope) => {
                 let mut visited = self.scoped(frame.node, scope, frame.inner, frame.first);
-                // The title of a tag in the text of a link is that tag's, so it
-                // sits beside the link, and `title & link` leaves it out.
+                // A tag in a link's text has its own title, so the title sits
+                // beside the link, and `title & link` leaves it out.
                 let mut nested = Vec::new();
                 if scope == Scope::Link
                     && let Some(link) = visited
@@ -992,9 +1002,10 @@ impl Builder<'_> {
     /// Makes each paragraph of the tight list item `node` close where the
     /// next flush comes.
     ///
-    /// A tight item has no `p` around its text, so Vale reads the text at the
-    /// next tag that opens a block inside the item, such as a nested list, or
-    /// when the item closes.
+    /// A tight item has no `p` around its text.
+    /// So Vale reads the text at the next tag that opens a block inside the
+    /// item, such as a nested list.
+    /// It also reads the text when the item closes.
     /// A comment indented under the text reaches the text unless a block
     /// opens before it.
     fn close_tight_item(&self, node: &Mdast, children: &mut [Node], element_end: usize) {
@@ -1020,7 +1031,7 @@ impl Builder<'_> {
         }
     }
 
-    /// A node of `scope` over `node`, holding the nodes in `inner`.
+    /// A node of `scope` over `node`, with the nodes in `inner`.
     ///
     /// Syntax that is not prose and sits inside the node is a gap between its
     /// segments.
@@ -1126,7 +1137,7 @@ impl Builder<'_> {
         Visited { nodes, cuts, tags }
     }
 
-    /// Whether the text of a node of `scope` holds the inline HTML that joins
+    /// Whether the text of a node of `scope` has the inline HTML that joins
     /// and flushes it.
     const fn reads_inline_html(scope: Scope) -> bool {
         matches!(
@@ -1150,16 +1161,19 @@ impl Builder<'_> {
     /// The syntax of an inline node that is not its text.
     ///
     /// Strong text, emphasis and a link written with brackets lose the
-    /// markers around what they hold, in their own text and in the text
-    /// around them.
+    /// markers around what they contain.
+    /// Those markers are cut from their own text and from the text around
+    /// them.
+    ///
     /// A link whose text is its address loses the whole link in the text
     /// around it.
     /// A code span loses its backticks the same way, and keeps its content.
     /// An autolink and a bare URL keep their address as their own text, and
     /// the text around them loses the whole of it.
+    ///
     /// A link that is not its own address, such as a bare email address,
-    /// stays in the text around it, with the angle brackets cut if it has
-    /// them.
+    /// stays in the text around it.
+    /// The angle brackets are cut if it has them.
     fn markup(&self, node: &Mdast, scope: Scope, span: Range<usize>) -> Markup {
         match scope {
             Scope::Strong | Scope::Emphasis => {
@@ -1285,19 +1299,25 @@ impl Builder<'_> {
     ///
     /// Vale drops the text of a link when it equals the link's `href`.
     /// goldmark writes that `href` percent-encoded, as [`goldmark_href`]
-    /// does, so the text is compared with it and not with the destination.
+    /// does.
+    /// So the text is compared with it and not with the destination.
     /// Thus `[a.md](a.md)` and `[a%20b](a%20b)` are their own address, and
     /// `[ä.md](ä.md)` and `[a b](<a b>)` are not.
-    /// A link with brackets is when its text repeats that address, whatever
-    /// the destination is, and Vale reads it as a URL.
-    /// An autolink is when that address is what is written, which holds for
-    /// a web address in angle brackets or written bare with a lower-case
-    /// scheme.
+    ///
+    /// A link with brackets is its own address when its text repeats that
+    /// address, whatever the destination is.
+    /// Vale reads it as a URL.
+    ///
+    /// An autolink is its own address when that address is what is written.
+    /// This is true for a web address in angle brackets or written bare with
+    /// a lower-case scheme.
     /// So is another address in angle brackets that is its own destination,
     /// such as `<mailto:x>`, which goldmark and Vale drop from the text.
+    ///
     /// A bare email address, a bare `www.` address and a bare `mailto:`
-    /// address are not: the converter writes a different destination for the
-    /// first two and reads the last as text, so their words stay in the text.
+    /// address are not.
+    /// The converter writes a different destination for the first two and
+    /// reads the last as text, so their words stay in the text.
     fn is_address(&self, node: &Mdast, text: &str, angle: bool) -> bool {
         let destination = if let Mdast::Link(link) = node {
             link.url.as_str()
@@ -1349,9 +1369,9 @@ impl Builder<'_> {
         inner
     }
 
-    /// The content of the code span at `span`: between its backtick runs,
-    /// without the one space a span pads its content with when both ends have
-    /// one.
+    /// The content of the code span at `span`, between its backtick runs.
+    /// The one space a span pads its content with is left out when both ends
+    /// have one.
     fn code_content(&self, span: &Range<usize>) -> Range<usize> {
         let text = self.source.get(span.clone()).unwrap_or_default();
         if text.starts_with('<')
@@ -1389,8 +1409,8 @@ impl Builder<'_> {
 
     /// The lines of a heading without its syntax.
     ///
-    /// An ATX heading loses its opening `#` run with the space after it, and
-    /// its closing `#` run.
+    /// A heading written with `#` loses its opening `#` run with the space
+    /// after it, and its closing `#` run.
     /// A setext heading loses its underline.
     fn heading_text(&self, mut lines: Vec<Range<usize>>, atx: bool) -> Vec<Range<usize>> {
         let text_of = |line: &Range<usize>| self.source.get(line.clone()).unwrap_or_default();
@@ -1448,8 +1468,8 @@ impl Builder<'_> {
         start..start + body.len()
     }
 
-    /// The parts of `span` that no cut covers, without the whitespace at
-    /// either end of the text.
+    /// The parts of `span` that no cut covers, with the whitespace cut from
+    /// both ends of the text.
     ///
     /// Returns no part when only whitespace is left.
     fn segments(&self, span: &Range<usize>, cuts: &[Range<usize>]) -> Vec<Range<usize>> {
@@ -1535,8 +1555,9 @@ impl Builder<'_> {
         visited
     }
 
-    /// Whether Vale reads the JSX element `node`, which holds no node, as
-    /// code: a flow element, and a text element written as `<Tag />`.
+    /// Whether Vale reads the JSX element `node` as code, when it has no child
+    /// node.
+    /// It does for a flow element, and for a text element written as `<Tag />`.
     /// An open and a close tag with nothing between them, inside a line of
     /// text, are no code.
     fn reads_as_code(&self, node: &Mdast, span: &Range<usize>) -> bool {
@@ -1547,8 +1568,8 @@ impl Builder<'_> {
                 .is_some_and(|text| text.ends_with("/>"))
     }
 
-    /// An `{…}` expression, which Vale reads as code, and not a `{/* … */}`
-    /// comment, which it turns into an HTML comment.
+    /// An `{…}` expression, which Vale reads as code.
+    /// A `{/* … */}` comment is not one: Vale turns it into an HTML comment.
     fn expression(&self, node: &Mdast) -> Visited {
         let span = span_of(node);
         let mut visited = Visited::cut(span.clone());
@@ -1588,8 +1609,8 @@ impl Builder<'_> {
         if matches!(node, Mdast::Image(_) | Mdast::ImageReference(_))
             && let Some(whole) = span_of(node)
         {
-            // The image holds its title, so `title & image` selects it. An
-            // image with no alt text holds an empty span, which reads as
+            // The image has its title, so `title & image` selects it.
+            // An image with no alt text has an empty span, which reads as
             // nothing.
             let has_title = matches!(node, Mdast::Image(image) if image.title.is_some());
             let titles: Vec<Node> = has_title
@@ -1635,8 +1656,9 @@ impl Builder<'_> {
 /// The bytes between the delimiters of the title that ends `source[from..to]`,
 /// when the text ends with one.
 ///
-/// A title is written `"…"`, `'…'` or `(…)` after white space, and an inline
-/// link or image closes with a `)` after it, which `paren` says to strip.
+/// A title is written `"…"`, `'…'` or `(…)` after white space.
+/// An inline link or image closes with a `)` after it, which the `paren` flag
+/// strips.
 /// A backslash escapes a delimiter inside the title.
 fn title_range(source: &str, from: usize, to: usize, paren: bool) -> Option<Range<usize>> {
     let mut text = source.get(from..to)?;
@@ -1716,8 +1738,9 @@ fn raw_scope(name: &str) -> Option<Scope> {
 /// For each child of `parent`, the index of the closing tag that ends the
 /// inline HTML element it opens, among the elements `raw_scope` scopes.
 ///
-/// One pass pairs the tags: a closing tag ends the latest open element of
-/// its name, so `<b>x<b>y</b>z</b>` nests.
+/// One pass pairs the tags.
+/// A closing tag ends the latest open element of its name, so
+/// `<b>x<b>y</b>z</b>` nests.
 fn raw_pairs(parent: &Mdast) -> Rc<[Option<usize>]> {
     let children = parent.children().map_or(&[][..], Vec::as_slice);
     let mut pairs = vec![None; children.len()];
@@ -1753,11 +1776,12 @@ fn footnotes_referenced(root: &Mdast) -> HashSet<String> {
     found
 }
 
-/// Where `text` holds an `ftp://` address that Vale's converter links.
+/// Where `text` has an `ftp://` address that Vale's converter links.
 ///
 /// Its linkify extension reads an address that starts at a line start or after
-/// a space or one of `*`, `_`, `~` and `(`, and ends at the last byte its
-/// pattern takes, less the closing punctuation.
+/// a space or one of `*`, `_`, `~` and `(`.
+/// The address ends at the last byte its pattern takes, less the closing
+/// punctuation.
 /// `before` is the character in the file before `text`.
 fn ftp_addresses(text: &str, before: Option<char>) -> Vec<Range<usize>> {
     static FTP: LazyLock<Regex> = LazyLock::new(|| {

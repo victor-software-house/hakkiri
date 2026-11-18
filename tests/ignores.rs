@@ -1,22 +1,29 @@
 //! Block and token ignores: the scenarios of the block-token-ignores change.
 //!
-//! `tests/fixtures/ignores` holds one package of seven rules (`styles`), nine
-//! text files (`text`, with `.fixture` after the extension), and ten configs
-//! for each tool: `vale/<name>.ini` and `.ctl/<name>.yaml`.
-//! `vale.tsv` holds one row for each alert Vale gave on the files under each
-//! config: the config, the file, the line, the first and last column, the
+//! `tests/fixtures/ignores` contains one package of seven rules (`styles`),
+//! nine text files (`text`, with `.fixture` after the extension), and ten
+//! configs for each tool: `vale/<name>.ini` and `.ctl/<name>.yaml`.
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files under each
+//! config.
+//! A row lists the config, the file, the line, the first and last column, the
 //! level, the rule, the message and the matched text.
-//! `t9.md` holds matches that wrap a line beside ignored text: a token ignore
-//! before one, a block ignore around another.
+//!
+//! `t9.md` contains matches that wrap a line beside ignored text: a token
+//! ignore before one, a block ignore around another.
+//!
 //! The rows come from Vale at `66bbb85`, with the Rust grammar built from the
-//! same commit, run from the fixture folder as `vale --config=vale/<name>.ini
+//! same commit.
+//! They were run from the fixture folder as `vale --config=vale/<name>.ini
 //! --output=JSON text`.
 //!
 //! A match that spans lines ends where its last character is in hakkiri, as
-//! `end_line` and `end_column`. Vale prints the first column plus the number of
-//! characters of the match, line breaks included, which can pass the end of the
-//! line. The comparison maps hakkiri's end to Vale's count for such a match,
-//! and compares the single-line ends as they are.
+//! `end_line` and `end_column`.
+//! Vale prints the first column plus the number of characters of the match,
+//! line breaks included, which can pass the end of the line.
+//!
+//! The comparison maps hakkiri's end to Vale's count for such a match.
+//! It compares the single-line ends as they are.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -134,8 +141,10 @@ fn rows_of(out: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
 }
 
 /// Takes out of Vale's rows the two alerts that the patterns of the `rust`
-/// config hide in hakkiri: Vale applies no pattern to a comment of a source
-/// file, and hakkiri applies them to the Markdown of the comment.
+/// config hide in hakkiri.
+/// Vale applies no pattern to a comment of a source file.
+/// hakkiri applies them to the Markdown of the comment.
+///
 /// The first `very` is between `BEGIN` and `END` in a `//!` comment, and the
 /// second word, `really`, is in `{{ really }}` in a `///` comment.
 fn hide_in_comments(vale: &mut BTreeSet<Row>) {
@@ -197,8 +206,8 @@ const BOTH: [&str; 2] = [
     "a.md:1:14: warning Team.Plain: Drop 'good'.",
 ];
 
-/// A project with one style `Team` that holds both rules, the config `config`,
-/// and `a.md` holding `This is very good.`
+/// A project with one style `Team` that has both rules, the config `config`,
+/// and `a.md` containing `This is very good.`
 fn small<'a>(suite: &'a Suite, name: &str, config: &str) -> Root<'a> {
     let root = suite.scenario(name);
     root.file("styles/Team/Filler.yml", FILLER);
