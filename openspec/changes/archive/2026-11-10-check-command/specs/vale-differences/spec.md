@@ -12,7 +12,7 @@ hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.2
 #### Scenario: The JSON is an object
 
 - **WHEN** `--format json` is given
-- **THEN** hakkiri prints one object holding `alerts`, `failures` and `files`, and Vale prints a map from each path to its alerts ([check 7][check-7])
+- **THEN** hakkiri prints one object containing `alerts`, `failures` and `files`, and Vale prints a map from each path to its alerts ([check 7][check-7])
 
 #### Scenario: A level flag in place of two
 
@@ -26,11 +26,12 @@ hakkiri SHALL print, report and exit as each scenario below says, where Vale 3.2
 
 ### Requirement: Globs match from the project root
 
-hakkiri SHALL match each `files` glob against the file's path relative to the project root, where Vale 3.26.0 matches the path as given after cleaning it.
+hakkiri SHALL match each `files` glob against the file's path relative to the project root.  
+This differs from Vale 3.26.0, which matches the path as given after cleaning it.
 
 #### Scenario: A file named by its absolute path
 
-- **WHEN** `files` holds `'docs/**'` and a caller names `docs/a.md` by its absolute path
+- **WHEN** `files` contains `'docs/**'` and a caller names `docs/a.md` by its absolute path
 - **THEN** hakkiri lints it with the styles of that glob, and Vale matches only a glob such as `**/docs/**` ([check 3][check-3])
 
 #### Scenario: A run from a subdirectory
@@ -42,12 +43,13 @@ hakkiri SHALL match each `files` glob against the file's path relative to the pr
 
 ### Requirement: Known gaps are listed apart
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, apart from the intended differences, with its queue row.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
+It SHALL NOT list the intended differences.  
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: Text inside an HTML block
 
-- **WHEN** a Markdown file holds prose inside an HTML block
+- **WHEN** a Markdown file has prose inside an HTML block
 - **THEN** hakkiri reads none of it, and Vale lints it with the scope of its block
 - **AND** Vale also lints the text after a closed raw-text tag or a `--!>`
 - **AND** Vale's entity unescaping, masking of `code`, `tt`, `kbd` and `samp`, and handling of `pre` are not yet probed (row [HKR-021][ledger], [case 9][case-9])
@@ -60,11 +62,12 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: Vocabularies
 
 - **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
-- **THEN** hakkiri loads the field and reads no vocabulary, and Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
+- **THEN** hakkiri loads the field and reads no vocabulary.  
+  Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
 
 #### Scenario: The Markdown parser
 
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **WHEN** a Markdown file has syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
 
 #### Scenario: A plain-text file
