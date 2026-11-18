@@ -207,8 +207,9 @@ fn an_autolink_is_a_gap_around_itself() -> TestResult {
 
 #[test]
 fn a_tag_whose_closing_tag_is_past_its_element_opens_none() -> TestResult {
-    // `</i>` lies past the `<b>` element that holds `<i>`, so `<i>` is a tag
-    // and no element, and the text after `</b>` stays in the paragraph once.
+    // `</i>` lies past the `<b>` element that contains `<i>`, so `<i>` is a tag
+    // and no element.
+    // The text after `</b>` stays in the paragraph once.
     let fixture = load("crossed-tags.md")?;
     assert_eq!(fixture.nodes(Scope::Strong).len(), 1);
     assert_eq!(fixture.nodes(Scope::Emphasis).len(), 0);
@@ -960,8 +961,8 @@ fn a_node_records_whether_it_is_first_in_its_container() -> TestResult {
     Ok(())
 }
 
-/// The names of the languages of the nodes of the fixture, in order, and
-/// `None` for a node with no language of its own.
+/// The language of each node of the fixture, in order.
+/// A node with no language of its own gives `None`.
 fn languages(node: &Node, found: &mut Vec<(Scope, Option<&'static str>)>) {
     found.push((node.scope, node.language.map(|language| language.name)));
     for child in &node.children {

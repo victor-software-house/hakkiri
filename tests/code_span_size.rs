@@ -2,8 +2,11 @@
 //! in the metrics built on words.
 //!
 //! Each test writes a project in a temporary directory and runs the binary
-//! there. The rule measures the words of each sentence, so a code span moves
-//! its count: 7 words at 1, 3 at 0, which is what Vale counts, and 11 at 2.
+//! there.
+//! The rule measures the words of each sentence, so a code span moves its
+//! count.
+//! The sample sentence has 7 words at size 1, 3 at size 0, and 11 at size 2.
+//! Size 0 is what Vale counts.
 
 #![expect(
     clippy::panic_in_result_fn,

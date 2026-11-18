@@ -17,9 +17,10 @@ pub(super) const END2: &str = "-END2-";
 
 /// The form of `word` the perceptron reads around the word it tags.
 ///
-/// A word with a hyphen inside is `!HYPHEN`, a number of four digits is
-/// `!YEAR`, any other word that starts with a digit is `!DIGITS`, and every
-/// other word is in lower case.
+/// A word with a hyphen inside is `!HYPHEN`.
+/// A number of four digits is `!YEAR`.
+/// Any other word that starts with a digit is `!DIGITS`.
+/// Every other word is in lower case.
 pub(super) fn normalize(word: &str) -> String {
     let Some(first) = word.chars().next() else {
         return String::new();
@@ -108,7 +109,7 @@ fn around(context: &[String], at: usize, offset: isize) -> &str {
         .map_or("", String::as_str)
 }
 
-/// The features of the word at `at` in `context`, which holds every word of
+/// The features of the word at `at` in `context`, which has every word of
 /// the sentence in its normal form and two padding words at each end.
 ///
 /// `word` is the word as written, and `previous` and `before` are the tags of

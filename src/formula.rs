@@ -203,11 +203,11 @@ enum Kind {
 impl Formula {
     /// Parses `source`.
     ///
-    /// `known` says whether a name is a variable.
+    /// `known` returns whether a name is a variable.
     ///
     /// # Errors
     ///
-    /// Returns a [`FormulaError`] when `source` is not one expression, names
+    /// Returns a [`FormulaError`] when `source` is not one expression, uses
     /// an unknown variable or function, or calls a function with the wrong
     /// number of arguments.
     pub fn parse(source: &str, known: &dyn Fn(&str) -> bool) -> Result<Self, FormulaError> {

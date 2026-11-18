@@ -199,7 +199,7 @@ impl Model {
                     return Err(fail("the bits are not a number"));
                 };
                 if bits & !Orthography::ALL != 0 {
-                    return Err(fail("the bits name a case that does not exist"));
+                    return Err(fail("the bits select a case that does not exist"));
                 }
                 self.orthography
                     .insert((*word).to_owned(), Orthography(bits));

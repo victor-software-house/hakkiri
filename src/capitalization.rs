@@ -46,8 +46,10 @@ fn words<'a>(rule: &Capitalization, text: &'a str) -> Vec<&'a str> {
         .collect()
 }
 
-/// Whether enough of the words of `text` agree with `expected`, its
-/// conversion: `expected` and whether the share is at least the threshold.
+/// The conversion `expected` of `text`, and whether enough of the words of
+/// `text` match it.
+/// The second value is true when the share of matching words is at least the
+/// threshold.
 ///
 /// A word passes when it equals the converted word at its place, or an
 /// exception matches it, or, in title case, it is in capitals. A word past

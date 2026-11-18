@@ -143,8 +143,9 @@ fn words_of(scope: &str) -> String {
 
 #[test]
 fn each_alert_keeps_its_place_where_vale_drops_it() -> TestResult {
-    // Each case lists what Vale 66bbb85 gives: the same alerts less the ones
-    // that share a line and a column with an earlier alert of the rule.
+    // Each case lists what Vale 66bbb85 gives.
+    // That is the same alerts less the ones that share a line and a column with
+    // an earlier alert of the rule.
     let table = "| Head | Other |\n|:--|:--|\n| one | two words |\n";
     // Vale: 1.00.
     assert_eq!(sized(&words_of("table.cell"), table, 0)?, ["1.00", "2.00"]);

@@ -101,8 +101,8 @@ pub(crate) fn check(args: &CheckArgs) -> Check {
 ///
 /// Vale lints such a file, a Latin-1 one for example, and reads each bad byte
 /// as a character that is no letter. One `?` for one byte keeps every other
-/// byte at the offset it has in the file, so a line and a column still name
-/// the place Vale names.
+/// byte at the offset it has in the file.
+/// So a line and a column still point to the place Vale reports.
 fn read_text(path: &Path) -> io::Result<String> {
     let bytes = fs::read(path)?;
     let mut text = String::with_capacity(bytes.len());
@@ -155,7 +155,7 @@ pub(crate) fn lint_planned(
 /// `work` on every item, on as many threads as the machine has, and the
 /// results in the order of the items.
 ///
-/// The threads take items from one shared index, so a slow file holds up
+/// The threads take items from one shared index, so a slow file delays
 /// only its own thread.
 ///
 /// # Errors

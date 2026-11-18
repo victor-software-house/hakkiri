@@ -58,12 +58,12 @@ impl fmt::Display for FormatError {
             Self::Magic => write!(f, "the file does not start with `PROSETAG`"),
             Self::Version(version) => write!(
                 f,
-                "format version {version} is not one this reader knows (1 to {VERSION})"
+                "format version {version} is not supported; use 1 to {VERSION}"
             ),
             Self::Truncated { at, wanted } => {
                 write!(
                     f,
-                    "the file ends early: {wanted} bytes wanted at offset {at}"
+                    "the file ends early: {wanted} more bytes are needed at offset {at}"
                 )
             }
             Self::Text { at } => write!(f, "the name at offset {at} is not UTF-8"),
@@ -189,7 +189,7 @@ impl Model {
         }
         let class_count = reader.size()?;
         if class_count > MAX_CLASSES {
-            return Err(FormatError::Invalid("the model names too many classes"));
+            return Err(FormatError::Invalid("the model has too many classes"));
         }
         let classes = (0..class_count)
             .map(|_| reader.string())
@@ -211,7 +211,7 @@ impl Model {
             let id = reader.u8()?;
             if usize::from(id) >= classes.len() {
                 return Err(FormatError::Invalid(
-                    "a word names a class that is not there",
+                    "a word uses a class that does not exist",
                 ));
             }
             tag_map.insert(word, id);
@@ -238,8 +238,9 @@ impl Model {
         Ok(model)
     }
 
-    /// Checks that the offsets end where the tables do, that every class id is
-    /// in range, and that the features are sorted, which a lookup relies on.
+    /// Checks that the offsets end where the tables do and that every class id
+    /// is in range.
+    /// It also checks that the features are sorted, which a lookup relies on.
     fn validate(&self) -> Result<(), FormatError> {
         if self.class_ids.len() != self.weights.len() {
             return Err(FormatError::Invalid(
@@ -263,7 +264,7 @@ impl Model {
             .any(|id| usize::from(*id) >= self.classes.len())
         {
             return Err(FormatError::Invalid(
-                "a pair names a class that is not there",
+                "a pair uses a class that does not exist",
             ));
         }
         let names = (0..self.feature_offsets.len().saturating_sub(1))
@@ -283,7 +284,7 @@ impl Model {
         self.blob.get(start..end)
     }
 
-    /// What the model's metadata holds under `key`.
+    /// What the model's metadata stores under `key`.
     #[must_use]
     pub(super) fn meta(&self, key: &str) -> Option<&str> {
         self.meta.get(key).map(String::as_str)
@@ -295,7 +296,7 @@ impl Model {
         self.classes.len()
     }
 
-    /// The tag of a word that has only one, as the model's own list holds it.
+    /// The tag of a word that has only one, as the model's own list stores it.
     #[must_use]
     pub(super) fn tag_for(&self, word: &str) -> Option<&str> {
         let id = self.tag_map.get(word)?;

@@ -1,12 +1,13 @@
 //! Math: the scenarios of the math-as-code change.
 //!
-//! `tests/fixtures/math` holds one package of five rules (`styles`), five
-//! Markdown files and three MDX files (`text`, with `.fixture` after the
-//! extension), and one config for each tool: `vale/all.ini` and
-//! `.ctl/all.yaml`.
-//! `vale.tsv` holds one row for each alert Vale gave on the files: the config,
-//! the file, the line, the first and last column, the level, the rule, the
-//! message and the matched text.
+//! `tests/fixtures/math` has one package of five rules (`styles`).
+//! It has five Markdown files and three Markdown-with-components (MDX) files
+//! (`text`, with `.fixture` after the extension).
+//! It has one config for each tool: `vale/all.ini` and `.ctl/all.yaml`.
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files.
+//! A row lists the config, the file, the line, the first and last column, the
+//! level, the rule, the message and the matched text.
 //! The rows come from Vale at `66bbb85`, run from the fixture folder as
 //! `vale --config=vale/all.ini --output=JSON text`.
 

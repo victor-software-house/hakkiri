@@ -1,12 +1,16 @@
 //! Vocabularies: the scenarios of the vocabularies change.
 //!
-//! `tests/fixtures/vocabularies` holds one package of rules and vocabularies
+//! `tests/fixtures/vocabularies` contains one package of rules and vocabularies
 //! (`styles`), eight Markdown files (`text`, with `.fixture` after `.md`), and
 //! five configs for each tool: `vale/<name>.ini` and `.ctl/<name>.yaml`.
-//! `vale.tsv` holds one row for each alert Vale gave on the files under each
-//! config: the config, the file, the line, the first and last column, the
-//! level, the rule, the message and the matched text. The rows come from Vale
-//! at `66bbb85` run from the fixture folder as `vale --config=vale/<name>.ini
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files under each
+//! config.
+//! A row lists the config, the file, the line, the first and last column, the
+//! level, the rule, the message and the matched text.
+//!
+//! The rows come from Vale at `66bbb85`.
+//! They were run from the fixture folder as `vale --config=vale/<name>.ini
 //! --output=JSON text`.
 
 #![expect(
@@ -53,7 +57,7 @@ fn copy_into(root: &Root<'_>, from: &Path, to: &Path) -> TestResult {
     Ok(())
 }
 
-/// A scenario folder that holds the fixture's styles and text.
+/// A scenario folder that has the fixture's styles and text.
 fn project<'a>(suite: &'a Suite, name: &str) -> Result<Root<'a>, Box<dyn Error>> {
     let root = suite.scenario(name);
     copy_into(&root, &fixture().join("styles"), Path::new("styles"))?;
@@ -152,8 +156,8 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
     Ok(())
 }
 
-/// A project with the fixture's styles, `text/a.md` holding `text`, and a
-/// config that holds `top` before `files`.
+/// A project with the fixture's styles, `text/a.md` containing `text`, and a
+/// config that has `top` before `files`.
 fn small<'a>(
     suite: &'a Suite,
     name: &str,
@@ -306,7 +310,7 @@ fn a_config_with_no_vocab_loads_as_before() -> TestResult {
     Ok(())
 }
 
-/// A match that holds an accepted word as a whole word with its case is held
+/// A match that contains an accepted word as a whole word with its case is held
 /// back, wherever the word sits in it. Vale 3.26.0 gave the same three alerts
 /// with `ProseStyle.PrepositionChain` and `Vocab = ProseStyle`, on 2026-11-14.
 #[test]

@@ -1,10 +1,10 @@
 //! The text of an HTML block of a Markdown file, as nodes of the tree.
 //!
-//! [`crate::html`] reads the block as Vale does and gives the runs of text,
-//! with byte ranges in the text of the block.
-//! The block sits in the file with the markers of the quotes and list items
-//! around it taken out, so this module maps each range back to the file, one
-//! line at a time.
+//! [`crate::html`] reads the block as Vale does and gives the runs of text.
+//! Each run is a byte range in the text of the block.
+//! The text of the block omits the quote and list item markers that surround
+//! it in the file.
+//! So this module maps each range back to the file, one line at a time.
 
 use std::ops::Range;
 
@@ -14,7 +14,7 @@ use crate::tree::{Join, Node, Reading, Scope};
 /// One line of the block, and where it lies in the file.
 #[derive(Debug)]
 struct Line {
-    /// The bytes of the line in the text of the block, without its `\r`.
+    /// The bytes of the line, as a range of the block text, without its `\r`.
     value: Range<usize>,
     /// The file byte of `value.start`.
     source: usize,
@@ -30,7 +30,7 @@ impl Lines {
     /// Matches the lines of `html`, the text of the block, to the lines of
     /// `span` in `source`.
     ///
-    /// A line of the file holds the block's line, after the markers of the
+    /// A line of the file contains the block's line, after the markers of the
     /// quotes and list items around it.
     /// Returns `None` when a line of the file does not end with the block's.
     fn new(source: &str, span: &Range<usize>, html: &str) -> Option<Self> {
@@ -68,7 +68,7 @@ impl Lines {
             })
     }
 
-    /// The ranges of the file that hold the bytes `range` of the block, one
+    /// The ranges of the file that contain the bytes `range` of the block, one
     /// for each line.
     fn map(&self, range: &Range<usize>) -> Vec<Range<usize>> {
         self.lines
@@ -124,7 +124,7 @@ impl Lines {
         run
     }
 
-    /// The node for one block of text, or `None` when it holds no text, or
+    /// The node for one block of text, or `None` when it contains no text, or
     /// hakkiri has no scope for it.
     fn block(&self, block: &Block, first: bool, then: usize) -> Option<Node> {
         let whole = self.run(block, 0..block.pieces.len());
@@ -173,8 +173,9 @@ impl Lines {
     }
 }
 
-/// Makes `node` and the nodes inside it close at the byte `at`: Vale reads
-/// the text of a block, and the elements inside it, when a tag flushes it.
+/// Makes `node` and the nodes inside it close at the byte `at`.
+/// Vale reads the text of a block, and the elements inside it, when a tag
+/// flushes it.
 fn close_at(node: &mut Node, at: usize) {
     node.closes = at;
     for child in &mut node.children {
@@ -182,9 +183,10 @@ fn close_at(node: &mut Node, at: usize) {
     }
 }
 
-/// The byte of the file where the first token of the HTML block `html`,
-/// which `span` covers in `source`, flushes the text before it, or `None`
-/// when no token does.
+/// The byte of the file where the first token of the HTML block `html` flushes
+/// the text before it.
+/// The block is the part of `source` that `span` covers.
+/// It is `None` when no token does.
 pub(crate) fn flushes_at(source: &str, span: &Range<usize>, html: &str) -> Option<usize> {
     let at = html::flushes_at(html)?;
     Some(Lines::new(source, span, html).map_or(span.start, |lines| lines.offset(at)))
@@ -195,7 +197,8 @@ pub(crate) fn flushes_at(source: &str, span: &Range<usize>, html: &str) -> Optio
 /// file.
 ///
 /// `first` is whether the block is the first thing inside the item or quote
-/// around it, which gives its first text the scope of that item or quote.
+/// around it.
+/// If so, its first text gets the scope of that item or quote.
 /// `then` is the byte of the file where the tag after the block flushes the
 /// text that no tag inside it does.
 pub(crate) fn nodes(
@@ -233,9 +236,9 @@ pub(crate) fn nodes(
 
 /// The nodes for the `title` attributes of the tags `titles` lists.
 ///
-/// A title of an `a` or an `img` tag sits in an empty node of the element, so
-/// `title & link` and `title & image` select it as they select the title of a
-/// Markdown link and image.
+/// A title of an `a` or an `img` tag sits in an empty node of the element.
+/// So `title & link` and `title & image` select it as they select the title of
+/// a Markdown link and image.
 fn title_nodes(lines: &Lines, titles: &[(Range<usize>, Option<Scope>)]) -> Vec<Node> {
     titles
         .iter()
@@ -252,9 +255,10 @@ fn title_nodes(lines: &Lines, titles: &[(Range<usize>, Option<Scope>)]) -> Vec<N
         .collect()
 }
 
-/// The nodes for the `title` attributes of the tag text `tag`, which `span`
-/// covers in `source`: the opening tag of an inline HTML element, or of a JSX
-/// element.
+/// The nodes for the `title` attributes of the tag text `tag`.
+/// The tag is the opening tag of an inline HTML element, or of a JavaScript
+/// XML (JSX) element.
+/// It is in `source`, where `span` covers it.
 ///
 /// Vale reads such an attribute only through `raw`. The `title` scope reads it
 /// too, so a rule on `title` sees what a rule on `raw` sees in a title.
@@ -267,11 +271,12 @@ pub(crate) fn tag_titles(source: &str, span: &Range<usize>, tag: &str) -> Vec<No
 }
 
 /// The nodes for an inline HTML tag `tag` in a line of text, which `span`
-/// covers in `source`: its `title` attributes, as [`tag_titles`] gives them,
-/// and the alt text of an `img` tag.
+/// covers in `source`.
+/// They are its `title` attributes, as [`tag_titles`] gives them, and the alt
+/// text of an `img` tag.
 ///
-/// The alt text is an `alt` node of its own, as Vale reads it, so the
-/// paragraph reads around it and a rule on `link` does not select it.
+/// The alt text is an `alt` node of its own, as Vale reads it.
+/// So the paragraph reads around it, and a rule on `link` does not select it.
 pub(crate) fn inline_tag_nodes(source: &str, span: &Range<usize>, tag: &str) -> Vec<Node> {
     let walk = html::walk(tag);
     if walk.titles.is_empty() && walk.alts.is_empty() {

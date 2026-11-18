@@ -1,12 +1,13 @@
 //! A place where hakkiri reads a file otherwise than Vale: the scenario of the
 //! `block-token-ignores` change.
 //!
-//! `tests/fixtures/markup-differences` holds two rules, one file (`text`,
+//! `tests/fixtures/markup-differences` contains two rules, one file (`text`,
 //! with `.fixture` after the extension) and one config for each tool.
-//! `vale.tsv` holds the alerts Vale gave at `66bbb85`, with the Rust grammar
-//! built from the same commit, run as `vale --config=vale/all.ini
-//! --output=JSON text`.
-//! A row holds the config, the file, the line, the first and last column, the
+//! `vale.tsv` has the alerts Vale gave at `66bbb85`, with the Rust grammar
+//! built from the same commit.
+//! They come from running `vale --config=vale/all.ini --output=JSON text`.
+//!
+//! A row has the config, the file, the line, the first and last column, the
 //! level, the rule, the message and the matched text.
 
 #![expect(

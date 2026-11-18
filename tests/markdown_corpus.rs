@@ -1,25 +1,31 @@
-//! The Markdown reader against Vale's converter: the alerts of one style of
-//! rules over a corpus of inputs, each holding one construct.
+//! The Markdown reader against Vale's converter.
+//! It compares the alerts of one style with Vale's, input by input.
+//! Each input has one construct.
 //!
-//! `tests/fixtures/markdown-corpus` holds the package `styles` and the inputs
+//! `tests/fixtures/markdown-corpus` has the package `styles` and the inputs
 //! under `text`, with `.fixture` after `.md`.
+//!
 //! The style `Probe` has one rule for each scope that a construct reaches
 //! (`text`, `paragraph`, `heading`, `list`, `blockquote`, `table.cell`,
 //! `link`, `strong`, `emphasis` and `code`).
-//! `Probe.Word` matches each run of non-space characters that holds a letter
-//! or a digit, so that where a construct joins or splits words shows.
-//! Each input uses words no other line of its file uses, since Vale places a
-//! repeated word at another copy of it.
-//! `vale.tsv` holds one row for each alert Vale gave: the file, the line, the
-//! first column, the rule and the matched text, with a line feed written `\n`,
-//! a tab `\t` and a backslash `\\`.
-//! The rows come from Vale at `66bbb85` run from the fixture folder as `vale
+//!
+//! `Probe.Word` matches each run of non-space characters that contains a
+//! letter or a digit.
+//! So it shows where a construct joins or splits words.
+//! Each input uses words that no other line of its file uses, since Vale places
+//! a repeated word at another copy of it.
+//!
+//! `vale.tsv` has one row for each alert Vale gave: the file, the line, the
+//! first column, the rule and the matched text.
+//! It writes a line feed as `\n`, a tab as `\t` and a backslash as `\\`.
+//! The rows come from Vale at `66bbb85`, run from the fixture folder as `vale
 //! --config=vale/probe.ini --output=JSON <file>`, one run for each input.
 //!
-//! `departures.tsv` holds one row for each alert that only one side gave, led
-//! by `vale` or `hakkiri`.
-//! The test fails on any difference that file does not list, and on any row
-//! of it that no longer differs.
+//! `departures.tsv` has one row for each alert that only one side gave, led by
+//! `vale` or `hakkiri`.
+//! The test fails on any difference that file does not list.
+//! It also fails on a row that lists a difference that has gone.
+//!
 //! `panics/vale-panic.md.fixture` is an input that makes Vale 66bbb85 panic,
 //! so it has no row.
 
@@ -63,7 +69,7 @@ fn copy_into(root: &Root<'_>, from: &Path, to: &Path) -> TestResult {
     Ok(())
 }
 
-/// A scenario folder that holds the fixture's package, inputs and config.
+/// A scenario folder that has the fixture's package, inputs and config.
 fn project<'a>(suite: &'a Suite, name: &str) -> Result<Root<'a>, Box<dyn Error>> {
     let root = suite.scenario(name);
     for folder in ["styles", "text", "panics", ".ctl"] {

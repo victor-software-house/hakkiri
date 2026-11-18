@@ -2,27 +2,34 @@
 //!
 //! Vale renders a Markdown file to HTML and walks the tokens of
 //! `golang.org/x/net/html` at v0.62.0.
-//! It collects the text of a block, and reads the block under the tags opened
-//! since the last reset.
-//! It flushes the block at the next start tag that is not inline, at an end
-//! tag that is not inline, and at the end of the input.
-//! It resets the tags at an end tag that is not inline, and when it flushes
-//! at a start tag.
+//! It collects the text of a block.
+//! It reads the block under the tags opened since the last reset.
+//!
+//! Vale flushes the block at the next start tag that is not inline.
+//! It also flushes at an end tag that is not inline, and at the end of the
+//! input.
+//! It resets the tags at an end tag that is not inline, and when it flushes at
+//! a start tag.
+//!
 //! A block element that opens inside an inline element reads as inline.
-//! The text of `script`, `style`, `noscript`, `iframe` and `pre` is left out,
-//! as is the text of an element whose class is `code`, `pre` or `problematic`.
+//! The text of `script`, `style`, `noscript`, `iframe` and `pre` is left out.
+//! So is the text of an element whose class is `code`, `pre` or `problematic`.
+//!
 //! The first text after a `tt`, `code`, `kbd` or `samp` start tag is masked,
 //! and reads as one `*` for each character.
 //! hakkiri reads the text of `tt` and `code` as a code span, which a rule reads
 //! as one word.
 //!
 //! Vale joins the texts of a block with a space where an inline tag opens
-//! before the text, and as the source has it where one closes before it.
+//! before the text.
+//! Where an inline tag closes before it, Vale joins them as the source has it.
 //! [`Spacer`] follows that.
 //!
 //! This module follows [that tokenizer's rules][tokenizer] for where a tag
-//! ends and what is text, so a `>` in a quoted attribute value, or inside a
-//! bogus comment such as `<?php echo "<div>"; ?>`, is read as it reads it.
+//! ends and what is text.
+//! A `>` in a quoted attribute value is read as the tokenizer reads it, and so
+//! is one inside a bogus comment such as `<?php echo "<div>"; ?>`.
+//!
 //! The content of a `script` element ends at the first `</script` that no
 //! `<!--` and `<script` hide.
 //!
@@ -76,8 +83,9 @@ const RAW_TEXT_TAGS: [&str; 10] = [
     "xmp",
 ];
 
-/// The whitespace the tokenizer skips: not a vertical tab, which only the
-/// trimming of a text counts (`is_blank_char`).
+/// The whitespace the tokenizer skips.
+/// A vertical tab is not in it: only the trimming of a text counts it
+/// (`is_blank_char`).
 const fn is_blank(c: u8) -> bool {
     matches!(c, b' ' | b'\n' | b'\r' | b'\t' | 0x0c)
 }
@@ -274,9 +282,10 @@ impl<'a> Tokenizer<'a> {
     /// Reads the content of a `script` element, up to its end tag, which is
     /// not consumed.
     ///
-    /// A `<!--` hides the end tag until a `-->`, and a `<script` after it
-    /// hides it again until the end tag of that script, as the HTML5 standard
-    /// defines.
+    /// A `<!--` hides the end tag until a `-->`.
+    /// A `<script` after it hides the end tag again until the end tag of that
+    /// script.
+    /// The HTML5 standard defines this.
     fn read_script(&mut self) {
         let mut state = Script::Data;
         loop {
@@ -695,8 +704,9 @@ pub(crate) struct Capture {
 /// One block of text Vale lints: the text between two flushes.
 #[derive(Debug)]
 pub(crate) struct Block {
-    /// The byte of the HTML where the token that flushed the text starts, or
-    /// `None` when the end of the HTML did, so a tag after the HTML flushes it.
+    /// The byte of the HTML where the token that flushed the text starts.
+    /// It is `None` when the end of the HTML flushed the text, so a tag after
+    /// the HTML flushes it.
     pub(crate) flushed_at: Option<usize>,
     pub(crate) place: Place,
     pub(crate) pieces: Vec<Piece>,
@@ -706,8 +716,8 @@ pub(crate) struct Block {
 /// What Vale reads in an HTML block.
 #[derive(Debug, Default)]
 pub(crate) struct Walk {
-    /// Whether the block ends the run of tags a block of text is read under:
-    /// it has an end tag that is not inline, or text that is read.
+    /// Whether the block ends the run of tags a block of text is read under.
+    /// It does when it has an end tag that is not inline, or text that is read.
     pub(crate) resets: bool,
     /// The blocks of text, in order.
     pub(crate) blocks: Vec<Block>,
@@ -715,8 +725,9 @@ pub(crate) struct Walk {
     pub(crate) alts: Vec<Range<usize>>,
     /// The content of each `meta` tag that describes the page, in order.
     pub(crate) descriptions: Vec<Range<usize>>,
-    /// The value of each `title` attribute that holds text, in order, with the
-    /// scope of the element that holds it when that is a link or an image.
+    /// The value of each `title` attribute that has text, in order.
+    /// Each comes with the scope of its element when that is a link or an
+    /// image.
     pub(crate) titles: Vec<(Range<usize>, Option<Scope>)>,
 }
 
@@ -725,9 +736,9 @@ const fn is_blank_char(c: char) -> bool {
     matches!(c, ' ' | '\n' | '\r' | '\t' | '\x0c' | '\x0b')
 }
 
-/// The part of `raw` between its blank ends, where a reference that stands for
-/// blank text, such as `&#32;`, is blank too: Vale reads the references of a
-/// text before it trims it.
+/// The part of `raw` between its blank ends.
+/// A reference that stands for blank text, such as `&#32;`, counts as blank
+/// too. Vale reads the references of a text before it trims it.
 fn trim_blank(raw: &str) -> Range<usize> {
     let references = entity::references(raw, false);
     let blank = |text: &str| text.chars().all(is_blank_char);
@@ -758,8 +769,9 @@ fn trim_blank(raw: &str) -> Range<usize> {
     start..end
 }
 
-/// The separator the source put at an end of a text: a line feed for a line
-/// break, a space for any other whitespace, and none when there was none.
+/// The separator the source put at an end of a text.
+/// It is a line feed for a line break, a space for any other whitespace, and
+/// none when there was none.
 fn separator(c: Option<char>) -> Option<char> {
     match c? {
         '\n' | '\r' => Some('\n'),
@@ -875,9 +887,11 @@ impl Spacer {
 
     /// A text token `decoded`, as the tokenizer gives it.
     ///
-    /// `last` is the last character of the block so far, `class_skipped` is
-    /// whether the element before the text has a class that Vale leaves out,
-    /// and `is_href` whether the text is the address of the link before it.
+    /// `last` is the last character of the block so far.
+    /// `class_skipped` is whether the element before the text has a class that
+    /// Vale leaves out.
+    /// `is_href` is whether the text is the address of the link before it.
+    ///
     /// Returns how the text reads, or `None` when it is blank.
     fn text(
         &mut self,
@@ -1001,12 +1015,16 @@ pub(crate) fn walk(html: &str) -> Walk {
 /// The byte of `html` where its first token flushes the text before it, or
 /// `None` when it has none.
 ///
-/// A start tag flushes it unless the tag is inline, void, inside an inline
-/// element, or opens an element that Vale skips: a tag among `SKIP_TAGS` or
-/// one with a skipped class, whose end tag flushes instead.
+/// A start tag flushes it unless the tag is inline, void, or inside an inline
+/// element.
+/// It does not flush when the tag opens an element that Vale skips: a tag among
+/// `SKIP_TAGS`, or one with a skipped class.
+/// The end tag of that element flushes instead.
+///
 /// An end tag flushes it unless the tag is inline or was promoted to inline.
-/// The open inline elements and the promoted tags are kept as `flush_tags`
-/// keeps them, so a block tag read as inline and its end tag flush nothing.
+/// `flush_tags` keeps the open inline elements and the promoted tags in the
+/// same way.
+/// So a block tag read as inline flushes nothing, and neither does its end tag.
 pub(crate) fn flushes_at(html: &str) -> Option<usize> {
     let mut tokenizer = Tokenizer::new(html);
     let mut history: Vec<String> = Vec::new();
@@ -1021,7 +1039,8 @@ pub(crate) fn flushes_at(html: &str) -> Option<usize> {
                 if INLINE_TAGS.contains(&name.as_str()) {
                     history.push(name);
                 } else if VOID_TAGS.contains(&name.as_str()) {
-                    // A void tag flushes nothing and stays out of the history.
+                    // A void tag does not flush, and it stays out of the
+                    // history.
                 } else if history
                     .iter()
                     .any(|open| INLINE_TAGS.contains(&open.as_str()))
@@ -1071,7 +1090,8 @@ pub(crate) fn flush_tags(source: &str, tags: &[Range<usize>]) -> Vec<usize> {
                 if INLINE_TAGS.contains(&name.as_str()) {
                     history.push(name);
                 } else if VOID_TAGS.contains(&name.as_str()) {
-                    // A void tag flushes nothing and stays out of the history.
+                    // A void tag does not flush, and it stays out of the
+                    // history.
                 } else if history
                     .iter()
                     .any(|open| INLINE_TAGS.contains(&open.as_str()))
@@ -1382,12 +1402,15 @@ impl Walker {
 /// How the segments of a Markdown paragraph read, where HTML tags lie between
 /// them.
 ///
-/// `start` is where the node starts, `segments` its text, and `tags` the spans
-/// of its inline HTML, each one tag or comment, all in `source`.
-/// Vale joins the text after a tag as it joins the text of an HTML block, and
-/// masks the text of a `kbd` or a `samp`.
-/// It trims each text between two tags, so a segment that touches a tag loses
-/// its whitespace there, and one that holds only whitespace is dropped.
+/// `start` is where the node starts, `segments` is its text, and `tags` is the
+/// spans of its inline HTML, each one tag or comment, all in `source`.
+///
+/// Vale joins the text after a tag as it joins the text of an HTML block.
+/// It also masks the text of a `kbd` or a `samp`.
+/// Vale trims each text between two tags, so a segment that touches a tag loses
+/// its whitespace there.
+/// A segment with only whitespace is dropped.
+///
 /// Returns the segments, and a reading for each, or no reading when no tag lies
 /// between two segments.
 pub(crate) fn inline_reads(
@@ -1396,8 +1419,9 @@ pub(crate) fn inline_reads(
     segments: Vec<Range<usize>>,
     tags: &[Range<usize>],
 ) -> (Vec<Range<usize>>, Vec<Reading>) {
-    // A tag that opens a block ends the text in Vale, and hakkiri reads the
-    // text around it as it did before: one text, with the tag a gap.
+    // A tag that opens a block ends the text in Vale.
+    // hakkiri reads the text around it as it did before: one text, with the tag
+    // a gap.
     let tags: Vec<Range<usize>> = tags
         .iter()
         .filter(|tag| source.get((*tag).clone()).is_some_and(Spacer::joins))

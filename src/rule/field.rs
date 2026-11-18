@@ -1,7 +1,7 @@
 //! The value types a rule file's fields read into.
 //!
-//! A field that holds the wrong kind of value does not fail the parse.
-//! It reads with a problem, and validation refuses it under the field's name
+//! A field that has the wrong kind of value does not fail the parse.
+//! It reads with a problem, and validation rejects it under the field's name
 //! and line, which a parse error does not carry.
 
 use std::fmt;

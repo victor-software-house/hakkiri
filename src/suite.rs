@@ -15,7 +15,7 @@ use crate::files::{FIRST_LINE, file_language, is_skipped, languages_of};
 use crate::report::{CaseResult, Failure, Tests, Uncovered};
 use crate::run::lint_planned;
 
-/// The suffix of a file that holds only cases.
+/// The suffix of a file that contains only cases.
 const TEST_FILE: &str = ".test.yml";
 
 /// Runs `test`.
@@ -99,18 +99,20 @@ fn paths_shown(paths: &[PathBuf]) -> String {
     }
 }
 
-/// Whether a walk leaves a folder named `name` alone when it lists rules: a
-/// dot or an underscore folder holds what the style loader ignores.
+/// Whether a walk leaves a folder called `name` alone when it lists rules.
+/// A dot or an underscore folder contains what the style loader ignores.
 fn skips_inert(name: &str) -> bool {
     name.starts_with('.') || name.starts_with('_')
 }
 
-/// The `.yml` files `paths` name or hold, in sorted order, and the paths that
-/// could not be read.
+/// The `.yml` files in or at `paths`, in sorted order, and the paths that could
+/// not be read.
 ///
-/// A file is taken as given. A walk skips a folder when it is a dot folder,
-/// when `inert` returns true, or when `check`'s walk skips it, except the
-/// folder it was given, and keeps a file when `keep` returns true.
+/// A file is taken as given.
+/// A walk skips a folder when it is a dot folder, when `inert` returns true, or
+/// when `check`'s walk skips it.
+/// The folder it was given is never skipped.
+/// A walk keeps a file when `keep` returns true.
 fn find(
     paths: &[PathBuf],
     inert: &dyn Fn(&str) -> bool,
@@ -175,7 +177,7 @@ fn has_key(text: &str, key: &str) -> bool {
     text.lines().any(|line| line.starts_with(key))
 }
 
-/// Whether `file` is a rule file: YAML that holds `extends`, and is no test
+/// Whether `file` is a rule file: YAML that has `extends`, and is not a test
 /// file.
 fn is_rule_file(file: &Path) -> bool {
     !file.to_string_lossy().ends_with(TEST_FILE)
@@ -185,11 +187,14 @@ fn is_rule_file(file: &Path) -> bool {
 /// `file` made absolute, with its `.` and `..` parts folded away and its
 /// symlinks left alone, as Go's `filepath.Abs` does for Vale.
 ///
-/// The fold ignores symlinks on purpose: `a/link/../b` is `a/b` even when
-/// `link` points elsewhere, where the operating system would step out of the
-/// link's target. A rule's text, name and package all come from this one path,
-/// so they name one file. The style loader names a rule from the folder it was
-/// given, so a style folder that is a symlink keeps the name of the link.
+/// The fold ignores symlinks on purpose.
+/// `a/link/../b` is `a/b` even when `link` points elsewhere, where the
+/// operating system would step out of the link's target.
+///
+/// A rule's text, name and package all come from this one path, so they refer
+/// to one file.
+/// The style loader takes a rule's name from the folder it was given.
+/// So a style folder that is a symlink keeps the name of the link.
 fn absolute(file: &Path) -> Option<PathBuf> {
     let mut clean = PathBuf::new();
     for part in path::absolute(file).ok()?.components() {
@@ -235,8 +240,9 @@ fn one_line(error: &LoadError) -> String {
     error.to_string().replace('\n', "; ")
 }
 
-/// Why a rule's cases did not run: its load error, on one line, and for a rule
-/// hakkiri cannot run, a word that its cases did not run at all.
+/// Why a rule's cases did not run: its load error, on one line.
+/// For a rule hakkiri cannot run, the text starts with a note that its cases
+/// did not run at all.
 fn not_run(error: &LoadError) -> String {
     if error.is_unrunnable() {
         format!("its cases did not run: {}", one_line(error))
@@ -364,9 +370,9 @@ impl Runner {
                 let Some(plan) = project.plan(&name) else {
                     return Ok(Vec::new());
                 };
-                // A case reads as `check` reads a selected file: a `formats`
-                // entry, then the reader of its language, then what
-                // `on_unknown` says.
+                // A case reads as `check` reads a selected file: first a
+                // `formats` entry, then the reader of its language, then the
+                // `on_unknown` setting.
                 let mapped = project.mapped_language(&name);
                 let language = match mapped.or(known) {
                     Some(language) => language,
@@ -429,14 +435,18 @@ impl Runner {
     /// gives them.
     ///
     /// Under a package of the project config, the style is the first folder
-    /// below the package, and the folders after it join the name.
-    /// Elsewhere the style is the folder that holds the file, as Vale names an
-    /// isolated rule.
+    /// below the package.
+    /// The folders after it join the name.
+    /// Elsewhere the style is the folder that contains the file, as Vale does
+    /// for an isolated rule.
+    ///
     /// The path is made absolute with symlinks left alone, so a style folder
     /// that is a link keeps the name of the link.
+    ///
     /// A folder above the file is the package when its real path is one of the
-    /// config's, which are real paths, so a project reached through a link
-    /// names its rules as `check` does.
+    /// config's.
+    /// Those are real paths, so a project reached through a link gets the same
+    /// rule names as under `check`.
     ///
     /// # Errors
     ///
@@ -492,8 +502,9 @@ impl Runner {
             .map_err(|error| not_run(&error))
     }
 
-    /// The package folders a rule looks its parent up in: those of the project
-    /// config, and the rule's own package when the config does not name it.
+    /// The package folders a rule looks its parent up in.
+    /// Those are the folders of the project config, and the rule's own package
+    /// when the config does not list it.
     fn search(&mut self, package: &Path) -> Vec<PathBuf> {
         let mut search = self.packages();
         if !search.iter().any(|known| known == package) {
@@ -503,8 +514,10 @@ impl Runner {
     }
 }
 
-/// `tree`, or why a case with it cannot run: its front matter is no YAML, TOML
-/// or JSON that its parser reads, which fails a file under `check`.
+/// `tree`, or why a case with it cannot run.
+/// A case cannot run when its front matter is not YAML, TOML or JSON that its
+/// parser reads.
+/// `check` fails a file for the same reason.
 fn readable(tree: hakkiri::Tree) -> Result<hakkiri::Tree, String> {
     match tree.front_matter_fault {
         Some(fault) => Err(format!("front matter: {fault}")),

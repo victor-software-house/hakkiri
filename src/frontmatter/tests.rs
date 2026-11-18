@@ -1,7 +1,7 @@
 //! Tests for the string values of front matter: which entries are text, and
 //! where the text lies in the file.
 //!
-//! `tests/fixtures/front-matter/cases` holds one file for each case, and
+//! `tests/fixtures/front-matter/cases` has one file for each case, and
 //! `cases_report_their_block_values_fault_and_body` snapshots what each gives.
 
 use std::fmt::Write as _;
@@ -27,7 +27,7 @@ fn pair(key: &str, text: &str) -> (String, String) {
     (key.to_owned(), text.to_owned())
 }
 
-/// The line of the file that holds byte `at`, counted from 1.
+/// The line of the file that contains byte `at`, counted from 1.
 fn line_of(source: &str, at: usize) -> usize {
     source
         .get(..at)
@@ -35,9 +35,10 @@ fn line_of(source: &str, at: usize) -> usize {
         + 1
 }
 
-/// What the front matter of `source` gives: the lines of its block, the label
-/// and text of each value, the fault of the block, and the line where the body
-/// starts.
+/// What the front matter of `source` gives.
+/// It is the lines of its block, the label and text of each value, and the
+/// fault of the block.
+/// It also gives the line where the body starts.
 fn report(source: &str) -> String {
     let mut report = String::new();
     match span(source) {

@@ -1,17 +1,21 @@
 //! Comment controls: the scenarios of the comment-controls change.
 //!
-//! `tests/fixtures/comment-controls` holds one package of twelve rules
-//! (`styles`), 23 Markdown files and one MDX file (`text`, with `.fixture`
-//! after the extension), two Markdown files where Vale places a comment
-//! wrongly (`differences`), and one config for each tool: `vale/all.ini` and
-//! `.ctl/all.yaml`.
-//! Each paragraph of a file holds `very`, `really` and `good`, which the
-//! rules flag by scope (text, sentence, paragraph, heading, table, link,
-//! emphasis, strong and raw), so the alerts that a comment leaves show which
-//! of them it turned off.
-//! `vale.tsv` holds one row for each alert Vale gave on the files: the config,
-//! the file, the line, the first and last column, the level, the rule, the
-//! message and the matched text.
+//! `tests/fixtures/comment-controls` has these files:
+//!
+//! - one package of twelve rules (`styles`)
+//! - 23 Markdown files and one Markdown with components (MDX) file (`text`,
+//!   with `.fixture` after the extension)
+//! - two Markdown files where Vale places a comment wrongly (`differences`)
+//! - one config for each tool: `vale/all.ini` and `.ctl/all.yaml`
+//!
+//! Each paragraph of a file has `very`, `really` and `good`.
+//! The rules flag them by scope (text, sentence, paragraph, heading, table,
+//! link, emphasis, strong and raw).
+//! So the alerts that a comment leaves show which of them it turned off.
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files.
+//! A row lists the config, the file, the line, the first and last column, the
+//! level, the rule, the message and the matched text.
 //! The rows come from Vale at `66bbb85`, run from the fixture folder as
 //! `vale --config=vale/all.ini --output=JSON text differences`.
 
@@ -161,8 +165,8 @@ fn project<'a>(suite: &'a Suite, name: &str, hakkiri: bool) -> Result<Root<'a>, 
     Ok(root)
 }
 
-/// `text` with each comment that Vale reads written as hakkiri writes it, in
-/// the HTML form of a Markdown file and the `{/* */}` form of an MDX file.
+/// `text` with each comment that Vale reads written as hakkiri writes it.
+/// A Markdown file uses the HTML form, and an MDX file the `{/* */}` form.
 fn hakkiri_form(text: &str) -> String {
     let mut lines: Vec<String> = text
         .lines()
@@ -229,8 +233,8 @@ fn every_file_gives_the_alerts_vale_gives() -> TestResult {
     Ok(())
 }
 
-/// The row of an alert of a rule of the fixture, whose message is the rule's
-/// name, a space and the matched text in quotes.
+/// The row of an alert for a fixture rule.
+/// Its message is the rule's name, a space and the matched text in quotes.
 fn row(file: &str, line: usize, (first, last): (usize, usize), rule: &str, matched: &str) -> Row {
     let name = rule.rsplit('.').next().unwrap_or(rule);
     (
@@ -318,11 +322,13 @@ fn vale_places_a_comment_wrongly_where_hakkiri_places_it_right() -> TestResult {
     let only_vale: Vec<_> = vale.difference(&ours).cloned().collect();
     let only_ours: Vec<_> = ours.difference(&vale).cloned().collect();
     // Vale takes the place of a real `vale off` comment from the text of a
-    // multi-line code span that holds the same words, and hides the alerts
-    // between them: `D2 very` on line 2 of `d1.md`.
+    // multi-line code span.
+    // That span has the same words.
+    // Vale hides the alerts between them: `D2 very` on line 2 of `d1.md`.
     let hidden = |rule: &str| row("differences/d1.md", 2, (9, 12), rule, "very");
-    // Vale puts the alert of a strong element that holds a comment on the
-    // comment: columns 16 to 19 of `d2.md`, where `D6 very` stands at 46 to 49.
+    // Vale puts the alert of a strong element that contains a comment on the
+    // comment.
+    // That is columns 16 to 19 of `d2.md`, where `D6 very` stands at 46 to 49.
     assert_eq!(
         only_vale,
         [row("differences/d2.md", 1, (16, 19), "Team.Strong", "very")],
@@ -348,7 +354,7 @@ fn vale_places_a_comment_wrongly_where_hakkiri_places_it_right() -> TestResult {
 /// A rule that flags `very`, and one that flags `good`.
 const FILLER: &str = "extends: existence\nmessage: \"Remove '%s'.\"\nlevel: warning\nscope: text\nignorecase: true\ntokens:\n  - very\n";
 
-/// A project with the style `Team` that holds the rule `Filler`, and `a.md`.
+/// A project with the style `Team` that has the rule `Filler`, and `a.md`.
 fn small<'a>(suite: &'a Suite, name: &str, text: &str) -> Root<'a> {
     let root = suite.scenario(name);
     root.file("styles/Team/Filler.yml", FILLER);

@@ -36,9 +36,9 @@ impl Model {
     /// Cuts `text` into sentences, as [`Model::split`] does, where each of the
     /// byte ranges `code`, in text order, reads a code span.
     ///
-    /// A code span is a word with no letter of its own, so a period after it
-    /// ends a sentence, as after any word, and it can begin one, however the
-    /// text before it ends.
+    /// A code span is a word with no letter of its own.
+    /// A period after it ends a sentence, as after any word.
+    /// The span can also begin a sentence, however the text before it ends.
     #[must_use]
     pub fn split_code(&self, text: &str, code: &[Range<usize>]) -> Vec<Range<usize>> {
         let tokens = token::tokens(text, code);

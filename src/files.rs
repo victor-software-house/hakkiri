@@ -40,15 +40,16 @@ pub(crate) struct Job<'a> {
 }
 
 /// Why a selected file that no reader reads is not linted, when `on_unknown`
-/// says it is not read as text.
+/// does not make it plain text.
 const UNKNOWN: &str = "no reader reads this file, so it is not linted: map it in `formats`";
 
 /// How many bytes of a file decide whether it is binary.
 const SNIFF: u64 = 8192;
 
-/// Whether the file at `path` is binary: it holds a NUL byte in its first
-/// 8192 bytes, as ripgrep and typos judge it. A file that cannot be read is not
-/// binary here, and the run reports the failure when it reads the file.
+/// Whether the file at `path` is binary: it has a null (NUL) byte in its first
+/// 8192 bytes, as ripgrep and typos judge it.
+/// A file that cannot be read is not binary here, and the run reports the
+/// failure when it reads the file.
 fn is_binary(path: &Path) -> bool {
     let Ok(file) = fs::File::open(path) else {
         return false;
@@ -74,8 +75,9 @@ fn head(path: &Path) -> Vec<u8> {
     head
 }
 
-/// The langdex language of a file: the one its path `relative` to the project
-/// root gives, else the one the first line of `head` names as its interpreter.
+/// The langdex language of a file.
+/// It is the one its path `relative` to the project root gives.
+/// Else it is the one the interpreter on the first line of `head` gives.
 pub(crate) fn file_language(
     relative: &str,
     head: impl FnOnce() -> Vec<u8>,
@@ -83,7 +85,7 @@ pub(crate) fn file_language(
     langdex::by_path(relative).or_else(|| langdex::by_first_line(&String::from_utf8_lossy(&head())))
 }
 
-/// The languages of a file for the scopes of its rules: its own, and its
+/// The languages that decide the scopes of a file's rules: its own, and its
 /// reader's when `mapped`, a `formats` entry, chose the reader.
 pub(crate) fn languages_of(
     file: Option<&'static langdex::Language>,
@@ -126,8 +128,9 @@ struct Finder<'a> {
     failures: Vec<Failure>,
 }
 
-/// The path as a report prints it: no `.` part unless that is all there is,
-/// `/` between the parts, and relative to `current` when it lies inside it.
+/// The path as a report prints it: no `.` part unless that is all there is, and
+/// `/` between the parts.
+/// It is relative to `current` when it lies inside it.
 fn display(path: &Path, current: Option<&Path>) -> String {
     let relative = current
         .and_then(|current| path.strip_prefix(current).ok())
@@ -149,15 +152,20 @@ impl Finder<'_> {
     /// Lints `file` when a glob selects it and a reader reads it.
     ///
     /// The reader is the one a `formats` entry gives, else the one of the
-    /// file's language. The language is the one its path names, else the one of
-    /// the interpreter on its first line. A selected file that no reader reads
-    /// is plain text, unless `on_unknown` says otherwise, and a plain-text file
-    /// that holds a NUL byte is binary and skipped, with no message.
+    /// file's language.
+    /// The language is the one its path gives, else the one of the interpreter
+    /// on its first line.
+    ///
+    /// A selected file that no reader reads is plain text, unless `on_unknown`
+    /// is set to something else.
+    /// A plain-text file with a NUL byte is binary and skipped, with no
+    /// message.
     ///
     /// The job's languages are the file's own, and its reader's when `formats`
-    /// chose the reader. The tree records the reader, and a scope may name
-    /// either language, so `text.md` selects text in a `.txt` file that
-    /// `formats` maps to `md`, and `text.txt` still does.
+    /// chose the reader.
+    /// The tree records the reader, and a scope may use either language.
+    /// So `text.md` selects text in a `.txt` file that `formats` maps to `md`,
+    /// and `text.txt` still does.
     fn file(&mut self, file: &Path, named: bool) {
         let path = display(file, self.current.as_deref());
         let Some(relative) = self.project.relative(file) else {
@@ -217,10 +225,11 @@ impl Finder<'_> {
         }
     }
 
-    /// Walks the directory `directory` in name order, leaving alone what
-    /// [`Finder::skips`] names and, unless the run reads them, the files and
-    /// folders that `.gitignore`, `.git/info/exclude` and the global git
-    /// excludes ignore.
+    /// Walks the directory `directory` in name order.
+    /// It leaves alone what [`Finder::skips`] matches.
+    /// Unless the run reads them, it also leaves alone the files and folders
+    /// that `.gitignore`, `.git/info/exclude` and the global git excludes
+    /// ignore.
     fn walk(&mut self, directory: &Path) {
         let root = self.project.root().to_path_buf();
         let packages = self.project.packages.clone();
@@ -265,9 +274,10 @@ impl Finder<'_> {
     }
 }
 
-/// Whether a walk leaves the directory `path` alone: `node_modules`, `.git`, a
-/// folder of a package, or a folder that is neither under the project `root`
-/// nor on the way to it.
+/// Whether a walk leaves the directory `path` alone.
+/// It does for `node_modules`, `.git`, and a folder of a package.
+/// It also does for a folder that is neither under the project `root` nor on
+/// the way to it.
 fn skips(root: &Path, packages: &[PathBuf], path: &Path) -> bool {
     path.file_name().is_some_and(is_skipped)
         || fs::canonicalize(path)
@@ -282,7 +292,7 @@ pub(crate) struct Found<'a> {
     pub(crate) failures: Vec<Failure>,
     /// One line for each path given that lies outside the project root.
     pub(crate) warnings: Vec<String>,
-    /// Whether any path given lies under the project root, or holds it.
+    /// Whether any path given lies under the project root, or contains it.
     pub(crate) reached: bool,
 }
 

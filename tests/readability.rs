@@ -69,8 +69,9 @@ fn scores_match_prose() -> TestResult {
             "{id} characters"
         );
         if counts.sentences.to_string() != *sentences {
-            // The splitter cuts the text apart from prose, which the design
-            // lists as a risk: every score but the word counts then differs.
+            // The splitter cuts the text apart from prose.
+            // The design lists that as a risk: every score but the word counts
+            // then differs.
             eprintln!("{id}: {} sentences, prose {sentences}", counts.sentences);
             continue;
         }

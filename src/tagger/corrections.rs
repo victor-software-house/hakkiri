@@ -1,10 +1,13 @@
 //! Corrections to the tags of one sentence, made after the model has tagged it.
 //!
-//! The model reads UD English EWT, a corpus of web text.
+//! The model learned from a corpus of web text, the English Web Treebank (EWT)
+//! of Universal Dependencies (UD).
 //! On the prose of our own documents it is wrong in a few cases that repeat.
-//! Each correction below is one rule, with the reason for it, and none is a
-//! second model. The rules read the words and the tags of the sentence only, so
-//! a word the model decides is never fed back into its context.
+//!
+//! Each correction below is one rule, with the reason for it.
+//! None is a second model.
+//! The rules read the words and the tags of the sentence only, so a word the
+//! model decides is never fed back into its context.
 
 /// The tags of a noun, which a possessive `'s` or a verb can follow.
 const NOUNS: [&str; 4] = ["NN", "NNS", "NNP", "NNPS"];
@@ -26,13 +29,16 @@ const FUNCTION_WORDS: [&str; 18] = [
 /// The units of size that stay as the model tags them, `MB` among them.
 const UNITS: [&str; 5] = ["KB", "MB", "GB", "TB", "PB"];
 
-/// The modals that RFC 2119 states a requirement with, as the model never reads
-/// them written in capitals: it reads `SHALL` as a noun, a verb or `TO`.
+/// The modals that RFC 2119 uses to state a requirement.
+/// The model never reads them in capitals as modals: it reads `SHALL` as a
+/// noun, a verb or `TO`.
 const MODALS: [&str; 6] = ["SHALL", "MUST", "MAY", "SHOULD", "WILL", "CAN"];
 
 /// The forms of the verbs of saying and thinking that prose never uses as a
-/// noun, so a noun tag on one is the model reading a compound.
-/// On UD English GUM, dev and test, each of them is a verb at every use.
+/// noun.
+/// A noun tag on one is the model reading a compound.
+/// In the dev and test sets of the Georgetown University Multilayer (GUM)
+/// corpus, each of them is a verb at every use.
 const NEVER_NOUNS: [&str; 16] = [
     "say",
     "says",
@@ -76,24 +82,26 @@ const PREPOSITIONS: [&str; 33] = [
     "via", "upon", "near", "toward", "towards", "beyond", "behind", "beside", "off", "out", "to",
 ];
 
-/// The tags of the words a noun phrase holds between its determiner and its
-/// head.
+/// The tags of the words a noun phrase has between its determiner and its head.
 const MODIFIERS: [&str; 8] = ["NN", "NNS", "NNP", "NNPS", "JJ", "CD", "POS", "VBG"];
 
 /// The tags of the words that can be the subject of a verb of saying.
 const SUBJECTS: [&str; 5] = ["NN", "NNS", "NNP", "NNPS", "JJ"];
 
 /// Words that technical prose uses as nouns after a determiner, a possessive or
-/// an adjective, where the model reads one other part of speech.
+/// an adjective, where the model reads some other part of speech.
 /// On nine repositories a reader found each one a noun in all 163 sampled
-/// places after a determiner, so none has a verb or an adjective to lose.
-/// `split` and `round` are not here: `the split DNS` and `the round trip` read
-/// as adjectives in a fifth of their places after a determiner.
+/// places after a determiner.
+/// So none has a verb or an adjective to lose.
+///
+/// `split` and `round` are not here.
+/// After a determiner, `the split DNS` and `the round trip` read as adjectives
+/// in a fifth of the places.
 const NOUNS_AFTER_DETERMINER: [&str; 4] = ["check", "prompt", "thinking", "fade"];
 
 /// Words that fill the slot of a noun before `pull request` in a title, as in
-/// `the load split pull request`, where the model reads a past tense, an
-/// adverb or an adjective.
+/// `the load split pull request`.
+/// There the model reads a past tense, an adverb or an adjective.
 const NOUNS_IN_TITLE: [&str; 3] = ["prompt", "round", "split"];
 
 /// Words that end a compound of singular nouns as a base form, as in `the peer
@@ -102,7 +110,7 @@ const NOUNS_ENDING_COMPOUND: [&str; 1] = ["check"];
 
 /// The tags of the words after the corrections.
 ///
-/// `tags` holds the model's tag of each word, and a correction replaces it.
+/// `tags` has the model's tag of each word, and a correction replaces it.
 /// A rule that reads the tag before a word reads the corrected tag.
 pub(super) fn apply(words: &[&str], tags: &mut [&str]) {
     let mut before = "";
@@ -126,8 +134,8 @@ pub(super) fn apply(words: &[&str], tags: &mut [&str]) {
 /// Reads a plural noun that starts a sentence before a determiner as the verb.
 ///
 /// The model reads `Takes` in `Takes every waiting ask` as a plural noun.
-/// A noun that starts a sentence is not followed by a determiner, and the doc
-/// comment of a function starts with the verb that has no subject.
+/// A noun that starts a sentence is not followed by a determiner.
+/// The doc comment of a function starts with a verb that has no subject.
 fn verb_at_start(words: &[&str], tags: &mut [&str]) {
     let relative = words
         .get(1)
@@ -207,19 +215,25 @@ fn pull_requests(words: &[&str], tags: &mut [&str]) {
 }
 
 /// Reads a word of [`NOUNS_AFTER_DETERMINER`], [`NOUNS_IN_TITLE`] or
-/// [`NOUNS_ENDING_COMPOUND`] as the noun it is when a noun phrase holds it.
+/// [`NOUNS_ENDING_COMPOUND`] as the noun it is when a noun phrase contains it.
 ///
-/// The model reads `split` in `the load split pull request` as a past tense,
-/// `round` in `the mask round pull request` as an adverb, and `check` in `the
-/// peer user id check` as a verb, since the corpus it learned from uses these
-/// words as one other part of speech.
+/// The model reads `split` in `the load split pull request` as a past tense.
+/// It reads `round` in `the mask round pull request` as an adverb.
+/// It reads `check` in `the peer user id check` as a verb.
+/// The corpus it learned from uses these words as some other part of speech.
+///
 /// A word of the first list is a noun after a determiner, a possessive or an
-/// adjective, unless it is a participle after an adjective, as in `so stupid
-/// thinking`.
+/// adjective.
+/// It is not a noun when it is a participle after an adjective, as in `so
+/// stupid thinking`.
+///
 /// A word of the second is a noun after a noun, when the nouns after it run up
-/// to `pull request`, the head of the title of a pull request.
+/// to `pull request`.
+/// That is the head of the title of a pull request.
+///
 /// A word of the third is a noun as a base form after two singular nouns with
-/// no noun after it, as no singular noun takes it as its verb.
+/// no noun after it.
+/// No singular noun takes it as its verb.
 fn nouns_of_technical_prose(words: &[&str], tags: &mut [&str]) {
     let noun_at = |tags: &[&str], index: Option<usize>| {
         index
@@ -276,8 +290,9 @@ fn heads_pull_request(words: &[&str], tags: &[&str], index: usize) -> bool {
 ///
 /// The model reads `say` in `The docs say so.` as a noun, as it reads a verb
 /// after a compound.
-/// These forms are no nouns, so a noun tag on one is wrong, unless a
-/// determiner, a number, a possessive or a preposition comes before it.
+/// These forms are no nouns, so a noun tag on one is wrong.
+/// The exception is a determiner, a number, a possessive or a preposition
+/// before it.
 fn verbs_of_saying(words: &[&str], tags: &mut [&str]) {
     for index in 1..tags.len() {
         let (Some(word), Some(&before)) = (words.get(index), tags.get(index - 1)) else {
@@ -333,18 +348,22 @@ fn subjects_of_verbs_of_saying(words: &[&str], tags: &mut [&str]) {
     }
 }
 
-/// Reads a verb of asking or wanting, and the past tense of one of saying, as
-/// the noun, the verb or the participle its place makes it.
+/// Reads a verb of asking or wanting as the noun, the verb or the participle
+/// its place makes it.
+/// It does the same for the past tense of a verb of saying.
 ///
 /// The model reads `asks` in `A request line asks for the rows` and in `the
-/// asks that wait` the same way, as a noun or as a verb by the words around
-/// it alone, and `asked` in `a batch a request asked for` as a participle.
+/// asks that wait` the same way.
+/// It picks a noun or a verb from the words around it alone.
+/// It reads `asked` in `a batch a request asked for` as a participle.
+///
 /// A clause that follows `asks` like a relative clause makes it a noun.
-/// A noun phrase that starts with a determiner and is the object of a
-/// preposition, of a gerund or of a first-word imperative ends in a noun.
-/// So a verb tag on `asks` there is wrong, and a past tense is a participle.
-/// A noun after a noun in any other place is the verb of the clause, and a
-/// participle there is a past tense.
+/// So does a noun phrase that starts with a determiner and is the object of a
+/// preposition, a gerund or a first-word imperative.
+/// A verb tag on `asks` there is wrong, and a past tense is a participle.
+///
+/// In any other place, a noun after a noun is the verb of the clause.
+/// A participle there is a past tense.
 fn asking_in_noun_phrases(words: &[&str], tags: &mut [&str]) {
     for index in 1..tags.len() {
         let Some(word) = words.get(index) else {
@@ -417,8 +436,8 @@ fn after_determiner(tags: &[&str], index: usize) -> bool {
     matches!(tag_at(1), "DT" | "PRP$") || (tag_at(1) == "VBG" && matches!(tag_at(2), "DT" | "PRP$"))
 }
 
-/// The tag of the past tense of a verb of saying at `index`, when the model's
-/// tag is wrong.
+/// The corrected tag of the word at `index`, a past tense of a verb of saying.
+/// It returns a tag only when the model's tag is wrong.
 fn reading_of_past(words: &[&str], tags: &[&str], index: usize) -> Option<&'static str> {
     let tag = *tags.get(index)?;
     let before = *tags.get(index.checked_sub(1)?)?;
@@ -443,12 +462,13 @@ fn reading_of_past(words: &[&str], tags: &[&str], index: usize) -> Option<&'stat
     }
 }
 
-/// Whether what follows the word at `index` is what follows a noun: a relative
-/// clause with or without `that`, a possessive ending, or a noun phrase joined
-/// by `and`.
+/// Whether the word at `index` has what a noun has after it.
+/// That is a relative clause with or without `that`, a possessive ending, or a
+/// noun phrase joined by `and`.
 ///
-/// `The asks that wait` and `the asks it leaves` hold a clause that a verb of
-/// asking, which takes an object or a `that` clause with a subject, never has.
+/// `The asks that wait` and `the asks it leaves` contain a clause.
+/// A verb of asking never has one: it takes an object or a `that` clause with
+/// a subject.
 fn followed_by_clause_of_noun(words: &[&str], tags: &[&str], index: usize) -> bool {
     let at = |offset: usize| tags.get(index + offset).copied().unwrap_or_default();
     let word_at = |offset: usize| words.get(index + offset).copied().unwrap_or_default();
@@ -603,11 +623,15 @@ fn corrected(word: &str, before: &str, model: &str) -> Option<&'static str> {
 ///
 /// The model reads `reads` in `The freshness harness reads stdout.` as a plural
 /// noun, as it reads a verb that ends in `s` after a compound of nouns.
-/// The noun before it ends a noun phrase, and a determiner, a possessive
-/// pronoun, a number or a pronoun after it starts the object.
+/// The noun before it ends a noun phrase.
+/// A determiner, a possessive pronoun, a number or a pronoun after it starts
+/// the object.
+///
 /// A noun, an adjective or a preposition other than `of` after it starts the
-/// object or a phrase only when no other word of the sentence is a verb.
+/// object or a phrase.
+/// That applies only when no other word of the sentence is a verb.
 /// A plural noun that this rule turned into a verb counts as one.
+///
 /// A compound noun with a plural head, such as `layout rules of the widgets`,
 /// reads the same.
 fn verbs_after_noun_phrases(words: &[&str], tags: &mut [&str]) {

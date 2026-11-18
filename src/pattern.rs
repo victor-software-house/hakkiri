@@ -16,12 +16,12 @@ const SIZE_LIMIT: usize = 64 << 20;
 pub(crate) struct Captured {
     /// The bytes of the whole match.
     pub(crate) whole: Range<usize>,
-    /// The bytes of each capture group that matched and holds text, in group
+    /// The bytes of each capture group that matched and has text, in group
     /// order.
     pub(crate) groups: Vec<Range<usize>>,
 }
 
-/// What the first capture group of a pattern holds in one match.
+/// What the first capture group of a pattern contains in one match.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) enum FirstGroup {
     /// The pattern has no capture group.
@@ -32,7 +32,7 @@ pub(crate) enum FirstGroup {
     At(Range<usize>),
 }
 
-/// One match that holds text, and the first capture group in it.
+/// One match that has text, and the first capture group in it.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) struct Replaceable {
     /// The bytes of the whole match.
@@ -238,8 +238,8 @@ impl Pattern {
         Ok(found)
     }
 
-    /// Each match as the number in the name of its first group that starts
-    /// with `prefix` and sits in the match, and the byte range of that group.
+    /// Each match with the number and byte range of its first group.
+    /// The group must sit in the match, and its name must start with `prefix`.
     ///
     /// A group named `swap_3` with the prefix `swap_` has the number 3.
     ///
@@ -309,7 +309,7 @@ impl Pattern {
         Ok(found)
     }
 
-    /// Each match that holds text, with the first capture group in it.
+    /// Each match that has text, with the first capture group in it.
     ///
     /// A match of no bytes is left out.
     ///
@@ -374,8 +374,9 @@ impl Pattern {
     }
 }
 
-/// The match `whole`, with what its first group `first` holds, or `None` for a
-/// match of no bytes. `grouped` says whether the pattern has a capture group.
+/// The match `whole`, with what its first group `first` contains, or `None` for
+/// a match of no bytes.
+/// `grouped` is true when the pattern has a capture group.
 fn replaceable(
     grouped: bool,
     whole: Option<Range<usize>>,

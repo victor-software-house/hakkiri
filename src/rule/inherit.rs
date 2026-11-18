@@ -1,14 +1,19 @@
 //! Rule inheritance, as Vale 3.26.0 reads it.
 //!
-//! A rule whose `extends` holds a dot names another rule instead of a check
-//! type. The child starts from the parent's fields and lays its own on top:
-//! a bare key replaces the parent's value, `key+` adds to a list or a mapping,
-//! and `key-` removes entries from one. The parent's `tests` never carry over.
+//! A rule whose `extends` contains a dot inherits from another rule instead of
+//! a check type.
+//! The child starts from the parent's fields and lays its own on top:
 //!
-//! [`merged`] resolves the chain and writes the result as JSON text, which is
-//! valid YAML, so the rule reads through the same reader as any other file.
-//! It lays a config's parameters over the fields last, as a bare key replaces
-//! a field of a rule.
+//! - a bare key replaces the parent's value;
+//! - `key+` adds to a list or a mapping;
+//! - `key-` removes entries from one.
+//!
+//! The parent's `tests` never carry over.
+//!
+//! [`merged`] resolves the chain and writes the result as JSON text.
+//! JSON is valid YAML, so the rule reads through the same reader as any other
+//! file. It lays a config's parameters over the fields last, as a bare key
+//! replaces a field of a rule.
 
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
@@ -20,11 +25,11 @@ use serde::Deserialize;
 
 use super::{LoadError, LoadProblem, Param};
 
-/// How many rules a chain may hold before it is taken for a cycle.
+/// How many rules a chain may contain before it is taken for a cycle.
 const MAX_DEPTH: usize = 10;
 
-/// Whether an `extends` value names a rule: a check type is one lowercase
-/// word, and a rule name holds at least one dot.
+/// Whether an `extends` value is a rule name: a check type is one lowercase
+/// word, and a rule name has at least one dot.
 pub(super) fn is_rule_ref(extends: &str) -> bool {
     extends.contains('.')
 }
@@ -64,7 +69,7 @@ impl Node {
     ///
     /// # Errors
     ///
-    /// A number JSON cannot hold: not finite.
+    /// A number JSON cannot represent: not finite.
     fn write(&self, out: &mut String) -> Result<(), String> {
         match self {
             Self::Null(()) => out.push_str("null"),
@@ -73,7 +78,7 @@ impl Node {
             Self::Float(value) if value.is_finite() => {
                 let _ = write!(out, "{value:?}");
             }
-            Self::Float(value) => return Err(format!("`{value}` is not a number a rule can hold")),
+            Self::Float(value) => return Err(format!("`{value}` is not a finite number")),
             Self::Text(value) => write_text(value, out),
             Self::List(items) => {
                 out.push('[');
@@ -138,7 +143,7 @@ fn problem(file: &str, field: &str, message: impl Into<String>) -> LoadProblem {
     }
 }
 
-/// The fields of the rule file `text`, named `file` in errors.
+/// The fields of the rule file `text`, called `file` in errors.
 fn parse(file: &str, text: &str) -> Result<Fields, LoadProblem> {
     match Input::new(file, text).parse::<Node>() {
         Ok(Node::Map(fields)) => Ok(fields),
@@ -194,17 +199,20 @@ impl From<&Param> for Node {
     }
 }
 
-/// `text`, the rule file `file`, with its chain of parents resolved against
-/// the package folders in `search`, and each of `params` laid over a field of
-/// the rule, as JSON text.
+/// `text`, the rule file `file`, as JSON text.
+/// Its parents are resolved against the package folders in `search`, and each
+/// of `params` is laid over a field of the rule.
 ///
 /// # Errors
 ///
-/// The faults Vale refuses.
-/// They are a parent that is missing, a cycle or a chain over ten rules, and
-/// a `Vale.` parent.
-/// They are also a key written both bare and with `+` or `-`, and an edit of
-/// a field the parent lacks or of a value that is no list or mapping.
+/// The faults Vale rejects:
+///
+/// - a parent that is missing;
+/// - a cycle or a chain over ten rules;
+/// - a `Vale.` parent;
+/// - a key written both bare and with `+` or `-`;
+/// - an edit of a field the parent lacks, or of a value that is no list or
+///   mapping.
 pub(super) fn merged(
     file: &str,
     text: &str,
@@ -224,7 +232,7 @@ pub(super) fn merged(
     Ok(out)
 }
 
-/// `fields`, the rule file `file`, with the parent it names laid underneath,
+/// `fields`, the rule file `file`, with the parent it extends laid underneath,
 /// and that parent's own.
 fn flatten(
     fields: Fields,

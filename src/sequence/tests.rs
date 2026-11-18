@@ -1,19 +1,24 @@
 //! Tests for the sequence walk: a comparison with Vale.
 //!
-//! `tests/fixtures/sequence/rules` holds one rule file for each shape of
-//! token the check reads, and `inputs.txt` the texts to read: hand-written
-//! headings and sentences, and every third line of "The Adventures of Sherlock
-//! Holmes", a public domain text. `vale.tsv` holds a rule name, a text, the
-//! text of one alert and its message, for each alert Vale gave, in order. The
-//! rows come from Vale at `66bbb85` run in Go on each text as one sentence,
-//! with prose `b33e60d` tagging it.
-//! The walk reads the tags of the model alone here, since the corrections that
-//! hakkiri makes after the model would change the tags that Vale walked.
+//! `tests/fixtures/sequence/rules` contains one rule file for each shape of
+//! token the check reads.
+//! `inputs.txt` contains the texts to read: hand-written headings and
+//! sentences, and every third line of "The Adventures of Sherlock Holmes", a
+//! public domain text.
 //!
-//! Vale cuts each text again with prose's segmenter and tags each part apart,
-//! where hakkiri tags the sentence its own splitter gave whole. `inputs.txt`
-//! holds the texts that the segmenter reads as one sentence, so both tag the
-//! same words.
+//! `vale.tsv` has one row for each alert Vale gave, in order: a rule name, a
+//! text, the text of the alert and its message.
+//! The rows come from Vale at `66bbb85` run in Go on each text as one
+//! sentence, with prose `b33e60d` tagging it.
+//!
+//! The walk reads the tags of the model alone here.
+//! Corrections that hakkiri makes after the model would change the tags that
+//! Vale walked.
+//!
+//! Vale cuts each text again with prose's segmenter and tags each part apart.
+//! hakkiri tags the sentence its own splitter gave, whole.
+//! `inputs.txt` contains the texts that the segmenter reads as one sentence,
+//! so both tag the same words.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -111,9 +116,12 @@ fn walks_the_tokens_as_vale_does() -> TestResult {
 }
 
 /// The rules of `tests/fixtures/sequence-verbs` fill indexed verbs in the
-/// message: two `ProseStyle` rules from v0.0.14, and three that take the values
-/// out of order, after an index and mixed with plain `%s`. Vale gives each
-/// message through Go's `Sprintf`, so the rows are the messages it prints.
+/// message.
+/// Two are `ProseStyle` rules from v0.0.14.
+/// Three take the values out of order, after an index and mixed with plain
+/// `%s`.
+/// Vale builds each message with Go's `Sprintf`, so the rows are the messages
+/// it prints.
 #[test]
 fn fills_indexed_verbs_as_vale_does() -> TestResult {
     let (with_alerts, wrong) = compare("sequence-verbs")?;

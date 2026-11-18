@@ -1,10 +1,12 @@
 //! A rule's `scope`: which nodes of the tree a rule reads.
 //!
 //! A scope is a list of items, and a node is read when any item selects it.
-//! An item is parts joined by `&`, and every part must hold.
-//! A part is a dotted scope name, `~` before it to leave out an element, and a
-//! language as its last piece, by any name, alias or extension langdex holds,
-//! to limit it to nodes in that language.
+//! An item is parts joined by `&`, and every part must match.
+//!
+//! A part is a dotted scope name.
+//! A `~` before it leaves out an element.
+//! Its last piece can be a language, by any name, alias or extension in
+//! langdex. The language limits the part to nodes in that language.
 
 use std::{error, fmt};
 
@@ -72,8 +74,8 @@ struct Part {
 }
 
 impl Part {
-    /// Whether the part holds in a node with `languages`: it names no
-    /// language, or one of the node's.
+    /// Whether the part matches a node with `languages`: it has no language, or
+    /// one of the node's.
     fn applies_to(&self, languages: &[Language]) -> bool {
         self.language
             .is_none_or(|wanted| languages.contains(&wanted))
@@ -94,8 +96,8 @@ pub struct Selector {
 
 /// Whether the dotted scope `name` is `part`, or inside it.
 ///
-/// `text` alone is the prose leaves: it does not reach the scopes below it,
-/// which are the comments.
+/// `text` alone is the prose leaves.
+/// It does not reach the scopes below it, which are the comments.
 fn named(part: &str, name: &str) -> bool {
     if part == "text" {
         return name == "text";
@@ -156,11 +158,13 @@ impl Selector {
                 let (negated, written) = written
                     .strip_prefix('~')
                     .map_or((false, written), |rest| (true, rest.trim()));
-                // A key of the front matter may be any name. So a front matter
-                // part ends in a language when its last piece names Markdown or
-                // MDX, the languages that hold front matter. Any other part
-                // ends in a language only when the whole part is no scope, and
-                // the rest of it is one.
+                // A key of the front matter may be any name.
+                // So a front matter part ends in a language when its last piece
+                // is Markdown or Markdown with embedded components (MDX).
+                // Those are the languages that have front matter.
+                //
+                // Any other part ends in a language only when the whole part is
+                // not a scope, and the rest of it is one.
                 let front =
                     written.starts_with("frontmatter.") || written.starts_with("text.frontmatter.");
                 let (named_parts, language) = if front
@@ -223,14 +227,15 @@ impl Selector {
 
     /// What a block reads, or `None` when no item selects it.
     ///
-    /// `names` are the scope names the block holds, and `languages` the
+    /// `names` are the scope names the block has, and `languages` are the
     /// languages it is in.
     /// `around` are the names of the element around the block that a part may
-    /// name beside the block's own, as `link` does in `title & link`: an item
-    /// still needs a part that names the block itself.
+    /// use beside the block's own, as `link` does in `title & link`.
+    ///
+    /// An item still needs a part that matches the block itself.
     /// The block reads as spaces the inline elements that the selecting items
-    /// leave out, such as `~link`; an item that does not select the block
-    /// leaves out nothing.
+    /// leave out, such as `~link`.
+    /// An item that does not select the block leaves out nothing.
     pub(crate) fn reads(
         &self,
         names: &[&str],
@@ -315,8 +320,8 @@ impl Alternative {
         }
         // A negated part that names the element around the block leaves the
         // block out, so `title & ~link` selects no title of a link.
-        // The names of inline elements are read as blank in a block that
-        // holds them, and only the element around a block excludes it here.
+        // The names of inline elements are read as blank in a block that has
+        // them, and only the element around a block excludes it here.
         let excluded_by_around = self.parts.iter().any(|part| {
             part.negated
                 && part.applies_to(languages)

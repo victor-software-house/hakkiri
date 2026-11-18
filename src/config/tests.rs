@@ -4,9 +4,12 @@ use std::cmp::Reverse;
 
 use super::{MAX_ALTERNATIVES, alternatives, specificity, standard_glob};
 
-/// A glob and its specificity: the parts of literal characters only, the parts
-/// of a literal character and something else, the parts that are `**`, and the
-/// literal characters of the whole glob.
+/// A glob and its specificity, which has four counts:
+///
+/// - the parts of literal characters only
+/// - the parts of a literal character and something else
+/// - the parts that are `**`
+/// - the literal characters of the whole glob
 #[test]
 fn a_glob_counts_its_parts_and_its_literal_characters() {
     for (pattern, counts) in [

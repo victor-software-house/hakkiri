@@ -61,13 +61,16 @@ pub(crate) struct Memory {
     terms: HashSet<String>,
 }
 
-/// The matches `check` finds in `text`, the next block of a file whose earlier
-/// blocks `memory` holds and whose extension, without the dot, is `extension`.
+/// The matches `check` finds in `text`, the next block of a file.
 ///
-/// `accepted` holds the exceptions of the vocabularies the file's globs name.
-/// An `existence`, `repetition`, `spelling` or `substitution` rule holds back
-/// the matches they name, besides its own exceptions, whatever it sets for
-/// `vocab` and `nonword`.
+/// `memory` stores the earlier blocks of the file.
+/// `extension` is the file's extension, without the dot.
+///
+/// `accepted` stores the exceptions of the vocabularies that the file's globs
+/// list.
+/// An `existence`, `repetition`, `spelling` or `substitution` rule also
+/// suppresses the matches they list, besides its own exceptions, whatever it
+/// sets for `vocab` and `nonword`.
 /// A `metric` or `readability` rule counts each code span as `code_span_size`
 /// words.
 ///
@@ -135,7 +138,7 @@ impl PhraseSpans {
     }
 }
 
-/// The spans of the multi-word exceptions in `content`, when `found` holds a
+/// The spans of the multi-word exceptions in `content`, when `found` has a
 /// match to check them against.
 ///
 /// Each exception is searched on its own, so two that overlap or nest both
@@ -154,7 +157,7 @@ fn phrase_spans(
     Ok(PhraseSpans::new(spans))
 }
 
-/// Whether an exception holds back the match `range`, which reads `observed`.
+/// Whether an exception suppresses the match `range`, which reads `observed`.
 fn excepted(
     exceptions: &Exceptions,
     phrases: &PhraseSpans,
@@ -170,7 +173,7 @@ fn excepted(
 }
 
 /// The spans of the multi-word terms of each of a file's accepted exceptions in
-/// `content`, when `found` holds a match to check them against.
+/// `content`, when `found` has a match to check them against.
 pub(crate) fn accepted_spans(
     accepted: &[&Exceptions],
     content: &str,
@@ -182,7 +185,7 @@ pub(crate) fn accepted_spans(
         .collect()
 }
 
-/// Whether one of a file's accepted exceptions holds back the match `range`,
+/// Whether one of a file's accepted exceptions suppresses the match `range`,
 /// which reads `observed`.
 pub(crate) fn accepted_hold(
     accepted: &[&Exceptions],
@@ -198,7 +201,7 @@ pub(crate) fn accepted_hold(
     Ok(false)
 }
 
-/// Each match of the tokens that no exception holds back and that neither
+/// Each match of the tokens that no exception suppresses and that neither
 /// starts nor ends on a code span.
 ///
 /// The pattern reads a code span as `*`, so a match runs across one when
@@ -369,8 +372,8 @@ fn first_word(content: &str) -> Option<Range<usize>> {
     Some(start..start + length)
 }
 
-/// How many matches of the tokens `existence` holds in `content`, not
-/// counting the ones an exception holds back. A match in a code span counts.
+/// How many matches of the tokens `existence` finds in `content`, not
+/// counting the ones an exception suppresses. A match in a code span counts.
 fn count_tokens(existence: &Existence, content: &str) -> Result<usize, SearchError> {
     let found = existence.pattern.find_all(content)?;
     let phrases = phrase_spans(&existence.exceptions, content, !found.is_empty())?;
@@ -425,12 +428,14 @@ fn term(conditional: &Conditional, text: &str) -> String {
 }
 
 /// Each match of `first` in `text` that the file has not defined, and no
-/// exception holds back.
+/// exception suppresses.
 ///
 /// With no group in `second`, a match of `second` in `text` defines every
-/// `first` in it. With one, the texts its groups capture in `text` are
-/// defined from here to the end of the file, and a `first` is defined when it
-/// is one of them. A match that overlaps a code span is no match of either.
+/// `first` in it.
+/// With one, the texts its groups capture in `text` are defined from here to
+/// the end of the file.
+/// A `first` is defined when it is one of them.
+/// A match that overlaps a code span is no match of either.
 fn run_conditional(
     conditional: &Conditional,
     text: &Text,
@@ -479,7 +484,7 @@ fn run_conditional(
 /// One hit for each pair that matched in `text` once both of its forms have
 /// matched in the file so far, `text` included.
 ///
-/// The hit is at the last match of the pair in `text`, and holds its text. A
+/// The hit is at the last match of the pair in `text`, and stores its text. A
 /// match that overlaps a code span is no match.
 fn run_consistency(
     consistency: &Consistency,
@@ -524,18 +529,22 @@ fn same(repetition: &Repetition, before: &str, current: &str) -> bool {
 
 /// Whether `left` and `right` are equal without regard to case, as Go's
 /// `strings.EqualFold` reads them: character by character, each by its simple
-/// case folding. Lowercasing the whole text is not that, since it gives a
-/// final `ς` for a `Σ` at the end of a word and a `σ` for one inside it, so
-/// `ΣΑΣ` and `σασ` differ.
+/// case folding.
+/// Lowercasing the whole text is not that.
+/// It gives a final `ς` for a `Σ` at the end of a word and a `σ` for one inside
+/// it, so `ΣΑΣ` and `σασ` differ.
 fn equal_fold(left: &str, right: &str) -> bool {
     left.chars().map(fold).eq(right.chars().map(fold))
 }
 
 /// The simple case folding of `character`, found as the lowercase of its
-/// uppercase when each is one character: `Σ`, `σ` and `ς` all give `σ`, and
-/// `K` of the Kelvin sign gives `k`. A character with a longer case mapping,
-/// such as `ß` or `İ`, keeps it out of that step. The dotless `ı` is the one
-/// character whose uppercase is not in its folding, so it stays as it is.
+/// uppercase when each is one character.
+/// `Σ`, `σ` and `ς` all give `σ`, and `K` of the Kelvin sign gives `k`.
+///
+/// A character with a longer case mapping, such as `ß` or `İ`, keeps it out of
+/// that step.
+/// The dotless `ı` is the one character whose uppercase is not in its folding,
+/// so it stays as it is.
 fn fold(character: char) -> char {
     fn single(mut mapped: impl Iterator<Item = char>) -> Option<char> {
         let first = mapped.next()?;
@@ -551,11 +560,13 @@ fn fold(character: char) -> char {
 /// Each match of the tokens that repeats the one before it, once the repeats
 /// of the text are over `max`.
 ///
-/// A match is compared, trimmed of spaces, with the match before it. The
-/// count of repeats goes back to 0 only after a hit, as Vale counts it. A
-/// repeat that spans more than one sentence, or that an exception holds back,
-/// is no hit. A match that overlaps a code span is no match, and it breaks the
-/// chain: the match after it has nothing before it to repeat.
+/// A match is compared, trimmed of spaces, with the match before it.
+/// The count of repeats goes back to 0 only after a hit, as Vale counts it.
+/// A repeat that spans more than one sentence, or that an exception suppresses,
+/// is no hit.
+///
+/// A match that overlaps a code span is no match, and it breaks the chain.
+/// The match after it has nothing before it to repeat.
 fn run_repetition(
     repetition: &Repetition,
     text: &Text,
@@ -644,8 +655,8 @@ fn run_capitalization(capitalization: &Capitalization, text: &Text) -> Vec<Hit> 
     }]
 }
 
-/// One hit for each run of words in `text`, a sentence, that the rule's tokens
-/// match. The message's `%s` read the words of the run.
+/// One hit for each run of words that the rule's tokens match in `text`, a
+/// sentence. The message's `%s` reads the words of the run.
 fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchError> {
     Ok(find(sequence, text)?
         .into_iter()
@@ -659,7 +670,7 @@ fn run_sequence(sequence: &Sequence, text: &Text) -> Result<Vec<Hit>, SearchErro
 }
 
 /// One hit at the start of `text` when the average grade of the text is over
-/// the rule's grade, measured apart from the rest of the file.
+/// the rule's grade. The grade is measured apart from the rest of the file.
 fn run_readability(readability: &Readability, text: &Text, code_span_size: u8) -> Vec<Hit> {
     let sized = text.code_sized(code_span_size);
     let Some(base) = variables(

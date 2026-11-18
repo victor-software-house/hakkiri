@@ -4,12 +4,14 @@ use std::time::{Duration, Instant};
 
 use super::{Parts, Replace, Text};
 
-/// A text of many segments with a code span between each pair builds in time
-/// that grows with its length, not with the product of its segments and spans.
+/// A text of many segments with a code span between each pair builds in linear
+/// time.
+/// The time grows with its length, not with the product of its segments and
+/// spans.
 #[test]
 fn many_segments_and_replacements_build_in_linear_time() {
     // One segment per line, and one code span in each line, as a paragraph of
-    // many lines holds them.
+    // many lines has them.
     let count = 100_000;
     let source = "ab `c` d\n".repeat(count);
     let (mut segments, mut replacements) = (Vec::new(), Vec::new());
@@ -39,7 +41,7 @@ fn many_segments_and_replacements_build_in_linear_time() {
 }
 
 /// A line break between two segments that sit inside one code span is no
-/// separator, and the replacement that holds them is the one found.
+/// separator, and the replacement that contains them is the one found.
 #[test]
 fn a_gap_inside_a_code_span_has_no_separator() {
     let source = "a `b\nc` d";

@@ -1,5 +1,5 @@
-//! A Vale style loads as it is: a rule may extend another rule, and a rule
-//! hakkiri cannot run is reported while the rest of its style runs.
+//! A Vale style loads as it is: a rule may extend another rule.
+//! hakkiri reports a rule it cannot run while the rest of its style runs.
 //!
 //! Each test writes a project in a temporary directory, runs the binary in it,
 //! and reads the exit status and the streams. The last tests run the three
@@ -377,7 +377,7 @@ const SCRIPT: &str =
 /// A rule hakkiri cannot run: a selector over rendered HTML.
 const DOC: &str = "extends: existence\nmessage: Doc\nscope: doc(h1)\ntokens: [alpha]\n";
 
-/// A project whose style `Kid` holds the rule `Parent`, as a warning, and the
+/// A project whose style `Kid` has the rule `Parent`, as a warning, and the
 /// rule `Cannot` from `cannot`, with `config`.
 fn cannot<'a>(suite: &'a Suite, name: &str, cannot: &str, config: &str) -> Root<'a> {
     let root = suite.scenario(name);

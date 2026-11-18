@@ -229,7 +229,7 @@ fn a_pattern_with_no_text_is_refused() {
             Rule::from_text("Team.Defined", "Team/Defined.yml", &rule(first, second, "")).err();
         let text = error.map_or_default(|error| error.to_string());
         assert!(text.contains("Team.Defined"), "{text}");
-        assert!(text.contains(&format!("`{field}` holds nothing")), "{text}");
+        assert!(text.contains(&format!("`{field}` has nothing")), "{text}");
     }
 }
 

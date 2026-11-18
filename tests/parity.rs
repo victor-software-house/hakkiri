@@ -6,8 +6,9 @@
 //! it is within 0.5. The test prints each input whose counts differ.
 //!
 //! The 10 Rust inputs are the one place hakkiri departs from Vale, by decision
-//! 16 of the rule-engine design: Vale prints no value for them, and hakkiri
-//! measures the prose of a code file's comments.
+//! 16 of the rule-engine design.
+//! Vale prints no value for them.
+//! hakkiri measures the prose of a code file's comments.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -112,7 +113,7 @@ fn flesch_kincaid_matches_vale() -> TestResult {
 }
 
 /// The Rust inputs where Vale prints no value and hakkiri gives one, because
-/// each holds a comment whose prose it measures.
+/// each has a comment whose prose it measures.
 const RUST_WITH_COMMENTS: [&str; 6] = [
     "BareURLInComment-01",
     "BareWorkItemInComment-01",

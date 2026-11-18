@@ -52,7 +52,7 @@ impl Speller {
         })
     }
 
-    /// Whether a dictionary accepts `word`, or a list holds it.
+    /// Whether a dictionary accepts `word`, or a list contains it.
     #[must_use]
     pub fn spell(&self, word: &str) -> bool {
         self.books

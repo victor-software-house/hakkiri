@@ -1,12 +1,14 @@
 //! Places where Vale splits a sentence that hakkiri keeps whole, or keeps whole
 //! what hakkiri splits: the scenarios of the `splitter-code-spans` change.
 //!
-//! `tests/fixtures/sentence-differences` holds one rule, one file for each
+//! `tests/fixtures/sentence-differences` has one rule, one file for each
 //! case (`text`, with `.fixture` after the extension), and a config for each
-//! tool. The rule marks the first character of each sentence.
-//! `vale.tsv` holds the alerts Vale gave at `66bbb85`, run as
+//! tool.
+//! The rule marks the first character of each sentence.
+//!
+//! `vale.tsv` has the alerts Vale gave at `66bbb85`, run as
 //! `vale --config=vale/all.ini --output=JSON text`.
-//! A row holds the config, the file, the line, the first and last column, the
+//! A row has the config, the file, the line, the first and last column, the
 //! level, the rule, the message and the matched text.
 
 #![expect(
@@ -102,8 +104,9 @@ fn vale_and_hakkiri_split_these_sentences_otherwise() -> TestResult {
         &[],
     )?;
     assert_eq!(result.code, 0, "{}{}", result.out, result.err);
-    // Vale reads `1.` of a numbered heading or item as a sentence, keeps a
-    // version, a decimal and a task number whole, and ends a sentence at `vs.`.
+    // Vale reads `1.` of a numbered heading or item as a sentence.
+    // It keeps a version, a decimal and a task number whole, and ends a
+    // sentence at `vs.`.
     assert_eq!(
         vale()?,
         starts(&[

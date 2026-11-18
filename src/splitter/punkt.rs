@@ -1,8 +1,8 @@
 //! Punkt's decision: does the end mark of a token end a sentence?
 //!
 //! The decision follows Kiss and Strunk, "Unsupervised Multilingual Sentence
-//! Boundary Detection" (Computational Linguistics 32(4), 2006), and reads the
-//! four tables of the [`Model`]:
+//! Boundary Detection" (Computational Linguistics 32(4), 2006).
+//! It reads the four tables of the [`Model`]:
 //!
 //! 1. abbreviations, which a period does not end a sentence after;
 //! 2. collocations, pairs a period between them does not split;
@@ -33,8 +33,8 @@ pub(super) fn ends_sentence(
 
 /// The decision for a token that ends in a period or an ellipsis.
 fn after_period(model: &Model, current: &Token<'_>, next: &Token<'_>, after_number: bool) -> bool {
-    // `vs.` sets two things against each other, so a capital or a number after
-    // it goes on with the same sentence.
+    // `vs.` sets two things against each other.
+    // A capital or a number after it stays in the same sentence.
     if current.is_versus() {
         return false;
     }
@@ -85,7 +85,7 @@ fn after_period(model: &Model, current: &Token<'_>, next: &Token<'_>, after_numb
 /// that it does not, or shows nothing.
 fn starts_sentence(model: &Model, next: &Token<'_>, next_kind: &str) -> Option<bool> {
     // Punctuation on its own never starts a sentence. Quotes and brackets on
-    // their own say nothing.
+    // their own are no evidence.
     if next.word == "."
         || (next.word.is_empty() && (next.mark != Mark::None || next.internal_after))
     {
