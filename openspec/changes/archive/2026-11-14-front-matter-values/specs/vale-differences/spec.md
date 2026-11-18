@@ -6,13 +6,14 @@ hakkiri SHALL read the front matter values as Vale does, and put each alert at t
 
 #### Scenario: A folded scalar
 
-- **WHEN** a folded block scalar holds `Folded very` and `text here` and a rule flags `here`
+- **WHEN** a folded block scalar contains `Folded very` and `text here` and a rule flags `here`
 - **THEN** hakkiri puts the alert on the second line, and Vale puts it on the first ([front-matter-values 5][front-matter-values-5])
 
 #### Scenario: A TOML value
 
 - **WHEN** a TOML value reads `"A very toml title"` and a rule flags `title`
-- **THEN** hakkiri puts the alert in the value, and Vale puts it on the key, since it finds the value by searching the block ([front-matter-values 5][front-matter-values-5])
+- **THEN** hakkiri puts the alert in the value, and Vale puts it on the key ([front-matter-values 5][front-matter-values-5])
+- **AND** Vale does so because it finds the value by searching the block
 
 #### Scenario: An explicit tag or an anchor
 
