@@ -4,13 +4,19 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 1. The probe
 
-- [x] 1.1 Probe Vale at `66bbb85`, built with the grammars of its `grammars/build.sh`, and hakkiri over 23 files that each hold one kind of comment, and record Vale's alerts in `tests/fixtures/comment-languages`.  
-  Verify `comments_read_as_vale_reads_them_but_where_decided` passes: every difference from Vale is a row of `departures.tsv`.  
+- [x] 1.1 Probe Vale at `66bbb85`, built with the grammars of its `grammars/build.sh`, and hakkiri over 23 files.  
+  Each file contains one kind of comment.  
+  Record Vale's alerts in `tests/fixtures/comment-languages`.  
+  Verify `comments_read_as_vale_reads_them_but_where_decided` passes: every difference from Vale is a row of `departures.tsv`.
+
   Evidence, 2026-11-12 (UTC), in a box: Go, YAML, TOML, TypeScript and JavaScript gave Vale's alerts on the fixtures apart from the departures.  
   The departures are Swift, Shell, directives, indentation, columns, and 3 words that Vale's duplicate-position check drops.
-- [x] 1.2 Probe the same tools over 640 files of the ctl repositories, 278 Go files and 122 Swift files, and give a cause to each difference that is left.  
-  Verify the table of [design 9][design-9] contains the counts.  
-  Evidence, 2026-11-12 (UTC): with Vale's check off, the differences fall to 92 rows for Go, 18 for Rust and 4 for TOML, each a Markdown reading, an indented example, a directive or a column.
+- [x] 1.2 Probe the same tools over 640 files of the ctl repositories, 278 Go files and 122 Swift files.  
+  Give a cause to each difference that is left.  
+  Verify the table of [design 9][design-9] contains the counts.
+
+  Evidence, 2026-11-12 (UTC): with Vale's check off, the differences fall to 92 rows for Go, 18 for Rust and 4 for TOML.  
+  Each is a Markdown reading, an indented example, a directive or a column.
 - [x] 1.3 Measure the release binary before and after.  
   Verify the numbers are in [design 1][design-1] and in the ledger row.  
   Evidence, 2026-11-12 (UTC), release builds in a box: 15,264,456 bytes before, 21,171,528 after, and 76 and 82 seconds.

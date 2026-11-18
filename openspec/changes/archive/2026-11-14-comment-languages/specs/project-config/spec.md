@@ -2,9 +2,16 @@
 
 ### Requirement: formats maps a file to a reader
 
-`formats` SHALL map an extension, a file name or a glob to a reader, named by any langdex name, alias or extension of the language it reads: Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell or Text.  
-So `md`, `markdown` and `Markdown` name one reader, `sh` and `bash` name the Shell reader, and `text` names plain text.  
-An entry named by the file's extension SHALL come first, then, in the order of the keys as text, an entry whose key is the file's name or a glob that matches its name or its path.  
+`formats` SHALL map an extension, a file name or a glob to a reader.  
+The value SHALL be any langdex name, alias or extension of the language the reader reads.  
+The readers are Markdown, MDX, Rust, TypeScript, TSX, JavaScript, Go, Swift, YAML, TOML, Shell and Text.
+
+So `md`, `markdown` and `Markdown` select one reader, `sh` and `bash` select the Shell reader, and `text` selects plain text.
+
+An entry for the file's extension SHALL come first.  
+Next SHALL come an entry whose key is the file's name, or a glob that matches its name or its path.  
+These SHALL come in the order of the keys as text.
+
 A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.  
 An entry SHALL beat the language of the file.
 
@@ -40,7 +47,8 @@ An entry SHALL beat the language of the file.
 
 ### Requirement: formats refuses a bad entry
 
-A reader that names no language hakkiri reads SHALL be an error that lists the twelve, and a key that contains a glob mark and is not a glob SHALL be an error.
+A reader value that matches no language hakkiri reads SHALL be an error that lists the twelve.  
+A key that contains a glob mark and is not a glob SHALL be an error.
 
 #### Scenario: An unknown reader
 

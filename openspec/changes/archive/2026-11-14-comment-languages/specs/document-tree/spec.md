@@ -2,8 +2,11 @@
 
 ### Requirement: Source files give the tree their comments only
 
-For Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL put only comment text in the tree, scoped `text.comment.line`, `text.comment.block`, `text.comment.doc.line` or `text.comment.doc.block` as the rule-files spec states.  
-Each language SHALL find its comments with its tree-sitter grammar, so a comment marker inside a string, a raw string, a multi-line string, a heredoc or a block scalar opens no comment.  
+For Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL put only comment text in the tree.  
+Its scope SHALL be `text.comment.line`, `text.comment.block`, `text.comment.doc.line` or `text.comment.doc.block`, as the rule-files spec states.
+
+Each language SHALL find its comments with its tree-sitter grammar.  
+So a comment marker inside a string, a raw string, a multi-line string, a heredoc or a block scalar opens no comment.  
 A Swift block comment SHALL nest.  
 The `#!` line that opens a script SHALL be no comment.
 
@@ -31,7 +34,8 @@ The `#!` line that opens a script SHALL be no comment.
 
 ### Requirement: A comment addressed to a tool is not prose
 
-hakkiri SHALL leave out of the tree a comment that a tool reads and a person does not, by the patterns of its language, which the scenarios list.  
+hakkiri SHALL leave out of the tree a comment that a tool reads and a person does not.  
+The patterns of each language, which the scenarios list, SHALL find such a comment.  
 A directive SHALL end a run of line comments, so the line after it starts a new comment node.
 
 #### Scenario: A Go directive
@@ -76,7 +80,8 @@ A directive SHALL end a run of line comments, so the line after it starts a new 
 
 hakkiri SHALL drop an alert whose match lies wholly in a doc name or a doc link.  
 A doc name is the name of the declaration that a Go doc comment opens with.  
-A doc link is a link in brackets of a Go or Rust comment, or an inline link tag of a TypeScript or JavaScript comment.  
+A doc link is a link in brackets of a Go or Rust comment, or an inline link tag of a TypeScript or JavaScript comment.
+
 It SHALL leave the text of the node as written, so counts and sentences do not change.  
 A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 
@@ -103,7 +108,8 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 
 #### Scenario: What a link names
 
-- **WHEN** a Go link contains an identifier with dots and an optional `*`, such as `[*pkg.Type]`, or a Rust link contains a path with `::` or a code span, such as ``[`Type`]``
+- **WHEN** a Go link contains an identifier with dots and an optional `*`, such as `[*pkg.Type]`
+- **AND** a Rust link contains a path with `::` or a code span, such as ``[`Type`]``
 - **THEN** no alert lies in the brackets
 
 ### Requirement: More JSDoc tags name something
