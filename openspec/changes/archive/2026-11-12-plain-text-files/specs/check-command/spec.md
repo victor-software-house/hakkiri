@@ -27,7 +27,7 @@ A file that a glob selects and that no reader reads SHALL be read as plain text,
 
 #### Scenario: The reader of an extension
 
-- **WHEN** `formats` holds `txt: md` and `a.txt` holds a fenced block that holds `very`
+- **WHEN** `formats` contains `txt: md` and `a.txt` contains a fenced block that contains `very`
 - **THEN** hakkiri reads `a.txt` as Markdown and reports nothing for the fence
 
 ### Requirement: Plain text is read as written
@@ -37,28 +37,28 @@ No marker, escape or entity SHALL change its text.
 
 #### Scenario: Paragraphs
 
-- **WHEN** `notes.txt` holds `This is very good.`, a blank line and `A second very paragraph.` and a rule flags `very`
+- **WHEN** `notes.txt` contains `This is very good.`, a blank line and `A second very paragraph.` and a rule flags `very`
 - **THEN** hakkiri reports `notes.txt:1:9` and `notes.txt:3:10`
 
 #### Scenario: A fence is text
 
-- **WHEN** `a.txt` holds a fence around `very`
+- **WHEN** `a.txt` contains a fence around `very`
 - **THEN** hakkiri reports `very` on line 2, column 1
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text that holds a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.  
+A file read as plain text that contains a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.  
 This SHALL hold whether a walk finds the file or the command line names it.  
 A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
 
 #### Scenario: A picture
 
-- **WHEN** `logo.png` holds a NUL byte and the glob `*` selects it
+- **WHEN** `logo.png` contains a NUL byte and the glob `*` selects it
 - **THEN** hakkiri skips it, counts no file for it, and exits 0
 
 #### Scenario: A Latin-1 file
 
-- **WHEN** `latin.txt` holds a word that has the byte `E9`, then a space and `very`, and no NUL byte, and a rule flags `very`
+- **WHEN** `latin.txt` contains a word that has the byte `E9`, then a space and `very`, and no NUL byte, and a rule flags `very`
 - **THEN** hakkiri reports `very` at the column that counts the bytes, and Vale gives the same column
 
 ### Requirement: A file has its own extension and its reader's
@@ -68,7 +68,7 @@ A scope part that names an extension SHALL hold for either, and a negated part S
 
 #### Scenario: A mapped file
 
-- **WHEN** `formats` maps `txt: md`, `a.txt` holds `# beta`, a blank line and `beta alpha gamma.`, and three rules have `text.md` with `alpha`, `text & ~heading.md` with `beta`, and `text.txt` with `gamma`
+- **WHEN** `formats` maps `txt: md`, `a.txt` contains `# beta`, a blank line and `beta alpha gamma.`, and three rules have `text.md` with `alpha`, `text & ~heading.md` with `beta`, and `text.txt` with `gamma`
 - **THEN** hakkiri reports `beta`, `alpha` and `gamma` on line 3, and none in the heading
 
 ### Requirement: on_unknown sets what a selected file with no reader gets

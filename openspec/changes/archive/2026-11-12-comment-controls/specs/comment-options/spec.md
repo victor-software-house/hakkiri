@@ -28,7 +28,7 @@ A level for a style, and any other word, SHALL be no comment.
 
 #### Scenario: A level until the rule is named again
 
-- **WHEN** a file holds `very` after no comment, after `error`, after `suggestion`, and after `on` for one rule
+- **WHEN** a file contains `very` after no comment, after `error`, after `suggestion`, and after `on` for one rule
 - **THEN** the alerts are a warning, an error, a suggestion and a warning
 
 #### Scenario: Over the config
@@ -42,7 +42,7 @@ A glob that matches a source file SHALL leave the text of its comments as it is,
 
 #### Scenario: A Rust doc comment
 
-- **WHEN** a doc comment holds `<!-- hakkiri off -->` and the lines after it hold `very`
+- **WHEN** a doc comment contains `<!-- hakkiri off -->` and the lines after it hold `very`
 - **THEN** the alerts are those of the file with no comment
 
 ### Requirement: A level leaves a rule failure an error

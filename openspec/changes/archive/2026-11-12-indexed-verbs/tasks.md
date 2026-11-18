@@ -5,7 +5,7 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 ## 1. The fill rule
 
 - [x] 1.1 Probe Vale at `66bbb85` for messages with indexed verbs, and record the alerts in `tests/fixtures/sequence-verbs/vale.tsv`.  
-  Verify the file holds the alerts of ProseStyle v0.0.14 `NounStack` and `ThingsSpeakNoun` and of the three rules that take values by number.  
+  Verify the file contains the alerts of ProseStyle v0.0.14 `NounStack` and `ThingsSpeakNoun` and of the three rules that take values by number.  
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran over the new inputs and over the whole `sequence` fixture. It reproduced all 446 rows of `tests/fixtures/sequence/vale.tsv`, and gave 11 rows for the new rules.
 - [x] 1.2 Fill `%[n]s` in `fill`, with a plain verb after it taking the next value.  
   Verify `fills_indexed_verbs_as_vale_does` and the scenarios of the `alerts` delta fail before the change and pass after it.  

@@ -12,7 +12,7 @@ The operator decided hakkiri does as Vale does unless Vale is wrong, and this is
 
 ## Changes
 
-- A key that names a rule and gives a level runs that rule on the matched files at that level, whichever style holds it.
+- A key that names a rule and gives a level runs that rule on the matched files at that level, whichever style contains it.
 - The word `on` runs the rule at the level of its rule file, as Vale's `YES` does.
 - `off` on a rule of an unlisted style changes nothing, and `off` on a rule of a listed style still stops it.
 - A later glob wins for a rule, and a level once set stays when a later glob turns the rule `off` and `on`, as in Vale.

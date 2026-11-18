@@ -25,7 +25,7 @@ Non-goals:
 hakkiri applies Vale's own rewrite to the text, parses the result with the Markdown parser it already has, and then replaces every range in the tree by the bytes of the file it came from.  
 Each block match becomes the match's first group between `\n```\n` and `\n```\n`, and each token match the group between backticks ([html.go][v-apply]).  
 The patterns run in the order written, each over the text the one before it left, block patterns first.  
-A byte that no pattern added keeps its place in the file, and the group copied into the replacement keeps its place too, so a code span that holds an ignored token still points at the token.  
+A byte that no pattern added keeps its place in the file, and the group copied into the replacement keeps its place too, so a code span that contains an ignored token still points at the token.  
 A range with no byte of the file, such as the backticks, gives no segment, and a node that has no segment left gives way to its children.
 
 Alternative: mask the match with spaces and leave the Markdown as it is.  
@@ -40,7 +40,7 @@ The probe of Vale at `66bbb85` (2026-11-11) found these:
 
 - A pattern with no capture group leaves the text `$1`, since Vale hands the replacement `$1` to an engine that keeps it as written, so the whole match is dropped from the prose.
 - A group that took no part in the match leaves nothing, and a match of no bytes becomes an empty pair of backticks everywhere in the text. hakkiri skips such a match, since nobody writes a pattern for it on purpose.
-- Patterns apply to the result of the one before, so a token pattern that holds a block pattern's match no longer matches once the block is fenced.
+- Patterns apply to the result of the one before, so a token pattern that contains a block pattern's match no longer matches once the block is fenced.
 - A `scope: raw` rule still reads the file as written, and a `scope: code` rule reads each ignored token, since it is a code span.
 - Vale does not apply the patterns to a Rust, TypeScript or JavaScript file: it reads a comment as plain lines unless a View names a markup format ([lintComment][v-comment]).
 

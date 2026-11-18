@@ -18,7 +18,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 2. Run the rule
 
-- [x] 2.1 Run a rule that a matching glob gives a level, whichever style holds it, and clear the rule settings at an empty `styles` list, in `plan` of `src/config.rs`.  
+- [x] 2.1 Run a rule that a matching glob gives a level, whichever style contains it, and clear the rule settings at an empty `styles` list, in `plan` of `src/config.rs`.  
   Verify the `rule_setting` tests that enable a rule of an unlisted style, and the test of the empty list, fail on the old `plan` and pass on the new one.
   - 2026-11-11 (UTC), 8 of the 11 `rule_setting` tests failed on `config.rs` and `rule.rs` of [bf04395][c-base], in a throwaway Linux box.  
     The other 3 guard behaviour that did not change: a rule turned on after it was off, `off` on an unlisted rule, and the order of keys.  

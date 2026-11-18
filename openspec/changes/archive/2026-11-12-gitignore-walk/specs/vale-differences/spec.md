@@ -6,7 +6,7 @@ hakkiri SHALL skip the files git ignores in a walk and SHALL warn about a named 
 
 #### Scenario: An ignored build folder
 
-- **WHEN** `.gitignore` holds `build/` and the folder holds a file a glob selects
+- **WHEN** `.gitignore` contains `build/` and the folder contains a file a glob selects
 - **THEN** hakkiri skips it, and Vale lints it, because Vale skips only its default ignored folders and reads no git file ([gitignore 6][gitignore-6])
 
 #### Scenario: A named file with no glob

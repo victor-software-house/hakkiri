@@ -21,7 +21,7 @@ The operator ruled on 2026-11-11 that an alert names the true end of the match.
 ### Modified Capabilities
 
 - `alerts`: a match ends at its last character, on its own line.
-- `check-command`: each JSON alert holds `end_line`.
+- `check-command`: each JSON alert contains `end_line`.
 - `vale-differences`: where a wrapped match ends.
 
 ## Impact

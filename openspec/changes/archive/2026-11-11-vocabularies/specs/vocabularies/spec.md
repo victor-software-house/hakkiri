@@ -6,12 +6,12 @@ hakkiri SHALL read a named vocabulary from `config/vocabularies/<name>/` under a
 
 #### Scenario: A list in a subfolder
 
-- **WHEN** the vocabulary `Team` holds `accept.txt` with `GitHub`, `sub/accept.txt` with `Kubernetes`, and `words.txt` with `Gamma`
+- **WHEN** the vocabulary `Team` contains `accept.txt` with `GitHub`, `sub/accept.txt` with `Kubernetes`, and `words.txt` with `Gamma`
 - **THEN** `GitHub` and `Kubernetes` are accepted terms and `Gamma` is no term ([vocabularies 3][vocabularies-3])
 
 #### Scenario: A vocabulary that is not there
 
-- **WHEN** the config names `Nope` and no loaded package holds `config/vocabularies/Nope`
+- **WHEN** the config names `Nope` and no loaded package contains `config/vocabularies/Nope`
 - **THEN** hakkiri reports an error that names `Nope` and the line of the key, and exits with a failure status
 
 #### Scenario: Two packages hold one name
@@ -25,17 +25,17 @@ hakkiri SHALL read each line of a list as one term after trimming it, and SHALL 
 
 #### Scenario: A comment and a term that looks like one
 
-- **WHEN** a list holds the lines `# a comment`, `#nocomment`, `padded` with spaces around it, and a blank line
+- **WHEN** a list contains the lines `# a comment`, `#nocomment`, `padded` with spaces around it, and a blank line
 - **THEN** the terms are `#nocomment` and `padded`
 
 #### Scenario: A line ending of Windows
 
-- **WHEN** a list holds `Alpha` followed by a carriage return and a line feed
+- **WHEN** a list contains `Alpha` followed by a carriage return and a line feed
 - **THEN** the term is `Alpha`
 
 ### Requirement: A term is plain text or a pattern
 
-hakkiri SHALL read a term that holds no pattern operator other than a period as plain text, with each period literal, and any other term as a pattern.  
+hakkiri SHALL read a term that contains no pattern operator other than a period as plain text, with each period literal, and any other term as a pattern.  
 A run of whitespace in a term SHALL match any run of whitespace.
 
 #### Scenario: A plain term with a period
@@ -50,12 +50,12 @@ A run of whitespace in a term SHALL match any run of whitespace.
 
 #### Scenario: A phrase that wraps
 
-- **WHEN** `mea culpa` is accepted and a text holds `mea` and `culpa` on two lines
+- **WHEN** `mea culpa` is accepted and a text contains `mea` and `culpa` on two lines
 - **THEN** the pair counts as the phrase
 
 #### Scenario: A term that is not a pattern
 
-- **WHEN** a list holds `C(` on line 3
+- **WHEN** a list contains `C(` on line 3
 - **THEN** hakkiri reports an error that names the file and line 3, and exits with a failure status, where Vale reports the pattern error with no line ([vocabularies 4][vocabularies-4])
 
 ### Requirement: Accepted terms hold back matches of the checks that read them
@@ -109,7 +109,7 @@ A file SHALL take the vocabularies of every glob that matches it, besides the to
 #### Scenario: Rules a glob does not reach
 
 - **WHEN** a glob names `Team` and accepts `API` and `Kubernetes`, a `conditional` rule reads `The SDK and the API are here.` and a `capitalization` rule with `match: $sentence` reads `# Using Kubernetes with Terraform today`
-- **THEN** the `conditional` rule reports `SDK` and `API`, and the `capitalization` rule reports the heading, where the top level holds both back
+- **THEN** the `conditional` rule reports `SDK` and `API`, and the `capitalization` rule reports the heading, where the top level contains both back
 
 #### Scenario: Two globs and the top level
 
@@ -119,7 +119,7 @@ A file SHALL take the vocabularies of every glob that matches it, besides the to
 #### Scenario: Spelling reads a glob's terms exactly
 
 - **WHEN** `zorbl` is accepted, and a `spelling` rule reads `Zorbl, zorbl and ZORBL.`
-- **THEN** a vocabulary at the top level holds back all three words, and a glob's vocabulary holds back `zorbl` only, and the rule reports ``Did you really mean 'Zorbl'?``
+- **THEN** a vocabulary at the top level contains back all three words, and a glob's vocabulary contains back `zorbl` only, and the rule reports ``Did you really mean 'Zorbl'?``
 
 [vocabularies-3]: ../../design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package
 [vocabularies-4]: ../../design.md#4-a-line-of-a-list-is-a-pattern

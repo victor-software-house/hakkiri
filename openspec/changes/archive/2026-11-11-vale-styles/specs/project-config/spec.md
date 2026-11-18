@@ -9,7 +9,7 @@ A rule in a style no glob lists SHALL be ignored.
 
 #### Scenario: A script rule in a listed style
 
-- **WHEN** `Kid/Cannot.yml` holds `extends: script`, `Kid/Parent.yml` flags `alpha`, `beta` and `gamma`, `files` holds `'*.md': {styles: [Kid]}`, and `a.md` holds `alpha beta gamma delta swapme`
+- **WHEN** `Kid/Cannot.yml` contains `extends: script`, `Kid/Parent.yml` flags `alpha`, `beta` and `gamma`, `files` contains `'*.md': {styles: [Kid]}`, and `a.md` contains `alpha beta gamma delta swapme`
 - **THEN** hakkiri reports three alerts from `Kid.Parent`, prints one `failed` line for `Kid.Cannot`, and exits 2
 
 #### Scenario: A doc selector
@@ -19,7 +19,7 @@ A rule in a style no glob lists SHALL be ignored.
 
 #### Scenario: A rule turned off
 
-- **WHEN** the glob also holds `Kid.Cannot: off`
+- **WHEN** the glob also contains `Kid.Cannot: off`
 - **THEN** hakkiri reports the three alerts, prints no `failed` line, and exits 0
 
 #### Scenario: A style no glob lists
@@ -29,7 +29,7 @@ A rule in a style no glob lists SHALL be ignored.
 
 #### Scenario: A level or on
 
-- **WHEN** a glob that lists `Other` holds `Kid.Cannot: warning`, or `Kid.Cannot: on`
+- **WHEN** a glob that lists `Other` contains `Kid.Cannot: warning`, or `Kid.Cannot: on`
 - **THEN** hakkiri prints the `failed` line for `Kid.Cannot`, and exits 2
 
 #### Scenario: A rule that extends a script rule

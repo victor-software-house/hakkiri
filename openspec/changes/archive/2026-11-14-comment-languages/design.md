@@ -17,7 +17,7 @@ The inputs were 23 hand-written files, each with one kind of comment, and 640 fi
 A count on 2026-11-12 found, in the eleven repositories of the group with fixtures and snapshots left out, 252 Rust, 61 TypeScript, 140 TOML, 118 YAML and 69 shell files.  
 The project types of the shared template add Go modules and Swift packages.  
 All five new languages are on the list of the row: Go and Swift are among Vale's, Bash and YAML are among the six it adds, and TOML is the operator's later request.  
-Rego files and Nushell scripts also appear in the repositories, and no crate on crates.io holds a grammar for either, so those files stay plain text until one exists.
+Rego files and Nushell scripts also appear in the repositories, and no crate on crates.io contains a grammar for either, so those files stay plain text until one exists.
 
 The five grammars add 5.9 MB to the release binary, 15,264,456 to 21,171,528 bytes, and 6 seconds to a 76 second release build in a box with 4 vCPUs.  
 By the size of each crate's archive Swift weighs 5.8 MB, Bash 1.5 MB, Go 0.36 MB, YAML 0.24 MB and TOML 0.06 MB.  
@@ -94,7 +94,7 @@ A comment above `var hit string` inside a function is a doc comment of `hit` in 
 
 Go removes the first space of a line comment and no more, and a line indented further is a code block of the comment.  
 Vale takes every leading space off each line of a run after the first ([appendLine][v-append]), so `///     cargo run` is a sentence.  
-hakkiri removed the indentation that every line shares, as rustdoc does, which turned a comment that holds only an indented example into prose.
+hakkiri removed the indentation that every line shares, as rustdoc does, which turned a comment that contains only an indented example into prose.
 
 For Go, YAML, TOML and shell, hakkiri now removes the first space of each line and no more.  
 For Rust, TypeScript, JavaScript and Swift it keeps the rule of rustdoc, which keeps an example code when a prose line sits beside it.  
@@ -135,7 +135,7 @@ Each difference that is left has a cause, found on its own input:
 - Markdown reading, the same as in Markdown files: the Go rows hold inline HTML such as `<script>`, a code span beside a word, and a triple backtick in a sentence.  
   The Rust rows hold a code span beside a word.  
   Vale's converter and hakkiri's parser read these otherwise, and `vale-differences` already records the Markdown cases.
-- One line of a workflow holds a `${{ }}` expression and gives 3 rows, and 4 TOML rows hold a reference link and a code span.
+- One line of a workflow contains a `${{ }}` expression and gives 3 rows, and 4 TOML rows hold a reference link and a code span.
 
 A comment that opens a function body is the one place where the two grammars of Go differ, as decision 6 says, and the probe found it as a `hit` that only hakkiri reported.
 
@@ -146,7 +146,7 @@ So the readers hold no extension list: `.yml`, `.bash`, `.zsh`, a script that st
 A fenced code block of the five languages gives its comments through the same dialects, so a ```` ```yaml ```` fence in a Markdown file reads its `#` comments.
 
 Alternative: an extension table for the new readers.  
-It lost because langdex already holds every name, extension, file name and interpreter, and a second table drifts from it.
+It lost because langdex already contains every name, extension, file name and interpreter, and a second table drifts from it.
 
 [comments]: https://github.com/victor-software-house/hakkiri/blob/962f38348478048ad7e3f5b0464a8bfb29224f44/src/comments.rs
 [code-span-size-6]: ../../code-span-size/design.md#6-vale-drops-an-alert-that-has-the-place-of-another

@@ -12,5 +12,5 @@ It SHALL NOT hold `on_unknown`, and a file that does SHALL be an error that name
 
 #### Scenario: A package sets on_unknown
 
-- **WHEN** a package's file holds `on_unknown: warn` on line 5
+- **WHEN** a package's file contains `on_unknown: warn` on line 5
 - **THEN** hakkiri reports `pkg/.ctl/hakkiri.yaml: line 5: on_unknown: belongs to the project's config` and exits 2

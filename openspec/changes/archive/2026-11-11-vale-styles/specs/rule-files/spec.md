@@ -15,5 +15,5 @@ It SHALL report it as a rule it cannot run, with an error that names the rule fi
 
 #### Scenario: A style ships a script rule
 
-- **WHEN** a style folder `Team` holds `Grade.yml` with `extends: script` and a glob lists `Team`
+- **WHEN** a style folder `Team` contains `Grade.yml` with `extends: script` and a glob lists `Team`
 - **THEN** hakkiri reports an error naming `Team/Grade.yml` and exits 2, and the other rules of `Team` run

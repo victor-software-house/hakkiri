@@ -15,7 +15,7 @@ It reads every other file the config selects as plain text, so a `Cargo.toml`, a
 Vale reads the comments of Go files, and of YAML and TOML files when a view names them.  
 It reads a Swift file with its C grammar and reads no shell.  
 Its comment lexer also drops the comments addressed to tools, and masks the links and names of doc comments, which hakkiri did for no language.  
-A probe of Vale at `66bbb85` against hakkiri, in a box, found each of these differences, and the design holds their causes.
+A probe of Vale at `66bbb85` against hakkiri, in a box, found each of these differences, and the design contains their causes.
 
 ## Changes
 

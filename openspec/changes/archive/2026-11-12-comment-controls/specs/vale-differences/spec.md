@@ -20,12 +20,12 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: A YAML vocabulary
 
-- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
+- **WHEN** a vocabulary folder contains `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
 - **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
 
 #### Scenario: The Markdown parser
 
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **WHEN** a Markdown file contains syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
 
 #### Scenario: A plain-text file
@@ -45,7 +45,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: The built-in repetition rule
 
-- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
+- **WHEN** a glob lists the style `Vale`, which contains `Vale.Repetition`
 - **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 #### Scenario: A doc selector or a View
@@ -56,12 +56,12 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: A Vale configuration file
 
-- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
+- **WHEN** a project contains a `.vale.ini` and runs `hakkiri import vale`
 - **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
 
 #### Scenario: An action
 
-- **WHEN** a rule holds an `action`
+- **WHEN** a rule contains an `action`
 - **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
 
 ### Requirement: Comment controls differ from Vale's in these ways
@@ -70,12 +70,12 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 
 #### Scenario: Forms hakkiri adds
 
-- **WHEN** a Markdown file holds `<!-- hakkiri Team.Words: warning -->` or `<!-- hakkiri Team.Words: off -->`
+- **WHEN** a Markdown file contains `<!-- hakkiri Team.Words: warning -->` or `<!-- hakkiri Team.Words: off -->`
 - **THEN** hakkiri sets the level of the rule from there on, or turns it off, and Vale reads neither form
 
 #### Scenario: A source file
 
-- **WHEN** a doc comment of a Rust, TypeScript or JavaScript file holds an HTML comment that turns rules off
+- **WHEN** a doc comment of a Rust, TypeScript or JavaScript file contains an HTML comment that turns rules off
 - **THEN** hakkiri turns nothing off, and Vale reads a comment as plain lines, so it turns nothing off either ([comment-controls 4][comment-controls-4])
 
 #### Scenario: A directive quoted across a line break
@@ -83,9 +83,9 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 - **WHEN** a code span reads `<!-- vale off` on one line and `-->` on the next, and a real `vale off` comment comes after it
 - **THEN** hakkiri hides the text after the real comment, and Vale also hides the text after the code span, since it takes the comment's place from the first `vale off` that its search finds ([comment-controls 8][comment-controls-8])
 
-#### Scenario: An alert in an element that holds a comment
+#### Scenario: An alert in an element that contains a comment
 
-- **WHEN** a `strong` element holds a comment, and its text holds a match
+- **WHEN** a `strong` element contains a comment, and its text contains a match
 - **THEN** hakkiri places the alert on the match, and Vale places it on the comment ([comment-controls 8][comment-controls-8])
 
 #### Scenario: The styles of a file
@@ -96,7 +96,7 @@ hakkiri SHALL read the comments that turn rules off and on as Vale does in a Mar
 [check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
 [comment-controls-8]: ../../design.md#8-a-comment-that-vale-places-wrongly
 [comment-controls-3]: ../../design.md#3-a-style-comment-reads-the-styles-of-the-rules
-[comment-controls-4]: ../../design.md#4-a-source-file-holds-no-comment-control
+[comment-controls-4]: ../../design.md#4-a-source-file-contains-no-comment-control
 [engine-14]: ../../../2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
 [ledger]: ../../../../../../tasks.yaml
 [spelling-goals]: ../../../2026-11-10-spelling-and-affix-checks/design.md#goals--non-goals

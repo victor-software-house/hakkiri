@@ -23,7 +23,7 @@ The first release is `0.0.1`, as every new project's is.
 
 ### New Capabilities
 
-- `release`: what a release holds, how it installs, and which texts carry its version.
+- `release`: what a release contains, how it installs, and which texts carry its version.
 
 ### Modified Capabilities
 

@@ -4,7 +4,7 @@
 
 Vale builds the rules of a file from its sections in the order written.  
 Each section may replace the list of styles, and may set rules on or off and give a level ([section merge][v-merge]).  
-A rule runs when a listed style holds it and no section turned it off, or when a section turned it on.  
+A rule runs when a listed style contains it and no section turned it off, or when a section turned it on.  
 hakkiri keeps one map from rule name to the last choice among the matching globs, and reads it only for rules of listed styles ([plan][plan]).
 
 The probes ran Vale `66bbb85` in a throwaway Linux box, over a style `Team` with `Terms` (suggestion, flags `foo`) and `Other` (warning, flags `bar`), and a style `Extra` that the section lists.
@@ -15,7 +15,7 @@ The probes ran Vale `66bbb85` in a throwaway Linux box, over a style `Team` with
 
 `Team.Terms = YES` and `Team.Terms = error` under `BasedOnStyles = Extra` ran `Team.Terms`, at suggestion and at error.  
 `Team.Terms = YES` alone, with no `BasedOnStyles`, ran only that rule.  
-hakkiri runs a rule whose name a matching glob gives a level, whichever style holds it, at that level.  
+hakkiri runs a rule whose name a matching glob gives a level, whichever style contains it, at that level.  
 The word `on` is `YES`: it runs the rule at the level of its rule file (operator, 2026-11-11).  
 The reader gives a bare `on` as a string, as it gives `off`, in a flow and in a block map, so the setting needs no quotes.
 

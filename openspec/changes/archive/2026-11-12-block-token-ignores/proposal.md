@@ -13,8 +13,8 @@ A project that moves from Vale to hakkiri has no way to say the same, so it eith
 ## Changes
 
 - A `files` glob takes `block_ignores` and `token_ignores`, each a list of patterns, in the config of a project and in a package's settings file.
-- In a Markdown or MDX file, each match of a block pattern is read as a fenced code block that holds the first group of the match, as Vale reads it.
-- Each match of a token pattern is read as a code span that holds the first group.
+- In a Markdown or MDX file, each match of a block pattern is read as a fenced code block that contains the first group of the match, as Vale reads it.
+- Each match of a token pattern is read as a code span that contains the first group.
 - The patterns of every glob that matches a file apply, a package's first and then the project's, so a project adds to a package.
 - The Markdown of a source file's comment takes the patterns too, where Vale applies none to a comment it reads as plain lines.
 - The differences from Vale go in the `vale-differences` spec, one more that the probe found among them: a sentence rule in a comment.

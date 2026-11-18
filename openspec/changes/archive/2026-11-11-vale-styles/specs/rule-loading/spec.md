@@ -6,35 +6,35 @@ hakkiri SHALL refuse a rule whose `extends` names neither a check type nor a rul
 
 #### Scenario: A check type Vale does not define
 
-- **WHEN** `Team/Grammar.yml` holds `extends: grammar`
+- **WHEN** `Team/Grammar.yml` contains `extends: grammar`
 - **THEN** hakkiri reports an error naming `Team/Grammar.yml` and `grammar`, and exits with a failure status
 
 ## ADDED Requirements
 
 ### Requirement: A rule may extend another rule
 
-A rule whose `extends` holds a dot SHALL start from the rule that name gives and lay its own fields on top, as Vale 3.26.0 does.  
+A rule whose `extends` contains a dot SHALL start from the rule that name gives and lay its own fields on top, as Vale 3.26.0 does.  
 The first segment of the name SHALL be a style folder of any loaded package, and the rest SHALL be folders and a file name, in a nested folder or a `_` folder too.  
 The parent's `tests` SHALL NOT carry over.
 
 #### Scenario: A child takes the fields of its parent
 
-- **WHEN** `Kid/Child.yml` holds `extends: Base.Parent`, `message: "Child: found %s"` and `level: error`, `Base/Parent.yml` flags `alpha`, `beta` and `gamma`, and the input is `alpha beta gamma delta swapme`
+- **WHEN** `Kid/Child.yml` contains `extends: Base.Parent`, `message: "Child: found %s"` and `level: error`, `Base/Parent.yml` flags `alpha`, `beta` and `gamma`, and the input is `alpha beta gamma delta swapme`
 - **THEN** hakkiri reports three errors from `Kid.Child`, with the message `Child: found alpha` and the two after it
 
 #### Scenario: A parent in a nested folder or a `_` folder
 
-- **WHEN** a rule holds `extends: Base.Deep.Parent`, or `extends: Base._shared.Parent`
+- **WHEN** a rule contains `extends: Base.Deep.Parent`, or `extends: Base._shared.Parent`
 - **THEN** hakkiri reads the rule from `Base/Deep/Parent.yml`, or from `Base/_shared/Parent.yml`, which no style loads as a rule
 
 #### Scenario: A parent in another package
 
-- **WHEN** the config lists the packages `one` and `two`, `one/Kid/Child.yml` holds `extends: Base.Parent`, and `two/Base/Parent.yml` exists
+- **WHEN** the config lists the packages `one` and `two`, `one/Kid/Child.yml` contains `extends: Base.Parent`, and `two/Base/Parent.yml` exists
 - **THEN** hakkiri finds the parent in `two`
 
 #### Scenario: A fetched package
 
-- **WHEN** the config pins a Vale package by `url` and `sha256`, and its rule `Direct.Length` extends `Std.Readability.SentenceLength`, which the same zip holds
+- **WHEN** the config pins a Vale package by `url` and `sha256`, and its rule `Direct.Length` extends `Std.Readability.SentenceLength`, which the same zip contains
 - **THEN** hakkiri reads the package from the cache and loads the rule
 
 #### Scenario: A chain of three
@@ -55,17 +55,17 @@ A bare key SHALL replace the parent's value.
 
 #### Scenario: An entry added to a list
 
-- **WHEN** a child of a rule that flags `alpha`, `beta` and `gamma` holds `tokens+: [delta]`
+- **WHEN** a child of a rule that flags `alpha`, `beta` and `gamma` contains `tokens+: [delta]`
 - **THEN** the child flags all four words, with the message of the parent
 
 #### Scenario: An entry removed from a list
 
-- **WHEN** the child holds `tokens-: [beta]`
+- **WHEN** the child contains `tokens-: [beta]`
 - **THEN** the child flags `alpha` and `gamma`
 
 #### Scenario: A mapping edited
 
-- **WHEN** a child of a rule with `swap: {swapme: swapped, delta: delta2}` holds `swap+: {alpha: omega}` and `swap-: [delta]`
+- **WHEN** a child of a rule with `swap: {swapme: swapped, delta: delta2}` contains `swap+: {alpha: omega}` and `swap-: [delta]`
 - **THEN** the child swaps `alpha` for `omega` and `swapme` for `swapped`, and not `delta`
 
 ### Requirement: A chain Vale refuses is refused
@@ -75,17 +75,17 @@ A rule read through a parent SHALL name no line.
 
 #### Scenario: A key written two ways
 
-- **WHEN** a child holds `tokens` and `tokens+`
+- **WHEN** a child contains `tokens` and `tokens+`
 - **THEN** hakkiri reports an error naming the file and `tokens+`: it both replaces `tokens` and edits it, so pick one, and exits 2
 
 #### Scenario: An entry the parent lacks
 
-- **WHEN** a child holds `tokens-: [missing]`, and the parent's `tokens` has no `missing`
+- **WHEN** a child contains `tokens-: [missing]`, and the parent's `tokens` has no `missing`
 - **THEN** hakkiri reports that the parent has no entry `missing` to remove, and exits 2
 
 #### Scenario: A cycle
 
-- **WHEN** `Kid/Child.yml` holds `extends: Kid.Child`
+- **WHEN** `Kid/Child.yml` contains `extends: Kid.Child`
 - **THEN** hakkiri reports an inheritance cycle, and exits 2
 
 #### Scenario: A chain over ten rules
@@ -95,17 +95,17 @@ A rule read through a parent SHALL name no line.
 
 #### Scenario: A parent that does not exist
 
-- **WHEN** a rule holds `extends: Base.Absent` and no package holds `Base/Absent.yml`
+- **WHEN** a rule contains `extends: Base.Absent` and no package contains `Base/Absent.yml`
 - **THEN** hakkiri reports that `Base.Absent` is not on the search path, and exits 2
 
 #### Scenario: A built-in parent
 
-- **WHEN** a rule holds `extends: Vale.Terms`
+- **WHEN** a rule contains `extends: Vale.Terms`
 - **THEN** hakkiri reports that `Vale.Terms` is a built-in rule with no file to extend, and exits 2
 
 #### Scenario: A parent name that is a path
 
-- **WHEN** a rule holds `extends: /etc/x.y` or `extends: Std..Rule`
+- **WHEN** a rule contains `extends: /etc/x.y` or `extends: Std..Rule`
 - **THEN** hakkiri reports that it is not a rule name, says a rule name is a style, a dot and a rule such as `Std.Rule`, reads no file for it, and exits 2
 
 ### Requirement: A rule hakkiri cannot run loads no rule
@@ -116,13 +116,13 @@ The loader SHALL keep its name and its file, so a config can turn it `off`.
 
 #### Scenario: A script rule beside a rule that runs
 
-- **WHEN** `Kid/Cannot.yml` holds `extends: script` and `Kid/Parent.yml` flags `alpha`
-- **THEN** the style `Kid` loads the rule `Kid.Parent` and holds `Kid.Cannot` as a rule it cannot run
+- **WHEN** `Kid/Cannot.yml` contains `extends: script` and `Kid/Parent.yml` flags `alpha`
+- **THEN** the style `Kid` loads the rule `Kid.Parent` and contains `Kid.Cannot` as a rule it cannot run
 
 #### Scenario: A doc selector
 
-- **WHEN** a rule holds `scope: doc(h1)`
-- **THEN** the style holds it as a rule it cannot run
+- **WHEN** a rule contains `scope: doc(h1)`
+- **THEN** the style contains it as a rule it cannot run
 
 #### Scenario: A child of a script rule
 

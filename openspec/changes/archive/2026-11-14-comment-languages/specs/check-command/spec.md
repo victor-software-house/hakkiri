@@ -19,12 +19,12 @@ A Text file SHALL be read as plain text whatever `on_unknown` says.
 
 #### Scenario: The reader of an extension
 
-- **WHEN** `formats` holds `txt: md` and `a.txt` holds a fenced block that holds `very`
+- **WHEN** `formats` contains `txt: md` and `a.txt` contains a fenced block that contains `very`
 - **THEN** hakkiri reads `a.txt` as Markdown and reports nothing for the fence
 
 #### Scenario: More extensions of a language
 
-- **WHEN** `a.mts` holds `// A very good start.`, `a.markdown` holds `A very good start.`, and a rule flags `very`
+- **WHEN** `a.mts` contains `// A very good start.`, `a.markdown` contains `A very good start.`, and a rule flags `very`
 - **THEN** hakkiri reads `a.mts` as TypeScript and `a.markdown` as Markdown, and reports `very` once in each
 
 #### Scenario: An interpreter picks the reader
@@ -39,10 +39,10 @@ A Text file SHALL be read as plain text whatever `on_unknown` says.
 
 #### Scenario: A TOML file
 
-- **WHEN** a glob selects `Cargo.toml`, which holds `name = "very" # very`
+- **WHEN** a glob selects `Cargo.toml`, which contains `name = "very" # very`
 - **THEN** hakkiri reports one alert, in the comment, and none for the string
 
 #### Scenario: Files of the data and shell languages
 
-- **WHEN** `a.yml` holds `# A very good start.`, `a.bash` holds `# A very good start.`, `bashrc` holds `# A very good start.`, `bin/tool` starts with `#!/bin/sh` and holds `# A very good start.`, and a rule flags `very`
+- **WHEN** `a.yml` contains `# A very good start.`, `a.bash` contains `# A very good start.`, `bashrc` contains `# A very good start.`, `bin/tool` starts with `#!/bin/sh` and contains `# A very good start.`, and a rule flags `very`
 - **THEN** hakkiri reads the first as YAML and the other three as Shell, and reports `very` once in each

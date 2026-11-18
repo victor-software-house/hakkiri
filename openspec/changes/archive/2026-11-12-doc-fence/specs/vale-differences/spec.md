@@ -6,7 +6,7 @@ hakkiri SHALL join Rust doc line comments of the same type across blank lines, w
 
 #### Scenario: A fence across a blank line
 
-- **WHEN** a Rust file holds `/// ```sh`, an empty line, `/// curl it` and `/// ```` `
+- **WHEN** a Rust file contains `/// ```sh`, an empty line, `/// curl it` and `/// ```` `
 - **THEN** hakkiri reads `curl it` as code, and Vale reads two comments, so a `text` rule sees `curl it` as prose ([doc-fence 1][doc-fence-1])
 
 [doc-fence-1]: ../../design.md#1-doc-line-comments-join-across-blank-lines

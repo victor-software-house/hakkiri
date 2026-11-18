@@ -20,17 +20,17 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: A YAML vocabulary
 
-- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
+- **WHEN** a vocabulary folder contains `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
 - **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
 
 #### Scenario: The Markdown parser
 
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **WHEN** a Markdown file contains syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
 
 #### Scenario: Comments that turn rules off and on
 
-- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
+- **WHEN** a file contains a `vale off` comment, a `vale on` comment or a comment that turns one rule off
 - **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
 
 #### Scenario: A script rule
@@ -45,7 +45,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: The built-in repetition rule
 
-- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
+- **WHEN** a glob lists the style `Vale`, which contains `Vale.Repetition`
 - **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 #### Scenario: A doc selector or a View
@@ -56,12 +56,12 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: A Vale configuration file
 
-- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
+- **WHEN** a project contains a `.vale.ini` and runs `hakkiri import vale`
 - **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
 
 #### Scenario: An action
 
-- **WHEN** a rule holds an `action`
+- **WHEN** a rule contains an `action`
 - **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
 
 ### Requirement: Readers differ from Vale in what a file with no reader gets
@@ -70,12 +70,12 @@ hakkiri SHALL read a selected file that no reader reads as plain text, skip a bi
 
 #### Scenario: A manuscript
 
-- **WHEN** a `.txt` file holds chapter lines
+- **WHEN** a `.txt` file contains chapter lines
 - **THEN** hakkiri reads paragraphs, and Vale reads a document whose chapter lines are headings ([plain-text 1][plain-text-1])
 
 #### Scenario: A binary file
 
-- **WHEN** a glob selects a file that holds a NUL byte
+- **WHEN** a glob selects a file that contains a NUL byte
 - **THEN** hakkiri skips it, and Vale has no such test and reads it as lines ([plain-text 5][plain-text-5])
 
 #### Scenario: The extension of a mapped file
@@ -85,7 +85,7 @@ hakkiri SHALL read a selected file that no reader reads as plain text, skip a bi
 
 #### Scenario: A plain-text file with markup
 
-- **WHEN** `notes.cfg` holds a fenced block, a glob selects it and no `formats` entry maps it
+- **WHEN** `notes.cfg` contains a fenced block, a glob selects it and no `formats` entry maps it
 - **THEN** hakkiri reads the fence as text, as Vale reads a file of lines ([plain-text 1][plain-text-1])
 
 #### Scenario: A format in a package and in the project

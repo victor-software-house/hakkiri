@@ -45,7 +45,7 @@ hakkiri SHALL list here the place where it reads a file otherwise than Vale at 6
 
 #### Scenario: A sentence rule in a comment
 
-- **WHEN** a doc comment of a source file holds one sentence and a rule has `scope: sentence`
+- **WHEN** a doc comment of a source file contains one sentence and a rule has `scope: sentence`
 - **THEN** hakkiri runs the rule on the sentence, and Vale runs it on none, since it reads the comment as plain lines ([block-token-ignores 5][block-token-ignores-5])
 
 [block-token-ignores-2]: ../../design.md#2-what-a-match-turns-into-is-what-vale-gives

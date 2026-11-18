@@ -5,7 +5,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 ## 1. The math
 
 - [x] 1.1 Probe Vale at `66bbb85` for inline spans and display blocks in Markdown and MDX, and record Vale's alerts in `tests/fixtures/math/vale.tsv`.  
-  Verify the file holds the alerts of every scenario of the requirements, with the Vale commit named in the test.  
+  Verify the file contains the alerts of every scenario of the requirements, with the Vale commit named in the test.  
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/math`, four files and five rules, and gave 80 alerts.
 - [x] 1.2 Find the math in each paragraph, heading and table cell, write the file again with the same length, and parse it, giving a span's code node its delimiters.  
   Verify `tests/math.rs` fails before the change and passes after it.  

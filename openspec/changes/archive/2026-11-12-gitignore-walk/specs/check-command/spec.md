@@ -8,7 +8,7 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: An ignored folder and file
 
-- **WHEN** `.gitignore` holds `build/` and `draft.md`, and `a.md`, `draft.md` and `build/b.md` each draw one warning
+- **WHEN** `.gitignore` contains `build/` and `draft.md`, and `a.md`, `draft.md` and `build/b.md` each draw one warning
 - **THEN** `hakkiri check` lints `a.md` alone, and prints `1 alert in 1 file`
 
 #### Scenario: The exclude file and the global excludes
@@ -18,7 +18,7 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: A nested gitignore
 
-- **WHEN** `docs/.gitignore` holds `skip.md`, and `docs/skip.md` and `skip.md` exist
+- **WHEN** `docs/.gitignore` contains `skip.md`, and `docs/skip.md` and `skip.md` exist
 - **THEN** a walk skips `docs/skip.md` and lints `skip.md`
 
 #### Scenario: A named ignored file
@@ -58,5 +58,5 @@ A file that a glob matches whose styles hold no rule, a file found by a walk, an
 
 #### Scenario: A walk finds an unselected file
 
-- **WHEN** `hakkiri check` walks a folder that holds `README.md`, which no glob selects
+- **WHEN** `hakkiri check` walks a folder that contains `README.md`, which no glob selects
 - **THEN** hakkiri prints no warning

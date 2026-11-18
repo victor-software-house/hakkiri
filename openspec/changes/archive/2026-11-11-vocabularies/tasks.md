@@ -1,12 +1,12 @@
 # Tasks
 
 Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
-This change follows [`project-config`][config], which holds the grammar of the config, and [`package-fetch`][fetch], which keeps a package's `styles/config` folder.
+This change follows [`project-config`][config], which contains the grammar of the config, and [`package-fetch`][fetch], which keeps a package's `styles/config` folder.
 
 ## 1. The probe and the reading
 
 - [x] 1.1 Probe Vale at `66bbb85` for the exceptions of each check, `vocab: false`, a plain term with a period, a phrase that wraps, and a glob's vocabulary, and record every alert in `tests/fixtures/vocabularies/vale.tsv`.  
-  Verify the file holds the alerts of five configs over one package, with the Vale commit named in `tests/vocabularies.rs`.  
+  Verify the file contains the alerts of five configs over one package, with the Vale commit named in `tests/vocabularies.rs`.  
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/vocabularies` with the five configs in `vale/`, and gave 293 alerts.  
   Nothing in them contradicts the plan, and the design lists what they add.
 - [x] 1.2 Add `src/vocabulary.rs`: find `config/vocabularies/<name>/` in a package folder, walk it, read each `accept.txt` and `reject.txt` as terms, and refuse an unknown name, two packages with one name and a term that is not a pattern.  

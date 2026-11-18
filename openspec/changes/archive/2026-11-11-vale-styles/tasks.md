@@ -22,7 +22,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 2.3 Commit the Voices, Std and Readability styles with their licences and the tag, and run them.  
   Verify `hakkiri test --coverage` passes every case of Voices and Std, and Readability runs with its script rule turned off.
   - 2026-11-11 (UTC), 103 cases in 48 files pass with no uncovered rule, and Readability fails once for `Readability.Polysyllables` until it is `off`, in [19d121d][c-code].
-- [x] 2.4 Load a fetched package that holds inheriting rules.  
+- [x] 2.4 Load a fetched package that contains inheriting rules.  
   Verify a test pins ProseStyle v0.0.14 by hash, serves it from a local port, and lints with `Direct.Length`, and that its six script rules fail the run until they are `off`.
   - 2026-11-11 (UTC), both tests of `tests/package_fetch.rs` failed on `src/` of [06feef5][c-pkg], and pass in [91bbdb7][c-fetch].  
     The first run failed on the search path: the loader looked for `Std` only in packages written as a `path`, so the fixture found the fault.

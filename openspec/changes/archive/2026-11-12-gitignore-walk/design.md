@@ -4,7 +4,7 @@
 
 [`check-command`][check] walks a folder with `fs::read_dir`, skipping `node_modules`, `.git` and the package folders.  
 Vale at [66bbb85][v-walk] does the same with its default ignored folders and reads no git file.  
-`--fail-level` is a flag and a variable, and the config holds `level` only.
+`--fail-level` is a flag and a variable, and the config contains `level` only.
 
 ## Goals / Non-Goals
 

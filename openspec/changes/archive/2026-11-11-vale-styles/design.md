@@ -11,7 +11,7 @@ Vale resolves `extends: Style.Rule` by path, overlays the child's keys, and fail
 
 ### 1. The loader resolves inheritance
 
-A rule whose `extends` holds a dot is a rule name.  
+A rule whose `extends` contains a dot is a rule name.  
 The loader reads the child into a generic tree, reads each ancestor the same way, overlays them, and builds the rule from the result.  
 The overlay is Vale's: a bare key replaces, `key+` appends to a list or merges into a mapping, `key-` removes entries by their text or keys by name, and the parent's `tests` are dropped at every level.  
 The root's `extends` gives the check type, and the child's `extends` is consumed.
@@ -39,8 +39,8 @@ Lost: the first adds a dependency for output nobody reads, and the second duplic
 
 ### 3. A parent is found in any loaded package
 
-Vale looks a parent up on its search path, which holds every styles folder, and the parent need not be enabled.  
-hakkiri puts every package folder of the config on the search path before it reads the first style, a fetched package included, so `Direct.Length` finds `Std` whichever package holds it.  
+Vale looks a parent up on its search path, which contains every styles folder, and the parent need not be enabled.  
+hakkiri puts every package folder of the config on the search path before it reads the first style, a fetched package included, so `Direct.Length` finds `Std` whichever package contains it.  
 The first segment of the name is a style folder, and the rest are folders and a file name.  
 A `_` folder and a nested folder both resolve, as `GenZ._shared.Slang` needs.  
 `hakkiri test` searches the packages of the config, and the rule's own package when the config does not name it.

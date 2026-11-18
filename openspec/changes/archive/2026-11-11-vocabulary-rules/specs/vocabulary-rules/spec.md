@@ -46,7 +46,7 @@ hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the named v
 
 #### Scenario: A term padded with spaces
 
-- **WHEN** a list holds the term `padded` with spaces around it and the text is `This is padded and Padded.`
+- **WHEN** a list contains the term `padded` with spaces around it and the text is `This is padded and Padded.`
 - **THEN** the only alert is ``Use 'padded' instead of 'Padded'.``
 
 #### Scenario: No accepted term

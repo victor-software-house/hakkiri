@@ -13,7 +13,7 @@ A case whose format no reader reads SHALL read its input as plain text, except t
 
 #### Scenario: A formats entry
 
-- **WHEN** the config maps `cfg: md`, a glob selects `*.cfg`, and a case has `format: cfg` and a fenced block that holds `very`
+- **WHEN** the config maps `cfg: md`, a glob selects `*.cfg`, and a case has `format: cfg` and a fenced block that contains `very`
 - **THEN** the case reads the input as Markdown and the rule reports nothing for the fence
 
 ### Requirement: A case through the config has the extensions of its file
@@ -33,10 +33,10 @@ A case through the config whose format no reader reads, and whose file the confi
 
 #### Scenario: An error
 
-- **WHEN** the config holds `on_unknown: error` and `'*.txt': {styles: [Team]}`, and a case has `format: txt`
+- **WHEN** the config contains `on_unknown: error` and `'*.txt': {styles: [Team]}`, and a case has `format: txt`
 - **THEN** the case fails to run with ``no reader reads the format `txt` ``, and the run exits 2
 
 #### Scenario: A warning or an ignore
 
-- **WHEN** the config holds `on_unknown: warn`, or `ignore`, and a case has `format: txt` with `want: ''` and an input that a rule flags in plain text
+- **WHEN** the config contains `on_unknown: warn`, or `ignore`, and a case has `format: txt` with `want: ''` and an input that a rule flags in plain text
 - **THEN** the case passes, because the config does not lint such a file

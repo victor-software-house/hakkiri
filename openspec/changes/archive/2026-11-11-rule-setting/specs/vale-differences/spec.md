@@ -25,7 +25,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: The Markdown parser
 
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **WHEN** a Markdown file contains syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
 
 #### Scenario: A plain-text file
@@ -35,7 +35,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: Comments that turn rules off and on
 
-- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
+- **WHEN** a file contains a `vale off` comment, a `vale on` comment or a comment that turns one rule off
 - **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
 
 ### Requirement: A rule setting is spelled as hakkiri's config spells it
@@ -49,7 +49,7 @@ hakkiri SHALL write `on` and `off` where Vale 3.26.0 writes `YES` and `NO`, and 
 
 #### Scenario: A key that names no rule
 
-- **WHEN** a glob holds `Team.Nope: warning` and no loaded style holds a rule `Team.Nope`
+- **WHEN** a glob contains `Team.Nope: warning` and no loaded style contains a rule `Team.Nope`
 - **THEN** hakkiri refuses it with the line of the key, and Vale ignores `Team.Nope = YES` ([rule-setting 7][rule-setting-7])
 
 #### Scenario: A word that is no level

@@ -8,7 +8,7 @@ An unknown value SHALL be an error that names the line.
 
 #### Scenario: The config sets the fail level
 
-- **WHEN** the config holds `fail_level: warning` and a file draws one warning
+- **WHEN** the config contains `fail_level: warning` and a file draws one warning
 - **THEN** `hakkiri check` exits 1
 
 #### Scenario: The variable beats the config
@@ -28,10 +28,10 @@ An unknown value SHALL be an error that names the line.
 
 #### Scenario: An unknown word
 
-- **WHEN** the config holds `on_unmatched: loud` or `fail_level: loud`
+- **WHEN** the config contains `on_unmatched: loud` or `fail_level: loud`
 - **THEN** hakkiri reports an error that names `loud`, and exits 2
 
 #### Scenario: Not a boolean
 
-- **WHEN** the config holds `gitignore: maybe`
+- **WHEN** the config contains `gitignore: maybe`
 - **THEN** hakkiri reports an error on line 1, and exits 2

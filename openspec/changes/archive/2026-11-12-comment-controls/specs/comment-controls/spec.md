@@ -7,7 +7,7 @@ The comment SHALL be read with the blanks at its ends and its line breaks trimme
 
 #### Scenario: Between two blocks
 
-- **WHEN** a paragraph holds `very really good.` between `<!-- hakkiri off -->` and `<!-- hakkiri on -->`, and so do the paragraphs before and after
+- **WHEN** a paragraph contains `very really good.` between `<!-- hakkiri off -->` and `<!-- hakkiri on -->`, and so do the paragraphs before and after
 - **THEN** only the paragraphs before and after draw alerts
 
 #### Scenario: Inside a paragraph
@@ -27,7 +27,7 @@ The comment SHALL be read with the blanks at its ends and its line breaks trimme
 
 #### Scenario: A comment with no partner
 
-- **WHEN** a file holds `on` with no `off`, two `off` and one `on`, or an `off` that nothing closes
+- **WHEN** a file contains `on` with no `off`, two `off` and one `on`, or an `off` that nothing closes
 - **THEN** the first changes nothing, the second ends at the `on`, and the third runs to the end of the file, a `raw` rule included
 
 ### Requirement: A comment turns a rule or a style off and on
@@ -65,7 +65,7 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 #### Scenario: A pair inside a paragraph
 
-- **WHEN** a paragraph holds the comment that turns a rule off, then `very`, then the comment that turns it on, then `very`
+- **WHEN** a paragraph contains the comment that turns a rule off, then `very`, then the comment that turns it on, then `very`
 - **THEN** only the second `very` draws the alert
 
 #### Scenario: A tight list item
@@ -75,7 +75,7 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 #### Scenario: A block that opens inside a tight list item
 
-- **WHEN** a tight list item holds `A very`, and a nested list, a quote, a fenced block, a table or a heading under it holds a comment that turns the rule off
+- **WHEN** a tight list item contains `A very`, and a nested list, a quote, a fenced block, a table or a heading under it contains a comment that turns the rule off
 - **THEN** `A very` draws its alert, and the text after the comment draws none
 
 #### Scenario: A comment before the block that opens
@@ -85,7 +85,7 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 #### Scenario: A comment inside a nested HTML element
 
-- **WHEN** a `div` holds `one very`, a comment that turns the rule off, and a closing `</div>`
+- **WHEN** a `div` contains `one very`, a comment that turns the rule off, and a closing `</div>`
 - **THEN** `one very` draws no alert, since the closing tag reads the text after the comment
 
 #### Scenario: A tag that opens a block inside a paragraph
@@ -115,17 +115,17 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 #### Scenario: A heading
 
-- **WHEN** a heading holds the comment that turns a rule back on, and the rule was turned off before it
+- **WHEN** a heading contains the comment that turns a rule back on, and the rule was turned off before it
 - **THEN** the rule reports nothing in the heading
 
 #### Scenario: A table cell
 
-- **WHEN** a cell holds `very <!-- hakkiri off -->`
+- **WHEN** a cell contains `very <!-- hakkiri off -->`
 - **THEN** the cell draws no alert, and the cell of the next row after an `on` draws the alerts after the comment
 
 #### Scenario: HTML blocks
 
-- **WHEN** a `div`, a `p` or a `table` holds `very`, an `off` comment, `very`, an `on` comment and `very`
+- **WHEN** a `div`, a `p` or a `table` contains `very`, an `off` comment, `very`, an `on` comment and `very`
 - **THEN** the first and last `very` draw alerts, and so do the words before the comment
 
 #### Scenario: A raw rule

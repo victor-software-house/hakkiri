@@ -25,7 +25,7 @@ The probe of Vale at `66bbb85` (2026-11-11) over nine files and 304 alerts found
 
 - The text after `vale off` is left out of every block until `vale on`, so a rule that reads across the gap reads `start  end`. An unclosed `off` runs to the end of the file.
 - A rule is gated per block by the toggles when the element of the block ends. A lone comment in the middle of a paragraph, a list item, a table cell or a heading turns the rule off for the whole element, text before it included.
-- An alert between the comment that turned a rule off and the one that turned it on is also dropped, so a heading that holds the comment that turns the rule back on draws no alert before it.
+- An alert between the comment that turned a rule off and the one that turned it on is also dropped, so a heading that contains the comment that turns the rule back on draws no alert before it.
 - A tight list item reads when the item ends, so a comment indented under its text reaches the text. A comment in a block of its own, such as the one in a quote, reaches only what follows.
 - Inside a `div`, text before an `off` comment keeps its alerts, because Vale reads each run of text as its own block.
 - A `raw` rule reads the file at the end, and only `off` gates it. Its alerts between the comments are dropped like the others.
@@ -35,7 +35,7 @@ The probe of Vale at `66bbb85` (2026-11-11) over nine files and 304 alerts found
 hakkiri keeps the two moments apart.  
 `cut` leaves the text between `off` and `on` out of the tree, as Vale leaves it out of the block.  
 The engine skips a block that the toggles gate when its element ends, and drops an alert that a region holds.  
-A node holds the byte where its text is read for that, which decision 7 explains.
+A node contains the byte where its text is read for that, which decision 7 explains.
 
 Alternative: drop every alert whose place lies between the comments.  
 It lost because Vale also gates the text before a lone comment in the same element, and the probe shows both.
@@ -51,7 +51,7 @@ The comment of an HTML block inside a block quote or a list is found in the sour
 `vale styles = Other` turns off the styles the file is based on, except `Other`.  
 hakkiri has no list of base styles for a file at that point, so it reads the styles of the rules the config runs on the file, which are the same ones.
 
-### 4. A source file holds no comment control
+### 4. A source file contains no comment control
 
 Vale reads a source file's comment as plain lines unless a View names a markup format ([lintComment][v-comment]), so an HTML comment in a doc comment turns nothing off there.  
 hakkiri reads those comments as Markdown, and turns nothing off either, to match.
@@ -98,7 +98,7 @@ Vale finds the byte of a comment by searching its text from the end of the previ
 Two probes show the search fail:
 
 - A multi-line code span such as `` `<!-- vale off`` and `` -->` `` leaves the text `vale off` in the searched text, so the next real `vale off` comment takes the place of the code span, and Vale hides the alerts between them.
-- An alert inside a `strong` element that holds a comment gets the column of the words `vale` in the comment instead of the column of its match.
+- An alert inside a `strong` element that contains a comment gets the column of the words `vale` in the comment instead of the column of its match.
 
 hakkiri places both from the parser, and the `vale-differences` spec records them.
 

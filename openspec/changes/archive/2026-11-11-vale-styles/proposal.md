@@ -7,15 +7,15 @@ Queue row: `HKR-007` in [tasks.yaml][ledger].
 Vale styles are plain YAML files, and hakkiri keeps Vale's field names, so a Vale style should load as it is.  
 Two things stop it.  
 A rule may extend another rule, as Vale 3.26.0 allows: `Direct.Length` in Voices extends `Std.Readability.SentenceLength`, and three GenZ rules extend a shared fragment.  
-hakkiri reads `extends` as a check type only, so a style that holds such a rule fails to load.  
-A `script` rule makes hakkiri refuse its whole style, so `Readability`, which holds one script rule beside seven others, cannot load.  
+hakkiri reads `extends` as a check type only, so a style that contains such a rule fails to load.  
+A `script` rule makes hakkiri refuse its whole style, so `Readability`, which contains one script rule beside seven others, cannot load.  
 The row first named a converter, `hakkiri import vale`, for the rule files.  
 Measured against the pinned Std, Voices and Readability styles, the converter has nothing else to do.  
 So the operator decided hakkiri reads a Vale style as it is, and keeps the name `hakkiri import vale` for the `.vale.ini` conversion (operator, 2026-11-11).
 
 ## Changes
 
-- A rule whose `extends` holds a dot starts from the rule it names and lays its own fields on top, as Vale does: `key+` adds, `key-` removes, and the parent's `tests` do not carry over.  
+- A rule whose `extends` contains a dot starts from the rule it names and lays its own fields on top, as Vale does: `key+` adds, `key-` removes, and the parent's `tests` do not carry over.  
   The parent is found in any loaded package, in a nested folder or in a `_` folder.
 - A chain Vale refuses is refused the same way.  
   Those are a key written both bare and with `+` or `-`, an edit of a field the parent lacks, a cycle, and a chain over ten rules.  

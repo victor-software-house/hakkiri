@@ -27,7 +27,7 @@ The operator chose this over Vale's count and over the old end of the first line
 Alternative: Vale's count, the first column plus the number of characters of the match.  
 It lost because it points past the end of the line for a wrapped match, where no character of the match is.  
 Alternative: keep the end of the first line.  
-It lost because it names no character of the match past the first line, and no field holds the line the match ends on.
+It lost because it names no character of the match past the first line, and no field contains the line the match ends on.
 
 ### 2. The comparison with Vale maps the end
 

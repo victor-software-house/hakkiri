@@ -32,7 +32,7 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 
 #### Scenario: A swap key with a space reads a line wrap
 
-- **WHEN** a `substitution` key holds a space and `$1` in its value, and the matched text wraps a line
+- **WHEN** a `substitution` key contains a space and `$1` in its value, and the matched text wraps a line
 - **THEN** hakkiri expands `$1` from the key as matched, and Vale expands it from the key as written, so the alert is lost ([engine 16][engine-16])
 
 #### Scenario: An occurrence over blank text points at a word
@@ -48,7 +48,7 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 #### Scenario: Overlapping phrase exceptions both hold
 
 - **WHEN** the text is `a b c`, the exceptions are the phrases `a b` and `b c`, and a rule matches `c`
-- **THEN** hakkiri holds back the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
+- **THEN** hakkiri contains back the match, and Vale reports `c`, since its one alternation never finds `b c` after `a b` ([engine 18][engine-18])
 
 [engine-16]: ../../../2026-11-10-rule-engine/design.md#16-better-than-vale-where-vale-is-wrong
 [engine-18]: ../../../2026-11-10-rule-engine/design.md#18-every-phrase-exception-holds-overlapping-or-nested

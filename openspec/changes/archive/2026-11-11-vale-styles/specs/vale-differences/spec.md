@@ -20,10 +20,10 @@ hakkiri SHALL load or select as each scenario below says, where Vale 3.26.0 does
 
 #### Scenario: A table row is a scope
 
-- **WHEN** a rule has `scope: table.row` and a row holds the matched text
+- **WHEN** a rule has `scope: table.row` and a row contains the matched text
 - **THEN** hakkiri selects the text of the row, and Vale loads the rule and selects nothing, since no block has a `row` part ([format 9][format-9])
 
-#### Scenario: A scope no node holds
+#### Scenario: A scope no node contains
 
 - **WHEN** a rule has `scope: nonsense`
 - **THEN** hakkiri refuses it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
@@ -39,7 +39,7 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.val
 
 #### Scenario: A Vale configuration
 
-- **WHEN** a project holds a `.vale.ini` and no `.ctl/hakkiri.yaml`
+- **WHEN** a project contains a `.vale.ini` and no `.ctl/hakkiri.yaml`
 - **THEN** hakkiri reads no setting from it, and Vale reads it ([bootstrap 1][bootstrap-1], row [HKR-035][ledger])
 
 #### Scenario: A rule is turned off
@@ -54,7 +54,7 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml`, where Vale reads `.val
 
 #### Scenario: A Vale style folder
 
-- **WHEN** a package holds a Vale style folder, such as Voices, Std or Readability
+- **WHEN** a package contains a Vale style folder, such as Voices, Std or Readability
 - **THEN** hakkiri loads it with no conversion, as Vale does, apart from the rules the Known gaps list ([styles 1][styles-1])
 
 ## MODIFIED Requirements
@@ -76,7 +76,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: The Markdown parser
 
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **WHEN** a Markdown file contains syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
 
 #### Scenario: A plain-text file
@@ -86,7 +86,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: Comments that turn rules off and on
 
-- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
+- **WHEN** a file contains a `vale off` comment, a `vale on` comment or a comment that turns one rule off
 - **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
 
 #### Scenario: A script rule
@@ -101,7 +101,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: The built-in repetition rule
 
-- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
+- **WHEN** a glob lists the style `Vale`, which contains `Vale.Repetition`
 - **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 #### Scenario: A doc selector or a View
@@ -111,12 +111,12 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: A Vale configuration file
 
-- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
+- **WHEN** a project contains a `.vale.ini` and runs `hakkiri import vale`
 - **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
 
 #### Scenario: An action
 
-- **WHEN** a rule holds an `action`
+- **WHEN** a rule contains an `action`
 - **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
 
 [ledger]: ../../../../../../tasks.yaml

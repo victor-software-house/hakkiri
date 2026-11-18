@@ -7,10 +7,10 @@ It SHALL report a case that runs through a config as not run when the config run
 
 #### Scenario: A script rule with a case
 
-- **WHEN** `Cannot.yml` holds `extends: script` and one case, and `Parent.yml` holds a case that passes
+- **WHEN** `Cannot.yml` contains `extends: script` and one case, and `Parent.yml` contains a case that passes
 - **THEN** hakkiri prints a failure that says its cases did not run, counts the passing case, and exits 2
 
 #### Scenario: A case through a config that runs a rule hakkiri cannot run
 
-- **WHEN** a test file holds a case that runs through a config whose listed style holds a script rule
+- **WHEN** a test file contains a case that runs through a config whose listed style contains a script rule
 - **THEN** hakkiri reports the case as not run, naming the rule, and exits 2

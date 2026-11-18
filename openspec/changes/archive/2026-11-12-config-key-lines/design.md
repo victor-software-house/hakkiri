@@ -12,7 +12,7 @@ It missed a key inside a flow mapping, and it took a later line for an earlier k
 A fault builds the path of its key, one step for each key, such as `files`, `docs/**/*.md` and `Team.Hint`.  
 The config's `Input` gives the line.
 
-A glob that holds `.`, `*`, `/`, `[` or `{`, and a setting such as `Team.Hint`, are one step each, so no text splits them.  
+A glob that contains `.`, `*`, `/`, `[` or `{`, and a setting such as `Team.Hint`, are one step each, so no text splits them.  
 Alternative: keep the text search and make it read flow style.  
 It lost because a text search finds a line and not a key, and ctl-core owns the location index for every CLI.
 

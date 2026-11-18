@@ -2,7 +2,7 @@
 
 ## Context
 
-[`vocabularies`][vocabularies] reads `accept.txt` and `reject.txt` and holds back the matches the accepted terms name.  
+[`vocabularies`][vocabularies] reads `accept.txt` and `reject.txt` and contains back the matches the accepted terms name.  
 Vale also builds two rules from the lists, in [`loadVocabRules`][v-load-rules], which runs when the style `Vale` is needed.  
 hakkiri has no style `Vale` yet, and `HKR-026` and `HKR-038` will add `Spelling` and `Repetition` to it.
 
@@ -22,7 +22,7 @@ Non-goals:
 
 ### 1. Terms and Avoid are rules of a style named Vale
 
-hakkiri builds `Vale.Terms` when a vocabulary holds an accepted term, and `Vale.Avoid` when it holds a rejected one ([manager.go][v-load-rules]).  
+hakkiri builds `Vale.Terms` when a vocabulary contains an accepted term, and `Vale.Avoid` when it contains a rejected one ([manager.go][v-load-rules]).  
 `Vale.Terms` is a `substitution` rule: each accepted term lowercased is a swap key with the term as its value, matched without regard to case, with the boundaries `(?<!\w)` and `(?!\w)` and not `\b`.  
 The message is `Use '%s' instead of '%s'.`, the level `error` and the scope `text`, and the value shown is the term in the case of the text it replaced ([substitution.go][v-recase]).  
 `Vale.Avoid` is an `existence` rule over the rejected terms, case-sensitive, between word boundaries, with the message `Avoid using '%s'.`, the level `error` and the scope `text`.  
@@ -51,7 +51,7 @@ It lost because Vale lowercases the key, so a term written in capitals and one w
 
 A rule runs on a file when its style is listed for the file, or its name is set ([lint.go][v-should-run]).  
 So `styles: [Vale]` runs both rules, and `Vale.Terms: warning` runs `Terms` at that level, as `BasedOnStyles = Vale` and `Vale.Terms = warning` do.  
-hakkiri's rule settings already run a rule whichever style holds it.  
+hakkiri's rule settings already run a rule whichever style contains it.  
 With no accepted term there is no `Vale.Terms`, and a setting that names it is an error, as for any rule no loaded style holds.
 
 The names are Vale's own, so a ProseStyle config reads the same in both tools.  
@@ -69,9 +69,9 @@ It lost because Vale's names and its alerts carry the vocabulary, and a project 
 
 ### 4. The style Vale needs a vocabulary term
 
-`styles: [Vale]` is an error today, because no package holds a style `Vale`.  
-It stays an error when no named vocabulary holds a term, and `HKR-026` and `HKR-038` will give the style rules that need no vocabulary.  
-Alternative: a style `Vale` that is always present and holds no rule.  
+`styles: [Vale]` is an error today, because no package contains a style `Vale`.  
+It stays an error when no named vocabulary contains a term, and `HKR-026` and `HKR-038` will give the style rules that need no vocabulary.  
+Alternative: a style `Vale` that is always present and contains no rule.  
 It lost because an empty style hides a wrong vocabulary name: the config would load and lint nothing.
 
 ### 5. A package style named Vale is refused

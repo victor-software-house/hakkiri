@@ -16,7 +16,7 @@ A file named on the command line that no glob selects is skipped with no message
 - A named file is never filtered by git.
 - A named file that no glob selects draws a warning, and `on_unmatched` (`--on-unmatched`, `HAKKIRI_ON_UNMATCHED`) takes `warn`, `error` or `ignore`.
 - `fail_level`, `gitignore` and `on_unmatched` are config keys, each resolved as flag, then variable, then config, then default.
-- A package's settings file that holds one of the three keys is an error.
+- A package's settings file that contains one of the three keys is an error.
 - The `vale-differences` spec lists the walk as an intended difference.
 
 ## Capabilities

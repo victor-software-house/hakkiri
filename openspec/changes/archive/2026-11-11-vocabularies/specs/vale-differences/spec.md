@@ -13,16 +13,16 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: Vocabularies
 
 - **WHEN** a section of a Vale config sets `Vocab`, or the top level names a vocabulary
-- **THEN** hakkiri holds back the matches the accepted terms name, and builds no `Vale.Terms`, `Vale.Avoid`, `Vale.<Name>.Terms` or `Vale.<Name>.Avoid`, which Vale runs for the project or the section (row [HKR-042][ledger], [vocabulary-rules 1][vocabulary-rules-1])
+- **THEN** hakkiri contains back the matches the accepted terms name, and builds no `Vale.Terms`, `Vale.Avoid`, `Vale.<Name>.Terms` or `Vale.<Name>.Avoid`, which Vale runs for the project or the section (row [HKR-042][ledger], [vocabulary-rules 1][vocabulary-rules-1])
 
 #### Scenario: A YAML vocabulary
 
-- **WHEN** a vocabulary folder holds `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
+- **WHEN** a vocabulary folder contains `vocab.yml` with `accept` and `reject` entries, and options such as `regex`, `ignorecase` and `flags`
 - **THEN** hakkiri reads `accept.txt` and `reject.txt` only, and Vale reads the YAML file too (row [HKR-041][ledger], [vocabularies 8][vocabularies-8])
 
 #### Scenario: The Markdown parser
 
-- **WHEN** a Markdown file holds syntax that hakkiri's parser and Vale's converter read differently
+- **WHEN** a Markdown file contains syntax that hakkiri's parser and Vale's converter read differently
 - **THEN** no such difference is measured yet, so the cases are unknown (row [HKR-027][ledger], [tree 1][tree-1])
 
 #### Scenario: A plain-text file
@@ -32,7 +32,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: Comments that turn rules off and on
 
-- **WHEN** a file holds a `vale off` comment, a `vale on` comment or a comment that turns one rule off
+- **WHEN** a file contains a `vale off` comment, a `vale on` comment or a comment that turns one rule off
 - **THEN** hakkiri lints the text after it as before, and Vale skips it until the matching comment (row [HKR-031][ledger], [html 7][html-7])
 
 #### Scenario: A script rule
@@ -47,7 +47,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: The built-in repetition rule
 
-- **WHEN** a glob lists the style `Vale`, which holds `Vale.Repetition`
+- **WHEN** a glob lists the style `Vale`, which contains `Vale.Repetition`
 - **THEN** hakkiri has no such style and refuses the name, and Vale reports a repeated word (row [HKR-038][ledger])
 
 #### Scenario: A doc selector or a View
@@ -58,12 +58,12 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 #### Scenario: A Vale configuration file
 
-- **WHEN** a project holds a `.vale.ini` and runs `hakkiri import vale`
+- **WHEN** a project contains a `.vale.ini` and runs `hakkiri import vale`
 - **THEN** hakkiri has no such command yet, and the config is written by hand (row [HKR-035][ledger])
 
 #### Scenario: An action
 
-- **WHEN** a rule holds an `action`
+- **WHEN** a rule contains an `action`
 - **THEN** hakkiri loads it and applies nothing, and Vale offers the fix (row [HKR-011][ledger])
 
 ## ADDED Requirements
@@ -74,13 +74,13 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 
 #### Scenario: A term that is not a pattern
 
-- **WHEN** a list holds a term such as `C(` that is not a valid pattern
+- **WHEN** a list contains a term such as `C(` that is not a valid pattern
 - **THEN** hakkiri reports an error that names the file and line, where Vale stops with a pattern error that has no line ([vocabularies 4][vocabularies-4])
 
 #### Scenario: A term that Vale's engines refuse
 
-- **WHEN** a list holds `C++`
-- **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and holds back `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
+- **WHEN** a list contains `C++`
+- **THEN** hakkiri reads it as the pattern `C` with a possessive plus, and contains back `C` and `CC`, where Vale stops with a pattern error ([bootstrap 8][bootstrap-8])
 
 #### Scenario: Two packages with one vocabulary
 
@@ -94,7 +94,7 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 
 #### Scenario: An unknown vocabulary
 
-- **WHEN** the config names a vocabulary that no package holds
+- **WHEN** the config names a vocabulary that no package contains
 - **THEN** hakkiri names the vocabulary and the line of the key, where Vale lists the search paths and gives no line ([vocabularies 3][vocabularies-3])
 
 [vocabularies-3]: ../../design.md#3-a-vocabulary-is-a-folder-in-a-loaded-package

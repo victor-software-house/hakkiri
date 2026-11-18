@@ -38,15 +38,15 @@ The probe of Vale at `66bbb85` (2026-11-11), over three Markdown files, one MDX 
 - `$5 and $10`, `US$5 and CA$10`, `A lone $5` and `$ very$` are text, and `\$5` is text.
 - `$g_i =` and `really$` on the next line are one span.
 - `$a$5 very then $b$` is one span, since the first closing `$` is followed by a digit.
-- `$$x very$$` inside a line holds the span `$x very$`, because the first `$` cannot open and the second can.
-- A span holds `*very*` and a backtick as written, since the math parser reads before the emphasis and code parsers do.
+- `$$x very$$` inside a line contains the span `$x very$`, because the first `$` cannot open and the second can.
+- A span contains `*very*` and a backtick as written, since the math parser reads before the emphasis and code parsers do.
 - A display block can end with `$$` after content, with `$$ {#eq-a}`, with a blank line, or with the paragraph, and it can start in the middle of a paragraph, in a list item and in a block quote.
 - An MDX file reads the same rules, and skips a `{…}` expression first.
 - A `code` rule reads `$a$` with its delimiters, so a rule that matches `$` flags both.
 
 ### 3. A container's markers stay
 
-A line after the first of a paragraph in a block quote or a list item holds the container's markers and indentation.  
+A line after the first of a paragraph in a block quote or a list item contains the container's markers and indentation.  
 hakkiri skips them when it looks for `$$` at the start of a line, and a masked line keeps them, so a quote or an item goes on.
 
 [v-math]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/lint/math.go

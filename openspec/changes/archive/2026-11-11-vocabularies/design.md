@@ -2,7 +2,7 @@
 
 ## Context
 
-A Vale vocabulary is a folder `config/vocabularies/<Name>/` that holds `accept.txt` and `reject.txt`, one term per line.  
+A Vale vocabulary is a folder `config/vocabularies/<Name>/` that contains `accept.txt` and `reject.txt`, one term per line.  
 Vale reads the accepted terms as exceptions in most checks, and builds `Vale.Terms` and `Vale.Avoid` from the lists.  
 The [vocabulary-rules change][rules] builds those two rules, so this change reads the lists and applies the exceptions.  
 `HKR-006` fetches a package whole and keeps its `styles/config` folder, and the loader skips that folder as a style.  
@@ -14,7 +14,7 @@ So a vocabulary is already on disk and nothing reads it.
 Goals:
 
 - A project names vocabularies at the top level and per glob, and hakkiri reads them from its packages.
-- The accepted terms reach the checks that Vale reaches, and hold back the matches Vale holds back.
+- The accepted terms reach the checks that Vale reaches, and hold back the matches Vale contains back.
 
 Non-goals:
 
@@ -28,16 +28,16 @@ Non-goals:
 ### 1. Vale's code and a probe are the reference
 
 Vale at `66bbb85` reads vocabularies in these places.  
-The probe ran a Vale build of that commit on 2026-11-11, in two rounds: nine small projects, then five configs over one package in `tests/fixtures/vocabularies`, whose `vale.tsv` holds every alert.
+The probe ran a Vale build of that commit on 2026-11-11, in two rounds: nine small projects, then five configs over one package in `tests/fixtures/vocabularies`, whose `vale.tsv` contains every alert.
 
 | Part | Where in Vale | What it does |
 |:--|:--|:--|
 | Top-level `Vocab` | [ini.go][v-top-vocab] | Reads each named vocabulary, and adds its terms to the project's accepted and rejected lists |
-| A section's `Vocab` | [ini.go][v-section-vocab], [file.go][v-file-vocab], [definition.go][v-vocab-for] | Holds the terms per file, from each section that matches, and checks them as each rule runs |
-| Finding one | [ini.go][v-load-vocab], [config.go][v-search-paths] | Takes the first search path that holds `config/vocabularies/<Name>`, walks it, and reads each `accept.txt` and `reject.txt` |
+| A section's `Vocab` | [ini.go][v-section-vocab], [file.go][v-file-vocab], [definition.go][v-vocab-for] | Contains the terms per file, from each section that matches, and checks them as each rule runs |
+| Finding one | [ini.go][v-load-vocab], [config.go][v-search-paths] | Takes the first search path that contains `config/vocabularies/<Name>`, walks it, and reads each `accept.txt` and `reject.txt` |
 | A line | [ini.go][v-word-list] | Trims it, skips a blank line and one that starts with a hash and a space |
 | A term as a pattern | [definition.go][v-term-pattern] | Escapes the periods of a plain term, and makes each run of whitespace match any run |
-| Exceptions | [definition.go][v-update-exceptions], [definition.go][v-phrase] | Sorts the terms longest first, gives each `(?-i)`, and holds back a match inside an accepted phrase |
+| Exceptions | [definition.go][v-update-exceptions], [definition.go][v-phrase] | Sorts the terms longest first, gives each `(?-i)`, and contains back a match inside an accepted phrase |
 | The checks | [capitalization][v-capitalization], [conditional][v-conditional], [existence][v-existence], [repetition][v-repetition], [substitution][v-substitution], [spelling][v-spelling] | Each adds the accepted terms to its exceptions |
 
 The probe found these, which the spec states as scenarios:
@@ -45,14 +45,14 @@ The probe found these, which the spec states as scenarios:
 - A line that starts with `#` and no space is a term: `#nocomment` is accepted as the text `#nocomment`.
 - A term of `C++` stops the run: Vale reports `error parsing regexp: invalid nested repetition operator` with no file and no line.
 - A `words.txt` is ignored, and an `accept.txt` in a subfolder is read.
-- A plain term with a period holds back its own text only: `Node.js` leaves `Nodexjs` flagged.
+- A plain term with a period contains back its own text only: `Node.js` leaves `Nodexjs` flagged.
 - A phrase that wraps across a line is held back whole, in `existence` and in `spelling`.
 - At the top level, `existence`, `repetition`, `substitution`, `conditional`, `capitalization` and `spelling` all take the accepted terms, and `vocab: false` turns it off in the first five and `nonword` in `existence`.
 - A `capitalization` rule keeps its own `exceptions` and the accepted terms together.
 - A section's list reaches `existence`, `repetition`, `substitution` and `spelling`, and not `capitalization` or `conditional`.
 - A section's list ignores `vocab: false` and `nonword`: `Filler0` and `Raw` hold back `GitHub` there and not at the top.
 - A file takes the lists of every section that matches it, and the top-level lists besides.
-- A section's list is read case-sensitively in `spelling`: with `zorbl` accepted, the top level holds back `Zorbl` and a section does not.
+- A section's list is read case-sensitively in `spelling`: with `zorbl` accepted, the top level contains back `Zorbl` and a section does not.
 - A section's `Vocab` also turns on `Vale.<Name>.Terms` for its files, which is `HKR-042`.
 
 ### 2. The key is `vocab`, at the top level and per glob
@@ -110,7 +110,7 @@ In both, a run of whitespace matches any run of whitespace, so a phrase that wra
 
 A term that is not a valid pattern is an error that names the vocabulary file and the line.  
 Vale reports the failure with no line of the vocabulary file, and `C++` stops every run (intended difference, so the error is one a person can find).  
-hakkiri's regex dialect reads `C++` as a pattern with a possessive plus, so it holds back `C` and `CC` and stops nothing; a term is written `C\+\+` to mean the text.  
+hakkiri's regex dialect reads `C++` as a pattern with a possessive plus, so it contains back `C` and `CC` and stops nothing; a term is written `C\+\+` to mean the text.  
 Alternative: escape every term unless it is marked as a pattern.  
 It lost because Vale's vocabularies hold patterns that way (`harness(?:es)?` in ProseStyle), so an escaped term would stop matching.
 
