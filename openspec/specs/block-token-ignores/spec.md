@@ -9,8 +9,11 @@ A glob can hide the blocks and the inline text that a pattern matches from the p
 ### Requirement: A glob lists block and token patterns
 
 A glob of `files` SHALL take `block_ignores` and `token_ignores`, each a list of patterns, in the project config and in a package's settings file.  
-A file SHALL take the patterns of every glob that matches it, in the order the globs are written, a package's first and then the project's.  
-A pattern that does not compile, or a value that is not a list, SHALL be an error that names the key and its line, and the run SHALL exit 2.
+Each file SHALL take the patterns of every glob that matches it, in the order the globs are written.  
+The globs of a package SHALL come first, then the project's.
+
+A pattern that does not compile, or a value that is not a list, SHALL be an error that gives the key and its line.  
+The run SHALL then exit 2.
 
 #### Scenario: A pattern that does not compile
 
@@ -34,9 +37,11 @@ A pattern that does not compile, or a value that is not a list, SHALL be an erro
 
 ### Requirement: A block pattern hides a match as a code block
 
-In a Markdown or MDX (Markdown with components) file, each match of a block pattern SHALL be read as a fenced code block that contains the first group of the match, so no rule that reads prose reports text inside it.  
-A match with no first group SHALL hold the text `$1` in place of the match.  
-The text before and after a block in the middle of a paragraph SHALL read as two paragraphs.
+In a Markdown or MDX (Markdown with components) file, each match of a block pattern SHALL be read as a fenced code block.  
+The block SHALL contain the first group of the match, so no rule that reads prose reports text inside it.
+
+A match with no first group SHALL contain the text `$1` in place of the match.  
+When a block splits a paragraph, the text before it and the text after it SHALL read as two paragraphs.
 
 #### Scenario: Two headings of an OpenSpec proposal
 
@@ -60,8 +65,10 @@ The text before and after a block in the middle of a paragraph SHALL read as two
 
 ### Requirement: A token pattern hides a match as a code span
 
-In a Markdown or MDX file, each match of a token pattern SHALL be read as a code span that contains the first group of the match, so no rule that reads prose reports text inside it.  
-A rule with `scope: code` SHALL report the text of the span.  
+In a Markdown or MDX file, each match of a token pattern SHALL be read as a code span.  
+The span SHALL contain the first group of the match, so no rule that reads prose reports text inside it.  
+A rule with `scope: code` SHALL report the text of the span.
+
 Block patterns SHALL run before token patterns, and each pattern SHALL run over the text the one before it left.  
 A match of no bytes SHALL change nothing.
 
@@ -121,7 +128,8 @@ The text of a comment is read with its markers and shared indentation removed.
 
 ### Requirement: A test case reads the ignores as a file does
 
-`hakkiri test` SHALL read a case that runs through the project config with the block and token ignores of the globs that match the case's format, as `hakkiri check` reads a file of that format.
+`hakkiri test` SHALL read a case that runs through the project config with the block and token ignores of each glob that matches its format.  
+It SHALL read them as `hakkiri check` reads a file of that format.
 
 #### Scenario: An ignored block in a case
 

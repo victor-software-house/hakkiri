@@ -2,14 +2,20 @@
 
 ## Purpose
 
-An HTML comment in a Markdown file, and a `{/* … */}` comment in an MDX (Markdown with components) file, turns rules off and on for the text after it, with the reach of Vale's comments.
+In a Markdown file, an HTML comment turns rules off and on for the text that follows it.  
+So does a `{/* … */}` comment in an MDX (Markdown with components) file.  
+Both reach as far as Vale's comments do.
 
 ## Requirements
 
 ### Requirement: A comment turns every rule off and on
 
-In a Markdown file, an HTML comment `hakkiri off` or `vale off` SHALL leave the text after it out of every block until a comment `hakkiri on` or `vale on`, or the end of the file.  
-The comment SHALL be read with the blanks at its ends and its line breaks trimmed, and in capitals, with another word in front, or in a code block, a code span or after a backslash it SHALL be text.
+In a Markdown file, an HTML comment `hakkiri off` or `vale off` SHALL leave the text after it out of every block.  
+This SHALL last until a comment `hakkiri on` or `vale on`, or the end of the file.
+
+hakkiri SHALL read the comment with the blanks at its ends and its line breaks trimmed.  
+The comment SHALL be text when it is in capitals or has another word in front.  
+It SHALL also be text inside a code block or a code span, or after a backslash.
 
 #### Scenario: Between two blocks
 
@@ -60,9 +66,13 @@ Vale's `off` and `on` SHALL stand for `NO` and `YES`, and a rule name that no ru
 ### Requirement: A rule is gated where its text is read
 
 A rule that a comment turned off before the text of a block is read SHALL read no text in that block.  
-The text is read when its element ends, or where a tag that opens a block inside the element flushes it.  
-An alert between the comment that turned a rule off and the one that turned it on SHALL be left out.  
-A paragraph in a tight list item SHALL be read before a nested list, quote, code block, table, heading or HTML block that opens a block tag, and at the end of the item otherwise.
+The text is read when its element ends, or where a tag that opens a block inside the element flushes it.
+
+An alert between the comment that turned a rule off and the one that turned it on SHALL be left out.
+
+In a tight list item, a paragraph SHALL be read before a nested block that opens a block tag.  
+Such a block is a list, quote, code block, table, heading or HTML block.  
+Otherwise it SHALL be read at the end of the item.
 
 #### Scenario: A comment inside a paragraph
 
@@ -76,12 +86,14 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 #### Scenario: A tight list item
 
-- **WHEN** a comment that turns a rule off is indented under the text of a tight list item, and the one that turns it on is under the item after it
+- **WHEN** a comment that turns a rule off is indented under the text of a tight list item
+- **AND** the comment that turns it on is under the next item
 - **THEN** the rule reports nothing in the first item, and nothing in the item between the comments
 
 #### Scenario: A block that opens inside a tight list item
 
-- **WHEN** a tight list item contains `A very`, and a nested list, a quote, a fenced block, a table or a heading under it contains a comment that turns the rule off
+- **WHEN** a tight list item contains `A very`
+- **AND** a nested list, a quote, a fenced block, a table or a heading under it contains a comment that turns the rule off
 - **THEN** `A very` draws its alert, and the text after the comment draws none
 
 #### Scenario: A comment before the block that opens
@@ -107,7 +119,7 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 #### Scenario: A skipped element flushes at its end tag
 
 - **WHEN** a paragraph reads `one very <!-- hakkiri off --> <pre>two</pre> three very.`
-- **THEN** `one very` draws no alert, since the `pre` start tag flushes nothing and the `pre` end tag, after the comment, flushes `one very`
+- **THEN** `one very` draws no alert, since nothing is flushed at the `pre` start tag, and the `pre` end tag, after the comment, flushes `one very`
 
 #### Scenario: Text left at the end of an HTML block
 
@@ -141,7 +153,9 @@ A paragraph in a tight list item SHALL be read before a nested list, quote, code
 
 ### Requirement: An MDX file's braces comments are comments
 
-In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}`, as a block of its own or inside a line of text, SHALL turn rules off and on as the HTML comment does, with every form of the HTML comment.  
+In an MDX file, a comment `{/* hakkiri off */}` or `{/* vale off */}` SHALL turn rules off and on as the HTML comment does.  
+It SHALL do so as a block of its own or inside a line of text, and in every form the HTML comment takes.
+
 The text SHALL be exactly `{/*` and `*/}` around the comment, so `{ /* vale off */ }` and `{/* Vale Off */}` are text.
 
 #### Scenario: A block of its own

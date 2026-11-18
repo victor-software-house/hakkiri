@@ -9,8 +9,11 @@ It exits 0 for a clean run, 1 when an alert reaches `--fail-level`, and 2 when a
 
 ### Requirement: A path is a file or a directory
 
-`hakkiri check` SHALL lint each file it is given and each file under each directory it is given, and SHALL lint the current directory when it is given none.  
-A walk SHALL skip `node_modules`, `.git` and each folder a `packages` entry names, comparing the resolved path of each folder with the resolved package paths.  
+`hakkiri check` SHALL lint each file it is given and each file under each directory it is given.  
+With no path, it SHALL lint the current directory.
+
+A walk SHALL skip `node_modules`, `.git` and each folder that a `packages` entry points to.  
+It SHALL compare the resolved path of each folder with the resolved package paths.  
 It SHALL lint a file once, however many of the paths it is given reach that file.
 
 #### Scenario: A directory and a file
@@ -80,7 +83,8 @@ The output SHALL hold no escape (ESC) byte, whatever the colour variables hold.
 
 ### Requirement: The exit status shows what happened
 
-hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed, and otherwise 1 when a reported alert reaches `--fail-level`, and otherwise 0.  
+hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed.  
+Otherwise it SHALL exit 1 when a reported alert reaches `--fail-level`, and 0 when none does.  
 `--fail-level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `error` when unset.  
 It SHALL see only the alerts that the config's `level` leaves in.
 
@@ -156,8 +160,11 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 ### Requirement: A named file that no glob selects draws a warning
 
-A file named on the command line that no glob of `files` matches SHALL draw a warning that names it, or a failure with exit 2 when `on_unmatched` is `error`, or nothing when it is `ignore`.  
-A file that a glob matches whose styles hold no rule, a file found by a walk, and a file named twice SHALL NOT draw more than the one warning.
+A file given on the command line that no glob of `files` matches SHALL draw a warning that gives its path.  
+When `on_unmatched` is `error`, it SHALL draw a failure with exit 2 instead, and when it is `ignore`, nothing.
+
+A file that a glob matches but whose styles contain no rule SHALL NOT draw more than the one warning.  
+Nor SHALL a file found by a walk, or a file given twice.
 
 #### Scenario: A warning
 
@@ -186,7 +193,9 @@ A file that a glob matches whose styles hold no rule, a file found by a walk, an
 
 ### Requirement: A reader is chosen by formats, then by extension
 
-hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell or Text.  
+hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by the reader of its language.  
+The languages are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell and Text.
+
 A reader SHALL follow the langdex language of the file, so no table of extensions lists the files a reader takes.
 
 #### Scenario: The reader of an extension
@@ -216,8 +225,9 @@ A reader SHALL follow the langdex language of the file, so no table of extension
 
 ### Requirement: A file no reader reads is plain text
 
-A file that a glob selects and whose language no reader reads, or that has no language, SHALL be read as plain text, unless `on_unknown` says otherwise.  
-A Text file SHALL be read as plain text whatever `on_unknown` says.
+A file that a glob selects and that has no language, or whose language no reader reads, SHALL be read as plain text.  
+`on_unknown` can choose another action for it.  
+A Text file SHALL be read as plain text whatever the value of `on_unknown`.
 
 #### Scenario: A file no reader reads, found by a walk
 
@@ -236,7 +246,8 @@ A Text file SHALL be read as plain text whatever `on_unknown` says.
 
 ### Requirement: Plain text is read as written
 
-A plain-text file SHALL have one `raw` scope over the whole file, and one `paragraph` for each run of lines between blank lines.  
+A plain-text file SHALL have one `raw` scope over the whole file.  
+Each run of lines between blank lines SHALL be one `paragraph`.  
 No marker, escape or entity SHALL change its text.
 
 #### Scenario: Paragraphs
@@ -251,8 +262,9 @@ No marker, escape or entity SHALL change its text.
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text that contains a null (NUL) byte in its first 8192 bytes SHALL be skipped with no alert and no message.  
-This SHALL hold whether a walk finds the file or the command line names it.  
+A file read as plain text SHALL be skipped, with no alert and no message, when its first 8192 bytes contain a null (NUL) byte.  
+This SHALL apply whether a walk finds the file or the command line gives it.
+
 A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
 
 #### Scenario: A picture
@@ -295,7 +307,9 @@ A file that no glob selects SHALL draw no message.
 ### Requirement: A file has a language
 
 A file SHALL have the langdex language of its path, read by its file name and then its extension.  
-A file whose path gives none SHALL have the language of the interpreter on its first line, read from at most its first 4096 bytes, and otherwise no language.
+A file whose path gives no language SHALL take the language of the interpreter on its first line.  
+hakkiri SHALL read at most the first 4096 bytes to find that line.  
+With no interpreter line, the file SHALL have no language.
 
 #### Scenario: A file name, an extension and an interpreter
 
@@ -305,8 +319,9 @@ A file whose path gives none SHALL have the language of the interpreter on its f
 ### Requirement: A file has its own language, and its reader's when formats chose it
 
 For the scopes of the rules that run on it, a node outside a fenced code block SHALL be in the file's own language.  
-It SHALL also be in the language of the file's reader when a `formats` entry chose that reader.  
-A scope part that names a language SHALL hold for either, and a negated part SHALL leave a block out for either.
+It SHALL also be in the language of the file's reader when a `formats` entry chose that reader.
+
+A scope part that names a language SHALL match either, and a negated part SHALL leave a block out for either.
 
 #### Scenario: A mapped file
 
