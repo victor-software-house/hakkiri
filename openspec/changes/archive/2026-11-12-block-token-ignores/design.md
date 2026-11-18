@@ -18,7 +18,7 @@ Goals:
 
 Non-goals:
 
-- Ignores in a file that is not Markdown or Markdown with components (MDX), since hakkiri reads no other markup.
+- Ignores in a file that is not Markdown or MDX, since hakkiri reads no other markup.
 - `IgnorePatterns`, Vale's older name for the block patterns.
 
 ## Decisions

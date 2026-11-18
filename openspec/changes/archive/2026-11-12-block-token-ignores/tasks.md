@@ -4,7 +4,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 1. The patterns
 
-- [x] 1.1 Probe Vale at `66bbb85` for block and token patterns on Markdown, Markdown with components (MDX) and Rust files.  
+- [x] 1.1 Probe Vale at `66bbb85` for block and token patterns on Markdown, MDX and Rust files.  
   Record Vale's alerts in `tests/fixtures/ignores/vale.tsv`.  
   Verify the file contains the alerts of every scenario of the requirements, and the test gives the Vale commit.
 

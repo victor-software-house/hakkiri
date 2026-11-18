@@ -15,7 +15,7 @@ So it either lints text it hid before or edits its documents.
 ## Changes
 
 - A `files` glob takes `block_ignores` and `token_ignores`, each a list of patterns, in the config of a project and in a package's settings file.
-- In a Markdown or Markdown with components (MDX) file, each match of a block pattern is read as a fenced code block.  
+- In a Markdown or MDX file, each match of a block pattern is read as a fenced code block.  
   The block contains the first group of the match, as Vale reads it.
 - Each match of a token pattern is read as a code span that contains the first group.
 - The patterns of every glob that matches a file apply, a package's first and then the project's.  

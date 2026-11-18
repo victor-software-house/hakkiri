@@ -27,7 +27,7 @@ The walk takes the entries of each folder by name, so the rules come in Vale's o
 Alternative: read only the files directly in the folder.  
 Lost: a nested rule would load in Vale and not in hakkiri, in `check` and in `test` alike.
 
-### 3. Two files with one name are refused
+### 3. Two files with one name are rejected
 
 Once a name ends at the first dot, `Terms.yml` and `Terms.custom.yml` give one name.  
 The loader refuses the second file with an error that names both files and the rule name, when a glob lists the style.
