@@ -18,14 +18,18 @@ It lost because a text search finds a line and not a key, and ctl-core owns the 
 
 ### 2. A fault about one item lands on that item
 
-A fault about a name of a list, such as a `styles` name that is no style, a `vocab` name that is no vocabulary or a pattern that does not compile, takes the index step of that item.  
+A fault about a name of a list takes the index step of that item.  
+Such a fault is a `styles` name that is no style, a `vocab` name that is no vocabulary, or a pattern that does not compile.
+
 `place` gives the line of the item, so a later item of a block list gets its own line and not the first.
 
 A fault about the whole value of a key still lands where the value starts.  
-For a scalar or a flow value that is the line of the key, and for a block collection it is the first line below it.  
+For a scalar or a flow value that is the line of the key.  
+For a block collection it is the first line below it.
+
 The faults about the key itself take `Input::place_key`, which ctl-core adds in [CTC-054][ledger].  
-They are a glob that is no glob and a setting that names no rule.  
-They are also a key that a package's settings file may not hold, and a `path` entry in such a file.
+They are a glob that is no glob and a setting that matches no rule.  
+They are also a key that a package's settings file may not contain, and a `path` entry in such a file.
 
 ### 3. A layer keeps one `Input`
 

@@ -3,7 +3,8 @@
 ### Requirement: Adjacent line comments join
 
 Adjacent line comments of the same type SHALL join into one comment node, read as one Markdown text.  
-Doc line comments of the same type SHALL join across blank lines, as rustdoc reads them, and a line of code or a comment of another type SHALL end the run.
+Doc line comments of the same type SHALL join across blank lines, as rustdoc reads them.  
+A line of code or a comment of another type SHALL end the run.
 
 #### Scenario: A doc comment over three lines
 

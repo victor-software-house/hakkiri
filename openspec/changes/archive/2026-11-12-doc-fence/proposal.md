@@ -5,7 +5,8 @@ Queue row: `HKR-046` in [tasks.yaml][ledger].
 ## Motivation
 
 A fenced block in a Rust doc comment stopped being code at a blank line between two `///` lines.  
-Rustdoc reads the doc comments of one item as one text, so the fence stays open.  
+Rustdoc reads the doc comments of one item as one text, so the fence stays open.
+
 hakkiri cut the comment into two nodes at the blank line, and read the lines after it as prose.  
 The ProseStyle v0.0.14 `BareURLInComment` case `keeps a doc comment's fence open across a blank line` failed for that reason.
 

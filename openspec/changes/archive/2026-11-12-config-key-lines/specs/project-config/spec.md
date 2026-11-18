@@ -2,10 +2,11 @@
 
 ### Requirement: A fault names the line of its own key
 
-A fault about a key of the config SHALL name the line where the config writes that key.  
-A fault about the value of a key SHALL name the line where the value starts.  
-Both hold whatever characters the key contains and however the config is written.  
-A fault about one item of a list SHALL name the line of that item.  
+A fault about a key of the config SHALL give the line where the config writes that key.  
+A fault about the value of a key SHALL give the line where the value starts.  
+Both apply whatever characters the key contains and however the config is written.
+
+A fault about one item of a list SHALL give the line of that item.  
 A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{` split nothing.
 
 #### Scenario: Globs and settings that hold special characters
@@ -30,8 +31,8 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 
 #### Scenario: A glob or a setting with a block value
 
-- **WHEN** a glob that is no glob has a block mapping below it, or a setting that names no rule has a block list below it
-- **THEN** hakkiri names the line of the key, and not the line below it
+- **WHEN** a glob that is no glob has a block mapping below it, or a rule setting with no rule has a block list
+- **THEN** hakkiri gives the line of the key, and not the line below it
 
 #### Scenario: A refused key of a package's settings file
 
