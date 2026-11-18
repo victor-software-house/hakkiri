@@ -1,12 +1,3 @@
 # Local work loads the dev profile by default. CI never loads it: workflows
 # set MISE_ENV=ci, or ci,release for release jobs.
 env = ["dev"]
-# With auto_env, mise loads a platform file only on the matching OS.
-# Examples are mise.linux.toml and mise.macos.toml, each with its own
-# mise.<platform>.lock.
-#
-# A tool that one OS needs goes in a platform file, not behind an
-# os = [...] option. Under locked = true, mise 2026.11.x still resolves an
-# os-filtered core tool on the other OSes. It then warns that the tool is
-# not in the lockfile. mise 2027.6.0 enables auto_env by default.
-auto_env = true
