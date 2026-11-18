@@ -27,4 +27,4 @@ A render of the shared template has 47 such alerts.
 - Changed: `src/comments.rs`, `src/instructions.md`, `tests/fixtures/comment-languages`.
 - No new dependency.
 
-[ledger]: ../../../tasks.yaml
+[ledger]: ../../../../tasks.yaml
