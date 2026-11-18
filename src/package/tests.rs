@@ -28,7 +28,7 @@ const ROUNDS: usize = 100;
 /// The folder of the package in the cache.
 const FOLDER: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 
-/// A zip of one top folder that holds [`RULES`] rule files.
+/// A zip of one top folder that has [`RULES`] rule files.
 fn package() -> Result<Vec<u8>, Box<dyn Error>> {
     let mut writer = ZipWriter::new(Cursor::new(Vec::new()));
     let options = SimpleFileOptions::default().compression_method(CompressionMethod::Stored);

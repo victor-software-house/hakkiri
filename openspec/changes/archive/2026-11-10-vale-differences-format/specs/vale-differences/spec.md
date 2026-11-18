@@ -2,11 +2,12 @@
 
 ### Requirement: A comment reads as Markdown
 
-hakkiri SHALL read every comment of a code file as Markdown, where Vale 3.26.0 reads it as plain lines unless a View names a markup format.
+hakkiri SHALL read every comment of a code file as Markdown.  
+Vale 3.26.0 reads a comment as plain lines unless a View sets a markup format.
 
 #### Scenario: A code span in a plain comment
 
-- **WHEN** a Rust file holds ``// Use `utilize` here.`` and an `existence` rule matches `utilize`
+- **WHEN** a Rust file has ``// Use `utilize` here.`` and an `existence` rule matches `utilize`
 - **THEN** hakkiri reads the span as code and reports nothing, and Vale reports `utilize` inside the backticks ([format 8][format-8])
 
 ### Requirement: Rule files differ from Vale in what they accept or select
@@ -15,10 +16,10 @@ hakkiri SHALL load, refuse or select as each scenario below says, where Vale 3.2
 
 #### Scenario: A table row is a scope
 
-- **WHEN** a rule has `scope: table.row` and a row holds the matched text
+- **WHEN** a rule has `scope: table.row` and a row has the matched text
 - **THEN** hakkiri selects the text of the row, and Vale loads the rule and selects nothing, since no block has a `row` part ([format 9][format-9])
 
-#### Scenario: A scope no node holds
+#### Scenario: A scope no node has
 
 - **WHEN** a rule has `scope: nonsense`
 - **THEN** hakkiri refuses it as an unknown scope, and Vale loads it and selects nothing ([engine 3][engine-3])
@@ -44,7 +45,7 @@ hakkiri SHALL read its settings from `.ctl/hakkiri.yaml` and take Vale styles on
 
 #### Scenario: A Vale configuration
 
-- **WHEN** a project holds a `.vale.ini` and no `.ctl/hakkiri.yaml`
+- **WHEN** a project has a `.vale.ini` and no `.ctl/hakkiri.yaml`
 - **THEN** hakkiri reads no setting from it, and Vale reads it ([bootstrap 1][bootstrap-1])
 
 #### Scenario: A rule is turned off

@@ -1,10 +1,11 @@
 //! The Treebank word tokenizer, which cuts a title before it is tagged.
 //!
 //! A port of `tokenize/treebank.go` in [prose] at `b33e60d`, itself a port of
-//! a sed script of the Penn Treebank project. The sentence tokenizer of this
-//! crate is not this one: [`super::tokens`] ports `tokenize.New()`, which tags
-//! the words of a sentence, and the title converter of prose cuts its input
-//! with this one.
+//! a sed script of the Penn Treebank project.
+//! The sentence tokenizer of this crate is not this one.
+//! [`super::tokens`] ports `tokenize.New()`, which tags the words of a
+//! sentence.
+//! The title converter of prose cuts its input with this tokenizer.
 //!
 //! Go reads each map of replacements in an order that changes between runs.
 //! The replacements of a map touch different text, so this reads them in the

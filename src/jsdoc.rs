@@ -8,8 +8,8 @@ use std::ops::Range;
 /// A line that starts with `@` and a letter begins a tag, unless it sits in a
 /// fenced block.
 /// The tag name is not prose, and neither is a type in braces after it.
-/// After `@param` and the tags that name something, the name is not prose
-/// either.
+///
+/// After `@param` and the tags that take a name, the name is not prose either.
 /// The body of `@example` is code, not prose.
 /// A description runs to the next tag.
 pub(crate) fn prose(text: &str) -> Vec<Range<usize>> {
@@ -114,7 +114,7 @@ impl Tag {
     }
 }
 
-/// The offset in `line` after the type in braces at `at`, or `at` when no type
+/// The offset in `line` past the braced type at `at`, or `at` when no type
 /// starts there.
 fn skip_type(line: &str, at: usize) -> usize {
     let rest = line.get(at..).unwrap_or_default();

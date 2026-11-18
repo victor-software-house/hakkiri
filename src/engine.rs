@@ -17,22 +17,33 @@ pub const DEFAULT_CODE_SPAN_SIZE: u8 = 1;
 
 /// The alerts of `rules` in one file, sorted by line and then by column.
 ///
-/// `rules` is a slice of rules or of references to them, so a caller that picks
-/// a few of many rules for a file lends them without a copy.
-/// `tree` is the file's tree, `source` its text and `languages` its languages:
-/// its own, and its reader's when a mapping chose the reader. A scope that
-/// names a language reads the nodes in it, and the nodes of a fenced code block
-/// are in the language of the fence. Alerts at one place keep the order of
-/// their rules. A rule whose pattern gives up on a block reports one `error`
-/// alert at the block, and the other rules still run.
-/// A comment of a Markdown file can turn rules off and on: see
-/// [`crate::control`]. A rule that a comment turned off for the element of a
-/// block reads no text in it, and an alert between the comment that turned its
-/// rule off and the one that turned it on is left out.
-/// A `raw` rule reads the whole file, and only `off` gates it.
-/// A `metric` or `readability` rule with no `scope`, or `scope: text`, measures
-/// the prose of the whole file, the comments of a code file included, and
-/// reports at its start; any other scope measures each block it selects.
+/// `rules` is a slice of rules or of references to them.
+/// So a caller can pick a few of many rules for a file and lend them without a
+/// copy.
+/// `tree` is the file's tree, `source` is its text, and `languages` are its
+/// languages: its own, and its reader's when a mapping chose the reader.
+///
+/// A scope with a language reads the nodes in that language.
+/// The nodes of a fenced code block are in the language of the fence.
+/// Alerts at one place keep the order of their rules.
+///
+/// A rule whose pattern gives up on a block reports one `error` alert at the
+/// block, and the other rules still run.
+///
+/// A Markdown file can turn rules off and on with comments: see
+/// [`crate::control`].
+/// When a comment turns a rule off for the element of a block, the rule reads
+/// no text in it.
+/// Alerts between the comment that turned the rule off and the one that turned
+/// it on are left out.
+///
+/// Only `off` gates a `raw` rule, which reads the whole file.
+/// Without a `scope`, or with `scope: text`, a `metric` or `readability` rule
+/// measures the prose of the whole file.
+/// That prose includes the comments of a code file, and the rule reports at the
+/// start of the file.
+/// With any other scope, it measures each block it selects.
+///
 /// A `readability` rule reports at column 1 of the first line of each block.
 /// The counts and scores of that prose are worked out once, and each rule adds
 /// only its `occurrences`.
@@ -54,13 +65,14 @@ pub fn lint<R: Borrow<Rule>>(
 /// The alerts of `rules` in one file, as [`lint`] gives them, with the
 /// vocabularies of the file's globs held back too.
 ///
-/// `accepted` holds the [`Exceptions`] of each vocabulary a glob that matches
-/// the file names.
+/// `accepted` contains the [`Exceptions`] of each vocabulary that a glob
+/// matching the file lists.
 /// A `metric` or `readability` rule counts each code span as `code_span_size`
 /// words: [`DEFAULT_CODE_SPAN_SIZE`] by default, and 0 as Vale does.
-/// An `existence`, `repetition`, `spelling` or `substitution` rule holds back
-/// each match they hold back, besides its own exceptions, whatever it sets for
-/// `vocab` and `nonword`.
+///
+/// An `existence`, `repetition`, `spelling` or `substitution` rule skips each
+/// match that those vocabularies skip, besides its own exceptions, whatever it
+/// sets for `vocab` and `nonword`.
 /// A `capitalization` or `conditional` rule reads none of them.
 ///
 /// # Errors

@@ -1,11 +1,12 @@
 //! `sequence` rules with `forms`: the scenarios of the sequence-forms change.
 //!
-//! `tests/fixtures/sequence-forms` holds a rule with three forms,
+//! `tests/fixtures/sequence-forms` contains a rule with three forms,
 //! `ThingsSpeak.yml`, the same three lists as the one-list rules of `single`,
 //! and `inputs.txt`, one sentence a line.
-//! A one-list rule reads `tokens` as Vale does, which the `sequence` tests
-//! compare with Vale's alerts, so the three rules together give the alerts the
-//! rule with three forms must give.
+//! A one-list rule reads `tokens` as Vale does.
+//! The `sequence` tests compare such a rule with Vale's alerts.
+//! So the three rules together give the alerts the rule with three forms must
+//! give.
 
 #![expect(
     clippy::panic_in_result_fn,

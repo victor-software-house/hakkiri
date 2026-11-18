@@ -1,22 +1,26 @@
 //! The comments of Go, Swift, YAML, TOML and Shell files, and the directives
 //! and doc links of every source language, against Vale.
-//! The alerts are those of an `existence` rule that matches every word, over
-//! files that hold one kind of comment each.
+//! The alerts are those of an `existence` rule that matches every word.
+//! Each input file has one kind of comment.
 //!
-//! `tests/fixtures/comment-languages/rules` holds the rule, `inputs` the files
-//! with `.fixture` after the extension, and `vale.tsv` one row for each alert
-//! Vale gave: the rule, the file, the line, the first and last column, and the
-//! matched text. The rows come from Vale at `66bbb85` with the grammars of its
+//! `tests/fixtures/comment-languages/rules` has the rule.
+//! `inputs` has the files, with `.fixture` after the extension.
+//!
+//! `vale.tsv` has one row for each alert Vale gave: the rule, the file, the
+//! line, the first and last column, and the matched text.
+//! The rows come from Vale at `66bbb85` with the grammars of its
 //! `grammars/build.sh`.
-//! Vale ran on the inputs with the rule as one style, a `View`
-//! that reads the comments of YAML and TOML files as Markdown, and `[formats]`
-//! that reads the comments of the other files as Markdown.
 //!
-//! hakkiri gives Vale's alerts except in the cases of the
-//! `comment-languages` change. `departures.tsv` holds one row for each alert
-//! that only one side gave, led by `vale` or `hakkiri`. The test fails on any
-//! difference that file does not list, and on any row of it that no longer
-//! differs.
+//! Vale ran on the inputs with the rule as one style.
+//! A `View` reads the comments of YAML and TOML files as Markdown.
+//! `[formats]` reads the comments of the other files as Markdown.
+//!
+//! hakkiri gives Vale's alerts except in the cases of the `comment-languages`
+//! change.
+//! `departures.tsv` has one row for each alert that only one side gave, led by
+//! `vale` or `hakkiri`.
+//! The test fails on any difference that file does not list.
+//! It also fails on a row that lists a difference that has gone.
 
 #![expect(
     clippy::panic_in_result_fn,

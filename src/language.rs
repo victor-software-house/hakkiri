@@ -1,23 +1,23 @@
 //! The languages hakkiri reads.
 //!
-//! A reader is one of the twelve parsers hakkiri has, and each reads one
-//! language of [langdex], the table of languages with their names, aliases,
-//! extensions, file names and interpreters.
+//! A reader is one of the twelve parsers hakkiri has.
+//! Each reads one language of [langdex], the table of languages with their
+//! names, aliases, extensions, file names and interpreters.
 
 use std::path::Path;
 
 /// A language hakkiri builds a tree for.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Language {
-    /// Markdown with GFM and front matter.
+    /// Markdown with GitHub Flavored Markdown (GFM) and front matter.
     Markdown,
-    /// MDX.
+    /// Markdown with JavaScript (MDX).
     Mdx,
     /// Rust.
     Rust,
     /// TypeScript.
     TypeScript,
-    /// TypeScript with JSX.
+    /// TypeScript with JavaScript XML (JSX).
     Tsx,
     /// JavaScript with JSX.
     JavaScript,

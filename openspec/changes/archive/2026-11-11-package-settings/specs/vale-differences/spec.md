@@ -6,18 +6,20 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 
 #### Scenario: The file and its place
 
-- **WHEN** a package holds `.ctl/hakkiri.yaml`
+- **WHEN** a package contains `.ctl/hakkiri.yaml`
 - **THEN** hakkiri reads it from the package's top folder, beside `styles`, and Vale copies the package's `.vale.ini` to `StylesPath/.vale-config/<index>-<Name>.ini` at `vale sync` ([package settings 2][settings-2])
 
 #### Scenario: A scalar in a package
 
 - **WHEN** a package and the project both set `level`
-- **THEN** the project's value applies, and Vale lets a package win for the keys it reads first, such as `WordTemplate` and the `[formats]` entries ([package settings 5][settings-5])
+- **THEN** the project's value applies
+  - By contrast, Vale lets a package win for the keys it reads first, such as `WordTemplate` and the `[formats]` entries ([package settings 5][settings-5])
 
 #### Scenario: An unknown key in a package
 
-- **WHEN** a package's settings file holds a key hakkiri does not define
-- **THEN** hakkiri refuses it with the line and the package, and Vale warns that the key is not a core option and ignores it ([package settings 7][settings-7])
+- **WHEN** a package's settings file contains a key hakkiri does not define
+- **THEN** hakkiri refuses it with the line and the package
+  - By contrast, Vale warns that the key is not a core option and ignores it ([package settings 7][settings-7])
 
 #### Scenario: A deep chain of packages
 
@@ -26,7 +28,7 @@ hakkiri SHALL read a package's settings as each scenario below says, where Vale 
 
 #### Scenario: A nested package pinned by path
 
-- **WHEN** a package's `packages` holds a `path` entry
+- **WHEN** a package's `packages` contains a `path` entry
 - **THEN** hakkiri refuses it, and Vale installs a local folder named there ([package settings 3][settings-3])
 
 #### Scenario: Ten or more packages

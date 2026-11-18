@@ -47,7 +47,7 @@ pub struct Text {
     /// The bytes of `text` that read a code span.
     code: Vec<Range<usize>>,
     /// The text as a pattern reads it, built by the first call of
-    /// `pattern_reading` on a text that holds a code span.
+    /// `pattern_reading` on a text that contains a code span.
     masked: OnceLock<String>,
 }
 
@@ -96,9 +96,9 @@ impl Text {
             let reading = parts.reads.get(index).copied().unwrap_or_default();
             if let Some(end) = previous_end {
                 source.get(end..segment.start)?;
-                // The replacements are in file order with no overlap, so the
-                // ones that reach back to `end` and forward to the segment lie
-                // together after a binary search.
+                // The replacements are in file order with no overlap.
+                // So the ones that reach back to `end` and forward to the
+                // segment lie together after a binary search.
                 let from = parts
                     .replacements
                     .partition_point(|(range, _)| range.end < segment.start);
@@ -293,7 +293,8 @@ impl Text {
     /// lies in a code span.
     ///
     /// A match that has text on both sides of a code span reads as a match
-    /// across it, and one that starts or ends on a span does not.
+    /// across it.
+    /// A match that starts or ends on a span does not.
     #[must_use]
     pub fn edge_in_code(&self, range: &Range<usize>) -> bool {
         if range.is_empty() {

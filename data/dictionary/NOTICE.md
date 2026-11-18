@@ -4,9 +4,10 @@
 Their SHA-256 sums are `e3aa3f24f75ea49468f79f0aaf43e1095797f465d90ebd5a3e47690612e4b189` and `7e203a29114761b1c5d96d74d4c2011a9a202827cc64b1f1f0cee6a2fd377ba6`.  
 hakkiri made no change to them.
 
-The `.dic` file holds 81,558 words made from the English Speller Database (ESDB, previously SCOWL).  
+The `.dic` file contains 81,558 words made from the English Speller Database (ESDB).  
+ESDB is the successor of Spell Checker Oriented Word Lists (SCOWL).  
 The [copyright notice of the database][esdb-license] allows any use, as long as the notice appears in every copy, so it follows here.  
-The official speller dictionaries need only the part before the `===` line.
+Official speller dictionaries need only the part before the `===` line.
 
 ```text
 Copyright 2000-2026 by Kevin Atkinson

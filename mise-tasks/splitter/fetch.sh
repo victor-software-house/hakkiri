@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #MISE description="Fetch the splitter's training text from the pinned sources"
+#
 # Reads data/splitter/repositories.tsv, datasets.tsv and licenses.txt and writes
 # target/splitter-corpus/{repositories,issues,books}.txt: documents separated by
 # a form feed. A repository is fetched without credentials, so a private one

@@ -44,7 +44,7 @@ static IDENTIFIER: LazyLock<Regex> = LazyLock::new(|| {
         .expect("the identifier pattern compiles")
 });
 
-/// A word that holds a character no identifier holds: not a letter, a digit,
+/// A word with a character that no identifier has: not a letter, a digit,
 /// `_`, `-` or `'`.
 #[expect(
     clippy::expect_used,
@@ -154,8 +154,9 @@ struct Word {
     text: String,
     /// The bytes of the word in the text.
     range: Range<usize>,
-    /// For a word that holds a replaced quote, the byte of the text that each
-    /// byte of `text` came from, and one more that ends the last.
+    /// For a word with a replaced quote, the byte of the text that each byte of
+    /// `text` came from.
+    /// One more byte ends the last.
     origin: Option<Vec<usize>>,
 }
 
@@ -172,8 +173,8 @@ impl Word {
     }
 }
 
-/// The text of a run of characters with the quotes `SANITIZED` names
-/// replaced, and the byte each byte of it came from.
+/// The text of a run of characters, with the quotes `SANITIZED` lists replaced.
+/// Also the byte that each byte of it came from.
 fn sanitize(run: &str, base: usize) -> (String, Option<Vec<usize>>) {
     if !SANITIZED.iter().any(|(old, _)| run.contains(old)) {
         return (run.to_owned(), None);
@@ -198,14 +199,15 @@ fn sanitize(run: &str, base: usize) -> (String, Option<Vec<usize>>) {
     (text, Some(origin))
 }
 
-/// Whether `token` holds no letter.
+/// Whether `token` has no letter.
 fn no_letter(token: &str) -> bool {
     !token.chars().any(|c| is(Category::Letter, c))
 }
 
-/// Cuts the run `run` of a text, which starts at byte `base`, into words:
-/// strips the prefixes and suffixes the tokenizer strips, and drops what
-/// holds no letter.
+/// Cuts the run `run` of a text into words.
+/// The run starts at byte `base`.
+/// It strips the prefixes and suffixes the tokenizer strips, and drops what has
+/// no letter.
 fn cut(run: &str, base: usize, words: &mut Vec<Word>) {
     let (text, origin) = sanitize(run, base);
     let (mut start, mut end) = (0, text.len());
@@ -262,13 +264,13 @@ fn tokenize(text: &str) -> Vec<Word> {
 
 /// Whether the filters a rule has unless it sets `custom` skip `word`.
 ///
-/// They skip a word that holds a character other than an ASCII letter, `_`
-/// or `'`, and one that ends in capitals.
+/// They skip a word that has a character other than an ASCII letter, `_` or
+/// `'`, and one that ends in capitals.
 /// They also skip a word made of a capital, lower-case letters and more
 /// capitals, such as `FooBar`.
 ///
-/// With `split` an identifier is taken apart and not skipped, so only a word
-/// with a character no identifier holds is.
+/// With `split` an identifier is taken apart and not skipped.
+/// Only a word with a character that no identifier has is skipped.
 fn skipped(split: bool, word: &str) -> bool {
     if split {
         return NOT_IDENTIFIER.is_match(word);
@@ -390,8 +392,9 @@ fn split_identifier(word: &str) -> Vec<Part<'_>> {
     parts
 }
 
-/// Whether one part of an identifier passes: a short one or one in capitals
-/// is not checked, and neither is one the dictionary or an accepted term holds.
+/// Whether one part of an identifier passes.
+/// A short part or one in capitals is not checked.
+/// Neither is one that the dictionary or an accepted term has.
 fn part_passes(spelling: &Spelling, part: &str, accepted: &[&Exceptions]) -> bool {
     let letters = part.chars().filter(|c| is(Category::Letter, *c)).count();
     letters < MIN_PART_LETTERS
@@ -406,7 +409,7 @@ fn part_passes(spelling: &Spelling, part: &str, accepted: &[&Exceptions]) -> boo
         })
 }
 
-/// Whether an accepted term of the project holds `word` back.
+/// Whether an accepted term of the project has `word`.
 fn accepts_word(spelling: &Spelling, word: &str) -> bool {
     spelling
         .accepted
@@ -442,12 +445,13 @@ fn capitals(text: &str) -> usize {
     text.chars().filter(|c| is(Category::Upper, *c)).count()
 }
 
-/// Whether the dictionary's other-case spelling of `word` is a fix to offer:
-/// one that adds capitals inside a word of three letters or more that has at
-/// most one, as in `GitHub` or `JSON`.
+/// Whether the dictionary's other-case spelling of `word` is a fix to offer.
+/// It is when it adds capitals inside a word of three letters or more that has
+/// at most one, as in `GitHub` or `JSON`.
 ///
 /// A name with a capital only at its start, `Kubernetes`, cannot be told from
-/// a word in another language, and a word with more capitals chose them.
+/// a word in another language.
+/// A word with more capitals chose them.
 fn certain_recase(word: &str, cased: &str) -> bool {
     let inner = cased.chars().skip(1).any(|c| is(Category::Upper, c));
     word.chars().count() >= MIN_PART_LETTERS
@@ -456,9 +460,9 @@ fn certain_recase(word: &str, cased: &str) -> bool {
         && inner
 }
 
-/// A message that says more than the rule's: the dictionary spells `word` in
-/// another case, or `found` is shaped like an identifier in a file with
-/// inline code.
+/// A message that says more than the rule's.
+/// The dictionary spells `word` in another case, or `found` is shaped like an
+/// identifier in a file with inline code.
 fn explain(spelling: &Spelling, word: &str, found: &str, extension: &str) -> Option<String> {
     if let Some(cased) = spelling.speller.recase(word)
         && certain_recase(word, &cased)
@@ -471,13 +475,14 @@ fn explain(spelling: &Spelling, word: &str, found: &str, extension: &str) -> Opt
     Some(format!("'{found}' looks like code; format it as code."))
 }
 
-/// Each word of `text` that no dictionary of the rule holds.
+/// Each word of `text` that no dictionary of the rule has.
 ///
-/// A word that overlaps a code span is not read. With `split`, an
-/// identifier is reported by its misspelt parts, each at its own place.
-/// A word an accepted term of the project holds back is not reported, and
-/// neither is one that an exception of `accepted`, the vocabularies of the
-/// file's globs, holds back.
+/// A word that overlaps a code span is not read.
+/// With `split`, an identifier is reported by its misspelt parts, each at its
+/// own place.
+/// A word that an accepted term of the project or an exception of `accepted`
+/// suppresses is not reported.
+/// `accepted` is the vocabularies of the file's globs.
 pub(crate) fn run(
     spelling: &Spelling,
     text: &Text,

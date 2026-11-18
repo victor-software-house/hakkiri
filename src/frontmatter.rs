@@ -1,19 +1,20 @@
 //! The string values of a Markdown file's front matter.
 //!
 //! Vale lints each top-level string value of YAML front matter as the scope
-//! `text.frontmatter.<key>`, and each top-level string of TOML and JSON front
-//! matter the same way ([`metadata.go`][v-meta] and
-//! [`frontmatter.go`][v-values] at `66bbb85`).
-//! A key, a number, a boolean, a null, a date, a list and a nested mapping hold
+//! `text.frontmatter.<key>`.
+//! It lints each top-level string of TOML and JSON front matter the same way
+//! ([`metadata.go`][v-meta] and [`frontmatter.go`][v-values] at `66bbb85`).
+//! A key, a number, a boolean, a null, a date, a list and a nested mapping have
 //! no text it lints.
 //!
 //! The [`front-matter`](https://crates.io/crates/front-matter) crate finds the
 //! block in every form it supports.
-//! It reads each top-level value with the parser of the block's format, and
-//! returns the key, the bytes of the value as written, how it is written and,
-//! for a string, its text.
-//! A block that no parser reads gives no value and is a [`fault`] of the file,
-//! where Vale lints nothing of the file.
+//! It reads each top-level value with the parser of the block's format.
+//!
+//! The crate returns the key, the bytes of the value as written, how it is
+//! written and, for a string, its text.
+//! A block that no parser reads gives no value and is a [`fault`] of the file.
+//! In that case Vale lints nothing of the file.
 //!
 //! hakkiri blanks the block out of the body before markdown-rs parses it (see
 //! `markdown::build`), and reads the values from the file as written.
@@ -38,7 +39,8 @@ pub(crate) fn span(source: &str) -> Option<Range<usize>> {
 }
 
 /// `source` with an ASCII space over each byte of `span` that is not a line
-/// feed, so every offset and every line of the file stays where it was.
+/// feed.
+/// So every offset and every line of the file stays where it was.
 pub(crate) fn blank(source: &str, span: &Range<usize>) -> String {
     let mut blanked = String::with_capacity(source.len());
     for (at, character) in source.char_indices() {
@@ -55,7 +57,8 @@ pub(crate) fn blank(source: &str, span: &Range<usize>) -> String {
 /// or none when it has none.
 ///
 /// A rewrite of the text, such as the block and token patterns do, leaves the
-/// front matter as it is: Vale lints the metadata before it rewrites the body.
+/// front matter as it is.
+/// Vale lints the metadata before it rewrites the body.
 pub(crate) fn leading(source: &str) -> Vec<Node> {
     let Some(block) = find(source) else {
         return Vec::new();
@@ -69,16 +72,17 @@ pub(crate) fn leading(source: &str) -> Vec<Node> {
         .collect()
 }
 
-/// Why the front matter that starts `source` is no YAML, TOML or JSON that its
-/// parser reads, as the line of the file and the parser's words, or `None` when
-/// it has none or a parser reads it.
+/// Why the front matter that starts `source` is not YAML, TOML or JSON that its
+/// parser reads.
+/// The reason is the line of the file and the parser's words.
+/// It is `None` when there is no front matter or a parser reads it.
 pub(crate) fn fault(source: &str) -> Option<String> {
     let block = find(source)?;
     read(source, &block).err().map(|fault| fault.to_string())
 }
 
 /// The node of one top-level value of the front matter, or `None` when the
-/// parser reads it as no string or it holds no text.
+/// parser reads it as no string or it has no text.
 ///
 /// The segments are the text as written, which escapes are not resolved in,
 /// joined as the YAML or TOML rules fold it.
@@ -106,12 +110,13 @@ fn value_node(source: &str, value: &Value) -> Option<Node> {
     node(&value.key, segments, join)
 }
 
-/// Whether the plain scalar at `value` is a date, the merge key `<<` or a
-/// number that yaml.v3 reads and the YAML 1.2 core schema does not.
+/// Whether yaml.v3 reads the plain scalar at `value` as a date, the merge key
+/// `<<` or a number.
+/// The YAML 1.2 core schema does not.
 ///
 /// yaml.v3, the parser Vale reads front matter with, reads them as no string.
-/// The front-matter crate reads them as strings, by the YAML 1.2 core schema,
-/// so hakkiri leaves them out unless a tag such as `!!str` says otherwise.
+/// The front-matter crate reads them as strings, by the YAML 1.2 core schema.
+/// So hakkiri leaves them out unless a tag such as `!!str` makes them strings.
 fn plain_non_string(source: &str, value: &Range<usize>) -> bool {
     let line_start = source
         .get(..value.start)
@@ -126,9 +131,11 @@ fn plain_non_string(source: &str, value: &Range<usize>) -> bool {
 }
 
 /// A number as yaml.v3 reads a plain scalar, in
-/// [`resolve.go`](https://github.com/go-yaml/yaml/blob/v3/resolve.go): it
-/// starts with a digit, `+` or `-`, and with every `_` removed it is an
-/// integer by the rules of Go's `strconv.ParseInt(s, 0, 64)`, or a float.
+/// [`resolve.go`](https://github.com/go-yaml/yaml/blob/v3/resolve.go).
+/// It starts with a digit, `+` or `-`.
+/// With every `_` removed, it is an integer by the rules of Go's
+/// `strconv.ParseInt(s, 0, 64)`, or a float.
+///
 /// The front-matter crate reads the YAML 1.2 core schema, which has no `_` and
 /// no `0b`.
 /// An integer too large for 64 bits is still a number here.
@@ -249,7 +256,7 @@ fn lines(source: &str, range: &Range<usize>) -> Vec<Range<usize>> {
 }
 
 /// The lines of the block scalar in `range`, under its header line, each cut at
-/// the indent of the first line that holds text.
+/// the indent of the first line that has text.
 fn block_lines(source: &str, range: &Range<usize>) -> Vec<Range<usize>> {
     let written = text(source, range);
     let Some(header) = written.find('\n') else {

@@ -46,7 +46,7 @@ const BLAND: &str =
     "extends: existence\nmessage: \"Plain '%s'.\"\nlevel: warning\ntokens: [bland]\n";
 
 /// A project with the styles `Team` and `Other`, the config `files` and the
-/// files `a.md` and `b.md`, both holding [`TEXT`].
+/// files `a.md` and `b.md`, both containing [`TEXT`].
 fn project<'a>(suite: &'a Suite, name: &str, files: &str) -> Root<'a> {
     let root = suite.scenario(name);
     root.file("styles/Team/Filler.yml", FILLER);
@@ -494,9 +494,9 @@ fn a_word_that_is_no_level_is_refused_with_its_line() -> TestResult {
     Ok(())
 }
 
-/// The three faults below sit under glob keys that hold `.`, `*`, `/`, `[` and
-/// `{`, and one setting key that holds a `.`, each written as one key of the
-/// config.
+/// The three faults below sit under glob keys that contain `.`, `*`, `/`, `[`
+/// and `{`, and one setting key that contains a `.`.
+/// Each is written as one key of the config.
 #[test]
 fn a_fault_under_a_glob_key_with_dots_stars_and_slashes_lands_on_its_own_line() -> TestResult {
     let suite = Suite::new("rule-setting-glob-lines");
@@ -556,9 +556,10 @@ fn a_fault_about_a_later_style_names_the_line_of_that_style() -> TestResult {
     Ok(())
 }
 
-/// A glob that is no glob, and a setting that names no rule, each with a block
-/// value: the fault is about the key, so it names the key's line and not the
-/// line below it.
+/// A glob that is no glob, and a setting for a rule that does not exist, each
+/// with a block value.
+/// The fault is about the key, so it points to the key's line and not the line
+/// below it.
 #[test]
 fn a_fault_about_a_key_with_a_block_value_names_the_line_of_the_key() -> TestResult {
     let suite = Suite::new("rule-setting-key-lines");
@@ -571,7 +572,7 @@ fn a_fault_about_a_key_with_a_block_value_names_the_line_of_the_key() -> TestRes
     assert_eq!(result.code, 2, "{}{}", result.out, result.err);
     for expected in [
         "line 4: [a: is not a glob",
-        "line 7: Nope.Rule: is not `styles`, and names no rule",
+        "line 7: Nope.Rule: is neither `styles` nor a rule in any style the config loads",
     ] {
         assert!(result.err.contains(expected), "{expected}: {}", result.err);
     }

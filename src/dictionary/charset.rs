@@ -1,7 +1,8 @@
 //! The character set of a dictionary's two files.
 //!
-//! A port of `encoding.go` in [Vale]'s `spell` package at `66bbb85`, for UTF-8
-//! and ISO 8859-1 only.
+//! A port of `encoding.go` in [Vale]'s `spell` package at `66bbb85`.
+//! It handles UTF-8 and International Organization for Standardization (ISO)
+//! 8859-1 only.
 //!
 //! [Vale]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell/encoding.go
 

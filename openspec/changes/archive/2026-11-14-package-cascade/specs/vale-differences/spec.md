@@ -3,7 +3,8 @@
 ### Requirement: A package glob can beat the project's top level, and the project can force a value
 
 hakkiri SHALL rank a package's glob above the project's top level, and SHALL apply a value the project tags `!override` after every other value.  
-Vale 66bbb85 applies the sections of a package before the project's in the order written, and has no way to force a value ([file.go][vale-file]).
+Vale 66bbb85 applies a package's sections before the project's, in the order written ([file.go][vale-file]).  
+Vale has no way to force a value.
 
 #### Scenario: A package glob and the project's top level
 

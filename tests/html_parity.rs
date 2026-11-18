@@ -1,25 +1,29 @@
 //! The text of HTML blocks against Vale: the alerts of an `existence` rule for
-//! each scope, over Markdown files that hold HTML blocks.
+//! each scope, over Markdown files that have HTML blocks.
 //!
-//! `tests/fixtures/html-block/rules` holds the rules, `inputs` the Markdown
-//! files with `.fixture` after `.md`, and `vale.tsv` one row for each alert
-//! Vale gave: the rule, the file, the line, the first and last column, and the
-//! matched text. The rows come from Vale at `66bbb85` run on the inputs with
-//! the rules as one style.
+//! `tests/fixtures/html-block/rules` has the rules, and `inputs` has the
+//! Markdown files with `.fixture` after `.md`.
+//!
+//! `vale.tsv` has one row for each alert Vale gave: the rule, the file, the
+//! line, the first and last column, and the matched text.
+//! The rows come from Vale at `66bbb85` run on the inputs with the rules as one
+//! style.
 //!
 //! A `dump-` rule matches the whole text of a block, which shows how the block
 //! reads.
 //! Vale places such an alert where it finds the words of the text in the file.
-//! A text that holds a masked word, a decoded reference or a joined tag is not
-//! in the file.
-//! So the test compares the file and the text of a `dump-` alert, and not its
-//! place.
-//! A line feed or a tab in the text is written `\n` or `\t`, as `jq` writes it.
+//! Not every text is in the file: one with a masked word, a decoded reference
+//! or a joined tag is not.
 //!
-//! `departures.tsv` holds one row for each alert that only one side gave, led
-//! by `vale` or `hakkiri`. The `html-block-text` change records each in the
-//! `vale-differences` spec. The test fails on any difference that file does
-//! not list, and on any row of it that no longer differs.
+//! So the test compares the file and the text of a `dump-` alert, not its
+//! place. In the text, a line feed or a tab is written `\n` or `\t`, as `jq`
+//! writes it.
+//!
+//! `departures.tsv` has one row for each alert that only one side gave, led by
+//! `vale` or `hakkiri`.
+//! The `html-block-text` change records each in the `vale-differences` spec.
+//! The test fails on any difference that file does not list, and on any row of
+//! it whose alert both sides now give.
 
 #![expect(
     clippy::panic_in_result_fn,

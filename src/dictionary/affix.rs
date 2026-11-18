@@ -1,9 +1,9 @@
 //! The affix file of a Hunspell dictionary, and the words an entry makes with
 //! it.
 //!
-//! A port of `aff.go` in [Vale]'s `spell` package at `66bbb85`, without the
-//! directives for compounds made by flag, for suggestions and for Turkic
-//! casing.
+//! A port of `aff.go` in [Vale]'s `spell` package at `66bbb85`.
+//! It leaves out the directives for compounds made by flag, suggestions and
+//! Turkic casing.
 //!
 //! [Vale]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/spell/aff.go
 
@@ -64,9 +64,9 @@ impl Atom {
     }
 }
 
-/// The condition of an affix rule on the word it applies to: Hunspell's
-/// characters, classes and dots, read at the start of a word for a prefix and
-/// at its end for a suffix.
+/// The condition of an affix rule on the word it applies to.
+/// It is Hunspell's characters, classes and dots.
+/// A prefix reads it at the start of a word, and a suffix at its end.
 #[derive(Clone, Debug)]
 struct Condition(Vec<Atom>);
 
@@ -171,7 +171,7 @@ impl Form {
 pub(crate) struct AffixFile {
     flag_type: FlagType,
     /// A file that declares `SET UTF-8` has flags of one byte unless `FLAG`
-    /// says otherwise. In any other file a flag is one character, so `é` and
+    /// sets another type. In any other file a flag is one character, so `é` and
     /// `è` are two flags in a Latin-1 file.
     byte_flags: bool,
     /// The flag sets that an entry names by number, from `AF`.
@@ -509,7 +509,8 @@ impl AffixFile {
 
     /// The flags a string of flags names.
     pub(super) fn parse_flags(&self, written: &str) -> Vec<Flag> {
-        // With AF, an entry's flags are the number of an alias line.
+        // With an `AF` directive, an entry's flags are the number of an alias
+        // line.
         let written = if !self.aliases.is_empty() && all_digits(written) {
             let Some(alias) = written
                 .parse::<usize>()

@@ -1,22 +1,29 @@
 //! The built-in rule `Vale.Repetition`: the scenarios of the vale-repetition
 //! change.
 //!
-//! `tests/fixtures/builtin-repetition` holds one package (`styles`, with a
+//! `tests/fixtures/builtin-repetition` contains one package (`styles`, with a
 //! vocabulary `Rep`), three Markdown files and one Rust file (`text`, with
-//! `.fixture` after the extension), and five configs for each tool:
-//! `vale/<name>.ini` and `.ctl/<name>.yaml`. `vale.tsv` holds one row for each
-//! alert Vale gave on the files under each config. A row has the config, the
-//! file, the line, the first and last column, the level, the rule, the message
-//! and the matched text, with a line feed written `\n` and a tab `\t`.
-//! The rows come from Vale at `66bbb85` run from the fixture folder as `vale
-//! --config=vale/<name>.ini --output=JSON text`, with `Vale.Spelling` turned
-//! off, as the hakkiri configs turn it off.
+//! `.fixture` after the extension).
+//! It also has five configs for each tool: `vale/<name>.ini` and
+//! `.ctl/<name>.yaml`.
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files under each
+//! config.
+//! A row has the config, the file, the line, the first and last column, the
+//! level, the rule, the message and the matched text.
+//! A line feed is written `\n` and a tab `\t`.
+//!
+//! The rows come from Vale at `66bbb85`, run from the fixture folder as
+//! `vale --config=vale/<name>.ini --output=JSON text`.
+//! `Vale.Spelling` is turned off, as the hakkiri configs turn it off.
 //!
 //! A repeat that spans two lines ends where its last character is in hakkiri,
-//! as `end_line` and `end_column`. Vale prints the first column plus the
-//! number of characters from the start to the end in the file, line breaks and
-//! indentation included, which passes the end of the line. The comparison maps
-//! hakkiri's end to that count for such a match.
+//! as `end_line` and `end_column`.
+//! Vale prints the first column plus the number of characters from the start
+//! to the end in the file, line breaks and indentation included.
+//! That count passes the end of the line.
+//!
+//! The comparison maps hakkiri's end to that count for such a match.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -62,7 +69,7 @@ fn copy_into(root: &Root<'_>, from: &Path, to: &Path) -> TestResult {
     Ok(())
 }
 
-/// A scenario folder that holds the fixture's styles, text and configs.
+/// A scenario folder that has the fixture's styles, text and configs.
 fn project<'a>(suite: &'a Suite, name: &str) -> Result<Root<'a>, Box<dyn Error>> {
     let root = suite.scenario(name);
     copy_into(&root, &fixture().join("styles"), Path::new("styles"))?;
@@ -107,8 +114,9 @@ fn vale_rows(name: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
 }
 
 /// The last column Vale prints for a match that starts at `line` and `first`
-/// and ends at `end_line` and `end_column` of `source`: the first column plus
-/// the characters from the start to the end of the match, minus one.
+/// and ends at `end_line` and `end_column` of `source`.
+/// It is the first column plus the characters from the start to the end of the
+/// match, minus one.
 fn vale_last(source: &str, line: usize, first: usize, end: (usize, usize)) -> usize {
     let lines: Vec<&str> = source.lines().collect();
     let length = |number: usize| lines.get(number - 1).map_or(0, |text| text.chars().count());

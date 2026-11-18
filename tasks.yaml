@@ -161,6 +161,28 @@ queue:
       - '2026-11-12, operator decision: a code span counts as one word by default, a setting sets it to zero, at the package, project and glob levels, with a flag and a variable. The key is code_span_size, and its unit is words.'
       - It applies only to word counts and to the metrics built on words. HKR-051 keeps the rule form of LongSentence; this row gives a project the way to count as Vale does.
 
+  - id: HKR-077
+    title: Skip mise task headers as tool directives
+    scope: comments
+    outcome: "hakkiri never lints a #MISE or # [MISE] header line, as it never lints //go: or shellcheck lines."
+    blocked_by: []
+    acceptance:
+      - 'A Shell, TOML or other comment line that starts with #MISE or # [MISE] draws no alert.'
+      - hakkiri instructions lists the mise header among the comments addressed to a tool.
+    notes:
+      - '2026-11-18, the prose pass found UndefinedAcronym on the #MISE description line of each file task; mise reads only #MISE or # [MISE], so the line cannot change.'
+
+  - id: HKR-078
+    title: Print a whole metric value without decimals
+    scope: metric rules, alert messages
+    outcome: A metric message shows a word count as 62, never as 62.00.
+    blocked_by: []
+    acceptance:
+      - A metric value that is a whole number, such as a word count, prints with no decimal places.
+      - A score with a fraction, such as a grade of 8.59, keeps two decimal places.
+    notes:
+      - 2026-11-18, ProseStyle Paragraph, ListItem and LongSentence read Split this 62.00-word paragraph; a metric message takes only %s, and %d or %.0f print as written.
+
 archive:
   - id: HKR-074
     title: Correct where Vale places a block alert

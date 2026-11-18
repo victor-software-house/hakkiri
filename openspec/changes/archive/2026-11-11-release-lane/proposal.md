@@ -5,8 +5,8 @@ It is the last of three changes that ship the command line, after [`check-comman
 
 ## Motivation
 
-The template switch (`HKR-009`) and prose-style's CI install hakkiri through mise, so a release must exist first.
-hakkiri has no release lane: its crate version is `0.0.0`, `publish = false`, and the repository has no release workflow or `.ctl/ver.yaml`.
+The template switch (`HKR-009`) and prose-style's CI install hakkiri through mise, so a release must exist first.  
+hakkiri has no release lane: its crate version is `0.0.0`, `publish = false`, and the repository has no release workflow or `.ctl/ver.yaml`.  
 The first release is `0.0.1`, as every new project's is.
 
 ## Changes
@@ -23,7 +23,7 @@ The first release is `0.0.1`, as every new project's is.
 
 ### New Capabilities
 
-- `release`: what a release holds, how it installs, and which texts carry its version.
+- `release`: what a release contains, how it installs, and which texts carry its version.
 
 ### Modified Capabilities
 

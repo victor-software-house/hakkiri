@@ -2,15 +2,18 @@
 
 ## Purpose
 
-A dollar-delimited span or a `$$` block of math in a Markdown file reads as code, so a text rule reports nothing in it and a code rule reads it, as in Vale.
+A dollar-delimited span or a `$$` block of math in a Markdown file reads as code, as in Vale.  
+So a rule that reads text reports nothing in it, and a rule that reads code reads it.
 
 ## Requirements
 
 ### Requirement: An inline span of math reads as code
 
 In a Markdown or MDX file, text from a `$` to the next closing `$` SHALL read as a code span.  
-The opening `$` SHALL be followed by a character that is not a space or a `$`.  
-The closing `$` SHALL not be escaped, SHALL follow a character that is not a space, SHALL not be followed by a digit, and SHALL not start a line.  
+The opening `$` SHALL be followed by a character that is not a space or a `$`.
+
+The closing `$` SHALL not be escaped, and SHALL follow a character that is not a space.  
+It SHALL not be followed by a digit, and SHALL not start a line.  
 A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one SHALL be text.
 
 #### Scenario: Math in prose
@@ -21,7 +24,7 @@ A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one S
 #### Scenario: Money
 
 - **WHEN** a paragraph reads `Money $5 and $10 very today.`, `Glued US$5 and CA$10 very.` or `A lone $5 very here.`
-- **THEN** the text rule reports `very`, since none of the three holds math
+- **THEN** the text rule reports `very`, since none of the three contains math
 
 #### Scenario: Spaces and escapes
 
@@ -45,23 +48,26 @@ A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one S
 
 #### Scenario: Emphasis and a backtick inside
 
-- **WHEN** a paragraph holds `$a *very* b$` or `$a `b` very c$`
-- **THEN** the span holds them as written, and the code rule reports `very`
+- **WHEN** a paragraph contains `$a *very* b$` or `$a `b` very c$`
+- **THEN** the span contains them as written, and the code rule reports `very`
 
 #### Scenario: A code span or a heading or a table cell
 
 - **WHEN** `` `$very$` `` is a code span, and `$very$` is in a heading and in a table cell
-- **THEN** the code span holds no math, and the heading and the cell each hold a span
+- **THEN** the code span contains no math, and the heading and the cell each contain a span
 
 #### Scenario: The delimiters
 
-- **WHEN** a code rule matches `$` and a paragraph holds `$a$`
+- **WHEN** a code rule matches `$` and a paragraph contains `$a$`
 - **THEN** the rule reports both delimiters, as it does in Vale
 
 ### Requirement: A display block of math reads as code
 
-In a Markdown or MDX file, a line of a paragraph that starts with `$$` SHALL open a block that reads as code, even in the middle of a paragraph.  
-A line that ends with an unescaped `$$`, with at most one `{…}` after it, SHALL close the block, and so SHALL a blank line and the end of the paragraph.  
+In a Markdown or MDX file, a line of a paragraph that starts with `$$` SHALL open a block that reads as code.  
+This SHALL happen even in the middle of a paragraph.
+
+A line that ends with an unescaped `$$`, with at most one `{…}` after it, SHALL close the block.  
+So SHALL a blank line and the end of the paragraph.  
 The text before and after the block SHALL read as separate paragraphs.
 
 #### Scenario: A block of lines
@@ -91,12 +97,13 @@ The text before and after the block SHALL read as separate paragraphs.
 
 #### Scenario: In an MDX file
 
-- **WHEN** an MDX file holds an inline span, money, a block and `{1 + 1}` in one line with a span
-- **THEN** the alerts are those of a Markdown file, and the expression holds no math
+- **WHEN** an MDX file contains an inline span, money, a block and `{1 + 1}` in one line with a span
+- **THEN** the alerts are those of a Markdown file, and the expression contains no math
 
 ### Requirement: A backtick beside math changes nothing
 
-A run of backticks that opens no code span SHALL stay text beside a span, and a code span or a span that touches a span SHALL read as code with it.
+A run of backticks that opens no code span SHALL stay text beside a span.  
+A code span, or a span that touches a span, SHALL read as code with it.
 
 #### Scenario: A tick that opens no code span
 
@@ -115,7 +122,7 @@ A tab runs to the next multiple of four.
 
 #### Scenario: Under no container
 
-- **WHEN** a paragraph holds `$$`, `z very` and `$$` on lines indented four spaces or a tab, or three spaces
+- **WHEN** a paragraph contains `$$`, `z very` and `$$` on lines indented four spaces or a tab, or three spaces
 - **THEN** the text rule reports `z very` for four spaces and a tab, and does not for three
 
 #### Scenario: Under a list item and a quote
@@ -123,16 +130,22 @@ A tab runs to the next multiple of four.
 - **WHEN** the lines are indented four columns past the content of a list item, or past the `>` and its space in a block quote
 - **THEN** the text rule reports `w very` and `q very`, and does not for two columns
 
-#### Scenario: A lazy line and nested containers
+#### Scenario: A lazy line
 
-- **WHEN** a line of a quote or of its item has no `>` and is indented six spaces or three, or the lines are indented past a quote in a list item or a list item in a quote
-- **THEN** six spaces keep the line as text and three open a block, and the nested lines follow the same four columns past both containers
+- **WHEN** a line of a quote or of its item has no `>` and is indented six spaces or three
+- **THEN** six spaces keep the line as text and three open a block
+
+#### Scenario: Nested containers
+
+- **WHEN** the lines are indented past a quote in a list item, or past a list item in a quote
+- **THEN** the nested lines follow the same four columns past both containers
 
 ### Requirement: A paragraph of unclosed delimiters costs its length
 
-The search for the closing `$` of a span and for the end of an HTML tag SHALL take time in proportion to the length of the paragraph.
+The search for the closing `$` of a span SHALL take linear time in the length of the paragraph.  
+So SHALL the search for the end of an HTML tag.  
 
 #### Scenario: A hundred thousand unclosed openers
 
-- **WHEN** a paragraph holds `$a` and a space, or `<a`, a hundred thousand times with no closer
+- **WHEN** a paragraph contains `$a` and a space, or `<a`, a hundred thousand times with no closer
 - **THEN** the spans are found in seconds

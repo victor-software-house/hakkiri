@@ -1,9 +1,12 @@
 //! A package's settings file: the scenarios of the package-settings change.
 //!
-//! A package folder that holds `.ctl/hakkiri.yaml` ships settings in the format
-//! of the project config. Each test writes a project in a temporary directory
-//! and runs the binary there. The tests of packages a package lists start a
-//! small HTTP server on a local port and serve zips built in the test.
+//! A package folder that has `.ctl/hakkiri.yaml` ships settings in the format
+//! of the project config.
+//! Each test writes a project in a temporary directory and runs the binary
+//! there.
+//!
+//! The tests of packages a package lists start a small HTTP server on a local
+//! port and serve zips built in the test.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -43,9 +46,9 @@ fn very(file: &str, level: &str) -> String {
     format!("{file}:1:9: {level} Team.Filler: Remove 'very'.")
 }
 
-/// A project of one text file, `a.md`, whose config is `config`, with the style
-/// `Team` in the package `pkg` and the style `Other` in `own`, each a `styles`
-/// folder beside the `.ctl` folder of its settings.
+/// A project of one text file, `a.md`, whose config is `config`.
+/// It has the style `Team` in the package `pkg` and the style `Other` in `own`.
+/// Each is a `styles` folder beside the `.ctl` folder of its settings.
 fn project<'a>(suite: &'a Suite, name: &str, config: &str) -> Root<'a> {
     let root = suite.scenario(name);
     root.file("pkg/styles/Team/Filler.yml", FILLER);
@@ -428,7 +431,7 @@ fn a_forced_list_replaces_the_ignores_without_the_tag() -> TestResult {
     Ok(())
 }
 
-/// A rule that flags `GitHub` and `Kubernetes`, and the text that holds both.
+/// A rule that flags `GitHub` and `Kubernetes`, and the text that has both.
 const TERMS: &str = "extends: existence\nmessage: \"Remove '%s'.\"\nlevel: warning\nscope: text\ntokens:\n  - GitHub\n  - Kubernetes\n";
 
 #[test]
@@ -538,9 +541,9 @@ fn a_later_package_can_clear_the_vocabularies_of_an_earlier_one() -> TestResult 
 #[test]
 fn an_empty_vocab_in_a_glob_clears_only_the_lists_of_the_same_glob_text() -> TestResult {
     let suite = Suite::new("package-settings-vocab-glob");
-    // The package's `*.md` glob names `Docs`, which accepts `GitHub`, and its
-    // `a.md` glob names `Own`, which accepts `Kubernetes`. Both globs match
-    // `a.md`, and only the first matches `b.md`.
+    // The package's `*.md` glob lists `Docs`, which accepts `GitHub`.
+    // Its `a.md` glob lists `Own`, which accepts `Kubernetes`.
+    // Both globs match `a.md`, and only the first matches `b.md`.
     let write = |root: &Root<'_>| {
         root.file("pkg/styles/Team/Filler.yml", TERMS);
         root.file("pkg/styles/config/vocabularies/Docs/accept.txt", "GitHub\n");
@@ -647,7 +650,7 @@ fn a_rule_setting_in_a_package_file_that_names_no_rule_is_an_error() -> TestResu
     assert!(
         result
             .err
-            .contains("failed pkg/.ctl/hakkiri.yaml: line 4: Team.Nope: names no rule"),
+            .contains("failed pkg/.ctl/hakkiri.yaml: line 4: Team.Nope: is not a rule in any style the config loads"),
         "{}",
         result.err
     );
@@ -724,11 +727,11 @@ fn a_styles_folder_with_another_name_has_no_top() -> TestResult {
     Ok(())
 }
 
-/// What the server holds, by path.
+/// What the server serves, by path.
 type Routes = Arc<Mutex<HashMap<String, Vec<u8>>>>;
 
-/// A server on a local port, whose routes can be added after it starts: a zip
-/// names the URL of the next one, so the port comes first.
+/// A server on a local port, whose routes can be added after it starts.
+/// A zip lists the URL of the next one, so the port comes first.
 struct Server {
     address: SocketAddr,
     routes: Routes,
@@ -846,7 +849,7 @@ fn serve(server: &Server, path: &str, files: &[(&str, &str)]) -> Result<String, 
     Ok(entry)
 }
 
-/// Runs `check` in `root` with its cache in a folder of `suite`.
+/// Runs `check` in `root`, using a cache folder from `suite`.
 fn check_cached(suite: &Suite, root: &Root<'_>, name: &str) -> Result<common::Run, Box<dyn Error>> {
     let cache = suite.scenario(name);
     let cache = cache
@@ -942,8 +945,8 @@ fn a_package_named_twice_loads_once() -> TestResult {
 }
 
 /// A chain of `length` packages, each listing the next, and the project that
-/// lists the first. The last holds a style, so a chain that loads draws an
-/// alert.
+/// lists the first.
+/// The last package has a style, so a chain that loads draws an alert.
 fn chain<'a>(
     suite: &'a Suite,
     server: &Server,

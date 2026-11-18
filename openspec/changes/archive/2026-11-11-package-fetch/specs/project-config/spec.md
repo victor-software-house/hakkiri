@@ -2,49 +2,51 @@
 
 ### Requirement: A package is a folder or a download
 
-Each entry in `packages` SHALL hold a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
-A `url` SHALL start with `https://` or `http://`, and a `sha256` SHALL be 64 lowercase hex digits.  
-It SHALL fetch and cache each `url` with no separate sync step, and lint with it only when its download matches the hash.  
-It SHALL refuse two entries that hold a style of one name, and the error SHALL name both.
+Each entry in `packages` SHALL have a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
+A `url` SHALL start with `https://` or `http://`, and a `sha256` SHALL be 64 lowercase hex digits.
+
+hakkiri SHALL fetch and cache each `url` with no separate sync step.  
+It SHALL lint with a download only when it matches the hash.  
+It SHALL refuse two entries that contain a style of one name, and the error SHALL show both.
 
 #### Scenario: A local folder
 
-- **WHEN** `packages` holds `{path: styles}` and `styles/Team/Filler.yml` is a rule
+- **WHEN** `packages` contains `{path: styles}` and `styles/Team/Filler.yml` is a rule
 - **THEN** a glob with `styles: [Team]` runs `Team.Filler`
 
 #### Scenario: A matching package
 
-- **WHEN** `packages` holds one entry whose download matches its `sha256`
+- **WHEN** `packages` contains one entry whose download matches its `sha256`
 - **THEN** hakkiri lints with the styles in that package, and a second run reads it from the cache
 
 #### Scenario: A package that does not match
 
 - **WHEN** a package's download does not match its `sha256`
-- **THEN** hakkiri reports an error naming the `url`, the expected hash and the actual hash, lints nothing, caches nothing, and exits with a failure status
+- **THEN** hakkiri reports an error showing the `url`, the expected hash and the actual hash, lints nothing, caches nothing, and exits with a failure status
 
 #### Scenario: An entry with both
 
-- **WHEN** an entry holds a `path` and a `url`
-- **THEN** hakkiri reports an error naming the entry's line, and exits with a failure status
+- **WHEN** an entry contains a `path` and a `url`
+- **THEN** hakkiri reports an error showing the entry's line, and exits with a failure status
 
 #### Scenario: One style in two folders
 
-- **WHEN** `packages` holds `{path: a}` and `{path: b}` and both hold a folder `Team`
-- **THEN** hakkiri reports an error naming `a/Team` and `b/Team`, and exits with a failure status
+- **WHEN** `packages` contains `{path: a}` and `{path: b}` and both contain a folder `Team`
+- **THEN** hakkiri reports an error showing `a/Team` and `b/Team`, and exits with a failure status
 
 #### Scenario: A folder of settings
 
-- **WHEN** a package's `styles` folder holds `config/vocabularies/Team/accept.txt` beside the style `Team`
-- **THEN** `config` is no style, a glob that lists `config` is an error, and two packages that each hold a `config` folder load together
+- **WHEN** a package's `styles` folder contains `config/vocabularies/Team/accept.txt` beside the style `Team`
+- **THEN** `config` is no style, a glob that lists `config` is an error, and two packages that each contain a `config` folder load together
 
 #### Scenario: A hash of the wrong shape
 
-- **WHEN** an entry holds `sha256: abc123`
+- **WHEN** an entry contains `sha256: abc123`
 - **THEN** hakkiri reports ``line 2: packages[0]: `sha256` is 64 lowercase hex digits``, and exits with a failure status
 
 #### Scenario: A url that is not http
 
-- **WHEN** an entry holds `url: file:///tmp/Team.zip`
+- **WHEN** an entry contains `url: file:///tmp/Team.zip`
 - **THEN** hakkiri reports ``line 2: packages[0]: a package `url` starts with `https://` or `http://` ``, and exits with a failure status
 
 ## ADDED Requirements
@@ -52,14 +54,16 @@ It SHALL refuse two entries that hold a style of one name, and the error SHALL n
 ### Requirement: A download is checked before it is read
 
 A body SHALL be at most 32 MiB and SHALL match the `sha256`.  
-It SHALL be a zip with one top folder that names no file outside the package and unpacks to at most 128 MiB.  
-The top folder SHALL be a style, or hold a `styles` folder of styles, as in a Vale package.  
-Each fault SHALL be an error that names the `url`, and a download that fails a check SHALL leave nothing in the cache.
+It SHALL be a zip with one top folder that names no file outside the package and unpacks to at most 128 MiB.
+
+The top folder SHALL be a style, or contain a `styles` folder of styles, as in a Vale package.  
+Each fault SHALL be an error that shows the `url`.  
+A download that fails a check SHALL leave nothing in the cache.
 
 #### Scenario: A server answers 404
 
 - **WHEN** a `url` answers `404`
-- **THEN** hakkiri reports an error naming the `url` and `404`, and exits with a failure status
+- **THEN** hakkiri reports an error showing the `url` and `404`, and exits with a failure status
 
 #### Scenario: A redirect
 
@@ -69,32 +73,32 @@ Each fault SHALL be an error that names the `url`, and a download that fails a c
 #### Scenario: A body that is not a zip
 
 - **WHEN** a body matches its hash and is not a zip
-- **THEN** hakkiri reports an error naming the `url` and saying it is not a zip
+- **THEN** hakkiri reports an error showing the `url` and saying it is not a zip
 
 #### Scenario: A name that leaves the package
 
-- **WHEN** a zip holds the entry `../escape.txt`
-- **THEN** hakkiri reports an error naming the `url` and the entry, writes no file outside the cache folder of that package, and caches nothing
+- **WHEN** a zip contains the entry `../escape.txt`
+- **THEN** hakkiri reports an error showing the `url` and the entry, writes no file outside the cache folder of that package, and caches nothing
 
 #### Scenario: A zip with no top folder
 
-- **WHEN** a zip holds a file at its root and no folder
-- **THEN** hakkiri reports an error naming the `url` and saying a package holds one top folder, and caches nothing
+- **WHEN** a zip contains a file at its root and no folder
+- **THEN** hakkiri reports an error showing the `url` and saying `a package holds one top folder`, and caches nothing
 
 #### Scenario: A style-only package
 
-- **WHEN** a zip holds `Team/Filler.yml` and no `styles` folder
+- **WHEN** a zip contains `Team/Filler.yml` and no `styles` folder
 - **THEN** a glob with `styles: [Team]` runs `Team.Filler`
 
 #### Scenario: A Vale package is kept whole
 
-- **WHEN** a package holds `Team/.vale.ini` and `Team/styles/Team/Filler.yml`
-- **THEN** the cache folder of its hash holds both files where the zip put them
+- **WHEN** a package contains `Team/.vale.ini` and `Team/styles/Team/Filler.yml`
+- **THEN** the cache folder of its hash contains both files where the zip put them
 
 #### Scenario: A body over the limit
 
 - **WHEN** a body is over 32 MiB
-- **THEN** hakkiri reports an error naming the `url` and the limit, and caches nothing
+- **THEN** hakkiri reports an error showing the `url` and the limit, and caches nothing
 
 ### Requirement: A fetched package is cached by its hash
 
@@ -108,7 +112,7 @@ hakkiri SHALL keep each fetched package in the folder `<cache>/<sha256>/`, and S
 #### Scenario: Two runs fetch at once
 
 - **WHEN** two runs fetch one package into one cache folder at the same moment, even with one process id
-- **THEN** both succeed, the folder `<cache>/<sha256>/` holds one complete package, and the cache holds no unpacking folder
+- **THEN** both succeed, the folder `<cache>/<sha256>/` contains one complete package, and the cache contains no unpacking folder
 
 #### Scenario: A cached package with the server gone
 
@@ -117,8 +121,8 @@ hakkiri SHALL keep each fetched package in the folder `<cache>/<sha256>/`, and S
 
 #### Scenario: An empty cache with the server gone
 
-- **WHEN** the cache holds no folder for the hash and the server does not answer
-- **THEN** hakkiri reports an error naming the `url`, lints nothing, and exits with a failure status
+- **WHEN** the cache contains no folder for the hash and the server does not answer
+- **THEN** hakkiri reports an error showing the `url`, lints nothing, and exits with a failure status
 
 #### Scenario: The test command
 

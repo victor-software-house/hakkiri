@@ -3,21 +3,22 @@
 ### Requirement: A glob matches the path under the project root
 
 hakkiri SHALL match each `files` glob against the file's path relative to the project root, with `/` separators.  
-It SHALL resolve the root and the folders of the file through symlinks, and keep the file's own name, so a symlink to a file matches by the name it is reached by, as in Vale.
+It SHALL resolve the root and the folders of the file through symlinks, and keep the file's own name.  
+So a symlink to a file matches by the name it is reached by, as in Vale.
 
 #### Scenario: A dot-slash argument
 
-- **WHEN** `files` holds `'docs/**'` and `hakkiri check ./docs` runs
+- **WHEN** `files` contains `'docs/**'` and `hakkiri check ./docs` runs
 - **THEN** hakkiri lints `docs/a.md` with the styles of that glob
 
 #### Scenario: An absolute argument
 
-- **WHEN** `files` holds `'docs/**'` and `hakkiri check` is given the absolute path of `docs/a.md`
+- **WHEN** `files` contains `'docs/**'` and `hakkiri check` is given the absolute path of `docs/a.md`
 - **THEN** hakkiri lints it with the styles of that glob
 
 #### Scenario: A parent argument
 
-- **WHEN** `files` holds `'docs/**'` and `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ../docs/a.md` runs in `other/`
+- **WHEN** `files` contains `'docs/**'` and `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ../docs/a.md` runs in `other/`
 - **THEN** hakkiri lints `docs/a.md` with the styles of that glob
 
 #### Scenario: A root reached through a symlink
@@ -27,18 +28,20 @@ It SHALL resolve the root and the folders of the file through symlinks, and keep
 
 #### Scenario: A symlink to a file
 
-- **WHEN** `files` holds `'docs/**'` and `docs/a.md` is a symlink to `shared/a.md`, or to a file outside the root
+- **WHEN** `files` contains `'docs/**'` and `docs/a.md` is a symlink to `shared/a.md`, or to a file outside the root
 - **THEN** hakkiri lints it as `docs/a.md`, with the styles of that glob
 
 ### Requirement: A path outside the project root is reported
 
-hakkiri SHALL print a warning on standard error for each path it is given that is outside the project root and does not hold it, and SHALL lint none of its files.  
+hakkiri SHALL print a warning on standard error for each path it is given that is outside the project root and does not contain it.  
+hakkiri SHALL lint none of that path's files.
+
 When it is given no path, the current directory is the path given.  
-When no path lies under the root or holds it, hakkiri SHALL report a failure that names the root and exit 2.  
+When no path lies under the root or contains it, hakkiri SHALL report a failure that shows the root and exit 2.  
 
 #### Scenario: One file outside the root
 
-- **WHEN** `hakkiri check in.md ../outside.md` runs in `project/`, which holds the root, and `in.md` draws a warning
+- **WHEN** `hakkiri check in.md ../outside.md` runs in `project/`, which contains the root, and `in.md` draws a warning
 - **THEN** hakkiri prints a warning that names `../outside.md`, lints `in.md`, and exits 0
 
 #### Scenario: No file under the root
@@ -53,9 +56,12 @@ When no path lies under the root or holds it, hakkiri SHALL report a failure tha
 
 ### Requirement: The warning is a diagnostic
 
-hakkiri SHALL write the warning to standard error in every output format, and `--quiet` SHALL not hide it, because `--quiet` hides only a successful result.  
-A run with some paths under the root and some outside SHALL lint those under it, warn for each one outside, and exit by the alert level.  
-The failure that names the root SHALL be one of the `failures` of the JSON object.
+hakkiri SHALL write the warning to standard error in every output format.  
+`--quiet` SHALL not hide it, because `--quiet` hides only a successful result.
+
+A run with some paths under the root and some outside SHALL lint those under it.  
+It SHALL warn for each path outside, and exit by the alert level.  
+The failure that shows the root SHALL be one of the `failures` of the JSON object.
 
 #### Scenario: A mixed run
 
@@ -65,25 +71,27 @@ The failure that names the root SHALL be one of the `failures` of the JSON objec
 #### Scenario: JSON output
 
 - **WHEN** `hakkiri check --format json ../outside.md` runs in `project/`
-- **THEN** standard error holds the warning, standard output is one JSON object whose `failures` names the root, and hakkiri exits 2
+- **THEN** standard error contains the warning, standard output is one JSON object whose `failures` names the root, and hakkiri exits 2
 
 #### Scenario: Quiet output
 
 - **WHEN** `hakkiri check --quiet in.md ../outside.md` runs in `project/`
-- **THEN** standard output is empty, standard error holds the warning, and hakkiri exits 0
+- **THEN** standard output is empty, standard error contains the warning, and hakkiri exits 0
 
 ### Requirement: A walk enters only the way to the project root
 
-A walk of a directory that holds the root SHALL enter only the folders on the way to the root and the folders under it.
+A walk of a directory that contains the root SHALL enter only the folders on the way to the root and the folders under it.
 
-#### Scenario: A walk from a folder that holds the root
+#### Scenario: A walk from a folder that contains the root
 
 - **WHEN** `hakkiri check ..` runs in `project/` and a sibling folder `sibling/locked` cannot be read
 - **THEN** hakkiri does not enter `sibling`, lints the files under the root, and exits 0
 
 ### Requirement: A walk compares resolved paths
 
-When it skips package folders, a walk SHALL compare the resolved path of each folder with the resolved package paths, so a folder written in another case, or below a symlinked folder, is skipped alike.  
+When it skips package folders, a walk SHALL compare the resolved path of each folder with the resolved package paths.  
+So a folder written in another case, or below a symlinked folder, is skipped alike.
+
 A walk SHALL NOT enter a symlink to a folder.  
 A directory named as an argument SHALL be walked even when it is a package folder, as Vale lints its styles path only when named.
 

@@ -22,7 +22,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   - 2026-11-10 (UTC), the four scenario tests and 77 tree tests pass in the same box run, in [462eaa9][c-tree].  
     Nine snapshots changed and were read.  
     A strikethrough loses its tildes too.  
-    A paragraph that holds only a URL has no text, so its link node moves up a level.
+    A paragraph that has only a URL has no text, so its link node moves up a level.
 - [x] 2.2 Count the fenced and indented code blocks of a Markdown or MDX tree.  
   Verify the [document-tree scenario][tree] passes as a test in CI.
   - 2026-11-10 (UTC), the test of two fences and an indented block passes in the same box run, in [462eaa9][c-tree].
@@ -33,7 +33,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Refuse a missing, unknown or wrongly typed field with its file and line.  
   Verify every [rule-loading scenario][loading] passes as a unit test in CI.
   - 2026-11-10 (UTC), the 24 loading tests pass in the same box run, in [389d5b4][c-load].  
-    The YAML parser reports a tab in an indentation on the line of the scalar above it, so loading moves the error to the line of the tab.
+    For a tab in the indentation, the YAML parser reports the line of the scalar above it.  
+    So loading moves the error to the line of the tab.
 - [x] 3.2 Refuse `affix`, `doc(...)` scopes and `script` with an error that names them, and load `vocab` and `action` with no effect.  
   Verify a unit test per field passes in CI.
   - 2026-11-10 (UTC), one test per field passes in the same box run, in [389d5b4][c-load].  
@@ -45,7 +46,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 - [x] 4.1 Parse scopes with `&`, `~`, lists and extension parts, and match parts by dotted prefix, with `text`, `paragraph` and `sentence` as the design states.  
   Verify every [scope-selection scenario][selection] and every scope scenario in the [rule-files spec][rule-files] pass as unit tests in CI.
   - 2026-11-10 (UTC), 23 selection tests and the unknown-scope load test pass in a Linux box, in [3fdac6d][c-select].  
-    They assert the selected blocks and their file bytes, since alerts come with task 5.2.  
+    They assert the selected blocks and their file bytes.  
+    Alerts come with task 5.2.  
     An item of only `~` parts reads as `text`, unless every part names another extension.  
     A last part from Vale's extension list narrows the scope.
   - 2026-11-10 (UTC), the `~heading.rs` test passes in a Linux box run of [9220201][c-scope-only]: an item whose every part names another extension selects nothing.
@@ -77,8 +79,11 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     No Vale binary was at hand, so only its source was read, not run.
 - [x] 5.3 Run every check type of this change over a 50,000-character line and a 60,000-line file.  
   Verify both long-input tests pass in CI with no panic, and record their run time in the evidence note.
-  - 2026-11-10 (UTC), both tests pass for all four check types in a Linux box, in a debug build: 88 ms for 50,000 characters, 27.7 s for 60,000 lines, in [d324f02][c-metric].  
-    `parse` takes nearly all of it: markdown-rs grows with the square of the line count, 2.5 s alone in a release build.
+  - 2026-11-10 (UTC), both tests pass for all four check types in a Linux box, in a debug build, in [d324f02][c-metric].  
+    The run took 88 ms for 50,000 characters and 27.7 s for 60,000 lines.
+    - `parse` takes nearly all of that time.  
+      The markdown-rs parser slows with the square of the line count.  
+      Parsing alone takes 2.5 s in a release build.
 
 ## 6. Checks
 
@@ -87,9 +92,12 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   - 2026-11-10 (UTC), the five `existence` scenarios of the match-checks spec pass in the same box run, in [0647690][c-alerts].  
     The rule-files spec has no `existence` scenario.  
     The alerts tests need a check to run, so this task moved up.  
-  - 2026-11-10 (UTC), the nested phrases test passes in a box run of [f59a77f][c-phrases], and the 50,000-character test runs in 95 ms with a phrase that matches throughout.  
-    A scratch case of 25,000 matches in 25,000 phrase spans took 0.6 s, since `excepted` scanned every span per match.  
-  - 2026-11-10 (UTC), `excepted` looks a match up by binary search in [7cbdcc5][c-linear]: 50,000 matches in 50,000 spans take 118 ms, and the test holds them to 5 s.  
+  - 2026-11-10 (UTC), the nested phrases test passes in a box run of [f59a77f][c-phrases].  
+    The 50,000-character test runs in 95 ms with a phrase that matches throughout.  
+    A scratch case of 25,000 matches in 25,000 phrase spans took 0.6 s.  
+    The cause was that `excepted` scanned every span per match.  
+  - 2026-11-10 (UTC), `excepted` looks a match up by binary search in [7cbdcc5][c-linear].  
+    50,000 matches in 50,000 spans take 118 ms, and the test limits them to 5 s.  
     The 50,000-character test takes 92 ms.  
     Tests cover a phrase in another case and two phrase searches that give up, as one error alert.
 - [x] 6.2 Build `substitution`, with longer keys first, the already-correct skip, `capitalize` and `$1` values.  
@@ -102,21 +110,26 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify its match-checks and rule-files scenarios pass as unit tests in CI.
   - 2026-11-10 (UTC), the two `occurrence` scenarios of the match-checks spec pass in the same box run, in [3868424][c-checks].  
     The rule-files spec has no `occurrence` scenario.  
-  - 2026-11-10 (UTC), three tests pass in a box run of [1341734][c-occ-code]: a match in code is not counted, one outside is, and none in code misses a minimum.  
+  - 2026-11-10 (UTC), three tests pass in a box run of [1341734][c-occ-code].  
+    A match in code is not counted, and one outside code is.  
+    A text with no match outside code misses a minimum.  
   - 2026-11-10 (UTC), a token that matches only blanks points at the first word under `min`, in [eb734af][c-blank].
 - [x] 6.4 Build `metric`: the variables, `occurrences`, element counts, the evaluator, the condition with `result`, and load errors.  
   Verify every [metric-check scenario][metric] and the metric scenarios of the rule-files spec pass as unit tests in CI.
-  - 2026-11-10 (UTC), 13 metric tests cover every metric-check scenario and both rule-files scenarios, with 7 formula tests, in a Linux box, in [d324f02][c-metric].  
+  - 2026-11-10 (UTC), 13 metric tests cover every metric-check scenario and both rule-files scenarios, in a Linux box, in [d324f02][c-metric].  
+    Seven formula tests run beside them.  
     All 4,383 words of prose's syllable data match.  
     Two of its three score cases match to 0.01, and the third has two sentences here, where prose finds one.  
-  - 2026-11-10 (UTC), the Rust comment test and the heading condition test pass in a box run of [4fabe24][c-condition].  
-    A whole-file metric now measures the comments of a code file, from [f312d38][c-comments], which Vale's default does not do ([decision 16][design-16]).  
+  - 2026-11-10 (UTC), the Rust comment test and the test of a heading in a condition pass in a box run of [4fabe24][c-condition].  
+    A whole-file metric now measures a code file's comments, from [f312d38][c-comments].  
+    Vale's default does not ([decision 16][design-16]).  
     Eight such rules over a 50,000-character line take 42 ms, from 327 ms, in [7950466][c-once].  
-  - 2026-11-10 (UTC), after one warm-up run, the median of five runs on a 4x8 box is 42 ms for one rule and 42 ms for eight.  
+  - 2026-11-10 (UTC), one warm-up run came first, then five runs on a 4x8 box.  
+    Their median is 42 ms for one rule and for eight.  
     Before [7950466][c-once] it was 43 ms and 341 ms.  
     The earlier 66 ms for one rule was a single run with no warm-up.
   - 2026-11-10 (UTC), a test lints 60,000 lines with one metric rule and with eight, in [df67f66][c-long-metric].  
-    Eight take 463 ms and one takes 488 ms, and the test holds eight to under three times one.  
+    Eight take 463 ms and one takes 488 ms, and the test limits eight to under three times one.  
     Before [7950466][c-once] eight took 3.59 s against 480 ms, which fails that bound.
 
 ## 7. Flesch-Kincaid parity
@@ -125,36 +138,40 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Run it once in a throwaway Linux box, with a `metric` rule whose message prints each value.  
   Verify the measurement covers every such input.
 - [x] 7.2 Store the values in a fixture file under `tests/fixtures/` that names the Vale version and the prose-style commit.  
-  Verify the fixture holds one entry per input.
+  Verify the fixture has one entry per input.
 - [x] 7.3 Compare hakkiri's values with the fixture at the tolerance the design states.  
   Verify the parity test passes in CI and prints each input whose counts differ from Vale's.
-  - 2026-11-10 (UTC), the parity test passes in the same box run: 51 inputs, counts equal Vale's on all 51, scores within 0.01, in [d324f02][c-metric].
+  - 2026-11-10 (UTC), the parity test passes in the same box run, in [d324f02][c-metric].  
+    It covers 51 inputs.  
+    Counts equal Vale's on all 51, and scores are within 0.01.
   - 2026-11-10 (UTC), the test also covers the 10 Rust inputs where Vale prints no value, in [ff43618][c-rust-parity].  
-    Six hold a comment, and hakkiri counts 18, 21, 9, 3, 2 and 4 words in them.  
-    The other four hold only strings, and hakkiri gives nothing, as Vale does.
+    Six have a comment, and hakkiri counts 18, 21, 9, 3, 2 and 4 words in them.  
+    The other four have only strings, and hakkiri gives nothing, as Vale does.
 
 ### Evidence for 7.1
 
-- 2026-11-10 UTC: Vale 3.26.0, the official Linux release, ran once in a throwaway Linux box with four `metric` rules, one per value.
-- The inputs are the 87 cases of [prose-style at `ee9f207`][ps-commit].
-  21 hold a code span or fence and are left out, which leaves 66.
-- Vale printed values for 51 of the 66.
-  It printed none for 15: 10 Rust inputs, 4 Markdown tables and 1 line that holds only a URL.
+- 2026-11-10 UTC: Vale 3.26.0, the official Linux release, ran once in a throwaway Linux box.  
+  It used four `metric` rules, one per value.
+- The inputs are the 87 cases of [prose-style at `ee9f207`][ps-commit].  
+  21 have a code span or fence and are left out, which leaves 66.
+- Vale printed values for 51 of the 66.  
+  It printed none for 15: 10 Rust inputs, 4 Markdown tables and 1 line that has only a URL.  
   The fixture marks them `no-words`.
 - The rule messages print `%.2f`, so the score was multiplied by 1,000,000 in the formula to keep six decimals.
 - Not verified: Vale's scores for Rust inputs, which its summary leaves empty.
 
 ### Evidence for 7.2
 
-- 2026-11-10 UTC: [`vale-fk.tsv`][fk-tsv] holds one row per input, 66 rows, each with the Vale version and the prose-style commit.
+- 2026-11-10 UTC: [`vale-fk.tsv`][fk-tsv] has one row per input, 66 rows, each with the Vale version and the prose-style commit.
 - The 15 `no-words` rows stay in the fixture with that mark, so task 7.3 compares the other 51.
-- The inputs are copied under [`inputs/`][fk-inputs], from a repository the same owner holds.
+- The inputs are copied under [`inputs/`][fk-inputs], from another repository of the same owner.
 - How to rerun the measurement, the format and the license note are in [`SOURCES.md`][fk-sources].
 
 ## 8. Integration
 
 - [x] 8.1 Verify the pull request's CI passes: build, lint, tests, docs, deny, prose lint, OpenSpec and the Template check.
-  - 2026-11-10 (UTC), CI passes on [08a2d35][c-horizon] of [PR 23][pr-23]: Build and test, Static checks, Verify, CodeQL, both Analyze jobs, secrets and the Kody review.  
+  - 2026-11-10 (UTC), CI passes on [08a2d35][c-horizon] of [PR 23][pr-23].  
+    The passing checks are Build and test, Static checks, Verify, CodeQL, both Analyze jobs, secrets and the Kody review.  
     The Template check and Publish checks skip on this branch, and I did not run them.
 
 ## Workflow follow-up

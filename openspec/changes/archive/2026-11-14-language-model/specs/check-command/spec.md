@@ -3,7 +3,8 @@
 ### Requirement: A file has a language
 
 A file SHALL have the langdex language of its path, read by its file name and then its extension.  
-A file whose path gives none SHALL have the language of the interpreter on its first line, read from at most its first 4096 bytes, and otherwise no language.
+A file whose path gives none SHALL have the language of the interpreter on its first line.  
+hakkiri SHALL read at most the first 4096 bytes for it, and otherwise the file SHALL have no language.
 
 #### Scenario: A file name, an extension and an interpreter
 
@@ -13,26 +14,31 @@ A file whose path gives none SHALL have the language of the interpreter on its f
 ### Requirement: A file has its own language, and its reader's when formats chose it
 
 For the scopes of the rules that run on it, a node outside a fenced code block SHALL be in the file's own language.  
-It SHALL also be in the language of the file's reader when a `formats` entry chose that reader.  
-A scope part that names a language SHALL hold for either, and a negated part SHALL leave a block out for either.
+It SHALL also be in the language of the file's reader when a `formats` entry chose that reader.
+
+A scope part for a language SHALL match either of them, and a negated part SHALL leave a block out for either.
 
 #### Scenario: A mapped file
 
-- **WHEN** `formats` maps `txt: md`, `a.txt` holds `# beta`, a blank line and `beta alpha gamma.`, and three rules have `text.md` with `alpha`, `text & ~heading.md` with `beta`, and `text.txt` with `gamma`
+- **WHEN** `formats` maps `txt: md`, `a.txt` contains `# beta`, a blank line and `beta alpha gamma.`, and three rules have `text.md` with `alpha`, `text & ~heading.md` with `beta`, and `text.txt` with `gamma`
 - **THEN** hakkiri reports `beta`, `alpha` and `gamma` on line 3, and none in the heading
 
 #### Scenario: A file read as plain text by on_unknown
 
-- **WHEN** a rule has `scope: text.txt` and `tokens: [marker]`, the glob `*` selects `notes.txt`, `guide.rst` and `README`, and each holds `A marker.`
+- **WHEN** a rule has `scope: text.txt` and `tokens: [marker]`, the glob `*` selects `notes.txt`, `guide.rst` and `README`, and each contains `A marker.`
 - **THEN** hakkiri reports one alert, in `notes.txt`
 
 ## MODIFIED Requirements
 
 ### Requirement: A reader is chosen by formats, then by extension
 
-hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by the reader of its language: Markdown, MDX, Rust, TypeScript, TSX, JavaScript or Text.  
-A file that a glob selects and whose language no reader reads, or that has no language, SHALL be read as plain text, unless `on_unknown` says otherwise.  
-A Text file SHALL be read as plain text whatever `on_unknown` says.
+hakkiri SHALL read a file by the reader its `formats` entry gives it.  
+Otherwise it SHALL read the file by the reader of its language.  
+The readers are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and Text.
+
+Some files that a glob selects have a language that no reader reads, or have no language.  
+Such a file SHALL be read as plain text, unless `on_unknown` is set to something else.  
+A Text file SHALL be read as plain text whatever `on_unknown` is set to.
 
 #### Scenario: A file no reader reads, found by a walk
 
@@ -46,12 +52,12 @@ A Text file SHALL be read as plain text whatever `on_unknown` says.
 
 #### Scenario: The reader of an extension
 
-- **WHEN** `formats` holds `txt: md` and `a.txt` holds a fenced block that holds `very`
+- **WHEN** `formats` has `txt: md` and `a.txt` contains a fenced block with `very` in it
 - **THEN** hakkiri reads `a.txt` as Markdown and reports nothing for the fence
 
 #### Scenario: More extensions of a language
 
-- **WHEN** `a.mts` holds `// A very good start.`, `a.markdown` holds `A very good start.`, and a rule flags `very`
+- **WHEN** `a.mts` contains `// A very good start.`, `a.markdown` contains `A very good start.`, and a rule flags `very`
 - **THEN** hakkiri reads `a.mts` as TypeScript and `a.markdown` as Markdown, and reports `very` once in each
 
 #### Scenario: An interpreter picks the reader
@@ -68,5 +74,5 @@ A Text file SHALL be read as plain text whatever `on_unknown` says.
 
 ### Requirement: A file has its own extension and its reader's
 
-**Reason**: A file has languages, not extensions.
+**Reason**: A file has languages, not extensions.  
 **Migration**: Read "A file has its own language, and its reader's when formats chose it".

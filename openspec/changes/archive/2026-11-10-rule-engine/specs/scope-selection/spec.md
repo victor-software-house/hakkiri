@@ -13,12 +13,12 @@ A scope part SHALL select every node whose scope name equals it or starts with i
 
 #### Scenario: heading selects every level
 
-- **WHEN** a rule has `scope: heading` and `tokens: [marker]`, and the input holds `# A marker` and `### Another marker`
+- **WHEN** a rule has `scope: heading` and `tokens: [marker]`, and the input has `# A marker` and `### Another marker`
 - **THEN** hakkiri reports two alerts, one in each heading
 
 #### Scenario: text.comment selects every comment
 
-- **WHEN** a rule has `scope: text.comment` and `tokens: [marker]`, and a Rust file holds `// A marker.` and `/// Another marker.`
+- **WHEN** a rule has `scope: text.comment` and `tokens: [marker]`, and a Rust file has `// A marker.` and `/// Another marker.`
 - **THEN** hakkiri reports two alerts
 
 ### Requirement: text selects the prose leaves
@@ -28,7 +28,7 @@ A list item or a block quote SHALL be read through the paragraphs inside it, so 
 
 #### Scenario: One alert per place
 
-- **WHEN** a rule has `scope: text` and `tokens: [marker]`, and the input holds `# A marker`, a paragraph `A marker.` and a list item `- A marker`
+- **WHEN** a rule has `scope: text` and `tokens: [marker]`, and the input has `# A marker`, a paragraph `A marker.` and a list item `- A marker`
 - **THEN** hakkiri reports three alerts, one on each line
 
 ### Requirement: An unset scope reads as text
@@ -37,7 +37,7 @@ A rule of any check type except `metric` that sets no `scope` SHALL select what 
 
 #### Scenario: A table cell with no scope
 
-- **WHEN** a rule has `tokens: [marker]` and no `scope`, and a table body cell holds `marker`
+- **WHEN** a rule has `tokens: [marker]` and no `scope`, and a table body cell has `marker`
 - **THEN** hakkiri reports one alert in that cell
 
 ### Requirement: paragraph leaves out list items and quotes
@@ -46,7 +46,7 @@ The scope `paragraph` SHALL select a paragraph that has no list item or block qu
 
 #### Scenario: A paragraph and a list item
 
-- **WHEN** a rule has `scope: paragraph` and `tokens: [marker]`, and the input holds `- A marker item.` and a paragraph `A marker.`
+- **WHEN** a rule has `scope: paragraph` and `tokens: [marker]`, and the input has `- A marker item.` and a paragraph `A marker.`
 - **THEN** hakkiri reports one alert, in the paragraph
 
 ### Requirement: sentence selects each sentence
@@ -61,28 +61,28 @@ A sentence SHALL keep the nodes around its node, so an exclusion such as `~block
 
 ### Requirement: A file extension narrows a scope
 
-A last scope part that names a file extension, such as `rs` in `raw.rs`, SHALL limit the scope to files with that extension.
+When the last scope part names a file extension, such as `rs` in `raw.rs`, it SHALL limit the scope to files with that extension.  
 A negated part with an extension, such as `~heading.rs`, SHALL leave out nodes only in files with that extension.  
 A scope item whose every part names another extension SHALL select nothing.
 
 #### Scenario: raw.rs in two files
 
-- **WHEN** a rule has `scope: raw.rs` and `tokens: [marker]`, and a Markdown file holds `A marker.` and a Rust file holds `// A marker.`
+- **WHEN** a rule has `scope: raw.rs` and `tokens: [marker]`, and a Markdown file has `A marker.` and a Rust file has `// A marker.`
 - **THEN** hakkiri reports one alert, in the Rust file
 
 #### Scenario: A negated part for another language
 
-- **WHEN** a rule has `scope: text & ~heading.rs` and `tokens: [marker]`, and a Markdown file holds `# A marker`
+- **WHEN** a rule has `scope: text & ~heading.rs` and `tokens: [marker]`, and a Markdown file has `# A marker`
 - **THEN** hakkiri reports one alert, on the heading
 
 #### Scenario: An item that names only another language
 
-- **WHEN** a rule has `scope: [~heading.rs]` and `tokens: [marker]`, and a Markdown file holds `# A marker` and `A marker.`
+- **WHEN** a rule has `scope: [~heading.rs]` and `tokens: [marker]`, and a Markdown file has `# A marker` and `A marker.`
 - **THEN** hakkiri reports no alert
 
 ### Requirement: An inline exclusion blanks the element
 
-A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.
+A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.  
 The exclusion SHALL apply only to the blocks that its own scope item selects.
 
 #### Scenario: A word outside and inside a link
@@ -97,7 +97,7 @@ The exclusion SHALL apply only to the blocks that its own scope item selects.
 
 ### Requirement: A check reads text without inline markup
 
-The text a check reads SHALL hold the text of strong, emphasis and link elements without their markers, and no link target.
+The text a check reads SHALL contain the text of strong, emphasis and link elements without their markers, and no link target.
 
 #### Scenario: A phrase across markup
 

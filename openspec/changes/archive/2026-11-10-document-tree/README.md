@@ -1,3 +1,4 @@
 # document-tree
 
-The one node tree that Markdown, MDX and the comments of Rust, TypeScript and JavaScript parse into
+One node tree for Markdown, MDX and comments.  
+The comments come from Rust, TypeScript and JavaScript files.

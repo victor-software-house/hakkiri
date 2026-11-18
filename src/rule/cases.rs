@@ -1,8 +1,9 @@
 //! The test cases of a rule file and of a `*.test.yml` file.
 //!
-//! A case holds a document and what linting it must give. Both places read
-//! the same fields, refuse a field a case does not define, and refuse a case
-//! that asserts nothing, because that case passes whatever the rule does.
+//! A case contains a document and what linting it must give.
+//! Both places read the same fields and reject a field a case does not define.
+//! They also reject a case that asserts nothing, because that case passes
+//! whatever the rule does.
 
 use std::collections::HashSet;
 
@@ -123,9 +124,9 @@ pub struct TestCase {
     pub rule: Option<String>,
     /// The exact output expected, where an empty text means no alerts.
     pub want: Option<String>,
-    /// Text the output must hold.
+    /// Text the output must contain.
     pub contains: Vec<String>,
-    /// Text the output must not hold.
+    /// Text the output must not contain.
     pub absent: Vec<String>,
 }
 
@@ -197,9 +198,14 @@ pub fn alert_lines(alerts: &[Alert]) -> String {
 /// # Errors
 ///
 /// Returns a [`LoadError`] when the text is not a list of cases.
-/// It also refuses a case that holds a field it does not define or one of the
-/// wrong kind, a case with no name, a case that asserts nothing, and two cases
-/// that share a name. Each problem names its line.
+/// It also rejects:
+///
+/// - a case that has a field it does not define, or one of the wrong kind;
+/// - a case with no name;
+/// - a case that asserts nothing;
+/// - two cases that share a name.
+///
+/// Each problem shows its line.
 pub fn cases_from_text(file: &str, text: &str) -> Result<Vec<TestCase>, LoadError> {
     let input = Input::new(file, text);
     let list: CaseList = input.load().map_err(|error| at_tab(error, text))?;

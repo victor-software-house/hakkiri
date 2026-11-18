@@ -5,7 +5,8 @@ It is the second of four changes that build the `vale-differences` spec, after [
 
 ## Motivation
 
-The [`vale-differences` change][first] lists the differences in what a rule reads, where an alert points and how text is measured.  
+The [`vale-differences` change][first] lists the differences in what a rule reads, where an alert points and how text is measured.
+
 The pattern checks, and the rules that hakkiri refuses where Vale loads them, are the next part of the list.  
 A project that moves a Vale style meets a refusal at load, so it needs to find each one in one place.
 

@@ -122,7 +122,7 @@ fn a_title_of_a_long_run_of_backslashes_costs_its_length() -> TestResult {
     Ok(())
 }
 
-/// A link, an image and a definition, each with a title that holds `marker`.
+/// A link, an image and a definition, each with a title that contains `marker`.
 fn titled() -> String {
     concat_lines(&[
         "A [link](u.html \"a link marker\") and ![img](i.png 'an image marker') end.",
@@ -805,7 +805,8 @@ fn a_front_matter_key_that_is_an_extension_stays_a_key() -> TestResult {
 
 /// The alt text of an inline `img` tag is an `alt` block of its own, as Vale
 /// 66bbb85 reads it.
-/// No `link` block and no sentence holds it, and the paragraph reads around it.
+/// No `link` block and no sentence contains it, and the paragraph reads around
+/// it.
 #[test]
 fn the_alt_text_of_an_inline_img_is_an_alt_block() -> TestResult {
     let source = concat_lines(&[

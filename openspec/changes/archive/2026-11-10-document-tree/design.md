@@ -10,7 +10,7 @@ This slice builds the tree both feed, with no checks yet.
 
 **Goals:**
 
-- One tree type for every file, each node holding its scope name, its byte span in the file, and its children.
+- One tree type for every file, where each node has its scope name, its byte span in the file, and its children.
 - Spans that point into the original file, also for text that sits inside a comment.
 
 **Non-Goals:**
@@ -22,11 +22,12 @@ This slice builds the tree both feed, with no checks yet.
 
 ### 1. markdown-rs parses Markdown and MDX
 
-[markdown-rs][markdown-rs] 1.0.0 parses `.md` with GFM and front matter, and `.mdx` with its MDX constructs.  
+[markdown-rs][markdown-rs] 1.0.0 parses GitHub Flavored Markdown (GFM) and front matter in `.md` files, and MDX constructs in `.mdx` files.  
 Every mdast node carries a start and end offset, which become the node's span.  
 It is the only Rust parser with MDX and a position on each node, as the [bootstrap research][research] found.
 
-Alternative: comrak. Lost: no MDX, so `.mdx` would need a second parser.
+Alternative: comrak.  
+It has no MDX, so `.mdx` would need a second parser.
 
 ### 2. tree-sitter finds comments
 
@@ -34,7 +35,8 @@ tree-sitter with the [Rust][ts-rust] 0.24.2, [TypeScript][ts-ts] 0.23.2 and [Jav
 Only comment nodes enter the tree, so a string literal never does.  
 The grammar names the comment type: Rust has `line_comment`, `block_comment` and a `doc_comment` marker; TypeScript and JavaScript have `comment`, whose text shows `//`, `/*` or `/**`.
 
-Alternative: a lexer per language, such as `ra_ap_rustc_lexer`. Lost: one per language, where tree-sitter adds a language as a grammar.
+Alternative: a lexer per language, such as `ra_ap_rustc_lexer`.  
+Lost: each language needs its own lexer, where tree-sitter adds a language as a grammar.
 
 ### 3. Comment text keeps a map to the file
 
@@ -66,11 +68,11 @@ An alert takes its position from the span.
 | `strong`, `emphasis` | `strong`, `emphasis` |
 | `image` alt text | `alt` |
 
-These carry no prose scope: fenced code, raw HTML, link definitions, front matter, MDX expressions, MDX imports, and the tags of JSX elements.  
+These carry no prose scope: fenced code, raw HTML, link definitions, front matter, MDX expressions, MDX imports, and the tags of JavaScript XML (JSX) elements.  
 The node-segments design makes them gaps in the text of the node around them.
 
 Text inside a JSX element is prose.  
-`raw` holds the whole file for Markdown and MDX, and the comment text for a source file.
+`raw` is the whole file for Markdown and MDX, and the comment text for a source file.
 
 The builder walks the mdast with its own stack of frames.  
 So does the map from the stripped text back to the file.  
@@ -81,9 +83,11 @@ markdown-rs reads 1,000 levels of block quotes or lists, and so does hakkiri.
 
 In a `/** */` comment of TypeScript or JavaScript, a line that starts with `@` begins a tag.  
 The tag name, and a type in braces after it, are not prose.  
-Neither is the name after `@param` and the tags that name something.  
+Neither is the name after `@param` and the tags that give something a name.
+
 The description after them is prose.  
-The body of `@example` is code, and a line inside a fenced block begins no tag.
+The body of `@example` is code.  
+A line inside a fenced block begins no tag.
 
 ### 6. insta snapshots
 

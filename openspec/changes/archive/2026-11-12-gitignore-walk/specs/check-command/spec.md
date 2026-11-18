@@ -8,7 +8,7 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: An ignored folder and file
 
-- **WHEN** `.gitignore` holds `build/` and `draft.md`, and `a.md`, `draft.md` and `build/b.md` each draw one warning
+- **WHEN** `.gitignore` contains `build/` and `draft.md`, and `a.md`, `draft.md` and `build/b.md` each draw one warning
 - **THEN** `hakkiri check` lints `a.md` alone, and prints `1 alert in 1 file`
 
 #### Scenario: The exclude file and the global excludes
@@ -18,10 +18,10 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 #### Scenario: A nested gitignore
 
-- **WHEN** `docs/.gitignore` holds `skip.md`, and `docs/skip.md` and `skip.md` exist
+- **WHEN** `docs/.gitignore` contains `skip.md`, and `docs/skip.md` and `skip.md` exist
 - **THEN** a walk skips `docs/skip.md` and lints `skip.md`
 
-#### Scenario: A named ignored file
+#### Scenario: A given ignored file
 
 - **WHEN** `hakkiri check draft.md build/b.md` runs and git ignores both
 - **THEN** hakkiri lints both
@@ -33,8 +33,11 @@ A file named on the command line SHALL be linted whether git ignores it or not.
 
 ### Requirement: A named file that no glob selects draws a warning
 
-A file named on the command line that no glob of `files` matches SHALL draw a warning that names it, or a failure with exit 2 when `on_unmatched` is `error`, or nothing when it is `ignore`.  
-A file that a glob matches whose styles hold no rule, a file found by a walk, and a file named twice SHALL NOT draw more than the one warning.
+A file given on the command line that no glob of `files` matches SHALL draw a warning that gives its path.  
+It SHALL instead fail with exit 2 when `on_unmatched` is `error`, and draw nothing when it is `ignore`.
+
+Three kinds of file SHALL NOT draw more than the one warning.  
+They are a file that a glob matches whose styles contain no rule, a file found by a walk, and a file given twice.
 
 #### Scenario: A warning
 
@@ -58,5 +61,5 @@ A file that a glob matches whose styles hold no rule, a file found by a walk, an
 
 #### Scenario: A walk finds an unselected file
 
-- **WHEN** `hakkiri check` walks a folder that holds `README.md`, which no glob selects
+- **WHEN** `hakkiri check` walks a folder that contains `README.md`, which no glob selects
 - **THEN** hakkiri prints no warning

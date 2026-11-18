@@ -4,8 +4,9 @@
 //!
 //! [`load`] reads the file once, loads every style folder of every package, and
 //! refuses what it cannot run, with the file and line of the fault.
-//! A package may ship a settings file in the same format, and the settings of
-//! each package rank below the project's own at equal specificity.
+//! A package may ship a settings file in the same format.
+//! The settings of each package rank below the project's own at equal
+//! specificity.
 //! The globs that match a file apply from the least specific to the most, and
 //! the values the project tags `!override` apply after all the others.
 //! [`Project::plan`] then says which rules run on a file.
@@ -125,7 +126,7 @@ enum Value {
 #[derive(Clone, Debug)]
 struct Written {
     param: Param,
-    /// The config file that holds it, as a fault names it.
+    /// The config file that contains it, as a fault shows it.
     file: String,
     line: Option<usize>,
 }
@@ -231,10 +232,10 @@ fn words_ok(value: &Option<Tagged<u64>>, _: &Known) -> garde::Result {
 fn entry_ok(entry: &Entry, _: &Known) -> garde::Result {
     match (&entry.path, &entry.url, &entry.sha256) {
         (Some(_), Some(_), _) => Err(garde::Error::new(
-            "an entry holds a `path` or a `url`, never both",
+            "an entry has a `path` or a `url`, never both",
         )),
         (Some(_), None, Some(_)) => Err(garde::Error::new(
-            "`sha256` belongs to a `url`, and this entry holds a `path`",
+            "`sha256` belongs to a `url`, and this entry has a `path`",
         )),
         (None, Some(_), None) => Err(garde::Error::new("a `url` needs its `sha256`")),
         (None, Some(url), Some(sha256)) => url_ok(url, sha256),
@@ -307,14 +308,16 @@ const OVERRIDE: &str = "!override";
 
 /// How specific a glob is: four counts, compared in order, a larger count more
 /// specific.
-/// They are the parts between slashes made of literal characters only, the
-/// parts that hold a literal character and something else, the parts that are
-/// `**` (fewer is more specific, so [`Reverse`]), and the literal characters of
-/// the whole glob.
+/// The counts are:
+///
+/// - the parts between slashes made of literal characters only;
+/// - the parts that contain a literal character and something else;
+/// - the parts that are `**` (fewer is more specific, so [`Reverse`]);
+/// - the literal characters of the whole glob.
 type Specificity = (usize, usize, Reverse<usize>, usize);
 
 /// The specificity of the glob `pattern`, one of the [`alternatives`] of a
-/// glob, so it holds no `{…}` group.
+/// glob, so it has no `{…}` group.
 ///
 /// A literal character is one outside a `[…]` class that is not `*` or `?`,
 /// and a backslash with the character after it is one literal character.
@@ -403,8 +406,8 @@ fn alternatives(pattern: &str) -> Option<Vec<String>> {
 }
 
 /// The byte offsets of the first `{…}` group of `glob`: its opening brace, its
-/// closing brace, and the commas between its choices, those of a group inside
-/// it left out.
+/// closing brace, and the commas between its choices.
+/// Commas of a group inside it are left out.
 fn first_group(glob: &str) -> Option<(usize, usize, Vec<usize>)> {
     let (mut open, mut depth, mut commas) = (None, 0_usize, Vec::new());
     // The members seen in a class so far, and whether it is negated, as
@@ -550,8 +553,9 @@ pub(crate) struct Project {
     /// alternatives ranks.
     ranking: Ranking,
     /// The rule each set of parameters gives, by the rule's place in `rules`
-    /// and the parameters' [`variant_key`]: one for every set that the globs
-    /// matching some file can add up to.
+    /// and the parameters' [`variant_key`].
+    /// There is one for every set that the globs matching some file can add up
+    /// to.
     variants: HashMap<(usize, String), Rule>,
     /// The vocabularies the config names, by name.
     vocabularies: BTreeMap<String, Vocabulary>,
@@ -580,7 +584,7 @@ pub(crate) struct Project {
     /// What the load skipped, such as a package style folder named for a
     /// built-in style.
     pub(crate) warnings: Vec<String>,
-    /// The project root: the folder that holds the `.ctl` folder of the
+    /// The project root: the folder that has the `.ctl` folder of the
     /// config, with symlinks resolved.
     root: PathBuf,
 }
@@ -603,7 +607,7 @@ struct Ranking {
 }
 
 impl Ranking {
-    /// Ranks the alternatives of `globs`, which [`load`] holds in load order.
+    /// Ranks the alternatives of `globs`, which [`load`] keeps in load order.
     /// Alternatives that do not compile into one set are a fault, and then no
     /// glob matches.
     fn of(mut globs: Vec<Glob>, faults: &mut Faults<'_>) -> Self {
@@ -680,8 +684,10 @@ impl Ranking {
 /// The rules that run on one file, and the levels the config sets for some.
 #[derive(Debug)]
 pub(crate) struct Plan<'a> {
-    /// The rules to run: those of the listed styles in the order listed, then
-    /// those a config enables by name in the order their styles load.
+    /// The rules to run.
+    /// First come those of the listed styles, in the order listed.
+    /// Then come those a config enables by name, in the order their styles
+    /// load.
     pub(crate) rules: Vec<&'a Rule>,
     /// The level an alert of a rule takes, by rule name.
     pub(crate) levels: HashMap<&'a str, Level>,
@@ -701,7 +707,7 @@ pub(crate) struct Plan<'a> {
     pub(crate) code_span_size: u8,
 }
 
-/// Whether the resolved directory `real` is under `root` or holds it.
+/// Whether the resolved directory `real` is under `root` or contains it.
 pub(crate) fn leads_to(root: &Path, real: &Path) -> bool {
     real.starts_with(root) || root.starts_with(real)
 }
@@ -713,7 +719,7 @@ impl Project {
     }
 
     /// Whether the resolved directory `real` is under the project root or
-    /// holds it, so a walk of it can reach a file under the root.
+    /// contains it, so a walk of it can reach a file under the root.
     pub(crate) fn leads_to_root(&self, real: &Path) -> bool {
         leads_to(&self.root, real)
     }
@@ -731,7 +737,7 @@ impl Project {
     }
 
     /// Whether `argument` can lead to a file under the project root: a file
-    /// that is under it, or a directory that is under it or holds it.
+    /// under it, or a directory under or above it.
     pub(crate) fn reaches(&self, argument: &Path, directory: bool) -> bool {
         if directory {
             fs::canonicalize(argument).is_ok_and(|real| self.leads_to_root(&real))
@@ -744,8 +750,9 @@ impl Project {
     /// separators, or `None` when it is outside the root or cannot be resolved.
     ///
     /// The folders of `file` are resolved through symlinks, as the root is, but
-    /// its own name is kept: a symlink to a file is matched by the name it is
-    /// reached by, as Vale matches it.
+    /// its own name is kept.
+    /// A symlink to a file is matched by the name that reaches it, as Vale
+    /// matches it.
     pub(crate) fn relative(&self, file: &Path) -> Option<String> {
         let absolute = path::absolute(file).ok()?;
         let real = fs::canonicalize(absolute.parent()?)
@@ -764,24 +771,33 @@ impl Project {
     /// The rules for `path`, written relative to the project root with `/`
     /// separators, or `None` when no glob matches it or it has no rule to run.
     ///
-    /// The globs that match apply in rank order, a higher rank winning for the
-    /// same key, then the values the project tags `!override` apply in the same
-    /// order.
-    /// A `styles` list replaces the one of a lower rank, and an empty list also
-    /// drops every rule setting of a lower rank, as Vale's empty
-    /// `BasedOnStyles` does.
-    /// A rule runs when a listed style holds it and the config does not turn it
-    /// off, or when the config turns it on or sets its level, whatever style
-    /// holds it. A level once set stays when a glob of higher rank turns the
-    /// rule off or on, as in Vale.
-    /// A parameter a glob sets reaches the files that glob matches, a higher
-    /// rank winning for the same parameter, and an empty `styles` list drops
-    /// the parameters of a lower rank as it drops the levels.
+    /// The globs that match apply in rank order, and a higher rank wins for the
+    /// same key.
+    /// Then the values the project tags `!override` apply in the same order.
+    ///
+    /// A `styles` list replaces the one of a lower rank.
+    /// An empty list also drops every rule setting of a lower rank, as Vale's
+    /// empty `BasedOnStyles` does.
+    ///
+    /// A rule runs when a listed style contains it and the config does not turn
+    /// it off.
+    /// It also runs when the config turns it on or sets its level, whatever
+    /// style contains it.
+    /// A level once set stays when a glob of higher rank turns the rule off or
+    /// on, as in Vale.
+    ///
+    /// A parameter a glob sets reaches the files that glob matches.
+    /// A higher rank wins for the same parameter.
+    /// An empty `styles` list drops the parameters of a lower rank, as it drops
+    /// the levels.
+    ///
     /// The lists of `vocab`, `block_ignores` and `token_ignores` add up over
-    /// every matching glob; when one forces a list for a key, the forced lists
-    /// of that key replace the others.
-    /// A rule hakkiri cannot run is held to the same test, and each one that
-    /// passes it is in [`Plan::unrunnable`].
+    /// every matching glob.
+    /// When one glob forces a list for a key, the forced lists of that key
+    /// replace the others.
+    ///
+    /// Each rule hakkiri cannot run goes through the same test.
+    /// Those that pass it are in [`Plan::unrunnable`].
     pub(crate) fn plan(&self, path: &str) -> Option<Plan<'_>> {
         let matching = self.ranking.matching(path);
         if matching.is_empty() {
@@ -905,8 +921,9 @@ struct Fold<'a> {
 
 impl<'a> Fold<'a> {
     /// What the `globs` that match a file set, in rank order, starting from
-    /// `code_span_size`: first the settings without the tag, then the forced
-    /// ones, with the project's forced `code_span_size` ahead of them.
+    /// `code_span_size`.
+    /// First come the settings without the tag, then the forced ones, with the
+    /// project's forced `code_span_size` ahead of them.
     fn of(globs: &[&'a Glob], code_span_size: u8, forced_code_span_size: Option<u8>) -> Self {
         let mut fold = Self {
             styles: &[],
@@ -986,8 +1003,8 @@ impl<'a> Fold<'a> {
 }
 
 impl Project {
-    /// The rule at `index`, read with the parameters `set` holds for its name
-    /// when it holds any.
+    /// The rule at `index`, read with the parameters `set` has for its name
+    /// when it has any.
     fn rule_for(
         &self,
         index: usize,
@@ -1019,8 +1036,8 @@ fn set_vocabulary_rules<S: AsRef<str>>(switches: &mut HashMap<String, bool>, nam
 /// The 1-based line where `input` writes the key at `path`, or where its
 /// nearest written ancestor's key is, and `None` when the text does not parse.
 ///
-/// A fault about a key itself, such as a glob that is no glob, belongs here,
-/// since the value of a key that holds a block collection starts on the line
+/// A fault about a key itself, such as a glob that is no glob, belongs here.
+/// The value of a key that contains a block collection starts on the line
 /// below it.
 fn key_line_of(input: &Input, path: &FieldPath) -> Option<usize> {
     input.place_key(path).map(|at| at.line)
@@ -1067,7 +1084,7 @@ struct Loaded {
     /// a glob enables the style.
     names: BTreeMap<String, Vec<LoadProblem>>,
     /// The rules that are valid Vale and that hakkiri cannot run, with the
-    /// style that holds each.
+    /// style that contains each.
     unrunnable: Vec<Held>,
     /// The vocabularies the config names, by name.
     vocabularies: BTreeMap<String, Vocabulary>,
@@ -1084,7 +1101,7 @@ struct Loaded {
 
 /// A package folder that was found, and where its entry is written.
 struct Found {
-    /// The config file that holds the entry, as a fault names it.
+    /// The config file that contains the entry, as a fault shows it.
     origin: String,
     written: PathBuf,
     folder: PathBuf,
@@ -1092,14 +1109,14 @@ struct Found {
     line: Option<usize>,
 }
 
-/// A rule hakkiri cannot run, and the style that holds it.
+/// A rule hakkiri cannot run, and the style that contains it.
 #[derive(Debug)]
 struct Held {
     style: String,
     rule: Unrunnable,
 }
 
-/// The folder that holds the `.ctl` folder of the config file `config`, or the
+/// The folder that has the `.ctl` folder of the config file `config`, or the
 /// folder of `config` when it is not in a `.ctl` folder, with symlinks
 /// resolved.
 fn project_root(config: &Path) -> io::Result<PathBuf> {
@@ -1162,7 +1179,7 @@ impl<'a> Walk<'a> {
     /// project root and each `url` fetched into the cache folder, then the
     /// packages that package lists.
     ///
-    /// `file` is the config that holds `entries`, as a fault names it, and
+    /// `file` is the config that contains `entries`, as a fault shows it, and
     /// `depth` the packages between it and the project.
     fn entries(&mut self, entries: &[Entry], input: &Input, file: &str, depth: usize) {
         let mut faults = Faults {
@@ -1235,12 +1252,12 @@ impl<'a> Walk<'a> {
         self.problems.extend(faults.problems);
     }
 
-    /// The folder that holds the package whose styles folder is `styles`: its
+    /// The folder that has the package whose styles folder is `styles`: its
     /// parent, when `styles` is named `styles`.
     ///
-    /// The project's own config is not a package's: its `.ctl` folder sits in
-    /// the project root, so a parent that is the project root, or holds it, is
-    /// no package top.
+    /// The project's own config is not a package's.
+    /// Its `.ctl` folder sits in the project root.
+    /// So a parent that is the project root, or contains it, is no package top.
     fn top_of(&self, styles: &Path) -> Option<PathBuf> {
         let top = styles.parent()?;
         (styles.file_name()? == "styles" && top != self.root && !self.root.starts_with(top))
@@ -1248,7 +1265,7 @@ impl<'a> Walk<'a> {
     }
 
     /// Reads the settings file of the package whose styles folder is `styles`,
-    /// when its top folder holds one, and walks the packages it lists.
+    /// when its top folder has one, and walks the packages it lists.
     ///
     /// `shown` is the top folder as the config writes it.
     fn settings(&mut self, styles: &Path, shown: &Path, depth: usize) {
@@ -1308,19 +1325,24 @@ impl<'a> Walk<'a> {
 
 /// Reads the config at `path`, and loads the style folders of its packages. A
 /// package pinned by `url` is fetched into `cache_dir`, or into the per-user
-/// cache folder when there is none, unless that folder already holds it.
+/// cache folder when there is none, unless that folder already contains it.
 ///
-/// A package whose top folder holds `.ctl/hakkiri.yaml` ships settings in the
-/// format of the config: they rank below the project's at equal specificity,
-/// and the packages that file lists are fetched as the project's are.
+/// A package whose top folder has `.ctl/hakkiri.yaml` ships settings in the
+/// format of the config.
+/// They rank below the project's at equal specificity.
+/// The packages that file lists are fetched as the project's are.
 ///
 /// # Errors
 ///
 /// Returns every fault found.
-/// A fault is a file that cannot be read, a key the config does not define, a
-/// package that cannot be read or that repeats a style, or a rule that does not
-/// load. It is also a glob, a style or a rule name that names nothing, and a
-/// chain of packages over [`MAX_DEPTH`].
+/// A fault is any of these:
+///
+/// - a file that cannot be read;
+/// - a key the config does not define;
+/// - a package that cannot be read or that repeats a style;
+/// - a rule that does not load;
+/// - a glob, a style or a rule name that matches nothing;
+/// - a chain of packages over [`MAX_DEPTH`].
 pub(crate) fn load(path: &Path, cache_dir: Option<&Path>) -> Result<Project, LoadError> {
     let input = Input::read(path).map_err(LoadError::from)?;
     let raw: Raw = input.load().map_err(LoadError::from)?;
@@ -1435,8 +1457,8 @@ fn refuse_top_level_tag(layer: &Layer, project: bool, faults: &mut Faults<'_>) {
 /// Adds the globs `read` to `globs`, in the order written, as one config file
 /// gave them.
 ///
-/// A `styles` list adds to the one an earlier file gave the same glob text, and
-/// an empty `vocab` list drops the lists of the earlier globs of that text.
+/// A `styles` list adds to the one an earlier file gave the same glob text.
+/// An empty `vocab` list drops the lists of the earlier globs of that text.
 fn push_globs(globs: &mut Vec<Glob>, read: Vec<Glob>, listed: &mut HashMap<String, Vec<String>>) {
     for mut glob in read {
         add_up(&mut glob, listed);
@@ -1481,8 +1503,8 @@ fn last_settings(layers: &[Layer]) -> (Option<Level>, Option<u8>, Option<u8>) {
 /// gave the same glob text, as Vale merges the sections of one name.
 ///
 /// An empty list stays empty, which drops the earlier styles and the rule
-/// settings of a lower rank. `listed` holds the list each glob text ended with.
-/// A list the project forces is taken as written, so it is not added up.
+/// settings of a lower rank. `listed` stores the list each glob text ended
+/// with. A list the project forces is taken as written, so it is not added up.
 fn add_up(glob: &mut Glob, listed: &mut HashMap<String, Vec<String>>) {
     let Some(own) = glob.normal.styles.as_mut() else {
         return;
@@ -1624,9 +1646,12 @@ fn forces(tag: &str, project: bool) -> Result<bool, String> {
     }
 }
 
-/// Reads each glob of `files`, and refuses a style or a rule that names nothing
-/// `loaded` holds, a level that is none, and a tag that is not `!override` or
-/// that a package's settings file holds.
+/// Reads each glob of `files`, and refuses these:
+///
+/// - a style or a rule that `loaded` does not contain;
+/// - a level that is none;
+/// - a tag that is not `!override`;
+/// - any tag in a package's settings file.
 ///
 /// `origin` is the place of the config file among the layers, and `project`
 /// whether it is the project's.
@@ -1646,7 +1671,7 @@ fn read_globs(
         .collect();
     let mut globs = Vec::new();
     for (pattern, settings) in files.0 {
-        // One key of the path, whatever dots, stars and slashes the glob holds.
+        // One key of the path, whatever dots, stars and slashes the glob has.
         let glob = FieldPath::root().key("files").key(&pattern);
         let line = key_line_of(input, &glob);
         let branches = match compile(&pattern) {
@@ -1700,9 +1725,9 @@ fn read_globs(
                 }
                 (_, setting) if !known.contains(key.as_str()) => {
                     let message = if matches!(setting, Setting::List(_)) {
-                        "is not `styles`, and names no rule in any style the config loads"
+                        "is neither `styles` nor a rule in any style the config loads"
                     } else {
-                        "names no rule in any style the config loads"
+                        "is not a rule in any style the config loads"
                     };
                     faults.add(
                         key_line_of(input, &glob.clone().key(&key)),
@@ -1735,7 +1760,7 @@ fn read_globs(
 }
 
 /// Refuses each name of the `styles` list under the glob at `glob` that no
-/// package holds, on the line of that name.
+/// package contains, on the line of that name.
 fn refuse_unknown_styles(
     names: &[String],
     input: &Input,
@@ -1755,9 +1780,9 @@ fn refuse_unknown_styles(
     }
 }
 
-/// The parameters `rules` holds, the value of `params` under the glob at
-/// `glob` in `input`, and a fault on the line of each name or value that is
-/// not one.
+/// Reads the parameters `rules` contains, the value of `params` under the glob
+/// at `glob` in `input`.
+/// Adds a fault on the line of each name or value that is not one.
 ///
 /// A rule must be one the config loads and its parameters a mapping of one
 /// value each: a number, `true` or `false`, or text. What a rule's check does
@@ -1776,7 +1801,7 @@ fn read_params(
             faults.add(
                 key_line_of(input, &at),
                 &rule,
-                "names no rule in any style the config loads".to_owned(),
+                "is not a rule in any style the config loads".to_owned(),
             );
             continue;
         }
@@ -1854,7 +1879,7 @@ fn too_many_words(words: u64) -> String {
     format!("`{words}` is too many words: use 0 to {}", u8::MAX)
 }
 
-/// The patterns `list` holds, the value of `key` under the glob at `glob` in
+/// The patterns `list` contains, the value of `key` under the glob at `glob` in
 /// `input`, compiled, and a fault on the line of each that does not compile.
 fn compile_all(
     list: &[String],
@@ -1895,22 +1920,31 @@ fn refuse_names(globs: &[Glob], loaded: &Loaded, faults: &mut Faults<'_>) {
 }
 
 /// Reads each rule again for every set of parameters that the globs matching
-/// some file can give it, and refuses a parameter its rule cannot take.
+/// some file can give it.
+/// Refuses a parameter its rule cannot take.
 ///
-/// A file gets the parameters of the globs that match it, in rank order, and an
-/// empty `styles` list drops those of a lower rank. Then it gets the forced
-/// parameters of the same globs, in the same order, and an empty forced list
-/// drops every parameter before it.
-/// Each glob either matches a file or does not, so the sets a rule can get are
-/// those that each choice leaves, first over the parameters without the tag and
-/// then over the forced ones. Sets that come out alike count once.
-/// `globs` holds a glob once at the rank of each of its alternatives, so the
-/// place it takes for any file is among the choices.
+/// A file gets the parameters of the globs that match it, in rank order.
+/// An empty `styles` list drops those of a lower rank.
+/// Then it gets the forced parameters of the same globs, in the same order.
+/// An empty forced list drops every parameter before it.
+///
+/// Each glob either matches a file or does not.
+/// So the sets a rule can get are those that each choice leaves.
+/// They come first from the parameters without the tag, then from the forced
+/// ones.
+/// Sets that come out alike count once.
+///
+/// `globs` has the glob once for each of its alternatives, at the rank of that
+/// alternative.
+/// So the place it takes for any file is among the choices.
+///
 /// A set no file gives may be read too, and its faults are those of its
 /// parameters.
-/// A fault is placed on the line of the parameter it names, or of the first
-/// parameter of the set when it names none. When a set of several is refused,
-/// each parameter is read alone, so every fault shows at once.
+/// A fault goes on the line of the parameter it is about, or of the first
+/// parameter of the set when it is about none.
+///
+/// When a set of several is refused, each parameter is read alone, so every
+/// fault shows at once.
 fn build_variants(
     globs: &[&Glob],
     loaded: &Loaded,
@@ -1968,9 +2002,9 @@ fn build_variants(
                     variants.insert((index, key), rule);
                 }
                 Err(error) => {
-                    // Each parameter alone, so a fault of one does not hide
-                    // the fault of another; a fault of the set as a whole is
-                    // what the set gave.
+                    // Each parameter alone, so one fault does not hide
+                    // another. A fault of the set as a whole is what the set
+                    // gave.
                     let alone: Vec<LoadProblem> = if params.len() > 1 {
                         params
                             .iter()
@@ -2023,8 +2057,8 @@ fn build_variants(
 /// globs of `files`.
 #[derive(Default)]
 struct Named {
-    /// Each name once, with the line of the key that first names it and the
-    /// file that holds the key.
+    /// Each name once, with the line of the key that first writes it and the
+    /// file that contains the key.
     all: Vec<(String, Option<usize>, String)>,
     /// The names of the top level, in order: those of each package's file and
     /// then the project's. A written empty list drops the names before it.
@@ -2091,9 +2125,10 @@ impl Named {
     }
 }
 
-/// The folders that may hold the affix file a YAML vocabulary named `name`
-/// names: the dictionaries folder of the package that holds the vocabulary,
-/// then that of every other package, in order.
+/// The folders that may contain the affix file a YAML vocabulary `name` refers
+/// to.
+/// First comes the dictionaries folder of the package that contains the
+/// vocabulary, then that of every other package, in order.
 fn affix_folders(found: &[Found], name: &str) -> Vec<PathBuf> {
     let holds = |package: &&Found| vocabulary::find(&package.folder, name).is_some();
     found
@@ -2104,8 +2139,8 @@ fn affix_folders(found: &[Found], name: &str) -> Vec<PathBuf> {
         .collect()
 }
 
-/// Reads each vocabulary `vocab` names from the package folders in `found`,
-/// and refuses a name no package holds and a name two packages hold.
+/// Reads each vocabulary `vocab` lists from the package folders in `found`.
+/// Rejects a name no package contains and a name two packages contain.
 fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults: &mut Faults<'_>) {
     for (name, line, file) in &vocab.all {
         let mut at = Faults {
@@ -2161,9 +2196,10 @@ fn read_vocabularies(found: &[Found], vocab: &Named, loaded: &mut Loaded, faults
 
 /// Builds the rules of the style `Vale` and of the vocabularies the config
 /// names, as Vale builds them.
-/// The style `Vale` holds `Vale.Repetition`, and `Vale.Spelling` when a glob
-/// uses the style, and the lists of the top level give it `Vale.Terms` and
-/// `Vale.Avoid`. Each vocabulary a glob lists gives `Vale.<Name>.Terms` and
+/// The style `Vale` has `Vale.Repetition`, and `Vale.Spelling` when a glob
+/// uses the style.
+/// The lists of the top level give it `Vale.Terms` and `Vale.Avoid`.
+/// Each vocabulary a glob lists gives `Vale.<Name>.Terms` and
 /// `Vale.<Name>.Avoid`, which that glob runs on its files.
 fn build_vocabulary_rules(
     loaded: &mut Loaded,
@@ -2189,7 +2225,7 @@ fn build_vocabulary_rules(
         }
     }
     for (prefix, own_accepted, own_rejected, style) in built {
-        // The style `Vale` holds `Vale.Repetition`, and `Vale.Spelling` when a
+        // The style `Vale` has `Vale.Repetition`, and `Vale.Spelling` when a
         // glob uses the style, as Vale builds a rule when it is used.
         let built_in = if style {
             vale_repetition(accepted).and_then(|repetition| {
@@ -2227,9 +2263,10 @@ fn build_vocabulary_rules(
     }
 }
 
-/// The style folders of the package folder `package`, in name order: each
-/// folder inside it whose name does not begin with a dot, except
-/// [`SETTINGS_FOLDER`], which holds Vale's vocabularies and other settings.
+/// The style folders of the package folder `package`, in name order.
+/// These are the folders inside it whose name does not begin with a dot.
+/// [`SETTINGS_FOLDER`] is left out: it contains Vale's vocabularies and other
+/// settings.
 fn style_folders(package: &Path, line: Option<usize>, faults: &mut Faults<'_>) -> Vec<PathBuf> {
     let entries = match fs::read_dir(package) {
         Ok(entries) => entries,

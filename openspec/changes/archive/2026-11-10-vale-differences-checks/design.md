@@ -23,7 +23,8 @@ This change adds the part that comes from the [`pattern-and-readability`][patter
 Eleven rules that Vale loads and hakkiri refuses sit in one requirement, from three designs.  
 A project that moves a Vale style needs to know which of its rules stop loading, and they are the same kind of difference.
 
-Alternative: put each refusal beside the check it belongs to. Lost: a reader would scan every check to find what stops loading.
+Alternative: put each refusal beside the check it belongs to.  
+Lost: a reader would scan every check to find what stops loading.
 
 ## Risks / Trade-offs
 

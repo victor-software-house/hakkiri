@@ -2,14 +2,18 @@
 
 ## Purpose
 
-An MDX file's expressions and its JSX elements with no children read as code, as in Vale, and the tags of an element with children read as no node.
+An MDX file's expressions read as code, as in Vale, and so do its JSX (JavaScript XML) elements with no children.  
+The tags of an element with children read as no node.
 
 ## Requirements
 
 ### Requirement: An MDX expression and a childless JSX element read as code
 
-In an MDX file, an `{…}` expression, in a line of text, a heading, a table cell or a block of its own, SHALL read as a code node over the text as written.
-A JSX element with no children SHALL read the same way when it is a block, or when it is written `<Tag />` in a line of text.
+In an MDX file, an `{…}` expression SHALL read as a code node over the text as written.  
+This SHALL apply in a line of text, a heading, a table cell or a block of its own.
+
+A JSX element with no children SHALL read the same way when it is a block.  
+So SHALL one written `<Tag />` in a line of text.  
 A `{/* … */}` comment SHALL read as no node, and the tags of an element with children SHALL read as no node.
 
 #### Scenario: A self-closing element in a line of text
@@ -20,7 +24,7 @@ A `{/* … */}` comment SHALL read as no node, and the tags of an element with c
 #### Scenario: An element with children
 
 - **WHEN** a paragraph reads `Pre <Tag a="very">child very</Tag> post very.`
-- **THEN** the text rule reports `child very` and `post very`, and the code rule reports nothing
+- **THEN** the text rule reports `child very` and `post very`, and the code rule reports no alert
 
 #### Scenario: A block element with no children
 
@@ -36,4 +40,4 @@ A `{/* … */}` comment SHALL read as no node, and the tags of an element with c
 #### Scenario: A comment
 
 - **WHEN** a block reads `{/* very $ */} then very.`
-- **THEN** the code rule reports nothing, and the text rule reports the last `very`
+- **THEN** the code rule reports no alert, and the text rule reports the last `very`

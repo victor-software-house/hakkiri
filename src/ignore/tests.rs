@@ -1,6 +1,6 @@
-//! Tests for the rewrite of a file under block and token patterns: the cases
-//! of `Test_applyPatterns` in Vale, and the places the rewritten text came
-//! from.
+//! Tests of how block and token patterns rewrite a file.
+//! They cover the cases of `Test_applyPatterns` in Vale.
+//! They also cover the places the rewritten text came from.
 
 use std::ops::Range;
 

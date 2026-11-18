@@ -37,12 +37,12 @@ A match SHALL never cross a sentence end.
 
 #### Scenario: Sentences of list items
 
-- **WHEN** the first rule above has `scope: list`, and the input holds the paragraph `Do it your self.` on line 1 and the list item `- Do it your self.` on line 3
+- **WHEN** the first rule above has `scope: list`, and the input contains the paragraph `Do it your self.` on line 1 and the list item `- Do it your self.` on line 3
 - **THEN** hakkiri reports one alert, on line 3
 
 ### Requirement: skip and min widen a token
 
-A token with `skip: N` SHALL match up to N words of any kind before the word it names.  
+A token with `skip: N` SHALL match up to N words of any kind before the word it matches.  
 A token with `min: N` SHALL repeat N times, each with its own `skip`.  
 With `ignorecase: true`, patterns SHALL ignore case.
 
@@ -64,7 +64,7 @@ With `ignorecase: true`, patterns SHALL ignore case.
 ### Requirement: negate and target
 
 A token with `negate: true` SHALL match a word its pattern or tag does not match.  
-A negated token SHALL also hold at the start or end of the sentence.  
+A negated token SHALL also apply at the start or end of the sentence.  
 When one or more tokens set `target: true`, the alert SHALL span only the words from the first to the last of them.
 
 #### Scenario: Not followed by a noun
@@ -82,10 +82,10 @@ When one or more tokens set `target: true`, the alert SHALL span only the words 
 - **WHEN** a rule has `message: "Join it."` and `tokens: [{pattern: your}, {pattern: self, target: true}]`, and the input is `Do it your self.`
 - **THEN** hakkiri reports one alert, with the matched text `self`
 
-### Requirement: upos names a universal tag
+### Requirement: upos sets a universal tag
 
-A token's `upos` SHALL name one or more universal part-of-speech tags joined by `|`, matched through the Penn Treebank tags Vale maps them to.  
-hakkiri SHALL refuse a token that sets both `tag` and `upos`, or names an unknown universal tag.
+A token's `upos` SHALL list one or more universal part-of-speech tags joined by `|`, matched through the Penn Treebank tags Vale maps them to.  
+hakkiri SHALL reject a token that sets both `tag` and `upos`, or uses an unknown universal tag.
 
 #### Scenario: A universal noun
 
@@ -95,7 +95,7 @@ hakkiri SHALL refuse a token that sets both `tag` and `upos`, or names an unknow
 #### Scenario: Both tag kinds
 
 - **WHEN** rule `Team.Noun` has a token `{tag: NN, upos: NOUN}`
-- **THEN** hakkiri reports an error naming `Team.Noun`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `Team.Noun`, and exits with a failure status
 
 ### Requirement: exceptions drop a match
 
@@ -106,15 +106,15 @@ A match that begins inside a match of one of the rule's `exceptions` patterns SH
 - **WHEN** the first rule above has `exceptions: ['"[^"]*"']`, and the input is `He wrote "your self" twice.`
 - **THEN** hakkiri reports no alert
 
-### Requirement: model is refused
+### Requirement: model is rejected
 
-hakkiri SHALL refuse a `sequence` rule that sets `model`, since it has no format for another tagger's model.  
-The error SHALL name the rule and the field.
+hakkiri SHALL reject a `sequence` rule that sets `model`, since it has no format for another tagger's model.  
+The error SHALL show the rule and the field.
 
 #### Scenario: A rule with a model
 
 - **WHEN** rule `Team.Tags` has `extends: sequence` and `model: other`
-- **THEN** hakkiri reports an error naming `Team.Tags` and `model`, and exits with a failure status
+- **THEN** hakkiri reports an error that shows `Team.Tags` and `model`, and exits with a failure status
 
 ### Requirement: A code span is a noun that reads as one capital letter
 
@@ -148,13 +148,14 @@ The square brackets of an intra-doc link around one code span SHALL belong to th
 
 ### Requirement: A sequence rule may list several forms
 
-A `sequence` rule SHALL take `forms`, a list of mappings that each hold `tokens`, in place of `tokens`.  
-It SHALL report each run of words that any form matches, with the rule's own name, and the rest of the rule SHALL apply to every form.
+A `sequence` rule SHALL take `forms`, a list of mappings that each contain `tokens`, in place of `tokens`.  
+It SHALL report each run of words that any form matches, with the rule's own name.  
+The rest of the rule SHALL apply to every form.
 
 #### Scenario: Either of two forms
 
 - **WHEN** a rule has `message: "'%s'."` and `forms: [{tokens: [{pattern: red}, {pattern: green}]}, {tokens: [{pattern: blue}, {pattern: yellow}]}]`, and the input is `Paint red green or blue yellow.`
-- **THEN** hakkiri reports two alerts, with the matched text `red green` and `blue yellow`, both named by the rule
+- **THEN** hakkiri reports two alerts, with the matched text `red green` and `blue yellow`, both with the name of the rule
 
 #### Scenario: One form is the same as tokens
 
@@ -163,7 +164,8 @@ It SHALL report each run of words that any form matches, with the rule's own nam
 
 ### Requirement: Overlapping forms give one alert
 
-A match of one form that overlaps a match of another form SHALL give no alert when the other match starts first, or starts at the same word in an earlier form.  
+A match of one form may overlap a match of another form.  
+It SHALL give no alert when the other match starts first, or starts at the same word in an earlier form.  
 Matches of one form SHALL NOT drop each other.
 
 #### Scenario: Two forms share a word
@@ -171,10 +173,10 @@ Matches of one form SHALL NOT drop each other.
 - **WHEN** a rule has the forms `[{pattern: red}, {pattern: green}]` and `[{pattern: green}, {pattern: blue}]`, and the input is `Paint red green blue.`
 - **THEN** hakkiri reports one alert, with the matched text `red green`
 
-### Requirement: A sequence rule holds tokens or forms
+### Requirement: A sequence rule has tokens or forms
 
-hakkiri SHALL refuse a `sequence` rule that sets both `tokens` and `forms`, or neither.  
-It SHALL refuse a form with no token that has a `pattern`, `tag` or `upos` without `negate`, and name the form's tokens in the error.
+hakkiri SHALL reject a `sequence` rule that sets both `tokens` and `forms`, or neither.  
+It SHALL reject a form with no token that has a `pattern`, `tag` or `upos` without `negate`, and name the form's tokens in the error.
 
 #### Scenario: Both keys
 
@@ -184,7 +186,7 @@ It SHALL refuse a form with no token that has a `pattern`, `tag` or `upos` witho
 #### Scenario: A fault in the second form
 
 - **WHEN** the second of two forms has the tokens `[{pattern: green}, {pattern: '('}]`
-- **THEN** hakkiri reports an error naming `forms[1].tokens[1].pattern`
+- **THEN** hakkiri reports an error that shows `forms[1].tokens[1].pattern`
 
 #### Scenario: Forms set as a parameter
 
@@ -197,6 +199,7 @@ A form SHALL read the tokens a `tokens` list reads, so a negated token that foll
 
 #### Scenario: Three forms of one check
 
-- **WHEN** a rule has a form of a noun and a present verb, a form of a noun, a past verb and a negated `TO|RB|RBR|RBS` token, and a form of a pronoun and a verb
+- **WHEN** a rule has three forms, and the first is a noun and a present verb
+- **AND** the second is a noun, a past verb and a negated `TO|RB|RBR|RBS` token, and the third a pronoun and a verb
 - **AND** the input is `The doc says to run the tool.`, `The jobs asked to end early.` and `The state is open and it knows its names.`
 - **THEN** hakkiri reports `doc says` and `it knows`, and no alert for the second sentence

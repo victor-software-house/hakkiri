@@ -5,23 +5,26 @@
 - [x] 1.1 Create the public repository with README and `AGENTS.md` in the first commit, and verify the commit is on `main`.
   - 2026-11-09 (UTC), [6f8aef2][c-first] is the first commit on `main` of [hakkiri][repo].
 - [x] 1.2 Render the templates `rust-crate` type with `openspec` and `lint_prose`, and verify `.copier-answers.yml` records the tag.
-  - 2026-11-09 (UTC), [20e8df5][c-render] records `_commit: v0.0.84`. The template's own check runs in CI (task 3.1).
+  - 2026-11-09 (UTC), [20e8df5][c-render] records `_commit: v0.0.84`.
+    - The template's own check runs in CI (task 3.1).
 - [x] 1.3 Lock the default, dev and ci mise profiles, and verify the pre-push `hooks:lockfile` check passes.
   - 2026-11-09 (UTC), the first push failed on a stale ci lock; [efe389a][c-ci-lock] fixed it, and the next push passed the hook.
 
 ## 2. Plan
 
-- [x] 2.1 Queue the release 1 slices as HKR rows, and verify `qctl check` passes.
+- [x] 2.1 Queue the release 1 slices as rows with the `HKR` prefix, and verify `qctl check` passes.
   - 2026-11-09 (UTC), `HKR-001` to `HKR-010` are queued in [tasks.yaml][ledger] and `HKR-011` waits on the horizon; `qctl check --no-git` passed.
 - [x] 2.2 Write this change's proposal, design and research, and verify `openspec validate --all --strict` passes.
 
 ## 3. Integration
 
 - [x] 3.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
-  - 2026-11-09 (UTC), the first run failed: doc-tests found no library target, and rumdl flagged 4-space hard breaks.  
-    [ad825d5][c-doc-tests] turned the `doc_tests` piece off, and [2e693a7][c-prose] cleared the Markdown and ProseStyle alerts.  
-    [Run 42666547836][run-ci] then passed Build and test and Static checks, and [run 42666547754][run-template] passed the Template check.  
-    Kody found nothing, and [PR 1][pr-1] merged as [cb248d7][c-merge].
+  - 2026-11-09 (UTC), the first run failed: doc-tests found no library target, and rumdl flagged 4-space hard breaks.
+    - [ad825d5][c-doc-tests] turned the `doc_tests` piece off.
+    - [2e693a7][c-prose] cleared the Markdown and ProseStyle alerts.
+    - [Run 42666547836][run-ci] then passed Build and test and Static checks.
+    - [Run 42666547754][run-template] passed the Template check.
+    - Kody found nothing, and [PR 1][pr-1] merged as [cb248d7][c-merge].
 - [x] 3.2 Add hakkiri to the ctl mani group and the ctl `AGENTS.md` table, and verify `mani check` lists it.
   - 2026-11-09 (UTC), the workspace manifest and guide changed in the private dotfiles, and `mani list projects --tags prose` lists hakkiri.
 

@@ -1,5 +1,5 @@
 //! The dictionaries and word lists of a `spelling` rule, read from the
-//! package that holds the rule and from no other place.
+//! package that contains the rule and from no other place.
 
 use std::collections::HashSet;
 use std::path::{Component, Path, PathBuf};
@@ -127,7 +127,7 @@ fn dictionary_file(
     )))
 }
 
-/// The words each list of `ignore` holds, one word to a line.
+/// The words each list of `ignore` contains, one word to a line.
 ///
 /// A list is the file at that path in the package, or in its word list
 /// folder, and each that exists is read.
@@ -159,12 +159,15 @@ fn lists(
 /// `aff` and `dic` name one dictionary and nothing else.
 /// A rule that names none uses the built-in dictionary.
 ///
-/// The rule `Vale.Spelling` has no package of its own: it reads the folders of
-/// every package of the project, as Vale reads its styles path, and the first
-/// that holds a file a field names is the one it reads.
+/// The rule `Vale.Spelling` has no package of its own.
+/// It reads the folders of every package of the project, as Vale reads its
+/// styles path.
+/// The first folder that contains a file a field lists is the one it reads.
+///
 /// It adds to the built-in dictionary each dictionary of their dictionaries
-/// folders, unless it names dictionaries or files of its own, and it accepts
-/// the words of every `.txt` file under their word list folders.
+/// folders, unless it lists dictionaries or files of its own.
+/// It also accepts the words of every `.txt` file under their word list
+/// folders.
 pub(super) fn speller(source: &Source<'_>, fields: &SpellingFields) -> Result<Speller, LoadError> {
     let internal = source.name == VALE_SPELLING_NAME;
     let folders: Vec<&Path> = if internal {
@@ -257,8 +260,9 @@ pub(super) fn speller(source: &Source<'_>, fields: &SpellingFields) -> Result<Sp
     Ok(Speller::new(books, listed))
 }
 
-/// The package folder a rule reads: the only one it has, or for `Vale.Spelling`
-/// the first folder that holds a file the fields name, or else the first.
+/// The package folder a rule reads: the only one it has.
+/// For `Vale.Spelling`, it is the first folder that contains a file the fields
+/// list, or else the first folder.
 /// `None` when the rule has no folder.
 fn holder<'a>(folders: &[&'a Path], files: [&str; 3], names: &[String]) -> Option<&'a Path> {
     if folders.len() < 2 {
@@ -335,7 +339,7 @@ fn ignored_words(source: &Source<'_>, folders: &[&Path]) -> Result<HashSet<Strin
 ///
 /// `root` is the real path of the package. An entry that a link sends outside
 /// it is refused, as `find` refuses a path that leaves the package. `visited`
-/// holds the real path of each folder read, so a link back to a folder read
+/// stores the real path of each folder read, so a link back to a folder read
 /// before stops there.
 fn read_lists(
     source: &Source<'_>,

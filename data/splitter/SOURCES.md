@@ -15,9 +15,10 @@ Two runs on these sources write byte-identical files.
 ## Repositories
 
 `repositories.tsv` lists the Markdown sources: public repositories of the owner, each at the commit below.  
-A repository is listed when it is public, is not a fork, is not archived, and is at most 10 MB.  
-A license of `none` means the repository declares no license.  
-The corpus holds every tracked `.md` file except `CHANGELOG.md`, and the trainer reads the text of its paragraphs.
+A repository is listed when it is public, is not a fork, is not archived, and is at most 10 MB.
+
+The corpus contains every tracked `.md` file except `CHANGELOG.md`, and the trainer reads the text of its paragraphs.  
+A license of `none` means the repository declares no license.
 
 | Repository | Commit | License |
 |:--|:--|:--|
@@ -83,12 +84,13 @@ The corpus holds every tracked `.md` file except `CHANGELOG.md`, and the trainer
 
 ### Filters
 
-- `common-pile/stackv2` ([dataset card](https://huggingface.co/datasets/common-pile/stackv2)) holds code files from GitHub repositories whose detected licenses are all on the Blue Oak list.  
-  A record is kept when its `metadata.path` ends in `.md` or `.markdown`, in any case, and every license in its `metadata.license`, a comma-separated list, is one of the 225 ids in `licenses.txt`.  
+- `common-pile/stackv2` ([dataset card](https://huggingface.co/datasets/common-pile/stackv2)) contains code files from GitHub repositories whose detected licenses are all on the Blue Oak list.  
+  A record is kept when its `metadata.path` ends in `.md` or `.markdown`, in any case.  
+  Each license in its comma-separated `metadata.license` must be one of the 225 ids in `licenses.txt`.  
   That file is the [Blue Oak Council list](https://blueoakcouncil.org/list), version 16.
-- `common-pile/python_enhancement_proposals` ([dataset card](https://huggingface.co/datasets/common-pile/python_enhancement_proposals)) holds the Python Enhancement Proposals in the public domain, as plain text.  
+- `common-pile/python_enhancement_proposals` ([dataset card](https://huggingface.co/datasets/common-pile/python_enhancement_proposals)) contains the Python Enhancement Proposals in the public domain, as plain text.  
   A record is kept when `metadata.license` is `Public Domain`.
-- `common-pile/project_gutenberg` ([dataset card](https://huggingface.co/datasets/common-pile/project_gutenberg)) holds books.  
+- `common-pile/project_gutenberg` ([dataset card](https://huggingface.co/datasets/common-pile/project_gutenberg)) contains books.  
   A record is kept when `metadata.license` is `Public Domain` and `metadata.language` is `en`.
 
 ## Result

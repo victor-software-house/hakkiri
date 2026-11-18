@@ -15,12 +15,12 @@ Each Vale behaviour below was read at `66bbb85`, which is 3.26.0 plus 16 commits
 **Goals:**
 
 - Give `spelling` and `affix` Vale 3.26.0's meaning, so the importer, `HKR-007`, converts upstream styles without changing what they report.
-- Read every dictionary, word list and affix file from the pinned package that holds the rule.
+- Read every dictionary, word list and affix file from the pinned package that contains the rule.
 
 **Non-Goals:**
 
 - Spelling suggestions and fixes: `action` rides along, as in the rule-engine change.
-- Vale's built-in `Vale.Spelling` rule and its `config/ignore` default; a style names its own lists.
+- Vale's built-in `Vale.Spelling` rule and its `config/ignore` default; a style refers to its own lists.
 - Languages other than English.
 
 ## Decisions
@@ -28,18 +28,24 @@ Each Vale behaviour below was read at `66bbb85`, which is 3.26.0 plus 16 commits
 ### 1. spelling reads words as Vale's tokenizer cuts them
 
 Spelling words come from Vale's word tokenizer, which splits on spaces and trims listed prefixes and suffixes ([spelling.go][v-spell-run]).  
-The metric check's word pattern is not used here.  
-Each word is converted by the dictionary's `ICONV` table, and skipped by the built-in filters, unless `custom: true`, and by `filters`.  
-The remaining words are looked up.
+Spelling does not use the metric check's word pattern.  
+Each word goes through the dictionary's `ICONV` table.  
+The built-in filters skip words, unless `custom: true`, and so do `filters`.  
+Then the remaining words are looked up.
 
 `split` takes an identifier apart and reports each misspelt part of three letters or more at its own position.  
-Vale's two message rewrites stay, for a casing mistake and for an identifier in Markdown or MDX ([spelling.go][v-spell-explain]).  
+Vale's two message rewrites stay, for a casing mistake and for an identifier in Markdown, or in MDX ([spelling.go][v-spell-explain]).
+
 A word that overlaps a code span gives no alert, as the rule-engine change decides for `existence`.
 
-A word with a curly quote or `&rsquo;` is read with a straight quote, as Vale reads it, and reported where it stands in the file, as written.
-Vale gives such a word no position ([tokenize.go][v-tokenize-offsets]), so its alert lands at a wrong place, and its text is the straight form.
-The text of an autolink, a URL or an email address is a gap in the prose around it ([node-segments spec][node-segments], [format design][format-7]), so no word in it is read.
-Vale reads an email address, so it reports one when `custom` turns the filters off.
+A word with a curly quote or `&rsquo;` is read with a straight quote, as Vale reads it.  
+hakkiri reports it where it stands in the file, as written.  
+Vale gives such a word no position ([tokenize.go][v-tokenize-offsets]), so its alert lands at a wrong place.  
+The text of Vale's alert is the straight form.
+
+The text of an autolink, a URL or an email address is a gap in the prose around it ([node-segments spec][node-segments], [format design][format-7]).  
+So no word in it is read.  
+Vale reads an email address, so it reports one when `custom` turns the filters off.  
 The [parity test][parity-test] lists these alerts as departures.
 
 Alternative: one word splitter for every check.  
@@ -47,9 +53,11 @@ Lost: Vale's spelling and metric checks cut words differently, and either choice
 
 ### 2. Dictionaries and lists stay inside the package
 
-`dictionaries`, `dicpath`, `aff`, `dic`, `ignore` and `affix` resolve inside the package that holds the rule.  
-`affix: en_US-web`, and a rule with no dictionary, mean the built-in files.  
-A path that leaves the package is refused, and so is a rule that sets only one of `aff` and `dic`, which Vale answers with the built-in dictionary.
+`dictionaries`, `dicpath`, `aff`, `dic`, `ignore` and `affix` resolve inside the package that contains the rule.  
+`affix: en_US-web`, and a rule with no dictionary, mean the built-in files.
+
+A path that leaves the package is refused.  
+So is a rule that sets only one of `aff` and `dic`, which Vale answers with the built-in dictionary.  
 A list in `ignore` that does not exist loads nothing, as in Vale.
 
 Alternative: Vale's search, which also tries an absolute path, the working directory and `DICPATH` ([spelling.go][v-spell-dicpath], [vocab.go][v-find-affix]).  
@@ -58,8 +66,11 @@ Lost: the [project config][project-config] pins each package by hash, and a dict
 ### 3. Fields Vale reads and never uses
 
 Vale accepts `exceptions` and `threshold` in a `spelling` rule and uses neither.  
-It builds its exception pattern before it decodes the rule's fields, and reads `threshold` nowhere ([spelling.go][v-spell-new]).  
-A probe of Vale 66bbb85 gave the same seven alerts over four rules, with `blorft` and a misspelling of `receive` among them: one with `exceptions` that name both words, one with `threshold: 99`, one with both fields, and one with neither.
+It builds its exception pattern before it decodes the rule's fields, and reads `threshold` nowhere ([spelling.go][v-spell-new]).
+
+A probe of Vale 66bbb85 ran four rules and gave the same seven alerts for each.  
+Among them were `blorft` and a misspelling of `receive`.  
+The rules were: one with `exceptions` that list both words, one with `threshold: 99`, one with both fields, and one with neither.
 
 hakkiri refuses a rule that sets either one, with a message that says the field has no effect on a spelling rule.  
 This is an intended difference from Vale: a rule that Vale loads and hakkiri refuses.  
@@ -73,25 +84,47 @@ Lost: imported rules would report fewer words than in Vale, a difference the [fo
 ### 4. affix expands before compiling
 
 A `word/FLAGS` part of an `existence` token or a `substitution` key becomes an alternation before the rule compiles ([affix.go][v-affix]).  
-The alternation holds the word and the forms its flags name.  
-The expansion uses the dictionary reader's affix rules, which `main` holds, and the rule-engine change's refusal ends here.
+The alternation has the word and the forms its flags list.  
+It uses the dictionary reader's affix rules, which `main` has.  
+The rule-engine change's refusal ends here.
 
 Each space-separated part of a token is read alone.  
-A part with no unescaped slash, or a slash written `\/`, is text, and a `\b` at either end of a part stays outside the alternation.  
-The word before the slash must be plain text, and each form is escaped as Go's `regexp.QuoteMeta` escapes it.  
-A rule with no `affix` keeps every slash.  
-The file is `name.aff` in the package's dictionaries folder, which wins over the built-in file of the same name `en_US-web`, as in Vale ([vocab.go][v-find-affix]).
+A part with no unescaped slash, or a slash written `\/`, is text.  
+A `\b` at either end of a part stays outside the alternation.
 
-A probe of Vale 66bbb85 and a parity test cover the built-in and a package file, `\b`, an escaped slash, a part with no flags, `ignorecase`, and the swap keys of `substitution`.  
-The same probe refused each of these as a rule error, as hakkiri does: a flag that names no class, a word that is not plain text, flags with no word, and a file that is missing.  
+The word before the slash must be plain text.  
+Each form is escaped the way Go's `regexp.QuoteMeta` escapes it.  
+A rule with no `affix` keeps every slash.
+
+The file is `name.aff` in the package's dictionaries folder.  
+It wins over the built-in file of the same name `en_US-web`, as in Vale ([vocab.go][v-find-affix]).
+
+A probe of Vale 66bbb85 and a parity test cover these cases:
+
+- the built-in file and a package file
+- `\b`
+- an escaped slash
+- a part with no flags
+- `ignorecase`
+- the swap keys of `substitution`
+
+The same probe refused each of these as a rule error, as hakkiri does:
+
+- a flag that has no class
+- a word that is not plain text
+- flags with no word
+- a file that is missing
+
 One difference is read from Vale's source and not probed: two keys of a `swap` that expand to the same text.  
-Vale keeps the replacement of the key its map visits last, which can change from run to run, and hakkiri keeps both in the order written, so the first gives the replacement.
+Vale keeps the replacement of the key its map visits last.  
+That key can change from run to run.  
+hakkiri keeps both in the order written, so the first gives the replacement.
 
 [case-design]: ../2026-11-10-case-and-sequence-checks/design.md
 [case-reader]: ../2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
 [project-config]: ../../../specs/project-config/spec.md
 [format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[node-segments]: ../../../specs/node-segments/spec.md#requirement-a-url-is-a-gap-in-the-prose-around-the-link
+[node-segments]: ../../../specs/node-segments/spec.md#requirement-a-link-that-shows-its-address-is-a-gap-in-the-prose-around-it
 [parity-test]: ../../../../tests/spelling_parity.rs
 [v-tokenize-offsets]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/tokenize.go#L80-L148
 [v-spell-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L74-L135

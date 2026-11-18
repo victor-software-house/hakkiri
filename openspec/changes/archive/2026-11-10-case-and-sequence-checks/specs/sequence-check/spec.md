@@ -37,7 +37,7 @@ A match SHALL never cross a sentence end.
 
 #### Scenario: Sentences of list items
 
-- **WHEN** the first rule above has `scope: list`, and the input holds the paragraph `Do it your self.` on line 1 and the list item `- Do it your self.` on line 3
+- **WHEN** the first rule above has `scope: list`, and the input has the paragraph `Do it your self.` on line 1 and the list item `- Do it your self.` on line 3
 - **THEN** hakkiri reports one alert, on line 3
 
 ### Requirement: skip and min widen a token

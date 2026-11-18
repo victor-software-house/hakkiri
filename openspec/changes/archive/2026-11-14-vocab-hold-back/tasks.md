@@ -4,7 +4,8 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 1. Spec and test
 
-- [x] 1.1 State in the vocabularies spec that a match holding an accepted word as a whole word with its case is held back, in both requirements.  
+- [x] 1.1 In both requirements of the vocabularies spec, state that a match that contains an accepted word is held back.  
+  The word must match as a whole word with its case.  
   Verify `openspec validate --all --strict` passes.  
   Evidence, 2026-11-14 (UTC): the spec delta of this change states the rule in both requirements, and `openspec validate --all --strict` passes.
 - [x] 1.2 Add `a_match_that_holds_an_accepted_word_is_held_back` to `tests/vocabularies.rs` with the probe's four sentences.  

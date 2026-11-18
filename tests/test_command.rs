@@ -1,7 +1,7 @@
 //! `hakkiri test`: the scenarios of the test-command change.
 //!
-//! Each test writes a style folder and its cases in a temporary directory, runs
-//! the binary there, and reads the exit status and the two streams.
+//! Each test writes a style folder and its cases in a temporary directory.
+//! It runs the binary there and reads the exit status and the two streams.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -58,7 +58,7 @@ files:
       - \"(?s)BEGIN(.*?)END\"
 ";
 
-/// A project whose style `Team` holds a rule with two cases.
+/// A project whose style `Team` has a rule with two cases.
 fn styled<'a>(suite: &'a Suite, name: &str) -> Root<'a> {
     let root = suite.scenario(name);
     root.file("styles/Team/Filler.yml", FILLER);
@@ -396,7 +396,7 @@ fn a_nested_rule_file_is_named_by_every_folder_under_its_style() -> TestResult {
     Ok(())
 }
 
-/// A rule on `very` that holds one case, so it is named by its own file.
+/// A rule on `very` that has one case, so it takes the name of its own file.
 const FOO: &str = "\
 extends: existence
 message: \"Remove '%s'.\"
@@ -746,9 +746,9 @@ fn the_cases_of_two_rules_with_indexed_verbs_pass() -> TestResult {
     Ok(())
 }
 
-/// `ProseStyle` v0.0.14 `BareURLInComment` reads the whole Rust file as `raw`,
-/// and its own case expects a fence in a doc comment to stay open across a
-/// blank line.
+/// `ProseStyle` v0.0.14 `BareURLInComment` reads the whole Rust file as `raw`.
+/// Its own case expects a fence in a doc comment to stay open across a blank
+/// line.
 #[test]
 fn the_cases_of_a_rule_that_reads_a_fence_across_a_blank_line_pass() -> TestResult {
     let suite = Suite::new("test-bare-url-comment");

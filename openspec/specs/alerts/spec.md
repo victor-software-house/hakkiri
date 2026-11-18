@@ -7,10 +7,10 @@ This spec fixes its fields, its position, its message, its order, and what a pat
 
 ## Requirements
 
-### Requirement: An alert names the rule, level, message, place and match
+### Requirement: An alert shows the rule, level, message, place and match
 
-Each alert SHALL hold the rule name, the level, the message, the line, the first and last column of the match, and the matched text.  
-It SHALL also hold the rule's `link` and `description` when the rule sets them.
+Each alert SHALL contain the rule name, the level, the message, the line, the first and last column of the match, and the matched text.  
+It SHALL also contain the rule's `link` and `description` when the rule sets them.
 
 #### Scenario: A word in a sentence
 
@@ -32,15 +32,16 @@ The line and columns of a match inside a comment SHALL be those of its bytes in 
 
 #### Scenario: An indented doc comment
 
-- **WHEN** a rule has `scope: text.comment` and `tokens: [marker]`, and a Rust file holds a line of four spaces and `/// A marker.`
+- **WHEN** a rule has `scope: text.comment` and `tokens: [marker]`, and a Rust file contains a line of four spaces and `/// A marker.`
 - **THEN** the alert is on that line, columns 11 to 16
 
 ### Requirement: A message fills %s in order
 
 Each `%s` in a message SHALL take the next value the check gives, and `%%` SHALL read as `%`.  
-A `%[n]s`, with `n` counting from 1, SHALL take the `n`th value, and a `%s` after it SHALL take the value that follows, as Go's `fmt` does.  
-A `%s` or `%[n]s` with no value to take SHALL read as nothing.  
-A line break inside a value SHALL read as one space.
+A `%[n]s`, with `n` counting from 1, SHALL take the `n`th value, and a `%s` after it SHALL take the value that follows, as Go's `fmt` does.
+
+With no value to take, a `%s` or `%[n]s` SHALL read as nothing.  
+Inside a value, a line break SHALL read as one space.
 
 #### Scenario: A percent sign
 
@@ -109,7 +110,7 @@ It SHALL NOT panic.
 #### Scenario: Nested repeats with a lookahead
 
 - **WHEN** rule `Team.Slow` has `nonword: true` and `tokens: ['(a+)+(?=b)c']`, and the input is one line of 50,000 `a` characters
-- **THEN** hakkiri reports one `error` alert for `Team.Slow` that names the backtrack limit, and the other rules report as usual
+- **THEN** hakkiri reports one `error` alert for `Team.Slow` that shows the backtrack limit, and the other rules report as usual
 
 ### Requirement: Long input finishes
 
@@ -122,12 +123,13 @@ hakkiri SHALL lint a 50,000-character line and a 60,000-line file to the end, wi
 
 #### Scenario: Sixty thousand lines
 
-- **WHEN** the same rule reads a file of 60,000 lines that each hold `A marker.`
+- **WHEN** the same rule reads a file of 60,000 lines that each contain `A marker.`
 - **THEN** hakkiri reports 60,000 alerts, the last on line 60,000
 
 ### Requirement: A match ends at its last character
 
-An alert SHALL name the line and the column of the match's last character in the file, so markup inside a match counts toward it.  
+An alert SHALL give the line and column, in the file, of the last character of the match.  
+So markup inside the match counts toward that place.  
 A match on one line SHALL end on the line it starts on.  
 A match that goes on to the next lines SHALL end on the line of its last character.
 

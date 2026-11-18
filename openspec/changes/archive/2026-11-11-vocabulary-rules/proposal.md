@@ -1,19 +1,19 @@
 # Proposal
 
-Queue row: `HKR-042` in [tasks.yaml][ledger].
+Queue row: `HKR-042` in [tasks.yaml][ledger].  
 It builds on [vocabularies][vocabularies], which reads the lists, and is blocked by `HKR-019`.
 
 ## Motivation
 
-Vale builds two rules from a vocabulary: `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term.
-Once hakkiri reads vocabularies, a project that lists `Vale` in its styles gets neither.
+Vale builds two rules from a vocabulary: `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term.  
+Once hakkiri reads vocabularies, a project that lists `Vale` in its styles gets neither.  
 The [vale-differences spec][differences] lists the missing rules as a known gap.
 
 ## Changes
 
 - hakkiri builds `Vale.Terms` from the accepted terms and `Vale.Avoid` from the rejected ones, with Vale's messages, levels and boundaries.
-- A built-in style `Vale` holds the two rules, so `styles: [Vale]` runs them and `Vale.Terms: warning` sets one's level.
-- Each vocabulary a glob names builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no style or setting.
+- A built-in style `Vale` contains the two rules, so `styles: [Vale]` runs them and `Vale.Terms: warning` sets one's level.
+- Each vocabulary a glob lists builds `Vale.<Name>.Terms` and `Vale.<Name>.Avoid`, which run on that glob's files with no style or setting.
 - Without a vocabulary term, the style `Vale` is not a style in any package.
 - The `vale-differences` spec drops the gap for the vocabulary rules.
 

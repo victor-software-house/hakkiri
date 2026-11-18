@@ -1,20 +1,26 @@
 //! The rules a vocabulary builds: the scenarios of the vocabulary-rules change.
 //!
-//! `tests/fixtures/vocabulary-rules` holds one package of vocabularies
+//! `tests/fixtures/vocabulary-rules` contains one package of vocabularies
 //! (`styles`), seven Markdown files (`text`, with `.fixture` after `.md`), and
 //! nine configs for each tool: `vale/<name>.ini` and `.ctl/<name>.yaml`.
-//! `vale.tsv` holds one row for each alert Vale gave on the files under each
-//! config: the config, the file, the line, the first and last column, the
-//! level, the rule, the message and the matched text. The rows come from Vale
-//! at `66bbb85` run from the fixture folder as `vale --config=vale/<name>.ini
-//! --output=JSON text`, with `Vale.Spelling` and `Vale.Repetition` turned off,
-//! as the hakkiri configs turn them off.
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files under each
+//! config.
+//! A row lists the config, the file, the line, the first and last column, the
+//! level, the rule, the message and the matched text.
+//!
+//! The rows come from Vale at `66bbb85`, run from the fixture folder as `vale
+//! --config=vale/<name>.ini --output=JSON text`.
+//! `Vale.Spelling` and `Vale.Repetition` were turned off, as the hakkiri
+//! configs turn them off.
 //!
 //! A match that spans lines ends where its last character is in hakkiri, as
-//! `end_line` and `end_column`. Vale prints the first column plus the number of
-//! characters of the match, line breaks included, which can pass the end of the
-//! line. The comparison maps hakkiri's end to Vale's count for such a match,
-//! and compares the single-line ends as they are.
+//! `end_line` and `end_column`.
+//! Vale prints the first column plus the number of characters of the match,
+//! line breaks included, which can pass the end of the line.
+//!
+//! The comparison maps hakkiri's end to Vale's count for such a match.
+//! It compares the single-line ends as they are.
 
 #![expect(
     clippy::panic_in_result_fn,
@@ -62,7 +68,7 @@ fn copy_into(root: &Root<'_>, from: &Path, to: &Path) -> TestResult {
     Ok(())
 }
 
-/// A scenario folder that holds the fixture's styles and text.
+/// A scenario folder that has the fixture's styles and text.
 fn project<'a>(suite: &'a Suite, name: &str) -> Result<Root<'a>, Box<dyn Error>> {
     let root = suite.scenario(name);
     copy_into(&root, &fixture().join("styles"), Path::new("styles"))?;
@@ -176,10 +182,11 @@ const ESCAPE_MESSAGE: &str = "Use 'data\\Wset' instead of 'DATA SET'.";
 /// Takes out the rows that differ because of an escape in a term.
 ///
 /// Vale lowercases the whole pattern of `data\\Wset`, so `\\W` turns into
-/// `\\w`: it flags `dataxset` and leaves `DATA SET` alone.
+/// `\\w`, and it flags `dataxset` and leaves `DATA SET` alone.
 /// hakkiri lowercases only the literal text, so `\\W` stays a non-word
-/// character: it flags `DATA SET`, which is not written as the term is, and
-/// leaves `dataxset` alone.
+/// character.
+/// It flags `DATA SET`, which is not written as the term is, and leaves
+/// `dataxset` alone.
 /// Each config that gives one of the two must give the other.
 fn leave_out_the_escape_difference(vale: &mut BTreeSet<Row>, ours: &mut BTreeSet<Row>) {
     let before = (vale.len(), ours.len());
@@ -193,7 +200,7 @@ fn leave_out_the_escape_difference(vale: &mut BTreeSet<Row>, ours: &mut BTreeSet
 }
 
 /// `text/t5.md` wraps `mea Culpa` and `Bad Word` across a line break, and each
-/// alert names the line and column of the match's last character.
+/// alert shows the line and column of the match's last character.
 #[test]
 fn a_match_across_lines_ends_at_its_last_character() -> TestResult {
     let suite = Suite::new("vocabulary-rules-end");
@@ -229,8 +236,8 @@ fn a_match_across_lines_ends_at_its_last_character() -> TestResult {
     Ok(())
 }
 
-/// A project with one package that holds `files`, a config that holds `config`,
-/// and `a.md` holding `text`.
+/// A project with one package that has `files`, a config that has `config`,
+/// and `a.md` containing `text`.
 fn small<'a>(
     suite: &'a Suite,
     name: &str,
@@ -286,7 +293,7 @@ fn a_level_for_a_rule_no_term_builds_is_an_error() -> TestResult {
     assert!(
         result
             .err
-            .contains("Vale.Avoid: names no rule in any style the config loads"),
+            .contains("Vale.Avoid: is not a rule in any style the config loads"),
         "{}",
         result.err
     );

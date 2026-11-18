@@ -13,15 +13,15 @@ mod tests;
 use std::iter::Peekable;
 use std::str::Chars;
 
-/// The most spellings a term may list; past it a term is no longer one word
+/// The most spellings a term may list; past it a term is not one word
 /// spelled several ways.
 const MAX_EXPANSIONS: usize = 64;
 
 /// `term` with the literal text of the pattern lowercased and the rest as
 /// written.
-/// The rest is an escape such as `\W`, `\p{Lu}`, `\pL` or `\x{41}`, the name of
-/// a capture group and of a backreference to it, and a flag group such as
-/// `(?U)`.
+/// The rest is an escape such as `\W`, `\p{Lu}`, `\pL` or `\x{41}`.
+/// It can also be the name of a capture group and of a backreference to it, or
+/// a flag group such as `(?U)`.
 ///
 /// Vale lowercases the whole pattern, so `\W` becomes `\w` and the term means
 /// something else. hakkiri leaves the escapes alone.
@@ -215,8 +215,10 @@ fn alternation(runes: &[char], mut at: usize, nested: bool) -> Option<(Vec<Strin
 }
 
 /// The literal characters of `pattern`, in order, or nothing when it uses a
-/// construct that no single fixed text stands for: a character class, a group,
-/// an alternation, a wildcard or a repeat. A `?` after a character keeps it.
+/// construct that has no single fixed text.
+/// Those constructs are a character class, a group, an alternation, a wildcard
+/// and a repeat.
+/// A `?` after a character keeps it.
 fn skeleton(pattern: &str) -> String {
     let runes: Vec<char> = pattern.chars().collect();
     let mut out = String::new();

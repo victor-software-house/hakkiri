@@ -1,18 +1,24 @@
-//! Math in a Markdown or MDX file: `$…$` inline and `$$…$$` display math.
+//! Math in Markdown, including Markdown with JavaScript (MDX): `$…$` inline and
+//! `$$…$$` display math.
 //!
-//! A port of `math.go` in [Vale] at `66bbb85`. Vale reads both as text that no
-//! prose rule reads: an inline span renders as a code span, and a display block
-//! as a code block.
+//! A port of `math.go` in [Vale] at `66bbb85`.
+//! Vale reads both as text that no prose rule reads.
+//! An inline span renders as a code span, and a display block as a code block.
 //!
 //! markdown-rs reads a `$` pair as math whatever stands around it, so `$5 and
-//! $10` is math to it. Vale follows Pandoc: the opening `$` must be followed by
-//! a character that is not a space, and the closing `$` must follow one and
-//! not be followed by a digit. A span may wrap over lines of a paragraph, and
-//! it ends where the paragraph does when nothing closes it.
+//! $10` is math to it.
+//!
+//! Vale follows Pandoc.
+//! The opening `$` must be followed by a character that is not a space.
+//! The closing `$` must follow a character that is not a space, and must not
+//! be followed by a digit.
+//! A span may wrap over lines of a paragraph.
+//! It ends where the paragraph does when nothing closes it.
 //!
 //! hakkiri finds the spans in the text of each paragraph, heading and table
-//! cell that markdown-rs parsed, and writes the file again with the same
-//! length.
+//! cell that markdown-rs parsed.
+//! It writes the file again with the same length.
+//!
 //! The `$` of an inline span is a backtick, so it parses as a code span.
 //! The lines of a display block are blank, so the paragraph ends before it and
 //! starts again after it.
@@ -34,11 +40,11 @@ use crate::tree::{Node, Scope};
 pub(crate) struct Math {
     /// The bytes of each inline span, `$` delimiters included.
     pub(crate) inline: Vec<Range<usize>>,
-    /// The bytes of each line of a display block that the block holds, from
-    /// the first byte of its text to the end of the line.
+    /// The bytes of each line of a display block, from the first byte of its
+    /// text to the end of the line.
     pub(crate) display: Vec<Range<usize>>,
     /// The bytes of each run of backticks that opens no code span, in a
-    /// paragraph that holds a span.
+    /// paragraph that has a span.
     pub(crate) loose: Vec<Range<usize>>,
 }
 
@@ -111,12 +117,13 @@ fn expression_end(text: &[u8], from: usize) -> Option<usize> {
     None
 }
 
-/// The inline spans in `text`, which starts at the byte `base` of the file,
-/// as byte ranges of the file, and the runs of backticks that open no code
-/// span. `braces` says that a `{…}` expression holds no math, as in MDX.
+/// The inline spans in `text`, which starts at the byte `base` of the file.
+/// They are byte ranges of the file, and so are the runs of backticks that
+/// open no code span.
+/// `braces` is true when a `{…}` expression contains no math, as in MDX.
 ///
-/// The closers and the end of an HTML tag are looked up in lists made once, so
-/// a paragraph of unclosed `$` or `<` costs no more than its length.
+/// The closers and the end of an HTML tag are looked up in lists made once.
+/// So a paragraph of unclosed `$` or `<` costs no more than its length.
 fn inline_spans(text: &str, base: usize, braces: bool) -> (Vec<Range<usize>>, Vec<Range<usize>>) {
     let bytes = text.as_bytes();
     let closers: Vec<usize> = (0..bytes.len()).filter(|at| closes(bytes, *at)).collect();
@@ -177,9 +184,9 @@ fn closer(closers: &[usize], open: usize) -> Option<usize> {
     closers.get(first).copied()
 }
 
-/// The end of the part of `rest` before a closing `$$`: the index of the `$$`
-/// that ends the line, with trailing blanks and at most one `{…}` after it,
-/// or `None`.
+/// The end of the part of `rest` before a closing `$$`, or `None`.
+/// It is the index of the `$$` that ends the line, with trailing blanks and at
+/// most one `{…}` after it.
 fn display_closer(rest: &str) -> Option<usize> {
     let bytes = rest.as_bytes();
     let mut end = bytes.len();
@@ -205,8 +212,8 @@ fn display_closer(rest: &str) -> Option<usize> {
     Some(end - 2)
 }
 
-/// The text of a line that the container around a paragraph does not hold:
-/// the indentation and the `>` markers that start a line after the first.
+/// The text of a line that is outside the container around a paragraph.
+/// It is the indentation and the `>` markers that start a line after the first.
 fn content_start(line: &str, first: bool) -> usize {
     if first {
         return 0;
@@ -224,8 +231,8 @@ pub(crate) enum Container {
 }
 
 /// The column where the content of the list item that starts at the byte
-/// `start` of `source` begins, counted from 0: after the marker and the one to
-/// four spaces that follow it.
+/// `start` of `source` begins, counted from 0.
+/// It comes after the marker and the one to four spaces that follow it.
 pub(crate) fn item_content(source: &str, start: usize, column: usize) -> usize {
     let rest = source.get(start..).unwrap_or_default();
     let marker = rest
@@ -244,9 +251,9 @@ pub(crate) fn item_content(source: &str, start: usize, column: usize) -> usize {
 /// its containers, which are `containers`.
 ///
 /// A line that lacks the indentation of a list item continues the paragraph
-/// lazily, and holds what it has.
-/// A line with no `>` in a block quote keeps all its spaces, and none of the
-/// containers inside the quote holds it.
+/// lazily, and keeps the indentation it has.
+/// In a block quote, a line with no `>` keeps all its spaces, and none of the
+/// containers inside the quote contains it.
 /// A tab runs to the next multiple of four.
 fn indent_in(line: &str, containers: &[Container]) -> usize {
     let bytes = line.as_bytes();
@@ -281,7 +288,7 @@ fn indent_in(line: &str, containers: &[Container]) -> usize {
                     }
                 } else {
                     // The line is a lazy continuation of the quote, so it
-                    // holds none of the containers inside the quote either.
+                    // contains none of the containers inside the quote either.
                     (at, column) = (before, start);
                     break;
                 }
@@ -297,8 +304,9 @@ fn indent_in(line: &str, containers: &[Container]) -> usize {
 /// of, as ranges of the indexes of `lines`.
 ///
 /// A line that starts with `$$` opens a block, even in the middle of a
-/// paragraph, and a line that ends with `$$` closes it, or a blank line, or the
-/// end of the paragraph.
+/// paragraph.
+/// A line that ends with `$$` closes it.
+/// So does a blank line, or the end of the paragraph.
 fn display_blocks(
     text: &str,
     lines: &[Range<usize>],
@@ -348,7 +356,7 @@ fn display_blocks(
 /// The math in the paragraph, heading or table cell whose text is `text`, from
 /// the byte `base` of the file.
 ///
-/// Only a paragraph holds display blocks.
+/// Only a paragraph contains display blocks.
 fn in_container(
     text: &str,
     base: usize,
@@ -399,10 +407,11 @@ fn in_container(
 }
 
 /// The math in `root`, a parse of `source`: in each paragraph, heading and
-/// table cell. `braces` says that a `{…}` expression holds no math.
+/// table cell.
+/// `braces` is true when a `{…}` expression contains no math.
 pub(crate) fn find(root: &Mdast, source: &str, braces: bool) -> Math {
     let mut math = Math::default();
-    // Each container that holds a node is one entry, with the entry of the
+    // Each container that contains a node is one entry, with the entry of the
     // container around it.
     let mut chains: Vec<(Option<usize>, Container)> = Vec::new();
     let mut pending = vec![(root, None)];
@@ -439,7 +448,7 @@ pub(crate) fn find(root: &Mdast, source: &str, braces: bool) -> Math {
     math
 }
 
-/// The container `node` is, when it is one that indents the lines it holds.
+/// The container `node` is, when it is one that indents the lines it contains.
 fn container_of(node: &Mdast, source: &str) -> Option<Container> {
     if matches!(node, Mdast::Blockquote(_)) {
         return Some(Container::Quote);
@@ -471,12 +480,12 @@ fn containers_of(
 }
 
 /// Gives the code span that each inline span became its `$` delimiters, which
-/// Vale's code span holds.
+/// Vale's code span contains.
 ///
-/// A span that touches another code span or span is one code span with it, so
-/// the delimiter at each end is looked for on its own.
-/// Only the segments of the node change: its span stays the inner text, which
-/// the text around it reads as one word.
+/// A span that touches another code span or span is one code span with it.
+/// So the delimiter at each end is looked for on its own.
+/// Only the segments of the node change.
+/// Its span stays the inner text, which the text around it reads as one word.
 pub(crate) fn include_delimiters(nodes: &mut [Node], inline: &[Range<usize>]) {
     let mut pending: Vec<&mut Node> = nodes.iter_mut().collect();
     while let Some(node) = pending.pop() {
@@ -509,10 +518,13 @@ pub(crate) fn include_delimiters(nodes: &mut [Node], inline: &[Range<usize>]) {
 /// and each line of a display block is blank.
 ///
 /// A backtick inside a span is an apostrophe, since a code span would end at
-/// it. So is a run of backticks that opens no code span, in a paragraph with a
-/// span: left alone, it would pair with the backtick of a span, or join it into
-/// a longer run. The tree reads the text from the file, so the change shows
-/// nowhere.
+/// it.
+/// So is a run of backticks that opens no code span, in a paragraph with a
+/// span.
+///
+/// Left alone, such a run would pair with the backtick of a span, or join it
+/// into a longer run.
+/// The tree reads the text from the file, so the change shows nowhere.
 pub(crate) fn mask(source: &str, math: &Math) -> String {
     let mut bytes = source.as_bytes().to_vec();
     for run in &math.loose {

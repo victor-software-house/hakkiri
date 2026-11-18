@@ -2,21 +2,22 @@
 
 ## Purpose
 
-A release of hakkiri is a tag, a GitHub Release and one tarball for each platform a consumer locks, built by verctl's release workflow, and mise installs it from a pinned version with the checksum its lock records.
+A release of hakkiri is a tag, a GitHub Release and one tarball for each platform a consumer locks.  
+The release workflow of verctl builds it, and mise installs it from a pinned version with the checksum its lock records.
 
 ## Requirements
 
 ### Requirement: A release is a tag, a Release and two tarballs
 
 A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.  
-The `linux-x64` tarball SHALL hold a statically linked `x86_64-unknown-linux-musl` binary.  
+The `linux-x64` tarball SHALL contain a statically linked `x86_64-unknown-linux-musl` binary.  
 GitHub records each tarball's SHA-256 digest, which a lock reads.  
 It SHALL publish nothing to crates.io.
 
 #### Scenario: The first release
 
 - **WHEN** the Version PR that moves `Cargo.toml` from `0.0.0` to `0.0.1` merges
-- **THEN** the repository has the tag `v0.0.1` and a Release that holds the two tarballs, and crates.io has no `hakkiri` crate
+- **THEN** the repository has the tag `v0.0.1` and a Release that contains the two tarballs, and crates.io has no `hakkiri` crate
 
 #### Scenario: A platform missing
 
@@ -39,13 +40,13 @@ It SHALL publish nothing to crates.io.
 
 ### Requirement: Two texts carry the version
 
-The skill's `version:` line and the README's install line SHALL name the released version, and the Version PR SHALL move both with the crate.  
+The skill's `version:` line and the README's install line SHALL show the released version, and the Version PR SHALL move both with the crate.  
 A pattern that matches nowhere or more than once SHALL stop the release.
 
 #### Scenario: A version bump
 
 - **WHEN** the Version PR bumps the crate to `0.0.1`
-- **THEN** `skills/hakkiri/SKILL.md` holds `version: 0.0.1` and the README installs `hakkiri@0.0.1`
+- **THEN** `skills/hakkiri/SKILL.md` contains `version: 0.0.1` and the README installs `hakkiri@0.0.1`
 
 ### Requirement: The linux-x64 binary needs no loader
 
@@ -53,7 +54,8 @@ The `linux-x64` binary SHALL start on a Linux machine that has no glibc loader, 
 
 #### Scenario: A root with no files
 
-- **WHEN** the binary runs in a root folder that holds no file but the binary, with `check` on a Markdown file that has the word `very` and a rule that flags it
+- **WHEN** the binary runs in a root folder that contains nothing but the binary
+- **AND** it runs `check` on a Markdown file that has the word `very`, with a rule that flags it
 - **THEN** it prints `1 alert in 1 file` and exits 0, and `--version` prints the released version
 
 ### Requirement: The linux-x64 binary keeps its speed
@@ -63,7 +65,8 @@ A `check` over many files on four CPUs SHALL take at most twice as long as the s
 
 #### Scenario: Many files
 
-- **WHEN** `check` lints 3000 Markdown files of 18 MB in total on four CPUs, with the musl build and the glibc build of one release
+- **WHEN** a machine with four CPUs runs `check` on 3000 Markdown files, 18 MB in total
+- **AND** it runs the musl build and then the glibc build of one release
 - **THEN** the musl build takes at most twice the time of the glibc build
 
 #### Scenario: Other builds

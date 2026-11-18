@@ -42,7 +42,7 @@ The line and columns of a match inside a comment SHALL be those of its bytes in 
 
 #### Scenario: An indented doc comment
 
-- **WHEN** a rule has `scope: text.comment` and `tokens: [marker]`, and a Rust file holds a line of four spaces and `/// A marker.`
+- **WHEN** a rule has `scope: text.comment` and `tokens: [marker]`, and a Rust file has a line of four spaces and `/// A marker.`
 - **THEN** the alert is on that line, columns 11 to 16
 
 ### Requirement: A message fills %s in order
@@ -110,5 +110,5 @@ hakkiri SHALL lint a 50,000-character line and a 60,000-line file to the end, wi
 
 #### Scenario: Sixty thousand lines
 
-- **WHEN** the same rule reads a file of 60,000 lines that each hold `A marker.`
+- **WHEN** the same rule reads a file of 60,000 lines that each contain `A marker.`
 - **THEN** hakkiri reports 60,000 alerts, the last on line 60,000

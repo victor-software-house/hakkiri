@@ -13,7 +13,7 @@ pub struct Elements {
     /// The paragraphs outside list items and block quotes.
     pub paragraphs: usize,
     /// The paragraphs inside a list item, not counting those in a block quote
-    /// that holds the list.
+    /// that contains the list.
     pub list: usize,
     /// The paragraphs inside a block quote.
     pub blockquote: usize,

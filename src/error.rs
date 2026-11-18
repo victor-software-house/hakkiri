@@ -9,7 +9,7 @@ use crate::pattern::SearchError;
 /// Why a file gave no tree.
 #[derive(Debug)]
 pub enum Error {
-    /// The MDX parser refused the file.
+    /// The MDX parser rejected the file.
     Mdx(Message),
     /// A tree-sitter grammar could not load.
     Grammar(tree_sitter::LanguageError),
@@ -27,7 +27,7 @@ impl fmt::Display for Error {
             Self::Mdx(message) => write!(f, "MDX syntax error: {message}"),
             Self::Grammar(error) => write!(f, "cannot load the grammar: {error}"),
             Self::Query(error) => write!(f, "cannot compile the comment query: {error}"),
-            Self::Syntax => f.write_str("tree-sitter gave no syntax tree"),
+            Self::Syntax => f.write_str("tree-sitter returned no syntax tree"),
             Self::Ignore(error) => write!(f, "an ignore pattern failed: {error}"),
         }
     }

@@ -1,9 +1,12 @@
 //! Words and end marks: the tokens Punkt decides over.
 //!
-//! A token is one run of non-whitespace characters. Quotes, brackets and
-//! Markdown emphasis marks around the run belong to no word, and the end mark
-//! at the end of the word is read off as a [`Mark`]. A sentence can end only at
-//! the end of a token, so a run with no space inside never holds a boundary.
+//! A token is one run of non-whitespace characters.
+//! Quotes, brackets and Markdown emphasis marks around the run belong to no
+//! word.
+//! The end mark at the end of the word is read off as a [`Mark`].
+//!
+//! A sentence can end only at the end of a token.
+//! So a run with no space inside never contains a boundary.
 
 use std::collections::HashSet;
 use std::ops::Range;
@@ -44,7 +47,8 @@ pub(super) struct Token<'a> {
     /// What comes before the token.
     pub(super) gap: Gap,
     /// The word is the one-letter reading of a code span, with no letter of
-    /// its own: it is no initial, and it has no case.
+    /// its own.
+    /// It is no initial, and it has no case.
     pub(super) code: bool,
 }
 
@@ -70,28 +74,32 @@ pub(super) struct Annotation {
     pub(super) ellipsis: bool,
 }
 
-/// SI prefix symbols, from the BIPM SI Brochure, 9th edition (2019, with the
-/// 2022 prefixes), table 7, with `u` for `µ` as ASCII text writes it.
+/// Prefix symbols of the International System of Units (SI), from the SI
+/// Brochure of the International Bureau of Weights and Measures (BIPM).
+/// The source is the 9th edition (2019, with the 2022 prefixes), table 7.
+/// It has `u` for `µ`, as ASCII text writes it.
 const SI_PREFIXES: &[&str] = &[
     "Q", "R", "Y", "Z", "E", "P", "T", "G", "M", "k", "h", "da", "d", "c", "m", "u", "µ", "n", "p",
     "f", "a", "z", "y", "r", "q",
 ];
 
-/// Binary prefix symbols, from IEC 80000-13:2008, table 3.
+/// Binary prefix symbols, from standard 80000-13:2008, table 3, of the
+/// International Electrotechnical Commission (IEC).
 const BINARY_PREFIXES: &[&str] = &["Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"];
 
 /// Unit symbols that take a prefix.
-/// They are the base and the named derived units of the SI Brochure (tables 2
-/// and 4), and the non-SI units it accepts that take a prefix (table 8: `L`,
-/// `l`, `t`, `eV`, `Da`, `ha`).
-/// The bit and the byte come from IEC 80000-13.
+/// They are the base and the named derived units of the Brochure (tables 2 and
+/// 4).
+/// They also include the units outside the SI that it accepts and that take a
+/// prefix (table 8: `L`, `l`, `t`, `eV`, `Da`, `ha`).
+/// The bit and the byte come from standard 80000-13.
 const UNIT_SYMBOLS: &[&str] = &[
     "m", "g", "s", "A", "K", "mol", "cd", "rad", "sr", "Hz", "N", "Pa", "J", "W", "C", "V", "F",
     "S", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat", "L", "l", "t", "eV", "Da", "ha",
     "bit", "B",
 ];
 
-/// Time units that take no prefix: `min`, `h` and `d` from the SI Brochure
+/// Time units that take no prefix: `min`, `h` and `d` from the Brochure
 /// (table 8), and the written forms `sec`, `secs`, `mins`, `hr` and `hrs`.
 /// `px` and `pt` are the pixel and the point of CSS Values and Units Level 4,
 /// section 6.2.
@@ -137,8 +145,7 @@ const fn is_closing(c: char) -> bool {
 
 /// The tokens of `text`, in order.
 ///
-/// `code` holds the byte ranges of `text` that read a code span, in text
-/// order.
+/// `code` has the byte ranges of `text` that read a code span, in text order.
 pub(super) fn tokens<'a>(text: &'a str, code: &[Range<usize>]) -> Vec<Token<'a>> {
     let mut tokens = Vec::new();
     let mut previous_end = 0;
@@ -280,11 +287,12 @@ impl Token<'_> {
     }
 
     /// Whether the word is the symbol of a unit of measure, with its period,
-    /// such as `ms.`, which follows a number and does not stand for a title
-    /// or a name.
+    /// such as `ms.`.
+    /// It follows a number and does not stand for a title or a name.
     ///
-    /// A symbol alone, or with an SI or binary prefix, counts. A single
-    /// capital letter is an initial, and `Ms` is the title, so neither does.
+    /// A symbol alone, or with a decimal or binary prefix, counts.
+    /// A single capital letter is an initial, and `Ms` is the title, so
+    /// neither does.
     pub(super) fn is_unit(&self) -> bool {
         if self.mark != Mark::Period {
             return false;

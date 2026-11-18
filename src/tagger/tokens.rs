@@ -124,8 +124,8 @@ pub(super) fn tokens(sentence: &str) -> Vec<Range<usize>> {
 }
 
 /// The `ranges` with each pair of square brackets around one token of a code
-/// span joined with it into one token, as in ``[`Name`]``, the form of an
-/// intra-doc link.
+/// span joined with it into one token.
+/// An intra-doc link has that form, as in ``[`Name`]``.
 ///
 /// The three tokens must follow each other with no byte between them.
 pub(super) fn with_link_brackets(
@@ -197,10 +197,11 @@ pub(super) fn is_emoticon(span: &str) -> bool {
 /// Whether `text[from..to]` must stay whole: an emoticon, initials such as
 /// `U.S.`, or a title such as `Dr.`.
 ///
-/// `initials` holds where the run of initials from `from` ends, once it is
-/// found, and stays right for every `to` while `from` stays the same. A run is
-/// scanned once for each `from`, so a token of many marks costs a pass over
-/// the token and not a pass for each mark.
+/// `initials` stores where the run of initials from `from` ends, once it is
+/// found, and stays right for every `to` while `from` stays the same.
+/// A run is scanned once for each `from`.
+/// So a token of many marks costs one pass over the token, with no pass for
+/// each mark.
 pub(super) fn is_special(
     text: &str,
     from: usize,
@@ -247,7 +248,7 @@ fn is_title(span: &str) -> bool {
     )
 }
 
-/// The length of the prefix of `span`, when it has one and holds more.
+/// The length of the prefix of `span`, when it has one and is longer.
 fn prefix_length(span: &str) -> Option<usize> {
     PREFIXES
         .iter()
@@ -255,7 +256,7 @@ fn prefix_length(span: &str) -> Option<usize> {
         .map(|prefix| prefix.len())
 }
 
-/// The length of the suffix of `span`, when it has one and holds more.
+/// The length of the suffix of `span`, when it has one and is longer.
 fn suffix_length(span: &str) -> Option<usize> {
     SUFFIXES
         .iter()
@@ -265,9 +266,9 @@ fn suffix_length(span: &str) -> Option<usize> {
 
 /// Where each ending of [`CONTRACTIONS`] occurs in one span.
 ///
-/// Every ending holds an apostrophe, at its start or one byte after it, so
+/// Every ending contains an apostrophe, at its start or one byte after it, so
 /// each ending is checked at the apostrophes of the span, once.
-/// A span with no apostrophe holds nothing.
+/// A span with no apostrophe contains nothing.
 pub(super) struct Contractions {
     /// For each ending, the byte offset of each place it occurs, in order.
     starts: Vec<Vec<usize>>,

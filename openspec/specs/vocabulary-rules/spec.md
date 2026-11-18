@@ -4,13 +4,15 @@
 
 `Vale.Terms` and `Vale.Avoid` are the rules a vocabulary builds, in a built-in style `Vale`.  
 `Terms` reports an accepted term written in another case, and `Avoid` reports a rejected term.  
-A vocabulary that a glob names builds the same rules for that glob's files.
+A vocabulary that a glob lists builds the same rules for that glob's files.
 
 ## Requirements
 
 ### Requirement: Terms reports an accepted term written in another case
 
-hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the named vocabularies, as a `substitution` rule with the level `error` and the message `Use '%s' instead of '%s'.`, and SHALL report an accepted term that is not written as the term is.
+hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the listed vocabularies.  
+It SHALL be a `substitution` rule with the level `error` and the message `Use '%s' instead of '%s'.`  
+It SHALL report an accepted term that is not written as the term is.
 
 #### Scenario: A term in the wrong case
 
@@ -59,17 +61,18 @@ hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the named v
 
 #### Scenario: A term padded with spaces
 
-- **WHEN** a list holds the term `padded` with spaces around it and the text is `This is padded and Padded.`
+- **WHEN** a list contains the term `padded` with spaces around it and the text is `This is padded and Padded.`
 - **THEN** the only alert is ``Use 'padded' instead of 'Padded'.``
 
 #### Scenario: No accepted term
 
-- **WHEN** the named vocabularies hold no accepted term
-- **THEN** no rule `Vale.Terms` exists, and a config that sets its level is an error that names the rule
+- **WHEN** the listed vocabularies contain no accepted term
+- **THEN** no rule `Vale.Terms` exists, and a config that sets its level is an error that shows the rule
 
 ### Requirement: Avoid reports a rejected term
 
-hakkiri SHALL build the rule `Vale.Avoid` from the rejected terms, as an `existence` rule that is case-sensitive, with the level `error` and the message `Avoid using '%s'.`, and SHALL read the accepted terms as its exceptions.
+hakkiri SHALL build the rule `Vale.Avoid` from the rejected terms, as a case-sensitive `existence` rule.  
+It SHALL have the level `error` and the message `Avoid using '%s'.`, and read the accepted terms as its exceptions.
 
 #### Scenario: A rejected word
 
@@ -93,17 +96,18 @@ hakkiri SHALL build the rule `Vale.Avoid` from the rejected terms, as an `existe
 
 ### Requirement: Terms and Avoid run where the Vale style or their name is listed
 
-hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file when a glob lists the style `Vale` or sets the rule by name, and on no other file, and a level set by name SHALL be their level.
+hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file only when a glob lists the style `Vale` or sets the rule by name.  
+A level set by name SHALL be their level.
 
 #### Scenario: The Vale style is listed
 
 - **WHEN** a glob lists `styles: [Team, Vale]` and the vocabulary accepts `GitHub`
 - **THEN** `github` in a matching file draws ``error Vale.Terms: Use 'GitHub' instead of 'github'.``
 
-#### Scenario: Only the vocabulary is named
+#### Scenario: Only the vocabulary is listed
 
 - **WHEN** a glob lists `styles: [Team]` and the vocabulary accepts `GitHub`
-- **THEN** `github` draws no alert, and the accepted terms still hold back the `Team` rules' matches
+- **THEN** `github` draws no alert, and the accepted terms still drop the `Team` rules' matches
 
 #### Scenario: One rule turned off
 
@@ -117,19 +121,20 @@ hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file when a glob lists the 
 
 ### Requirement: A glob's vocabularies build rules of their own
 
-hakkiri SHALL build `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` from each vocabulary a glob of `files` names, as it builds `Vale.Terms` and `Vale.Avoid`, and SHALL run them on the files that glob matches with no style or setting.
+hakkiri SHALL build `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` from each vocabulary that a glob of `files` lists, as it builds `Vale.Terms` and `Vale.Avoid`.  
+It SHALL run them on the files that glob matches, with no style or setting.
 
-#### Scenario: A glob names Team
+#### Scenario: A glob lists Team
 
-- **WHEN** a glob names `Team`, which accepts `harness(?:es)?` and `kubectl`, and the text is `We harness it. HARNESS it. Run KUBECTL.`
+- **WHEN** a glob lists `Team`, which accepts `harness(?:es)?` and `kubectl`, and the text is `We harness it. HARNESS it. Run KUBECTL.`
 - **THEN** the alerts are ``error Vale.Team.Terms: Use 'harness' instead of 'HARNESS'.`` and ``error Vale.Team.Terms: Use 'kubectl' instead of 'KUBECTL'.``
 
 #### Scenario: A glob's own setting
 
-- **WHEN** a glob names `Team` and sets `Vale.Team.Terms: off`
+- **WHEN** a glob lists `Team` and sets `Vale.Team.Terms: off`
 - **THEN** `Vale.Team.Terms` still runs on its files, because the vocabulary turns it on after the glob's settings
 
-#### Scenario: A file no glob names
+#### Scenario: A file no glob lists
 
-- **WHEN** `Team` is named at the top level only, and the text is `Run KUBECTL.`
+- **WHEN** `Team` is listed at the top level only, and the text is `Run KUBECTL.`
 - **THEN** `Vale.Team.Terms` draws no alert, and `Vale.Terms` draws one only where the style `Vale` is listed

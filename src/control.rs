@@ -19,10 +19,12 @@
 //! rows.
 //!
 //! Vale reads each comment at two moments.
+//!
 //! The text of a Markdown file after `off` is left out of its blocks, which
 //! `cut` does.
 //! A rule is gated per block, by the toggles that a comment inside the element
 //! of the block sets before the element ends (`Controls::gated`).
+//!
 //! An alert is hidden when its place lies between the comment that turned its
 //! rule off and the one that turned it on (`Controls::hides`).
 //!
@@ -316,8 +318,8 @@ impl Controls {
     /// column `place`, is hidden.
     ///
     /// It is hidden when a comment turned off the matches of the rule for a
-    /// block that ends at `closes`, or when the alert lies in a region of a
-    /// comment.
+    /// block that ends at `closes`.
+    /// It is also hidden when the alert lies in a region of a comment.
     pub(crate) fn hides(&self, rule: &str, matched: &str, place: Place, closes: usize) -> bool {
         let match_key = format!("{rule}[{matched}]");
         if !matched.is_empty()
@@ -392,7 +394,7 @@ fn off_ranges(comments: &[Comment], len: usize) -> Vec<Range<usize>> {
 }
 
 /// The parts of `span` that lie outside `ranges`, which are in order and do
-/// not overlap. A span of no bytes is kept unless a range holds it.
+/// not overlap. A span of no bytes is kept unless a range contains it.
 fn outside(span: &Range<usize>, ranges: &[Range<usize>]) -> Vec<Range<usize>> {
     if span.is_empty() {
         let held = ranges
@@ -421,7 +423,8 @@ fn outside(span: &Range<usize>, ranges: &[Range<usize>]) -> Vec<Range<usize>> {
 }
 
 /// Leaves out of `nodes` the text between a comment that turns every rule off
-/// and the one that turns them on, as Vale leaves it out of its blocks.
+/// and the one that turns them on.
+/// Vale does the same for its blocks.
 ///
 /// `len` is the length of the file.
 pub(crate) fn cut(nodes: &mut Vec<Node>, comments: &[Comment], len: usize) {
@@ -433,11 +436,12 @@ pub(crate) fn cut(nodes: &mut Vec<Node>, comments: &[Comment], len: usize) {
 }
 
 /// Gives each alert the level that a comment of `tree` sets for its rule at
-/// its place, and leaves the others as they are, and so a fault of a rule
-/// itself (`Alert::fault`).
+/// its place.
+/// It leaves the others as they are, and so a fault of a rule itself
+/// (`Alert::fault`).
 ///
 /// The comment is `hakkiri Style.Rule: suggestion`, `warning` or `error`, and
-/// it holds until a later comment names the rule.
+/// it applies until a later comment for the rule replaces it.
 /// `source` is the text `tree` was parsed from.
 pub fn apply_levels(tree: &Tree, source: &str, alerts: &mut [Alert]) {
     if tree.comments.is_empty() {

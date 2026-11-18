@@ -2,13 +2,15 @@
 
 ### Requirement: A path is a file or a directory
 
-`hakkiri check` SHALL lint each file it is given and each file under each directory it is given, and SHALL lint the current directory when it is given none.  
-A walk SHALL skip `node_modules`, `.git` and each folder a `packages` entry names, comparing the resolved path of each folder with the resolved package paths.  
+`hakkiri check` SHALL lint each file it is given and each file under each directory it is given.  
+It SHALL lint the current directory when it is given none.
+
+A walk SHALL skip `node_modules`, `.git` and each folder a `packages` entry lists, comparing the resolved path of each folder with the resolved package paths.  
 It SHALL lint a file once, however many of the paths it is given reach that file.
 
 #### Scenario: A directory and a file
 
-- **WHEN** `hakkiri check docs README.md` runs and `docs` holds `a.md` and `sub/b.md`
+- **WHEN** `hakkiri check docs README.md` runs and `docs` contains `a.md` and `sub/b.md`
 - **THEN** hakkiri lints `docs/a.md`, `docs/sub/b.md` and `README.md`
 
 #### Scenario: A file named two ways
@@ -23,18 +25,18 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 
 #### Scenario: Folders a walk leaves alone
 
-- **WHEN** a walk meets `node_modules/x.md`, `.git/y.md` and a `packages` folder `styles/` holding `z.md`
+- **WHEN** a walk meets `node_modules/x.md`, `.git/y.md` and a `packages` folder `styles/` containing `z.md`
 - **THEN** hakkiri lints none of them, and lints a file of `.github/` that a glob matches
 
 #### Scenario: A walk from another folder
 
-- **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ..` runs in `other/` and the package folder `styles/` holds `Team/notes.md`
+- **WHEN** `HAKKIRI_CONFIG=../.ctl/hakkiri.yaml hakkiri check ..` runs in `other/` and the package folder `styles/` contains `Team/notes.md`
 - **THEN** hakkiri lints `docs/a.md` and not `styles/Team/notes.md`
 
 ### Requirement: A language is read by extension
 
-hakkiri SHALL read a `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` file as Markdown, MDX, Rust, TypeScript, TSX or JavaScript.  
-It SHALL skip any other file a walk finds, and SHALL refuse one named as an argument, with an error that names it.
+hakkiri SHALL read a `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` file as Markdown, MDX, Rust, TypeScript, TypeScript with JavaScript XML (TSX) or JavaScript.  
+It SHALL skip any other file a walk finds, and SHALL refuse one named as an argument, with an error that shows its name.
 
 #### Scenario: A file no language reads, found by a walk
 
@@ -58,7 +60,7 @@ hakkiri SHALL report a file it cannot read or parse as a failure, and SHALL stil
 ### Requirement: The pretty output is a line per alert
 
 hakkiri SHALL print each alert as `path:line:column: level Rule: message`, in order of path, then line, then column, then each failure as `failed path: message`, and then one count line.  
-The lines SHALL hold no colour and no frame, and two runs over the same files SHALL print the same text.
+The lines SHALL contain no colour and no frame, and two runs over the same files SHALL print the same text.
 
 #### Scenario: A warning
 
@@ -73,17 +75,18 @@ The lines SHALL hold no colour and no frame, and two runs over the same files SH
 ### Requirement: The JSON output is one object
 
 `--format json` SHALL print one object with `alerts`, `failures` and `files`.  
-Each alert SHALL hold `path`, `line`, `column`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
-The output SHALL hold no ESC byte, whatever value the colour variables hold.
+Each alert SHALL contain `path`, `line`, `column`, `end_column`, `level`, `rule`, `message`, `description`, `link` and `match`.  
+The output SHALL contain no escape (ESC) byte, whatever value the colour variables contain.
 
 #### Scenario: JSON with colour forced
 
 - **WHEN** `hakkiri check --format json` runs with `CLICOLOR_FORCE=1` and a file draws an alert
-- **THEN** the output parses as JSON with one alert, and holds no ESC byte
+- **THEN** the output parses as JSON with one alert, and has no ESC byte
 
 ### Requirement: The exit status reports what happened
 
-hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed, and otherwise 1 when a reported alert reaches `--fail-level`, and otherwise 0.  
+hakkiri SHALL exit 2 when a config or rule error stopped the run or a file failed.  
+Otherwise it SHALL exit 1 when a reported alert reaches `--fail-level`, and 0 when none does.  
 `--fail-level` SHALL be `suggestion`, `warning` or `error`, and SHALL be `error` when unset.  
 It SHALL see only the alerts that the config's `level` leaves in.
 
@@ -109,7 +112,7 @@ It SHALL see only the alerts that the config's `level` leaves in.
 
 #### Scenario: A broken config
 
-- **WHEN** `.ctl/hakkiri.yaml` holds an unknown key
+- **WHEN** `.ctl/hakkiri.yaml` contains an unknown key
 - **THEN** hakkiri lints no file, prints the error with its line to stderr, and exits 2
 
 ### Requirement: Every flag has a variable

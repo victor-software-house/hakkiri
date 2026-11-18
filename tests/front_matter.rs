@@ -1,12 +1,14 @@
 //! Front matter: the scenarios of the front-matter-values change.
 //!
-//! `tests/fixtures/front-matter` holds one package of nine rules (`styles`),
-//! six Markdown files, one MDX file and one probe of YAML scalars (`text`, with
-//! `.fixture` after the extension), and one config for each tool:
-//! `vale/all.ini` and `.ctl/all.yaml`.
-//! `vale.tsv` holds one row for each alert Vale gave on the files: the config,
-//! the file, the line, the first and last column, the level, the rule, the
-//! message and the matched text.
+//! `tests/fixtures/front-matter` contains one package of nine rules
+//! (`styles`).
+//! It also has six Markdown files, one MDX file
+//! and one probe of YAML scalars (`text`, with `.fixture` after the extension).
+//! There is one config for each tool: `vale/all.ini` and `.ctl/all.yaml`.
+//!
+//! `vale.tsv` has one row for each alert Vale gave on the files.
+//! A row has the config, the file, the line, the first and last column, the
+//! level, the rule, the message and the matched text.
 //! The rows come from Vale at `66bbb85`, run from the fixture folder as
 //! `vale --config=vale/all.ini --output=JSON text`.
 
@@ -128,7 +130,8 @@ fn rows_of(out: &str) -> Result<BTreeSet<Row>, Box<dyn Error>> {
 type Place = (&'static str, usize, usize, &'static str);
 
 /// The alerts that Vale places in the wrong part of a value, and where hakkiri
-/// places them: the file, the line, the first column, and the matched text.
+/// places them.
+/// Each place is the file, the line, the first column, and the matched text.
 ///
 /// Vale puts the words of the second line of a folded block scalar on its
 /// first line.
@@ -170,7 +173,7 @@ const MISPLACED: [(Place, Place); 9] = [
 ];
 
 /// Takes the misplaced alerts out of both sets, and asserts that each side
-/// holds them for the same rules.
+/// has them for the same rules.
 /// A `raw` rule reads the file as written, so Vale places its alerts right.
 fn leave_out_the_misplaced(vale: &mut BTreeSet<Row>, ours: &mut BTreeSet<Row>) {
     let is = |row: &Row, (file, line, column, text): Place| {
@@ -193,10 +196,12 @@ fn leave_out_the_misplaced(vale: &mut BTreeSet<Row>, ours: &mut BTreeSet<Row>) {
 }
 
 /// The alerts that Vale gives on the lines of a `;;;` block and hakkiri does
-/// not, each as a file, a line, a column and a rule.
+/// not.
+/// Each is a file, a line, a column and a rule.
 ///
 /// Vale lints the lines of a `;;;` block as a paragraph too (design decision 3
-/// of `front-matter-crate`), where hakkiri cuts every block from the body.
+/// of `front-matter-crate`).
+/// hakkiri cuts every block from the body.
 /// The `Team.Text` alert at line 2, column 14 of `text/f8.md` stays, because
 /// the title is a value of the front matter, which that rule reads.
 const BLOCK_AS_PARAGRAPH: [(&str, usize, usize, &str); 7] = [
@@ -210,7 +215,8 @@ const BLOCK_AS_PARAGRAPH: [(&str, usize, usize, &str); 7] = [
 ];
 
 /// Takes the alerts of the `;;;` blocks as a paragraph out of Vale's set,
-/// after asserting that Vale holds each, and asserts that hakkiri holds none.
+/// after asserting that Vale has each.
+/// It also asserts that hakkiri has none.
 fn leave_out_the_block_as_paragraph(vale: &mut BTreeSet<Row>, ours: &BTreeSet<Row>) {
     for (file, line, column, rule) in BLOCK_AS_PARAGRAPH {
         let is = |row: &Row| row.0 == file && row.1 == line && row.2 == column && row.5 == rule;
@@ -269,10 +275,11 @@ fn every_config_gives_the_alerts_vale_gives() -> TestResult {
 /// Front matter that no parser reads, and a sequence key that one reads.
 ///
 /// Vale fails each file of the first three with E201 on line 1 and lints none
-/// of it, and it fails the sequence key too.
+/// of it.
+/// It fails the sequence key too.
 /// hakkiri fails the file with the line of the parser's problem and lints the
-/// rest of it, and lints the rest of the sequence key's block, which a parser
-/// reads.
+/// rest of it.
+/// It also lints the rest of the sequence key's block, which a parser reads.
 #[test]
 fn front_matter_no_parser_reads_fails_the_file_and_leaves_the_rest_linted() -> TestResult {
     let suite = Suite::new("front-matter-broken");
@@ -355,8 +362,9 @@ fn front_matter_no_parser_reads_fails_the_file_and_leaves_the_rest_linted() -> T
 /// Every form of front matter is metadata: its values are lints of the
 /// `frontmatter` scope, and no line of the block is a paragraph.
 ///
-/// The `form-*` cases hold a title and the body `Body very.`, after a blank
-/// line. `json-key-only` holds a JSON key `very` and no string value.
+/// The `form-*` cases have a title and the body `Body very.`, after a blank
+/// line.
+/// `json-key-only` has a JSON key `very` and no string value.
 /// The snapshot lists each `Team.Para`, `Team.FmTitle` and `Team.Text` alert
 /// as its file and line.
 #[test]

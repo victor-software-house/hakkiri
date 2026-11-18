@@ -5,33 +5,38 @@ Training and measurement run in an ephemeral build box.
 
 ## 1. Evaluation sets
 
-- [x] 1.1 Label sentence boundaries by hand in paragraphs from the owner's public repositories, including the 89 measured hard cases.  
+- [x] 1.1 Label sentence boundaries by hand.  
+  Use paragraphs from the owner's public repositories, including the 89 measured hard cases.  
   Verify each paragraph's source and license are listed beside the set.
-- [x] 1.2 Add the Golden Rules list and a MASC sample with their gold boundaries, after reading each license file.  
+- [x] 1.2 Add the Golden Rules list and a Manually Annotated Sub-Corpus (MASC) sample with their gold boundaries, after reading each license file.  
   Verify the license of each set is named beside it.
-- [x] 1.3 Measure Vale 3.26.0's F1 on each set, and on UD English-EWT and GUM.  
+- [x] 1.3 Measure Vale 3.26.0's F1 on each set.  
+  Also measure it on the English Web Treebank (EWT) and Georgetown University Multilayer (GUM) sets of Universal Dependencies (UD).  
   Commit the numbers for the committed sets.  
   Record the EWT and GUM numbers under this task, with the command that produced them.
 
 ### Evidence for 1.1
 
-- 2026-11-10 UTC: [`docs.fixture`][docs-set] holds 298 paragraphs, each headed by its repository and file.
-- [`hard.fixture`][hard-set] holds 88 of the 89 cases, written for this test.
+- 2026-11-10 UTC: [`docs.fixture`][docs-set] contains 298 paragraphs, each headed by its repository and file.
+- [`hard.fixture`][hard-set] contains 88 of the 89 cases, written for this test.
 - The case with two spaces after a full stop is left out, since a record joins sentences with one space.
 - Sources and licenses are in [`SOURCES.md`][sources].
 - Not verified: one reader labelled the boundaries so far, and the review of this pull request is the second.
 
 ### Evidence for 1.2
 
-- 2026-11-10 UTC: [`golden-rules.fixture`][golden-set] holds 48 rules from [pySBD][pysbd].
-- [`masc.fixture`][masc-set] holds 284 sentences in 71 records from [MASC 3.0.0][masc].
+- 2026-11-10 UTC: [`golden-rules.fixture`][golden-set] contains 48 rules from [pySBD][pysbd].
+- [`masc.fixture`][masc-set] contains 284 sentences in 71 records from [MASC 3.0.0][masc].
 - pySBD and pragmatic_segmenter are MIT, with both notices in [`golden-rules.LICENSE`][golden-license].
 - The MASC site states that MASC has no license or other restrictions.
-- MASC's gold is the corpus's own sentence regions, made with GATE's ANNIE splitter and validated by hand.
+- MASC's gold is the corpus's own sentence regions.  
+  They were made with the sentence splitter of ANNIE (A Nearly-New Information Extraction system).  
+  ANNIE is part of the General Architecture for Text Engineering (GATE).  
+  People validated them by hand.
 
 ### Evidence for 1.3
 
-- 2026-11-10 UTC: [`vale-f1.tsv`][vale-f1] holds Vale's F1 on the four committed sets.
+- 2026-11-10 UTC: [`vale-f1.tsv`][vale-f1] lists Vale's F1 on the four committed sets.
 - Vale v3.26.0 [pins][vale-gomod] prose v3.2.2 and sentences.v1 v1.0.7.  
   The committed numbers use these.
 - Vale at [66bbb85][vale-main], which the designs read, pins prose `b33e60d`.  
@@ -58,7 +63,8 @@ Training and measurement run in an ephemeral build box.
   | UD English-EWT test | 1223 | 0.9750 | 0.7980 | 0.8777 |
   | UD English-GUM test | 901 | 0.9586 | 0.9512 | 0.9549 |
 
-- The design cites 90.8 F1 for Punkt on EWT from the [SaT paper][sat].  
+- The design cites 90.8 F1 for Punkt on EWT.  
+  The figure is from the [SaT paper][sat].  
   This run scores 87.8 on its own paragraph grouping, so the two numbers measure different things.
 
 ## 2. Splitter
@@ -79,17 +85,19 @@ Training and measurement run in an ephemeral build box.
   - 2026-11-10 (UTC), two runs of `mise run splitter:train` in a 4x8 build box wrote byte-identical `en.tsv` and `SOURCES.md`, and the fetched corpus files were identical too.  
     The SHA-256 of `en.tsv` is `b4ec6f04…` and of `SOURCES.md` is `dd147b99…` in both runs.
   - Each run took about 2 minutes: the fetch about 75 seconds, reading the corpus about 22 seconds, training 5.8 seconds.
-  - The corpus holds 26,079,695 tokens.  
+  - The corpus has 26,079,695 tokens.  
     A token is a whitespace-separated word, counted after the Markdown sources are cut to the text of their paragraphs.
   - The owner's 48 public repositories give 1,037 documents and 574,192 tokens.
   - The first 512 MiB of `stackv2` shard 129 gives 45,930 Markdown documents and 10,717,783 tokens.
   - The Python Enhancement Proposals give 818 documents and 1,625,676 tokens.
   - The first 32 MiB of `project_gutenberg` shard 0 gives 186 documents and 13,162,044 tokens.
-  - The model is 570,625 bytes in 24,598 lines: 2,629 abbreviations, 1,181 collocations, 787 sentence starters and 20,000 capitalization entries cut from 815,218.  
+  - The model is 570,625 bytes in 24,598 lines.  
+    It has 2,629 abbreviations, 1,181 collocations, 787 sentence starters and 20,000 capitalization entries cut from 815,218.  
     The data comes from 1,257,144 word types, 1,222,335 tokens that end in a period.
   - `stackv2` spreads its Markdown over many of its 764 shards, mixed with code.  
-    Shard 129 holds 45,915 `.md` and `.markdown` records, the densest of the shards counted, and a prefix of it is read.
-  - `github_archive` holds issue and pull request threads, not `.md` files, so it is not a source.
+    Shard 129 has 45,915 `.md` and `.markdown` records, the densest of the shards counted.  
+    A prefix of it is read.
+  - `github_archive` has issue and pull request threads, not `.md` files, so it is not a source.
 - [x] 3.2 Embed the model and parse it once per process.  
   Verify a test reads the embedded model in CI.
   - 2026-11-10 (UTC), `the_embedded_model_is_read_and_is_in_file_order` reads the embedded model, finds `dr` in it, and checks that the model writes back the same text as the file.  
@@ -99,15 +107,18 @@ Training and measurement run in an ephemeral build box.
 
 - [x] 4.1 Add the evaluation test.  
   Verify it passes in CI, and record hakkiri's and Vale's F1 per set under this task.
-  - 2026-11-10 (UTC), the three tests of [`tests/splitter_eval.rs`][eval-test] passed in [Verify][run-eval] on [PR 15][pr15] at `d13d27d`.
+  - 2026-11-10 (UTC), the three tests of [`tests/splitter_eval.rs`][eval-test] passed in the [Verify][run-eval] run on [PR 15][pr15] at `d13d27d`.
   - The F1 test fails when hakkiri's F1 on a set, rounded to four decimals, is below the `f1` column of [`vale-f1.tsv`][vale-f1].  
-    The two fixture tests fail when a record holds two identical consecutive sentences, and when a `masc` record does not hold exactly four sentences.
+    The two fixture tests fail in two cases.  
+    One is a record with two identical consecutive sentences.  
+    The other is a `masc` record that does not have exactly four sentences.
   - hakkiri's F1 on `docs` is 0.9909 against Vale's 0.9849.
   - On `hard` it is 0.9268 against 0.9157, on `golden-rules` 0.6301 against 0.5797, and on `masc` 0.9883 against 0.9883.
   - The numbers come from a build box run of the test, which prints them.  
-    The `masc` tie holds: 212 of 213 gold boundaries are right out of 216 predicted, for both splitters.
+    The `masc` tie is real: 212 of 213 gold boundaries are right out of 216 predicted, for both splitters.
   - The 300,000-token penalty was swept on these same sets, so the scores show no independent evidence for that value.
-  - The held-out check scores hakkiri on [UD English-EWT][ewt] and [UD English-GUM][gum], the test files of r2.18 that task 1.3 scored Vale on.  
+  - The held-out check scores hakkiri on [UD English-EWT][ewt] and [UD English-GUM][gum].  
+    These are the test files of r2.18 that task 1.3 scored Vale on.  
     The model was not tuned on either, and nothing from them is committed.
   - 2026-11-10 (UTC), a scratch program in an ephemeral build box, since removed, split each record as task 1.3 defines it.  
     Both files had the SHA-256 recorded under 1.3, and both gave the same gold counts, 1,223 and 901.
@@ -117,8 +128,9 @@ Training and measurement run in an ephemeral build box.
     The program is not committed, as with Vale's.
 - [x] 4.2 Split a 50,000-character paragraph and a 60,000-line file.  
   Verify both finish in CI with no panic, and record the time per paragraph.
-  - 2026-11-10 (UTC), `a_50000_character_paragraph_splits`, `a_50000_character_run_with_no_space_is_one_sentence` and `a_60000_line_input_splits` passed in [Verify][run-splitter] on [PR 14][pr14] at `cac88f4`.
-  - In the build box, a 50,000-character paragraph of 2,845 sentences took 8 ms in a debug build and 0.7 ms in a release build.  
+  - 2026-11-10 (UTC), `a_50000_character_paragraph_splits`, `a_50000_character_run_with_no_space_is_one_sentence` and `a_60000_line_input_splits` passed in the [Verify][run-splitter] run on [PR 14][pr14] at `cac88f4`.
+  - In the build box, a 50,000-character paragraph of 2,845 sentences took 8 ms in a debug build.  
+    A release build took 0.7 ms.  
     A 60,000-line input of 120,000 sentences took 290 ms and 20 ms.  
     The cost is linear in the length of the text.
 

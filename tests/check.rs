@@ -1399,7 +1399,7 @@ fn a_misspelled_rule_name_is_refused() -> TestResult {
     assert!(
         result
             .err
-            .contains("line 6: Team.Fillr: names no rule in any style the config loads"),
+            .contains("line 6: Team.Fillr: is not a rule in any style the config loads"),
         "{}",
         result.err
     );
@@ -1419,7 +1419,7 @@ fn a_package_entry_with_a_path_and_a_url_is_refused() -> TestResult {
     assert!(
         result
             .err
-            .contains("line 2: packages[0]: an entry holds a `path` or a `url`, never both"),
+            .contains("line 2: packages[0]: an entry has a `path` or a `url`, never both"),
         "{}",
         result.err
     );
@@ -1801,7 +1801,7 @@ fn an_unknown_fail_level_in_the_config_is_refused() -> TestResult {
 /// A linked git worktree of the project: `.git` is a file that points into the
 /// `worktrees` folder of a main repository, as `git worktree add` writes it.
 /// The worktree's `.gitignore` ignores `build/`, and the main repository's
-/// `info/exclude` holds `exclude`. The main repository comes back with the
+/// `info/exclude` contains `exclude`. The main repository comes back with the
 /// worktree, because its directory is deleted when it drops.
 fn worktree<'a>(suite: &'a Suite, name: &str, exclude: &str) -> (Root<'a>, Root<'a>) {
     let main = suite.scenario(&format!("{name}-main"));
