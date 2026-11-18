@@ -37,20 +37,20 @@ url_api = "https://api.github.com/repos/Fission-AI/OpenSpec/releases/assets/6937
 provenance = "github-attestations"
 
 [[tools."github:victor-software-house/hakkiri"]]
-version = "0.1.1"
+version = "0.1.2"
 backend = "github:victor-software-house/hakkiri"
-specifiers = ["0.1.1"]
+specifiers = ["0.1.2"]
 
 [tools."github:victor-software-house/hakkiri"."platforms.linux-x64"]
-checksum = "sha256:b63dbd6dfc212b14d4915aef129fd4054258fd4f35b732202cc62d2b12805424"
-url = "https://github.com/victor-software-house/hakkiri/releases/download/v0.1.1/hakkiri_0.1.1_linux_x64.tar.gz"
-url_api = "https://api.github.com/repos/victor-software-house/hakkiri/releases/assets/764713424"
+checksum = "sha256:38f4750d7844c241440e8a3f2a9a0cdfab1c1fd25a01caa2b96617b2e02dd174"
+url = "https://github.com/victor-software-house/hakkiri/releases/download/v0.1.2/hakkiri_0.1.2_linux_x64.tar.gz"
+url_api = "https://api.github.com/repos/victor-software-house/hakkiri/releases/assets/765084977"
 provenance = "github-attestations"
 
 [tools."github:victor-software-house/hakkiri"."platforms.macos-arm64"]
-checksum = "sha256:d15040c2fb2bbefb9de9c59e630a741d2a2b5279118f3a4de980b086ec1edf31"
-url = "https://github.com/victor-software-house/hakkiri/releases/download/v0.1.1/hakkiri_0.1.1_macos_arm64.tar.gz"
-url_api = "https://api.github.com/repos/victor-software-house/hakkiri/releases/assets/764713388"
+checksum = "sha256:734ce75e8b67c009b3ae32667e7c6600f2a6f2d4a97abb65a079aec91cc565b5"
+url = "https://github.com/victor-software-house/hakkiri/releases/download/v0.1.2/hakkiri_0.1.2_macos_arm64.tar.gz"
+url_api = "https://api.github.com/repos/victor-software-house/hakkiri/releases/assets/765084899"
 provenance = "github-attestations"
 
 [[tools."github:victor-software-house/qctl"]]

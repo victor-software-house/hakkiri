@@ -20,8 +20,10 @@
 # It also works on a push to a URL, or to a remote with no tracking refs yet.
 # The remote sha covers a remote tip that no tracking ref points to.
 #
-# The credential scan runs first, so a failing lint never hides a leaked
-# secret. The script keeps to bash 3.2, the bash macOS ships.
+# Each ref is scanned and linted even when an earlier step failed, and the
+# task fails at the end. So a failing lint never hides a leaked secret, on
+# the same ref or on a later one. The script keeps to bash 3.2, the bash
+# macOS ships.
 set -euo pipefail
 
 # Prints the remote sha when this repository has that commit.
@@ -72,12 +74,14 @@ scan_pushed() {
   gitleaks git --redact --no-banner --log-opts="$1 --not --remotes${2:+ $2}" </dev/null
 }
 
+status=0
 while read -r _ tip _ remote; do
   # A delete pushes an all-zero sha, 40 zeros under SHA-1 and 64 under SHA-256.
   [[ $tip == *[!0]* ]] || continue
   known=$(known_tip "$remote")
   commits=$(pushed_commits "$tip" "$known")
   [[ -n $commits ]] || continue
-  scan_pushed "$tip" "$known"
-  lint_pushed "$tip" "$commits"
+  scan_pushed "$tip" "$known" || status=1
+  lint_pushed "$tip" "$commits" || status=1
 done
+exit "$status"
