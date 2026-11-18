@@ -10,7 +10,7 @@ The engine slice `HKR-004` runs checks over this tree, and alerts point back int
 
 ## Changes
 
-- Markdown and Markdown with JavaScript XML (MDX) files parse into the tree, each node named by its Vale scope.
+- Markdown and Markdown with components (MDX) files parse into the tree, each node named by its Vale scope.
 - Rust, TypeScript and JavaScript files give the tree their comments only, each read as Markdown, so string literals never reach it.
 - Every node has the byte span of its text in the file, including text inside a comment.
 - Snapshot tests show the tree for block comments, strings that contain URLs, nested lists, tables and MDX.

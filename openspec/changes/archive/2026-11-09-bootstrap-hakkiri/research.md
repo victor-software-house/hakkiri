@@ -47,7 +47,7 @@ No Vale rule type expresses that today.
   Six ProseStyle rules use lookbehind: `BareURL`, `BareURLInComment`, `BareWorkItem`, `BareWorkItemInComment`, `Dashes`, `Exclamation`.  
   `BareURL`'s lookbehind is variable-length and nests lookarounds ([BareURL.yml][ps-bareurl]).
 - A vocabulary, `Vocab = ProseStyle`, whose `accept.txt` lists words that pass upstream rules.
-- Formats: Markdown, MDX (Markdown with JSX), and Rust through `[formats] rs = md`.
+- Formats: Markdown, Markdown with components (MDX), and Rust through `[formats] rs = md`.
 - Configuration: a package `.vale.ini` read before the project's, glob sections, per-rule levels and `NO`, `StylesPath`, `Packages` pointing at a release zip.
 - Tests: every rule carries `tests:` cases run by `vale test --coverage`, which fails when a rule fires in no case, plus 16 package cases in [`test/package.test.yml`][ps-pkgtest].  
   `vale test` is upstream since [ae6d749][vale-test] (2026-08-11).

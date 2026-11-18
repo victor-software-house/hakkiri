@@ -4,7 +4,7 @@
 
 ### Requirement: A node records its first-child place
 
-In a Markdown or MDX (Markdown with JSX) tree, each node SHALL record whether it is the first child of its container.  
+In a Markdown or Markdown with components (MDX) tree, each node SHALL record whether it is the first child of its container.  
 The container is a list item, quote or table row.  
 The parser sets it from every child of that container.
 

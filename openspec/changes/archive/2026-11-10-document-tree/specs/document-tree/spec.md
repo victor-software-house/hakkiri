@@ -3,7 +3,7 @@
 ## Purpose
 
 Every file hakkiri reads becomes one tree of nodes, each with a scope name and the byte span of its text in the file.  
-hakkiri reads Markdown, MDX (Markdown with JSX), and the comments of Rust, TypeScript and JavaScript files.  
+hakkiri reads Markdown, Markdown with components (MDX), and the comments of Rust, TypeScript and JavaScript files.  
 Rules select text from this tree, and alerts point back into the file through the spans.
 
 ## ADDED Requirements

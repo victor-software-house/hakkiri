@@ -56,7 +56,7 @@ Lost: it is the cause of the lookbehind rules, the panics and the run time in th
 
 ### 3. Release 1 is parity plus rate rules
 
-Release 1 reaches parity on Markdown, MDX (Markdown with JSX) and Rust comments.  
+Release 1 reaches parity on Markdown, Markdown with components (MDX) and Rust comments.  
 It also adds rate rules: a habit counted per sentence or per number of words.  
 The frequency-habit rules in prose-style ship with it.
 

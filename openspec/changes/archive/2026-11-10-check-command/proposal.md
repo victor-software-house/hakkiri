@@ -5,7 +5,7 @@ It is the first of three changes that ship the command line: this one adds `chec
 
 ## Motivation
 
-hakkiri reads Markdown, MDX (Markdown with JSX) and source comments and runs every check type, but its binary is empty (`fn main() {}`).  
+hakkiri reads Markdown, Markdown with components (MDX) and source comments and runs every check type, but its binary is empty (`fn main() {}`).  
 `hakkiri check` is what the `lint:prose` task, CI and a pre-commit hook run, so no project can leave Vale until it exists.
 
 The project config, `.ctl/hakkiri.yaml`, is specified and not yet read.  

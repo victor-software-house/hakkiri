@@ -34,7 +34,7 @@ The built-in filters skip words, unless `custom: true`, and so do `filters`.
 Then the remaining words are looked up.
 
 `split` takes an identifier apart and reports each misspelt part of three letters or more at its own position.  
-Vale's two message rewrites stay, for a casing mistake and for an identifier in Markdown, or in Markdown with JavaScript XML (MDX) ([spelling.go][v-spell-explain]).
+Vale's two message rewrites stay, for a casing mistake and for an identifier in Markdown, or in Markdown with components (MDX) ([spelling.go][v-spell-explain]).
 
 A word that overlaps a code span gives no alert, as the rule-engine change decides for `existence`.
 

@@ -38,7 +38,7 @@ Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`c
 ### Modified Capabilities
 
 - `node-segments`: inline markup becomes a gap, so a link reads as its text.
-- `document-tree`: a Markdown or MDX (Markdown with JSX) tree counts its code blocks, for the metric variable `pre`.
+- `document-tree`: a Markdown or Markdown with components (MDX) tree counts its code blocks, for the metric variable `pre`.
 - `rule-files`: the semicolon-rate scenario gains `nonword: true`, so its token matches as an `existence` token does.
 
 ## Impact

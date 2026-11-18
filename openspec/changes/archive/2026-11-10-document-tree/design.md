@@ -3,7 +3,7 @@
 ## Context
 
 The [rule-format design][rule-format] fixed the scope names a rule selects text with, and that every comment reads as Markdown.  
-The [bootstrap design][bootstrap] chose markdown-rs for Markdown and Markdown with JavaScript XML (MDX) and tree-sitter grammars for source languages.  
+The [bootstrap design][bootstrap] chose markdown-rs for Markdown and Markdown with components (MDX) and tree-sitter grammars for source languages.  
 This slice builds the tree both feed, with no checks yet.
 
 ## Goals / Non-Goals

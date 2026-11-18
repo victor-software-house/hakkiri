@@ -1,6 +1,6 @@
 # Tasks
 
-## 1. Markdown and Markdown with JavaScript XML (MDX)
+## 1. Markdown and MDX
 
 - [x] 1.1 Add the tree type and parse Markdown with markdown-rs.  
   Verify the snapshot tests for headings, nested lists and tables pass in CI.

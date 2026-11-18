@@ -23,7 +23,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     Nine snapshots changed and were read.  
     A strikethrough loses its tildes too.  
     A paragraph that has only a URL has no text, so its link node moves up a level.
-- [x] 2.2 Count the fenced and indented code blocks of a Markdown or MDX (Markdown with JSX) tree.  
+- [x] 2.2 Count the fenced and indented code blocks of a Markdown or Markdown with components (MDX) tree.  
   Verify the [document-tree scenario][tree] passes as a test in CI.
   - 2026-11-10 (UTC), the test of two fences and an indented block passes in the same box run, in [462eaa9][c-tree].
 

@@ -83,7 +83,7 @@ A misspelt part of three letters or more that is not in capitals SHALL be report
 When the dictionary contains the word only with more capitals inside it, the message SHALL show the dictionary form.  
 It SHALL read `Use '<dictionary form>' instead of '<word>'.`
 
-Otherwise, without `split`, a word shaped like an identifier SHALL get the code message in a Markdown file or a Markdown with JavaScript XML (MDX) file.  
+Otherwise, without `split`, a word shaped like an identifier SHALL get the code message in a Markdown file or a Markdown with components (MDX) file.  
 That message SHALL read `'<word>' looks like code; format it as code.`
 
 #### Scenario: A casing mistake

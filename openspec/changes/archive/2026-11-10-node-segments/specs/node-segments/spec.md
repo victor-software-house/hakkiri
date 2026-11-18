@@ -86,7 +86,7 @@ A block quote or list item with no prose inside it SHALL give no node.
 ### Requirement: Syntax that is not prose is a gap
 
 Fenced code, raw HTML, link definitions and front matter SHALL be gaps between the segments of the prose node around them.  
-Markdown with JavaScript XML (MDX) expressions SHALL be gaps too.  
+Markdown with components (MDX) expressions SHALL be gaps too.  
 The tags of a JavaScript XML (JSX) element SHALL also be gaps, and its text SHALL be prose.  
 A paragraph that contains one of them SHALL stay one node.
 

@@ -35,7 +35,7 @@ It SHALL lint a file once, however many of the paths it is given reach that file
 
 ### Requirement: A language is read by extension
 
-hakkiri SHALL read a `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` file as Markdown, MDX (Markdown with JSX), Rust, TypeScript, TypeScript with JavaScript XML (TSX) or JavaScript.  
+hakkiri SHALL read a `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` file as Markdown, Markdown with components (MDX), Rust, TypeScript, TypeScript with JavaScript XML (TSX) or JavaScript.  
 It SHALL skip any other file a walk finds, and SHALL refuse one named as an argument, with an error that shows its name.
 
 #### Scenario: A file no language reads, found by a walk

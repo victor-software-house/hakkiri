@@ -54,7 +54,7 @@ Only the binary size measurement in task 1.2 runs on a box, because CI cannot.
   - Evidence, 2026-11-10 (UTC): `a_directory_and_a_file`, `no_argument_lints_the_current_directory`, `folders_a_walk_leaves_alone` and `a_file_no_language_reads` pass in [the CI run][ci52].
 - [x] 3.2 Lint files on a pool of threads, keep each file's alerts with its path, and sort the report.
   - Verify a run over 200 generated files prints the same text twice.
-  - Verify one broken MDX (Markdown with JSX) file reports a failure and still lints the rest.
+  - Verify one broken Markdown with components (MDX) file reports a failure and still lints the rest.
   - Evidence, 2026-11-10 (UTC): `a_run_over_many_files_prints_the_same_text_twice` and `one_broken_mdx_file` pass in [the CI run][ci52].
 
 ## 4. Output and exit status
