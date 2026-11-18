@@ -1,6 +1,6 @@
 ## MODIFIED Requirements
 
-### Requirement: An unknown extends is refused
+### Requirement: An unknown extends is rejected
 
 hakkiri SHALL reject a rule whose `extends` is neither a check type nor a rule, and report an error that gives the file and the value.
 
@@ -70,7 +70,7 @@ A bare key SHALL replace the parent's value.
 - **WHEN** a child of a rule with `swap: {swapme: swapped, delta: delta2}` contains `swap+: {alpha: omega}` and `swap-: [delta]`
 - **THEN** the child swaps `alpha` for `omega` and `swapme` for `swapped`, and not `delta`
 
-### Requirement: A chain Vale refuses is refused
+### Requirement: A chain Vale rejects is rejected
 
 hakkiri SHALL reject a chain of rules that Vale 3.26.0 rejects, with an error that gives the rule file and the field.  
 A rule read through a parent SHALL name no line.

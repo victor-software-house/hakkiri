@@ -1,6 +1,6 @@
 ## REMOVED Requirements
 
-### Requirement: A script rule is refused
+### Requirement: A script rule is rejected
 
 **Reason**: A script rule no longer makes its whole style fail.  
 The loader reports it apart and the rest of the style runs.  
