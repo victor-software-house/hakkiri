@@ -23,7 +23,7 @@ The splitter SHALL end a sentence after `.`, `?` or `!` when whitespace follows 
 
 ### Requirement: An abbreviation does not end a sentence
 
-The splitter SHALL NOT end a sentence after a word its model holds as an abbreviation, when the next word does not start a sentence.
+The splitter SHALL NOT end a sentence after a word its model contains as an abbreviation, when the next word does not start a sentence.
 
 #### Scenario: A title before a name
 
@@ -35,7 +35,7 @@ The splitter SHALL NOT end a sentence after a word its model holds as an abbrevi
 - **WHEN** the splitter reads `Use a list, e.g. a table of flags. Then stop.`
 - **THEN** it returns the sentences `Use a list, e.g. a table of flags.` and `Then stop.`
 
-### Requirement: A token with no space holds no boundary
+### Requirement: A token with no space has no boundary
 
 The splitter SHALL NOT end a sentence inside a run of characters with no whitespace, such as a version, a file name or a decimal.
 
@@ -84,7 +84,7 @@ Vale's F1 for each set is committed beside the set.
 
 #### Scenario: The evaluation test
 
-- **WHEN** the test splits every paragraph of the owner's labelled documentation set, the Golden Rules set and the MASC sample
+- **WHEN** the test splits every paragraph of the owner's labelled documentation set, the Golden Rules set and the Manually Annotated Sub-Corpus (MASC) sample
 - **THEN** hakkiri's F1 on each set is at least Vale's committed F1 for that set
 
 ### Requirement: Training rebuilds the model
@@ -120,7 +120,7 @@ A word that is no unit after a number SHALL end nothing.
 - **WHEN** the text is `The test takes 92 ms. Tests cover a phrase.`
 - **THEN** the splitter gives two sentences, the first ending after `ms.`
 
-### Requirement: vs. and a date end nothing
+### Requirement: `vs.` and a date end nothing
 
 `vs.` SHALL end no sentence, before a capital word or a number.  
 A date before a full stop SHALL NOT be a list number.

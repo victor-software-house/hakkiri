@@ -2,21 +2,24 @@
 
 ## Purpose
 
-Each top-level string of a file's YAML, TOML or JSON front matter is a node of the scope `frontmatter`, with its key as its label, so prose rules read it as text.
+Each top-level string of YAML, TOML or JSON front matter is a node of the scope `frontmatter`, labelled with its key.  
+So prose rules read it as text.
 
 ## Requirements
 
 ### Requirement: A top-level string of front matter is text
 
-In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
-The front matter is the block at the top of the file, in a form of the next requirement.  
-A key, a list, a nested mapping and a value that is not a string SHALL not be read.  
-A TOML string below a table and a member of a nested JSON object SHALL not be read.  
-A YAML key that is a list, a mapping or an alias SHALL give no value, and the entries after it SHALL be read.
+In a Markdown or Markdown with components (MDX) file, a rule scoped `text` SHALL read each top-level string value of front matter.  
+The front matter is the block at the top of the file, in a form of the next requirement.
+
+Keys, lists, nested mappings and values that are not strings SHALL not be read.  
+Neither SHALL a TOML string below a table, or a member of a nested JSON object.  
+When a YAML key is a list, a mapping or an alias, it SHALL give no value, and the entries after it SHALL be read.
 
 #### Scenario: Values of several kinds
 
-- **WHEN** YAML front matter holds a plain, a quoted, a folded and a literal string, and a number, a boolean, a date, a list, a nested mapping and a key that holds `very`
+- **WHEN** YAML front matter contains a plain, a quoted, a folded and a literal string
+- **AND** it contains a number, a boolean, a date, a list, a nested mapping and a key that contains `very`
 - **THEN** a text rule that flags `very` reports the four strings, and no other
 
 #### Scenario: Scalars that resolve to a string
@@ -32,17 +35,20 @@ A YAML key that is a list, a mapping or an alias SHALL give no value, and the en
 #### Scenario: Anchors, aliases and complex keys
 
 - **WHEN** a value has an anchor, a key has an anchor, a value is an alias, and an entry has a sequence as its key
-- **THEN** the anchored value and the anchored key's value are read, the alias and the entry with the sequence key are not, and the entries after them are
+- **THEN** the anchored value and the anchored key's value are read
+- **AND** the alias and the entry with the sequence key are not read, and the entries after them are
 
-#### Scenario: Keys that other parsers refuse
+#### Scenario: Keys that other parsers reject
 
-- **WHEN** a YAML block holds a key twice, a merge key `<<: *base`, a key that is a number or a null, and the values `.inf`, `-.inf` and `.NaN`, each beside strings
+- **WHEN** a YAML block contains a key twice, a merge key `<<: *base`, and a key that is a number or a null
+- **AND** it contains the values `.inf`, `-.inf` and `.NaN`, each beside strings
 - **THEN** every string is read, a key written twice gives each of its values, and no value of the block is lost
 
 #### Scenario: Front matter that no parser reads
 
 - **WHEN** a YAML, TOML or JSON block is not valid, such as `other: [open`
-- **THEN** `hakkiri check` reports the file as a failure with the line of the problem, exits 2, reads no value of the block, and lints the rest of the file
+- **THEN** `hakkiri check` reports the file as a failure with the line of the problem, and exits 2
+- **AND** it reads no value of the block, and lints the rest of the file
 
 #### Scenario: A fence with blanks
 
@@ -51,30 +57,31 @@ A YAML key that is a list, a mapping or an alias SHALL give no value, and the en
 
 #### Scenario: A scalar over lines and a comment
 
-- **WHEN** a plain scalar goes on over two lines, and another holds `very # trail`
+- **WHEN** a plain scalar goes on over two lines, and another contains `very # trail`
 - **THEN** the first reads as its lines joined by a space, and the second as `very`
 
 #### Scenario: TOML and JSON
 
-- **WHEN** TOML front matter holds `title = "A very toml title"` and a table with a string, and JSON front matter holds a string, a list and a nested object
+- **WHEN** TOML front matter contains `title = "A very toml title"` and a table with a string, and JSON front matter contains a string, a list and a nested object
 - **THEN** the title and the top-level JSON string are read, and the table, the list and the nested object are not
 
 #### Scenario: An MDX file
 
-- **WHEN** an MDX file starts with YAML front matter that holds a title
+- **WHEN** an MDX file starts with YAML front matter that contains a title
 - **THEN** a text rule reads the title as it does in a Markdown file
 
 ### Requirement: Front matter takes every form of block
 
 YAML front matter SHALL sit between `---` lines, after a `---yaml` line, or before a closing `...` line.  
 TOML front matter SHALL sit between `+++` lines or after a `---toml` line.  
-JSON front matter SHALL sit between `;;;` lines, after a `---json` line, or in an object that opens with `{` on the first line.  
+JSON front matter SHALL sit between `;;;` lines, after a `---json` line, or in an object that opens with `{` on the first line.
+
 An opening fence line MAY carry blanks after the dashes or pluses.  
 The block SHALL be no part of the body: no rule reads its lines as a paragraph, a heading or a sentence.
 
 #### Scenario: Every form of block
 
-- **WHEN** a Markdown file starts with `---yaml`, `---toml`, `---json`, a bare `{"title": "Install guide"}` line, or a YAML block closed by `...`, and the title holds `Install`
+- **WHEN** a Markdown file starts with `---yaml`, `---toml`, `---json`, a bare `{"title": "Install guide"}` line, or a YAML block closed by `...`, and the title contains `Install`
 - **THEN** a text rule that flags `Install` reports it once, in the title
 
 #### Scenario: The block is no body text
@@ -89,22 +96,22 @@ A scope name that goes on after `frontmatter` or `text.frontmatter` SHALL be a s
 
 #### Scenario: Scopes that read the title
 
-- **WHEN** rules are scoped `frontmatter`, `frontmatter.title`, `text.frontmatter`, `text.frontmatter.title` and `text`, and a value `title` holds `very`
+- **WHEN** rules are scoped `frontmatter`, `frontmatter.title`, `text.frontmatter`, `text.frontmatter.title` and `text`, and a value `title` contains `very`
 - **THEN** all five report it, and a rule scoped `frontmatter.title` reports no other key
 
 #### Scenario: Scopes that do not
 
-- **WHEN** a rule is scoped `paragraph` or `sentence`, and a `title` holds `very` or a sentence
+- **WHEN** a rule is scoped `paragraph` or `sentence`, and a `title` contains `very` or a sentence
 - **THEN** it reports nothing in the front matter
 
 ### Requirement: Front matter is read as written
 
 A block or token pattern of a glob SHALL not change the front matter, and a comment control SHALL not turn its rules off.  
-An alert in a value SHALL lie at the text of the value in the file.
+An alert in a value SHALL be placed on the value's text in the file.
 
 #### Scenario: A pattern that matches in a value
 
-- **WHEN** a glob holds `token_ignores: ['{{.*?}}']`, with or without a group, and the title is `A {{ very }} title`
+- **WHEN** a glob contains `token_ignores: ['{{.*?}}']`, with or without a group, and the title is `A {{ very }} title`
 - **THEN** a text rule reports `very` in the title, and none in the same text of the body
 
 #### Scenario: A folded scalar over two lines

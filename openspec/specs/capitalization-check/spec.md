@@ -2,14 +2,14 @@
 
 ## Purpose
 
-A `capitalization` rule compares the case of each selected text with the case its `match` asks for, and reports text that falls short.  
+A `capitalization` rule compares the case of each selected text with the case its `match` sets, and reports text that falls short.  
 Its case styles, word share and exceptions keep the meaning Vale 3.26.0 gives them.
 
 ## Requirements
 
 ### Requirement: capitalization reports text in the wrong case
 
-A `capitalization` rule SHALL convert each selected text to the case its `match` names.  
+A `capitalization` rule SHALL convert each selected text to the case its `match` sets.  
 When the text is not in that case, it SHALL report one alert that spans the text.  
 In its message, the first `%s` SHALL read as the text and the second as the converted text.
 
@@ -65,7 +65,7 @@ A word that matches one of the rule's `exceptions` SHALL keep the case the excep
 - **WHEN** the rule above has `exceptions: [Hakkiri]` and reads `# Getting started with Hakkiri`
 - **THEN** hakkiri reports no alert
 
-### Requirement: title case follows AP or Chicago
+### Requirement: title case follows AP (Associated Press) or Chicago
 
 With `match: $title`, the first and last words SHALL start with a capital.  
 In `AP` style, the default, the articles, conjunctions and prepositions of Vale's short word list SHALL be in lower case.  
@@ -108,11 +108,11 @@ Any other `match` SHALL be a pattern that the text passes by matching.
 - **WHEN** the rule above has `match: '^[A-Z][a-z]+$'` instead, and reads the heading `# Changelog` on line 1 and `# ChangeLog` on line 3
 - **THEN** hakkiri reports one alert, on line 3
 
-### Requirement: An unknown style is refused
+### Requirement: An unknown style is rejected
 
-A `capitalization` rule whose `style` is neither `AP` nor `Chicago` SHALL be refused with an error that names the rule and the value.
+A `capitalization` rule whose `style` is neither `AP` nor `Chicago` SHALL be rejected with an error that shows the rule and the value.
 
 #### Scenario: A misspelt style
 
 - **WHEN** rule `Team.Headings` has `extends: capitalization`, `match: $title` and `style: chicago`
-- **THEN** hakkiri refuses the rule with an error naming `Team.Headings` and `chicago`
+- **THEN** hakkiri rejects the rule with an error that shows `Team.Headings` and `chicago`

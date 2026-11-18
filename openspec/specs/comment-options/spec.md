@@ -2,14 +2,15 @@
 
 ## Purpose
 
-A comment turns off the matches of a rule, limits the styles of a file or sets the level of a rule, and a source file reads none of them.
+A comment turns off the matches of a rule, limits the styles of a file or sets the level of a rule.  
+A source file reads none of these comments.
 
 ## Requirements
 
 ### Requirement: A comment turns off the matches of a rule or limits the styles
 
 In a Markdown file, an HTML comment `vale Style.Rule["a","b"] = NO` or `YES` SHALL turn off and on the matches `a` and `b` of the rule.  
-A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style of the file except those it names.
+A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style of the file except those it lists.
 
 #### Scenario: One match
 
@@ -28,13 +29,15 @@ A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style 
 
 ### Requirement: A comment sets the level of a rule
 
-In a Markdown file, an HTML comment `hakkiri Style.Rule: suggestion`, `warning` or `error` SHALL give each alert of the rule after it that level, over a level the config sets, until a later comment names the rule.  
+In a Markdown file, an HTML comment `hakkiri Style.Rule: suggestion`, `warning` or `error` SHALL set that level on each later alert of the rule.  
+That level SHALL win over a level the config sets, until a later comment for the same rule.
+
 A comment `hakkiri Style.Rule: on` SHALL return the level of the config.  
 A level for a style, and any other word, SHALL be no comment.
 
-#### Scenario: A level until the rule is named again
+#### Scenario: A level until the rule is set again
 
-- **WHEN** a file holds `very` after no comment, after `error`, after `suggestion`, and after `on` for one rule
+- **WHEN** a file contains `very` after no comment, after `error`, after `suggestion`, and after `on` for one rule
 - **THEN** the alerts are a warning, an error, a suggestion and a warning
 
 #### Scenario: Over the config
@@ -42,18 +45,19 @@ A level for a style, and any other word, SHALL be no comment.
 - **WHEN** the config sets the rule to `suggestion` and a comment before the text sets it to `error`
 - **THEN** the alert is an error
 
-### Requirement: Source files hold no comment control
+### Requirement: Source files have no comment control
 
-A glob that matches a source file SHALL leave the text of its comments as it is, whatever HTML comment they hold.
+A glob that matches a source file SHALL leave the text of its comments as it is, whatever HTML comment they contain.
 
 #### Scenario: A Rust doc comment
 
-- **WHEN** a doc comment holds `<!-- hakkiri off -->` and the lines after it hold `very`
+- **WHEN** a doc comment contains `<!-- hakkiri off -->` and the lines after it contain `very`
 - **THEN** the alerts are those of the file with no comment
 
 ### Requirement: A level leaves a rule failure an error
 
-A level from a comment or from the config SHALL NOT change an alert that reports a fault of the rule itself, such as a pattern that gave up on a text.
+A level from a comment or from the config SHALL NOT change an alert that reports a fault of the rule itself.  
+One such fault is a pattern that gave up on a text.
 
 #### Scenario: A pattern that gives up
 

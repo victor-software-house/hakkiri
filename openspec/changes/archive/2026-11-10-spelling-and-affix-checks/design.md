@@ -91,7 +91,7 @@ Vale keeps the replacement of the key its map visits last, which can change from
 [case-reader]: ../2026-11-10-case-and-sequence-checks/design.md#6-spelling-ports-vales-hunspell-reader
 [project-config]: ../../../specs/project-config/spec.md
 [format-7]: ../2026-11-10-rule-format/design.md#7-intended-differences-from-vale
-[node-segments]: ../../../specs/node-segments/spec.md#requirement-a-url-is-a-gap-in-the-prose-around-the-link
+[node-segments]: ../../../specs/node-segments/spec.md#requirement-a-link-that-shows-its-address-is-a-gap-in-the-prose-around-it
 [parity-test]: ../../../../tests/spelling_parity.rs
 [v-tokenize-offsets]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/nlp/tokenize.go#L80-L148
 [v-spell-new]: https://github.com/vale-cli/vale/blob/66bbb85a1a78a5b5497331e04d4033357caced4d/internal/check/spelling.go#L74-L135

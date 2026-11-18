@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 #MISE description="Pin the owner's public repositories for the splitter corpus"
-# Lists the public repositories of the owner that are not forks, not archived
-# and at most 10 MB, and writes each one's name, default-branch commit and
-# license to data/splitter/repositories.tsv. The listing needs no credentials,
-# so it holds only what anyone can read.
+#
+# Lists the owner's public repositories of at most 10 MB, but not forks or
+# archived ones. For each, it writes the name, the head commit of the default
+# branch and the license to data/splitter/repositories.tsv. The listing uses
+# no credentials, so it sees only what anyone can read.
 set -euo pipefail
 export GIT_TERMINAL_PROMPT=0
 owner=victor-software-house
@@ -27,6 +28,6 @@ LC_ALL=C sort "$listing" | while IFS=$'\t' read -r name license; do
   fi
   printf '%s\t%s\t%s\n' "$name" "$commit" "$license"
 done >"$pins"
-# A failed listing or lookup stops the script above, so the pin file is
-# replaced only by a complete one.
+# A failed listing or lookup stops the script, so only a full pin file
+# takes the place of the old one.
 mv "$pins" data/splitter/repositories.tsv
