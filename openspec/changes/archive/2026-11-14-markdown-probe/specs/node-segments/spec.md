@@ -2,11 +2,11 @@
 
 ### Requirement: A URL is a gap in the prose around the link
 
-An autolink or a bare URL can be its own destination.  
+An autolink or a bare URL can be its own destination.
 Its text SHALL stay in its `link` node, and SHALL be a gap in the nodes around it.
 
-A link written with brackets whose text is its destination SHALL keep that text in its `link` node and in the nodes around it.  
-A link whose destination differs from its text SHALL stay in the nodes around it.  
+A link written with brackets whose text is its destination SHALL keep that text in its `link` node and in the nodes around it.
+A link whose destination differs from its text SHALL stay in the nodes around it.
 Such links include a bare email address and a `www.` address.
 
 #### Scenario: An autolink
@@ -37,10 +37,10 @@ Such links include a bare email address and a `www.` address.
 
 ### Requirement: A bare ftp address is a gap
 
-An `ftp://` address can start a line or follow a space, `*`, `_`, `~` or `(`.  
+An `ftp://` address can start a line or follow a space, `*`, `_`, `~` or `(`.
 Such an address SHALL be a gap in the text around it, as an address with another scheme is.
 
-Its end SHALL be where Vale's converter ends it.  
+Its end SHALL be where Vale's converter ends it.
 Closing punctuation, an unbalanced `)` and a character reference at its end are not part of it.
 
 #### Scenario: An ftp address
@@ -50,7 +50,7 @@ Closing punctuation, an unbalanced `)` and a character reference at its end are 
 
 ### Requirement: A backslash escape is a gap
 
-The backslash of an escape, and of a hard break written with a backslash, SHALL be a gap in the text.  
+The backslash of an escape, and of a hard break written with a backslash, SHALL be a gap in the text.
 So the text contains the escaped character.
 
 #### Scenario: An escape inside a word
@@ -65,7 +65,7 @@ So the text contains the escaped character.
 
 ### Requirement: A table row has the cells of its header
 
-A cell past the last cell of the header row SHALL be a gap.  
+A cell past the last cell of the header row SHALL be a gap.
 A row with fewer cells SHALL keep the cells it has.
 
 #### Scenario: A row with an extra cell
@@ -75,8 +75,8 @@ A row with fewer cells SHALL keep the cells it has.
 
 ### Requirement: A footnote has the scope Vale gives it
 
-A footnote reference SHALL be a gap in the text around it.  
-When a reference points to a definition, the definition SHALL be a `list` node of its content, where it stands.  
+A footnote reference SHALL be a gap in the text around it.
+When a reference points to a definition, the definition SHALL be a `list` node of its content, where it stands.
 A definition that no reference points to SHALL be a gap.
 
 #### Scenario: A referenced and an unreferenced definition
@@ -87,10 +87,10 @@ A definition that no reference points to SHALL be a gap.
 
 ### Requirement: An inline HTML element has the scope of its tag
 
-An inline HTML element can have an opening tag and a closing tag among the same siblings.  
+An inline HTML element can have an opening tag and a closing tag among the same siblings.
 Such an element SHALL be a node of the scope Vale gives its tag.
 
-The scope SHALL be `strong` for `b` and `strong`, `emphasis` for `i` and `em`, `code` for `code` and `tt`, and `link` for `a`.  
+The scope SHALL be `strong` for `b` and `strong`, `emphasis` for `i` and `em`, `code` for `code` and `tt`, and `link` for `a`.
 The two tags SHALL be gaps in the text of the node and of the paragraph around it.
 
 #### Scenario: Bold and a link in HTML

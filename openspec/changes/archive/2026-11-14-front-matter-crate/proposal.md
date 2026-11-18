@@ -2,14 +2,14 @@
 
 ## Motivation
 
-hakkiri reads front matter through ctl-core's config reader, and that reader reads JSON as YAML.  
+hakkiri reads front matter through ctl-core's config reader, and that reader reads JSON as YAML.
 So a `;;;` block such as `{title: Install guide}` passes when it is no JSON.
 
-markdown-rs reads only the `---` and `+++` blocks.  
+markdown-rs reads only the `---` and `+++` blocks.
 So a `;;;` block is linted twice, once as values and once as a paragraph, and a `---toml` block turns into a heading.
 
-On 2026-11-13 the operator ruled that front matter is document content, read by one parser per format.  
-On 2026-11-14 the operator ruled that the reader is its own crate, [front-matter], on crates.io.  
+On 2026-11-13 the operator ruled that front matter is document content, read by one parser per format.
+On 2026-11-14 the operator ruled that the reader is its own crate, [front-matter], on crates.io.
 This change is row `HKR-068` of the [ledger].
 
 ## Changes

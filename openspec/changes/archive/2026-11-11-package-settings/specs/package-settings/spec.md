@@ -2,11 +2,11 @@
 
 ### Requirement: A package's settings file is in its top folder
 
-The top folder of a package SHALL be the folder that contains its `styles` folder.  
+The top folder of a package SHALL be the folder that contains its `styles` folder.
 A fetched zip's top folder SHALL be its one top folder.
 
-The top folder of a `path` entry that names a folder called `styles` SHALL be that folder's parent.  
-The exception is a parent that is the project root or contains it.  
+The top folder of a `path` entry that names a folder called `styles` SHALL be that folder's parent.
+The exception is a parent that is the project root or contains it.
 A package with no top folder, and the project's own config, SHALL be no package's settings.
 
 #### Scenario: A fetched package
@@ -31,11 +31,11 @@ A package with no top folder, and the project's own config, SHALL be no package'
 
 ### Requirement: A package may list packages
 
-The `packages` of a package SHALL be fetched like the project's, with a `url` and a `sha256` in each entry.  
-Any `path` entry in a package's file SHALL be an error.  
+The `packages` of a package SHALL be fetched like the project's, with a `url` and a `sha256` in each entry.
+Any `path` entry in a package's file SHALL be an error.
 A chain of packages more than 10 deep SHALL be an error.
 
-A package named twice SHALL load once, by its `sha256` for a download and by its folder for a `path`.  
+A package named twice SHALL load once, by its `sha256` for a download and by its folder for a `path`.
 The packages a package lists SHALL come before it, in the order written.
 
 #### Scenario: A nested package
@@ -65,11 +65,11 @@ The packages a package lists SHALL come before it, in the order written.
 
 ### Requirement: Package vocabularies and the project's add up
 
-The `vocab` names of the packages and the project SHALL add up, the packages' first.  
+The `vocab` names of the packages and the project SHALL add up, the packages' first.
 A `vocab` written as an empty list SHALL drop the names before it, as Vale's `Vocab = NONE` does, and a missing key SHALL keep them.
 
-The same SHALL apply between two packages, where the later one wins.  
-The same SHALL apply for the `vocab` of a glob, which drops only the lists of earlier configs for the same glob text.  
+The same SHALL apply between two packages, where the later one wins.
+The same SHALL apply for the `vocab` of a glob, which drops only the lists of earlier configs for the same glob text.
 A name that no package contains, or that two packages contain, SHALL be an error on its line in the file that names it.
 
 #### Scenario: Two lists

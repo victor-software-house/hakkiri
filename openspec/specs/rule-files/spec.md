@@ -2,15 +2,15 @@
 
 ## Purpose
 
-A rule file contains one hakkiri rule.  
-It sets which text the rule reads and which check it runs, and it has the test cases that prove the rule.  
+A rule file contains one hakkiri rule.
+It sets which text the rule reads and which check it runs, and it has the test cases that prove the rule.
 This spec fixes the file format, its fields, its scopes, how words are counted, and how its tests run.
 
 ## Requirements
 
 ### Requirement: A rule file has one rule
 
-hakkiri SHALL read each `.yml` file in a style folder as one rule.  
+hakkiri SHALL read each `.yml` file in a style folder as one rule.
 The rule's name is the folder, a dot, and the file name without its extension.
 
 #### Scenario: The file name is the rule name
@@ -52,7 +52,7 @@ hakkiri SHALL run a rule whose `extends` is `existence`, `substitution`, `occurr
 
 ### Requirement: A scope selects text with Vale's scope names
 
-A rule's `scope` SHALL take Vale 3.26.0's lowercase dotted scope names, such as `sentence`, `paragraph`, `heading.h1`, `list`, `blockquote`, `table.header` and `raw`.  
+A rule's `scope` SHALL take Vale 3.26.0's lowercase dotted scope names, such as `sentence`, `paragraph`, `heading.h1`, `list`, `blockquote`, `table.header` and `raw`.
 The rule SHALL read only the text those scopes contain.
 
 #### Scenario: A paragraph rule skips a heading
@@ -91,7 +91,7 @@ A rule SHALL read text that every part of a `&` scope matches, and text that any
 
 A scope part written `~` and a name SHALL leave out each block of text that has that scope, and no other.
 
-A block has the scope of one element, as the scope-selection spec states.  
+A block has the scope of one element, as the scope-selection spec states.
 So an element inside a quote keeps its own scope, and `~blockquote` does not leave out a list item that follows text in a quote.
 
 #### Scenario: A sentence in a list inside a quote
@@ -106,7 +106,7 @@ So an element inside a quote keeps its own scope, and `~blockquote` does not lea
 
 ### Requirement: Code comments are scopes
 
-In Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL read `//` and `#` comments as `text.comment.line` and `/* */` comments as `text.comment.block`.  
+In Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL read `//` and `#` comments as `text.comment.line` and `/* */` comments as `text.comment.block`.
 It SHALL read Rust's `///` and `//!`, and Swift's `///`, as `text.comment.doc.line`, and `/** */`, Rust's `/*! */` and Swift's `/** */`, as `text.comment.doc.block`.
 
 #### Scenario: A Rust block comment is read
@@ -136,7 +136,7 @@ It SHALL read Rust's `///` and `//!`, and Swift's `///`, as `text.comment.doc.li
 
 ### Requirement: Every comment reads as Markdown
 
-hakkiri SHALL read the text of every comment as Markdown, plain comments included.  
+hakkiri SHALL read the text of every comment as Markdown, plain comments included.
 A code span, a link and a bare URL in a comment SHALL read as they do in a Markdown file.
 
 #### Scenario: A URL in a plain comment
@@ -155,7 +155,7 @@ In a code file, every scope, `raw` included, SHALL contain comment text only, an
 
 ### Requirement: A code span reads as one word
 
-In text a rule reads, hakkiri SHALL read each code span as one word that no token matches.  
+In text a rule reads, hakkiri SHALL read each code span as one word that no token matches.
 Link text SHALL read as words, and a link target SHALL be left out.
 
 #### Scenario: A word count with a code span
@@ -193,7 +193,7 @@ A `metric` rule with no `scope` SHALL measure the whole file once and report at 
 
 ### Requirement: A rule carries test cases
 
-hakkiri SHALL run each case in a rule's `tests` against that rule alone.  
+hakkiri SHALL run each case in a rule's `tests` against that rule alone.
 It SHALL read `input` as Markdown, or as the extension that `format` gives, and never assert on `about`.
 
 #### Scenario: A case in Rust
@@ -203,7 +203,7 @@ It SHALL read `input` as Markdown, or as the extension that `format` gives, and 
 
 ### Requirement: A test case checks the alerts
 
-A case SHALL pass when each `contains` string appears in the rule's alerts, no `absent` string appears, and the alerts equal `want` when `want` is set.  
+A case SHALL pass when each `contains` string appears in the rule's alerts, no `absent` string appears, and the alerts equal `want` when `want` is set.
 A `want` of `''` SHALL mean no alerts.
 
 #### Scenario: A case that fails
@@ -227,7 +227,7 @@ The `tokens` of a `metric` rule SHALL match as the `tokens` of an `existence` ru
 
 ### Requirement: A script rule is reported, and the rest of its style runs
 
-hakkiri SHALL NOT run a rule whose `extends` is `script`.  
+hakkiri SHALL NOT run a rule whose `extends` is `script`.
 It SHALL report it as a rule it cannot run, with an error that shows the rule file, as the project-config spec fixes.
 
 #### Scenario: A style ships a script rule

@@ -4,7 +4,7 @@
 
 The [`vale-differences` design][first-design] sets how the list is built: one scenario for each difference, with a link to its decision, and only what is true now.
 
-Any behaviour that differs from Vale belongs in it, whether or not a design calls it a difference.  
+Any behaviour that differs from Vale belongs in it, whether or not a design calls it a difference.
 This change adds the decisions that the [rule-format][format], [rule-engine][engine] and [bootstrap][bootstrap] designs record as choices, and that differ from Vale when checked.
 
 ## Goals / Non-Goals
@@ -43,14 +43,14 @@ A probe of Vale 66bbb85 built from source gave these results:
   - Vale loaded it ([script.go][v-script]).
   - The refusal in hakkiri is from its spec.
 
-Alternative: list these from the designs alone.  
+Alternative: list these from the designs alone.
 Lost: no design states that Vale differs, so each scenario would repeat a claim no one had checked.
 
 ### 2. Configuration is listed with the behaviour
 
 A project that moves from Vale writes new settings, so the three differences in configuration and packages sit in the same spec.
 
-Alternative: leave configuration to the importer's documentation.  
+Alternative: leave configuration to the importer's documentation.
 Lost: the list has any difference, and a project meets these at its first run.
 
 ## Risks / Trade-offs

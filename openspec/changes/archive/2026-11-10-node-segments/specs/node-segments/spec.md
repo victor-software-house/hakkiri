@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Every node of the document tree reads its text from segments: byte ranges of the file that hold prose and no syntax.  
+Every node of the document tree reads its text from segments: byte ranges of the file that hold prose and no syntax.
 A check reads the text, and an alert points at the span that covers it.
 
 ## ADDED Requirements
 
 ### Requirement: Every node has segments
 
-Each node SHALL hold its segments, the byte ranges of its text in the file, in order.  
+Each node SHALL hold its segments, the byte ranges of its text in the file, in order.
 The span of the node SHALL run from the start of the first segment to the end of the last.
 
 #### Scenario: A heading
@@ -19,9 +19,9 @@ The span of the node SHALL run from the start of the first segment to the end of
 
 ### Requirement: Segments join into the text of a node
 
-The text of a node SHALL be its segments in order.  
-A line feed SHALL separate two segments with a line break between them.  
-One space SHALL separate two cells of a table row.  
+The text of a node SHALL be its segments in order.
+A line feed SHALL separate two segments with a line break between them.
+One space SHALL separate two cells of a table row.
 Any other gap between segments SHALL read as nothing.
 
 #### Scenario: A table row
@@ -33,7 +33,7 @@ Any other gap between segments SHALL read as nothing.
 
 A Markdown paragraph, heading or inline node SHALL hold one segment for each line of its text.
 
-A segment leaves out the line ending.  
+A segment leaves out the line ending.
 It also leaves out the indentation and the block quote markers in front of the line.
 
 #### Scenario: A paragraph in a block quote
@@ -54,7 +54,7 @@ It also leaves out the indentation and the block quote markers in front of the l
 
 ### Requirement: Heading syntax is not text
 
-A hash-style (ATX) heading SHALL leave out its opening run of `#` with the space after it, and its closing run of `#`.  
+A hash-style (ATX) heading SHALL leave out its opening run of `#` with the space after it, and its closing run of `#`.
 A setext heading SHALL leave out its underline.
 
 #### Scenario: A closed heading
@@ -69,8 +69,8 @@ A setext heading SHALL leave out its underline.
 
 ### Requirement: Container text contains the content only
 
-A block quote, a list item and a table row SHALL have the segments of the nodes inside them, in order.  
-Their text SHALL hold no `>` marker, bullet, number or indentation.  
+A block quote, a list item and a table row SHALL have the segments of the nodes inside them, in order.
+Their text SHALL hold no `>` marker, bullet, number or indentation.
 A block quote or list item with no prose inside it SHALL give no node.
 
 #### Scenario: A nested quote
@@ -85,9 +85,9 @@ A block quote or list item with no prose inside it SHALL give no node.
 
 ### Requirement: Syntax that is not prose is a gap
 
-Fenced code, raw HTML, link definitions and front matter SHALL be gaps between the segments of the prose node around them.  
-MDX expressions SHALL be gaps too.  
-The tags of a JavaScript XML (JSX) element SHALL also be gaps, and its text SHALL be prose.  
+Fenced code, raw HTML, link definitions and front matter SHALL be gaps between the segments of the prose node around them.
+MDX expressions SHALL be gaps too.
+The tags of a JavaScript XML (JSX) element SHALL also be gaps, and its text SHALL be prose.
 A paragraph that contains one of them SHALL stay one node.
 
 #### Scenario: HTML inside a paragraph
@@ -102,7 +102,7 @@ A paragraph that contains one of them SHALL stay one node.
 
 ### Requirement: Segments inside comments point into the file
 
-A node inside a comment SHALL hold one segment for each line of its text.  
+A node inside a comment SHALL hold one segment for each line of its text.
 A segment leaves out the comment marker and the indentation that hakkiri strips.
 
 #### Scenario: A paragraph over two line comments

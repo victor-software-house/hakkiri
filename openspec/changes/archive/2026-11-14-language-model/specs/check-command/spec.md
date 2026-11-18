@@ -2,8 +2,8 @@
 
 ### Requirement: A file has a language
 
-A file SHALL have the langdex language of its path, read by its file name and then its extension.  
-A file whose path gives none SHALL have the language of the interpreter on its first line.  
+A file SHALL have the langdex language of its path, read by its file name and then its extension.
+A file whose path gives none SHALL have the language of the interpreter on its first line.
 hakkiri SHALL read at most the first 4096 bytes for it, and otherwise the file SHALL have no language.
 
 #### Scenario: A file name, an extension and an interpreter
@@ -13,7 +13,7 @@ hakkiri SHALL read at most the first 4096 bytes for it, and otherwise the file S
 
 ### Requirement: A file has its own language, and its reader's when formats chose it
 
-For the scopes of the rules that run on it, a node outside a fenced code block SHALL be in the file's own language.  
+For the scopes of the rules that run on it, a node outside a fenced code block SHALL be in the file's own language.
 It SHALL also be in the language of the file's reader when a `formats` entry chose that reader.
 
 A scope part for a language SHALL match either of them, and a negated part SHALL leave a block out for either.
@@ -32,12 +32,12 @@ A scope part for a language SHALL match either of them, and a negated part SHALL
 
 ### Requirement: A reader is chosen by formats, then by extension
 
-hakkiri SHALL read a file by the reader its `formats` entry gives it.  
-Otherwise it SHALL read the file by the reader of its language.  
+hakkiri SHALL read a file by the reader its `formats` entry gives it.
+Otherwise it SHALL read the file by the reader of its language.
 The readers are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and Text.
 
-Some files that a glob selects have a language that no reader reads, or have no language.  
-Such a file SHALL be read as plain text, unless `on_unknown` is set to something else.  
+Some files that a glob selects have a language that no reader reads, or have no language.
+Such a file SHALL be read as plain text, unless `on_unknown` is set to something else.
 A Text file SHALL be read as plain text whatever `on_unknown` is set to.
 
 #### Scenario: A file no reader reads, found by a walk
@@ -74,5 +74,5 @@ A Text file SHALL be read as plain text whatever `on_unknown` is set to.
 
 ### Requirement: A file has its own extension and its reader's
 
-**Reason**: A file has languages, not extensions.  
+**Reason**: A file has languages, not extensions.
 **Migration**: Read "A file has its own language, and its reader's when formats chose it".

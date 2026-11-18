@@ -2,11 +2,11 @@
 
 ### Requirement: An inline span of math reads as code
 
-In a Markdown or MDX file, text from a `$` to the next closing `$` SHALL read as a code span.  
+In a Markdown or MDX file, text from a `$` to the next closing `$` SHALL read as a code span.
 The opening `$` SHALL be followed by a character that is not a space or a `$`.
 
-The closing `$` SHALL not be escaped, SHALL follow a character that is not a space, and SHALL not be followed by a digit.  
-It SHALL not start a line.  
+The closing `$` SHALL not be escaped, SHALL follow a character that is not a space, and SHALL not be followed by a digit.
+It SHALL not start a line.
 A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one SHALL be text.
 
 #### Scenario: Math in prose
@@ -56,11 +56,11 @@ A span SHALL wrap over the lines of a paragraph, and a `$` with no closing one S
 
 ### Requirement: A display block of math reads as code
 
-In a Markdown or MDX file, a line of a paragraph that starts with `$$` SHALL open a block that reads as code.  
+In a Markdown or MDX file, a line of a paragraph that starts with `$$` SHALL open a block that reads as code.
 This SHALL apply even in the middle of a paragraph.
 
-A line that ends with an unescaped `$$`, with at most one `{…}` after it, SHALL close the block.  
-So SHALL a blank line and the end of the paragraph.  
+A line that ends with an unescaped `$$`, with at most one `{…}` after it, SHALL close the block.
+So SHALL a blank line and the end of the paragraph.
 The text before and after the block SHALL read as separate paragraphs.
 
 #### Scenario: A block of lines
@@ -95,7 +95,7 @@ The text before and after the block SHALL read as separate paragraphs.
 
 ### Requirement: A backtick beside math changes nothing
 
-A run of backticks that opens no code span SHALL stay text beside a span.  
+A run of backticks that opens no code span SHALL stay text beside a span.
 A code span or a span that touches a span SHALL read as code with it.
 
 #### Scenario: A tick that opens no code span
@@ -110,7 +110,7 @@ A code span or a span that touches a span SHALL read as code with it.
 
 ### Requirement: A line indented four columns opens no block
 
-A line indented four columns or more beyond its container SHALL be text of the paragraph, and SHALL open no display block.  
+A line indented four columns or more beyond its container SHALL be text of the paragraph, and SHALL open no display block.
 A tab runs to the next multiple of four.
 
 #### Scenario: Under no container

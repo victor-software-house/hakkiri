@@ -2,7 +2,7 @@
 
 ### Requirement: A vocabulary is a folder of word lists in a package
 
-hakkiri SHALL read a named vocabulary from `config/vocabularies/<name>/` under a loaded package folder.  
+hakkiri SHALL read a named vocabulary from `config/vocabularies/<name>/` under a loaded package folder.
 It SHALL read every `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml` below that folder and no other file.
 
 #### Scenario: A list in a subfolder
@@ -29,8 +29,8 @@ It SHALL read every `accept.txt`, `reject.txt`, `vocab.yml` and `vocab.yaml` bel
 
 ### Requirement: A YAML entry is a term, or a term with options
 
-A `vocab.yml` or `vocab.yaml` file SHALL have the keys `affix`, `accept` and `reject`.  
-An entry of `accept` or `reject` SHALL be a term, a term mapped to nothing, or a term mapped to the options `regex`, `ignorecase` and `flags`.  
+A `vocab.yml` or `vocab.yaml` file SHALL have the keys `affix`, `accept` and `reject`.
+An entry of `accept` or `reject` SHALL be a term, a term mapped to nothing, or a term mapped to the options `regex`, `ignorecase` and `flags`.
 It SHALL give the patterns that a line of a text list would.
 
 #### Scenario: A plain term
@@ -66,7 +66,7 @@ It SHALL give the patterns that a line of a text list would.
 
 ### Requirement: A wrong YAML entry is refused with its file and line
 
-hakkiri SHALL reject a vocabulary file that has a wrong entry or a missing affix file.  
+hakkiri SHALL reject a vocabulary file that has a wrong entry or a missing affix file.
 Each problem SHALL show the file and the line that Vale reports, and one run SHALL report every one.
 
 #### Scenario: A wrong shape
@@ -93,9 +93,9 @@ Each problem SHALL show the file and the line that Vale reports, and one run SHA
 
 ### Requirement: The affix file comes from the packages
 
-`affix` SHALL refer to a file `<name>.aff` in the `config/dictionaries` folder of the package that contains the vocabulary.  
-After that package, hakkiri SHALL look in every other loaded package in order.  
-No name, and `en_US-web` with no such file, SHALL read the built-in dictionary.  
+`affix` SHALL refer to a file `<name>.aff` in the `config/dictionaries` folder of the package that contains the vocabulary.
+After that package, hakkiri SHALL look in every other loaded package in order.
+No name, and `en_US-web` with no such file, SHALL read the built-in dictionary.
 hakkiri SHALL reject a name that is not one file name.
 
 #### Scenario: The holder first

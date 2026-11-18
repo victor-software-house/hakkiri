@@ -2,16 +2,16 @@
 
 ## Purpose
 
-`Vale.Terms` and `Vale.Avoid` are the rules a vocabulary builds, in a built-in style `Vale`.  
-`Terms` reports an accepted term written in another case, and `Avoid` reports a rejected term.  
+`Vale.Terms` and `Vale.Avoid` are the rules a vocabulary builds, in a built-in style `Vale`.
+`Terms` reports an accepted term written in another case, and `Avoid` reports a rejected term.
 A vocabulary that a glob lists builds the same rules for that glob's files.
 
 ## Requirements
 
 ### Requirement: Terms reports an accepted term written in another case
 
-hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the listed vocabularies.  
-It SHALL be a `substitution` rule with the level `error` and the message `Use '%s' instead of '%s'.`  
+hakkiri SHALL build the rule `Vale.Terms` from the accepted terms of the listed vocabularies.
+It SHALL be a `substitution` rule with the level `error` and the message `Use '%s' instead of '%s'.`
 It SHALL report an accepted term that is not written as the term is.
 
 #### Scenario: A term in the wrong case
@@ -71,7 +71,7 @@ It SHALL report an accepted term that is not written as the term is.
 
 ### Requirement: Avoid reports a rejected term
 
-hakkiri SHALL build the rule `Vale.Avoid` from the rejected terms, as a case-sensitive `existence` rule.  
+hakkiri SHALL build the rule `Vale.Avoid` from the rejected terms, as a case-sensitive `existence` rule.
 It SHALL have the level `error` and the message `Avoid using '%s'.`, and read the accepted terms as its exceptions.
 
 #### Scenario: A rejected word
@@ -96,7 +96,7 @@ It SHALL have the level `error` and the message `Avoid using '%s'.`, and read th
 
 ### Requirement: Terms and Avoid run where the Vale style or their name is listed
 
-hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file only when a glob lists the style `Vale` or sets the rule by name.  
+hakkiri SHALL run `Vale.Terms` and `Vale.Avoid` on a file only when a glob lists the style `Vale` or sets the rule by name.
 A level set by name SHALL be their level.
 
 #### Scenario: The Vale style is listed
@@ -121,7 +121,7 @@ A level set by name SHALL be their level.
 
 ### Requirement: A glob's vocabularies build rules of their own
 
-hakkiri SHALL build `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` from each vocabulary that a glob of `files` lists, as it builds `Vale.Terms` and `Vale.Avoid`.  
+hakkiri SHALL build `Vale.<Name>.Terms` and `Vale.<Name>.Avoid` from each vocabulary that a glob of `files` lists, as it builds `Vale.Terms` and `Vale.Avoid`.
 It SHALL run them on the files that glob matches, with no style or setting.
 
 #### Scenario: A glob lists Team

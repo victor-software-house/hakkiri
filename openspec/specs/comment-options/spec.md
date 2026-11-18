@@ -2,14 +2,14 @@
 
 ## Purpose
 
-A comment turns off the matches of a rule, limits the styles of a file or sets the level of a rule.  
+A comment turns off the matches of a rule, limits the styles of a file or sets the level of a rule.
 A source file reads none of these comments.
 
 ## Requirements
 
 ### Requirement: A comment turns off the matches of a rule or limits the styles
 
-In a Markdown file, an HTML comment `vale Style.Rule["a","b"] = NO` or `YES` SHALL turn off and on the matches `a` and `b` of the rule.  
+In a Markdown file, an HTML comment `vale Style.Rule["a","b"] = NO` or `YES` SHALL turn off and on the matches `a` and `b` of the rule.
 A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style of the file except those it lists.
 
 #### Scenario: One match
@@ -29,10 +29,10 @@ A comment `vale styles = A, B`, or `vale style = A`, SHALL turn off every style 
 
 ### Requirement: A comment sets the level of a rule
 
-In a Markdown file, an HTML comment `hakkiri Style.Rule: suggestion`, `warning` or `error` SHALL set that level on each later alert of the rule.  
+In a Markdown file, an HTML comment `hakkiri Style.Rule: suggestion`, `warning` or `error` SHALL set that level on each later alert of the rule.
 That level SHALL win over a level the config sets, until a later comment for the same rule.
 
-A comment `hakkiri Style.Rule: on` SHALL return the level of the config.  
+A comment `hakkiri Style.Rule: on` SHALL return the level of the config.
 A level for a style, and any other word, SHALL be no comment.
 
 #### Scenario: A level until the rule is set again
@@ -56,7 +56,7 @@ A glob that matches a source file SHALL leave the text of its comments as it is,
 
 ### Requirement: A level leaves a rule failure an error
 
-A level from a comment or from the config SHALL NOT change an alert that reports a fault of the rule itself.  
+A level from a comment or from the config SHALL NOT change an alert that reports a fault of the rule itself.
 One such fault is a pattern that gave up on a text.
 
 #### Scenario: A pattern that gives up

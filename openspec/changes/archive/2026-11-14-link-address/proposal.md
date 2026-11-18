@@ -4,19 +4,19 @@ Queue row: `HKR-064` in [tasks.yaml][ledger].
 
 ## Motivation
 
-Vale reads a link whose text is its address, such as `[research.md](research.md)`, as a bare URL.  
-It counts no word for it.  
+Vale reads a link whose text is its address, such as `[research.md](research.md)`, as a bare URL.
+It counts no word for it.
 hakkiri counts the words of the text, two for `research.md`.
 
-On 2026-11-12 the word-count probe of [HKR-063][ledger] ran.  
-It found this case in 70 of the 860 differences that Vale's duplicate-position drop does not explain.  
+On 2026-11-12 the word-count probe of [HKR-063][ledger] ran.
+It found this case in 70 of the 860 differences that Vale's duplicate-position drop does not explain.
 It also found it in the paragraph and file metrics of the same text.
 
 A link of this shape only repeats the address and is no prose, so hakkiri reads it as Vale does.
 
 ## Changes
 
-- A Markdown link, inline or by reference, can have one run of text equal to its address.  
+- A Markdown link, inline or by reference, can have one run of text equal to its address.
   Such a link is a gap in the prose around it, as an autolink is, and stays in its `link` node.
 - The address of a reference link is the destination of the first definition of its label.
 - The address is compared as goldmark writes it into the `href`, percent-encoded, since Vale compares the text with that `href`.

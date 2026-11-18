@@ -2,12 +2,12 @@
 
 ### Requirement: Accepted terms hold back matches of the checks that read them
 
-hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule.  
-It SHALL add them before it rewrites and sorts the exceptions.  
-It SHALL hold back a match that contains an accepted word anywhere in the matched text, as Vale does.  
+hakkiri SHALL add the accepted terms to the exceptions of each `capitalization`, `conditional`, `existence`, `repetition` and `substitution` rule.
+It SHALL add them before it rewrites and sorts the exceptions.
+It SHALL hold back a match that contains an accepted word anywhere in the matched text, as Vale does.
 The word SHALL match as a whole word, with its case.
 
-It SHALL also hold back a match that lies inside an accepted phrase.  
+It SHALL also hold back a match that lies inside an accepted phrase.
 A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonword` SHALL read none.
 
 #### Scenario: An existence rule
@@ -18,7 +18,7 @@ A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonwor
 #### Scenario: A match that contains an accepted word
 
 - **WHEN** `Team.Chain` is an `existence` rule with `ignorecase: true` and the raw pattern `with the \w+ in a folder`, the vocabulary accepts `harness(?:es)?`, and the text has the paragraphs `Run it with the harness in a folder.`, `Run it with the Harness in a folder.`, `Run it with the harnessing in a folder.` and `Run it with the parser in a folder.`
-- **THEN** the rule alerts on the second, third and fourth paragraphs but not on the first.  
+- **THEN** the rule alerts on the second, third and fourth paragraphs but not on the first.
   Vale 3.26.0 does the same with `ProseStyle.PrepositionChain` and `Vocab = ProseStyle`
 
 #### Scenario: A capitalization rule
@@ -33,12 +33,12 @@ A rule with `vocab: false` SHALL read none, and an `existence` rule with `nonwor
 
 ### Requirement: A glob adds vocabularies for its files
 
-hakkiri SHALL hold back, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.  
-The match SHALL contain an accepted word of a vocabulary that a matching glob lists, as a whole word with its case.  
+hakkiri SHALL hold back, in a file, a match of an `existence`, `repetition`, `spelling` or `substitution` rule.
+The match SHALL contain an accepted word of a vocabulary that a matching glob lists, as a whole word with its case.
 Or it SHALL lie inside an accepted phrase of one.
 
-hakkiri SHALL do so whatever the rule's `vocab` and `nonword` are set to.  
-A `capitalization` or `conditional` rule SHALL read none.  
+hakkiri SHALL do so whatever the rule's `vocab` and `nonword` are set to.
+A `capitalization` or `conditional` rule SHALL read none.
 A file SHALL take the vocabularies of every glob that matches it, besides the top-level ones.
 
 #### Scenario: A glob's vocabulary
@@ -53,13 +53,13 @@ A file SHALL take the vocabularies of every glob that matches it, besides the to
 
 #### Scenario: Two globs and the top level
 
-- **WHEN** the top level lists `Docs`, which accepts `Zebra`.  
-  One glob lists `Team`, which accepts `GitHub`.  
+- **WHEN** the top level lists `Docs`, which accepts `Zebra`.
+  One glob lists `Team`, which accepts `GitHub`.
   The text is `We saw Zebra and GitHub here.`
 - **THEN** `Team.Filler` with the tokens `Zebra` and `GitHub` reports nothing, and a second glob that lists `Docs` for another file does not reach this one
 
 #### Scenario: Spelling reads a glob's terms exactly
 
 - **WHEN** `zorbl` is accepted, and a `spelling` rule reads `Zorbl, zorbl and ZORBL.`
-- **THEN** a vocabulary at the top level keeps all three words from alerting.  
+- **THEN** a vocabulary at the top level keeps all three words from alerting.
   A glob's vocabulary keeps only `zorbl` from alerting, and the rule reports ``Did you really mean 'Zorbl'?``

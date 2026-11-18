@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Selection decides which nodes of the document tree a rule reads, and what text, sentences and words a check sees in each of them.  
+Selection decides which nodes of the document tree a rule reads, and what text, sentences and words a check sees in each of them.
 The [rule-files spec][rule-files] lists the scopes; this spec fixes how they match.
 
 ## Requirements
@@ -23,7 +23,7 @@ A scope part SHALL select every node whose scope name equals it or starts with i
 
 ### Requirement: text selects the prose leaves
 
-The scope `text` SHALL select each paragraph, heading, table cell and caption, in a Markdown file and inside a comment.  
+The scope `text` SHALL select each paragraph, heading, table cell and caption, in a Markdown file and inside a comment.
 It SHALL select the alt text of an image and the description of a page too, each as one block that no sentence splitter cuts.
 
 A list item or a block quote SHALL be read through the paragraphs inside it, so its text is read once.
@@ -49,7 +49,7 @@ A rule of any check type except `metric` that sets no `scope` SHALL select what 
 
 ### Requirement: paragraph leaves out list items and quotes
 
-The scope `paragraph` SHALL select a paragraph that opens no list item or block quote, as Vale 3.26.0 does.  
+The scope `paragraph` SHALL select a paragraph that opens no list item or block quote, as Vale 3.26.0 does.
 It SHALL also select every later paragraph of an item or a quote.
 
 #### Scenario: A paragraph and a list item
@@ -64,8 +64,8 @@ It SHALL also select every later paragraph of an item or a quote.
 
 ### Requirement: sentence selects each sentence
 
-The scope `sentence` SHALL select each sentence of a paragraph, a heading or a table cell.  
-A sentence SHALL have the scope of the block it is in.  
+The scope `sentence` SHALL select each sentence of a paragraph, a heading or a table cell.
+A sentence SHALL have the scope of the block it is in.
 So a part such as `list` selects the sentences of a list item, and an exclusion such as `~blockquote` leaves out the sentences of a quote.
 
 #### Scenario: Two sentences measured apart
@@ -80,7 +80,7 @@ So a part such as `list` selects the sentences of a list item, and an exclusion 
 
 ### Requirement: An inline exclusion blanks the element
 
-A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.  
+A part `~link`, `~code`, `~strong` or `~emphasis` SHALL leave the selected node in place and read the text of that inline element as spaces.
 The exclusion SHALL apply only to the blocks that its own scope item selects.
 
 #### Scenario: A word outside and inside a link
@@ -104,11 +104,11 @@ The text a check reads SHALL contain the text of strong, emphasis and link eleme
 
 ### Requirement: A match on a code span is not reported
 
-A match that overlaps a code span SHALL give no alert from `substitution`.  
-An `existence` rule SHALL read each code span as one `*`, a byte that no word and no space matches.  
+A match that overlaps a code span SHALL give no alert from `substitution`.
+An `existence` rule SHALL read each code span as one `*`, a byte that no word and no space matches.
 It SHALL give no alert for a match that starts or ends on a code span.
 
-A match that has text before and after a code span SHALL give an alert.  
+A match that has text before and after a code span SHALL give an alert.
 Its matched text SHALL read the span as `x`.
 
 #### Scenario: A pattern that reaches into a code span
@@ -128,10 +128,10 @@ Its matched text SHALL read the span as `x`.
 
 ### Requirement: A block of text has the scope of one element
 
-A block of text SHALL have the scope of one element, as in Vale 3.26.0.  
+A block of text SHALL have the scope of one element, as in Vale 3.26.0.
 That element SHALL be the outermost list item, block quote, heading or table cell that the block is the first thing inside.
 
-A block that is the first thing inside none of them SHALL have its own scope: a paragraph, a heading or a table cell.  
+A block that is the first thing inside none of them SHALL have its own scope: a paragraph, a heading or a table cell.
 A list item and a block quote SHALL be read through the blocks inside them.
 
 #### Scenario: A heading in a quote
@@ -180,7 +180,7 @@ A scope part written `sentence.` and a name SHALL read as that name joined to `s
 
 ### Requirement: table selects cells
 
-The scope `table` SHALL select the header and body cells of a table, and not its rows.  
+The scope `table` SHALL select the header and body cells of a table, and not its rows.
 The scope `table.row` SHALL select the rows.
 
 #### Scenario: Cells and rows
@@ -190,8 +190,8 @@ The scope `table.row` SHALL select the rows.
 
 ### Requirement: A character reference reads as its character
 
-The text of a paragraph, heading, table cell, caption, link, strong text, emphasis and alt text SHALL read each HTML character reference as its character.  
-It SHALL read them as `golang.org/x/net/html` at v0.62.0 does.  
+The text of a paragraph, heading, table cell, caption, link, strong text, emphasis and alt text SHALL read each HTML character reference as its character.
+It SHALL read them as `golang.org/x/net/html` at v0.62.0 does.
 A code span, a comment and the `raw` text SHALL read as written.
 
 #### Scenario: A reference in a paragraph
@@ -216,7 +216,7 @@ A code span, a comment and the `raw` text SHALL read as written.
 
 ### Requirement: A reference reads once and keeps its place
 
-A reference SHALL read once, so `&amp;lt;` reads as `&lt;`.  
+A reference SHALL read once, so `&amp;lt;` reads as `&lt;`.
 An alert on a character that a reference gave SHALL point at the first byte of the reference.
 
 #### Scenario: A reference of a reference
@@ -243,11 +243,11 @@ An alert on a character that a reference gave SHALL point at the first byte of t
 
 ### Requirement: A language narrows a scope
 
-The last piece of a scope part can be a language.  
-Any of its langdex names, aliases or extensions works, such as `rs` in `raw.rs` or `rust` in `raw.rust`.  
+The last piece of a scope part can be a language.
+Any of its langdex names, aliases or extensions works, such as `rs` in `raw.rs` or `rust` in `raw.rust`.
 That piece SHALL limit the scope to nodes in that language.
 
-With a language, a negated part such as `~heading.rs` SHALL leave out nodes only in that language.  
+With a language, a negated part such as `~heading.rs` SHALL leave out nodes only in that language.
 A scope item in which every part has another language SHALL select nothing.
 
 #### Scenario: raw.rs in two files
@@ -277,7 +277,7 @@ A scope item in which every part has another language SHALL select nothing.
 
 ### Requirement: A piece is a language only after a scope
 
-A last piece SHALL be a language only when the whole part is not a scope hakkiri defines and the rest of it is one.  
+A last piece SHALL be a language only when the whole part is not a scope hakkiri defines and the rest of it is one.
 A piece that gives no language SHALL be an error.
 
 #### Scenario: A scope name that ends like a language
@@ -292,11 +292,11 @@ A piece that gives no language SHALL be an error.
 
 ### Requirement: title selects the title of a link, an image and a definition
 
-The scope `title` SHALL select the title text of an inline link, an inline image and a link reference definition.  
-This SHALL apply in a Markdown or MDX file.  
+The scope `title` SHALL select the title text of an inline link, an inline image and a link reference definition.
+This SHALL apply in a Markdown or MDX file.
 The block SHALL leave out the delimiters, and no sentence splitter SHALL cut it.
 
-The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.  
+The scopes `text`, `paragraph`, `link`, `alt` and `sentence` SHALL select no part of a title.
 A link or image with no title, or an empty one, SHALL give no block.
 
 #### Scenario: Three kinds of title
@@ -316,11 +316,11 @@ A link or image with no title, or an empty one, SHALL give no block.
 
 ### Requirement: A title is selected by what contains it
 
-A scope item `title & link` SHALL select the title of an inline link, and `title & image` the title of an inline image.  
-The scope `link` alone and the scope `image` alone SHALL select no title.  
+A scope item `title & link` SHALL select the title of an inline link, and `title & image` the title of an inline image.
+The scope `link` alone and the scope `image` alone SHALL select no title.
 An item with no part for the block itself SHALL select nothing in it.
 
-The scope `image` SHALL select the alt text of an image.  
+The scope `image` SHALL select the alt text of an image.
 A title in a heading or a table cell SHALL be a link title as any other.
 
 #### Scenario: Link, image and definition
@@ -347,7 +347,7 @@ A negated part for the element, such as `title & ~link`, SHALL leave out the tit
 
 ### Requirement: An HTML title attribute is a title
 
-The `title` attribute of an HTML tag SHALL be selected by `title`, and by no prose scope.  
+The `title` attribute of an HTML tag SHALL be selected by `title`, and by no prose scope.
 This SHALL apply in an HTML block, in a line of text, and to the opening tag of a JSX (JavaScript XML) element.
 
 The attribute of an `a` tag SHALL be a link title, and that of an `img` tag an image title.

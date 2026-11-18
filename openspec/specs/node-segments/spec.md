@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Every node of the document tree reads its text from segments: byte ranges of the file that contain prose and no syntax.  
+Every node of the document tree reads its text from segments: byte ranges of the file that contain prose and no syntax.
 A check reads the text, and an alert points at the span that covers it.
 
 ## Requirements
 
 ### Requirement: Every node has segments
 
-Each node SHALL contain its segments, the byte ranges of its text in the file, in order.  
+Each node SHALL contain its segments, the byte ranges of its text in the file, in order.
 The span of the node SHALL run from the start of the first segment to the end of the last.
 
 #### Scenario: A heading
@@ -19,13 +19,13 @@ The span of the node SHALL run from the start of the first segment to the end of
 
 ### Requirement: Segments join into the text of a node
 
-The text of a node SHALL be its segments in order.  
-A line feed SHALL separate two segments with a line break between them.  
-One space SHALL separate two cells of a table row.  
+The text of a node SHALL be its segments in order.
+A line feed SHALL separate two segments with a line break between them.
+One space SHALL separate two cells of a table row.
 Any other gap between segments SHALL read as nothing.
 
-A segment MAY carry a reading that replaces what the gap gives.  
-The reading is nothing, one space or one line feed before the segment, and `*` for each character of the segment.  
+A segment MAY carry a reading that replaces what the gap gives.
+The reading is nothing, one space or one line feed before the segment, and `*` for each character of the segment.
 The text of an HTML tag and the text around it SHALL read as the html-block-text spec defines.
 
 #### Scenario: A table row
@@ -42,7 +42,7 @@ The text of an HTML tag and the text around it SHALL read as the html-block-text
 
 A Markdown paragraph, heading or inline node SHALL have one segment for each line of its text.
 
-A segment leaves out the line ending.  
+A segment leaves out the line ending.
 It also leaves out the indentation and the block quote markers in front of the line.
 
 #### Scenario: A paragraph in a block quote
@@ -63,7 +63,7 @@ It also leaves out the indentation and the block quote markers in front of the l
 
 ### Requirement: Heading syntax is not text
 
-An ATX (hash-prefixed) heading SHALL leave out its opening run of `#` with the space after it, and its closing run of `#`.  
+An ATX (hash-prefixed) heading SHALL leave out its opening run of `#` with the space after it, and its closing run of `#`.
 A setext heading SHALL leave out its underline.
 
 #### Scenario: A closed heading
@@ -78,8 +78,8 @@ A setext heading SHALL leave out its underline.
 
 ### Requirement: Container text contains the content only
 
-A block quote, a list item and a table row SHALL have the segments of the nodes inside them, in order.  
-Their text SHALL contain no `>` marker, bullet, number or indentation.  
+A block quote, a list item and a table row SHALL have the segments of the nodes inside them, in order.
+Their text SHALL contain no `>` marker, bullet, number or indentation.
 A block quote or list item with no prose inside it SHALL give no node.
 
 #### Scenario: A nested quote
@@ -94,8 +94,8 @@ A block quote or list item with no prose inside it SHALL give no node.
 
 ### Requirement: Syntax that is not prose is a gap
 
-Fenced code, raw HTML, link definitions, front matter and MDX expressions SHALL be gaps in the prose node around them.  
-The tags of a JSX (JavaScript XML) element SHALL be gaps too, and its text SHALL be prose.  
+Fenced code, raw HTML, link definitions, front matter and MDX expressions SHALL be gaps in the prose node around them.
+The tags of a JSX (JavaScript XML) element SHALL be gaps too, and its text SHALL be prose.
 A paragraph that contains one of them SHALL stay one node.
 
 #### Scenario: HTML inside a paragraph
@@ -110,7 +110,7 @@ A paragraph that contains one of them SHALL stay one node.
 
 ### Requirement: Segments inside comments point into the file
 
-A node inside a comment SHALL have one segment for each line of its text.  
+A node inside a comment SHALL have one segment for each line of its text.
 A segment leaves out the comment marker and the indentation that hakkiri strips.
 
 #### Scenario: A paragraph over two line comments
@@ -121,7 +121,7 @@ A segment leaves out the comment marker and the indentation that hakkiri strips.
 
 ### Requirement: Inline markup is a gap
 
-The markup of strong text, emphasis, links, autolinks, code spans and images SHALL be gaps between segments.  
+The markup of strong text, emphasis, links, autolinks, code spans and images SHALL be gaps between segments.
 These gaps SHALL cover the markers, the brackets, a link's target and title, an autolink's angle brackets and the backticks.
 
 A link node SHALL have the segments of its text, a code node those of its content, and an `alt` node those of its alt text.
@@ -139,10 +139,10 @@ A link node SHALL have the segments of its text, a code node those of its conten
 
 ### Requirement: A URL is a gap in the prose around the link
 
-The text of an autolink or a bare URL that is its own destination SHALL stay in its `link` node.  
+The text of an autolink or a bare URL that is its own destination SHALL stay in its `link` node.
 It SHALL be a gap in the nodes around it.
 
-The requirement "A link that shows its address is a gap in the prose around it" covers a bracketed link whose text is its address.  
+The requirement "A link that shows its address is a gap in the prose around it" covers a bracketed link whose text is its address.
 A link whose destination differs from its text, such as a bare email address or a `www.` address, SHALL stay in the nodes around it.
 
 #### Scenario: An autolink
@@ -165,12 +165,12 @@ A link whose destination differs from its text, such as a bare email address or 
 
 ### Requirement: A link that shows its address is a gap in the prose around it
 
-The text of a Markdown link that is one run of text equal to the address of the link SHALL stay in its `link` node.  
-It SHALL be a gap in the nodes around that node.  
+The text of a Markdown link that is one run of text equal to the address of the link SHALL stay in its `link` node.
+It SHALL be a gap in the nodes around that node.
 Vale reads such a link as a URL and counts no words for it.
 
-The address SHALL be compared as goldmark writes it into the `href`.  
-goldmark percent-encodes a byte outside its safe set, and keeps a `%` before two hex digits.  
+The address SHALL be compared as goldmark writes it into the `href`.
+goldmark percent-encodes a byte outside its safe set, and keeps a `%` before two hex digits.
 The address of a link by reference SHALL be the destination of the first definition of its label.
 
 #### Scenario: A link that repeats its address
@@ -200,8 +200,8 @@ The address of a link by reference SHALL be the destination of the first definit
 
 ### Requirement: A bare ftp address is a gap
 
-An `ftp://` address that starts a line or follows a space, `*`, `_`, `~` or `(` SHALL be a gap in the text around it.  
-An address with another scheme is a gap the same way.  
+An `ftp://` address that starts a line or follows a space, `*`, `_`, `~` or `(` SHALL be a gap in the text around it.
+An address with another scheme is a gap the same way.
 Its end SHALL be where Vale's converter ends it.
 
 Closing punctuation, an unbalanced `)` and a character reference at its end are not part of it.
@@ -213,7 +213,7 @@ Closing punctuation, an unbalanced `)` and a character reference at its end are 
 
 ### Requirement: A backslash escape is a gap
 
-The backslash of an escape, and of a hard break written with a backslash, SHALL be a gap in the text.  
+The backslash of an escape, and of a hard break written with a backslash, SHALL be a gap in the text.
 So the text contains the escaped character.
 
 #### Scenario: An escape inside a word
@@ -228,7 +228,7 @@ So the text contains the escaped character.
 
 ### Requirement: A table row has the cells of its header
 
-A cell past the last cell of the header row SHALL be a gap.  
+A cell past the last cell of the header row SHALL be a gap.
 A row with fewer cells SHALL contain the cells it has.
 
 #### Scenario: A row with an extra cell
@@ -238,8 +238,8 @@ A row with fewer cells SHALL contain the cells it has.
 
 ### Requirement: A footnote has the scope Vale gives it
 
-A footnote reference SHALL be a gap in the text around it.  
-When a reference points to a definition, the definition SHALL be a `list` node of its content, where it stands.  
+A footnote reference SHALL be a gap in the text around it.
+When a reference points to a definition, the definition SHALL be a `list` node of its content, where it stands.
 A definition that no reference points to SHALL be a gap.
 
 #### Scenario: A referenced and an unreferenced definition
@@ -250,8 +250,8 @@ A definition that no reference points to SHALL be a gap.
 
 ### Requirement: An inline HTML element has the scope of its tag
 
-An inline HTML element with an opening tag and a closing tag among the same siblings SHALL be a node.  
-Its scope SHALL be the one Vale gives its tag.  
+An inline HTML element with an opening tag and a closing tag among the same siblings SHALL be a node.
+Its scope SHALL be the one Vale gives its tag.
 The scope SHALL be `strong` for `b` and `strong`, `emphasis` for `i` and `em`, `code` for `code` and `tt`, and `link` for `a`.
 
 The two tags SHALL be gaps in the text of the node and of the paragraph around it.

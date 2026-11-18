@@ -12,7 +12,7 @@ hakkiri SHALL read the front matter values as Vale does, and put each alert at t
 #### Scenario: A TOML value
 
 - **WHEN** a TOML value reads `"A very toml title"` and a rule flags `title`
-- **THEN** hakkiri puts the alert in the value, and Vale puts it on the key.  
+- **THEN** hakkiri puts the alert in the value, and Vale puts it on the key.
   Vale finds the value by searching the block ([front-matter-values 5][front-matter-values-5])
 
 #### Scenario: An explicit tag or an anchor

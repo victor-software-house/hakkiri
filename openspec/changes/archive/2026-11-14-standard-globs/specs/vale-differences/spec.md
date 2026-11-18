@@ -2,8 +2,8 @@
 
 ### Requirement: A glob follows gitignore, where Vale matches more
 
-hakkiri SHALL match a glob by the rules of gitignore, as the `project-root` spec sets.  
-Vale 66bbb85 reads a glob with no `**` through gobwas with no separator, so its `*` crosses `/`.  
+hakkiri SHALL match a glob by the rules of gitignore, as the `project-root` spec sets.
+Vale 66bbb85 reads a glob with no `**` through gobwas with no separator, so its `*` crosses `/`.
 It reads a glob with `**` through doublestar, whose trailing `/**` also matches zero folders.
 
 #### Scenario: A star across folders

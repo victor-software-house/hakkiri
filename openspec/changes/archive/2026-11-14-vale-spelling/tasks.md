@@ -4,48 +4,48 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 1. The probe
 
-- [x] 1.1 Probe Vale at `66bbb85` for `Vale.Spelling` under 11 configs, and record its alerts in `tests/fixtures/vale-spelling`.  
-  The probe covers Markdown, MDX, Rust and TypeScript files.  
+- [x] 1.1 Probe Vale at `66bbb85` for `Vale.Spelling` under 11 configs, and record its alerts in `tests/fixtures/vale-spelling`.
+  The probe covers Markdown, MDX, Rust and TypeScript files.
   Verify `vale.tsv` contains the alerts of every config that gives one.
-  - 2026-11-12 (UTC): A Vale build of `66bbb85` ran in a cloud box and gave 880 alerts.  
-    It showed that a dictionary in `config/dictionaries` adds to the built-in one, and that `dictionaries` replaces it.  
+  - 2026-11-12 (UTC): A Vale build of `66bbb85` ran in a cloud box and gave 880 alerts.
+    It showed that a dictionary in `config/dictionaries` adds to the built-in one, and that `dictionaries` replaces it.
     It also showed that the word lists are every `.txt` file below `config/ignore`.
 
 ## 2. The rule
 
-- [x] 2.1 Add `vale_spelling`, read the folders of every package for the rule, and put it in the style `Vale`.  
+- [x] 2.1 Add `vale_spelling`, read the folders of every package for the rule, and put it in the style `Vale`.
   Verify `tests/vale_spelling.rs` fails before the change and passes after it.
-  - 2026-11-12 (UTC): In a cloud box, the five tests of `tests/vale_spelling.rs` pass.  
+  - 2026-11-12 (UTC): In a cloud box, the five tests of `tests/vale_spelling.rs` pass.
     hakkiri gives the 880 alerts of Vale under 11 configs, except the 36 alerts of `departures.tsv`.
-  - 2026-11-12 (UTC): Before the change the style `Vale` has no `Vale.Spelling`.  
-    So the config `off` fails on the missing rule, and the other configs give no spelling alert.  
+  - 2026-11-12 (UTC): Before the change the style `Vale` has no `Vale.Spelling`.
+    So the config `off` fails on the missing rule, and the other configs give no spelling alert.
     That was not run against the old source.
   - 2026-11-12 (UTC): The whole `cargo test` and `cargo clippy --all-targets` pass, and the format check passes.
 
 ## 3. The surfaces
 
-- [x] 3.1 Update `src/instructions.md`, the skill and `AGENTS.md`, and add the deltas of the `spelling-check` and `vale-differences` specs.  
-  Turn the rule off in the hakkiri configs of the other `Vale` fixtures, and add the patch changeset.  
+- [x] 3.1 Update `src/instructions.md`, the skill and `AGENTS.md`, and add the deltas of the `spelling-check` and `vale-differences` specs.
+  Turn the rule off in the hakkiri configs of the other `Vale` fixtures, and add the patch changeset.
   Verify `operator_docs` and `openspec validate --all --strict` pass.
-  - 2026-11-12 (UTC): `operator_docs` passes in the box.  
+  - 2026-11-12 (UTC): `operator_docs` passes in the box.
     `openspec validate --all --strict` and `qctl check --no-git` pass on the authoring machine.
-  - 2026-11-12 (UTC): The fixtures of `builtin_repetition`, `vocabulary_rules`, `yaml_vocabularies` and `rule_parameters` failed at first.  
+  - 2026-11-12 (UTC): The fixtures of `builtin_repetition`, `vocabulary_rules`, `yaml_vocabularies` and `rule_parameters` failed at first.
     They passed once their hakkiri configs turned the rule off, as their Vale configs do.
 
 ## 4. A bare email address
 
-- [x] 4.1 Keep a bare email address, a `www.` address and an angle-bracket email address in the text of a Markdown file.  
-  Drop the departure that recorded them.  
+- [x] 4.1 Keep a bare email address, a `www.` address and an angle-bracket email address in the text of a Markdown file.
+  Drop the departure that recorded them.
   Verify `tests/vale_spelling.rs`, `tests/spelling_parity.rs` and `tests/tree.rs` pass, with the two departure rows of the email address removed.
-  - 2026-11-12 (UTC): A probe of Vale at `66bbb85` showed that it keeps those three in the text.  
-    It drops an address in angle brackets, or written bare with a lower-case `http` scheme.  
+  - 2026-11-12 (UTC): A probe of Vale at `66bbb85` showed that it keeps those three in the text.
+    It drops an address in angle brackets, or written bare with a lower-case `http` scheme.
     It does so because its converter writes the same destination.
-  - 2026-11-12 (UTC): In a cloud box the whole `cargo test --no-fail-fast` passes with 44 test binaries ok.  
+  - 2026-11-12 (UTC): In a cloud box the whole `cargo test --no-fail-fast` passes with 44 test binaries ok.
     The format check and the prose and spelling lints pass.
-  - 2026-11-12 (UTC): Not verified: `ftp://` addresses and an upper-case scheme.  
+  - 2026-11-12 (UTC): Not verified: `ftp://` addresses and an upper-case scheme.
     hakkiri reads them differently, and they are left to `HKR-027`.
 
 ## 5. Integration
 
-- [x] 5.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+- [x] 5.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
   Evidence, 2026-11-14 (UTC): The CI of the stack that [pull request 121](https://github.com/victor-software-house/hakkiri/pull/121) heads passed, and the stack merged as `7aac10a`.

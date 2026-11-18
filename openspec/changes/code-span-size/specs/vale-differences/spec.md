@@ -2,7 +2,7 @@
 
 ### Requirement: An occurrence counts no code span
 
-hakkiri SHALL count no match of an `occurrence` rule that overlaps a code span.  
+hakkiri SHALL count no match of an `occurrence` rule that overlaps a code span.
 Vale 3.26.0 reads a code span as a run of `*`, and a token written for that run counts it.
 
 #### Scenario: A token that reads Vale's mask
@@ -17,8 +17,8 @@ Vale 3.26.0 reads a code span as a run of `*`, and a token written for that run 
 
 ### Requirement: A word count matches Vale with a code span size of 0
 
-hakkiri SHALL count a code span as `code_span_size` words in a `metric` or `readability` rule, where Vale 3.26.0 counts none.  
-With `code_span_size` set to 0, the counts SHALL equal Vale's, and so SHALL the alerts of a rule that reads them.  
+hakkiri SHALL count a code span as `code_span_size` words in a `metric` or `readability` rule, where Vale 3.26.0 counts none.
+With `code_span_size` set to 0, the counts SHALL equal Vale's, and so SHALL the alerts of a rule that reads them.
 The only exceptions are the differences that other requirements of this spec record.
 
 #### Scenario: Words of a sentence
@@ -28,7 +28,7 @@ The only exceptions are the differences that other requirements of this spec rec
 
 ### Requirement: An alert keeps its own place
 
-hakkiri SHALL report each alert of a `metric` or `readability` rule at the place of its block.  
+hakkiri SHALL report each alert of a `metric` or `readability` rule at the place of its block.
 Vale 3.26.0 drops an alert that has the line, the column and the rule of an earlier one.
 
 #### Scenario: A table row

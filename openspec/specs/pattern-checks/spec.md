@@ -2,15 +2,15 @@
 
 ## Purpose
 
-The pattern checks compare matches with each other: `consistency` with the other form of a pair, `conditional` with a definition, and `repetition` with the match before it.  
+The pattern checks compare matches with each other: `consistency` with the other form of a pair, `conditional` with a definition, and `repetition` with the match before it.
 Each keeps the meaning Vale 3.26.0 gives it.
 
 ## Requirements
 
 ### Requirement: consistency reports a file that uses both forms
 
-A `consistency` rule SHALL match each `either` key and value as an `existence` rule matches tokens.  
-A node with a match of the pair SHALL give one alert when both forms have matched in the file so far, that node included.  
+A `consistency` rule SHALL match each `either` key and value as an `existence` rule matches tokens.
+A node with a match of the pair SHALL give one alert when both forms have matched in the file so far, that node included.
 That alert SHALL sit at the last match of the pair in the node.
 
 #### Scenario: Two spellings in two paragraphs
@@ -43,7 +43,7 @@ When `second` has no capture group, a `conditional` rule SHALL report each match
 
 ### Requirement: conditional with a group keeps the captured terms
 
-When `second` has a capture group, each text a group captures SHALL count as defined from that node to the end of the file.  
+When `second` has a capture group, each text a group captures SHALL count as defined from that node to the end of the file.
 A match of `first` that is not defined, and is not an `exceptions` entry, SHALL give one alert.
 
 #### Scenario: An acronym defined once
@@ -58,8 +58,8 @@ A match of `first` that is not defined, and is not an `exceptions` entry, SHALL 
 
 ### Requirement: repetition reports a repeated match
 
-A `repetition` rule SHALL compare each match of its `tokens` with the match before it, ignoring case when `ignorecase` is `true`.  
-It SHALL report two equal matches as one alert that spans both.  
+A `repetition` rule SHALL compare each match of its `tokens` with the match before it, ignoring case when `ignorecase` is `true`.
+It SHALL report two equal matches as one alert that spans both.
 With `alpha: true`, only matches made of letters SHALL count.
 
 #### Scenario: A doubled word
@@ -74,8 +74,8 @@ With `alpha: true`, only matches made of letters SHALL count.
 
 ### Requirement: repetition counts repeats up to max
 
-A `repetition` rule SHALL count the repeats in a selected node and report a repeat only when the count is over `max`.  
-The count SHALL go back to 0 after each alert, as Vale 3.26.0 counts it.  
+A `repetition` rule SHALL count the repeats in a selected node and report a repeat only when the count is over `max`.
+The count SHALL go back to 0 after each alert, as Vale 3.26.0 counts it.
 A match that does not repeat SHALL leave the count as it is.
 
 #### Scenario: Two separate repeats with max 1
@@ -112,7 +112,7 @@ When `ignorecase` is `true`, a match of `first` SHALL count as defined when it e
 
 ### Requirement: the pattern checks ignore code
 
-A match that overlaps a code span SHALL NOT count for `consistency`, `conditional` or `repetition`.  
+A match that overlaps a code span SHALL NOT count for `consistency`, `conditional` or `repetition`.
 It SHALL be no form seen, give no alert, define nothing, and leave the next match nothing before it to repeat.
 
 #### Scenario: A repeat across code
@@ -132,9 +132,9 @@ It SHALL be no form seen, give no alert, define nothing, and leave the next matc
 
 ### Requirement: the pattern checks need something to match
 
-hakkiri SHALL reject a `consistency` rule whose `either` has no pair, or has a form with no text.  
-It SHALL reject a `repetition` rule whose `tokens` have no text.  
-It SHALL also reject a `conditional` rule whose `first` or `second` is empty or matches the empty string.  
+hakkiri SHALL reject a `consistency` rule whose `either` has no pair, or has a form with no text.
+It SHALL reject a `repetition` rule whose `tokens` have no text.
+It SHALL also reject a `conditional` rule whose `first` or `second` is empty or matches the empty string.
 The error SHALL show the field.
 
 #### Scenario: No pair

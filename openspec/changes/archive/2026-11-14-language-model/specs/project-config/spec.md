@@ -2,17 +2,17 @@
 
 ### Requirement: formats maps a file to a reader
 
-`formats` SHALL map an extension, a file name or a glob to a reader.  
+`formats` SHALL map an extension, a file name or a glob to a reader.
 The entry SHALL give the reader by any langdex name, alias or extension of the language it reads.
 
-The readers are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and Text.  
+The readers are Markdown, MDX, Rust, TypeScript, TSX (TypeScript with JavaScript XML), JavaScript and Text.
 So `md`, `markdown` and `Markdown` give one reader, and `text` gives plain text.
 
-An entry keyed by the file's extension SHALL come first.  
-Next SHALL come an entry keyed by the file's name, or by a glob that matches its name or its path.  
+An entry keyed by the file's extension SHALL come first.
+Next SHALL come an entry keyed by the file's name, or by a glob that matches its name or its path.
 These entries SHALL go in the order of the keys as text.
 
-A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.  
+A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.
 An entry SHALL beat the language of the file.
 
 #### Scenario: An extension
@@ -42,7 +42,7 @@ An entry SHALL beat the language of the file.
 
 ### Requirement: formats refuses a bad entry
 
-A reader that is not a language hakkiri reads SHALL be an error that lists the seven.  
+A reader that is not a language hakkiri reads SHALL be an error that lists the seven.
 A key that contains a glob mark and is not a glob SHALL be an error.
 
 #### Scenario: An unknown reader

@@ -8,8 +8,8 @@ How hakkiri cuts an HTML block into tags and text, where it follows the tokenize
 
 ### Requirement: A vertical tab is not whitespace inside a tag
 
-hakkiri SHALL end a tag name and an attribute only at a space, tab, line feed, form feed or carriage return.  
-The tokenizer of `golang.org/x/net/html` does the same.  
+hakkiri SHALL end a tag name and an attribute only at a space, tab, line feed, form feed or carriage return.
+The tokenizer of `golang.org/x/net/html` does the same.
 The trimming of the text between tags SHALL trim a vertical tab too, as Vale does.
 
 #### Scenario: A vertical tab in a tag

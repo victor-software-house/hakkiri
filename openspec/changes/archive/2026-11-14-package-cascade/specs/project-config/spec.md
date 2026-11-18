@@ -2,8 +2,8 @@
 
 ### Requirement: Origin breaks a tie, and the top level ranks lowest
 
-At equal specificity the project SHALL rank above a package, and a later package above an earlier one.  
-Within one file, a later glob SHALL rank above an earlier one.  
+At equal specificity the project SHALL rank above a package, and a later package above an earlier one.
+Within one file, a later glob SHALL rank above an earlier one.
 The top level of each config file SHALL rank below every glob, in the same order of origin.
 
 #### Scenario: A tie between a package and the project
@@ -18,11 +18,11 @@ The top level of each config file SHALL rank below every glob, in the same order
 
 ### Requirement: The project forces a value with !override
 
-A value that the project's config tags `!override` SHALL apply after every value without the tag, whatever its rank.  
+A value that the project's config tags `!override` SHALL apply after every value without the tag, whatever its rank.
 The forced values SHALL apply among themselves in rank order.
 
-hakkiri SHALL read the tag on the value of a key directly under a glob, and on the top-level `code_span_size`.  
-A forced `params` mapping SHALL force every parameter it contains.  
+hakkiri SHALL read the tag on the value of a key directly under a glob, and on the top-level `code_span_size`.
+A forced `params` mapping SHALL force every parameter it contains.
 A forced `styles` list SHALL be taken as written, and an empty forced list SHALL drop every rule setting without the tag.
 
 #### Scenario: A forced level beats a more specific off
@@ -37,8 +37,8 @@ A forced `styles` list SHALL be taken as written, and an empty forced list SHALL
 
 ### Requirement: Only the project forces, and only with !override
 
-`!override` in a package's settings file SHALL be an error.  
-Any other tag on a value where hakkiri reads the tag SHALL also be an error.  
+`!override` in a package's settings file SHALL be an error.
+Any other tag on a value where hakkiri reads the tag SHALL also be an error.
 The error SHALL show the file and the line of the key.
 
 #### Scenario: A package that forces
@@ -53,7 +53,7 @@ The error SHALL show the file and the line of the key.
 
 ### Requirement: Lists add up over every matching glob
 
-The lists of `vocab`, `block_ignores` and `token_ignores` SHALL add up over every glob that matches a file, in rank order.  
+The lists of `vocab`, `block_ignores` and `token_ignores` SHALL add up over every glob that matches a file, in rank order.
 The forced lists SHALL add up among themselves and replace what the lists without the tag gave.
 
 #### Scenario: Two ignore lists
@@ -70,8 +70,8 @@ The forced lists SHALL add up among themselves and replace what the lists withou
 
 ### Requirement: The project overrides a package
 
-At equal specificity a setting in the project's config SHALL win over the same setting in a package's file.  
-A later package SHALL win over an earlier one.  
+At equal specificity a setting in the project's config SHALL win over the same setting in a package's file.
+A later package SHALL win over an earlier one.
 A rule that a package sets `off` SHALL stay off until a setting of a glob that ranks higher turns it on.
 
 The project's `level` SHALL win, and a package's `level` SHALL apply only when the project sets none.
@@ -103,7 +103,7 @@ The project's `level` SHALL win, and a package's `level` SHALL apply only when t
 
 ### Requirement: A project's styles join those of a package under one glob
 
-A project's `styles` list under the same glob text as a package's SHALL add to the package's list.  
+A project's `styles` list under the same glob text as a package's SHALL add to the package's list.
 A `styles` list under another glob SHALL compete in the settings cascade, the list of the higher rank replacing the other.
 
 #### Scenario: The same glob

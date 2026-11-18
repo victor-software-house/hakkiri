@@ -16,8 +16,8 @@ hakkiri SHALL select as each scenario below shows, where Vale 3.26.0 has no such
 
 #### Scenario: An HTML title attribute
 
-- **WHEN** a rule has `scope: title`.  
-  The input is a Markdown file that contains `<p title="a marker">Some text.</p>` or a line of text with an inline tag that has a title.  
+- **WHEN** a rule has `scope: title`.
+  The input is a Markdown file that contains `<p title="a marker">Some text.</p>` or a line of text with an inline tag that has a title.
   Or it is an MDX file that contains a JavaScript XML (JSX) element with `title`
 - **THEN** hakkiri selects each title, and Vale reads the attribute only in a rule on `raw` ([link-title 6][link-title])
 
@@ -29,7 +29,7 @@ hakkiri SHALL select as each scenario below shows, where Vale 3.26.0 has no such
 #### Scenario: The alt text of an image
 
 - **WHEN** a rule has `scope: image`
-- **THEN** hakkiri selects the alt text of each image.  
+- **THEN** hakkiri selects the alt text of each image.
   Vale loads the rule and selects nothing, since no block has an `image` part ([link-title 5][link-title])
 
 [ledger]: ../../../../../../tasks.yaml

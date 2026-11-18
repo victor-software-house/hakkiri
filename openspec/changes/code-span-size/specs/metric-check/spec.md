@@ -2,8 +2,8 @@
 
 ### Requirement: A code span counts as code_span_size words
 
-A `metric` or `readability` rule SHALL count each code span of the text it measures as `code_span_size` words: one by default.  
-At 0 a code span SHALL be no word, and at 2 or more it SHALL be that many words.  
+A `metric` or `readability` rule SHALL count each code span of the text it measures as `code_span_size` words: one by default.
+At 0 a code span SHALL be no word, and at 2 or more it SHALL be that many words.
 The count of `occurrences` SHALL not change with the size.
 
 #### Scenario: Sizes of a sentence

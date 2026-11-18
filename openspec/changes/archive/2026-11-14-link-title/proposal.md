@@ -4,25 +4,25 @@ Queue row: [`HKR-054`][ledger].
 
 ## Motivation
 
-Vale reads the title of a Markdown link only through the `raw` scope.  
+Vale reads the title of a Markdown link only through the `raw` scope.
 No other scope contains it.
 
-A probe of Vale at `66bbb85` put one rule on each of `text`, `paragraph`, `sentence`, `link`, `alt`, `heading`, `table`, `code` and `raw`.  
-It covered a link, an image, a single-quoted and a parenthesised title, two reference definitions, a heading and a table cell.  
+A probe of Vale at `66bbb85` put one rule on each of `text`, `paragraph`, `sentence`, `link`, `alt`, `heading`, `table`, `code` and `raw`.
+It covered a link, an image, a single-quoted and a parenthesised title, two reference definitions, a heading and a table cell.
 Only `raw` gave an alert at a title.
 
-ProseStyle's `BareURL` rule reads `raw`, so Vale flags the URL in `[t](u "see https://x")`.  
-hakkiri's package moves that rule onto the scopes it can read cheaply.  
+ProseStyle's `BareURL` rule reads `raw`, so Vale flags the URL in `[t](u "see https://x")`.
+hakkiri's package moves that rule onto the scopes it can read cheaply.
 No scope contains a title, so the URL goes unseen.
 
 ## Changes
 
 - A scope `title` selects the text of the title of an inline link, an inline image and a link reference definition.
 - No prose scope reads a title, as in Vale: `text`, `paragraph`, `link`, `alt` and `sentence` give no block of one.
-- `title & link` and `title & image` select the title of a link and of an image, by the element that has it.  
+- `title & link` and `title & image` select the title of a link and of an image, by the element that has it.
   A new scope `image` selects the alt text.
-- The `title` attribute of an HTML tag, in a block or in a line of text, is a title.  
-  This also applies to a JavaScript XML (JSX) element, through its `title` attribute.  
+- The `title` attribute of an HTML tag, in a block or in a line of text, is a title.
+  This also applies to a JavaScript XML (JSX) element, through its `title` attribute.
   Vale reads both through `raw` only.
 - The scope has its own name, because Vale has no scope for a title, and the dotted names of Vale keep their meaning.
 

@@ -7,13 +7,13 @@ hakkiri SHALL run the pattern checks as each scenario below says, where Vale 3.2
 #### Scenario: State belongs to one rule
 
 - **WHEN** one `conditional` rule captures a term, and another rule of either kind reads the same file
-- **THEN** hakkiri keeps each rule's state apart, and Vale keeps one list per file.  
+- **THEN** hakkiri keeps each rule's state apart, and Vale keeps one list per file.
   So a captured term can satisfy another `conditional` rule or count as a `consistency` form ([pattern 1][pattern-1])
 
 #### Scenario: A consistency alert sits at the last match
 
 - **WHEN** a `consistency` pair matches in a node whose earlier text has the same words
-- **THEN** hakkiri puts the alert at the last match through its byte table.  
+- **THEN** hakkiri puts the alert at the last match through its byte table.
   Vale searches for the text, so the alert lands where it first appears ([pattern 2][pattern-2])
 
 #### Scenario: ignorecase applies to both conditional patterns
@@ -24,7 +24,7 @@ hakkiri SHALL run the pattern checks as each scenario below says, where Vale 3.2
 #### Scenario: Code is no match
 
 - **WHEN** two code spans sit side by side, or a form appears only in code
-- **THEN** hakkiri counts no repeat and no form seen.  
+- **THEN** hakkiri counts no repeat and no form seen.
   Vale masks the code, so it can report a repeat the reader does not see ([pattern 9][pattern-9])
 
 ### Requirement: Rules that Vale loads are refused
@@ -79,8 +79,8 @@ hakkiri SHALL refuse at load each rule below, which Vale 3.26.0 loads.
 #### Scenario: A dictionary outside the package
 
 - **WHEN** a rule names a dictionary, list or affix file by a path that leaves its package, or sets only one of `aff` and `dic`
-- **THEN** hakkiri refuses it.  
-  Vale also searches an absolute path, the working directory and `DICPATH`.  
+- **THEN** hakkiri refuses it.
+  Vale also searches an absolute path, the working directory and `DICPATH`.
   It answers one of `aff` and `dic` with the built-in dictionary ([spelling 2][spelling-2])
 
 #### Scenario: A dictionary in another character set

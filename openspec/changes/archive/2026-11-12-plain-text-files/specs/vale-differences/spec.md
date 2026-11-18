@@ -2,18 +2,18 @@
 
 ### Requirement: Known gaps are listed apart from what differs by choice
 
-**Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for plain text closes.  
+**Reason**: OpenSpec cannot drop one scenario of a modified requirement, and the gap for plain text closes.
 So the requirement is removed and added again below without that scenario.
 
-**Migration**: Read the requirement of the same body under the ADDED section, called "Known gaps are listed apart from the choices".  
+**Migration**: Read the requirement of the same body under the ADDED section, called "Known gaps are listed apart from the choices".
 Its other scenarios are unchanged.
 
 ## ADDED Requirements
 
 ### Requirement: Known gaps are listed apart from the choices
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.  
-The intended differences SHALL stay apart from this list.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do, with its queue row.
+The intended differences SHALL stay apart from this list.
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: The built-in spelling rule
@@ -56,7 +56,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: A doc selector or a View
 
 - **WHEN** a rule has `scope: doc(h1)`, a section sets a View, or a case sets `view`
-- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.  
+- **THEN** hakkiri runs the rest of the style and fails the run for the rule until the config sets it `off`.
   It rejects the case field, where Vale selects by CSS over the rendered HTML (row [HKR-039][ledger], [test 2][test-2])
 
 #### Scenario: A Vale configuration file
@@ -71,7 +71,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 
 ### Requirement: Readers differ from Vale in what a file with no reader gets
 
-hakkiri SHALL read a selected file that no reader reads as plain text, and SHALL skip a binary file.  
+hakkiri SHALL read a selected file that no reader reads as plain text, and SHALL skip a binary file.
 It SHALL map a format as each scenario below shows, where Vale 3.26.0 does otherwise.
 
 #### Scenario: A manuscript

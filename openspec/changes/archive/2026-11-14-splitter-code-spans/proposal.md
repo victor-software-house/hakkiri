@@ -4,19 +4,19 @@ Queue row: `HKR-065` in [tasks.yaml][ledger].
 
 ## Motivation
 
-The splitter read a code span as the word `x`.  
-So a sentence that began or ended on a code span did not split where a reader and Vale split it.  
+The splitter read a code span as the word `x`.
+So a sentence that began or ended on a code span did not split where a reader and Vale split it.
 It also kept `92 ms. Tests` as one sentence, ended a sentence at `vs.`, and read a date before a full stop as a list number.
 
 On 2026-11-12, these cases caused most of the LongSentence and SentenceLength alerts that hakkiri gave and Vale did not, over four public repositories.
 
-On 2026-11-13 the ProseStyle v0.0.16 alert diff still found 75 LongSentence alerts that only hakkiri gave, 68 of them false.  
+On 2026-11-13 the ProseStyle v0.0.16 alert diff still found 75 LongSentence alerts that only hakkiri gave, 68 of them false.
 The operator chose to merge this change and run the diff again before that gate closes.
 
 ## Changes
 
-- The splitter takes the byte ranges of the code spans.  
-  A code span begins a sentence after a full stop and ends one before a full stop.  
+- The splitter takes the byte ranges of the code spans.
+  A code span begins a sentence after a full stop and ends one before a full stop.
   It is never an abbreviation or an initial.
 - A unit of measure after a number ends a sentence before a capital word, with the units and prefixes listed from their sources.
 - `vs.` ends no sentence, and a date is no list number.

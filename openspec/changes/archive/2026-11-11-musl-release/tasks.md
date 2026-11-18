@@ -1,8 +1,8 @@
 # Tasks
 
-Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
-The release run and the proofs after it happen after the merge.  
-The notes under tasks 2.1, 3.1 and 3.2 contain what they showed.  
+Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.
+The release run and the proofs after it happen after the merge.
+The notes under tasks 2.1, 3.1 and 3.2 contain what they showed.
 This change follows [`release-lane`][lane], so the lane and `0.0.1` exist.
 
 ## 1. The build
@@ -33,7 +33,7 @@ This change follows [`release-lane`][lane], so the lane and `0.0.1` exist.
 
 ## 3. The proofs
 
-- [x] 3.1 Run the released `linux-x64` binary in a root folder with no loader.  
+- [x] 3.1 Run the released `linux-x64` binary in a root folder with no loader.
   Such a folder can be an image imported from an empty archive, or the root of a NixOS machine with nix-ld off.
   - Verify `--version` prints `0.0.2`, `check` flags the word of a rule in a Markdown file, and `test --coverage` passes.
   - Evidence, 2026-11-11 (UTC): the released tarball ran in an image with no file but the binary, on a NixOS 26.11 box.
@@ -46,13 +46,13 @@ This change follows [`release-lane`][lane], so the lane and `0.0.1` exist.
   - The glibc binary took 0.38 to 0.39 s.
   - On one CPU, the musl binary took 1.01 to 1.03 s and the glibc binary 1.09 to 1.12 s.
   - The `mise` pin installed `0.0.2` on a Mac, with lock checksums equal to the GitHub digests, and `check` flagged the word.
-- [x] 3.3 Update `AGENTS.md` and the README with the static build.  
-  Verify decision 9 of `AGENTS.md` and the README's install text describe a static `linux-x64` binary.  
+- [x] 3.3 Update `AGENTS.md` and the README with the static build.
+  Verify decision 9 of `AGENTS.md` and the README's install text describe a static `linux-x64` binary.
   Evidence, 2026-11-11 (UTC): both describe it, merged with [PR 69][pr69].
 
 ## 4. Integration
 
-- [x] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+- [x] 4.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
   Evidence, 2026-11-11 (UTC): [the CI run of PR 69][ci-pr69] passed, and so did [the CI run on main][ci-main] after the Version PR.
 
 ## Workflow follow-up

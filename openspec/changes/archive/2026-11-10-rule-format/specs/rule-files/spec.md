@@ -2,8 +2,8 @@
 
 ## Purpose
 
-A rule file contains one hakkiri rule.  
-It defines which text the rule reads, which check it runs, and which test cases prove it.  
+A rule file contains one hakkiri rule.
+It defines which text the rule reads, which check it runs, and which test cases prove it.
 This spec fixes the file format, its fields, its scopes, how words are counted, and how its tests run.
 
 ## ADDED Requirements
@@ -60,7 +60,7 @@ hakkiri SHALL refuse a rule whose `extends` is `script`, report an error that na
 
 ### Requirement: A scope names text with Vale's scope names
 
-A rule's `scope` SHALL take Vale 3.26.0's lowercase dotted scope names, such as `sentence`, `paragraph`, `heading.h1`, `list`, `blockquote`, `table.header` and `raw`.  
+A rule's `scope` SHALL take Vale 3.26.0's lowercase dotted scope names, such as `sentence`, `paragraph`, `heading.h1`, `list`, `blockquote`, `table.header` and `raw`.
 The rule SHALL read only the text those scopes hold.
 
 #### Scenario: A paragraph rule skips a heading
@@ -106,8 +106,8 @@ A scope part written `~` and a name SHALL leave out the text of that element and
 
 ### Requirement: Code comments are scopes
 
-In Rust, TypeScript and JavaScript, hakkiri SHALL read `//` comments as `text.comment.line` and `/* */` comments as `text.comment.block`.  
-It SHALL read Rust's `///` and `//!` as `text.comment.doc.line`.  
+In Rust, TypeScript and JavaScript, hakkiri SHALL read `//` comments as `text.comment.line` and `/* */` comments as `text.comment.block`.
+It SHALL read Rust's `///` and `//!` as `text.comment.doc.line`.
 It SHALL read `/** */`, and Rust's `/*! */`, as `text.comment.doc.block`.
 
 #### Scenario: A Rust block comment is read
@@ -122,7 +122,7 @@ It SHALL read `/** */`, and Rust's `/*! */`, as `text.comment.doc.block`.
 
 ### Requirement: Every comment reads as Markdown
 
-hakkiri SHALL read the text of every comment as Markdown, plain comments included.  
+hakkiri SHALL read the text of every comment as Markdown, plain comments included.
 A code span, a link and a bare URL in a comment SHALL read as they do in a Markdown file.
 
 #### Scenario: A URL in a plain comment
@@ -141,7 +141,7 @@ In a code file, every scope, `raw` included, SHALL hold comment text only, and n
 
 ### Requirement: A code span reads as one word
 
-In text a rule reads, hakkiri SHALL read each code span as one word that no token matches.  
+In text a rule reads, hakkiri SHALL read each code span as one word that no token matches.
 Link text SHALL read as words, and a link target SHALL be left out.
 
 #### Scenario: A word count with a code span
@@ -161,7 +161,7 @@ Link text SHALL read as words, and a link target SHALL be left out.
 
 ### Requirement: A metric rule counts token matches
 
-A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`.  
+A `metric` rule with `tokens` SHALL give its formula the variable `occurrences`.
 The variable counts the matches of those tokens in the measured text.
 
 #### Scenario: A semicolon rate
@@ -180,7 +180,7 @@ A `metric` rule with no `scope` SHALL measure the whole file once and report at 
 
 ### Requirement: A rule carries test cases
 
-hakkiri SHALL run each case in a rule's `tests` against that rule alone.  
+hakkiri SHALL run each case in a rule's `tests` against that rule alone.
 It SHALL read `input` as Markdown, or as the extension that `format` names, and never assert on `about`.
 
 #### Scenario: A case in Rust
@@ -190,7 +190,7 @@ It SHALL read `input` as Markdown, or as the extension that `format` names, and 
 
 ### Requirement: A test case checks the alerts
 
-A case SHALL pass when each `contains` string appears in the rule's alerts, no `absent` string appears, and the alerts equal `want` when `want` is set.  
+A case SHALL pass when each `contains` string appears in the rule's alerts, no `absent` string appears, and the alerts equal `want` when `want` is set.
 A `want` of `''` SHALL mean no alerts.
 
 #### Scenario: A case that fails

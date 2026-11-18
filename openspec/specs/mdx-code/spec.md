@@ -2,18 +2,18 @@
 
 ## Purpose
 
-An MDX file's expressions read as code, as in Vale, and so do its JSX (JavaScript XML) elements with no children.  
+An MDX file's expressions read as code, as in Vale, and so do its JSX (JavaScript XML) elements with no children.
 The tags of an element with children read as no node.
 
 ## Requirements
 
 ### Requirement: An MDX expression and a childless JSX element read as code
 
-In an MDX file, an `{…}` expression SHALL read as a code node over the text as written.  
+In an MDX file, an `{…}` expression SHALL read as a code node over the text as written.
 This SHALL apply in a line of text, a heading, a table cell or a block of its own.
 
-A JSX element with no children SHALL read the same way when it is a block.  
-So SHALL one written `<Tag />` in a line of text.  
+A JSX element with no children SHALL read the same way when it is a block.
+So SHALL one written `<Tag />` in a line of text.
 A `{/* … */}` comment SHALL read as no node, and the tags of an element with children SHALL read as no node.
 
 #### Scenario: A self-closing element in a line of text

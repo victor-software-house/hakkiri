@@ -2,7 +2,7 @@
 
 ### Requirement: A message verb with no value differs from Vale
 
-hakkiri SHALL read as nothing a `%s` or `%[n]s` of a message that has no value to take.  
+hakkiri SHALL read as nothing a `%s` or `%[n]s` of a message that has no value to take.
 Vale 3.26.0 prints Go's error text for it.
 
 #### Scenario: A verb past the values

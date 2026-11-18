@@ -2,15 +2,15 @@
 
 ## Purpose
 
-A `sequence` rule matches a run of words in one sentence, each word tested by a token's pattern, part-of-speech tag or universal tag.  
+A `sequence` rule matches a run of words in one sentence, each word tested by a token's pattern, part-of-speech tag or universal tag.
 Its tokens keep the meaning Vale 3.26.0 gives them.
 
 ## ADDED Requirements
 
 ### Requirement: sequence matches tokens word by word
 
-A `sequence` rule SHALL split each selected sentence into words and part-of-speech tags.  
-It SHALL report each run of words that its `tokens` match in order, as one alert that spans the run.  
+A `sequence` rule SHALL split each selected sentence into words and part-of-speech tags.
+It SHALL report each run of words that its `tokens` match in order, as one alert that spans the run.
 A token's `pattern` SHALL match a whole word, and its `tag` SHALL match anywhere in the word's Penn Treebank tag.
 
 In its message, each `%s` SHALL read as the next matched word.
@@ -32,7 +32,7 @@ In its message, each `%s` SHALL read as the next matched word.
 
 ### Requirement: sequence reads sentences only
 
-A `sequence` rule SHALL read the sentences of the nodes its `scope` selects, or of every prose node when it has no scope.  
+A `sequence` rule SHALL read the sentences of the nodes its `scope` selects, or of every prose node when it has no scope.
 A match SHALL never cross a sentence end.
 
 #### Scenario: Sentences of list items
@@ -42,8 +42,8 @@ A match SHALL never cross a sentence end.
 
 ### Requirement: skip and min widen a token
 
-A token with `skip: N` SHALL match up to N words of any kind before the word it names.  
-A token with `min: N` SHALL repeat N times, each with its own `skip`.  
+A token with `skip: N` SHALL match up to N words of any kind before the word it names.
+A token with `min: N` SHALL repeat N times, each with its own `skip`.
 With `ignorecase: true`, patterns SHALL ignore case.
 
 #### Scenario: Words between two tokens
@@ -63,8 +63,8 @@ With `ignorecase: true`, patterns SHALL ignore case.
 
 ### Requirement: negate and target
 
-A token with `negate: true` SHALL match a word its pattern or tag does not match.  
-A negated token SHALL also hold at the start or end of the sentence.  
+A token with `negate: true` SHALL match a word its pattern or tag does not match.
+A negated token SHALL also hold at the start or end of the sentence.
 When one or more tokens set `target: true`, the alert SHALL span only the words from the first to the last of them.
 
 #### Scenario: Not followed by a noun
@@ -84,7 +84,7 @@ When one or more tokens set `target: true`, the alert SHALL span only the words 
 
 ### Requirement: upos names a universal tag
 
-A token's `upos` SHALL name one or more universal part-of-speech tags joined by `|`, matched through the Penn Treebank tags Vale maps them to.  
+A token's `upos` SHALL name one or more universal part-of-speech tags joined by `|`, matched through the Penn Treebank tags Vale maps them to.
 hakkiri SHALL refuse a token that sets both `tag` and `upos`, or names an unknown universal tag.
 
 #### Scenario: A universal noun
@@ -108,7 +108,7 @@ A match that begins inside a match of one of the rule's `exceptions` patterns SH
 
 ### Requirement: model is refused
 
-hakkiri SHALL refuse a `sequence` rule that sets `model`, since it has no format for another tagger's model.  
+hakkiri SHALL refuse a `sequence` rule that sets `model`, since it has no format for another tagger's model.
 The error SHALL name the rule and the field.
 
 #### Scenario: A rule with a model

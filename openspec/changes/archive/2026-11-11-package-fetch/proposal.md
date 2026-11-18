@@ -1,21 +1,21 @@
 # Proposal
 
-Queue row: `HKR-006` in [tasks.yaml][ledger].  
+Queue row: `HKR-006` in [tasks.yaml][ledger].
 It unblocks `HKR-019` (vocabularies) and `HKR-008` (the Vale importer's package build).
 
 ## Motivation
 
-`check` and `test` load a package only from a local folder.  
-A `url` entry with its `sha256` is in the config grammar and in the [project-config spec][config], but hakkiri refuses it with "not downloaded yet".  
+`check` and `test` load a package only from a local folder.
+A `url` entry with its `sha256` is in the config grammar and in the [project-config spec][config], but hakkiri refuses it with "not downloaded yet".
 prose-style publishes `ProseStyle.zip` as a release asset, so a project cannot pin its rules by version and hash yet.
 
 ## Changes
 
-- A `url` entry downloads a zip and checks its SHA-256.  
-  It unpacks the zip into a cache folder named by the hash.  
+- A `url` entry downloads a zip and checks its SHA-256.
+  It unpacks the zip into a cache folder named by the hash.
   It then loads the package's `styles` folder as a `path` entry does.
 - A second run reads the cache and asks for nothing, so a cached package lints with no network.
-- A bad download is an error that shows the `url`, and nothing is cached.  
+- A bad download is an error that shows the `url`, and nothing is cached.
   A bad download is one that does not match its hash, is not a zip, names a file outside the package, or has no `styles` folder.
 - `--cache-dir`, with the variable `HAKKIRI_CACHE_DIR`, moves the cache, which defaults to the per-user cache folder.
 - The `vale-differences` spec records what differs from `vale sync`.

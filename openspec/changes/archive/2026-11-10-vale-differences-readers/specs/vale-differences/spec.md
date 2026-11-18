@@ -7,13 +7,13 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 #### Scenario: A sentence is tagged whole
 
 - **WHEN** a text is cut differently by hakkiri's splitter and by prose's segmenter
-- **THEN** hakkiri tags its own sentence whole and Vale tags each part apart.  
+- **THEN** hakkiri tags its own sentence whole and Vale tags each part apart.
   So the tags can differ ([case 3][case-3])
 
 #### Scenario: A word's shape reads Rust's Unicode properties
 
 - **WHEN** a word has a character such as `²`
-- **THEN** hakkiri reads its shape from Rust's Unicode properties and Vale from Go's categories.  
+- **THEN** hakkiri reads its shape from Rust's Unicode properties and Vale from Go's categories.
   So the feature, and the tag, can differ ([case 5][case-5])
 
 #### Scenario: Compound directives are left out
@@ -39,7 +39,7 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 #### Scenario: Two swap keys expand to the same text
 
 - **WHEN** an `affix` rule's `swap` has two keys whose forms expand to the same text
-- **THEN** hakkiri keeps both in the order written, so the first gives the replacement.  
+- **THEN** hakkiri keeps both in the order written, so the first gives the replacement.
   Vale keeps the key its map visits last, which can change from run to run ([spelling 4][spelling-4])
 
 #### Scenario: A language other than English
@@ -49,13 +49,13 @@ hakkiri SHALL differ from Vale 3.26.0 in each case below, in how it reads tags, 
 
 ### Requirement: A run finishes where Vale panics, stalls or runs out of memory
 
-hakkiri SHALL finish a run on each input below in bounded time and memory.  
+hakkiri SHALL finish a run on each input below in bounded time and memory.
 On these inputs, Vale 3.26.0 panics, runs out of memory, or takes quadratic, cubic or exponential time.
 
 #### Scenario: A pattern reaches its limit
 
 - **WHEN** a `fancy-regex` pattern reaches its backtrack limit on a file
-- **THEN** hakkiri gives one error alert for that rule and file.  
+- **THEN** hakkiri gives one error alert for that rule and file.
   Vale has no time limit and panics when a match fails ([engine 8][engine-8], [bootstrap 8][bootstrap-8])
 
 #### Scenario: A large skip and min
@@ -66,25 +66,25 @@ On these inputs, Vale 3.26.0 panics, runs out of memory, or takes quadratic, cub
 #### Scenario: A sentence whose anchor matches most words
 
 - **WHEN** a `sequence` sentence of 16,667 words has an anchor that matches most of them
-- **THEN** hakkiri reads it in 31 ms by taking the next word the anchor accepts.  
+- **THEN** hakkiri reads it in 31 ms by taking the next word the anchor accepts.
   Vale costs the cube of the words, which took it 18 seconds for 8,000 ([case 3][case-3])
 
 #### Scenario: A token of many hyphenated parts
 
 - **WHEN** a `spelling` token has many hyphenated parts
-- **THEN** hakkiri keeps the result of each part for each depth, so it takes polynomial time.  
+- **THEN** hakkiri keeps the result of each part for each depth, so it takes polynomial time.
   Vale checks every part again at each split, so it takes exponential time ([case 6][case-6])
 
 #### Scenario: A token of many marks
 
 - **WHEN** a text has a token of 20,000 marks
-- **THEN** hakkiri splits its prefixes, suffixes and contractions in one pass.  
+- **THEN** hakkiri splits its prefixes, suffixes and contractions in one pass.
   Vale's `prose` package searches what is left again after each one it takes off, which takes quadratic time ([case 5][case-5])
 
 ### Requirement: Known gaps are listed apart
 
-This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do.  
-It SHALL list each apart from the intended differences, with its queue row.  
+This spec SHALL list each thing Vale 3.26.0 does that hakkiri does not yet do.
+It SHALL list each apart from the intended differences, with its queue row.
 A pull request that closes a gap SHALL remove its scenario, and record any difference the closing leaves as an intended difference.
 
 #### Scenario: Text inside an HTML block
@@ -102,7 +102,7 @@ A pull request that closes a gap SHALL remove its scenario, and record any diffe
 #### Scenario: Vocabularies
 
 - **WHEN** a rule sets `vocab`, or a project lists accepted and rejected terms
-- **THEN** hakkiri loads the field and reads no vocabulary.  
+- **THEN** hakkiri loads the field and reads no vocabulary.
   Vale adds the accepted terms to the exceptions and generates the `Vale.Terms` and `Vale.Avoid` rules (row [HKR-019][ledger], [case 1][case-1])
 
 #### Scenario: The Markdown parser

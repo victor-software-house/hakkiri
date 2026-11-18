@@ -2,19 +2,19 @@
 
 ## Purpose
 
-A package ships a settings file in its top folder, in the format of the project config.  
-hakkiri applies it under the project's own.  
+A package ships a settings file in its top folder, in the format of the project config.
+hakkiri applies it under the project's own.
 The file contains the packages a package lists and the vocabularies it uses.
 
 ## Requirements
 
 ### Requirement: A package's settings file is in its top folder
 
-The top folder of a package SHALL be the folder that contains its `styles` folder.  
+The top folder of a package SHALL be the folder that contains its `styles` folder.
 A fetched zip's top folder SHALL be its one top folder.
 
-A `path` entry may point to a folder called `styles`.  
-Its top folder SHALL then be that folder's parent, except when the parent is the project root or contains it.  
+A `path` entry may point to a folder called `styles`.
+Its top folder SHALL then be that folder's parent, except when the parent is the project root or contains it.
 A package with no top folder, and the project's own config, SHALL be no package's settings.
 
 #### Scenario: A fetched package
@@ -39,11 +39,11 @@ A package with no top folder, and the project's own config, SHALL be no package'
 
 ### Requirement: A package may list packages
 
-A package's `packages` SHALL be fetched like the project's, each entry containing a `url` and a `sha256`.  
-In a package's file, a `path` entry SHALL be an error.  
+A package's `packages` SHALL be fetched like the project's, each entry containing a `url` and a `sha256`.
+In a package's file, a `path` entry SHALL be an error.
 So SHALL a chain of packages more than 10 deep.
 
-A package listed twice SHALL load once, by its `sha256` for a download and its folder for a `path`.  
+A package listed twice SHALL load once, by its `sha256` for a download and its folder for a `path`.
 The packages a package lists SHALL come before it, in the order written.
 
 #### Scenario: A nested package
@@ -73,11 +73,11 @@ The packages a package lists SHALL come before it, in the order written.
 
 ### Requirement: Package vocabularies and the project's add up
 
-The `vocab` lists of the packages and the project SHALL add up, the packages' first.  
+The `vocab` lists of the packages and the project SHALL add up, the packages' first.
 An empty `vocab` list SHALL drop the names before it, as Vale's `Vocab = NONE` does, and a missing key SHALL keep them.
 
-The same SHALL apply between two packages, where the later one wins.  
-So SHALL the `vocab` of a glob, which drops only the lists of earlier configs for the same glob text.  
+The same SHALL apply between two packages, where the later one wins.
+So SHALL the `vocab` of a glob, which drops only the lists of earlier configs for the same glob text.
 A name that no package or two packages contain SHALL be an error on its line in the file that lists it.
 
 #### Scenario: Two lists
@@ -117,7 +117,7 @@ A name that no package or two packages contain SHALL be an error on its line in 
 
 ### Requirement: A package's settings do not set the run options
 
-A package's settings file SHALL NOT contain `fail_level`, `gitignore` or `on_unmatched`.  
+A package's settings file SHALL NOT contain `fail_level`, `gitignore` or `on_unmatched`.
 A file that does SHALL be an error that gives the key, its line and the package.
 
 #### Scenario: A package sets all three
@@ -127,8 +127,8 @@ A file that does SHALL be an error that gives the key, its line and the package.
 
 ### Requirement: A package's settings contain formats and not on_unknown
 
-A package's settings file MAY contain `formats`, and the entries of the packages and the project SHALL add up.  
-A later entry SHALL replace an earlier one with the same key.  
+A package's settings file MAY contain `formats`, and the entries of the packages and the project SHALL add up.
+A later entry SHALL replace an earlier one with the same key.
 It SHALL NOT contain `on_unknown`, and a file that does SHALL be an error that shows the key, its line and the package.
 
 #### Scenario: The project overrides the package

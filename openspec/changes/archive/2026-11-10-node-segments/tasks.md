@@ -2,29 +2,29 @@
 
 ## 1. Segments
 
-- [x] 1.1 Give each node segments, and join them into its text.  
+- [x] 1.1 Give each node segments, and join them into its text.
   Verify the test of a paragraph over two line comments passes in CI.
-  - 2026-11-10 (UTC), the test passes in a throwaway Linux box with `mise run test`, in [d315e7b][c-segments].  
+  - 2026-11-10 (UTC), the test passes in a throwaway Linux box with `mise run test`, in [d315e7b][c-segments].
     CI has not run yet (task 2.1).
-- [x] 1.2 Leave code, HTML, link definitions and MDX syntax as gaps between segments.  
+- [x] 1.2 Leave code, HTML, link definitions and MDX syntax as gaps between segments.
   Verify the HTML-in-a-paragraph test and the test of an expression in a paragraph pass in CI.
   - 2026-11-10 (UTC), both tests pass in the same kind of box run, in [ae31a1a][c-gaps].
-- [x] 1.3 Make each Markdown line one segment, without the line ending, the indentation or the `>` markers.  
+- [x] 1.3 Make each Markdown line one segment, without the line ending, the indentation or the `>` markers.
   Verify the quote-paragraph snapshot and test pass in CI.
   - 2026-11-10 (UTC), both pass in the same kind of box run, in [02f1676][c-lines].
-- [x] 1.4 Leave heading syntax out of the segments.  
+- [x] 1.4 Leave heading syntax out of the segments.
   Verify the heading-syntax snapshot passes in CI.
   - 2026-11-10 (UTC), the snapshot and the heading test pass among 69 tests in the same kind of box run, in [eb6115b][c-syntax].
-- [x] 1.5 Make a block quote, list item and table row read as their content.  
+- [x] 1.5 Make a block quote, list item and table row read as their content.
   Verify the quote and list tests pass in CI.
-  - 2026-11-10 (UTC), both pass in the same box run, in [eb6115b][c-syntax].  
+  - 2026-11-10 (UTC), both pass in the same box run, in [eb6115b][c-syntax].
     A container span now starts at its first segment.
 
 ## 2. Integration
 
 - [x] 2.1 Verify the pull request's CI passes: build, lint, tests, prose lint, OpenSpec and the Template check.
-  - 2026-11-10 (UTC), [Verify][run-pr7] passed on [PR 7][pr7] at `ab0f0b7`.  
-    The Template check passed at v0.0.88.  
+  - 2026-11-10 (UTC), [Verify][run-pr7] passed on [PR 7][pr7] at `ab0f0b7`.
+    The Template check passed at v0.0.88.
     Every Kody thread was answered and resolved, and the pull request merged at `94ae55e`.
 
 ## Workflow follow-up

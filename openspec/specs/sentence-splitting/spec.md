@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The splitter decides where a sentence ends in the check text of one paragraph, heading or table cell.  
+The splitter decides where a sentence ends in the check text of one paragraph, heading or table cell.
 The [scope-selection spec][scope] decides which nodes it reads.
 
 ## Requirements
@@ -46,7 +46,7 @@ The splitter SHALL NOT end a sentence inside a run of characters with no whitesp
 
 ### Requirement: Closing marks stay with their sentence
 
-A closing quote or bracket right after an end mark SHALL belong to the sentence the end mark ends.  
+A closing quote or bracket right after an end mark SHALL belong to the sentence the end mark ends.
 The splitter SHALL NOT end a sentence inside brackets that close later in the same text.
 
 #### Scenario: A quoted sentence
@@ -79,7 +79,7 @@ The splitter SHALL NOT end a sentence at `...` or `…` when the next word start
 
 ### Requirement: The splitter does at least as well as Vale
 
-On each committed evaluation set, the splitter's boundary F1 SHALL be at least the F1 that Vale 3.26.0 scores on it.  
+On each committed evaluation set, the splitter's boundary F1 SHALL be at least the F1 that Vale 3.26.0 scores on it.
 Vale's F1 for each set is committed beside the set.
 
 #### Scenario: The evaluation test
@@ -89,7 +89,7 @@ Vale's F1 for each set is committed beside the set.
 
 ### Requirement: Training rebuilds the model
 
-The embedded model SHALL be the output of the committed training task on the committed source list.  
+The embedded model SHALL be the output of the committed training task on the committed source list.
 The same sources SHALL give the same file.
 
 #### Scenario: A second training run
@@ -101,8 +101,8 @@ The same sources SHALL give the same file.
 
 ### Requirement: A code span begins and ends a sentence
 
-The splitter SHALL take the byte ranges of the code spans of its text.  
-A code span SHALL begin a sentence after a full stop, and a full stop after a code span SHALL end one.  
+The splitter SHALL take the byte ranges of the code spans of its text.
+A code span SHALL begin a sentence after a full stop, and a full stop after a code span SHALL end one.
 A code span SHALL NOT be an abbreviation or an initial.
 
 #### Scenario: Two sentences around code spans
@@ -112,7 +112,7 @@ A code span SHALL NOT be an abbreviation or an initial.
 
 ### Requirement: A unit after a number ends a sentence
 
-A unit of measure after a number, followed by a full stop and a capital word, SHALL end a sentence.  
+A unit of measure after a number, followed by a full stop and a capital word, SHALL end a sentence.
 A word that is no unit after a number SHALL end nothing.
 
 #### Scenario: A time in milliseconds
@@ -122,7 +122,7 @@ A word that is no unit after a number SHALL end nothing.
 
 ### Requirement: `vs.` and a date end nothing
 
-`vs.` SHALL end no sentence, before a capital word or a number.  
+`vs.` SHALL end no sentence, before a capital word or a number.
 A date before a full stop SHALL NOT be a list number.
 
 #### Scenario: Two versions compared

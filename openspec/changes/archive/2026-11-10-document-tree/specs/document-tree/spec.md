@@ -2,15 +2,15 @@
 
 ## Purpose
 
-Every file hakkiri reads becomes one tree of nodes, each with a scope name and the byte span of its text in the file.  
-hakkiri reads Markdown, MDX, and the comments of Rust, TypeScript and JavaScript files.  
+Every file hakkiri reads becomes one tree of nodes, each with a scope name and the byte span of its text in the file.
+hakkiri reads Markdown, MDX, and the comments of Rust, TypeScript and JavaScript files.
 Rules select text from this tree, and alerts point back into the file through the spans.
 
 ## ADDED Requirements
 
 ### Requirement: Every node has a scope and a span
 
-Each node in the tree SHALL have its scope name, the byte span of its text in the file, and its child nodes.  
+Each node in the tree SHALL have its scope name, the byte span of its text in the file, and its child nodes.
 The node-segments spec states which ranges make the text of a node and how the span covers them.
 
 #### Scenario: A paragraph in a Markdown file
@@ -20,7 +20,7 @@ The node-segments spec states which ranges make the text of a node and how the s
 
 ### Requirement: Markdown nodes carry Vale scope names
 
-hakkiri SHALL give each Markdown node the scope the design's table names.  
+hakkiri SHALL give each Markdown node the scope the design's table names.
 The table covers paragraphs, headings, block quotes, list items, table rows and cells, links, code spans, strong and emphasis text, and image alt text.
 
 #### Scenario: A nested list
@@ -35,7 +35,7 @@ The table covers paragraphs, headings, block quotes, list items, table rows and 
 
 ### Requirement: Code and markup are not prose
 
-Fenced code, raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.  
+Fenced code, raw HTML, link definitions and front matter SHALL carry no prose scope, and SHALL appear in the tree only under `raw`.
 Inside a prose node, the node-segments spec makes such syntax a gap in the text.
 
 #### Scenario: A URL in a fenced block
@@ -45,7 +45,7 @@ Inside a prose node, the node-segments spec makes such syntax a gap in the text.
 
 ### Requirement: MDX keeps prose and leaves code out
 
-In an MDX file, text inside a JavaScript XML (JSX) element SHALL be prose.  
+In an MDX file, text inside a JavaScript XML (JSX) element SHALL be prose.
 Imports, exports, expressions, and the tags and attributes of JSX elements SHALL carry no prose scope.
 
 #### Scenario: A JSX element with text
@@ -55,7 +55,7 @@ Imports, exports, expressions, and the tags and attributes of JSX elements SHALL
 
 ### Requirement: Export blocks end at the end of their code
 
-An export block SHALL end at the first blank line after which its code parses as TypeScript with JavaScript XML (TSX).  
+An export block SHALL end at the first blank line after which its code parses as TypeScript with JavaScript XML (TSX).
 Incomplete code SHALL read on past the blank line.
 
 #### Scenario: A quote or a regular expression in an export block
@@ -70,7 +70,7 @@ Incomplete code SHALL read on past the blank line.
 
 ### Requirement: Invalid export code is an error
 
-A syntax error in an import or export block SHALL fail the file with an error that names its line.  
+A syntax error in an import or export block SHALL fail the file with an error that names its line.
 A block incomplete at the end of the file SHALL fail the file too.
 
 #### Scenario: A syntax error in an export
@@ -85,7 +85,7 @@ A block incomplete at the end of the file SHALL fail the file too.
 
 ### Requirement: Deep nesting does not crash hakkiri
 
-hakkiri SHALL build the tree of a document with 1,000 levels of block quotes without exhausting the stack.  
+hakkiri SHALL build the tree of a document with 1,000 levels of block quotes without exhausting the stack.
 It SHALL do the same for 1,000 levels of lists.
 
 #### Scenario: A thousand block quotes
@@ -131,11 +131,11 @@ A node inside a comment SHALL span the bytes of its text in the file, not in the
 
 ### Requirement: JSDoc tags are not prose
 
-In a `/** */` comment of a TypeScript or JavaScript file, a tag name SHALL carry no prose scope.  
-A type in braces after a tag SHALL carry none either.  
+In a `/** */` comment of a TypeScript or JavaScript file, a tag name SHALL carry no prose scope.
+A type in braces after a tag SHALL carry none either.
 Neither SHALL the name after `@param`, `@typedef`, `@property`, `@prop`, `@arg`, `@argument`, `@template` or `@callback`.
 
-The description after them SHALL be prose, and the body of `@example` SHALL be code.  
+The description after them SHALL be prose, and the body of `@example` SHALL be code.
 A line inside a fenced block SHALL begin no tag.
 
 #### Scenario: A parameter tag

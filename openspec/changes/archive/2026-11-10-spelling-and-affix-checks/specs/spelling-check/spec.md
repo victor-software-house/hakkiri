@@ -2,17 +2,17 @@
 
 ## Purpose
 
-A `spelling` rule checks each word of the selected text against a dictionary and reports the words it does not contain.  
-An `affix` field lets an `existence` token or a `substitution` key write a word with its affix flags.  
+A `spelling` rule checks each word of the selected text against a dictionary and reports the words it does not contain.
+An `affix` field lets an `existence` token or a `substitution` key write a word with its affix flags.
 Both keep the meaning Vale 3.26.0 gives them.
 
 ## ADDED Requirements
 
 ### Requirement: spelling reports a word the dictionary lacks
 
-A `spelling` rule SHALL split the selected text into words.  
-It SHALL report each word that the rule's dictionaries do not contain, as one alert that spans the word.  
-A `%s` in its message SHALL read as the word.  
+A `spelling` rule SHALL split the selected text into words.
+It SHALL report each word that the rule's dictionaries do not contain, as one alert that spans the word.
+A `%s` in its message SHALL read as the word.
 When the rule loads no other dictionary, the dictionary SHALL be Vale's built-in `en_US-web`.
 
 #### Scenario: A misspelt word
@@ -32,8 +32,8 @@ When the rule loads no other dictionary, the dictionary SHALL be Vale's built-in
 
 ### Requirement: Built-in filters skip names and codes
 
-Unless the rule sets `custom: true`, three kinds of word SHALL be skipped.  
-These are a word that starts with a capital and has another capital after a lower-case letter, and a word that ends in capitals.  
+Unless the rule sets `custom: true`, three kinds of word SHALL be skipped.
+These are a word that starts with a capital and has another capital after a lower-case letter, and a word that ends in capitals.
 The third is a word that contains a character other than an ASCII letter, `_` or `'`.
 
 A word that matches one of the rule's `filters` SHALL also be skipped.
@@ -55,7 +55,7 @@ A word that matches one of the rule's `filters` SHALL also be skipped.
 
 ### Requirement: ignore adds word lists
 
-Each entry of `ignore` SHALL be the path of a file of accepted words, one per line.  
+Each entry of `ignore` SHALL be the path of a file of accepted words, one per line.
 The file SHALL be found at that path in the package that contains the rule, or under the package's `config/ignore` folder.
 
 #### Scenario: A project term
@@ -65,7 +65,7 @@ The file SHALL be found at that path in the package that contains the rule, or u
 
 ### Requirement: split checks the parts of an identifier
 
-With `split: true`, a word made of parts, such as `blorftMessage` or `blorft_message`, SHALL be checked part by part.  
+With `split: true`, a word made of parts, such as `blorftMessage` or `blorft_message`, SHALL be checked part by part.
 A misspelt part of three letters or more that is not in capitals SHALL be reported at its own position.
 
 #### Scenario: An identifier without split
@@ -80,10 +80,10 @@ A misspelt part of three letters or more that is not in capitals SHALL be report
 
 ### Requirement: Vale's casing and code messages
 
-When the dictionary contains the word only with more capitals inside it, the message SHALL show the dictionary form.  
+When the dictionary contains the word only with more capitals inside it, the message SHALL show the dictionary form.
 It SHALL read `Use '<dictionary form>' instead of '<word>'.`
 
-Otherwise, without `split`, a word shaped like an identifier SHALL get the code message in a Markdown file or an MDX file.  
+Otherwise, without `split`, a word shaped like an identifier SHALL get the code message in a Markdown file or an MDX file.
 That message SHALL read `'<word>' looks like code; format it as code.`
 
 #### Scenario: A casing mistake
@@ -98,8 +98,8 @@ That message SHALL read `'<word>' looks like code; format it as code.`
 
 ### Requirement: dictionaries come from the package
 
-`dictionaries` SHALL list dictionaries read as `<name>.aff` and `<name>.dic` from the `config/dictionaries` folder of the rule's package.  
-When `dicpath` is set, they SHALL be read from that folder inside the package instead.  
+`dictionaries` SHALL list dictionaries read as `<name>.aff` and `<name>.dic` from the `config/dictionaries` folder of the rule's package.
+When `dicpath` is set, they SHALL be read from that folder inside the package instead.
 `append: true` SHALL add the built-in dictionary to the ones the rule loads.
 
 #### Scenario: A team dictionary
@@ -109,7 +109,7 @@ When `dicpath` is set, they SHALL be read from that folder inside the package in
 
 ### Requirement: aff and dic name one dictionary
 
-`aff` and `dic` SHALL give one dictionary's two files inside the package.  
+`aff` and `dic` SHALL give one dictionary's two files inside the package.
 hakkiri SHALL refuse a rule that sets only one of them.
 
 #### Scenario: One dictionary by its two files
@@ -119,7 +119,7 @@ hakkiri SHALL refuse a rule that sets only one of them.
 
 ### Requirement: A dictionary that cannot be read is refused
 
-hakkiri SHALL refuse a rule whose dictionary is missing.  
+hakkiri SHALL refuse a rule whose dictionary is missing.
 It SHALL refuse a rule whose path to a dictionary, a folder or a word list leaves its package.
 
 #### Scenario: A path that leaves the package
@@ -143,7 +143,7 @@ hakkiri SHALL refuse a `spelling` rule that sets `exceptions`, or a `threshold` 
 
 ### Requirement: affix expands a word with flags
 
-When an `existence` or `substitution` rule sets `affix`, each token or key part written `word/FLAGS` SHALL match the word and each form the flags list in that affix file.  
+When an `existence` or `substitution` rule sets `affix`, each token or key part written `word/FLAGS` SHALL match the word and each form the flags list in that affix file.
 `affix: en_US-web` SHALL select the built-in affix file, and any other name SHALL be read from the package's `config/dictionaries`.
 
 #### Scenario: Every form of a verb

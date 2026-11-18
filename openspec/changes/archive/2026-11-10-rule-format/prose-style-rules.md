@@ -1,13 +1,13 @@
 # ProseStyle in the format
 
-This file proves the format covers the package.  
-It covers the 25 rules in [ProseStyle][prose-style-rules] and the habit candidates in the [frequency research][habit-research].  
-No rule below uses a lookbehind to find code, a link, a fence or a comment; a scope does that job.  
+This file proves the format covers the package.
+It covers the 25 rules in [ProseStyle][prose-style-rules] and the habit candidates in the [frequency research][habit-research].
+No rule below uses a lookbehind to find code, a link, a fence or a comment; a scope does that job.
 A lookbehind that checks only the next character, such as the word before a dash, stays.
 
 ## 1. The 25 rules
 
-Fields keep Vale's names (decision 2), so 20 rules carry over as they are.  
+Fields keep Vale's names (decision 2), so 20 rules carry over as they are.
 Five rules found structure with `raw` and lookbehind; decisions 8 and 9 make them three scope rules.
 
 | Rule | Check | Scope | In hakkiri |
@@ -138,9 +138,9 @@ The long-row case keeps ProseStyle's input, a row of 260 characters, which is to
 
 ## 3. The habit rules
 
-Each candidate in the research becomes one rule.  
-A rate rule is a metric on `occurrences` per 1,000 words over the whole file (decision 4).  
-Its threshold sits between the highest human rate and the agent rate the research measured.  
+Each candidate in the research becomes one rule.
+A rate rule is a metric on `occurrences` per 1,000 words over the whole file (decision 4).
+Its threshold sits between the highest human rate and the agent rate the research measured.
 The prose-style change that adds these rules sets the final numbers.
 
 | Candidate | Rule | Check | Research rate per 1,000 words |
@@ -254,9 +254,9 @@ tests:
 
 ### 3.6 ThingsAct, StockWords and the phrases
 
-These are word lists, so they are `existence` rules like `Filler`.  
-`ThingsAct` lists owns, refuses, survives, carries, stays, waits, keeps, sits and lives after a noun for a thing, as `ThingsSpeak` does for speech.  
-`StockWords` lists `durable`, `authoritative`, `deliberate`, `silently` and `verbatim`.  
+These are word lists, so they are `existence` rules like `Filler`.
+`ThingsAct` lists owns, refuses, survives, carries, stays, waits, keeps, sits and lives after a noun for a thing, as `ThingsSpeak` does for speech.
+`StockWords` lists `durable`, `authoritative`, `deliberate`, `silently` and `verbatim`.
 `StockPhrases` gains `byte identical`, `byte for byte`, `source of truth` and `keeps its own`.
 
 [prose-style-rules]: https://github.com/victor-software-house/prose-style/tree/ee9f207279864e305d7372aef4a6c5dacc3eb846/ProseStyle/styles/ProseStyle

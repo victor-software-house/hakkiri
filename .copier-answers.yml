@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; edit with `copier update --data`.
-_commit: v0.0.111
+_commit: v0.0.126
 _src_path: https://github.com/victor-software-house/templates.git
 build_os: linux
 cargo_min_publish_age: 3 days
@@ -23,7 +23,8 @@ deny_licenses:
 -   license: CDLA-Permissive-2.0
     reason: webpki-roots, the root certificates of ureq's rustls
 feature_sets: []
-generated_paths: []
+generated_paths:
+- data/splitter/SOURCES.md
 github_owner: victor-software-house
 layout: crate
 library: false
@@ -55,8 +56,9 @@ platforms:
 - linux-x64
 - macos-arm64
 project: rust-crate
-prose_fail_level: error
+prose_fail_level: suggestion
 published: false
+repository_id: 0
 repository_visibility: public
 rust_nightly: nightly-2026-11-01
 rust_version: 1.100.0

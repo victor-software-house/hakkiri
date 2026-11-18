@@ -4,21 +4,21 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 1. The word lists
 
-- [x] 1.1 Add `nouns_of_technical_prose` to `src/tagger/corrections.rs`, with one word list for each place a noun is certain.  
-  Verify tagger tests pin each list, and the Georgetown University Multilayer (GUM) corpus stays at 92.53% or above.  
+- [x] 1.1 Add `nouns_of_technical_prose` to `src/tagger/corrections.rs`, with one word list for each place a noun is certain.
+  Verify tagger tests pin each list, and the Georgetown University Multilayer (GUM) corpus stays at 92.53% or above.
   Verify `NounStack` now gives the 7 true alerts of Vale it lacked.
-  - 2026-11-12 (UTC): GUM is right on 52,298 of 56,516 tokens, 92.54%, as before the change.  
-    The judged conflicts count 134 right against 133.  
+  - 2026-11-12 (UTC): GUM is right on 52,298 of 56,516 tokens, 92.54%, as before the change.
+    The judged conflicts count 134 right against 133.
     `NounStack` gives all 16 true alerts of Vale, 14 of them with a span that runs through a link target.
-- [x] 1.2 Keep in each list only the words whose sampled readings in that place are all nouns, and put the counts in the design.  
+- [x] 1.2 Keep in each list only the words whose sampled readings in that place are all nouns, and put the counts in the design.
   Verify two readers labelled 530 places of the six words in the nine repositories, and each case and list was run alone.
-  - 2026-11-12 (UTC): After a determiner, `check`, `prompt`, `thinking` and `fade` are nouns in 163 of 163 places.  
+  - 2026-11-12 (UTC): After a determiner, `check`, `prompt`, `thinking` and `fade` are nouns in 163 of 163 places.
     `round` is a noun in 41 of 50 and `split` in 40 of 50, so the last two left that list.
-  - 2026-11-12 (UTC): The title case gives 5 true alerts of `NounStack` and the compound case gives 1.  
-    The same cases for every word add 98 alerts, and a sample of them are false.  
+  - 2026-11-12 (UTC): The title case gives 5 true alerts of `NounStack` and the compound case gives 1.
+    The same cases for every word add 98 alerts, and a sample of them are false.
     GUM, the judged conflicts and every alert of the nine repositories are the same with the three lists.
 
 ## 2. Integration
 
-- [x] 2.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+- [x] 2.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
   Evidence, 2026-11-14 (UTC): The CI of the stack that [pull request 121](https://github.com/victor-software-house/hakkiri/pull/121) heads passed, and the stack merged as `7aac10a`.

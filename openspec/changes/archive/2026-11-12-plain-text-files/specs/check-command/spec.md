@@ -2,8 +2,8 @@
 
 ### Requirement: A language is read by extension
 
-**Reason**: OpenSpec cannot drop a scenario of a modified requirement.  
-Both scenarios of this one no longer apply: a file that no language reads was skipped in a walk and rejected when given by name.  
+**Reason**: OpenSpec cannot drop a scenario of a modified requirement.
+Both scenarios of this one no longer apply: a file that no language reads was skipped in a walk and rejected when given by name.
 So the requirement is removed and added again below under a new name.
 
 **Migration**: Read the requirement called "A reader is chosen by formats, then by extension" under the ADDED section.
@@ -12,8 +12,8 @@ So the requirement is removed and added again below under a new name.
 
 ### Requirement: A reader is chosen by formats, then by extension
 
-hakkiri SHALL read a file by the reader its `formats` entry gives it.  
-Otherwise it SHALL read the file by its extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` as Markdown, MDX, Rust, TypeScript, TSX or JavaScript.  
+hakkiri SHALL read a file by the reader its `formats` entry gives it.
+Otherwise it SHALL read the file by its extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` as Markdown, MDX, Rust, TypeScript, TSX or JavaScript.
 A file that a glob selects and that no reader reads SHALL be read as plain text, unless `on_unknown` is set otherwise.
 
 #### Scenario: A file no reader reads, found by a walk
@@ -33,7 +33,7 @@ A file that a glob selects and that no reader reads SHALL be read as plain text,
 
 ### Requirement: Plain text is read as written
 
-A plain-text file SHALL have one `raw` scope over the whole file, and each run of lines between blank lines SHALL be one `paragraph`.  
+A plain-text file SHALL have one `raw` scope over the whole file, and each run of lines between blank lines SHALL be one `paragraph`.
 No marker, escape or entity SHALL change its text.
 
 #### Scenario: Paragraphs
@@ -48,7 +48,7 @@ No marker, escape or entity SHALL change its text.
 
 ### Requirement: A binary file is skipped
 
-When its first 8192 bytes contain a NUL (zero) byte, a plain-text file SHALL be skipped with no alert and no message.  
+When its first 8192 bytes contain a NUL (zero) byte, a plain-text file SHALL be skipped with no alert and no message.
 This SHALL apply whether a walk finds the file or the command line gives it.
 
 A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
@@ -66,7 +66,7 @@ A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file
 
 ### Requirement: A file has its own extension and its reader's
 
-A file SHALL have its own extension and its reader's, for the scopes of the rules that run on it.  
+A file SHALL have its own extension and its reader's, for the scopes of the rules that run on it.
 A scope part that gives an extension SHALL match either, and a negated part SHALL leave a block out for either.
 
 #### Scenario: A mapped file
@@ -76,9 +76,9 @@ A scope part that gives an extension SHALL match either, and a negated part SHAL
 
 ### Requirement: on_unknown sets what a selected file with no reader gets
 
-For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.  
-`text`, the default, reads it as plain text, and `warn` skips it with a warning that gives its path.  
-`error` fails the run with exit 2, and `ignore` skips it.  
+For a file that a glob selects and that no reader reads, `on_unknown` SHALL be one of four words.
+`text`, the default, reads it as plain text, and `warn` skips it with a warning that gives its path.
+`error` fails the run with exit 2, and `ignore` skips it.
 A file that no glob selects SHALL draw no message.
 
 #### Scenario: Warn

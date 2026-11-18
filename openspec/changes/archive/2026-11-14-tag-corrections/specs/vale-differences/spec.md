@@ -2,7 +2,7 @@
 
 ### Requirement: Tags come from the model and its corrections
 
-hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.  
+hakkiri SHALL tag a sentence with the English model of prose at `b33e60d` and then correct the tags by the rules below.
 Vale 3.26.0 tags with the model of prose v3.2.2, so the tags of the two tools differ.
 
 #### Scenario: Another model

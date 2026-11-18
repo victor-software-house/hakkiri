@@ -1,22 +1,22 @@
 # Research: a prose linter to replace Vale
 
-Retrieved 2026-11-09.  
-Each claim links its source.  
+Retrieved 2026-11-09.
+Each claim links its source.
 "Read at source" means the file, page or API response was read this session; "not verified" marks the rest.
 
 ## 1. Findings
 
-1. No existing tool replaces Vale for [ProseStyle][ps].  
+1. No existing tool replaces Vale for [ProseStyle][ps].
    Every candidate either runs a fixed rule set, checks grammar only, or writes rules in another language (section 4).
-2. ProseStyle uses a small part of Vale.  
-   The package configuration turns on 42 rules of four types: existence, substitution, occurrence and metric (section 2.1).  
+2. ProseStyle uses a small part of Vale.
+   The package configuration turns on 42 rules of four types: existence, substitution, occurrence and metric (section 2.1).
    The Tengo script rule and the conditional rule ship in the zip but no section turns them on.
-3. The slowest and least stable rules exist because Vale gives them no scope for "prose outside code".  
-   `BareURL` rebuilds fenced blocks and code spans out of lookbehinds; that rule caused the backtracking panics and the 249 s run (section 3).  
+3. The slowest and least stable rules exist because Vale gives them no scope for "prose outside code".
+   `BareURL` rebuilds fenced blocks and code spans out of lookbehinds; that rule caused the backtracking panics and the 249 s run (section 3).
    A linter that walks a Markdown tree offers that scope, and the rule becomes a token match.
-4. The Rust building blocks are mature for every part except sentence splitting and syllable counts (section 5).  
+4. The Rust building blocks are mature for every part except sentence splitting and syllable counts (section 5).
    `fancy-regex` now accepts variable-length lookbehind and returns an error instead of a panic when it runs out of backtracking budget.
-5. Whether `fancy-regex` compiles the six ProseStyle patterns that use lookbehind, unchanged, is not verified.  
+5. Whether `fancy-regex` compiles the six ProseStyle patterns that use lookbehind, unchanged, is not verified.
    That one test decides how cheap reading Vale rule YAML as it is would be.
 
 ## 2. What ProseStyle needs
@@ -35,27 +35,27 @@ The package [`.vale.ini`][ps-ini] sets `BasedOnStyles = ProseStyle, Voices, Dire
 | Std | 4, as suggestions | 10 | existence, substitution |
 | Readability | `FleschKincaid`, as a suggestion | 7, including the Tengo rule `Polysyllables` | metric with a formula |
 
-Projects set `MinAlertLevel = warning` in the [template's `.vale.ini`][tpl-ini], so the five suggestion rules run in every project and never print there.  
-The open [frequency-habit-rules][ps-freq] change proposes rules that count a habit per sentence or per word.  
+Projects set `MinAlertLevel = warning` in the [template's `.vale.ini`][tpl-ini], so the five suggestion rules run in every project and never print there.
+The open [frequency-habit-rules][ps-freq] change proposes rules that count a habit per sentence or per word.
 No Vale rule type expresses that today.
 
 ### 2.2 Features in use
 
 - Scopes: `raw`, `raw.rs`, `heading`, `list`, `paragraph`, `sentence`, `table.header`.
 - Rule fields: `tokens`, `swap`, `exceptions`, `ignorecase`, `nonword`, `raw`, `max`, `formula`, `condition`, `extends` naming another style's rule, a `%s` or `%d` message argument, `level`.
-- Regex: 43 of the enabled-style files are existence or substitution lists.  
-  Six ProseStyle rules use lookbehind: `BareURL`, `BareURLInComment`, `BareWorkItem`, `BareWorkItemInComment`, `Dashes`, `Exclamation`.  
+- Regex: 43 of the enabled-style files are existence or substitution lists.
+  Six ProseStyle rules use lookbehind: `BareURL`, `BareURLInComment`, `BareWorkItem`, `BareWorkItemInComment`, `Dashes`, `Exclamation`.
   `BareURL`'s lookbehind is variable-length and nests lookarounds ([BareURL.yml][ps-bareurl]).
 - A vocabulary, `Vocab = ProseStyle`, whose `accept.txt` lists words that pass upstream rules.
 - Formats: Markdown, MDX, and Rust through `[formats] rs = md`.
 - Configuration: a package `.vale.ini` read before the project's, glob sections, per-rule levels and `NO`, `StylesPath`, `Packages` pointing at a release zip.
-- Tests: every rule carries `tests:` cases run by `vale test --coverage`, which fails when a rule fires in no case, plus 16 package cases in [`test/package.test.yml`][ps-pkgtest].  
+- Tests: every rule carries `tests:` cases run by `vale test --coverage`, which fails when a rule fires in no case, plus 16 package cases in [`test/package.test.yml`][ps-pkgtest].
   `vale test` is upstream since [ae6d749][vale-test] (2026-08-11).
 
 ### 2.3 Use in projects
 
-The Copier template's `lint:prose` task lists tracked files with `git ls-files`, passes them to `vale --output=line` through `xargs`, and fails on any printed line when `prose_fail_level` is `warning`.  
-It pins Vale 3.26.0 through mise and ProseStyle v0.0.7 in `includes/pins.jinja`.  
+The Copier template's `lint:prose` task lists tracked files with `git ls-files`, passes them to `vale --output=line` through `xargs`, and fails on any printed line when `prose_fail_level` is `warning`.
+It pins Vale 3.26.0 through mise and ProseStyle v0.0.7 in `includes/pins.jinja`.
 Generated paths get an empty `BasedOnStyles` section, so large generated files are skipped rather than linted.
 
 ## 3. Vale today
@@ -74,7 +74,7 @@ Facts come from [vale-cli/vale at 66bbb85][vale-head] unless a row names another
 
 The README's "files linted in parallel" holds for a directory argument, not for a list of files.
 
-On one large Rust project's prose files, ProseStyle v0.0.6 took 249.5 s in one Vale process on 8 vCPUs.  
+On one large Rust project's prose files, ProseStyle v0.0.6 took 249.5 s in one Vale process on 8 vCPUs.
 Version 0.0.7 took 9.0 to 9.4 s on the same machine (measured 2026-11-09, not repeated here).
 
 ## 4. The field
@@ -94,7 +94,7 @@ Licences and dates from the GitHub API unless a LICENSE link is given.
 | [Language Check][langcheck] | MIT, Rust | started 2026-03 | runs Harper, LanguageTool, Vale and proselint | delegates style to Vale |
 | [Stilyagi][stilyagi] | Internet Systems Consortium (ISC), Rust and Python | pre-0.1.0, no rules | Python rules over extracted regions | early; extraction overlaps ours |
 
-One aggregator page scores Vale 87 and textlint 81 ([faun.dev][faun], seen only as a search excerpt, no method shown).  
+One aggregator page scores Vale 87 and textlint 81 ([faun.dev][faun], seen only as a search excerpt, no method shown).
 Other Rust tools found (`prosesmasher`, `lucid-lint`, `dslop`, `mq-content-lint`) ship fixed checks; none offers user rules with scopes and a vocabulary.
 
 ## 5. Rust building blocks
@@ -141,13 +141,13 @@ Versions and licences from the crates.io API on 2026-11-09.
 
 These follow from the findings; [design.md][design] records how the operator settled each one.
 
-1. Rule format: read Vale `.vale.ini` and rule YAML as they are, or a ctl-style `.ctl/<verb>.yaml` plus a new rule format with a one-time converter.  
-   Reading Vale YAML as it is ties us to Vale's scope names and regexp2 syntax.  
+1. Rule format: read Vale `.vale.ini` and rule YAML as they are, or a ctl-style `.ctl/<verb>.yaml` plus a new rule format with a one-time converter.
+   Reading Vale YAML as it is ties us to Vale's scope names and regexp2 syntax.
    A new format can add the scopes in finding 3.
-2. First release: Markdown, MDX and Rust comments; existence, substitution, occurrence, metric and `extends`.  
+2. First release: Markdown, MDX and Rust comments; existence, substitution, occurrence, metric and `extends`.
    Tengo, conditional, spelling and the five suggestion rules are not needed to reproduce what projects see today.
-3. Where it runs: the template's `lint:prose` task first.  
-   CI follows from it.  
+3. Where it runs: the template's `lint:prose` task first.
+   CI follows from it.
    An editor server and a pre-commit hook come later.
 4. How rules ship: a release zip as today, rules built into the binary, or both.
 5. Whether to draft a Vale issue for parallel file arguments; it would be drafted only, not sent.

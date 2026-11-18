@@ -4,10 +4,10 @@ Queue row: `HKR-014` in [tasks.yaml][ledger], a new row after `HKR-013`.
 
 ## Motivation
 
-The [`rule-engine` change][engine] and the [`pattern-and-readability-checks` change][pattern] run eight of Vale's eleven check types.  
+The [`rule-engine` change][engine] and the [`pattern-and-readability-checks` change][pattern] run eight of Vale's eleven check types.
 The Vale importer, `HKR-007`, also meets `capitalization` and `sequence` in the upstream styles it converts.
 
-These two need data the engine does not have: part-of-speech tags and word lists for title case.  
+These two need data the engine does not have: part-of-speech tags and word lists for title case.
 The `spelling` and `affix` checks, which need a dictionary with its affix rules, are in the [`spelling-and-affix-checks` change][spelling].
 
 ProseStyle uses none of them, so no project that hakkiri lints today waits on this change.

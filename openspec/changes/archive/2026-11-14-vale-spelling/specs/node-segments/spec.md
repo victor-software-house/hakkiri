@@ -2,10 +2,10 @@
 
 ### Requirement: A URL is a gap in the prose around the link
 
-The text of an autolink or a bare URL that is its own destination SHALL stay in its `link` node.  
+The text of an autolink or a bare URL that is its own destination SHALL stay in its `link` node.
 It SHALL be a gap in the nodes around that node, since a URL counts no words in Vale.
 
-Some links are not their own destination, such as a bare email address or a `www.` address.  
+Some links are not their own destination, such as a bare email address or a `www.` address.
 Such a link SHALL stay in the nodes around it as well.
 
 #### Scenario: An autolink

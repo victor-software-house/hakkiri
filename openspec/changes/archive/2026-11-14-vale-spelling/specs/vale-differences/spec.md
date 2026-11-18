@@ -8,7 +8,7 @@
 
 ### Requirement: Ported readers differ from Vale in detail
 
-**Reason**: One of its scenarios, an email address that hakkiri reads no word in, is no longer true.  
+**Reason**: One of its scenarios, an email address that hakkiri reads no word in, is no longer true.
 hakkiri now keeps a bare email address in the text, as Vale does.
 
 **Migration**: The ADDED requirement "Ported readers differ from Vale in these ways" contains the other scenarios unchanged.

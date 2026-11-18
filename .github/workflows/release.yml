@@ -1,19 +1,21 @@
 name: Release
 
 # verctl's reusable release workflow, on every push to main and on demand.
-# It releases, from HEAD, each version HEAD holds whose release is incomplete:
-# a draft GitHub Release with the tarballs .ctl/ver.yaml declares, each built
-# natively on its own hosted runner, then the published Release, which creates
-# the tag, with no registry upload (publisher: none). Then it opens or updates
-# the Version PR on verctl/release/main.
+# It releases each version at HEAD whose release is incomplete.
+#
+# First it makes a draft GitHub Release with the tarballs .ctl/ver.yaml
+# declares, each built on its own hosted runner. Then it publishes the
+# Release, and that creates the tag. Nothing goes to a registry
+# (publisher: none). Last, it opens or updates the Version PR on
+# verctl/release/main.
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 # One release run at a time. A newer run waits instead of cancelling one that
-# may be publishing; it releases every incomplete version at HEAD, so the
-# queued run covers what any skipped one would have. The "-caller" part keeps
+# may be publishing. Each run releases every incomplete version at HEAD, so
+# the queued run covers what any skipped one would have. The "-caller" part keeps
 # this group apart from the called workflow's own group.
 concurrency:
   group: ${{ github.workflow }}-caller-${{ github.ref }}

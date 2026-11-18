@@ -2,8 +2,8 @@
 
 ### Requirement: A code span is a noun that reads as one capital letter
 
-A `sequence` rule SHALL read a code span as a noun: its tag is `NN`, and the tagger reads a noun in its place.  
-A pattern or a word list SHALL read the span as the letter `X`.  
+A `sequence` rule SHALL read a code span as a noun: its tag is `NN`, and the tagger reads a noun in its place.
+A pattern or a word list SHALL read the span as the letter `X`.
 The square brackets of an intra-doc link around one code span SHALL belong to the span.
 
 #### Scenario: A code span in place of a noun

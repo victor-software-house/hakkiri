@@ -4,21 +4,21 @@ Queue row: `HKR-004` in [tasks.yaml][ledger].
 
 ## Motivation
 
-The tree slice gives every file a tree of scoped nodes with byte segments ([document-tree][document-tree], [node-segments][node-segments]).  
-Nothing reads it yet.  
+The tree slice gives every file a tree of scoped nodes with byte segments ([document-tree][document-tree], [node-segments][node-segments]).
+Nothing reads it yet.
 The CLI slice, `HKR-005`, needs an engine that loads rules, selects text by scope, runs checks and returns alerts that point into the file.
 
-Vale's eleven check types are too much for one change under the spec budget.  
-This change builds the engine and the four check types ProseStyle uses today: `existence`, `substitution`, `occurrence` and `metric`.  
+Vale's eleven check types are too much for one change under the spec budget.
+This change builds the engine and the four check types ProseStyle uses today: `existence`, `substitution`, `occurrence` and `metric`.
 Two later changes add the rest: [`pattern-and-readability-checks`][next] and [`case-and-sequence-checks`][last].
 
 ## Changes
 
-- Loading: a style folder gives one rule per `.yml` file.  
+- Loading: a style folder gives one rule per `.yml` file.
   A rule with a missing, unknown or invalid field is refused with an error that names it.
-- Selection: scope names match nodes by their dotted prefix; `text`, `sentence` and file extensions get Vale's meaning.  
+- Selection: scope names match nodes by their dotted prefix; `text`, `sentence` and file extensions get Vale's meaning.
   An inline exclusion blanks the text it names.
-- Text: a check reads the text of a node with inline markup left out, and each code span as one word.  
+- Text: a check reads the text of a node with inline markup left out, and each code span as one word.
   Sentences come from hakkiri's own splitter, and words from one word pattern.
 - Patterns: the `regex` crate, and `fancy-regex` with a backtrack limit for a pattern that needs lookaround; a limit reached is an error alert.
 - Alerts: rule, level, message, line, column span and matched text, sorted and deduplicated as Vale does.

@@ -4,11 +4,11 @@ Queue row: `HKR-053` in [tasks.yaml][ledger].
 
 ## Motivation
 
-A fault in a config gave its line from a text search for the key.  
+A fault in a config gave its line from a text search for the key.
 The search found a key only at the start of a line, so a config written in flow style gave no line.
 
-It also took the first line after the previous match that read as the key.  
-So two globs that set one rule gave the second glob's line to the first glob's fault.  
+It also took the first line after the previous match that read as the key.
+So two globs that set one rule gave the second glob's line to the first glob's fault.
 ctl-core 0.7.1 places a path through the location index, with one step for each key.
 
 ## Changes

@@ -4,8 +4,8 @@ Queue row: `HKR-003` in [tasks.yaml][ledger].
 
 ## Motivation
 
-A rule selects text by scope ([rule-format design][rule-format]).  
-So every file hakkiri reads must become one tree whose nodes carry those scope names and their byte spans.  
+A rule selects text by scope ([rule-format design][rule-format]).
+So every file hakkiri reads must become one tree whose nodes carry those scope names and their byte spans.
 The engine slice `HKR-004` runs checks over this tree, and alerts point back into the file through the spans.
 
 ## Changes

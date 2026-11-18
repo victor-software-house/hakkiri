@@ -4,14 +4,14 @@ Queue row: `HKR-015` in [tasks.yaml][ledger].
 
 ## Motivation
 
-The `sentence` scope, `LongSentence` and every metric that counts sentences need a sentence splitter.  
-Vale uses Punkt with the English model of the Natural Language Toolkit (NLTK).  
-That model is trained on Wall Street Journal text from the Linguistic Data Consortium (LDC).  
+The `sentence` scope, `LongSentence` and every metric that counts sentences need a sentence splitter.
+Vale uses Punkt with the English model of the Natural Language Toolkit (NLTK).
+That model is trained on Wall Street Journal text from the Linguistic Data Consortium (LDC).
 No license covers that model ([nltk_data#188][nltk-188]), so hakkiri cannot ship it.
 
-The splitter is also where hakkiri can beat Vale.  
-Punkt is known to fail on brackets, lists and abbreviation chains ([pySBD paper][pysbd]).  
-A Punkt model trained afresh splits better than the one that NLTK ships ([Gillick 2009][gillick]).  
+The splitter is also where hakkiri can beat Vale.
+Punkt is known to fail on brackets, lists and abbreviation chains ([pySBD paper][pysbd]).
+A Punkt model trained afresh splits better than the one that NLTK ships ([Gillick 2009][gillick]).
 The [rule-engine change][engine] reads sentences through this splitter.
 
 ## Changes

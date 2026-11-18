@@ -2,8 +2,8 @@
 
 ### Requirement: A script rule is rejected
 
-**Reason**: A script rule no longer makes its whole style fail.  
-The loader reports it apart and the rest of the style runs.  
+**Reason**: A script rule no longer makes its whole style fail.
+The loader reports it apart and the rest of the style runs.
 So the requirement is removed and added again below under a name that describes it.
 
 **Migration**: Read "A script rule is reported, and the rest of its style runs".
@@ -12,7 +12,7 @@ So the requirement is removed and added again below under a name that describes 
 
 ### Requirement: A script rule is reported, and the rest of its style runs
 
-hakkiri SHALL NOT run a rule whose `extends` is `script`.  
+hakkiri SHALL NOT run a rule whose `extends` is `script`.
 It SHALL report it as a rule it cannot run, with an error that gives the rule file, as the project-config spec sets.
 
 #### Scenario: A style ships a script rule

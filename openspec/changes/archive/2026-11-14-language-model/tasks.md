@@ -4,58 +4,58 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 1. The language model
 
-- [x] 1.1 Add `langdex` 0.0.1 to `Cargo.toml` and lock it past the publish-age cooldown with `mise run update:own`.  
+- [x] 1.1 Add `langdex` 0.0.1 to `Cargo.toml` and lock it past the publish-age cooldown with `mise run update:own`.
   Verify `cargo deny check` passes and `Cargo.lock` contains `langdex 0.0.1`.
-  - Evidence, 2026-11-14 (UTC): box run 8x16: `Cargo.lock` contains `langdex 0.0.1`, locked past the cooldown with the publish-age override.  
-    The build resolves it.  
+  - Evidence, 2026-11-14 (UTC): box run 8x16: `Cargo.lock` contains `langdex 0.0.1`, locked past the cooldown with the publish-age override.
+    The build resolves it.
     `cargo deny check` is left to the pull request's CI.
-- [x] 1.2 Map each reader of `src/language.rs` to and from its langdex entry.  
+- [x] 1.2 Map each reader of `src/language.rs` to and from its langdex entry.
   Read `from_path`, `extension` and the reader names from langdex, and remove `READERS`.
   - Verify the unit tests of `src/language.rs` cover each reader both ways, and `a.mts`, `a.markdown` and `LICENSE`.
-  - Evidence, 2026-11-14 (UTC): box run 8x16: the unit tests of `src/language/tests.rs` pass.  
+  - Evidence, 2026-11-14 (UTC): box run 8x16: the unit tests of `src/language/tests.rs` pass.
     They cover each reader both ways, the seven extensions, `a.mts`, `a.markdown` and `LICENSE`.
 
 ## 2. The language of a file
 
-- [x] 2.1 Give each file the language of its path, then of the interpreter of its first line.  
+- [x] 2.1 Give each file the language of its path, then of the interpreter of its first line.
   Choose its reader by `formats`, its language, then `on_unknown`, in `src/files.rs` and `src/suite.rs`.
   - Verify the scenarios of "A file has a language" and "A reader is chosen by formats, then by extension" pass in `tests/`.
-  - Evidence, 2026-11-14 (UTC): box run 8x16: the scenarios of both requirements pass in `tests/check.rs`.  
+  - Evidence, 2026-11-14 (UTC): box run 8x16: the scenarios of both requirements pass in `tests/check.rs`.
     The full suite gave 930 passed, 0 failed.
-- [x] 2.2 Read a `formats` reader by any langdex name of a language hakkiri reads, in `src/formats.rs`.  
-  Verify the scenarios of the `project-config` delta pass.  
+- [x] 2.2 Read a `formats` reader by any langdex name of a language hakkiri reads, in `src/formats.rs`.
+  Verify the scenarios of the `project-config` delta pass.
   Evidence, 2026-11-14 (UTC): box run 8x16: the `project-config` scenarios pass in `tests/check.rs`, with the new error text.
 
 ## 3. Scopes
 
-- [x] 3.1 Parse the last piece of a scope part as a langdex language in `src/scope.rs`, and remove `EXTENSIONS`.  
+- [x] 3.1 Parse the last piece of a scope part as a langdex language in `src/scope.rs`, and remove `EXTENSIONS`.
   Match a part against a node's languages in `src/select.rs` and `src/engine.rs`.
-  - Verify the scenarios of the `scope-selection` delta pass.  
+  - Verify the scenarios of the `scope-selection` delta pass.
     Verify "A file has its own language, and its reader's when formats chose it" passes.
   - Evidence, 2026-11-14 (UTC): box run 8x16: the `scope-selection` scenarios pass in `tests/select.rs`, and `a_mapped_file` in `tests/check.rs`.
 
 ## 4. Fences
 
-- [x] 4.1 Give `Node` a language in `src/markdown.rs`.  
+- [x] 4.1 Give `Node` a language in `src/markdown.rs`.
   Parse a fence with its grammar when hakkiri reads the comments of its language, and map each line of its code onto the file.
-  - Verify the scenarios of the `document-tree` delta pass.  
+  - Verify the scenarios of the `document-tree` delta pass.
     Verify the tree snapshots and the Markdown corpus change only where a fence contains comments.
-  - Evidence, 2026-11-14 (UTC): box run 8x16: the `document-tree` scenarios pass in `tests/alerts.rs` and `tests/tree.rs`.  
-    No snapshot and no corpus row changed.  
+  - Evidence, 2026-11-14 (UTC): box run 8x16: the `document-tree` scenarios pass in `tests/alerts.rs` and `tests/tree.rs`.
+    No snapshot and no corpus row changed.
     The one fixture fence of a language hakkiri reads contains no comment.
-- [x] 4.2 Record each fence comment that the Markdown corpus now reports in its departures, as `vale-differences` sets.  
+- [x] 4.2 Record each fence comment that the Markdown corpus now reports in its departures, as `vale-differences` sets.
   Verify `tests/markdown_corpus.rs` passes.
-  - Evidence, 2026-11-14 (UTC): box run 8x16: `tests/markdown_corpus.rs` passes with no new row.  
+  - Evidence, 2026-11-14 (UTC): box run 8x16: `tests/markdown_corpus.rs` passes with no new row.
     The one corpus fence of a language hakkiri reads contains no comment.
 
 ## 5. Surfaces
 
-- [x] 5.1 Update `src/instructions.md`, the skill and `AGENTS.md` decision 3, and add the patch changeset.  
+- [x] 5.1 Update `src/instructions.md`, the skill and `AGENTS.md` decision 3, and add the patch changeset.
   Verify `operator_docs` and `openspec validate --all --strict` pass.
-  - Evidence, 2026-11-14 (UTC): box run 8x16: `operator_docs` passes, and the changeset was in the plan commit.  
+  - Evidence, 2026-11-14 (UTC): box run 8x16: `operator_docs` passes, and the changeset was in the plan commit.
     `openspec validate --all --strict` is left to the pull request's CI.
 
 ## 6. Integration
 
-- [x] 6.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+- [x] 6.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
   Evidence, 2026-11-14 (UTC): The CI of [pull request 160](https://github.com/victor-software-house/hakkiri/pull/160) passed, and it merged as `962f383`.

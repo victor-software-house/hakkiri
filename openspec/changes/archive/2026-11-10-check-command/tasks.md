@@ -1,6 +1,6 @@
 # Tasks
 
-Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.  
+Every compile, lint and test step runs in the pull request's CI, not on the authoring machine.
 Only the binary size measurement in task 1.2 runs on a box, because CI cannot.
 
 ## 1. Dependencies and the chassis

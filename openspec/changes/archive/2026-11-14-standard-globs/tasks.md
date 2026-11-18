@@ -4,14 +4,14 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
 ## 1. The glob
 
-- [x] 1.1 Compile every `files` and `formats` glob through `config::standard_glob`, with a separator that `*` does not cross.  
-  Put `**/` before a glob with no `/`, drop a leading `/`, and add `**` after a trailing `/`.  
+- [x] 1.1 Compile every `files` and `formats` glob through `config::standard_glob`, with a separator that `*` does not cross.
+  Put `**/` before a glob with no `/`, drop a leading `/`, and add `**` after a trailing `/`.
   Verify the unit tests of `src/config/tests.rs` for each rule pass.
-  - Evidence, 2026-11-14 (UTC): The CI of [pull request 161](https://github.com/victor-software-house/hakkiri/pull/161) passed, and it merged as `358bf10`.  
+  - Evidence, 2026-11-14 (UTC): The CI of [pull request 161](https://github.com/victor-software-house/hakkiri/pull/161) passed, and it merged as `358bf10`.
     Its unit tests in `src/config/tests.rs` ran in that CI.
-- [x] 1.2 Update `src/instructions.md` and `AGENTS.md` decision 5, and add the patch changeset.  
+- [x] 1.2 Update `src/instructions.md` and `AGENTS.md` decision 5, and add the patch changeset.
   Verify `operator_docs` and `openspec validate --all --strict` pass.
-  - Evidence, 2026-11-14 (UTC): The CI of [pull request 161](https://github.com/victor-software-house/hakkiri/pull/161) passed, and it merged as `358bf10`.  
+  - Evidence, 2026-11-14 (UTC): The CI of [pull request 161](https://github.com/victor-software-house/hakkiri/pull/161) passed, and it merged as `358bf10`.
     `operator_docs` and the OpenSpec check ran in that CI.
 
 ## 2. Integration

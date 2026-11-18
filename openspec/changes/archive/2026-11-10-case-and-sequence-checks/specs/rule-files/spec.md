@@ -11,9 +11,9 @@ A rename lists FROM (the old heading) and TO (the new heading).
 
 ### Requirement: An exclusion leaves out blocks of that scope
 
-A scope part written `~` and a name SHALL leave out each block of text that has that scope, and no other.  
-A block has the scope of one element, as the scope-selection spec fixes.  
-So an element inside a quote keeps its own scope.  
+A scope part written `~` and a name SHALL leave out each block of text that has that scope, and no other.
+A block has the scope of one element, as the scope-selection spec fixes.
+So an element inside a quote keeps its own scope.
 A list item after text in a quote is not left out by `~blockquote`.
 
 #### Scenario: A sentence in a list inside a quote

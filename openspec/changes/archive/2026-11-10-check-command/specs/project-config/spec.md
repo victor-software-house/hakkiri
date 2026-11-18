@@ -2,10 +2,10 @@
 
 ### Requirement: Paths in the config are relative to the project root
 
-The project root SHALL be the folder that contains the `.ctl` folder of the config file, with symlinks resolved.  
+The project root SHALL be the folder that contains the `.ctl` folder of the config file, with symlinks resolved.
 When the config file is not in a `.ctl` folder, the root SHALL be the folder of the config file, with symlinks resolved.
 
-hakkiri SHALL read every `path` in the config relative to that root.  
+hakkiri SHALL read every `path` in the config relative to that root.
 When a walk skips the package folders, it SHALL compare each folder's resolved path with those resolved package paths.
 
 A `packages` `path` that does not exist SHALL be an error that names its line, and hakkiri SHALL NOT fall back to a path as written.
@@ -31,7 +31,7 @@ A rename lists FROM (the old heading) and TO (the new heading).
 
 ### Requirement: A package is a folder or a download
 
-Each entry in `packages` SHALL contain a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
+Each entry in `packages` SHALL contain a `path` to a folder of styles, or a `url` and a `sha256`, and never both.
 It SHALL fetch and cache each `url` with no separate sync step, and lint with it only when its download matches the hash.
 
 It SHALL refuse two entries that contain a style of one name, and the error SHALL show both names.

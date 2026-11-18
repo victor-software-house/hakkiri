@@ -2,12 +2,12 @@
 
 ### Requirement: Source files give the tree their comments only
 
-For Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL put only comment text in the tree.  
+For Rust, TypeScript, JavaScript, Go, Swift, YAML, TOML and Shell files, hakkiri SHALL put only comment text in the tree.
 Its scope SHALL be `text.comment.line`, `text.comment.block`, `text.comment.doc.line` or `text.comment.doc.block`, as the rule-files spec states.
 
-Each language SHALL find its comments with its tree-sitter grammar.  
-So a comment marker inside a string, a raw string, a multi-line string, a heredoc or a block scalar opens no comment.  
-A Swift block comment SHALL nest.  
+Each language SHALL find its comments with its tree-sitter grammar.
+So a comment marker inside a string, a raw string, a multi-line string, a heredoc or a block scalar opens no comment.
+A Swift block comment SHALL nest.
 The `#!` line that opens a script SHALL be no comment.
 
 #### Scenario: A Rust block comment
@@ -34,8 +34,8 @@ The `#!` line that opens a script SHALL be no comment.
 
 ### Requirement: A comment addressed to a tool is not prose
 
-hakkiri SHALL leave out of the tree a comment that a tool reads and a person does not.  
-The patterns of each language, which the scenarios list, SHALL find such a comment.  
+hakkiri SHALL leave out of the tree a comment that a tool reads and a person does not.
+The patterns of each language, which the scenarios list, SHALL find such a comment.
 A directive SHALL end a run of line comments, so the line after it starts a new comment node.
 
 #### Scenario: A Go directive
@@ -78,11 +78,11 @@ A directive SHALL end a run of line comments, so the line after it starts a new 
 
 ### Requirement: A doc link and a doc name draw no alert
 
-hakkiri SHALL drop an alert whose match lies wholly in a doc name or a doc link.  
-A doc name is the name of the declaration that a Go doc comment opens with.  
+hakkiri SHALL drop an alert whose match lies wholly in a doc name or a doc link.
+A doc name is the name of the declaration that a Go doc comment opens with.
 A doc link is a link in brackets of a Go or Rust comment, or an inline link tag of a TypeScript or JavaScript comment.
 
-It SHALL leave the text of the node as written, so counts and sentences do not change.  
+It SHALL leave the text of the node as written, so counts and sentences do not change.
 A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 
 #### Scenario: A Go link and name
@@ -114,7 +114,7 @@ A bracket SHALL be a link when no `(`, `[` or `:` follows it.
 
 ### Requirement: More JSDoc tags name something
 
-In a `/** */` comment, the name after a tag SHALL carry no prose scope for `@see`, `@event`, `@member`, `@var`, `@name`, `@alias`, `@memberof`, `@augments`, `@extends`, `@mixes`, `@borrows`, `@function`, `@func`, `@method`, `@class`, `@constructor`, `@namespace` and `@module`, as it does after `@param`.  
+In a `/** */` comment, the name after a tag SHALL carry no prose scope for `@see`, `@event`, `@member`, `@var`, `@name`, `@alias`, `@memberof`, `@augments`, `@extends`, `@mixes`, `@borrows`, `@function`, `@func`, `@method`, `@class`, `@constructor`, `@namespace` and `@module`, as it does after `@param`.
 The same SHALL apply to `@enum`, `@external`, `@host`, `@kind`, `@listens`, `@fires`, `@emits`, `@this`, `@requires`, `@implements` and `@satisfies`.
 
 #### Scenario: A see tag
@@ -129,8 +129,8 @@ The same SHALL apply to `@enum`, `@external`, `@host`, `@kind`, `@listens`, `@fi
 
 ### Requirement: A line comment keeps the indentation of its text
 
-For Go, YAML, TOML and Shell files, hakkiri SHALL remove from each line of a line comment only the first space after its marker.  
-A line indented further SHALL stay indented, so Markdown reads four spaces or a tab as a code block.  
+For Go, YAML, TOML and Shell files, hakkiri SHALL remove from each line of a line comment only the first space after its marker.
+A line indented further SHALL stay indented, so Markdown reads four spaces or a tab as a code block.
 For Rust, TypeScript, JavaScript and Swift it SHALL keep removing the indentation that every line shares.
 
 #### Scenario: A Go code block

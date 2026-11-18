@@ -2,7 +2,7 @@
 
 ### Requirement: The comments of a fenced code block are read
 
-hakkiri SHALL read the comments of a fenced code block when it reads the comments of the block's language, as the `document-tree` spec sets.  
+hakkiri SHALL read the comments of a fenced code block when it reads the comments of the block's language, as the `document-tree` spec sets.
 Vale 66bbb85 reads no text inside a fence.
 
 #### Scenario: A Rust fence in Markdown
@@ -12,11 +12,11 @@ Vale 66bbb85 reads no text inside a fence.
 
 ### Requirement: A scope part names a Linguist language
 
-hakkiri SHALL read the last piece of a scope part as a language of the GitHub Linguist table that langdex contains.  
-Vale 66bbb85 compares it with the file's extension.  
+hakkiri SHALL read the last piece of a scope part as a language of the GitHub Linguist table that langdex contains.
+Vale 66bbb85 compares it with the file's extension.
 Before that, its own table folds some extensions together, such as `.tsx`, `.mts` and `.cts` into `.ts`.
 
-Linguist keeps TSX (TypeScript with JavaScript XML) apart from TypeScript.  
+Linguist keeps TSX (TypeScript with JavaScript XML) apart from TypeScript.
 So a scope that gives `ts` does not reach a `.tsx` file.
 
 #### Scenario: A TSX file
@@ -26,7 +26,7 @@ So a scope that gives `ts` does not reach a `.tsx` file.
 
 ### Requirement: A file with no extension is read by its interpreter
 
-hakkiri SHALL read a file whose path gives no language as the language of its first-line interpreter.  
+hakkiri SHALL read a file whose path gives no language as the language of its first-line interpreter.
 Vale 66bbb85 finds no format for such a file and lints nothing in it.
 
 #### Scenario: A script

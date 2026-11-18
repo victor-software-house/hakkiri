@@ -2,7 +2,7 @@
 
 ### Requirement: A walk and a named file differ from Vale's
 
-hakkiri SHALL skip the files git ignores in a walk, and SHALL warn about a given file that no glob selects.  
+hakkiri SHALL skip the files git ignores in a walk, and SHALL warn about a given file that no glob selects.
 Vale 3.26.0 does neither.
 
 #### Scenario: An ignored build folder

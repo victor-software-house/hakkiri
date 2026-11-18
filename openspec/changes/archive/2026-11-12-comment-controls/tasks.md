@@ -4,39 +4,39 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
 ## 1. The comments
 
-- [x] 1.1 Probe Vale at `66bbb85` for each comment form in Markdown text and in HTML blocks.  
-  Record Vale's alerts in `tests/fixtures/comment-controls/vale.tsv`.  
+- [x] 1.1 Probe Vale at `66bbb85` for each comment form in Markdown text and in HTML blocks.
+  Record Vale's alerts in `tests/fixtures/comment-controls/vale.tsv`.
   Verify the file contains the alerts of every scenario of the requirements, and the test gives the Vale commit.
 
-  Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/comment-controls`, nine files and five rules, and gave 304 alerts.  
+  Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/comment-controls`, nine files and five rules, and gave 304 alerts.
   The probe found that Vale reads a comment at two moments, which the design records, and that a `raw` rule is gated by `off` alone.
-- [x] 1.2 Read the comments of a Markdown file, and leave the text between `off` and `on` out of the tree.  
-  Gate each block and alert as Vale does.  
+- [x] 1.2 Read the comments of a Markdown file, and leave the text between `off` and `on` out of the tree.
+  Gate each block and alert as Vale does.
   Verify `tests/comment_controls.rs` fails before the change and passes after it.
 
-  Evidence, 2026-11-11 (UTC): four of the five tests failed on the source before the change.  
+  Evidence, 2026-11-11 (UTC): four of the five tests failed on the source before the change.
   `every_file_gives_the_alerts_vale_gives` passes after it for the 304 alerts.
 
-  It fails on tree copies that leave out any of five parts.  
-  They are the gate of a block, the hiding of an alert and the cut of the text.  
+  It fails on tree copies that leave out any of five parts.
+  They are the gate of a block, the hiding of an alert and the cut of the text.
   The others are the end of the element and the end of a tight item.
-- [x] 1.3 Read hakkiri's forms, and a level in a comment.  
+- [x] 1.3 Read hakkiri's forms, and a level in a comment.
   Verify `hakkiri_comments_reach_as_vale_comments_do` passes, and the two tests of a level pass.
 
-  Evidence, 2026-11-11 (UTC): each Vale comment in the fixture files was written in hakkiri's form.  
-  The files then give the same alerts by line, rule and text.  
+  Evidence, 2026-11-11 (UTC): each Vale comment in the fixture files was written in hakkiri's form.
+  The files then give the same alerts by line, rule and text.
   A level stays until a comment sets the rule again, and wins over a level of the config.
-- [x] 1.4 Read the `{/* … */}` comments of an MDX file as the HTML comments of a Markdown file.  
-  Verify the parity test passes over the MDX file of the fixture, in Vale's form and in hakkiri's.  
+- [x] 1.4 Read the `{/* … */}` comments of an MDX file as the HTML comments of a Markdown file.
+  Verify the parity test passes over the MDX file of the fixture, in Vale's form and in hakkiri's.
   Evidence, 2026-11-11 (UTC): Vale 66bbb85 gave 46 alerts over `c10.mdx`, and the 350 rows of the fixture match.
-- [x] 1.5 Probe the cases of the first probe that it left open, and fix each one where hakkiri read less than Vale.  
-  Verify `every_file_gives_the_alerts_vale_gives` passes over the 23 files and 1,238 rows of the `text` folder.  
+- [x] 1.5 Probe the cases of the first probe that it left open, and fix each one where hakkiri read less than Vale.
+  Verify `every_file_gives_the_alerts_vale_gives` passes over the 23 files and 1,238 rows of the `text` folder.
   Verify also that `vale_places_a_comment_wrongly_where_hakkiri_places_it_right` passes.
 
-  Evidence, 2026-11-12 (UTC): Vale `66bbb85` and hakkiri ran over setext and ATX (hash-prefixed) headings, links, images and references.  
+  Evidence, 2026-11-12 (UTC): Vale `66bbb85` and hakkiri ran over setext and ATX (hash-prefixed) headings, links, images and references.
   They ran over nested quotes and lists, task lists and inline HTML.
 
-  They also ran over `details`, `pre`, nested `div`, fenced and indented code, tables in lists and odd comment spellings.  
+  They also ran over `details`, `pre`, nested `div`, fenced and indented code, tables in lists and odd comment spellings.
   The last were non-ASCII text, CRLF (carriage return and line feed) lines and footnotes.
 
   The two differed in six ways, apart from footnotes, and four were fixed:
@@ -46,19 +46,19 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   - the text left at the end of an HTML block
   - the text of a paragraph before a `div` tag inside it
 
-  Two are Vale's flaws, recorded in the `vale-differences` spec.  
+  Two are Vale's flaws, recorded in the `vale-differences` spec.
   Footnote definitions differ for reasons that are not comments, and move to row `HKR-027`.
 
 ## 2. The surfaces
 
-- [x] 2.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md`, `README.md` and `AGENTS.md` with the hakkiri form first.  
-  Record the differences in the `vale-differences` spec, and add the patch changeset.  
+- [x] 2.1 Update `src/instructions.md`, `skills/hakkiri/SKILL.md`, `README.md` and `AGENTS.md` with the hakkiri form first.
+  Record the differences in the `vale-differences` spec, and add the patch changeset.
   Verify `operator_docs` passes, the instructions show `<!-- hakkiri off -->` before Vale's form, and the changeset contains `hakkiri: patch`.
 
-  Evidence, 2026-11-11 (UTC): the full suite, 645 tests, passed in a box with `cargo fmt`, `clippy -D warnings` on the host and musl targets, `cargo deny` and `cargo machete`, and `operator_docs` with it.  
+  Evidence, 2026-11-11 (UTC): the full suite, 645 tests, passed in a box with `cargo fmt`, `clippy -D warnings` on the host and musl targets, `cargo deny` and `cargo machete`, and `operator_docs` with it.
   The Mac gate passed: the prose lint, rumdl, typos, workflow lint, workflow policy, `check:local`, `specs:budget`, `format:toml`, `qctl check` and `openspec validate --all --strict`.
 
 ## 3. Integration
 
-- [x] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.  
+- [x] 3.1 Verify the pull request's CI passes: lint, workflow policy, prose lint, OpenSpec, the Template check and the dependency checks.
   Evidence, 2026-11-12 (UTC): PRs 98 and 103 passed CI before they merged, and main passed after.

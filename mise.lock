@@ -2,23 +2,6 @@
 
 lockfile_version = 4
 
-[[tools."aqua:vale-cli/vale"]]
-version = "3.26.0"
-backend = "aqua:vale-cli/vale"
-specifiers = ["3.26.0"]
-
-[tools."aqua:vale-cli/vale"."platforms.linux-x64"]
-checksum = "sha256:22aa69a556558e4a9dfc63c17030777383d8d3c48dcdfad655fa98e839d666ed"
-checksum_source = "mise-versions"
-url = "https://github.com/vale-cli/vale/releases/download/v3.26.0/vale_3.26.0_Linux_64-bit.tar.gz"
-url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/695681930"
-
-[tools."aqua:vale-cli/vale"."platforms.macos-arm64"]
-checksum = "sha256:a6c3370f53bad93086c6b85f3163676e44e08049d69743afdcc13f3aab5b7482"
-checksum_source = "mise-versions"
-url = "https://github.com/vale-cli/vale/releases/download/v3.26.0/vale_3.26.0_macOS_arm64.tar.gz"
-url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/695682018"
-
 [[tools.conftest]]
 version = "0.71.1"
 backend = "aqua:open-policy-agent/conftest"
@@ -86,6 +69,23 @@ checksum = "sha256:63e28fee386d82d33f2d12406c857f98e2d4697f3f7df7f71f34dff07fca0
 checksum_source = "mise-versions"
 url = "https://github.com/bnjbvr/cargo-machete/releases/download/v0.9.2/cargo-machete-v0.9.2-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/bnjbvr/cargo-machete/releases/assets/397131114"
+
+[[tools."github:victor-software-house/hakkiri"]]
+version = "0.1.2"
+backend = "github:victor-software-house/hakkiri"
+specifiers = ["0.1.2"]
+
+[tools."github:victor-software-house/hakkiri"."platforms.linux-x64"]
+checksum = "sha256:38f4750d7844c241440e8a3f2a9a0cdfab1c1fd25a01caa2b96617b2e02dd174"
+url = "https://github.com/victor-software-house/hakkiri/releases/download/v0.1.2/hakkiri_0.1.2_linux_x64.tar.gz"
+url_api = "https://api.github.com/repos/victor-software-house/hakkiri/releases/assets/765084977"
+provenance = "github-attestations"
+
+[tools."github:victor-software-house/hakkiri"."platforms.macos-arm64"]
+checksum = "sha256:734ce75e8b67c009b3ae32667e7c6600f2a6f2d4a97abb65a079aec91cc565b5"
+url = "https://github.com/victor-software-house/hakkiri/releases/download/v0.1.2/hakkiri_0.1.2_macos_arm64.tar.gz"
+url_api = "https://api.github.com/repos/victor-software-house/hakkiri/releases/assets/765084899"
+provenance = "github-attestations"
 
 [[tools."github:victor-software-house/qctl"]]
 version = "0.6.0"

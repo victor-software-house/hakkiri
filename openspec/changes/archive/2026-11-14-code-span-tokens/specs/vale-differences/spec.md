@@ -2,7 +2,7 @@
 
 ### Requirement: A code span is a noun of a sequence
 
-hakkiri SHALL read a code span as a noun in a `sequence` rule, and a pattern for a lowercase word SHALL reject it.  
+hakkiri SHALL read a code span as a noun in a `sequence` rule, and a pattern for a lowercase word SHALL reject it.
 Vale 3.26.0 reads the span as a run of `*`, and a rule with a tag and no pattern flags it.
 
 #### Scenario: A code name before a verb
@@ -12,8 +12,8 @@ Vale 3.26.0 reads the span as a run of `*`, and a rule with a tag and no pattern
 
 ### Requirement: The verbs of saying and asking keep their place
 
-hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is.  
-It SHALL tag `asks` and `asked` in the noun phrase of a preposition as a noun and a participle.  
+hakkiri SHALL tag a verb of saying or asking after a noun as the verb it is.
+It SHALL tag `asks` and `asked` in the noun phrase of a preposition as a noun and a participle.
 So a `sequence` rule with a verb tag flags the first and no other.
 
 Vale tags the same words with the older model, and its rule has no verb tag.

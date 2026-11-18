@@ -27,14 +27,14 @@ hakkiri SHALL read a rule's parameters as Vale 3.26.0 does, apart from the scena
 #### Scenario: A parameter Vale rejects without a place
 
 - **WHEN** a parameter has a value of the wrong kind, a name the check does not define, or a list
-- **THEN** hakkiri rejects it with the config file and the line.  
-  Vale shows `[internal]`, or its rule file at line 0 or 1.  
+- **THEN** hakkiri rejects it with the config file and the line.
+  Vale shows `[internal]`, or its rule file at line 0 or 1.
   For a wrong kind, Vale cuts the message off after `1 error(s) decoding:` ([rule-parameters 4][rule-parameters-4])
 
 #### Scenario: A flag and a name Vale accepts
 
 - **WHEN** a flag parameter is spelled `YES` or `1`, or a parameter name is written `IGNORECASE`
-- **THEN** hakkiri rejects it, since a YAML config writes `true` and `false` and spells a field as the rule file does.  
+- **THEN** hakkiri rejects it, since a YAML config writes `true` and `false` and spells a field as the rule file does.
   Vale reads the ini spelling and ignores the case of a name ([rule-parameters 4][rule-parameters-4])
 
 #### Scenario: A rule built from a vocabulary
@@ -48,9 +48,9 @@ hakkiri SHALL place a `consistency` alert on the last match of a form, even when
 
 #### Scenario: A form inside a longer word on a later line
 
-- **WHEN** a `consistency` rule with `nonword: true` pairs `advisor` with `adviser`.  
+- **WHEN** a `consistency` rule with `nonword: true` pairs `advisor` with `adviser`.
   A paragraph contains `The adviser spoke first.` and then `Two advisors met two advisers.`
-- **THEN** hakkiri puts the alert on line 2, column 22, the last match.  
+- **THEN** hakkiri puts the alert on line 2, column 22, the last match.
   Vale searches the paragraph for the text `adviser` and puts it on line 1, column 5 ([pattern 2][pattern-2])
 
 [rule-parameters-2]: ../../design.md#2-parameters-apply-per-glob

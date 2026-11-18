@@ -2,8 +2,8 @@
 
 ### Requirement: A style folder gives one rule per file
 
-hakkiri SHALL load every `.yml` file under a style folder as one rule, in a folder that does not start with `.` or `_`.  
-It SHALL ignore every other file there.  
+hakkiri SHALL load every `.yml` file under a style folder as one rule, in a folder that does not start with `.` or `_`.
+It SHALL ignore every other file there.
 A file named `*.test.yml` contains cases and is no rule.
 
 #### Scenario: A folder with a rule and a README
@@ -20,9 +20,9 @@ A file named `*.test.yml` contains cases and is no rule.
 
 ### Requirement: A rule is named by its path
 
-hakkiri SHALL name a rule as Vale does, with dots between these parts.  
-The parts are its style folder, each folder between it and the file, and the file name up to its first dot.  
-A name with `[` or `]` SHALL be refused when a glob lists the style.  
+hakkiri SHALL name a rule as Vale does, with dots between these parts.
+The parts are its style folder, each folder between it and the file, and the file name up to its first dot.
+A name with `[` or `]` SHALL be refused when a glob lists the style.
 `check`, `test` and `test --coverage` SHALL give a file one name.
 
 #### Scenario: A dotted file name
@@ -47,8 +47,8 @@ A name with `[` or `]` SHALL be refused when a glob lists the style.
 
 ### Requirement: Two files with one name are refused
 
-hakkiri SHALL refuse a style folder in which two rule files give one rule name, when a glob lists the style.  
-The error SHALL name the rule and both files.  
+hakkiri SHALL refuse a style folder in which two rule files give one rule name, when a glob lists the style.
+The error SHALL name the rule and both files.
 A style no glob lists SHALL load with no error, as in Vale.
 
 #### Scenario: Terms.yml and Terms.custom.yml

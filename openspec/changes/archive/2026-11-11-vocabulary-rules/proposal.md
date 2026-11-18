@@ -1,12 +1,12 @@
 # Proposal
 
-Queue row: `HKR-042` in [tasks.yaml][ledger].  
+Queue row: `HKR-042` in [tasks.yaml][ledger].
 It builds on [vocabularies][vocabularies], which reads the lists, and is blocked by `HKR-019`.
 
 ## Motivation
 
-Vale builds two rules from a vocabulary: `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term.  
-Once hakkiri reads vocabularies, a project that lists `Vale` in its styles gets neither.  
+Vale builds two rules from a vocabulary: `Vale.Terms` reports an accepted term written in another case, and `Vale.Avoid` reports a rejected term.
+Once hakkiri reads vocabularies, a project that lists `Vale` in its styles gets neither.
 The [vale-differences spec][differences] lists the missing rules as a known gap.
 
 ## Changes

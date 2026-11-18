@@ -2,8 +2,8 @@
 
 ### Requirement: --code-span-size sets the words of a code span for every file
 
-`check` SHALL take `--code-span-size <WORDS>`, a whole number from 0 to 255, and read `HAKKIRI_CODE_SPAN_SIZE` when the flag is not given.  
-The flag SHALL win over the variable, and the variable over every `code_span_size` of a config file, a glob's included.  
+`check` SHALL take `--code-span-size <WORDS>`, a whole number from 0 to 255, and read `HAKKIRI_CODE_SPAN_SIZE` when the flag is not given.
+The flag SHALL win over the variable, and the variable over every `code_span_size` of a config file, a glob's included.
 A value that is no whole number from 0 to 255 SHALL be a usage error.
 
 #### Scenario: The variable beats the config

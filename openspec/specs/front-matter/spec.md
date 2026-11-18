@@ -2,18 +2,18 @@
 
 ## Purpose
 
-Each top-level string of YAML, TOML or JSON front matter is a node of the scope `frontmatter`, labelled with its key.  
+Each top-level string of YAML, TOML or JSON front matter is a node of the scope `frontmatter`, labelled with its key.
 So prose rules read it as text.
 
 ## Requirements
 
 ### Requirement: A top-level string of front matter is text
 
-In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.  
+In a Markdown or MDX file, a rule scoped `text` SHALL read each top-level string value of front matter.
 The front matter is the block at the top of the file, in a form of the next requirement.
 
-Keys, lists, nested mappings and values that are not strings SHALL not be read.  
-Neither SHALL a TOML string below a table, or a member of a nested JSON object.  
+Keys, lists, nested mappings and values that are not strings SHALL not be read.
+Neither SHALL a TOML string below a table, or a member of a nested JSON object.
 When a YAML key is a list, a mapping or an alias, it SHALL give no value, and the entries after it SHALL be read.
 
 #### Scenario: Values of several kinds
@@ -72,11 +72,11 @@ When a YAML key is a list, a mapping or an alias, it SHALL give no value, and th
 
 ### Requirement: Front matter takes every form of block
 
-YAML front matter SHALL sit between `---` lines, after a `---yaml` line, or before a closing `...` line.  
-TOML front matter SHALL sit between `+++` lines or after a `---toml` line.  
+YAML front matter SHALL sit between `---` lines, after a `---yaml` line, or before a closing `...` line.
+TOML front matter SHALL sit between `+++` lines or after a `---toml` line.
 JSON front matter SHALL sit between `;;;` lines, after a `---json` line, or in an object that opens with `{` on the first line.
 
-An opening fence line MAY carry blanks after the dashes or pluses.  
+An opening fence line MAY carry blanks after the dashes or pluses.
 The block SHALL be no part of the body: no rule reads its lines as a paragraph, a heading or a sentence.
 
 #### Scenario: Every form of block
@@ -91,7 +91,7 @@ The block SHALL be no part of the body: no rule reads its lines as a paragraph, 
 
 ### Requirement: A value has the scope of its key
 
-A front matter value SHALL be read by a rule scoped `frontmatter`, `text.frontmatter`, `frontmatter.<key>` or `text.frontmatter.<key>`, and by no rule scoped `paragraph` or `sentence`.  
+A front matter value SHALL be read by a rule scoped `frontmatter`, `text.frontmatter`, `frontmatter.<key>` or `text.frontmatter.<key>`, and by no rule scoped `paragraph` or `sentence`.
 A scope name that goes on after `frontmatter` or `text.frontmatter` SHALL be a scope hakkiri defines.
 
 #### Scenario: Scopes that read the title
@@ -106,7 +106,7 @@ A scope name that goes on after `frontmatter` or `text.frontmatter` SHALL be a s
 
 ### Requirement: Front matter is read as written
 
-A block or token pattern of a glob SHALL not change the front matter, and a comment control SHALL not turn its rules off.  
+A block or token pattern of a glob SHALL not change the front matter, and a comment control SHALL not turn its rules off.
 An alert in a value SHALL be placed on the value's text in the file.
 
 #### Scenario: A pattern that matches in a value

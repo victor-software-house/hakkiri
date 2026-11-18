@@ -2,13 +2,13 @@
 
 ### Requirement: Segments join into the text of a node
 
-The text of a node SHALL be its segments in order.  
-A line feed SHALL separate two segments with a line break between them.  
-One space SHALL separate two cells of a table row.  
+The text of a node SHALL be its segments in order.
+A line feed SHALL separate two segments with a line break between them.
+One space SHALL separate two cells of a table row.
 Any other gap between segments SHALL read as nothing.
 
-A segment MAY carry a reading that replaces what the gap gives.  
-The reading sets nothing, one space or one line feed before the segment, and it can also read `*` for each character of the segment.  
+A segment MAY carry a reading that replaces what the gap gives.
+The reading sets nothing, one space or one line feed before the segment, and it can also read `*` for each character of the segment.
 The text of an HTML tag and the text around it SHALL read as the html-block-text spec defines.
 
 #### Scenario: A table row

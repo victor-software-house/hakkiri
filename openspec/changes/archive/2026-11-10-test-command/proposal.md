@@ -1,15 +1,15 @@
 # Proposal
 
-Queue row: `HKR-028` in [tasks.yaml][ledger].  
+Queue row: `HKR-028` in [tasks.yaml][ledger].
 It is the second of three changes that ship the command line, after [`check-command`][check] and before [`release-lane`][release].
 
 ## Motivation
 
-ProseStyle runs `vale test --coverage` in its CI.  
+ProseStyle runs `vale test --coverage` in its CI.
 Every rule carries `tests:` cases, and the run fails when a rule fires in no case.
 
-`HKR-008` moves ProseStyle onto hakkiri, and its acceptance is that every case passes, so hakkiri needs the command that runs them.  
-The rule-files spec already says how a case reads and passes.  
+`HKR-008` moves ProseStyle onto hakkiri, and its acceptance is that every case passes, so hakkiri needs the command that runs them.
+The rule-files spec already says how a case reads and passes.
 But the loader refuses a `tests` field as unknown, and no command runs a case.
 
 ## Changes

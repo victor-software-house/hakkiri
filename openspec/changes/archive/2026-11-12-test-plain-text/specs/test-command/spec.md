@@ -2,8 +2,8 @@
 
 ### Requirement: A case's format picks its reader
 
-A case that runs through the config SHALL read its input by the reader a `formats` entry gives `input.<format>`, and otherwise by the extension `<format>`.  
-An isolated case SHALL read its input by the extension `<format>`.  
+A case that runs through the config SHALL read its input by the reader a `formats` entry gives `input.<format>`, and otherwise by the extension `<format>`.
+An isolated case SHALL read its input by the extension `<format>`.
 A case whose format no reader reads SHALL read its input as plain text, except that a case through the config follows `on_unknown`.
 
 #### Scenario: A format no extension matches
@@ -18,7 +18,7 @@ A case whose format no reader reads SHALL read its input as plain text, except t
 
 ### Requirement: A case through the config has the extensions of its file
 
-A case that runs through the config SHALL have the extensions that `check` gives the file `input.<format>`.  
+A case that runs through the config SHALL have the extensions that `check` gives the file `input.<format>`.
 Those are `<format>` and the extension of the reader, which a `formats` entry may give.
 
 #### Scenario: A mapped case
@@ -28,7 +28,7 @@ Those are `<format>` and the extension of the reader, which a `formats` entry ma
 
 ### Requirement: A case through the config follows on_unknown
 
-A case through the config whose format no reader reads, and whose file the config selects, SHALL follow `on_unknown` as `check` does.  
+A case through the config whose format no reader reads, and whose file the config selects, SHALL follow `on_unknown` as `check` does.
 `text` reads it as plain text, `warn` and `ignore` give it no alerts, and `error` makes the case fail to run with a message that gives the format.
 
 #### Scenario: An error

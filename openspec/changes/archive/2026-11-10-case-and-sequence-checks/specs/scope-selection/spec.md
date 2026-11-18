@@ -4,9 +4,9 @@
 
 ### Requirement: sentence selects each sentence
 
-The scope `sentence` SHALL select each sentence of a paragraph, a heading or a table cell.  
-A sentence SHALL have the scope of the block it is in.  
-A part such as `list` selects the sentences of a list item.  
+The scope `sentence` SHALL select each sentence of a paragraph, a heading or a table cell.
+A sentence SHALL have the scope of the block it is in.
+A part such as `list` selects the sentences of a list item.
 An exclusion such as `~blockquote` leaves out the sentences of a quote.
 
 #### Scenario: Two sentences measured apart
@@ -21,7 +21,7 @@ An exclusion such as `~blockquote` leaves out the sentences of a quote.
 
 ### Requirement: paragraph leaves out list items and quotes
 
-The scope `paragraph` SHALL select a paragraph that opens no list item or block quote.  
+The scope `paragraph` SHALL select a paragraph that opens no list item or block quote.
 It SHALL also select every later paragraph of an item or a quote, as Vale 3.26.0 does.
 
 #### Scenario: A paragraph and a list item
@@ -38,10 +38,10 @@ It SHALL also select every later paragraph of an item or a quote, as Vale 3.26.0
 
 ### Requirement: A block of text has the scope of one element
 
-A block of text SHALL have the scope of one element, as in Vale 3.26.0.  
+A block of text SHALL have the scope of one element, as in Vale 3.26.0.
 That element SHALL be the outermost list item, block quote, heading or table cell that the block is the first thing inside.
 
-A block that is the first thing inside none of them SHALL have its own scope: a paragraph, a heading or a table cell.  
+A block that is the first thing inside none of them SHALL have its own scope: a paragraph, a heading or a table cell.
 A list item and a block quote SHALL be read through the blocks inside them.
 
 #### Scenario: A heading in a quote
@@ -90,7 +90,7 @@ A scope part written `sentence.` and a name SHALL read as that name joined to `s
 
 ### Requirement: table selects cells
 
-The scope `table` SHALL select the header and body cells of a table, and not its rows.  
+The scope `table` SHALL select the header and body cells of a table, and not its rows.
 The scope `table.row` SHALL select the rows.
 
 #### Scenario: Cells and rows

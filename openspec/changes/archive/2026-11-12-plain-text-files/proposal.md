@@ -1,21 +1,21 @@
 # Proposal
 
-Queue row: `HKR-030` in [tasks.yaml][ledger].  
+Queue row: `HKR-030` in [tasks.yaml][ledger].
 It follows [`gitignore-walk`][walk], which chose the files a run reads, and changes [check-command][check] and [project-config][config].
 
 ## Motivation
 
-hakkiri reads Markdown, MDX and the comments of three source languages, and skips every other file a glob selects.  
+hakkiri reads Markdown, MDX and the comments of three source languages, and skips every other file a glob selects.
 `hakkiri check notes.txt` is a failure, and a `*` glob lints less than it matches.
 
-Vale reads such a file as plain text, and its `[formats]` section maps an extension to a reader.  
+Vale reads such a file as plain text, and its `[formats]` section maps an extension to a reader.
 A project that checks `README`, `LICENSE`, `.txt` and `.toml` files with Vale cannot switch while hakkiri rejects them (operator, 2026-11-11).
 
 ## Changes
 
-- A file that a glob selects and that no reader reads is plain text.  
+- A file that a glob selects and that no reader reads is plain text.
   It has one `raw` root over the file, and each run of lines between blank lines is a paragraph.
-- `formats` maps an extension, a file name or a glob to a reader (`md`, `mdx`, `rs`, `ts`, `tsx`, `js`, `text`), as Vale's `[formats]` does.  
+- `formats` maps an extension, a file name or a glob to a reader (`md`, `mdx`, `rs`, `ts`, `tsx`, `js`, `text`), as Vale's `[formats]` does.
   A package's settings file may contain it.
 - `on_unknown` (`--on-unknown`, `HAKKIRI_ON_UNKNOWN`) takes `text`, the default, `warn`, `error` or `ignore`, for a selected file that no reader reads.
 - A binary file is skipped with no message.

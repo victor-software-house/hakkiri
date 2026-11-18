@@ -1,7 +1,7 @@
 # Tagger model notice
 
-`en.bin` is the English part-of-speech model of [prose][prose-model], byte for byte, at commit `b33e60d`.  
-Its SHA-256 is `031ef22b05a03ea31ebc154bffd396e8497360546671d48f7b921f20ef4c9345`.  
+`en.bin` is the English part-of-speech model of [prose][prose-model], byte for byte, at commit `b33e60d`.
+Its SHA-256 is `031ef22b05a03ea31ebc154bffd396e8497360546671d48f7b921f20ef4c9345`.
 hakkiri made no change to it.
 
 | | |
@@ -10,7 +10,7 @@ hakkiri made no change to it.
 | Training data | English Web Treebank (EWT), `UD_English-EWT` at `4a4d77f` (2026-05-06), from the [Universal Dependencies][ud] project |
 | License of the model | [Creative Commons Attribution-ShareAlike 4.0][cc-by-sa] ([model list][prose-models]) |
 
-The model stays a separate data file.  
+The model stays a separate data file.
 So the share-alike license covers this file and any change to it, and not the source code of hakkiri.
 
 The code in `src/tagger` is a port of the `tag`, `tokenize` and `internal/perceptron` packages of prose, which are under the MIT license in [`prose.LICENSE`](prose.LICENSE).

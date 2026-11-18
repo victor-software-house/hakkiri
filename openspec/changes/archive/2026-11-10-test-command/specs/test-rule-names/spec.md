@@ -2,11 +2,11 @@
 
 ### Requirement: A rule is named from the path it was found at
 
-hakkiri SHALL name a rule from its path made absolute, with `.` and `..` parts folded away and symlinks left alone.  
+hakkiri SHALL name a rule from its path made absolute, with `.` and `..` parts folded away and symlinks left alone.
 The style loader names a rule the same way, from the folder it was given.
 
-hakkiri SHALL read the rule's text from that same path.  
-So a path through a symlink and back out with `..` reads the file that its folded form names.  
+hakkiri SHALL read the rule's text from that same path.
+So a path through a symlink and back out with `..` reads the file that its folded form names.
 A rule file named as `Foo.yml` or `./Foo.yml`, from inside its style folder, SHALL get the name of that folder.
 
 #### Scenario: Run from inside the style folder
