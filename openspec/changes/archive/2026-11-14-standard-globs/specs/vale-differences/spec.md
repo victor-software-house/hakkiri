@@ -8,12 +8,12 @@ It reads a glob with `**` through doublestar, whose trailing `/**` also matches 
 
 #### Scenario: A star across folders
 
-- **WHEN** a glob is `docs/*.md` and the project holds `docs/x/a.md`
+- **WHEN** a glob is `docs/*.md` and the project contains `docs/x/a.md`
 - **THEN** Vale lints the file, and hakkiri does not ([decision 1][standard-globs-1])
 
 #### Scenario: A trailing double star
 
-- **WHEN** a glob is `tests/oracle/*/**` and the project holds `tests/oracle/a.md`
+- **WHEN** a glob is `tests/oracle/*/**` and the project contains `tests/oracle/a.md`
 - **THEN** Vale lints the file, and hakkiri does not ([decision 1][standard-globs-1])
 
 [standard-globs-1]: ../../design.md#1-globs-follow-gitignore
