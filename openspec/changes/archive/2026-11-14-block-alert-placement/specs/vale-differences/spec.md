@@ -7,23 +7,27 @@ hakkiri SHALL place an alert, and match text for `existence`, `substitution` and
 #### Scenario: An alert is placed by offset
 
 - **WHEN** a phrase appears twice in a block and the second copy matches
-- **THEN** hakkiri points at the second copy through its byte table, and Vale's default path searches for the matched text, so it can land on the first ([engine 7][engine-7])
+- **THEN** hakkiri points at the second copy through its byte table
+- **AND** Vale's default path searches for the matched text, so it can land on the first ([engine 7][engine-7])
 
 #### Scenario: A measurement alert points at its node
 
 - **WHEN** a `metric` rule with `scope: paragraph`, `formula: words` and `condition: '> 3'` reads the paragraph `One two three`, `four five six`, `seven eight.` on lines 1 to 3
-- **THEN** hakkiri gives line 1, column 1, the first byte of the paragraph, and Vale gives line 3, column 1, the start of the block's last line ([engine 16][engine-16])
+- **THEN** hakkiri gives line 1, column 1, the first byte of the paragraph
+- **AND** Vale gives line 3, column 1, the start of the block's last line ([engine 16][engine-16])
 
 #### Scenario: A metric alert on a nested list item
 
 - **WHEN** the same rule with `scope: list` reads the items `Item one two` / `three four five.`, `Short.` with the nested item `Nested one two` / `three four five.`, and `Last item one` / `two three four.`, from line 5
 - **THEN** both count the nested item as its own block, so `Short.` gives no alert
-- **AND** hakkiri gives lines 5, 8 and 10 past each bullet, at columns 3, 5 and 3, where Vale gives lines 6, 9 and 11 at column 1 ([engine 16][engine-16])
+- **AND** hakkiri gives lines 5, 8 and 10 past each bullet, at columns 3, 5 and 3
+- **AND** Vale gives lines 6, 9 and 11 at column 1 ([engine 16][engine-16])
 
 #### Scenario: Word and space classes are Unicode
 
 - **WHEN** a pattern uses `\w`, `\d` or `\s` on `naïve`
-- **THEN** hakkiri reads one word, since these classes are Unicode as `\b` is, and Vale reads them as ASCII, so a word with an accent reads as two ([engine 16][engine-16])
+- **THEN** hakkiri reads one word, since these classes are Unicode as `\b` is
+- **AND** Vale reads them as ASCII, so a word with an accent reads as two ([engine 16][engine-16])
 
 #### Scenario: capitalize needs a capital to start
 

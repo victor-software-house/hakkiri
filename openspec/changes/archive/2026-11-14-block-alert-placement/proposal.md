@@ -7,7 +7,9 @@ Queue row: `HKR-074` in [tasks.yaml][ledger].
 In the `vale-differences` spec, Vale points a measurement alert on a list item at column 1 of the block's first line.  
 The ProseStyle v0.0.16 alert diff showed otherwise: of 504 paired `ProseStyle.Paragraph` alerts, Vale placed 500 on the paragraph's last line.
 
-A probe on 2026-11-14 ran Vale 3.26.0 and Vale 66bbb85 on one file with a `metric` rule over paragraphs and one over list items.  
+A probe on 2026-11-14 ran Vale 3.26.0 and Vale 66bbb85 on one file.  
+The file had a `metric` rule over paragraphs and one over list items.
+
 Both put each alert at column 1 of the block's last line.  
 hakkiri puts it at the first byte of the node, past the bullet.  
 Both tools count a nested list item as its own block.
