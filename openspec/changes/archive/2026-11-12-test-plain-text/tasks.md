@@ -1,11 +1,14 @@
 # Tasks
 
-Every compile, lint and test step runs in the pull request's CI, or in a box for a pre-push run, and never on the authoring machine.
+Every compile, lint and test step runs in the pull request's CI, or in a box for a pre-push run.  
+None runs on the authoring machine.
 
 ## 1. The reader of a case
 
 - [x] 1.1 Read a case's input by a `formats` entry, then by the extension, then as plain text.  
-  Verify the two scenarios of `test-command` pass, and a test for each fails on the source before the change.  
+  Verify the two scenarios of `test-command` pass.  
+  Verify also that a test of each fails on the old source.
+
   Evidence, 2026-11-12 (UTC): PR 109 added the two tests, and both failed on the source before the change and pass after it.  
   PR 112 added three more, and two of them failed before the change.
 

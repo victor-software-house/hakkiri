@@ -12,8 +12,9 @@ So the requirement is removed and added again below under a new name.
 
 ### Requirement: A reader is chosen by formats, then by extension
 
-hakkiri SHALL read a file by the reader its `formats` entry gives it, and otherwise by its extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` as Markdown, MDX, Rust, TypeScript, TSX or JavaScript.  
-A file that a glob selects and that no reader reads SHALL be read as plain text, unless `on_unknown` says otherwise.
+hakkiri SHALL read a file by the reader its `formats` entry gives it.  
+Otherwise it SHALL read the file by its extension: `.md`, `.mdx`, `.rs`, `.ts`, `.tsx` or `.js` as Markdown, MDX, Rust, TypeScript, TSX or JavaScript.  
+A file that a glob selects and that no reader reads SHALL be read as plain text, unless `on_unknown` is set otherwise.
 
 #### Scenario: A file no reader reads, found by a walk
 
@@ -32,7 +33,7 @@ A file that a glob selects and that no reader reads SHALL be read as plain text,
 
 ### Requirement: Plain text is read as written
 
-A plain-text file SHALL have one `raw` scope over the whole file, and one `paragraph` for each run of lines between blank lines.  
+A plain-text file SHALL have one `raw` scope over the whole file, and each run of lines between blank lines SHALL be one `paragraph`.  
 No marker, escape or entity SHALL change its text.
 
 #### Scenario: Paragraphs
@@ -47,8 +48,9 @@ No marker, escape or entity SHALL change its text.
 
 ### Requirement: A binary file is skipped
 
-A file read as plain text that contains a NUL byte in its first 8192 bytes SHALL be skipped with no alert and no message.  
-This SHALL hold whether a walk finds the file or the command line names it.  
+When its first 8192 bytes contain a NUL (zero) byte, a plain-text file SHALL be skipped with no alert and no message.  
+This SHALL apply whether a walk finds the file or the command line gives it.
+
 A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file binary.
 
 #### Scenario: A picture
@@ -59,12 +61,13 @@ A byte that is not valid UTF-8 SHALL read as one `?` and SHALL NOT make the file
 #### Scenario: A Latin-1 file
 
 - **WHEN** `latin.txt` contains a word that has the byte `E9`, then a space and `very`, and no NUL byte, and a rule flags `very`
-- **THEN** hakkiri reports `very` at the column that counts the bytes, and Vale gives the same column
+- **THEN** hakkiri reports `very` at the column that counts the bytes
+- **AND** Vale gives the same column
 
 ### Requirement: A file has its own extension and its reader's
 
-For the scopes of the rules that run on it, a file SHALL have its own extension and the extension of the reader that reads it.  
-A scope part that names an extension SHALL hold for either, and a negated part SHALL leave a block out for either.
+A file SHALL have its own extension and its reader's, for the scopes of the rules that run on it.  
+A scope part that gives an extension SHALL match either, and a negated part SHALL leave a block out for either.
 
 #### Scenario: A mapped file
 

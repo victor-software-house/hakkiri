@@ -2,8 +2,12 @@
 
 ### Requirement: formats maps a file to a reader
 
-`formats` SHALL map an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`.  
-An entry named by the file's extension SHALL come first, then, in the order of the keys as text, an entry whose key is the file's name or a glob that matches its name or its path.  
+`formats` SHALL map an extension, a file name or a glob to a reader: `md`, `mdx`, `rs`, `ts`, `tsx`, `js` or `text`.
+
+An entry for the file's extension SHALL come first.  
+Next SHALL come an entry whose key is the file's name, or a glob that matches its name or its path.  
+These SHALL come in the order of the keys as text.
+
 A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.  
 An entry SHALL beat the extension table.
 
@@ -29,7 +33,8 @@ An entry SHALL beat the extension table.
 
 ### Requirement: formats refuses a bad entry
 
-A reader that is not one of the seven SHALL be an error that lists them, and a key that contains a glob mark and is not a glob SHALL be an error.
+A reader that is not one of the seven SHALL be an error that lists them.  
+A key that contains a glob mark and is not a glob SHALL be an error.
 
 #### Scenario: An unknown reader
 

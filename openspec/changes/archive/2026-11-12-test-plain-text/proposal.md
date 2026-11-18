@@ -5,8 +5,9 @@ It follows [`plain-text-files`][plain], which made a file with no reader plain t
 
 ## Motivation
 
-A test case names its `format`, an extension, and hakkiri reads the input as a file of that extension.  
-`hakkiri test` refused a format that no language reads, such as `txt`, though `hakkiri check` now reads such a file as plain text.  
+A test case gives its `format`, an extension, and hakkiri reads the input as a file of that extension.
+
+`hakkiri test` rejected a format that no language reads, such as `txt`, though `hakkiri check` now reads such a file as plain text.  
 The ProseStyle package could not test that a text file is not prose.  
 A `formats` entry that maps an extension to a reader changed nothing for a case.
 
