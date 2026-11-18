@@ -27,10 +27,11 @@ hakkiri SHALL refuse a project config that contains a key it does not define, an
 
 ### Requirement: A package is a folder or a download
 
-Each entry in `packages` SHALL hold a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
-A `url` SHALL start with `https://` or `http://`, and a `sha256` SHALL be 64 lowercase hex digits.  
-It SHALL fetch and cache each `url` with no separate sync step, and lint with it only when its download matches the hash.  
-It SHALL refuse two entries that hold a style of one name, and the error SHALL name both.
+Each entry in `packages` SHALL contain a `path` to a folder of styles, or a `url` and a `sha256`, and never both.  
+A `url` SHALL start with `https://` or `http://`, and a `sha256` SHALL be 64 lowercase hex digits.
+
+hakkiri SHALL fetch and cache each `url` with no separate sync step, and lint with it only when its download matches the hash.  
+It SHALL refuse two entries that contain a style of one name, and the error SHALL give both.
 
 #### Scenario: A local folder
 
@@ -84,7 +85,8 @@ hakkiri SHALL report only alerts at or above `level`, which is `suggestion`, `wa
 ### Requirement: files maps globs to settings
 
 hakkiri SHALL lint a file only when it matches a glob under `files`.  
-It SHALL apply the settings of every glob the file matches in the rank of the settings cascade, a higher rank winning for the same key.
+It SHALL apply the settings of every glob the file matches, in the rank of the settings cascade.  
+A higher rank SHALL win for the same key.
 
 #### Scenario: Two globs match one file
 
@@ -132,8 +134,12 @@ A rule name SHALL match case-sensitively.
 
 ### Requirement: Paths in the config are relative to the project root
 
-The project root SHALL be the folder that contains the `.ctl` folder of the config file, or the folder of the config file when it is not in a `.ctl` folder, with symlinks resolved.  
-hakkiri SHALL read every `path` in the config relative to that root, and a walk SHALL compare each folder's resolved path with those resolved package paths when it skips package folders.
+The project root SHALL be the folder that contains the `.ctl` folder of the config file.  
+When the config file is not in a `.ctl` folder, the root SHALL be the folder of the config file.  
+In both cases, symlinks SHALL be resolved.
+
+hakkiri SHALL read every `path` in the config relative to that root.  
+To skip package folders, a walk SHALL compare each folder's resolved path with those resolved package paths.
 
 A `packages` `path` that does not exist SHALL be an error that names its line, and hakkiri SHALL NOT fall back to a path as written.
 
@@ -150,7 +156,8 @@ A `packages` `path` that does not exist SHALL be an error that names its line, a
 ### Requirement: A level or `on` runs a rule whichever style contains it
 
 A rule name that gives a level SHALL run that rule on the matched files at that level, though no glob lists its style.  
-`on` SHALL run the rule at the level of its rule file, and `off` SHALL stop a rule of a listed style and change nothing for a rule of a style no glob lists.
+`on` SHALL run the rule at the level of its rule file.  
+`off` SHALL stop a rule of a listed style, and change nothing for a rule of a style that no glob lists.
 
 #### Scenario: A rule of a style no glob lists
 
@@ -180,7 +187,8 @@ A rule name that gives a level SHALL run that rule on the matched files at that 
 ### Requirement: A rule setting does not make a clash an error
 
 A rule setting SHALL NOT make hakkiri refuse a name clash or a bracket in the style of the rule it enables.  
-When two files of a style that no glob lists give one name, and a setting enables that name, hakkiri SHALL run the later file in file name order.
+Two files of a style that no glob lists may give one name, and a setting may enable that name.  
+hakkiri SHALL then run the later file in file name order.
 
 #### Scenario: A clash in a style a setting enables
 
@@ -190,9 +198,12 @@ When two files of a style that no glob lists give one name, and a setting enable
 ### Requirement: A download is checked before it is read
 
 A body SHALL be at most 32 MiB and SHALL match the `sha256`.  
-It SHALL be a zip with one top folder that names no file outside the package and unpacks to at most 128 MiB.  
-The top folder SHALL be a style, or hold a `styles` folder of styles, as in a Vale package.  
-Each fault SHALL be an error that names the `url`, and a download that fails a check SHALL leave nothing in the cache.
+It SHALL be a zip with one top folder that unpacks to at most 128 MiB.  
+No entry of the zip SHALL point outside the package.  
+The top folder SHALL be a style, or contain a `styles` folder of styles, as in a Vale package.
+
+Each fault SHALL be an error that gives the `url`.  
+A download that fails a check SHALL leave nothing in the cache.
 
 #### Scenario: A server answers 404
 
@@ -250,7 +261,7 @@ hakkiri SHALL keep each fetched package in the folder `<cache>/<sha256>/`, and S
 
 #### Scenario: A cached package with the server gone
 
-- **WHEN** a package is cached and its server no longer answers
+- **WHEN** a package is cached and its server stops answering
 - **THEN** `check` lints with it and prints the alerts it printed before
 
 #### Scenario: An empty cache with the server gone
@@ -279,10 +290,12 @@ hakkiri SHALL keep each fetched package in the folder `<cache>/<sha256>/`, and S
 
 ### Requirement: A rule hakkiri cannot run fails the run until it is turned off
 
-Each rule hakkiri cannot run that the config runs on a linted file SHALL make the run exit 2, with a `failed` line that names the rule, its file and the setting that leaves it out.  
+When the config runs a rule on a linted file and hakkiri cannot run that rule, the run SHALL exit 2.  
+Its `failed` line SHALL give the rule, its file and the setting that leaves it out.  
+`off` SHALL leave such a rule out, and a level or `on` SHALL NOT make it work: the run still fails for it.
+
 A rule is run when its style is listed and no setting turns it `off`, or when a level or `on` turns it on.  
-A rule in a style no glob lists, and that no level or `on` names, SHALL be ignored.  
-`off` SHALL leave it out, and a level or `on` SHALL NOT make it work: the run still fails for it.
+A rule in a style no glob lists, and that no level or `on` sets, SHALL be ignored.
 
 #### Scenario: A script rule in a listed style
 
@@ -316,7 +329,8 @@ A rule in a style no glob lists, and that no level or `on` names, SHALL be ignor
 
 ### Requirement: The config names the vocabularies a project uses
 
-The project config SHALL name vocabularies by the name of their folder in a `vocab` list, at its top level and in a glob of `files`, and hakkiri SHALL read each from a loaded package before it builds any rule.
+The project config SHALL list vocabularies by folder name in a `vocab` list, at its top level and in a glob of `files`.  
+hakkiri SHALL read each from a loaded package before it builds any rule.
 
 #### Scenario: A vocabulary of a package
 
@@ -345,8 +359,10 @@ The project config SHALL name vocabularies by the name of their folder in a `voc
 
 ### Requirement: A package may ship a settings file
 
-hakkiri SHALL read `.ctl/hakkiri.yaml` in the top folder of each loaded package, when it exists, in the format of the project config.  
-It SHALL apply the settings of each package before the project's own, in the order of `packages`, as if they were written ahead of the project's `files` entries.  
+hakkiri SHALL read `.ctl/hakkiri.yaml` in the top folder of each loaded package, when it exists, in the format of the project config.
+
+It SHALL apply the settings of each package before the project's own, in the order of `packages`.  
+They SHALL apply as if they were written ahead of the project's `files` entries.  
 A package with no such file SHALL change nothing.
 
 #### Scenario: A package turns a style on
@@ -361,7 +377,9 @@ A package with no such file SHALL change nothing.
 
 ### Requirement: The project overrides a package
 
-At equal specificity a setting in the project's config SHALL win over the same setting in a package's file, and a later package SHALL win over an earlier one.  
+At equal specificity, a setting in the project's config SHALL win over the same setting in a package's file.  
+A later package SHALL win over an earlier one.
+
 A rule that a package sets `off` SHALL stay off until a setting of a glob that ranks higher turns it on.  
 The project's `level` SHALL win, and a package's `level` SHALL apply only when the project sets none.
 
@@ -428,7 +446,8 @@ Like in the project's config, a rule setting for no loaded rule SHALL be an erro
 
 ### Requirement: The built-in style Vale contains the vocabulary rules
 
-hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Repetition` and `Spelling`, and `Terms` and `Avoid` when a named vocabulary at the top level contains a term.  
+hakkiri SHALL accept `Vale` in a glob's `styles` as a style whose rules are `Repetition` and `Spelling`.  
+It SHALL also contain `Terms` and `Avoid` when a listed vocabulary at the top level contains a term.  
 The style SHALL exist whatever the vocabularies hold.
 
 #### Scenario: A style named Vale
@@ -479,8 +498,11 @@ An unknown value SHALL be an error that names the line.
 
 ### Requirement: formats maps a file to a reader
 
-`formats` SHALL map an extension, a file name or a glob to a reader, named by any langdex name, alias or extension of the language it reads: Markdown, MDX (Markdown with components), Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell or Text.  
-So `md`, `markdown` and `Markdown` name one reader, `sh` and `bash` name the Shell reader, and `text` names plain text.  
+`formats` SHALL map an extension, a file name or a glob to a reader.  
+The reader SHALL be given by any langdex name, alias or extension of the language it reads.  
+The languages are Markdown, MDX (Markdown with components), Rust, TypeScript, TSX (TypeScript with tags), JavaScript, Go, Swift, YAML, TOML, Shell and Text.
+
+So `md`, `markdown` and `Markdown` give one reader, `sh` and `bash` give the Shell reader, and `text` gives plain text.  
 An entry SHALL beat the language of the file.
 
 #### Scenario: An extension
@@ -505,7 +527,9 @@ An entry SHALL beat the language of the file.
 
 ### Requirement: formats entries are looked up in key order
 
-An entry named by the file's extension SHALL come first, then, in the order of the keys as text, an entry whose key is the file's name or a glob that matches its name or its path.  
+An entry keyed by the file's extension SHALL come first.  
+The other entries SHALL follow in the order of their keys as text.  
+Their key is the file's name, or a glob that matches its name or its path.  
 A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.
 
 #### Scenario: A name and a glob
@@ -520,7 +544,8 @@ A key that contains `*`, `?`, `[`, `{` or `/` SHALL be a glob.
 
 ### Requirement: formats refuses a bad entry
 
-A reader that names no language hakkiri reads SHALL be an error that lists the twelve, and a key that contains a glob mark and is not a glob SHALL be an error.
+A reader that gives no language hakkiri reads SHALL be an error that lists the twelve.  
+A key that contains a glob mark and is not a glob SHALL be an error.
 
 #### Scenario: An unknown reader
 
@@ -554,10 +579,11 @@ It SHALL be resolved as the flag, then `HAKKIRI_ON_UNKNOWN`, then the config, th
 
 ### Requirement: A fault names the line of its own key
 
-A fault about a key of the config SHALL name the line where the config writes that key.  
-A fault about the value of a key SHALL name the line where the value starts.  
-Both hold whatever characters the key contains and however the config is written.  
-A fault about one item of a list SHALL name the line of that item.  
+A fault about a key of the config SHALL give the line where the config writes that key.  
+A fault about its value SHALL give the line where the value starts.  
+Both SHALL apply whatever characters the key contains and however the config is written.
+
+A fault about one item of a list SHALL give the line of that item.  
 A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{` split nothing.
 
 #### Scenario: Globs and settings that hold special characters
@@ -582,8 +608,9 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 
 #### Scenario: A glob or a setting with a block value
 
-- **WHEN** a glob that is no glob has a block mapping below it, or a setting that names no rule has a block list below it
-- **THEN** hakkiri names the line of the key, and not the line below it
+- **WHEN** a glob that is no glob has a block mapping below it
+- **THEN** hakkiri gives the line of the key, and not the line below it
+- **AND** it does the same for a setting of an unknown rule that has a block list below it
 
 #### Scenario: A refused key of a package's settings file
 
@@ -592,7 +619,8 @@ A glob key and a setting key SHALL each be one key, so `.`, `*`, `/`, `[` and `{
 
 ### Requirement: A package style named Vale is skipped with a warning
 
-hakkiri SHALL skip a package folder named for the built-in style `Vale`, as Vale does, and SHALL print one warning that names the folder and says the built-in style wins.  
+hakkiri SHALL skip a package folder called after the built-in style `Vale`, as Vale does.  
+It SHALL print one warning that gives the folder and shows that the built-in style wins.  
 The other styles of the package SHALL load as before.
 
 #### Scenario: A package contains styles Acme and Vale
@@ -602,8 +630,14 @@ The other styles of the package SHALL load as before.
 
 ### Requirement: A glob's specificity is four counts over its parts
 
-A glob's specificity SHALL be four counts over the parts of its text between slashes, compared in order.  
-They SHALL be the parts of literal characters only, then the parts that hold a literal character and something else, then the parts that are `**`, then the literal characters of the whole glob.  
+A glob's specificity SHALL be four counts, compared in order.  
+The counts SHALL cover the slash-separated parts of the glob, and SHALL be:
+
+1. the parts of literal characters only;
+2. the parts that contain a literal character and something else;
+3. the parts that are `**`;
+4. the literal characters of the whole glob.
+
 More SHALL be more specific for each count but the third, where fewer SHALL be more specific.
 
 #### Scenario: A folder beats a file type
@@ -645,7 +679,8 @@ A glob with more than 256 alternatives SHALL be a fault that asks to split it in
 ### Requirement: The settings cascade applies the globs in rank order
 
 hakkiri SHALL rank every glob of the project and its packages once, by specificity, then by origin, then as written.  
-It SHALL apply the globs that match a file from the lowest rank to the highest, a higher rank winning for the same key.  
+It SHALL apply the globs that match a file from the lowest rank to the highest, a higher rank winning for the same key.
+
 A glob with alternatives SHALL take, for each file, the rank of its most specific alternative that matches that file.  
 Only settings of the same key SHALL compete: the settings of every matching glob merge.
 
@@ -656,8 +691,10 @@ Only settings of the same key SHALL compete: the settings of every matching glob
 
 ### Requirement: Rule settings combine in rank order
 
-A glob of higher rank SHALL win for the same rule, whether it turns the rule on or off or sets its level.  
-Turning a rule on or off and setting its level SHALL compete as two keys, so a level stays when a glob of higher rank turns the rule off or on.  
+A glob of higher rank SHALL win for the same rule, whether it turns the rule on or off or sets its level.
+
+Turning a rule on or off and setting its level SHALL compete as two keys.  
+So a level stays when a glob of higher rank turns the rule off or on.  
 The order of keys inside a glob SHALL NOT matter.
 
 #### Scenario: A rule turned on after it was turned off
@@ -707,7 +744,8 @@ An empty `styles` list SHALL drop every rule setting of a lower rank, and the ru
 
 ### Requirement: Origin breaks a tie, and the top level ranks lowest
 
-At equal specificity the project SHALL rank above a package and a later package above an earlier one, and within one file a later glob SHALL rank above an earlier one.  
+At equal specificity, the project SHALL rank above a package, and a later package above an earlier one.  
+Within one file, a later glob SHALL rank above an earlier one.  
 The top level of each config file SHALL rank below every glob, in the same order of origin.
 
 #### Scenario: A tie between a package and the project
@@ -722,8 +760,11 @@ The top level of each config file SHALL rank below every glob, in the same order
 
 ### Requirement: The project forces a value with !override
 
-A value that the project's config tags `!override` SHALL apply after every value without the tag, whatever its rank, and the forced values SHALL apply among themselves in rank order.  
-The tag SHALL be read on the value of a key directly under a glob and on the top-level `code_span_size`; a forced `params` mapping SHALL force every parameter it holds.  
+A value that the project's config tags `!override` SHALL apply after every value without the tag, whatever its rank.  
+The forced values SHALL apply among themselves in rank order.
+
+The tag SHALL be read on the value of a key directly under a glob, and on the top-level `code_span_size`.  
+A forced `params` mapping SHALL force every parameter it contains.  
 A forced `styles` list SHALL be taken as written, and an empty forced list SHALL drop every rule setting without the tag.
 
 #### Scenario: A forced level beats a more specific off
@@ -738,7 +779,8 @@ A forced `styles` list SHALL be taken as written, and an empty forced list SHALL
 
 ### Requirement: Only the project forces, and only with !override
 
-`!override` in a package's settings file, and any other tag on a value where hakkiri reads the tag, SHALL be an error that names the file and the line of its key.
+`!override` in a package's settings file SHALL be an error that gives the file and the line of its key.  
+So SHALL any other tag on a value where hakkiri reads the tag.
 
 #### Scenario: A package that forces
 
