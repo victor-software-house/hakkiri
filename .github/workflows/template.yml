@@ -49,7 +49,7 @@ jobs:
       id-token: write
       issues: write
     with:
-      mise-version: 2026.11.6
+      mise-version: 2026.11.10
       runner: ubuntu-26.04
       # A pull request that changes none of these files skips the check, which
       # still reports. The list has every file the template renders, whole

@@ -35,21 +35,32 @@ Accepted terms are exceptions of `Vale.Avoid`, not of `Vale.Terms` ([definition.
 The probe of Vale at `66bbb85` (2026-11-11) found these:
 
 - `github` and `Github` each draw `Use 'GitHub' instead of 'github'.`, and `GitHub` draws nothing.
+
 - `harness(?:es)?` draws `Use 'harnesses' instead of 'Harnesses'.` for `Harnesses`, so a pattern is shown as the spelling it matched.
+
 - `Node.js` matches `node.js` and not `nodexjs`, so a period of a plain term is literal.
+
 - A rejected term that is also accepted draws no `Vale.Avoid` alert.
+
 - `foo.*bar` draws one alert over the whole span from the first `foo` to the last `bar`.
+
 - `Bad Word` matches `Bad  Word` with two spaces, and not `bad word`.
+
 - `colou?r` draws `Use 'color' instead of 'COLOR'.` and `Use 'colour' instead of 'Colour'.`, and a term with a class, a wildcard or a repeat is shown as written.
+
 - Two terms with one lowercase form, `iOS` and `IOS`, give one swap key, and the later one is the value: `ios`, `Ios` and `iOS` each draw `Use 'IOS' instead of ...`.
+
 - Vale lowercases the whole pattern, escapes included, so `data\Wset` builds the key `data\wset`.
   That key flags `dataxset`, draws `Use 'data\Wset' instead of 'dataxset'.`, and leaves `data set` alone.
 
   That changes what the pattern means, so hakkiri lowercases only the literal text of a term.
   `\W` stays a non-word character, `data\Wset` flags `DATA SET`, and `dataxset` draws nothing.
   The lead session decided this, as a note on `HKR-042` records.
+
 - A phrase that wraps matches across the line break: `mea\nCulpa` draws `Use 'mea culpa' instead of 'mea Culpa'.`, and `mea\nculpa` draws nothing.
+
 - Nothing runs from a vocabulary that a config lists without the style `Vale`, and `Vale.Terms: off` leaves `Vale.Avoid` on.
+
 - A glob's own rule turns on after the glob's settings, so `Vale.Team.Terms: off` beside `vocab: [Team]` in one glob leaves it on.
 
 Alternative: swap keys that keep the term's case and match with the `(?i)` flag.

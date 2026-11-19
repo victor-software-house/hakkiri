@@ -10,6 +10,7 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Verify the tests in `src/sequence/tests.rs` and `tests/sequence.rs` fail on the source before the change and pass after it.
 
   Evidence, 2026-11-12 (UTC): in a box the three unit tests of the sequence module pass.
+
 - [x] 1.2 Label the alerts of `ThingsSpeakNoun` and `NounStack` that Vale and the hakkiri builds do not all give, against a written definition of each rule.
 
   Verify two readers labelled each alert of `ThingsSpeakNoun`, and each alert of `NounStack` that touches a code span.
@@ -17,6 +18,7 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
   Evidence, 2026-11-12 (UTC): 304 alerts of `ThingsSpeakNoun` and 540 of `NounStack` were labelled.
   The first set had 2 conflicts in 296, the second none in 169, and the last 1 in 18.
+
 - [x] 1.3 Diff the alerts of the nine repositories that run Vale, before and after.
   Verify the false alerts that remain are listed.
 
@@ -36,6 +38,7 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   They serve the verb tag that the package puts on the verb token of `ThingsSpeakNoun`.
   Verify a unit test pins each correction.
   Evidence, 2026-11-12 (UTC): in a box `cargo test` passes, and `clippy --lib --bins --tests -D warnings` passes.
+
 - [x] 3.2 Measure the tagger on UD (Universal Dependencies) English GUM (the Georgetown University Multilayer corpus).
   Measure it also on the 200 judged conflicts of our documents.
   Verify GUM stays at 92.53% or above.

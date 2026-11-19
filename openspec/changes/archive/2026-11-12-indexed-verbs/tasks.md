@@ -9,12 +9,14 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
 
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran over the new inputs and over the whole `sequence` fixture.
   It reproduced all 446 rows of `tests/fixtures/sequence/vale.tsv`, and gave 11 rows for the new rules.
+
 - [x] 1.2 Fill `%[n]s` in `fill`, with a plain verb after it taking the next value.
   Verify `fills_indexed_verbs_as_vale_does` and the scenarios of the `alerts` delta fail before the change and pass after it.
 
   Evidence, 2026-11-11 (UTC): against the old `fill` in a box, five tests fail.
   They are `fills_indexed_verbs_as_vale_does`, `values_taken_by_number`, `a_plain_verb_after_an_indexed_one`, `a_value_used_twice` and `a_verb_with_no_value`.
   `a_bracket_that_is_no_verb_stays_as_written` passes both ways, as a guard, and all pass with the change.
+
 - [x] 1.3 Run the ProseStyle v0.0.14 cases of the two rules through `hakkiri test`.
   Verify `tests/test_command.rs` passes with both files, and each case reports its message.
   Evidence, 2026-11-11 (UTC): `the_cases_of_two_rules_with_indexed_verbs_pass` runs the two rule files as ProseStyle v0.0.14 ships them, and reports `2 files, 6 passed, 0 failed`.

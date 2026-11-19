@@ -18,21 +18,25 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify the inheritance tests fail on the loader of main and pass on the new one.
   - 2026-11-11 (UTC), the 22 tests of `tests/vale_styles.rs` failed on `src/` of [fe3eea0][c-base] (0 passed), in a throwaway Linux box.
     All 22 pass in [19d121d][c-code].
+
 - [x] 2.2 Report a rule hakkiri cannot run apart, and run the rest of its style.
   Fail the run for that rule until the config turns it `off`, and report its cases as not run.
   The changes are in `src/config.rs`, `src/run.rs` and `src/suite.rs`.
 
   Verify the tests for a listed style, an unlisted style, `off`, a level and `on`, and `test` fail before and pass after.
   - 2026-11-11 (UTC), those tests are among the 22 above, and fail and pass with them.
+
 - [x] 2.3 Commit the Voices, Std and Readability styles with their licences and the tag, and run them.
   Verify `hakkiri test --coverage` passes every case of Voices and Std, and Readability runs with its script rule turned off.
   - 2026-11-11 (UTC), 103 cases in 48 files pass with no uncovered rule, and Readability fails once for `Readability.Polysyllables` until it is `off`, in [19d121d][c-code].
+
 - [x] 2.4 Load a fetched package that contains inheriting rules.
   Verify a test pins ProseStyle v0.0.14 by hash, serves it from a local port, and lints with `Direct.Length`.
   Verify also that its six script rules fail the run until they are `off`.
   - 2026-11-11 (UTC), both tests of `tests/package_fetch.rs` failed on `src/` of [06feef5][c-pkg], and pass in [91bbdb7][c-fetch].
     The first run failed on the search path: the loader looked for `Std` only in packages written as a `path`.
     So the fixture found the fault.
+
 - [x] 2.5 Gate in a throwaway Linux box.
   Verify test, lint, format, doc, deny and deps pass.
   - 2026-11-11 (UTC), all six pass on the tree of [91bbdb7][c-fetch] (rebased onto [06feef5][c-pkg]), with 29 test targets passing.

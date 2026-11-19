@@ -62,7 +62,7 @@ jobs:
       pull-requests: read
     uses: victor-software-house/actions/.github/workflows/rust-ci.yml@6243d0aec17b8d3eb664b6cf5162bfb5ef7990c3 # main, 2026-11-18
     with:
-      mise-version: 2026.11.6
+      mise-version: 2026.11.10
       advisories: true
       semver: false
       timeout-minutes: 8

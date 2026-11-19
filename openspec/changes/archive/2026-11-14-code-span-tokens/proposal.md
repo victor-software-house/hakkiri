@@ -35,6 +35,7 @@ A code span is never one of the four nouns of a stack.
 ## Impact
 
 - Changed: `src/sequence.rs`, `src/tagger.rs`, `src/tagger/tokens.rs`, `src/tagger/corrections.rs`, the tests of the sequence walk and the tagger, the instructions, the skill and `AGENTS.md`.
+
 - On nine repositories `ThingsSpeakNoun` gives 313 of the alerts the tools diverge on, 305 true and 8 false, and every true alert of Vale.
   `NounStack` gives 240, 44 true and 196 false where Vale gives 278, 16 true and 262 false.
 

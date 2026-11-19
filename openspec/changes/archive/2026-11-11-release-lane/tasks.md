@@ -13,6 +13,7 @@ This change follows [`check-command`][check] and [`test-command`][test], so the 
   Evidence, 2026-11-11 (UTC): [PR 65][pr65] pins verctl 0.8.0, the latest release ([CI run][ci-pr65]).
   Its CI run passes the Static checks job that contains those three tasks.
   The pre-push lockfile hook also required `verctl` in `mise.ci.lock` and `mise.dev.lock`, because the release jobs run with `MISE_ENV=ci`.
+
 - [x] 1.2 Add `.ctl/ver.yaml` with `publisher: none` and the `prepare.after` that regenerates `Cargo.lock`.
   It also lists the two assets, the two patterns and their pins, and the `changelog` block.
   The assets build natively on `macos-latest` and `ubuntu-latest`, with no `runners` entry.
@@ -21,6 +22,7 @@ This change follows [`check-command`][check] and [`test-command`][test], so the 
   Evidence, 2026-11-11 (UTC): the Plan job of [the release run after PR 65][release-65] ran `ver status` and passed.
   verctl 0.8.0 rejects a pattern with an open side, so both patterns carry `whole_line: true`.
   The README pin is the whole line `mise use github:victor-software-house/hakkiri@{version}`.
+
 - [x] 1.3 Add the changeset fragment that ships `check` and `test` as a patch.
   Verify the Version PR that the first push after the merge opens bumps `Cargo.toml` and `Cargo.lock` to `0.0.1`.
 
@@ -60,6 +62,7 @@ This change follows [`check-command`][check] and [`test-command`][test], so the 
 
   **Finding:** a NixOS machine without nix-ld has no loader at that path, and this binary does not start there.
   Not verified: a NixOS machine without nix-ld, and `ubuntu-latest` moving to Ubuntu 26, which raises the glibc the next build needs.
+
 - [x] 3.2 Update `AGENTS.md` with the release rule: a behaviour change adds a fragment, and the Version PR is the release.
   Verify `AGENTS.md` contains the rule.
   Evidence, 2026-11-11 (UTC): decision 9 of `AGENTS.md` contains it, merged with [PR 65][pr65].

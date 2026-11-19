@@ -1,5 +1,5 @@
 # The latest stable mise is the floor; CI pins the same version.
-min_version = "2026.11.6"
+min_version = "2026.11.10"
 
 [settings]
 # Every tool comes from the locks, whether a config file, a task or the command
@@ -25,11 +25,11 @@ rust = [
   # Pinned stable: build, lint, test.
   { version = "1.100.0", profile = "minimal", components = "clippy", mr_boxington = true },
   # rustfmt's unstable options, and rustdoc as docs.rs builds it.
-  { version = "nightly-2026-11-01", profile = "minimal", components = "rustfmt" },
+  { version = "nightly-2026-11-18", profile = "minimal", components = "rustfmt" },
 ]
 mr-boxington = "1.30.0"
-"github:EmbarkStudios/cargo-deny" = "0.20.2"
-"github:bnjbvr/cargo-machete" = "0.9.2"
+"github:EmbarkStudios/cargo-deny" = "0.21.0"
+"github:bnjbvr/cargo-machete" = "0.10.1"
 jq = "1.8.2"
 # The C compiler for the musl release build; see CC_x86_64_unknown_linux_musl
 # in [env] below.
@@ -40,9 +40,9 @@ zig = "0.17.1"
 # The shared Rust tasks read their toolchains from here and name none.
 [env]
 # format runs rustfmt on the nightly, for its unstable options.
-RUSTFMT_TOOLCHAIN = "+nightly-2026-11-01"
+RUSTFMT_TOOLCHAIN = "+nightly-2026-11-18"
 # doc builds on the nightly, as docs.rs does.
-RUST_NIGHTLY = "nightly-2026-11-01"
+RUST_NIGHTLY = "nightly-2026-11-18"
 # cc-rs compiles the C of the dependencies for the musl release target with
 # this wrapper around zig, and only for that target.
 CC_x86_64_unknown_linux_musl = "{{ config_root }}/tools/zig-cc-musl"

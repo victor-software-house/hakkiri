@@ -31,9 +31,11 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
     The other 3 guard behaviour that did not change.
     They cover a rule turned on after it was off, `off` on an unlisted rule, and the order of keys.
     All 11 pass in [0b15215][c-code].
+
 - [x] 2.2 Keep the later file's rule when two files of a style use one name, in `read_style` of `src/rule.rs`.
   Verify the clash test of `rule_setting` fails on the old loader and passes on the new one, with one alert from `Terms.yml`.
   - 2026-11-11 (UTC), the clash test failed on the old loader with the message of `Terms.custom.yml`, and passes in [0b15215][c-code].
+
 - [x] 2.3 In the reader and `plan` of `src/config.rs`, read `on` as a rule setting that runs the rule at its rule file's level.
   Keep a set level when a later glob turns the rule off and on.
 

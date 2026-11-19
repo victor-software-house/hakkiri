@@ -1,6 +1,6 @@
 #!/bin/sh
 #MISE description="GitHub Actions workflow lint"
-#MISE tools = { jactionlint = "2.5.0" }
+#MISE tools = { jactionlint = "2.6.0" }
 # GitHub runs only the workflows at the repository root.
 # The task lints those from the root, even in a render below it, such as cli/.
 #
