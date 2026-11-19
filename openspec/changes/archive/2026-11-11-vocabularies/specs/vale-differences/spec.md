@@ -112,3 +112,6 @@ hakkiri SHALL read vocabularies as Vale does, apart from the scenarios below.
 [check-5]: ../../../2026-11-10-check-command/design.md#5-a-language-is-read-by-extension
 [test-2]: ../../../2026-11-10-test-command/design.md#2-a-case-is-a-small-record
 [bootstrap-8]: ../../../2026-11-09-bootstrap-hakkiri/design.md#8-two-regex-engines-with-a-limit
+[engine-14]: ../../../2026-11-10-rule-engine/design.md#14-formulas-run-on-an-own-parser
+[html-7]: ../../../2026-11-10-html-block-text/design.md#not-ported
+[styles-4]: ../../../2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart

@@ -49,19 +49,26 @@ So the tagger gets these corrections, each reading the words and tags of one sen
 
 - The forms of `say`, `tell`, `know`, `think`, `believe`, `understand`, `insist` and `agree` are no nouns, and each is a verb at every use in GUM (the Georgetown University Multilayer corpus).
   A noun, adjective or interjection tag on one is a verb, unless a determiner, a number, a possessive or a preposition comes before it.
+
 - The word before such a verb is its subject.
   A `VBZ` after a noun is a plural noun (`the CI builds agree`), and an adjective after a determiner is a noun (`the report agree`).
+
 - A base form after a possessive is a noun, and `own` is an adjective (`the client's resolver asks`).
+
 - A lowercase first word before `say` or `ask` is a name (`cargo asks again`).
+
 - A plural noun that starts a sentence before a determiner is a verb, except before `that` (`Takes every waiting ask`).
+
 - `ask` and `asks` are a noun before a relative clause, a possessive ending, or `and` and a determiner.
   They are a noun after a preposition, a gerund or an imperative that opens a noun phrase.
 
   They are a verb before a preposition with no object.
   They are also a noun when they follow a noun in a clause of their own.
+
 - `asked` and `told` are a participle in the noun phrase of a preposition (`the hook told of the file`).
   They are also a participle after `one` before a preposition with no object.
   In any other place after a noun they are a past tense (`a batch a request asked for`).
+
 - `pull` before `request` is a noun.
 
 A rule that read any verb in a noun phrase as a noun lost 78 tokens of GUM.

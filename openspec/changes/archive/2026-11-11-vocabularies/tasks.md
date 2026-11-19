@@ -13,6 +13,7 @@ It also follows [`package-fetch`][fetch], which keeps a package's `styles/config
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/vocabularies`.
   It used the five configs in `vale/`, and gave 293 alerts.
   Nothing in them contradicts the plan, and the design lists what they add.
+
 - [x] 1.2 Add `src/vocabulary.rs`.
   It finds `config/vocabularies/<name>/` in a package folder, walks it, and reads each `accept.txt` and `reject.txt` as terms.
   It rejects an unknown name, two packages with one name, and a term that is not a pattern.
@@ -26,6 +27,7 @@ It also follows [`package-fetch`][fetch], which keeps a package's `styles/config
 
   The seventh, a config with no key, did not run before the change in its final form.
   A term `C++` is read as a pattern with a possessive plus, so the test for a term that is not a pattern uses `C(`.
+
 - [x] 1.3 Read `vocab` at the top level and in a glob, and read the packages, then the vocabularies, then the styles.
   Verify the scenarios of the `project-config` delta pass, and a config with no `vocab` key loads as before.
 
@@ -44,11 +46,13 @@ It also follows [`package-fetch`][fetch], which keeps a package's `styles/config
   Evidence, 2026-11-11 (UTC): `every_config_gives_the_alerts_vale_gives` passes for the five configs against `vale.tsv`.
   With the top level's terms taken out of the rules' exceptions, in a copy of the tree, it fails.
   Not verified: each of the five checks alone, since that copy takes them out together.
+
 - [x] 2.2 Add the accepted terms of the top level to `spelling` as whole words matched without regard to case, with a phrase masked.
   Verify the spelling scenarios pass, and the test fails before the change.
 
   Evidence, 2026-11-11 (UTC): the same test covers `Team.Spell` under each config.
   It fails with the accepted words and masks taken out of the `spelling` build.
+
 - [x] 2.3 Keep a file's glob vocabularies in a set built once for each distinct list.
   Check each match of an `existence`, `repetition`, `spelling` and `substitution` rule against it.
 

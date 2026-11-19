@@ -11,6 +11,7 @@ Every compile, lint and test step runs in a box or the pull request's CI, not on
   Evidence, 2026-11-11 (UTC): the alert tests do not compile against the old `Alert`, since they read `last_line`.
   Against the old source in a box, two JSON tests fail at run time, and all pass with the change.
   They are `json_holds_no_escape_byte_under_forced_colour` and `a_match_across_lines_ends_at_its_last_character`.
+
 - [x] 1.2 Make `tests/vocabulary_rules.rs` compare the end of a wrapped match through Vale's count.
   Pin the true end of the two wrapped matches in its fixture.
   Verify the comparison passes for the nine configs, with the wrapped rows included.

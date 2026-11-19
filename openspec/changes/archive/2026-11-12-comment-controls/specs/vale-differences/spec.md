@@ -113,3 +113,4 @@ hakkiri SHALL read the forms of its own as well.
 [styles-4]: ../../../2026-11-11-vale-styles/design.md#4-a-rule-hakkiri-cannot-run-is-reported-apart
 [test-2]: ../../../2026-11-10-test-command/design.md#2-a-case-is-a-small-record
 [tree-1]: ../../../2026-11-10-document-tree/design.md#1-markdown-rs-parses-markdown-and-mdx
+[vocabularies-8]: ../../../2026-11-11-vocabularies/design.md#8-what-stays-different

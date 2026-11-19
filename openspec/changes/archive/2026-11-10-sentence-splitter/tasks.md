@@ -37,25 +37,37 @@ Training and measurement run in an ephemeral build box.
 ### Evidence for 1.3
 
 - 2026-11-10 UTC: [`vale-f1.tsv`][vale-f1] lists Vale's F1 on the four committed sets.
+
 - Vale v3.26.0 [pins][vale-gomod] prose v3.2.2 and sentences.v1 v1.0.7.
   The committed numbers use these.
+
 - Vale at [66bbb85][vale-main], which the designs read, pins prose `b33e60d`.
   The four committed sets and EWT score the same on both pins.
   GUM gives 0.9549 on prose v3.2.2 and 0.9555 on `b33e60d`.
+
 - The measuring program is a small Go program.
   It is not committed, since it would make the repository declare Go for one measurement.
+
 - The program builds the segmenter with `segment.New()`.
   It calls `Segment` on the text of each record, as Vale does.
+
 - A record's text is its sentences joined by one space.
   The gold boundaries are the end offsets of every sentence but the last.
   The predicted ones are the end offsets of every segment but the last.
+
 - Precision is the correct boundaries over the predicted ones, and recall is the correct ones over the gold ones.
   F1 is their harmonic mean, summed over a whole set and not averaged per record.
+
 - A UD record is one `# newdoc` or `# newpar` block, with its `# text` lines joined by one space.
+
 - The program read the test files of [EWT r2.18][ewt] and [GUM r2.18][gum] in an ephemeral 4x8 build box, since removed.
+
 - The EWT file has SHA-256 `fa024f43dc5da3c5ac02563bc9bd0e974f46cbb1560823976a8f342a37dc494a`.
+
 - The GUM file has SHA-256 `cd96a285e7339f401f4803dd0f4f61109c51692e3ef6f9186a1f977544080b69`.
+
 - Neither file nor anything derived from it is committed.
+
 - The scores on prose v3.2.2:
 
   | Set | Boundaries | Precision | Recall | F1 |

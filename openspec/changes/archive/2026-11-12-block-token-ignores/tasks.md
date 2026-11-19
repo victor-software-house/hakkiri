@@ -11,6 +11,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/ignores`, with the Rust grammar built from the same commit.
   It used the ten configs in `vale/`, and gave 709 alerts.
   A second probe called Vale's `applyPatterns` on eighteen texts and printed the rewrite of each.
+
 - [x] 1.2 Add `block_ignores` and `token_ignores` to a glob, and rewrite a Markdown or MDX file under them.
   Give every node of the parsed tree the bytes of the file it came from.
   Verify `tests/ignores.rs` fails before the change and passes after it.
@@ -20,9 +21,11 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   It fails on tree copies with the block patterns left out, or with the places of the nodes left unrestored.
 
   With the token patterns run before the block patterns it passes, so a unit test of the rewrite pins that order.
+
 - [x] 1.3 Check each pattern when the config loads, and add the patterns of every matching glob in the order written.
   Verify the scenarios on a pattern that does not compile, a word for a list, a package and the project, and two globs pass.
   Evidence, 2026-11-11 (UTC): `an_invalid_pattern_is_an_error_on_its_key`, `a_word_where_a_list_of_patterns_belongs_is_an_error`, `a_packages_ignores_and_the_projects_add_up` and the `twoglobs` config pass.
+
 - [x] 1.4 Apply the patterns to the Markdown of each comment of a source file, which Vale does not do.
   Verify the `rust` config of `tests/ignores.rs` gives Vale's alerts less the two the patterns hide.
 

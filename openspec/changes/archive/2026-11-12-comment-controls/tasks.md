@@ -10,6 +10,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
 
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/comment-controls`, nine files and five rules, and gave 304 alerts.
   The probe found that Vale reads a comment at two moments, which the design records, and that a `raw` rule is gated by `off` alone.
+
 - [x] 1.2 Read the comments of a Markdown file, and leave the text between `off` and `on` out of the tree.
   Gate each block and alert as Vale does.
   Verify `tests/comment_controls.rs` fails before the change and passes after it.
@@ -20,15 +21,18 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   It fails on tree copies that leave out any of five parts.
   They are the gate of a block, the hiding of an alert and the cut of the text.
   The others are the end of the element and the end of a tight item.
+
 - [x] 1.3 Read hakkiri's forms, and a level in a comment.
   Verify `hakkiri_comments_reach_as_vale_comments_do` passes, and the two tests of a level pass.
 
   Evidence, 2026-11-11 (UTC): each Vale comment in the fixture files was written in hakkiri's form.
   The files then give the same alerts by line, rule and text.
   A level stays until a comment sets the rule again, and wins over a level of the config.
+
 - [x] 1.4 Read the `{/* … */}` comments of an MDX file as the HTML comments of a Markdown file.
   Verify the parity test passes over the MDX file of the fixture, in Vale's form and in hakkiri's.
   Evidence, 2026-11-11 (UTC): Vale 66bbb85 gave 46 alerts over `c10.mdx`, and the 350 rows of the fixture match.
+
 - [x] 1.5 Probe the cases of the first probe that it left open, and fix each one where hakkiri read less than Vale.
   Verify `every_file_gives_the_alerts_vale_gives` passes over the 23 files and 1,238 rows of the `text` folder.
   Verify also that `vale_places_a_comment_wrongly_where_hakkiri_places_it_right` passes.

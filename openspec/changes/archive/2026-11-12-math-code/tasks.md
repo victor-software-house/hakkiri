@@ -9,6 +9,7 @@ Every compile, lint and test step runs in the pull request's CI, not on the auth
   Verify the file contains the alerts of every scenario of the requirements, and the test gives the Vale commit.
 
   Evidence, 2026-11-11 (UTC): a Vale build of `66bbb85` ran in a box over `tests/fixtures/math`, four files and five rules, and gave 80 alerts.
+
 - [x] 1.2 Find the math in each paragraph, heading and table cell, and write the file again with the same length.
   Parse it, and give a span's code node its delimiters.
   Verify `tests/math.rs` fails before the change and passes after it.

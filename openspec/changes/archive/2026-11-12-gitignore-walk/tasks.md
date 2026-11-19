@@ -11,9 +11,11 @@ None runs on the authoring machine.
 
   Evidence, 2026-11-11 (UTC): the new walk tests failed on the source before the change.
   They pass after it in a box, with the 66 tests of `check`.
+
 - [x] 1.2 Warn about a given file that no glob selects, with `on_unmatched` for `warn`, `error` and `ignore`.
   Verify the unmatched scenarios of `check-command` pass, including the file given twice and the file whose styles contain no rule.
   Evidence, 2026-11-11 (UTC): the five tests of the scenarios failed before the change and pass after it.
+
 - [x] 1.3 Read `fail_level`, `gitignore` and `on_unmatched` from the config, below the flag and the variable, and reject them in a package's settings.
   Verify the scenarios of `project-config` and `package-settings` pass.
 

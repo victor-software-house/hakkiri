@@ -13,6 +13,7 @@ This change follows [`vocabularies`][vocabularies], which reads the lists and ad
   It used the nine configs in `vale/`, and gave 152 alerts.
   Nothing in them contradicts the plan, and the design lists what they add.
   One addition: Vale lowercases a term's escapes, so `data\Wset` flags `dataxset`, where hakkiri flags `DATA SET`.
+
 - [x] 1.2 Build `Vale.Terms` and `Vale.Avoid` in a style `Vale`, with Vale's messages, levels, boundaries and recasing of the shown term.
   Verify `tests/vocabulary_rules.rs` fails before the change and passes after it, against the alerts recorded in task 1.1.
 
@@ -24,6 +25,7 @@ This change follows [`vocabularies`][vocabularies], which reads the lists and ad
 
   The last column of a match that spans lines is left out of the test.
   hakkiri ends such a match on its first line, as it does for every rule.
+
 - [x] 1.3 Run them where the style `Vale` or their name is listed, and run a glob's rules on its files.
   Reject `Vale` as a style when no listed vocabulary contains a term.
   Verify the scenarios of the requirements on where they run and on a glob's rules pass.
