@@ -31,7 +31,7 @@ jobs:
       id-token: write # every job of the reusable workflow requests it
     uses: victor-software-house/verctl/.github/workflows/release.yml@e06503d01ceb0b04ba50e2d234583f002db22951 # v0.8.6-rc.5
     with:
-      mise-version: 2026.11.6
+      mise-version: 2026.11.10
       mise-env: ci
     # The App token opens the Version PR so that its CI starts; a PR opened
     # with GITHUB_TOKEN starts no workflow.
