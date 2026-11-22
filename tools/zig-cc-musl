@@ -15,5 +15,10 @@ while [ "$count" -gt 0 ]; do
     *) set -- "$@" "$arg" ;;
   esac
 done
-: "${triple:?cc-rs passed no --target}"
+# cc-rs runs this script with -E and no --target to detect the compiler
+# family, and it passes none on a later compile if that detection fails.
+# Every asset builds natively, so the host architecture is the target.
+if [ -z "$triple" ]; then
+  triple=$(uname -m)-unknown-linux-musl
+fi
 exec zig cc -target "${triple%%-*}-${triple#*-*-}" "$@"
