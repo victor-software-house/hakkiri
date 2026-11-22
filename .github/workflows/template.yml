@@ -58,6 +58,7 @@ jobs:
       paths: |
         .copier-answers.yml
         .changeset/config.json
+        .editorconfig
         .github/actionlint.yaml
         .github/workflows/ci.yml
         .github/workflows/secrets.yml

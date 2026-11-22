@@ -82,11 +82,17 @@ case $caller in
     exit 2
     ;;
 esac
-scratch=$(mktemp -d) || { echo "✘ mktemp failed; see its error above"; exit 1; }
+scratch=$(mktemp -d) || {
+  echo "✘ mktemp failed; see its error above"
+  exit 1
+}
 trap 'rm -rf "$scratch"; git worktree prune' EXIT
 # sh runs the `EXIT` trap on a signal only when a trap for it exits.
 trap 'exit 130' INT TERM HUP
-mkdir "$scratch/config" "$scratch/seen" || { echo "✘ mkdir failed; see its error above"; exit 1; }
+mkdir "$scratch/config" "$scratch/seen" || {
+  echo "✘ mkdir failed; see its error above"
+  exit 1
+}
 
 # inputs runs git with the given arguments on the files a lock depends on.
 # Those are the mise configs and locks, .miserc.toml, and mise-tasks/, whose
@@ -102,7 +108,10 @@ inputs() {
 # Errors go to stderr.
 check() (
   cd "$1" || exit 1
-  root=$(pwd -P) || { echo "✘ pwd -P failed; see its error above" >&2; exit 1; }
+  root=$(pwd -P) || {
+    echo "✘ pwd -P failed; see its error above" >&2
+    exit 1
+  }
   # MISE_IGNORED_CONFIG_PATHS is a list split on ':'.
   # Each entry is a glob that reads '\' as an escape.
   # A root with either character therefore fails.
@@ -125,7 +134,10 @@ check() (
       MISE_TRUSTED_CONFIG_PATHS="$root" MISE_IGNORED_CONFIG_PATHS="$pattern" "$@"
   }
   configs=$(git ls-files -- 'mise.*.toml') ||
-    { echo "✘ git ls-files failed; see its error above" >&2; exit 1; }
+    {
+      echo "✘ git ls-files failed; see its error above" >&2
+      exit 1
+    }
   # The locks of the profiles locked below; no other lockfile can fail the push.
   locked=mise.lock
   for config in $configs; do
@@ -157,13 +169,19 @@ check() (
   # A profile's first lock shows as untracked.
   # shellcheck disable=SC2086 # one lockfile name per word
   git status --porcelain --untracked-files=all -- $locked ||
-    { echo "✘ git status failed; see its error above" >&2; exit 1; }
+    {
+      echo "✘ git status failed; see its error above" >&2
+      exit 1
+    }
 )
 
 if [ -t 0 ]; then
   lines=""
 else
-  lines=$(cat) || { echo "✘ reading the pre-push lines failed; see its error above"; exit 1; }
+  lines=$(cat) || {
+    echo "✘ reading the pre-push lines failed; see its error above"
+    exit 1
+  }
 fi
 if [ -z "$lines" ]; then
   [ "$caller" = pre-push ] && exit 0
@@ -177,7 +195,10 @@ if [ -z "$lines" ]; then
 fi
 # The empty tree in this repository's object format, the base of each key.
 empty=$(git hash-object -t tree /dev/null) ||
-  { echo "✘ git hash-object failed; see its error above"; exit 1; }
+  {
+    echo "✘ git hash-object failed; see its error above"
+    exit 1
+  }
 status=0
 printf '%s\n' "$lines" | {
   while read -r ref sha _ rsha; do
@@ -186,7 +207,10 @@ printf '%s\n' "$lines" | {
     case $rsha in *[!0]*) git cat-file -e "$rsha^{commit}" 2>/dev/null && known=$rsha ;; esac
     # shellcheck disable=SC2086 # an empty $known adds no revision
     commits=$(git rev-list --reverse --parents "$sha" --not --remotes $known) ||
-      { echo "✘ git rev-list failed for $ref; see its error above"; exit 1; }
+      {
+        echo "✘ git rev-list failed for $ref; see its error above"
+        exit 1
+      }
     # An annotated tag's local sha points to the tag object.
     # rev-list lists its commit, so the tip is compared as a commit.
     tip=$(git rev-parse --verify --quiet "$sha^{commit}") || continue
@@ -196,21 +220,36 @@ printf '%s\n' "$lines" | {
       # this hook never saw, pushed before the check or past it.
       if [ -z "${second:-}" ] && [ -n "${parent:-}" ] && [ "$commit" != "$tip" ]; then
         touched=$(inputs diff-tree --no-commit-id --name-only -r "$parent" "$commit") ||
-          { echo "✘ git diff-tree failed for $commit; see its error above"; exit 1; }
+          {
+            echo "✘ git diff-tree failed for $commit; see its error above"
+            exit 1
+          }
         [ -n "$touched" ] || continue
       fi
       # ls-tree reads a pathspec literally, so mise.*.toml would match nothing;
       # a diff against the empty tree expands it as diff-tree does above.
       listing=$(inputs diff-tree -r --no-commit-id "$empty" "$commit") ||
-        { echo "✘ git diff-tree failed for $commit; see its error above"; exit 1; }
+        {
+          echo "✘ git diff-tree failed for $commit; see its error above"
+          exit 1
+        }
       key=$(printf '%s\n' "$listing" | git hash-object --stdin) ||
-        { echo "✘ git hash-object failed for $commit; see its error above"; exit 1; }
+        {
+          echo "✘ git hash-object failed for $commit; see its error above"
+          exit 1
+        }
       # Commits whose mise inputs match one this push checked lock the same.
       [ -e "$scratch/seen/$key" ] && continue
-      : >"$scratch/seen/$key" || { echo "✘ marking $commit checked failed"; exit 1; }
+      : >"$scratch/seen/$key" || {
+        echo "✘ marking $commit checked failed"
+        exit 1
+      }
       tree="$scratch/$commit"
       git -c core.hooksPath=/dev/null worktree add --quiet --detach "$tree" "$commit" </dev/null ||
-        { echo "✘ git worktree add failed for $ref; see its error above"; exit 1; }
+        {
+          echo "✘ git worktree add failed for $ref; see its error above"
+          exit 1
+        }
       # git runs pre-push with GIT_DIR set in a linked worktree, and a caller
       # can also export GIT_WORK_TREE or GIT_INDEX_FILE.
       # Each points to the checkout of the pusher.
@@ -227,7 +266,10 @@ printf '%s\n' "$lines" | {
       # One checkout at a time: a long push would otherwise keep one per
       # checked commit on disk until the `EXIT` trap.
       git worktree remove --force "$tree" </dev/null ||
-        { echo "✘ git worktree remove failed for $ref; see its error above"; exit 1; }
+        {
+          echo "✘ git worktree remove failed for $ref; see its error above"
+          exit 1
+        }
       if [ -n "$changed" ]; then
         printf '%s\n' "$changed"
         short=$(git rev-parse --short "$commit")

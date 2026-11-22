@@ -1,17 +1,24 @@
 #!/bin/sh
-# The C compiler cc-rs uses for the x86_64-unknown-linux-musl release build.
-# zig names the target x86_64-linux-musl, and cc-rs adds the Rust triple
-# --target=x86_64-unknown-linux-musl, which zig cannot parse, so that one
-# argument is dropped.
+# The C compiler cc-rs uses for the musl release builds, x86_64 and aarch64.
+# cc-rs adds the Rust triple as --target=<arch>-unknown-linux-musl, which zig
+# cannot parse. This script drops that argument and gives zig the same target
+# in its own spelling, <arch>-linux-musl.
 set -eu
+triple=
 count=$#
 while [ "$count" -gt 0 ]; do
   arg=$1
   shift
   count=$((count - 1))
   case "$arg" in
-    --target=*) ;;
+    --target=*) triple=${arg#--target=} ;;
     *) set -- "$@" "$arg" ;;
   esac
 done
-exec zig cc -target x86_64-linux-musl "$@"
+# cc-rs runs this script with -E and no --target to detect the compiler
+# family, and it passes none on a later compile if that detection fails.
+# Every asset builds natively, so the host architecture is the target.
+if [ -z "$triple" ]; then
+  triple=$(uname -m)-unknown-linux-musl
+fi
+exec zig cc -target "${triple%%-*}-${triple#*-*-}" "$@"

@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; edit with `copier update --data`.
-_commit: v0.0.127
+_commit: v0.0.131
 _src_path: https://github.com/victor-software-house/templates.git
 build_os: linux
 cargo_min_publish_age: 3 days
@@ -26,6 +26,7 @@ feature_sets: []
 generated_paths:
 - data/splitter/SOURCES.md
 github_owner: victor-software-house
+layer: whole
 layout: crate
 library: false
 linux_image: ubuntu-26.04
@@ -54,6 +55,7 @@ pieces_extra:
 - rustdoc
 platforms:
 - linux-x64
+- linux-arm64
 - macos-arm64
 project: rust-crate
 prose_fail_level: suggestion

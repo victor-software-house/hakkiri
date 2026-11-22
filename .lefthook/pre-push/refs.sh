@@ -1,3 +1,4 @@
+#!/bin/sh
 # lefthook runs this script with git's pre-push lines on stdin.
 # lefthook 2.2.2 gives every use_stdin job of a parallel hook one shared
 # reader. Two such jobs then race, and one of them can read no lines and pass.

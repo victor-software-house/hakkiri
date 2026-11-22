@@ -12,7 +12,7 @@ lockfile = true
 # The platforms CI and contributors use, from the platforms answer. Without
 # it, mise install fills every tool up to the platforms any tool already
 # records, and rewrites the locks.
-lockfile_platforms = ["linux-x64", "macos-arm64"]
+lockfile_platforms = ["linux-x64", "linux-arm64", "macos-arm64"]
 
 # Every tool this root declares must match mise.lock or mise.<env>.lock.
 [tool_config]
@@ -31,8 +31,8 @@ mr-boxington = "1.30.0"
 "github:EmbarkStudios/cargo-deny" = "0.21.0"
 "github:bnjbvr/cargo-machete" = "0.10.1"
 jq = "1.8.2"
-# The C compiler for the musl release build; see CC_x86_64_unknown_linux_musl
-# in [env] below.
+# The C compiler for the musl release builds; see CC_x86_64_unknown_linux_musl
+# and CC_aarch64_unknown_linux_musl in [env] below.
 zig = "0.17.1"
 # The ver task (release workflow, check:versions) runs this verctl.
 "github:victor-software-house/verctl" = "0.8.6-rc.5"
@@ -43,9 +43,10 @@ zig = "0.17.1"
 RUSTFMT_TOOLCHAIN = "+nightly-2026-11-18"
 # doc builds on the nightly, as docs.rs does.
 RUST_NIGHTLY = "nightly-2026-11-18"
-# cc-rs compiles the C of the dependencies for the musl release target with
+# cc-rs compiles the C of the dependencies for each musl release target with
 # this wrapper around zig, and only for that target.
 CC_x86_64_unknown_linux_musl = "{{ config_root }}/tools/zig-cc-musl"
+CC_aarch64_unknown_linux_musl = "{{ config_root }}/tools/zig-cc-musl"
 # cargo skips a crates.io release younger than this, unless Cargo.lock contains it.
 CARGO_REGISTRY_GLOBAL_MIN_PUBLISH_AGE = "3 days"
 # The crates.io logins whose crates `mise run update:own` takes past the cooldown.
@@ -76,7 +77,7 @@ includes = [
   # Pinned git:: catalogs follow mise-tasks.
   "mise-tasks",
   # The q task for the tasks.yaml work queue; it pins its own qctl.
-  "git::https://github.com/victor-software-house/qctl.git//tasks/q?ref=v0.6.0",
+  "git::https://github.com/victor-software-house/qctl.git//tasks/q?ref=v0.7.0",
   # The ver task the release workflow and check:versions run; it pins the verctl above.
   "git::https://github.com/victor-software-house/verctl.git//tasks/ver?ref=v0.8.6-rc.5",
   # The shared Rust tasks, at actions main, 2026-11-18.
