@@ -7,17 +7,19 @@ The release workflow of verctl builds it, and mise installs it from a pinned ver
 
 ## Requirements
 
-### Requirement: A release is a tag, a Release and two tarballs
+### Requirement: A release is a tag, a Release and three tarballs
 
-A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64` and `darwin-arm64`.
+A merged Version PR SHALL publish a tag and a GitHub Release for the new version, and attach one tarball for each of `linux-x64`, `linux-arm64` and `darwin-arm64`.
 The `linux-x64` tarball SHALL contain a statically linked `x86_64-unknown-linux-musl` binary.
+The `linux-arm64` tarball SHALL contain a statically linked `aarch64-unknown-linux-musl` binary.
+
 GitHub records each tarball's SHA-256 digest, which a lock reads.
 It SHALL publish nothing to crates.io.
 
 #### Scenario: The first release
 
 - **WHEN** the Version PR that moves `Cargo.toml` from `0.0.0` to `0.0.1` merges
-- **THEN** the repository has the tag `v0.0.1` and a Release that contains the two tarballs, and crates.io has no `hakkiri` crate
+- **THEN** the repository has the tag `v0.0.1` and a Release that contains the three tarballs, and crates.io has no `hakkiri` crate
 
 #### Scenario: A platform missing
 
@@ -26,17 +28,17 @@ It SHALL publish nothing to crates.io.
 
 #### Scenario: A static binary
 
-- **WHEN** `file` reads the `hakkiri` binary of the `linux-x64` tarball
+- **WHEN** `file` reads the `hakkiri` binary of a Linux tarball
 - **THEN** it reports a static or static-pie linked executable, and `readelf -l` lists no interpreter
 
 ### Requirement: mise installs the release
 
-`mise` SHALL install the released binary from `github:victor-software-house/hakkiri` pinned to the version, on `linux-x64` and `macos-arm64`, with the checksum its lock records.
+`mise` SHALL install the released binary from `github:victor-software-house/hakkiri` pinned to the version, on `linux-x64`, `linux-arm64` and `macos-arm64`, with the checksum its lock records.
 
 #### Scenario: A pinned install
 
 - **WHEN** an empty project pins `"github:victor-software-house/hakkiri" = "0.0.1"` and runs `mise lock` and `mise install`
-- **THEN** `hakkiri --version` prints `0.0.1` on a Mac and on Linux x86-64, and `hakkiri check` lints a Markdown file
+- **THEN** `hakkiri --version` prints `0.0.1` on a Mac, on Linux x86-64 and on Linux arm64, and `hakkiri check` lints a Markdown file
 
 ### Requirement: Two texts carry the version
 
@@ -48,9 +50,9 @@ A pattern that matches nowhere or more than once SHALL stop the release.
 - **WHEN** the Version PR bumps the crate to `0.0.1`
 - **THEN** `skills/hakkiri/SKILL.md` contains `version: 0.0.1` and the README installs `hakkiri@0.0.1`
 
-### Requirement: The linux-x64 binary needs no loader
+### Requirement: The Linux binaries need no loader
 
-The `linux-x64` binary SHALL start on a Linux machine that has no glibc loader, such as NixOS with nix-ld off.
+Each Linux binary SHALL start on a Linux machine that has no glibc loader, such as NixOS with nix-ld off.
 
 #### Scenario: A root with no files
 
@@ -58,9 +60,9 @@ The `linux-x64` binary SHALL start on a Linux machine that has no glibc loader, 
 - **AND** it runs `check` on a Markdown file that has the word `very`, with a rule that flags it
 - **THEN** it prints `1 alert in 1 file` and exits 0, and `--version` prints the released version
 
-### Requirement: The linux-x64 binary keeps its speed
+### Requirement: The musl binaries keep their speed
 
-The `linux-x64` binary SHALL use mimalloc as its global allocator, and no other build SHALL link it.
+The `linux-x64` and `linux-arm64` binaries SHALL use mimalloc as their global allocator, and no other build SHALL link it.
 A `check` over many files on four CPUs SHALL take at most twice as long as the same release built for glibc.
 
 #### Scenario: Many files

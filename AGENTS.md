@@ -264,16 +264,24 @@ Release 2 is the language server, on the same per-file engine.
 
 `.github/workflows/release.yml` calls verctl's reusable release workflow.
 `.ctl/ver.yaml` declares the package with `publisher: none`.
-So a release is a tag, a GitHub Release and two tarballs with their checksums.
+So a release is a tag, a GitHub Release and three tarballs with their checksums.
 
 Each tarball builds natively on a free GitHub-hosted runner.
 `linux-x64` builds on `ubuntu-26.04`, and `darwin-arm64` on `xcode-27`, the labels of verctl's built-in targets.
-The `linux-x64` binary is a static musl build (operator, 2026-11-11).
-So it starts on a machine with no glibc loader, NixOS without nix-ld included.
+`linux-arm64` is no built-in target, so `.ctl/ver.yaml` declares it with the `arm64` runner, GitHub's free `ubuntu-26.04-arm`.
+
+The `linux-x64` binary is a static musl build (operator, 2026-11-11), and `linux-arm64` is one too.
+So each starts on a machine with no glibc loader, NixOS without nix-ld included.
+The arm64 build serves repositories whose CI runs on Blacksmith arm64 runners.
 
 `mise run release:prepare` installs the Rust target before that build.
-The C compiler for it is the `zig` that `mise.toml` pins, set as `CC_x86_64_unknown_linux_musl` in `mise.toml`.
+The C compiler for it is the `zig` that `mise.toml` pins, set as `CC_x86_64_unknown_linux_musl` and `CC_aarch64_unknown_linux_musl` in `mise.toml`.
+`tools/zig-cc-musl` takes the zig target from the `--target` argument that cc-rs passes.
 So no apt package is installed.
+
+Each asset job runs `mise install --locked`, so the locks record `linux-arm64`: `platforms` in `.copier-answers.yml` lists it.
+A tool that only a task header pins is not part of that install.
+The `lint:prose` pin of hakkiri has no `linux-arm64` entry until a release ships that tarball, and `mise lock` warns about it.
 
 The musl build links mimalloc as its global allocator (operator, 2026-11-11).
 With musl's own allocator, a parallel `check` is about eight times slower.

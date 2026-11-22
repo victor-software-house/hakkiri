@@ -11,15 +11,22 @@ packages:
     path: Cargo.toml
     publisher: none
 
-# One key per host binary. The key is the name of the job, the tarball and
-# the platform. darwin-arm64 and linux-x64 are built-in records in verctl.
-# verctl supplies their runner labels (the free xcode-27 and ubuntu-26.04),
-# os, arch and triple.
+# The machine of an asset that verctl has no built-in record for. This
+# repository is public, so GitHub's free arm64 Ubuntu runner builds
+# linux-arm64.
+runners:
+  arm64:
+    labels: [ubuntu-26.04-arm]
+
+# One key per host binary, named for the job, the tarball and the platform.
+# darwin-arm64 and linux-x64 are built-in records in verctl.
+# Their runner labels (the free xcode-27 and ubuntu-26.04), os, arch and
+# triple come from it. linux-arm64 has none, so it states all four.
 #
 # Each binary builds natively with the runner's own C compiler, since the
 # tree-sitter grammars need one. Nothing is cross-compiled.
 #
-# linux-x64 overrides only the triple: a static musl binary starts on a
+# The Linux binaries are static musl builds: a static binary starts on a
 # machine with no glibc loader, such as NixOS without nix-ld. The musl C
 # compiler is the zig that mise installs, and mise.toml passes it to cc-rs.
 #
@@ -30,6 +37,11 @@ assets:
   darwin-arm64: {}
   linux-x64:
     triple: x86_64-unknown-linux-musl
+  linux-arm64:
+    runner: arm64
+    os: linux
+    arch: arm64
+    triple: aarch64-unknown-linux-musl
 
 # Hand-written version spellings outside Cargo.toml. Each is named once and
 # listed by the file that carries it; too few or too many stop the release.
