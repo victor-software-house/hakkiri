@@ -1,5 +1,10 @@
 # Changelog
 
+## hakkiri 0.1.3
+
+- A release now ships a `linux-arm64` tarball with a static binary.
+  So mise installs hakkiri on arm64 Linux ([`3350c59`](https://github.com/victor-software-house/hakkiri/commit/3350c5913bf84d4f0fab0574a1723355a35b1adf)).
+
 ## hakkiri 0.1.2
 
 - A Swift `// MARK:` comment, which Xcode shows as a section, is a tool directive and draws no alert ([`e21b2cd`](https://github.com/victor-software-house/hakkiri/commit/e21b2cddfe2b3b6eee92d3736ef23096be58558c)).
