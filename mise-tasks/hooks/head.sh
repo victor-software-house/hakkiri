@@ -26,7 +26,7 @@ while read -r lref lsha _ rsha || [ -n "${lref:-}" ]; do
     known=$rsha
   fi
   # An assignment, so set -e stops the push when git rev-list fails.
-  new=$(git rev-list -n 1 "$lsha" --not --remotes $known)
+  new=$(git rev-list -n 1 "$lsha" --not --remotes ${known:+"$known"})
   [ -n "$new" ] || continue
   if [ "$(git rev-parse "$lsha^{commit}")" != "$head" ]; then
     echo "$lref is not the checked-out commit, and the pre-push file checks read the checkout." >&2
