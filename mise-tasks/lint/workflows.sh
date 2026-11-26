@@ -1,6 +1,8 @@
 #!/bin/sh
 #MISE description="GitHub Actions workflow lint"
-#MISE tools = { jactionlint = "2.6.0" }
+#MISE tools = { jactionlint = "2.6.0", "aqua:koalaman/shellcheck" = "0.11.0" }
+# jactionlint runs shellcheck on every run: script, from the search path. The
+# task pins it, so each machine and CI check the scripts with the same version.
 # GitHub runs only the workflows at the repository root.
 # The task lints those from the root, even in a render below it, such as cli/.
 #

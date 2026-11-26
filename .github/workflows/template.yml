@@ -42,14 +42,14 @@ jobs:
   # It installs its tools through the release mirror with a session token.
   template:
     if: ${{ !github.event.pull_request.draft }}
-    uses: victor-software-house/actions/.github/workflows/template-check.yml@6243d0aec17b8d3eb664b6cf5162bfb5ef7990c3 # main, 2026-11-18
+    uses: victor-software-house/actions/.github/workflows/template-check.yml@e9cf7ef0da4f4a9a7a6f978f5dd54be0d0d539bc # main, 2026-11-26
     permissions:
       contents: read
       # The mise action exchanges it for the mirror's session token.
       id-token: write
       issues: write
     with:
-      mise-version: 2026.11.10
+      mise-version: 2026.11.12
       runner: ubuntu-26.04
       # A pull request that changes none of these files skips the check, which
       # still reports. The list has every file the template renders, whole
